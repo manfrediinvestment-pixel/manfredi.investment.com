@@ -17,10 +17,11 @@ exports.handler = async function(event, context) {
 
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   if (!GEMINI_API_KEY) {
+    console.error('ERROR: GEMINI_API_KEY no encontrada');
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ response: 'Error de configuración: API key no encontrada.' })
+      body: JSON.stringify({ response: 'Error de configuración.' })
     };
   }
 
@@ -40,45 +41,61 @@ exports.handler = async function(event, context) {
       contents: geminiMessages,
       generationConfig: {
         temperature: 0.7,
-        maxOutputTokens: 2048,
-        topP: 0.95
+        maxOutputTokens: 2048
       }
     };
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    // Lista de modelos a probar en orden
+    const models = [
+      'gemini-2.0-flash-lite',
+      'gemini-2.0-flash',
+      'gemini-1.5-flash',
+      'gemini-1.5-flash-8b'
+    ];
 
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody)
-    });
+    let lastError = '';
+    for (const model of models) {
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+      console.log(`Intentando modelo: ${model}`);
 
-    const responseText = await response.text();
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
 
-    if (!response.ok) {
-      console.error('Gemini error:', responseText);
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({ response: 'El servicio no está disponible en este momento. Intentá nuevamente.' })
-      };
+      const responseText = await response.text();
+      console.log(`${model} status: ${response.status}`);
+
+      if (response.ok) {
+        const data = JSON.parse(responseText);
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sin respuesta.';
+        console.log(`Éxito con modelo: ${model}`);
+        return {
+          statusCode: 200,
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+          body: JSON.stringify({ response: text })
+        };
+      } else {
+        lastError = responseText.substring(0, 200);
+        console.error(`${model} falló:`, lastError);
+      }
     }
 
-    const data = JSON.parse(responseText);
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No pude generar una respuesta. Intentá de nuevo.';
-
+    // Si todos fallaron
+    console.error('Todos los modelos fallaron. Último error:', lastError);
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ response: text })
+      body: JSON.stringify({ response: 'El servicio no está disponible en este momento. Por favor intentá más tarde.' })
     };
 
   } catch (error) {
-    console.error('Error:', error.message);
+    console.error('Error en la función:', error.message);
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ response: 'Ocurrió un error. Por favor intentá nuevamente.' })
+      body: JSON.stringify({ response: 'Ocurrió un error inesperado. Intentá nuevamente.' })
     };
   }
 };
