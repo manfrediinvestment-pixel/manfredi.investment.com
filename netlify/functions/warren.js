@@ -1,17 +1,33 @@
 exports.handler = async function(event, context) {
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      },
+      body: ''
+    };
+  }
+
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   if (!GEMINI_API_KEY) {
-    return { statusCode: 500, body: JSON.stringify({ error: 'API key not configured' }) };
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ response: 'Error de configuración: API key no encontrada.' })
+    };
   }
 
   try {
-    const { messages, systemPrompt } = JSON.parse(event.body);
+    const body = JSON.parse(event.body);
+    const { messages, systemPrompt } = body;
 
-    // Build Gemini request
     const geminiMessages = messages.map(m => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: m.content }]
@@ -19,7 +35,7 @@ exports.handler = async function(event, context) {
 
     const requestBody = {
       system_instruction: {
-        parts: [{ text: systemPrompt }]
+        parts: [{ text: systemPrompt || 'Sos Warren, asesor financiero de Manfredi Investment.' }]
       },
       contents: geminiMessages,
       generationConfig: {
@@ -29,41 +45,40 @@ exports.handler = async function(event, context) {
       }
     };
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      }
-    );
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody)
+    });
+
+    const responseText = await response.text();
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('Gemini API error:', error);
+      console.error('Gemini error:', responseText);
       return {
-        statusCode: response.status,
-        body: JSON.stringify({ error: 'Error communicating with AI' })
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({ response: 'El servicio no está disponible en este momento. Intentá nuevamente.' })
       };
     }
 
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const data = JSON.parse(responseText);
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No pude generar una respuesta. Intentá de nuevo.';
 
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       body: JSON.stringify({ response: text })
     };
 
   } catch (error) {
-    console.error('Function error:', error);
+    console.error('Error:', error.message);
     return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' })
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ response: 'Ocurrió un error. Por favor intentá nuevamente.' })
     };
   }
 };
