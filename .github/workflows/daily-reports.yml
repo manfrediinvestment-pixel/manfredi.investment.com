@@ -2,9 +2,8 @@ name: Reportes Diarios
 
 on:
   schedule:
-    # Corre todos los días a las 13:00 UTC = 10:00 AM Argentina
     - cron: '0 13 * * 1-5'
-  workflow_dispatch: # Permite correrlo manualmente desde GitHub
+  workflow_dispatch:
 
 jobs:
   update-reports:
@@ -13,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repositorio
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -26,6 +27,7 @@ jobs:
         run: |
           git config --global user.name "Manfredi Investment Bot"
           git config --global user.email "bot@manfredinvestment.com"
+          git pull --rebase origin main
           git add argentina.json wallstreet.json
           git diff --staged --quiet || git commit -m "Reportes diarios $(date +'%d/%m/%Y %H:%M')"
-          git push
+          git push origin main
