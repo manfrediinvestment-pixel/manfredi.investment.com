@@ -25,10 +25,10 @@ jobs:
           python-version: '3.11'
 
       - name: Generar reportes
-        run: python update_reports.py
+        run: python update_reports_final.py
 
       - name: Push reportes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Reportes diarios $(date +'%d/%m/%Y')"
-          file_pattern: "argentina.json wallstreet.json"
+          file_pattern: "reports/argentina.json reports/wallstreet.json"
