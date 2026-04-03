@@ -16,7 +16,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          ref: main
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Python
@@ -28,7 +29,13 @@ jobs:
         run: python update_reports_final.py
 
       - name: Push reportes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Reportes diarios $(date +'%d/%m/%Y')"
-          file_pattern: "reports/argentina.json reports/wallstreet.json"
+        run: |
+          git config user.name "Manfredi Investment Bot"
+          git config user.email "bot@manfrediinvestment.com"
+          git fetch origin main
+          git checkout origin/main -- .
+          python update_reports_final.py
+          git add reports/argentina.json reports/wallstreet.json
+          git diff --staged --quiet && echo "Sin cambios" && exit 0
+          git commit -m "Reportes diarios $(date +'%d/%m/%Y %H:%M')"
+          git push origin HEAD:main
