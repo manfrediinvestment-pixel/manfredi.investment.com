@@ -33,7 +33,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git pull origin main --rebase --autostash
-          git add argentina.json wallstreet.json
+          git add reports/argentina.json reports/wallstreet.json
           git diff --staged --quiet && echo "Sin cambios" && exit 0
           git commit -m "Reportes diarios $(date +'%d/%m/%Y %H:%M' -u)"
           git push origin main
