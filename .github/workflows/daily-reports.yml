@@ -1,41 +1,39 @@
 name: Reportes Diarios
-
+ 
 on:
   schedule:
     - cron: '0 13 * * 1-5'
   workflow_dispatch:
-
+ 
 permissions:
   contents: write
-
+ 
 jobs:
   update-reports:
     runs-on: ubuntu-latest
-
+ 
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-
+ 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
+ 
       - name: Generar reportes
         run: python update_reports_final.py
-
-      - name: Push reportes
+ 
+      - name: Commit y push
         run: |
-          git config user.name "Manfredi Investment Bot"
-          git config user.email "bot@manfrediinvestment.com"
-          git fetch origin main
-          git checkout origin/main -- .
-          python update_reports_final.py
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull origin main --rebase --autostash
           git add reports/argentina.json reports/wallstreet.json
           git diff --staged --quiet && echo "Sin cambios" && exit 0
-          git commit -m "Reportes diarios $(date +'%d/%m/%Y %H:%M')"
-          git push origin HEAD:main
+          git commit -m "Reportes diarios $(date +'%d/%m/%Y %H:%M' -u)"
+          git push origin main
