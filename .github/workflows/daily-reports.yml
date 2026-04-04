@@ -2,8 +2,8 @@ name: Reportes Diarios
 
 on:
   schedule:
-    - cron: '0 13 * * 1-5' # 10:00 AM Argentina
-  workflow_dispatch: # Permite correrlo a mano para probar
+    - cron: '0 13 * * 1-5'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -40,4 +40,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-         command: pages deploy . --project-name=manfredi-investment-com
+          command: pages deploy . --project-name=manfredi-investment-com
