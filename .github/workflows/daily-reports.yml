@@ -2,59 +2,36 @@ name: Reportes Diarios
 
 on:
   schedule:
-    - cron: '0 13 * * 1-5'
+    - cron: '0 13 * * 1-5' # Corre a las 10:00 AM hora Argentina
   workflow_dispatch:
 
-permissions:       # ← debe estar al nivel raíz, sin sangría
+permissions:
   contents: write
-          jobs:
-            update-reports:
-                runs-on: ubuntu-latest
 
-                    steps:
-                          - name: Checkout main
-                                  uses: actions/checkout@v4
-                                          with:
-                                                    ref: main
-                                                              fetch-depth: 0
-                                                                        token: ${{ secrets.GITHUB_TOKEN }}
+jobs:
+  run-reports:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-                                                                              - name: Setup Python
-                                                                                      uses: actions/setup-python@v5
-                                                                                              with:
-                                                                                                        python-version: '3.11'
-                                                                                                        
-                                                                                                              - name: Generar reportes
-                                                                                                                      run: python update_reports.py
-                                                                                                                      
-                                                                                                                            - name: Commit y push
-                                                                                                                                    run: |
-                                                                                                                                              git config user.name "github-actions[bot]"
-                                                                                                                                                        git config user.email "github-actions[bot]@users.noreply.github.com"
-                                                                                                                                                                  git pull origin main --rebase --autostash
-                                                                                                                                                                            git add reports/argentina.json reports/wallstreet.json
-                                                                                                                                                                                      git diff --staged --quiet && echo "Sin cambios" && exit 0
-                                                                                                                                                                                                git commit -m "Reportes diarios $(date +'%d/%m/%Y %H:%M' -u)"
-                                                                                                                                                                                                          git push origin main
-                                                                                                                                                                                                          
-                                                                                                                                                                                                                - name: Deploy a Cloudflare Pages
-                                                                                                                                                                                                                        env:
-                                                                                                                                                                                                                                  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-                                                                                                                                                                                                                                            CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                                                                                                                                                                                                                                                    run: |
-                                                                                                                                                                                                                                                              curl -s -X POST \
-                                                                                                                                                                                                                                                                          "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/manfredinvestment/deployments" \
-                                                                                                                                                                                                                                                                                      -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-                                                                                                                                                                                                                                                                                                  -H "Content-Type: application/json" \
-                                                                                                                                                                                                                                                                                                              | python3 -c "
-                                                                                                                                                                                                                                                                                                                        import sys, json
-                                                                                                                                                                                                                                                                                                                                  data = json.load(sys.stdin)
-                                                                                                                                                                                                                                                                                                                                            if data.get('success'):
-                                                                                                                                                                                                                                                                                                                                                          print('Deploy iniciado correctamente')
-                                                                                                                                                                                                                                                                                                                                                                        print('ID:', data['result'].get('id',''))
-                                                                                                                                                                                                                                                                                                                                                                                      print('URL:', data['result'].get('url',''))
-                                                                                                                                                                                                                                                                                                                                                                                                else:
-                                                                                                                                                                                                                                                                                                                                                                                                              print('Error en deploy:', json.dumps(data.get('errors', []), indent=2))
-                                                                                                                                                                                                                                                                                                                                                                                                                            sys.exit(1)
-                                                                                                                                                                                                                                                                                                                                                                                                                                      "
-                                                                                                                                                                                                                                                                                                                                                                                                                                      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate Reports
+        run: npm run generate-reports # Asegurate que este script exista en tu package.json
+        env:
+          # Si usas alguna API de mercados, agregá la key acá como secret
+          MARKET_API_KEY: ${{ secrets.MARKET_API_KEY }}
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
