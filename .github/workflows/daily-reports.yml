@@ -2,12 +2,11 @@ name: Reportes Diarios
 
 on:
   schedule:
-      - cron: '0 13 * * 1-5'
-        workflow_dispatch:
+    - cron: '0 13 * * 1-5'
+  workflow_dispatch:
 
-        permissions:
-          contents: write
-
+permissions:       # ← debe estar al nivel raíz, sin sangría
+  contents: write
           jobs:
             update-reports:
                 runs-on: ubuntu-latest
