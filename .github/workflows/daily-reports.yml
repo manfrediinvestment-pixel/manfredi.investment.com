@@ -2,8 +2,8 @@ name: Reportes Diarios
 
 on:
   schedule:
-    - cron: '0 13 * * 1-5' # Corre a las 10:00 AM hora Argentina
-  workflow_dispatch:
+    - cron: '0 13 * * 1-5' # 10:00 AM Argentina
+  workflow_dispatch: # Permite correrlo a mano para probar
 
 permissions:
   contents: write
@@ -15,23 +15,29 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          node-version: '20'
+          python-version: '3.9'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          pip install requests
 
       - name: Generate Reports
-        run: npm run generate-reports # Asegurate que este script exista en tu package.json
-        env:
-          # Si usas alguna API de mercados, agregá la key acá como secret
-          MARKET_API_KEY: ${{ secrets.MARKET_API_KEY }}
+        run: python update_reports.py
 
-      - name: Deploy to Cloudflare Workers
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add reports/*.json
+          git commit -m "Update daily reports [skip ci]" || echo "No changes to commit"
+          git push
+
+      - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy
+          command: pages deploy . --project-name=manfrediinvestment # Reemplaza con el nombre de tu proyecto en Cloudflare
