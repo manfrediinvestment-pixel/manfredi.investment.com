@@ -1593,7 +1593,6 @@
       const main    = document.getElementById('mainContent');
       if (user) {
         if (overlay) overlay.style.display = 'none';
-        if (main)    main.style.display    = '';
         updateNavUser(user);
         // Upsert user in Firestore
         const ref  = doc(db, 'users', user.uid);
@@ -1614,10 +1613,9 @@
         applyMemberLock(!window._isMiembro);
         window._currentUser = user;
       } else {
-        if (overlay) overlay.style.display = '';
-        if (main)    main.style.display    = 'none';
         window._isMiembro = false;
         window._currentUser = null;
+        setupGuestMode();
       }
     });
 
@@ -1654,11 +1652,41 @@
       });
     }
     window._applyMemberLock = applyMemberLock;
+
+    // ── Guest Mode: show login overlay on scroll or protected nav click ─────────
+    function setupGuestMode() {
+      let scrollTriggered = false;
+      function onScrollAttempt() {
+        if (scrollTriggered) return;
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        if (scrollY > 80) {
+          scrollTriggered = true;
+          showLoginOverlay();
+          window.scrollTo({top: 0, behavior: 'smooth'});
+          window.removeEventListener('scroll', onScrollAttempt);
+        }
+      }
+      window.addEventListener('scroll', onScrollAttempt, {passive: true});
+      document.querySelectorAll('[data-member-required], a[href="#informes"], a[href="#reportes"], a[href="#inversiones"]').forEach(function(el) {
+        el.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          showLoginOverlay();
+        }, {capture: true});
+      });
+    }
+
+    function showLoginOverlay() {
+      const overlay = document.getElementById('loginOverlay');
+      if (overlay) overlay.style.display = 'flex';
+    }
+
+    window.showLoginOverlay = showLoginOverlay;
   </script>
 </head>
 <body>
   <!-- ── Login Overlay ──────────────────────────────────────────────────────── -->
-  <div id="loginOverlay" style="display:flex">
+  <div id="loginOverlay" style="display:none">
     <div class="login-card">
       <div class="login-logo-mark">MI</div>
       <h1 class="login-title">Manfredi Investment</h1>
@@ -1672,7 +1700,7 @@
   </div>
 
   <!-- ── Main Content (hidden until auth) ────────────────────────────────────── -->
-  <div id="mainContent" style="display:none">
+  <div id="mainContent" style="">
 
 
   <!-- ââ TICKER BAR âââââââââââââââââââââââââââââââââââââââââââââââ -->
@@ -3116,7 +3144,7 @@
     .pct-pos{color:var(--green);font-weight:600}
     .pct-neg{color:var(--red);font-weight:600}
     .pct-neu{color:var(--text-sec)}
-    #loginOverlay{position:fixed;inset:0;background:var(--primary);display:flex;align-items:center;justify-content:center;z-index:9999}
+    #loginOverlay{position:fixed;inset:0;background:rgba(10,15,30,0.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .3s}
     .login-card{background:var(--white);border-radius:12px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
     .login-logo-mark{width:52px;height:52px;background:var(--primary);border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px;letter-spacing:.02em;margin-bottom:20px}
     .login-title{font-family:'DM Serif Display',Georgia,serif;font-size:26px;color:var(--primary);margin-bottom:8px}
