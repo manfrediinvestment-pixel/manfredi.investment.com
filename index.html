@@ -3076,22 +3076,16 @@
     if (!tbody) return;
     const tickers = TICKER_LISTS.usaStocksBody;
     try {
-      const resp = await fetch('https://query1.finance.yahoo.com/v7/finance/spark?symbols=' + tickers.join(',') + '&range=1d&interval=1d');
+      const resp = await fetch('https://data912.com/live/usa_stocks');
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
-      const data = await resp.json();
-      const quotes = data?.spark?.result || [];
-      const rows = tickers.map(sym => {
-        const q = quotes.find(r => r.symbol === sym);
-        const close = q?.response?.[0]?.meta?.regularMarketPrice;
-        const prev  = q?.response?.[0]?.meta?.chartPreviousClose;
-        const pct = (close && prev) ? ((close - prev)/prev*100) : null;
-        return { symbol: sym, price: close, change_pct: pct };
-      });
-      tbody.innerHTML = rows.map(r => {
-        const sym = r.symbol;
-        const price = r.price != null ? '$' + Number(r.price).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—';
-        const pct = r.change_pct != null ? (r.change_pct >= 0 ? '+' : '') + r.change_pct.toFixed(2) + '%' : '—';
-        const cls = r.change_pct > 0 ? 'pct-pos' : r.change_pct < 0 ? 'pct-neg' : 'pct-neu';
+      const rows = await resp.json();
+      const ordered = tickers.map(sym => rows.find(r => r.symbol === sym)).filter(Boolean);
+      if (!ordered.length) { tbody.innerHTML = '<tr><td colspan="3" class="loading-cell">Sin datos</td></tr>'; return; }
+      tbody.innerHTML = ordered.map(r => {
+        const sym = r.symbol || '';
+        const price = r.c != null ? '$' + Number(r.c).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—';
+        const pct = r.pct_change != null ? (r.pct_change >= 0 ? '+' : '') + Number(r.pct_change).toFixed(2) + '%' : '—';
+        const cls = r.pct_change > 0 ? 'pct-pos' : r.pct_change < 0 ? 'pct-neg' : 'pct-neu';
         const logo = tickerLogo(sym);
         return '<tr><td><span class="ticker-logo-wrap">' + logo + '<span class="ticker-name">' + sym + '</span></span></td>' +
                '<td class="align-right">' + price + '</td>' +
@@ -3106,39 +3100,38 @@
     const tbody = document.getElementById('fxBody');
     if (!tbody) return;
     const FX_CONFIG = [
-      { key:'mep',      label:'D&oacute;lar MEP',         flag:'&#127462;&#127479;', src:'dolar' },
-      { key:'ccl',      label:'D&oacute;lar CCL',         flag:'&#127462;&#127479;', src:'dolar' },
-      { key:'blue',     label:'D&oacute;lar Blue',        flag:'&#127462;&#127479;', src:'dolar' },
-      { key:'oficial',  label:'D&oacute;lar Oficial',     flag:'&#127462;&#127479;', src:'dolar' },
-      { key:'eur',      label:'Euro',                     flag:'&#127466;&#127482;', src:'cripto' },
-      { key:'brl',      label:'Real brasilero',           flag:'&#127463;&#127479;', src:'cripto' },
-      { key:'cny',      label:'Yuan chino',               flag:'&#127464;&#127475;', src:'cripto' },
-      { key:'gbp',      label:'Libra esterlina',          flag:'&#127468;&#127463;', src:'cripto' },
-      { key:'chf',      label:'Franco suizo',             flag:'&#127464;&#127469;', src:'cripto' },
-      { key:'jpy',      label:'Yen japon&eacute;s',       flag:'&#127471;&#127477;', src:'cripto' },
+      { key:'mep',   label:'D&oacute;lar MEP',          flag:'&#127462;&#127479;', type:'dolar', casa:'bolsa' },
+      { key:'ccl',   label:'D&oacute;lar CCL',          flag:'&#127462;&#127479;', type:'dolar', casa:'contadoconliqui' },
+      { key:'blue',  label:'D&oacute;lar Blue',         flag:'&#127462;&#127479;', type:'dolar', casa:'blue' },
+      { key:'ofic',  label:'D&oacute;lar Oficial',      flag:'&#127462;&#127479;', type:'dolar', casa:'oficial' },
+      { key:'eur',   label:'Euro',                      flag:'&#127466;&#127482;', type:'fx', code:'EUR' },
+      { key:'brl',   label:'Real brasilero',            flag:'&#127463;&#127479;', type:'fx', code:'BRL' },
+      { key:'cny',   label:'Yuan chino',                flag:'&#127464;&#127475;', type:'fx', code:'CNY' },
+      { key:'gbp',   label:'Libra esterlina',           flag:'&#127468;&#127463;', type:'fx', code:'GBP' },
+      { key:'chf',   label:'Franco suizo',              flag:'&#127464;&#127469;', type:'fx', code:'CHF' },
+      { key:'jpy',   label:'Yen japon&eacute;s',        flag:'&#127471;&#127477;', type:'fx', code:'JPY' },
     ];
     try {
-      const [dolarResp, criptoResp] = await Promise.all([
+      const [dolarResp, fxResp] = await Promise.all([
         fetch('https://dolarapi.com/v1/dolares'),
-        fetch('https://criptoya.com/api/fiat'),
+        fetch('https://open.er-api.com/v6/latest/USD'),
       ]);
       const dolarData = dolarResp.ok ? await dolarResp.json() : [];
-      const criptoData = criptoResp.ok ? await criptoResp.json() : {};
+      const fxData = fxResp.ok ? await fxResp.json() : {};
       const dolarMap = {};
-      if (Array.isArray(dolarData)) dolarData.forEach(d => { dolarMap[d.nombre?.toLowerCase()] = d; dolarMap[d.casa?.toLowerCase()] = d; });
+      if (Array.isArray(dolarData)) dolarData.forEach(d => { dolarMap[d.casa?.toLowerCase()] = d; });
+      const usdBlue = dolarMap['blue']?.venta || null;
+      const fxRates = fxData.rates || {};
       tbody.innerHTML = FX_CONFIG.map(cfg => {
         let compra = '—', venta = '—';
-        if (cfg.src === 'dolar') {
-          const names = { mep:'bolsa', ccl:'contadoconliqui', blue:'blue', oficial:'oficial' };
-          const d = dolarMap[names[cfg.key]] || dolarMap[cfg.key] || null;
-          if (d) { compra = '$' + (d.compra||'—'); venta = '$' + (d.venta||'—'); }
+        if (cfg.type === 'dolar') {
+          const d = dolarMap[cfg.casa] || null;
+          if (d) { compra = '$' + d.compra; venta = '$' + d.venta; }
         } else {
-          const keys = { eur:'eur', brl:'brl', cny:'cny', gbp:'gbp', chf:'chf', jpy:'jpy' };
-          const fk = keys[cfg.key];
-          if (fk && criptoData[fk]) {
-            const rate = criptoData[fk];
-            const r = typeof rate === 'object' ? (rate.ask || rate.price || Object.values(rate)[0]) : rate;
-            compra = '$' + Number(r).toFixed(2);
+          const rateVsUSD = fxRates[cfg.code];
+          if (rateVsUSD && usdBlue) {
+            const arsVal = usdBlue / rateVsUSD;
+            compra = '$' + Math.round(arsVal).toLocaleString('es-AR');
             venta = compra;
           }
         }
