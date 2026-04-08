@@ -1978,7 +1978,7 @@
       <!-- ââ Sub-sección 1: Reportes Diarios ââ -->
       <div class="inf-sub-header" id="reportes">
         <span class="inf-sub-title">Reportes Diarios</span>
-        <span class="inf-sub-meta" id="reportLastUpdate">Actualizado · 10:00 hs</span>
+        <span class="inf-sub-meta" id="reportLastUpdate">Actualizado · 11:01 hs</span>
       </div>
       <div class="reports-grid">
 
@@ -2400,7 +2400,7 @@
   loadPapersManifest();
 
   // ââ Carga reportes diarios desde JSON ââââââââââââââââââââââââââââ
-  const EMPTY_MSG = '<div class="report-loading">Sin datos aún. Próxima actualización: 10:00 hs.</div>';
+  const EMPTY_MSG = '<div class="report-loading">Sin datos aún. Próxima actualización: 11:01 hs.</div>';
 
   function varClass(v) {
     if (!v) return '';
@@ -2440,7 +2440,7 @@
     const merval = d.merval || {};
     const bcra = d.bcra || {};
     const varMerval = varClass(merval.variacion);
-    const tendIcon = merval.tendencia === 'alcista' ? 'â²' : merval.tendencia === 'bajista' ? 'â¼' : 'â';
+    const tendIcon = merval.tendencia === 'alcista' ? '&#9650;' : merval.tendencia === 'bajista' ? '&#9660;' : 'â';
     return `
       <div class="rpt-body">
         <div class="rpt-summary">${d.resumen || ''}</div>
@@ -2882,7 +2882,7 @@
     const n   = parseFloat(change);
     const pos = n >= 0;
     return {
-      text: (pos ? 'â² +' : 'â¼ ') + Math.abs(n).toFixed(2) + '%',
+      text: (pos ? '&#9650; +' : '&#9660; ') + Math.abs(n).toFixed(2) + '%',
       cls:  pos ? 'pos' : 'neg',
     };
   }
@@ -3036,11 +3036,23 @@
     if (domain) {
       return '<span class="ticker-logo-stack">' +
              '<span class="ticker-initials">' + initials + '</span>' +
-             '<img class="ticker-logo" src="https://logo.clearbit.com/' + domain + '" alt="' + sym + '">' +
+             '<img class="ticker-logo" src="https://logo.clearbit.com/' + domain + '" alt="">' +
              '</span>';
     }
     return '<span class="ticker-initials">' + initials + '</span>';
   }
+
+  const DISPLAY_NAMES = {
+    YPFD:'YPF', GGAL:'Galicia', BMA:'Macro', PAMP:'Pampa', LOMA:'Loma Negra',
+    TXAR:'Ternium', ALUA:'Aluar', BYMA:'BYMA', TECO2:'Telecom', CEPU:'Cen. Puerto',
+    AAPL:'Apple', TSLA:'Tesla', AMZN:'Amazon', GOOGL:'Google', MSFT:'Microsoft',
+    NVDA:'Nvidia', META:'Meta', JPM:'JPMorgan', KO:'Coca-Cola', DIS:'Disney',
+    YPF:'YPF', GGAL:'Galicia', BMA:'Macro', PAM:'Pampa', TEO:'Telecom',
+    LOM:'Loma Negra', TX:'Ternium', IRS:'IRSA', SUPV:'Supervielle', EDN:'Edenor',
+    NFLX:'Netflix', 'BRK.B':'Berkshire',
+    AL30:'AL30', GD30:'GD30', AL35:'AL35', GD35:'GD35', AE38:'AE38',
+    GD38:'GD38', AL41:'AL41', GD41:'GD41', GD46:'GD46', TV24:'TV24',
+  };
 
   async function fetchD912(endpoint, bodyId) {
     const allowList = TICKER_LISTS[bodyId];
@@ -3057,7 +3069,7 @@
       if (!ordered.length) { tbody.innerHTML = '<tr><td colspan="3" class="loading-cell">Sin datos</td></tr>'; return; }
       tbody.innerHTML = ordered.map(r => {
         const sym = r.symbol || r.ticker || '';
-        const name = r.name || sym;
+        const name = DISPLAY_NAMES[sym] || r.name || sym;
         const price = r.price != null ? '$' + Number(r.price).toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—';
         const pct = r.change_pct != null ? Number(r.change_pct).toFixed(2) + '%' : '—';
         const cls = r.change_pct > 0 ? 'pct-pos' : r.change_pct < 0 ? 'pct-neg' : 'pct-neu';
@@ -3087,7 +3099,7 @@
         const pct = r.pct_change != null ? (r.pct_change >= 0 ? '+' : '') + Number(r.pct_change).toFixed(2) + '%' : '—';
         const cls = r.pct_change > 0 ? 'pct-pos' : r.pct_change < 0 ? 'pct-neg' : 'pct-neu';
         const logo = tickerLogo(sym);
-        return '<tr><td><span class="ticker-logo-wrap">' + logo + '<span class="ticker-name">' + sym + '</span></span></td>' +
+        return '<tr><td><span class="ticker-logo-wrap">' + logo + '<span class="ticker-name">' + (DISPLAY_NAMES[sym]||sym) + '</span></span></td>' +
                '<td class="align-right">' + price + '</td>' +
                '<td class="align-right ' + cls + '">' + pct + '</td></tr>';
       }).join('');
