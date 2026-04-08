@@ -3033,17 +3033,16 @@
   function tickerLogo(sym) {
     const domain = LOGO_MAP[sym];
     const initials = sym.replace('.','').substring(0,3).toUpperCase();
-    const base = '<span class="t-logo" data-d="' + (domain||'') + '" data-i="' + initials + '">' + initials + '</span>';
-    return base;
+    return '<span class="t-logo" data-d="' + (domain||'') + '">' + initials + '</span>';
   }
 
   const DISPLAY_NAMES = {
-    YPFD:'YPF', GGAL:'Galicia', BMA:'Macro', PAMP:'Pampa', LOMA:'Loma Negra',
-    TXAR:'Ternium', ALUA:'Aluar', BYMA:'BYMA', TECO2:'Telecom', CEPU:'Cen. Puerto',
-    AAPL:'Apple', TSLA:'Tesla', AMZN:'Amazon', GOOGL:'Google', MSFT:'Microsoft',
+    YPFD:'YPF', GGAL:'Galicia', BMA:'Macro', PAMP:'Pampa Energ', LOMA:'Loma Negra',
+    TXAR:'Ternium AR', ALUA:'Aluar', BYMA:'BYMA', TECO2:'Telecom', CEPU:'Cen. Puerto',
+    AAPL:'Apple', TSLA:'Tesla', AMZN:'Amazon', GOOGL:'Alphabet', MSFT:'Microsoft',
     NVDA:'Nvidia', META:'Meta', JPM:'JPMorgan', KO:'Coca-Cola', DIS:'Disney',
-    YPF:'YPF', GGAL:'Galicia', BMA:'Macro', PAM:'Pampa', TEO:'Telecom',
-    LOM:'Loma Negra', TX:'Ternium', IRS:'IRSA', SUPV:'Supervielle', EDN:'Edenor',
+    YPF:'YPF ADR', GGAL:'Galicia ADR', BMA:'Macro ADR', PAM:'Pampa ADR', TEO:'Telecom ADR',
+    LOM:'Loma ADR', TX:'Ternium ADR', IRS:'IRSA ADR', SUPV:'Supervielle', EDN:'Edenor ADR',
     NFLX:'Netflix', 'BRK.B':'Berkshire',
     AL30:'AL30', GD30:'GD30', AL35:'AL35', GD35:'GD35', AE38:'AE38',
     GD38:'GD38', AL41:'AL41', GD41:'GD41', GD46:'GD46', TV24:'TV24',
@@ -3161,24 +3160,18 @@
   }
 
 
-  // Load clearbit logos for ticker cells
   function loadTickerLogos() {
     document.querySelectorAll('.t-logo[data-d]').forEach(function(el) {
-      const domain = el.getAttribute('data-d');
-      const initials = el.getAttribute('data-i');
-      if (!domain) return;
+      const d = el.getAttribute('data-d');
+      if (!d) return;
       const img = document.createElement('img');
-      img.width = 22; img.height = 22;
-      img.style.borderRadius = '50%';
-      img.style.objectFit = 'contain';
-      img.style.display = 'block';
-      img.onload = function() { el.textContent = ''; el.appendChild(img); };
-      img.onerror = function() { /* keep initials */ };
-      img.src = 'https://logo.clearbit.com/' + domain;
+      img.onload = function() { el.innerHTML = ''; el.appendChild(img); el.style.background='none'; };
+      img.src = 'https://logo.clearbit.com/' + d;
+      img.width = img.height = 22;
     });
   }
-  setTimeout(loadTickerLogos, 500);
-  setTimeout(loadTickerLogos, 3000);
+  setTimeout(loadTickerLogos, 800);
+  setTimeout(loadTickerLogos, 4000);
   fetchAllLiveTables();
   setInterval(fetchAllLiveTables, 60000);
   setInterval(fetchUSAStocks, 120000);
@@ -3419,11 +3412,10 @@
     .pct-pos{color:var(--green);font-weight:600}
     .pct-neg{color:var(--red);font-weight:600}
     .pct-neu{color:var(--text-sec)}
-    /* === TICKER LOGO COMPACT === */
-    .t-logo{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#fff;font-size:7px;font-weight:700;flex-shrink:0;vertical-align:middle;overflow:hidden;letter-spacing:-.3px}
-    .t-logo img{width:22px;height:22px;border-radius:50%;object-fit:contain;display:block}
-    .ticker-logo-wrap{display:inline-flex;align-items:center;gap:6px;line-height:1}
-    .ticker-name{font-size:12px;vertical-align:middle}
+    .t-logo{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#fff;font-size:7px;font-weight:700;flex-shrink:0;vertical-align:middle;overflow:hidden}
+    .t-logo img{width:22px;height:22px;border-radius:50%;object-fit:contain}
+    .ticker-logo-wrap{display:inline-flex;align-items:center;gap:6px;vertical-align:middle;font-size:0}
+    .ticker-name{font-size:12px;color:inherit}
     /* === TICKER LOGOS === */
     .ticker-logo-wrap{display:inline-flex;align-items:center;gap:7px}
     .ticker-logo-stack{position:relative;width:24px;height:24px;flex-shrink:0;display:inline-block;vertical-align:middle}
