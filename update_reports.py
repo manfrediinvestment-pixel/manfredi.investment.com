@@ -16,19 +16,28 @@ def fetch(url):
         return None
 
 def yahoo(ticker, nombre):
-    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=2d"
-    data = fetch(url)
-    if not data:
-        return {"valor": None, "variacion": None}
-    try:
-        meta = data["chart"]["result"][0]["meta"]
-        precio = meta.get("regularMarketPrice", 0)
-        anterior = meta.get("previousClose", 0)
-        var = round(((precio - anterior) / anterior) * 100, 2) if anterior else 0
-        var_str = f"{'+' if var >= 0 else ''}{var}%"
-        return {"valor": round(precio, 2), "variacion": var_str}
-    except:
-        return {"valor": None, "variacion": None}
+    # Intenta con query1 y query2 como fallback
+    for host in ["query1", "query2"]:
+        url = f"https://{host}.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=5d"
+        data = fetch(url)
+        if not data:
+            continue
+        try:
+            meta   = data["chart"]["result"][0]["meta"]
+            precio = meta.get("regularMarketPrice") or meta.get("regularMarketPreviousClose", 0)
+            # Preferir el % de cambio directo de la API
+            pct = meta.get("regularMarketChangePercent")
+            if pct is not None:
+                var_str = f"{'+' if pct >= 0 else ''}{round(pct, 2)}%"
+            else:
+                anterior = meta.get("previousClose", 0)
+                var = round(((precio - anterior) / anterior) * 100, 2) if anterior else 0
+                var_str = f"{'+' if var >= 0 else ''}{var}%"
+            return {"valor": round(precio, 2), "variacion": var_str}
+        except Exception as e:
+            print(f"Error parseando {ticker}: {e}")
+            continue
+    return {"valor": None, "variacion": None}
 
 # ── ARGENTINA ─────────────────────────────────────────────────────
 print("Generando argentina.json...")
