@@ -8237,51 +8237,93 @@ LÍMITES: Solo temas financieros y económicos. Siempre terminás con: "Este an�
 
   function buildWarrenChart(data) {
     if (!data || !data.datasets) return null;
+
+    // Map Spanish/alternative type names to Chart.js types
+    var typeMap = {
+        'linea': 'line', 'line': 'line',
+        'barra': 'bar', 'bar': 'bar', 'barras': 'bar',
+        'torta': 'pie', 'pie': 'pie',
+        'dona': 'doughnut', 'doughnut': 'doughnut',
+        'radar': 'radar',
+        'area': 'line'
+    };
+    var rawType = (data.tipo || 'bar').toLowerCase();
+    var chartType = typeMap[rawType] || 'bar';
+    var isArea = rawType === 'area';
+
     var wrapper = document.createElement('div');
-    wrapper.style.cssText = 'margin:12px 0;background:white;border-radius:8px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,0.08)';
+    wrapper.style.cssText = 'margin:12px 0;background:white;border-radius:8px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,0.08);position:relative';
+
     if (data.titulo) {
       var title = document.createElement('div');
-      title.style.cssText = 'font-size:12px;font-weight:600;color:var(--primary);margin-bottom:8px;text-align:center';
+      title.style.cssText = 'font-size:12px;font-weight:600;color:#0A0F1E;margin-bottom:8px;text-align:center';
       title.textContent = data.titulo;
       wrapper.appendChild(title);
     }
+
+    // Set explicit dimensions so canvas renders even inside display:none container
     var canvas = document.createElement('canvas');
-    canvas.style.cssText = 'max-height:220px';
+    canvas.width = 400;
+    canvas.height = 220;
+    canvas.style.cssText = 'width:100%;height:220px;display:block';
     wrapper.appendChild(canvas);
+
     var colors = ['#0A0F1E','#B8943F','#10B981','#EF4444','#6366F1','#F59E0B','#06B6D4','#8B5CF6'];
+
     try {
-      new Chart(canvas, {
-        type: data.tipo || 'bar',
+      var chartConfig = {
+        type: chartType,
         data: {
           labels: data.labels || [],
           datasets: data.datasets.map(function(ds, i) {
+            var color = colors[i % colors.length];
+            var isLine = (chartType === 'line');
             return {
               label: ds.nombre || ds.label || '',
               data: ds.datos || ds.data || [],
-              backgroundColor: (data.tipo === 'line') ? 'transparent' : colors[i % colors.length] + '99',
-              borderColor: colors[i % colors.length],
-              borderWidth: 2, tension: 0.4, fill: false, pointRadius: 4,
-              pointBackgroundColor: colors[i % colors.length]
+              backgroundColor: isLine ? (color + '22') : (color + 'cc'),
+              borderColor: color,
+              borderWidth: 2,
+              tension: 0.4,
+              fill: isArea,
+              pointRadius: isLine ? 4 : 0,
+              pointBackgroundColor: color,
+              pointHoverRadius: 6
             };
           })
         },
         options: {
-          responsive: true, maintainAspectRatio: true,
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 600 },
           plugins: {
-            legend: { labels: { font: { size: 11 }, color: '#1A1A2E' } },
+            legend: {
+              labels: { font: { size: 11 }, color: '#1A1A2E', padding: 12 }
+            },
             tooltip: { bodyFont: { size: 11 }, titleFont: { size: 11 } }
           },
-          scales: (data.tipo !== 'pie' && data.tipo !== 'doughnut') ? {
-            x: { ticks: { font: { size: 10 }, color: '#6B7280' }, grid: { color: '#E5E7EB' } },
-            y: { ticks: { font: { size: 10 }, color: '#6B7280' }, grid: { color: '#E5E7EB' } }
+          scales: (chartType !== 'pie' && chartType !== 'doughnut' && chartType !== 'radar') ? {
+            x: {
+              ticks: { font: { size: 10 }, color: '#6B7280' },
+              grid: { color: '#E5E7EB40' }
+            },
+            y: {
+              ticks: { font: { size: 10 }, color: '#6B7280' },
+              grid: { color: '#E5E7EB' },
+              beginAtZero: true
+            }
           } : {}
         }
-      });
+      };
+
+      new Chart(canvas, chartConfig);
       return wrapper;
-    } catch(e) { return null; }
+    } catch(e) {
+      return null;
+    }
 }
 
-  async function warrenSend() {
+  function warrenSend() {
     const input = document.getElementById('warrenInput');
     const text = input.value.trim();
     if (!text) return;
