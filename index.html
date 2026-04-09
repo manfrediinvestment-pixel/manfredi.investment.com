@@ -1825,12 +1825,10 @@
             🔒 Asesor IA<span class="member-badge">Membresía</span> <span style="display:inline-block;width:8px;height:8px;background:#10B981;border-radius:50%;margin-left:4px;vertical-align:middle;"></span>
           </span>
         </li>
-        <li>
-          <span class="nav-link" onclick="openModal()">Asesoría</span>
-        </li>
+        
       </ul>
 
-      <button class="btn-cta" onclick="openModal()">Contacto</button>
+      <button class="btn-cta" onclick="openModal()">Asesoría</button>
     
       <div id="navUserArea"></div>
     </div>
@@ -2090,11 +2088,18 @@
 
 
   <!-- ââ INVERSIONES âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="section section-alt" id="inversiones">
+  <section class="section section-alt member-protected locked" id="inversiones">
     <div class="container">
+      <!-- LOCK OVERLAY MEMBRESIA -->
+      <div class="member-lock-overlay">
+        <div class="member-lock-icon">&#128274;</div>
+        <div class="member-lock-title">Contenido exclusivo para miembros</div>
+        <div class="member-lock-sub">Suscribite a Manfredi Investment Premium para acceder a los picks de inversión, análisis detallados y señales.</div>
+        <button class="member-unlock-btn" onclick="openPaymentModal()">Ver planes de membresía &rarr;</button>
+      </div>
       <div class="section-header">
         <span class="section-label">Mis picks</span>
-        <h2 class="section-title">Inversiones de Nacho</h2>
+        <h2 class="section-title">Inversiones de Manfredi</h2>
         <p class="section-sub">Activos que sigo de cerca con análisis propio. Actualizado manualmente.</p>
       </div>
 
@@ -3443,7 +3448,84 @@
     .nav-locked{opacity:.6;pointer-events:none!important;cursor:not-allowed!important}
     .member-badge{display:inline-block;font-size:9px;font-weight:700;color:var(--white);background:var(--gold);padding:1px 5px;border-radius:3px;letter-spacing:.05em;text-transform:uppercase;margin-left:5px;vertical-align:middle}
     #navUserArea{display:flex;align-items:center;gap:6px;margin-left:16px}
-</style>
+
+    /* ===== MEMBRESIA: BLUR & LOCK OVERLAY ===== */
+    .member-protected { position: relative; }
+    .member-protected.locked::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      background: rgba(10,15,30,0.60);
+      z-index: 10;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+    .member-lock-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 11;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 14px;
+      text-align: center;
+      padding: 32px 24px;
+    }
+    .member-protected.locked .member-lock-overlay { display: flex; }
+    .member-lock-icon { font-size: 40px; }
+    .member-lock-title { color: #fff; font-size: 18px; font-weight: 700; font-family: var(--font-display); }
+    .member-lock-sub { color: rgba(255,255,255,0.72); font-size: 13px; line-height: 1.6; max-width: 300px; }
+    .member-unlock-btn {
+      background: var(--gold); color: #0A0F1E;
+      border: none; border-radius: 8px; padding: 12px 28px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      transition: opacity .2s;
+    }
+    .member-unlock-btn:hover { opacity: .85; }
+    /* ===== MODAL PAGO ===== */
+    .payment-overlay {
+      position: fixed; inset: 0; z-index: 3000;
+      background: rgba(0,0,0,.78);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .3s;
+    }
+    .payment-overlay.open { opacity: 1; pointer-events: auto; }
+    .payment-modal-box {
+      background: var(--bg-card, #111827);
+      border: 1px solid rgba(184,148,63,.25);
+      border-radius: 16px; padding: 36px 32px;
+      width: 100%; max-width: 480px; position: relative;
+    }
+    .payment-modal-box h2 { font-family: var(--font-display); font-size: 22px; color: var(--gold); margin-bottom: 6px; }
+    .payment-modal-box > p { color: var(--text-sec); font-size: 14px; line-height: 1.6; margin-bottom: 22px; }
+    .pay-plan-card {
+      background: rgba(255,255,255,.04); border: 1px solid rgba(184,148,63,.2);
+      border-radius: 12px; padding: 18px 20px; margin-bottom: 10px;
+      cursor: pointer; transition: border-color .2s, background .2s;
+    }
+    .pay-plan-card.selected, .pay-plan-card:hover { border-color: var(--gold); background: rgba(184,148,63,.07); }
+    .pay-plan-name { font-weight: 700; color: var(--text-primary, #fff); font-size: 15px; }
+    .pay-plan-price { color: var(--gold); font-size: 20px; font-weight: 800; margin: 3px 0; }
+    .pay-plan-desc { color: var(--text-sec); font-size: 12px; }
+    .pay-methods { margin: 20px 0 0; }
+    .pay-methods h4 { color: var(--text-primary, #fff); font-size: 13px; margin-bottom: 10px; }
+    .pay-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .pay-btn {
+      flex: 1; min-width: 120px; padding: 11px 8px;
+      border: 1px solid rgba(255,255,255,.1); border-radius: 8px;
+      background: rgba(255,255,255,.04); color: var(--text-primary, #fff);
+      font-size: 13px; font-weight: 600; cursor: pointer; text-align: center;
+      transition: background .2s, border-color .2s;
+    }
+    .pay-btn:hover { background: rgba(184,148,63,.1); border-color: var(--gold); }
+    .pay-note { text-align:center; color: var(--text-sec); font-size:12px; margin-top:16px; line-height:1.6; }
+    .pay-note a { color: var(--gold); text-decoration: none; }
+    .pay-close { position: absolute; top: 14px; right: 16px; background: none; border: none; color: var(--text-sec); font-size: 22px; cursor: pointer; line-height: 1; }
+
+  </style>
 
 <!-- COURSE MODALS -->
 <div class="course-modal-overlay" id="modal-FP"><div class="course-modal"><button class="course-modal-close" onclick="closeCourse('FP')">&times;</button><div class="app">
@@ -8186,14 +8268,31 @@ LÍMITES: Solo temas financieros y económicos. Siempre terminás con: "Este an�
         var block = codeBlocks[parseInt(idx)];
         try {
           var parsed = JSON.parse(block);
-          if (parsed && parsed.datasets) { chartPendingData.push(parsed); return ''; }
+          if (parsed && (parsed.datasets || (parsed.data && parsed.data.datasets))) {
+              if (!parsed.datasets && parsed.data) {
+                parsed.datasets = parsed.data.datasets;
+                if (!parsed.labels) parsed.labels = parsed.data.labels;
+              }
+              chartPendingData.push(parsed);
+              return '';
+            }
         } catch(e) {}
         return '<pre style="background:#f4f4f4;padding:10px;border-radius:6px;font-size:11px;overflow-x:auto;white-space:pre-wrap;color:#333">' + block.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</pre>';
       });
       div.innerHTML = html;
       chartPendingData.forEach(function(cd) {
         var chartBox = buildWarrenChart(cd);
-        if (chartBox) div.appendChild(chartBox);
+        if (chartBox) {
+              div.appendChild(chartBox);
+            } else {
+              var fallbackDiv = document.createElement('div');
+              fallbackDiv.style.cssText = 'background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:8px;';
+              var fallbackPre = document.createElement('pre');
+              fallbackPre.style.cssText = 'font-size:11px;color:var(--text-sec);white-space:pre-wrap;word-break:break-all;margin:0;';
+              fallbackPre.textContent = JSON.stringify(cd, null, 2);
+              fallbackDiv.appendChild(fallbackPre);
+              div.appendChild(fallbackDiv);
+            }
       });
     } else {
       div.innerHTML = formatWarrenText(content);
@@ -8349,18 +8448,25 @@ LÍMITES: Solo temas financieros y económicos. Siempre terminás con: "Este an�
 
     try {
       // Llamada al Cloudflare Worker que protege la API key
-      const res = await fetch('https://warren.nachito2502.workers.dev', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: warrenHistory,
-          systemPrompt: WARREN_SYSTEM
-        })
-      });
+      // Probar worker primero, luego Netlify como fallback
+        const aiEndpoints = [
+          'https://warren.nachito2502.workers.dev',
+          '/.netlify/functions/warren'
+        ];
+        let res = null;
+        for (const ep of aiEndpoints) {
+          try {
+            const attempt = await fetch(ep, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ messages: warrenHistory, systemPrompt: WARREN_SYSTEM })
+            });
+            if (attempt.ok) { res = attempt; break; }
+          } catch(epErr) { console.warn('AI endpoint failed:', ep); }
+        }
+        if (!res) throw new Error('Todos los endpoints de IA fallaron');      thinkDiv.remove();
 
-      thinkDiv.remove();
-
-      if (!res.ok) throw new Error('Error en la respuesta del servidor');
+      // res is guaranteed valid (threw above if all endpoints failed)
 
       const data = await res.json();
       let reply = data.response || 'No pude procesar tu consulta. Intentá de nuevo.';
@@ -8394,11 +8500,103 @@ LÍMITES: Solo temas financieros y económicos. Siempre terminás con: "Este an�
     document.getElementById('warrenInput').value = text;
     warrenSend();
   }
+  
+
+    // ===== SISTEMA DE MEMBRESIA =====
+    const MEMBER_KEY = 'mfi_member_v1';
+
+    function checkMembership() {
+      try {
+        const token = localStorage.getItem(MEMBER_KEY);
+        if (token && token.length > 10) unlockMemberContent();
+      } catch(e) {}
+    }
+
+    function unlockMemberContent() {
+      document.querySelectorAll('.member-protected.locked').forEach(function(el) {
+        el.classList.remove('locked');
+      });
+    }
+
+    function openPaymentModal() {
+      document.getElementById('paymentOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePaymentModal() {
+      document.getElementById('paymentOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function selectPlan(plan) {
+      document.getElementById('payPlanMonthly').classList.toggle('selected', plan === 'monthly');
+      document.getElementById('payPlanAnnual').classList.toggle('selected', plan === 'annual');
+    }
+
+    function handlePayment(method) {
+      var isAnnual = document.getElementById('payPlanAnnual').classList.contains('selected');
+      var planLabel = isAnnual ? 'Plan Anual (USD 69.99)' : 'Plan Mensual (USD 9.99)';
+      var subject = 'MEMBRESIA - ' + planLabel + ' - ' + method.toUpperCase();
+      var mailBody = 'Hola! Quiero suscribirme a: ' + planLabel + ' (pago via ' + method + ').';
+      if (method === 'mercadopago') {
+        window.open('mailto:manfredi.investment@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(mailBody));
+      } else if (method === 'crypto') {
+        window.open('mailto:manfredi.investment@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(mailBody));
+      } else {
+        window.open('mailto:manfredi.investment@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(mailBody));
+      }
+    }
+
+    // Funcion para activar membresia con token (usar desde consola)
+    function enableMembership(token) {
+      if (token && token.length > 10) {
+        localStorage.setItem(MEMBER_KEY, token);
+        unlockMemberContent();
+        alert('Membresía activada correctamente.');
+      }
+    }
+
+    // Ejecutar al cargar
+    document.addEventListener('DOMContentLoaded', function() {
+      checkMembership();
+    });
+
   </script>
 
 </body>
 </html>
 
   </div><!-- /mainContent -->
+
+  <!-- ===== MODAL DE MEMBRESIA / PAGO ===== -->
+  <div class="payment-overlay" id="paymentOverlay" onclick="if(event.target===this)closePaymentModal()">
+    <div class="payment-modal-box" role="dialog" aria-modal="true">
+      <button class="pay-close" onclick="closePaymentModal()" aria-label="Cerrar">&times;</button>
+      <h2>&#9733; Membresía Premium</h2>
+      <p>Accede al análisis de inversiones, picks seleccionados y contenido exclusivo de Manfredi Investment.</p>
+      <div class="pay-plan-card selected" id="payPlanMonthly" onclick="selectPlan('monthly')">
+        <div class="pay-plan-name">Plan Mensual</div>
+        <div class="pay-plan-price">USD 9.99 / mes</div>
+        <div class="pay-plan-desc">Acceso completo. Cancelá cuando quieras.</div>
+      </div>
+      <div class="pay-plan-card" id="payPlanAnnual" onclick="selectPlan('annual')">
+        <div class="pay-plan-name">Plan Anual <span style="background:var(--gold);color:#0A0F1E;font-size:10px;padding:2px 6px;border-radius:4px;margin-left:6px;vertical-align:middle;">AHORRA 30%</span></div>
+        <div class="pay-plan-price">USD 69.99 / año</div>
+        <div class="pay-plan-desc">Equivale a USD 5.83/mes. Mejor precio.</div>
+      </div>
+      <div class="pay-methods">
+        <h4>Elegí tu método de pago</h4>
+        <div class="pay-btns">
+          <button class="pay-btn" onclick="handlePayment('mercadopago')">&#127981; Mercado Pago</button>
+          <button class="pay-btn" onclick="handlePayment('crypto')">&#8383; Cripto (USDT)</button>
+          <button class="pay-btn" onclick="handlePayment('transfer')">&#127988; Transferencia</button>
+        </div>
+      </div>
+      <div class="pay-note">
+        &iquest;Dudas? Escribínos a <a href="mailto:manfredi.investment@gmail.com">manfredi.investment@gmail.com</a><br>
+        o por <a href="https://wa.me/5491168408987" target="_blank">WhatsApp</a>. Activamos tu acceso en menos de 24hs.
+      </div>
+    </div>
+  </div>
 </body>
 </html>
