@@ -8169,97 +8169,153 @@ LÍMITES: Solo temas financieros y económicos. Siempre terminás con: "Este an�
   }
 
   function warrenAddMessage(role, content) {
-    const container = document.getElementById('warrenMessages');
+    const msgs = document.getElementById('warrenMessages');
     const div = document.createElement('div');
-    div.className = `warren-msg ${role}`;
+    div.className = 'warren-message warren-' + role;
 
-    // Check if content has chart JSON
-    const chartMatch = content.match(/\{"tipo"[\s\S]*?"datasets"[\s\S]*?\]/);
-    if (chartMatch && role === 'assistant') {
-      try {
-        const chartData = JSON.parse(chartMatch[0] + '}');
-        const textWithout = content.replace(chartMatch[0] + '}', '').trim();
-        div.innerHTML = formatWarrenText(textWithout);
-        const chartBox = buildWarrenChart(chartData);
+    if (role === 'assistant') {
+      // Extract code blocks first
+      const codeBlocks = [];
+      let cleaned = content.replace(/```(?:json)?s*([sS]*?)```/g, (match, inner) => {
+        codeBlocks.push(inner.trim());
+        return ' CB' + (codeBlocks.length - 1) + ' ';
+      });
+
+      let html = formatWarrenText(cleaned);
+
+      // Rebuild code blocks: chart or pre
+      const chartPendingData = [];
+      html = html.replace(/ CB(d+) /g, (_, idx) => {
+        const block = codeBlocks[parseInt(idx)];
+        try {
+          let parsed = JSON.parse(block);
+          if (parsed && parsed.datasets) {
+            chartPendingData.push(parsed);
+            return '';
+          }
+        } catch(e) {}
+        return '<pre style="background:#f4f4f4;padding:10px;border-radius:6px;font-size:11px;overflow-x:auto;white-space:pre-wrap;color:#333">' + block.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</pre>';
+      });
+
+      div.innerHTML = html;
+      chartPendingData.forEach(cd => {
+        const chartBox = buildWarrenChart(cd);
         if (chartBox) div.appendChild(chartBox);
-      } catch(e) {
-        div.innerHTML = formatWarrenText(content);
-      }
+      });
+
     } else {
       div.innerHTML = formatWarrenText(content);
     }
 
-    // Add disclaimer to assistant messages
-    if (role === 'assistant' && content.length > 100) {
-      const disc = document.createElement('div');
-      disc.className = 'warren-disclaimer';
-      disc.textContent = 'Análisis educativo e informativo. No constituye asesoramiento financiero regulado.';
-      div.appendChild(disc);
-    }
-
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
-    return div;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
   }
 
   function formatWarrenText(text) {
+    // Fix encoding artifacts
+    text = text
+      .replace(/â/g, '’')
+      .replace(/â/g, '“')
+      .replace(/â/g, '”')
+      .replace(/â/g, '↑')
+      .replace(/â/g, '↓')
+      .replace(/â/g, '→')
+      .replace(/â¢/g, '•')
+      .replace(/Ã¢â¬¢/g, '•')
+      .replace(/Ã¢â¬/g, '–')
+      .replace(/Ã¢â¬/g, '—');
+
+    // Render markdown tables
+    const tableRegex = /((?:(?:|[^
+]*|)
+?){2,})/gm;
+    text = text.replace(tableRegex, (match) => {
+      const rows = match.trim().split('
+').filter(r => r.trim());
+      if (rows.length < 2) return match;
+      const isSep = r => /^|[s-:|]+|$/.test(r.trim());
+      if (!rows.some(isSep)) return match;
+      let html = '<div style="overflow-x:auto;margin:10px 0"><table style="border-collapse:collapse;width:100%;font-size:12px;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08)">';
+      let headerDone = false;
+      rows.forEach((row) => {
+        if (isSep(row)) { headerDone = true; return; }
+        const cells = row.trim().replace(/^|||$/g, '').split('|');
+        if (!headerDone) {
+          html += '<thead><tr>' + cells.map(c => '<th style="background:var(--primary);color:white;padding:8px 12px;text-align:left;font-weight:600;font-size:11px;white-space:nowrap">' + c.trim() + '</th>').join('') + '</tr></thead><tbody>';
+        } else {
+          html += '<tr>' + cells.map(c => '<td style="padding:7px 12px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:top">' + c.trim() + '</td>').join('') + '</tr>';
+        }
+      });
+      html += '</tbody></table></div>';
+      return html;
+    });
+
     return text
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^### (.*$)/gm, '<h4 style="font-size:13px;font-weight:700;margin:8px 0 4px;color:var(--primary)">$1</h4>')
-      .replace(/^## (.*$)/gm, '<h3 style="font-size:14px;font-weight:700;margin:10px 0 5px;color:var(--primary)">$1</h3>')
-      .replace(/^- (.*$)/gm, '<div style="padding:2px 0;padding-left:12px">â¢ $1</div>')
-      .replace(/\n\n/g, '<br><br>')
-      .replace(/\n/g, '<br>');
+      .replace(/**(.*?)**/g, '<strong>$1</strong>')
+      .replace(/*(.*?)*/g, '<em>$1</em>')
+      .replace(/^### (.*)$/gm, '<h4 style="font-size:13px;font-weight:700;margin:8px 0 4px;color:var(--primary)">$1</h4>')
+      .replace(/^## (.*)$/gm, '<h3 style="font-size:14px;font-weight:700;margin:10px 0 5px;color:var(--primary)">$1</h3>')
+      .replace(/^# (.*)$/gm, '<h2 style="font-size:16px;font-weight:700;margin:12px 0 6px;color:var(--primary)">$1</h2>')
+      .replace(/^- (.*)$/gm, '<div style="padding:2px 0;padding-left:12px">• $1</div>')
+      .replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:8px 0">')
+      .replace(/
+
+/g, '<br><br>')
+      .replace(/
+/g, '<br>');
   }
 
   function buildWarrenChart(data) {
-    if (!data || !data.tipo || !data.labels || !data.datasets) return null;
-    const box = document.createElement('div');
-    box.className = 'warren-chart-box';
-    const title = document.createElement('div');
-    title.style.cssText = 'font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6B7280;margin-bottom:8px';
-    title.textContent = data.titulo || '';
-    box.appendChild(title);
+    if (!data || !data.datasets) return null;
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'margin:12px 0;background:white;border-radius:8px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,0.08)';
+    if (data.titulo) {
+      const title = document.createElement('div');
+      title.style.cssText = 'font-size:12px;font-weight:600;color:var(--primary);margin-bottom:8px;text-align:center';
+      title.textContent = data.titulo;
+      wrapper.appendChild(title);
+    }
     const canvas = document.createElement('canvas');
-    canvas.id = 'wc_' + (warrenChartCounter++);
-    box.appendChild(canvas);
-
-    setTimeout(() => {
-      if (typeof Chart === 'undefined') return;
-      const colors = ['#0A0F1E','#B8943F','#10B981','#EF4444','#3B82F6','#8B5CF6'];
+    canvas.style.cssText = 'max-height:220px';
+    wrapper.appendChild(canvas);
+    const colors = ['#0A0F1E','#B8943F','#10B981','#EF4444','#6366F1','#F59E0B','#06B6D4','#8B5CF6'];
+    try {
       new Chart(canvas, {
-        type: data.tipo === 'torta' ? 'doughnut' : data.tipo === 'barra' ? 'bar' : 'line',
+        type: data.tipo || 'bar',
         data: {
-          labels: data.labels,
+          labels: data.labels || [],
           datasets: data.datasets.map((ds, i) => ({
-            label: ds.nombre,
-            data: ds.datos,
+            label: ds.nombre || ds.label || '',
+            data: ds.datos || ds.data || [],
+            backgroundColor: (data.tipo === 'line') ? 'transparent' : colors[i % colors.length] + '99',
             borderColor: colors[i % colors.length],
-            backgroundColor: data.tipo === 'torta'
-              ? colors.map(c => c + '33')
-              : colors[i % colors.length] + '22',
             borderWidth: 2,
-            fill: data.tipo === 'linea',
-            tension: 0.3,
-            borderRadius: data.tipo === 'barra' ? 4 : 0
+            tension: 0.4,
+            fill: false,
+            pointRadius: 4,
+            pointBackgroundColor: colors[i % colors.length]
           }))
         },
         options: {
           responsive: true,
-          plugins: { legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 12 } } },
-          scales: data.tipo === 'torta' ? {} : {
-            y: { grid: { color: 'rgba(0,0,0,.05)' } },
-            x: { grid: { display: false } }
-          }
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { labels: { font: { size: 11 }, color: '#1A1A2E' } },
+            tooltip: { bodyFont: { size: 11 }, titleFont: { size: 11 } }
+          },
+          scales: (data.tipo !== 'pie' && data.tipo !== 'doughnut') ? {
+            x: { ticks: { font: { size: 10 }, color: '#6B7280' }, grid: { color: '#E5E7EB' } },
+            y: { ticks: { font: { size: 10 }, color: '#6B7280' }, grid: { color: '#E5E7EB' } }
+          } : {}
         }
       });
-    }, 100);
-
-    return box;
+      return wrapper;
+    } catch(e) {
+      return null;
+    }
   }
 
-  async function warrenSend() {
+  function warrenSend() {
     const input = document.getElementById('warrenInput');
     const text = input.value.trim();
     if (!text) return;
