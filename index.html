@@ -598,7 +598,9 @@
       gap: 12px;
       padding: 13px 20px;
       border-bottom: 1px solid rgba(255,255,255,.04);
-      transition: background var(--transition);
+    display: none;
+    }
+        .payment-overlay.open { display: flex; align-items: center; justify-content: center; opacity: 1; pointer-events: auto; }transition: background var(--transition);
     }
     .feed-item:last-child { border-bottom: none; }
     .feed-item:hover { background: rgba(255,255,255,.02); }
@@ -3595,7 +3597,7 @@
     .payment-overlay {
       position: fixed; inset: 0; z-index: 3000;
       background: rgba(0,0,0,.78);
-      display: flex; align-items: center; justify-content: center;
+      display: none;
       opacity: 0; pointer-events: none; transition: opacity .3s;
     }
     .payment-overlay.open { opacity: 1; pointer-events: auto; }
@@ -8629,11 +8631,6 @@ LÍMITES: Solo temas financieros y económicos. Siempre terminás con: "Este an�
       document.querySelectorAll('.member-protected.locked').forEach(function(el) {
         el.classList.remove('locked');
       });
-    }
-
-    function openPaymentModal() {
-      document.getElementById('paymentOverlay').classList.add('open');
-      document.body.style.overflow = 'hidden';
     }
 
     function closePaymentModal() {
