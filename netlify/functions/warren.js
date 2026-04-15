@@ -1,101 +1,81 @@
 exports.handler = async function(event, context) {
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: ''
-    };
-  }
-
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
-
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-  if (!GEMINI_API_KEY) {
-    console.error('ERROR: GEMINI_API_KEY no encontrada');
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ response: 'Error de configuración.' })
-    };
-  }
-
-  try {
-    const body = JSON.parse(event.body);
-    const { messages, systemPrompt } = body;
-
-    const geminiMessages = messages.map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }]
-    }));
-
-    const requestBody = {
-      system_instruction: {
-        parts: [{ text: systemPrompt || 'Sos Warren, asesor financiero de Manfredi Investment.' }]
-      },
-      contents: geminiMessages,
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 2048
-      }
-    };
-
-    // Lista de modelos a probar en orden
-    const models = [
-      'gemini-2.0-flash-lite',
-      'gemini-2.0-flash',
-      'gemini-1.5-flash',
-      'gemini-1.5-flash-8b'
-    ];
-
-    let lastError = '';
-    for (const model of models) {
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-      console.log(`Intentando modelo: ${model}`);
-
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      });
-
-      const responseText = await response.text();
-      console.log(`${model} status: ${response.status}`);
-
-      if (response.ok) {
-        const data = JSON.parse(responseText);
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sin respuesta.';
-        console.log(`Éxito con modelo: ${model}`);
-        return {
-          statusCode: 200,
-          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-          body: JSON.stringify({ response: text })
-        };
-      } else {
-        lastError = responseText.substring(0, 200);
-        console.error(`${model} falló:`, lastError);
-      }
+    if (event.httpMethod === 'OPTIONS') {
+          return {
+                  statusCode: 200,
+                  headers: {
+                            'Access-Control-Allow-Origin': '*',
+                            'Access-Control-Allow-Headers': 'Content-Type',
+                            'Access-Control-Allow-Methods': 'POST, OPTIONS'
+                  },
+                  body: ''
+          };
     }
 
-    // Si todos fallaron
-    console.error('Todos los modelos fallaron. Último error:', lastError);
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ response: 'El servicio no está disponible en este momento. Por favor intentá más tarde.' })
-    };
+    if (event.httpMethod !== 'POST') {
+          return { statusCode: 405, body: 'Method Not Allowed' };
+    }
 
-  } catch (error) {
-    console.error('Error en la función:', error.message);
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ response: 'Ocurrió un error inesperado. Intentá nuevamente.' })
-    };
-  }
+    const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+    if (!ANTHROPIC_API_KEY) {
+          console.error('ERROR: ANTHROPIC_API_KEY no encontrada');
+          return {
+                  statusCode: 200,
+                  headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+                  body: JSON.stringify({ response: 'Error de configuracion: API key no encontrada.' })
+          };
+    }
+
+    try {
+          const body = JSON.parse(event.body);
+          const { messages, systemPrompt } = body;
+
+      const requestBody = {
+              model: 'claude-haiku-4-5',
+              max_tokens: 1024,
+              system: systemPrompt || 'Sos Warren, asesor financiero de Manfredi Investment.',
+              messages: messages.map(m => ({
+                        role: m.role === 'assistant' ? 'assistant' : 'user',
+                        content: m.content
+              }))
+      };
+
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+              method: 'POST',
+              headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': ANTHROPIC_API_KEY,
+                        'anthropic-version': '2023-06-01'
+              },
+              body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+              const errText = await response.text();
+              console.error('Anthropic API error:', response.status, errText);
+              return {
+                        statusCode: 200,
+                        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+                        body: JSON.stringify({ response: 'Error al conectar con el servicio de IA. Intenta de nuevo.' })
+              };
+      }
+
+      const data = await response.json();
+          const reply = data.content && data.content[0] && data.content[0].text
+            ? data.content[0].text
+                  : 'No pude procesar tu consulta. Intenta de nuevo.';
+
+      return {
+              statusCode: 200,
+              headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+              body: JSON.stringify({ response: reply })
+      };
+
+    } catch (err) {
+          console.error('Warren function error:', err);
+          return {
+                  statusCode: 200,
+                  headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+                  body: JSON.stringify({ response: 'Hubo un error inesperado. Por favor intenta nuevamente.' })
+          };
+    }
 };
