@@ -8666,18 +8666,81 @@ LÍMITES: Solo temas financieros y económicos. Siempre terminás con: "Este an�
       }
     }
 
-    // Ejecutar al cargar
-    document.addEventListener('DOMContentLoaded', function() {
-      checkMembership();
-    });
+        // === PAYWALL DE MEMBRESÍA ===
+            (function() {
+                        var MEMBER_KEY = 'mi_member_token';
 
+                        function isMember() {
+                                      return !!(localStorage.getItem(MEMBER_KEY) || window._isMiembro);
+                        }
+
+                        var paywallCardHTML = '<div style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;justify-content:center;background:linear-gradient(to bottom,rgba(10,15,30,0.05) 0%,rgba(10,15,30,0.92) 38%);border-radius:8px;pointer-events:auto;">'
+                          + '<div style="background:var(--primary,#0A0F1E);border:1px solid var(--gold,#F2C94C);border-radius:12px;padding:32px 28px;max-width:340px;width:90%;text-align:center;color:#fff;box-shadow:0 8px 32px rgba(0,0,0,0.5);">'
+                          + '<div style="background:var(--gold,#F2C94C);color:var(--primary,#0A0F1E);font-weight:800;font-size:1.1rem;border-radius:8px;width:48px;height:48px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">MI</div>'
+                + '<h3 style="margin:0 0 8px;font-size:1.2rem;font-weight:700;color:#fff;">Contenido para miembros</h3>'
+                + '<p style="margin:0 0 20px;font-size:0.9rem;color:rgba(255,255,255,0.7);line-height:1.5;">Accedé a todos los análisis, picks y posiciones con membresía activa.</p>'
+                + '<div style="margin-bottom:6px;"><span style="font-size:2rem;font-weight:800;color:var(--gold,#F2C94C);">$10</span><span style="font-size:1rem;color:rgba(255,255,255,0.7);margin-left:4px;">USD</span></div>'
+                + '<p style="margin:0 0 20px;font-size:0.78rem;color:rgba(255,255,255,0.5);">por mes · cancelá cuando quieras</p>'
+                + '<a href="#contacto" style="display:block;background:var(--gold,#F2C94C);color:var(--primary,#0A0F1E);font-weight:700;font-size:1rem;padding:12px 0;border-radius:8px;text-decoration:none;margin-bottom:12px;">Suscribirse ahora</a>'
+                + '<p style="margin:0;font-size:0.8rem;color:rgba(255,255,255,0.5);">¿Ya tenés membresía? <a href="#" onclick="document.getElementById(\'loginModal\') && (document.getElementById(\'loginModal\').style.display=\'flex\');return false;" style="color:var(--gold,#F2C94C);text-decoration:underline;">Iniciá sesión</a></p>'
+                + '</div></div>';
+
+              function applyPaywall(containerSel, wrapperSel) {
+                            var container = document.querySelector(containerSel);
+                            if (!container) return;
+                            var items = container.children;
+                if (items.length < 2) return;
+                // blur items after first
+                for (var i = 1; i < items.length; i++) {
+                  items[i].style.cssText += ';filter:blur(5px);opacity:0.45;pointer-events:none;user-select:none;';
+    }
+                // wrap section in relative container and inject overlay
+                var section = container.closest('section') || container.parentElement;
+                            if (!section) return;
+                            var existing = section.querySelector('.mi-paywall-overlay');
+                            if (existing) return;
+                            section.style.position = 'relative';
+                var overlay = document.createElement('div');
+                overlay.className = 'mi-paywall-overlay';
+                            overlay.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;justify-content:center;pointer-events:none;';
+                            overlay.innerHTML = paywallCardHTML;
+                section.appendChild(overlay);
+              }
+
+                        function applyWarrenPaywall() {
+                var body = document.querySelector('.warren-body');
+                if (!body) return;
+                var panel = document.querySelector('.warren-panel') || body.parentElement;
+                                      if (!panel) return;
+                                      // blur existing messages
+                                      var msgs = body.querySelectorAll('.warren-message, .chat-message, p, .message');
+                if (!msgs.length) msgs = body.children;
+                for (var i = 0; i < msgs.length; i++) {
+                  msgs[i].style.cssText += ';filter:blur(5px);opacity:0.45;pointer-events:none;';
+                  }
+                                      var existing = panel.querySelector('.mi-paywall-overlay');
+                                      if (existing) return;
+                                      panel.style.position = 'relative';
+                                      var overlay = document.createElement('div');
+                overlay.className = 'mi-paywall-overlay';
+                                      overlay.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;justify-content:center;pointer-events:none;';
+                                      overlay.innerHTML = paywallCardHTML;
+                                      panel.appendChild(overlay);
+    }
+
+              function checkMembership() {
+                            if (isMember()) return;
+                            applyPaywall('.picks-list', '#inversiones');
+                            applyPaywall('.reports-grid', '#informes');
+                            applyWarrenPaywall();
+              }
+
+                        document.addEventListener('DOMContentLoaded', function() {
+                checkMembership();
+                        });
+            })();
+    
   </script>
 
-</body>
-</html>
-
-  </div><!-- /mainContent -->
-
-  
 </body>
 </html>
