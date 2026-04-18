@@ -8695,7 +8695,7 @@ LÍMITES: Solo temas financieros y económicos. Siempre terminás con: "Este an�
                   items[i].style.cssText += ';filter:blur(5px);opacity:0.45;pointer-events:none;user-select:none;';
     }
                 // wrap section in relative container and inject overlay
-                var section = container.closest('section') || container.parentElement;
+                var section = wrapperSel ? (document.querySelector(wrapperSel) || container.closest('section')) : (container.closest('section') || container.parentElement);
                             if (!section) return;
                             var existing = section.querySelector('.mi-paywall-overlay');
                             if (existing) return;
@@ -8731,7 +8731,7 @@ LÍMITES: Solo temas financieros y económicos. Siempre terminás con: "Este an�
               function checkMembership() {
                             if (isMember()) return;
                             applyPaywall('.picks-list', '#inversiones');
-                            applyPaywall('.papers-grid', '#informes');
+                            applyPaywall('.papers-grid', '#papersGrid');
                             applyWarrenPaywall();
               }
 
