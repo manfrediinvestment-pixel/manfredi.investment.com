@@ -8633,34 +8633,27 @@ LÍMITES: Solo temas financieros y económicos. Siempre terminás con: "Este an�
     }
 
     async function handlePayment(method) {
-      if (method === 'mercadopago') {
-        var btn = document.querySelector(".pay-btn");
-        btn.disabled = true;
-        btn.textContent = 'Cargando...';
-        try {
-          var resp = await fetch('https://manfredi-memberships.nachito2502.workers.dev/crear-preferencia', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-          });
-          var data = await resp.json();
-          if (data.init_point) {
-            window.location.href = data.init_point;
-          } else {
-            alert('Error al generar el pago. Intentá de nuevo.');
-            btn.disabled = false;
-            btn.textContent = '💳 MercadoPago';
-          }
-        } catch (e) {
-          alert('Error de conexión. Intentá de nuevo.');
-          btn.disabled = false;
-          btn.textContent = '💳 MercadoPago';
-        }
-      } else if (method === 'crypto') {
-        window.open('mailto:manfredi.investment@gmail.com?subject=MEMBRESIA%20Cripto');
+  if (method === 'mercadopago') {
+    var btns = document.querySelectorAll('.pay-btn');
+    btns.forEach(function(b){ b.disabled = true; });
+    try {
+      var resp = await fetch('https://manfredi-memberships.nachito2502.workers.dev/crear-preferencia', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      var data = await resp.json();
+      if (data.init_point) {
+        window.location.href = data.init_point;
       } else {
-        window.open('mailto:manfredi.investment@gmail.com?subject=MEMBRESIA%20Transferencia');
+        alert('Error al generar el pago. Intentá de nuevo.');
+        btns.forEach(function(b){ b.disabled = false; });
       }
+    } catch (e) {
+      alert('Error de conexión. Intentá de nuevo.');
+      btns.forEach(function(b){ b.disabled = false; });
     }
+  }
+}
 
     // Funcion para activar membresia con token (usar desde consola)
     function enableMembership(token) {
