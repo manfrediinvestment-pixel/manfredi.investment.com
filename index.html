@@ -1536,7 +1536,7 @@
     .warren-fab{position:fixed;bottom:28px;right:28px;z-index:8000;width:60px;height:60px;background:var(--primary);border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(10,15,30,.35);transition:transform .2s,box-shadow .2s;}
     .warren-fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(10,15,30,.45);}
     .warren-fab .warren-badge{position:absolute;top:-3px;right:-3px;width:20px;height:20px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;font-family:'IBM Plex Sans',sans-serif;}
-    .warren-panel{position:fixed;bottom:100px;right:28px;z-index:8000;width:400px;max-width:calc(100vw - 40px);height:580px;max-height:calc(100vh - 120px);background:var(--white);border:1px solid var(--border);box-shadow:0 8px 40px rgba(10,15,30,.18);display:none;flex-direction:column;overflow:hidden;transition:all .3s cubic-bezier(.4,0,.2,1);}
+    .warren-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;width:400px;max-width:calc(100vw - 40px);height:580px;max-height:calc(100vh - 120px);background:var(--white);border:1px solid var(--border);box-shadow:0 8px 40px rgba(10,15,30,.18);display:none;flex-direction:column;overflow:hidden;transition:all .3s cubic-bezier(.4,0,.2,1);}
     .warren-panel.open{display:flex;}
     .warren-panel.fullscreen{bottom:0;right:0;width:100vw;max-width:100vw;height:100vh;max-height:100vh;border-radius:0;border:none;}
     .warren-panel.fullscreen .warren-messages{max-height:none;}
@@ -1570,7 +1570,7 @@
     .warren-suggestions{padding:0 16px 12px;display:flex;flex-wrap:wrap;gap:6px;}
     .warren-suggestion{font-size:11px;padding:5px 10px;border:1px solid var(--border);background:white;cursor:pointer;color:var(--text-sec);transition:all .15s;font-family:'IBM Plex Sans',sans-serif;}
     .warren-suggestion:hover{background:var(--bg-alt);color:var(--primary);border-color:var(--primary);}
-    @media(max-width:480px){.warren-panel{right:16px;bottom:90px;width:calc(100vw - 32px);}.warren-fab{right:16px;bottom:20px;}}
+    @media(max-width:480px){.warren-panel{width:calc(100vw - 32px);}.warren-fab{right:16px;bottom:20px;}}
 
     #loginOverlay{position:fixed;inset:0;background:rgba(10,15,30,0.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .3s}
     .login-card{background:var(--white);border-radius:12px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
@@ -3955,10 +3955,10 @@ function RSFP() {
       <div class="slide-title">${slide.title}</div>
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSFP()" ${CSFP===0?'disabled':''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSFP()" ${CSFP===0?'disabled':''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
         ${CSFP < total-1
-          ? `<button class="nav-btn primary" onclick="NSFP()">Siguiente â</button>`
+          ? `<button class="nav-btn primary" onclick="NSFP()">Siguiente →</button>`
           : CLFP < LSFP.length-1
             ? `<button class="nav-btn primary" onclick="GLFP(${CLFP+1})">Próxima lección â</button>`
             : `<button class="nav-btn primary" style="background:#1e3a8a;">¡Curso completado! ð</button>`
@@ -4486,10 +4486,10 @@ function RSIB() {
       <div class="slide-title">${slide.title}</div>
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSIB()" ${CSIB===0?'disabled':''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSIB()" ${CSIB===0?'disabled':''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
         ${CSIB < total-1
-          ? `<button class="nav-btn primary" onclick="NSIB()">Siguiente â</button>`
+          ? `<button class="nav-btn primary" onclick="NSIB()">Siguiente →</button>`
           : CLIB < LSIB.length-1
             ? `<button class="nav-btn primary" onclick="GLIB(${CLIB+1})">Próxima lección â</button>`
             : `<button class="nav-btn primary" style="background:#1e3a8a;">¡Curso completado! ð</button>`
@@ -5249,10 +5249,10 @@ function RSAF() {
       <div class="slide-title">${slide.title}</div>
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSAF()" ${currentSlideIdx === 0 ? 'disabled' : ''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSAF()" ${currentSlideIdx === 0 ? 'disabled' : ''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
         ${currentSlideIdx < total - 1
-          ? `<button class="nav-btn primary" onclick="NSAF()">Siguiente â</button>`
+          ? `<button class="nav-btn primary" onclick="NSAF()">Siguiente →</button>`
           : CLAF < LSAF.length - 1
             ? `<button class="nav-btn primary" onclick="GLAF(${CLAF + 1})">Próxima lección â</button>`
             : `<button class="nav-btn primary" style="background:#1e3a8a;">¡Curso completado! ð</button>`
@@ -5767,10 +5767,10 @@ function RSMA() {
       <div class="slide-title">${slide.title}</div>
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSMA()" ${CSMA===0?'disabled':''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSMA()" ${CSMA===0?'disabled':''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
         ${CSMA < total-1
-          ? `<button class="nav-btn primary" onclick="NSMA()">Siguiente â</button>`
+          ? `<button class="nav-btn primary" onclick="NSMA()">Siguiente →</button>`
           : CLMA < LSMA.length-1
             ? `<button class="nav-btn primary" onclick="GLMA(${CLMA+1})">Próxima lección â</button>`
             : `<button class="nav-btn primary" style="background:#1e3a8a;">¡Curso completado! ð</button>`
@@ -6265,10 +6265,10 @@ function RSFP() {
       <div class="slide-title">${slide.title}</div>
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSFP()" ${CSFP===0?'disabled':''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSFP()" ${CSFP===0?'disabled':''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
         ${CSFP < total-1
-          ? `<button class="nav-btn primary" onclick="NSFP()">Siguiente â</button>`
+          ? `<button class="nav-btn primary" onclick="NSFP()">Siguiente →</button>`
           : CLFP < LSFP.length-1
             ? `<button class="nav-btn primary" onclick="GLFP(${CLFP+1})">Próxima lección â</button>`
             : `<button class="nav-btn primary" style="background:#1e3a8a;">¡Curso completado! ð</button>`
@@ -6775,10 +6775,10 @@ function RSIB() {
       <div class="slide-title">${slide.title}</div>
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSIB()" ${CSIB===0?'disabled':''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSIB()" ${CSIB===0?'disabled':''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
         ${CSIB < total-1
-          ? `<button class="nav-btn primary" onclick="NSIB()">Siguiente â</button>`
+          ? `<button class="nav-btn primary" onclick="NSIB()">Siguiente →</button>`
           : CLIB < LSIB.length-1
             ? `<button class="nav-btn primary" onclick="GLIB(${CLIB+1})">Próxima lección â</button>`
             : `<button class="nav-btn primary" style="background:#1e3a8a;">¡Curso completado! ð</button>`
@@ -7514,10 +7514,10 @@ function RSAF() {
       <div class="slide-title">${slide.title}</div>
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSAF()" ${currentSlideIdx === 0 ? 'disabled' : ''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSAF()" ${currentSlideIdx === 0 ? 'disabled' : ''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
         ${currentSlideIdx < total - 1
-          ? `<button class="nav-btn primary" onclick="NSAF()">Siguiente â</button>`
+          ? `<button class="nav-btn primary" onclick="NSAF()">Siguiente →</button>`
           : CLAF < LSAF.length - 1
             ? `<button class="nav-btn primary" onclick="GLAF(${CLAF + 1})">Próxima lección â</button>`
             : `<button class="nav-btn primary" style="background:#1e3a8a;">¡Curso completado! ð</button>`
@@ -8012,10 +8012,10 @@ function RSMA() {
       <div class="slide-title">${slide.title}</div>
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSMA()" ${CSMA===0?'disabled':''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSMA()" ${CSMA===0?'disabled':''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
         ${CSMA < total-1
-          ? `<button class="nav-btn primary" onclick="NSMA()">Siguiente â</button>`
+          ? `<button class="nav-btn primary" onclick="NSMA()">Siguiente →</button>`
           : CLMA < LSMA.length-1
             ? `<button class="nav-btn primary" onclick="GLMA(${CLMA+1})">Próxima lección â</button>`
             : `<button class="nav-btn primary" style="background:#1e3a8a;">¡Curso completado! ð</button>`
