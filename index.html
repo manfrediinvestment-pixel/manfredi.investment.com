@@ -1542,7 +1542,7 @@
     .warren-panel.fullscreen .warren-messages{max-height:none;}
     .warren-expand-btn{background:none;border:none;color:rgba(255,255,255,.6);font-size:15px;cursor:pointer;padding:0 6px;line-height:1;}
     .warren-expand-btn:hover{color:white;}
-    .warren-header{background:var(--primary);padding:14px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+    .warren-header{background:var(--primary);padding:14px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;position:relative;z-index:21;}
     .warren-avatar{width:36px;height:36px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:16px;color:white;flex-shrink:0;}
     .warren-header-info{flex:1;}
     .warren-header-name{font-size:14px;font-weight:600;color:white;line-height:1.2;}
@@ -8237,7 +8237,7 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
         </div>
       </div>
       <button class="warren-expand-btn" onclick="toggleWarrenSize()" id="warrenExpandBtn" title="Expandir">â¶</button>
-      <button class="warren-close-btn" onclick="toggleWarren()">&times;</button>
+      <button class="warren-close-btn" onclick="closeWarren()">&times;</button>
     </div>
 
     <div class="warren-messages" id="warrenMessages"></div>
@@ -8329,6 +8329,11 @@ LÍMITES: Solo temas financieros y económicos. Siempre terminás con: "Este an�
       warrenInitialized = true;
       warrenShowWelcome();
     }
+  }
+  function closeWarren() {
+    warrenOpen = false;
+    const panel = document.getElementById('warrenPanel');
+    if (panel) panel.classList.remove('open');
   }
 
   let warrenFullscreen = false;
