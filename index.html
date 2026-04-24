@@ -1627,6 +1627,17 @@
       if (user) {
         if (overlay) overlay.style.display = 'none';
         updateNavUser(user);
+        // Registrar login en Google Sheets (independiente de Firestore)
+        fetch('https://log-user.nachito2502.workers.dev', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: user.email,
+            name: user.displayName || '',
+            uid: user.uid,
+            loginTime: Date.now()
+          })
+        }).catch(function(e) { console.warn('log-user error:', e); });
         // Upsert user in Firestore
         const ref  = doc(db, 'users', user.uid);
         const snap = await getDoc(ref);
@@ -1677,18 +1688,6 @@
         }
                 window._currentUser = user;
         // Registrar login en Google Sheets
-        try {
-          fetch('https://log-user.nachito2502.workers.dev', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: user.email,
-              name: user.displayName || '',
-              uid: user.uid,
-              loginTime: Date.now()
-            })
-          }).catch(function(e) { console.warn('log-user error:', e); });
-        } catch(e) {}
       } else {
         window._isMiembro = false;
         window._currentUser = null;
