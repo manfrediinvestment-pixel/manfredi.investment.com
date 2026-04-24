@@ -1638,6 +1638,14 @@
             loginTime: Date.now()
           })
         }).catch(function(e) { console.warn('log-user error:', e); });
+        try {
+          var memResp = await fetch('https://manfredi-memberships.nachito2502.workers.dev/verificar-membresia?email=' + encodeURIComponent(user.email));
+          var memData = await memResp.json();
+          window._isMiembro = memData.miembro === true;
+        } catch(e) {
+          window._isMiembro = userData.miembro === true;
+        }
+        applyMemberLock(!window._isMiembro);
         // Upsert user in Firestore
         const ref  = doc(db, 'users', user.uid);
         const snap = await getDoc(ref);
@@ -1653,14 +1661,6 @@
           await updateDoc(ref, { ultimoAcceso: serverTimestamp() });
         }
         const userData = snap.exists() ? snap.data() : {};
-        try {
-          var memResp = await fetch('https://manfredi-memberships.nachito2502.workers.dev/verificar-membresia?email=' + encodeURIComponent(user.email));
-          var memData = await memResp.json();
-          window._isMiembro = memData.miembro === true;
-        } catch(e) {
-          window._isMiembro = userData.miembro === true;
-        }
-        applyMemberLock(!window._isMiembro);
         // Interceptar clicks de nav para usuarios logueados sin membresía
         if (!window._isMiembro) {
           document.querySelectorAll('a[href="#informes"], a[href="#reportes"], a[href="#inversiones"], [data-member-required]').forEach(function(el) {
