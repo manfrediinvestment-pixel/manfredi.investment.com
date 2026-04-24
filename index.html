@@ -1646,6 +1646,19 @@
           window._isMiembro = false;
         }
         applyMemberLock(!window._isMiembro);
+        // Si es miembro, remover overlays de paywall que se aplicaron antes del login
+        if (window._isMiembro) {
+          document.querySelectorAll('.mi-paywall-overlay').forEach(function(el) {
+            el.remove();
+          });
+          // Remover blur de items
+          document.querySelectorAll('[style*="blur"]').forEach(function(el) {
+            el.style.filter = '';
+            el.style.opacity = '';
+            el.style.pointerEvents = '';
+            el.style.userSelect = '';
+          });
+        }
         // Upsert user in Firestore
         const ref  = doc(db, 'users', user.uid);
         const snap = await getDoc(ref);
