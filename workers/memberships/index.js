@@ -150,6 +150,33 @@ async function procesarWebhook(request, env) {
                 );
     }
 
+  // Validar firma de Mercado Pago
+  const xSignature = request.headers.get('x-signature');
+  const xRequestId = request.headers.get('x-request-id');
+  const urlParams = new URL(request.url).searchParams;
+  const dataId = urlParams.get('data.id') || (body.data && body.data.id) || body.id || '';
+
+  if (xSignature && env.MP_WEBHOOK_SECRET) {
+    const parts = xSignature.split(',');
+    let ts = '', v1 = '';
+    parts.forEach(part => {
+      const [key, val] = part.trim().split('=');
+      if (key === 'ts') ts = val;
+      if (key === 'v1') v1 = val;
+    });
+    const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(env.MP_WEBHOOK_SECRET);
+    const msgData = encoder.encode(manifest);
+    const cryptoKey = await crypto.subtle.importKey('raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    const signature = await crypto.subtle.sign('HMAC', cryptoKey, msgData);
+    const hashArray = Array.from(new Uint8Array(signature));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    if (hashHex !== v1) {
+      return new Response(JSON.stringify({ error: 'Firma inválida' }), { status: 401, headers: CORS_HEADERS });
+    }
+  }
+
   // Mercado Pago envía notificaciones de tipo "payment"
   const tipo = body.type || body.topic;
     const pagoId = body.data?.id || body.id;
