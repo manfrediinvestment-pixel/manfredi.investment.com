@@ -219,6 +219,12 @@ async function procesarWebhook(request, env) {
 
   // Guardar en KV: email -> "true"
   await env.MEMBERS.put(email.toLowerCase(), 'true');
+  // Marcar como miembro en Google Sheets
+  fetch('https://log-user.nachito2502.workers.dev/marcar-miembro', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email.toLowerCase() })
+  }).catch(err => console.error('Error marcando miembro en Sheets:', err));
     console.log(`Membresía activada para: ${email}`);
 
   return new Response(
