@@ -1721,6 +1721,7 @@
           }
           window.addEventListener('scroll', onMemberScrollAttempt, {passive: true});
         }
+                window._authChecked = true;
                 window._currentUser = user;
         // Registrar login en Google Sheets
       } else {
@@ -8782,7 +8783,15 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
               var _origToggleWarren = window.toggleWarren;
               window.toggleWarren = function() {
                 if (_origToggleWarren) _origToggleWarren.apply(this, arguments);
-                if (!isMember()) { setTimeout(applyWarrenPaywall, 50); }
+                setTimeout(function() {
+                  if (!isMember() && !window._authChecked) {
+                    setTimeout(function() {
+                      if (!isMember()) applyWarrenPaywall();
+                    }, 2000);
+                  } else if (!isMember()) {
+                    applyWarrenPaywall();
+                  }
+                }, 50);
               };
 
               function checkMembership() {
