@@ -1627,17 +1627,21 @@
       if (user) {
         if (overlay) overlay.style.display = 'none';
         updateNavUser(user);
-        // Registrar login en Google Sheets (independiente de Firestore)
-        fetch('https://log-user.nachito2502.workers.dev', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: user.email,
-            name: user.displayName || '',
-            uid: user.uid,
-            loginTime: Date.now()
-          })
-        }).catch(function(e) { console.warn('log-user error:', e); });
+        // Solo registrar en Sheets si es el primer login
+        const refCheck = doc(db, 'users', user.uid);
+        const snapCheck = await getDoc(refCheck);
+        if (!snapCheck.exists()) {
+          fetch('https://log-user.nachito2502.workers.dev', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: user.email,
+              name: user.displayName || '',
+              uid: user.uid,
+              loginTime: Date.now()
+            })
+          }).catch(function(e) { console.warn('log-user error:', e); });
+        }
         try {
           var memResp = await fetch('https://manfredi-memberships.nachito2502.workers.dev/verificar-membresia?email=' + encodeURIComponent(user.email));
           var memData = await memResp.json();
