@@ -1532,45 +1532,63 @@
       font-style: italic;
     }
 
-    /* âââ WARREN CHAT âââ */
-    .warren-fab{position:fixed;bottom:28px;right:28px;z-index:8000;width:60px;height:60px;background:var(--primary);border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(10,15,30,.35);transition:transform .2s,box-shadow .2s;}
-    .warren-fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(10,15,30,.45);}
-    .warren-fab .warren-badge{position:absolute;top:-3px;right:-3px;width:20px;height:20px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;font-family:'IBM Plex Sans',sans-serif;}
-    .warren-panel{position:fixed !important;top:50% !important;left:50% !important;transform:translate(-50%,-50%) !important;z-index:9999 !important;bottom:auto !important;right:auto !important;margin:0 !important;width:400px;max-width:calc(100vw - 40px);height:580px;max-height:calc(100vh - 120px);background:var(--white);border:1px solid var(--border);box-shadow:0 8px 40px rgba(10,15,30,.18);display:none;flex-direction:column;overflow:hidden;transition:all .3s cubic-bezier(.4,0,.2,1);}
-    .warren-panel.open{display:flex;}
-    .warren-panel.fullscreen{top:0 !important;left:0 !important;transform:none !important;bottom:auto !important;right:auto !important;width:100vw;max-width:100vw;height:100vh;max-height:100vh;border-radius:0;border:none;}
-    .warren-panel.fullscreen .warren-messages{max-height:none;}
-    .warren-expand-btn{background:none;border:none;color:rgba(255,255,255,.6);font-size:15px;cursor:pointer;padding:0 6px;line-height:1;}
-    .warren-expand-btn:hover{color:white;}
-    .warren-header{background:var(--primary);padding:14px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;position:relative;z-index:21;}
-    .warren-avatar{width:36px;height:36px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:16px;color:white;flex-shrink:0;}
-    .warren-header-info{flex:1;}
-    .warren-header-name{font-size:14px;font-weight:600;color:white;line-height:1.2;}
-    .warren-header-status{font-size:11px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:4px;}
-    .warren-status-dot{width:6px;height:6px;background:#10B981;border-radius:50%;}
-    .warren-close-btn{background:none;border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer;padding:0;line-height:1;}
-    .warren-close-btn:hover{color:white;}
-    .warren-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth;}
-    .warren-messages::-webkit-scrollbar{width:4px;}
-    .warren-messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-    .warren-msg{max-width:88%;font-size:13px;line-height:1.55;}
-    .warren-msg.user{align-self:flex-end;background:var(--primary);color:white;padding:10px 14px;border-radius:14px 14px 2px 14px;}
-    .warren-msg.assistant{align-self:flex-start;background:var(--bg-alt);color:var(--text-primary);padding:10px 14px;border-radius:14px 14px 14px 2px;border:1px solid var(--border);}
-    .warren-msg.assistant strong{color:var(--primary);}
-    .warren-msg.thinking{align-self:flex-start;color:var(--text-sec);font-style:italic;font-size:12px;padding:6px 0;}
-    .warren-chart-box{background:white;border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:8px;}
-    .warren-chart-box canvas{max-height:200px;}
-    .warren-disclaimer{font-size:10px;color:var(--text-sec);margin-top:6px;font-style:italic;border-top:1px solid var(--border);padding-top:6px;}
-    .warren-input-area{border-top:1px solid var(--border);padding:12px;display:flex;gap:8px;align-items:flex-end;flex-shrink:0;background:white;}
-    .warren-input{flex:1;border:1px solid var(--border);padding:10px 12px;font-size:13px;font-family:'IBM Plex Sans',sans-serif;resize:none;outline:none;max-height:100px;line-height:1.4;color:var(--text-primary);}
-    .warren-input:focus{border-color:var(--primary);}
-    .warren-send-btn{background:var(--primary);color:white;border:none;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:opacity .2s;}
-    .warren-send-btn:hover{opacity:.85;}
-    .warren-send-btn:disabled{opacity:.4;cursor:not-allowed;}
-    .warren-suggestions{padding:0 16px 12px;display:flex;flex-wrap:wrap;gap:6px;}
-    .warren-suggestion{font-size:11px;padding:5px 10px;border:1px solid var(--border);background:white;cursor:pointer;color:var(--text-sec);transition:all .15s;font-family:'IBM Plex Sans',sans-serif;}
-    .warren-suggestion:hover{background:var(--bg-alt);color:var(--primary);border-color:var(--primary);}
-    @media(max-width:480px){.warren-panel{width:calc(100vw - 32px);}.warren-fab{right:16px;bottom:20px;}}
+    /* ─── WARREN CHAT ─── */
+    .warren-fab{position:fixed;bottom:28px;right:28px;z-index:8000;width:56px;height:56px;background:#0A0F1E;border-radius:50%;border:1px solid rgba(242,201,76,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(0,0,0,.4);transition:transform .2s,box-shadow .2s}
+    .warren-fab:hover{transform:scale(1.06);box-shadow:0 6px 32px rgba(242,201,76,.2)}
+    .warren-fab svg{fill:#F2C94C;width:22px;height:22px}
+    .warren-badge{position:absolute;top:-2px;right:-2px;width:18px;height:18px;background:#F2C94C;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#0A0F1E;font-family:'IBM Plex Sans',sans-serif}
+    .warren-panel{position:fixed!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;z-index:9999!important;bottom:auto!important;right:auto!important;margin:0!important;width:480px;max-width:calc(100vw - 32px);height:620px;max-height:calc(100vh - 80px);background:#0A0F1E;border:1px solid rgba(242,201,76,.2);box-shadow:0 16px 64px rgba(0,0,0,.6);display:none;flex-direction:column;overflow:hidden;font-family:'IBM Plex Sans',sans-serif}
+    .warren-panel.open{display:flex}
+    .warren-panel.fullscreen{top:0!important;left:0!important;transform:none!important;width:100vw;max-width:100vw;height:100vh;max-height:100vh;border:none}
+    .warren-header{background:#080c18;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;border-bottom:1px solid rgba(242,201,76,.15);position:relative}
+    .warren-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(242,201,76,.3),transparent)}
+    .warren-avatar{width:30px;height:30px;border:1px solid rgba(242,201,76,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#F2C94C;flex-shrink:0;letter-spacing:.05em}
+    .warren-header-info{flex:1}
+    .warren-header-name{font-size:12px;font-weight:600;color:#F2C94C;letter-spacing:.08em}
+    .warren-header-status{font-size:10px;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:4px;margin-top:1px}
+    .warren-status-dot{width:5px;height:5px;background:#10B981;border-radius:50%}
+    .warren-expand-btn{background:none;border:none;color:rgba(255,255,255,.3);font-size:14px;cursor:pointer;padding:0 4px;line-height:1}
+    .warren-expand-btn:hover{color:#F2C94C}
+    .warren-close-btn{background:none;border:none;color:rgba(255,255,255,.3);font-size:18px;cursor:pointer;padding:0;line-height:1}
+    .warren-close-btn:hover{color:#F2C94C}
+    .warren-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth;background:#0A0F1E}
+    .warren-messages::-webkit-scrollbar{width:3px}
+    .warren-messages::-webkit-scrollbar-thumb{background:rgba(242,201,76,.2);border-radius:2px}
+    .warren-msg{max-width:90%;font-size:12px;line-height:1.6}
+    .warren-msg.user{align-self:flex-end;background:rgba(242,201,76,.1);border:1px solid rgba(242,201,76,.2);color:#e8d5a0;padding:8px 12px;border-radius:8px 8px 2px 8px}
+    .warren-msg.assistant{align-self:flex-start;color:#c8d8e8;max-width:96%}
+    .warren-msg.thinking{align-self:flex-start;color:rgba(242,201,76,.5);font-size:11px;letter-spacing:.06em;font-style:normal;padding:4px 0}
+    .warren-msg-label{font-size:9px;color:rgba(242,201,76,.6);letter-spacing:.1em;margin-bottom:5px}
+    .warren-msg-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:10px 12px;margin-bottom:6px}
+    .warren-msg-card strong{color:#F2C94C;font-weight:600}
+    .warren-rec{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.1em;padding:2px 10px;border-radius:3px;margin-bottom:8px}
+    .warren-rec.buy{background:rgba(16,185,129,.15);color:#10B981;border:1px solid rgba(16,185,129,.25)}
+    .warren-rec.hold{background:rgba(242,201,76,.12);color:#F2C94C;border:1px solid rgba(242,201,76,.2)}
+    .warren-rec.sell{background:rgba(239,68,68,.12);color:#EF4444;border:1px solid rgba(239,68,68,.2)}
+    .warren-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:11px}
+    .warren-table th{color:rgba(242,201,76,.8);text-align:left;padding:4px 6px;border-bottom:1px solid rgba(242,201,76,.15);font-size:9px;letter-spacing:.08em;font-weight:600}
+    .warren-table td{color:#9ab4c8;padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)}
+    .warren-table td.pos{color:#10B981}
+    .warren-table td.neg{color:#EF4444}
+    .warren-table tr:hover td{background:rgba(255,255,255,.02)}
+    .warren-chart-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:10px;margin:8px 0}
+    .warren-chart-box canvas{max-height:180px}
+    .warren-disclaimer{font-size:9px;color:rgba(255,255,255,.25);margin-top:8px;border-top:1px solid rgba(255,255,255,.06);padding-top:6px;font-style:italic}
+    .warren-suggestions{padding:0 14px 10px;display:flex;flex-wrap:wrap;gap:5px;background:#0A0F1E}
+    .warren-suggestion{font-size:10px;padding:4px 10px;border:1px solid rgba(242,201,76,.2);background:transparent;cursor:pointer;color:rgba(242,201,76,.7);transition:all .15s;font-family:'IBM Plex Sans',sans-serif;border-radius:3px}
+    .warren-suggestion:hover{background:rgba(242,201,76,.08);color:#F2C94C;border-color:rgba(242,201,76,.4)}
+    .warren-input-area{border-top:1px solid rgba(242,201,76,.1);padding:10px 14px;display:flex;gap:8px;align-items:flex-end;flex-shrink:0;background:#080c18}
+    .warren-input{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:8px 12px;font-size:12px;font-family:'IBM Plex Sans',sans-serif;resize:none;outline:none;max-height:90px;line-height:1.4;color:#c8d8e8;border-radius:4px}
+    .warren-input:focus{border-color:rgba(242,201,76,.35)}
+    .warren-input::placeholder{color:rgba(255,255,255,.25)}
+    .warren-send-btn{background:rgba(242,201,76,.15);border:1px solid rgba(242,201,76,.3);color:#F2C94C;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;border-radius:4px;transition:all .2s}
+    .warren-send-btn:hover{background:rgba(242,201,76,.25)}
+    .warren-send-btn:disabled{opacity:.3;cursor:not-allowed}
+    .warren-send-btn svg{fill:#F2C94C;width:14px;height:14px}
+    @media(max-width:480px){
+      .warren-panel{width:calc(100vw - 20px)}
+      .warren-fab{right:16px;bottom:20px}
+    }
 
     #loginOverlay{position:fixed;inset:0;background:rgba(10,15,30,0.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .3s}
     .login-card{background:var(--white);border-radius:12px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
