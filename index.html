@@ -8787,24 +8787,14 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
               var _origToggleWarren = window.toggleWarren;
               window.toggleWarren = function() {
                 if (_origToggleWarren) _origToggleWarren.apply(this, arguments);
-                setTimeout(function() {
-                  if (!isMember() && !window._authChecked) {
-                    setTimeout(function() {
-                      if (!isMember()) applyWarrenPaywall();
-                    }, 2000);
-                  } else if (!isMember()) {
-                    applyWarrenPaywall();
-                  }
-                }, 50);
+                if (window._authChecked && !isMember()) {
+                  applyWarrenPaywall();
+                }
               };
 
                             function checkMembership() {
                             if (isMember()) return;
-                            // Esperar a que Firebase resuelva el auth antes de aplicar paywall
-                            if (!window._authChecked) {
-                                setTimeout(checkMembership, 500);
-                                return;
-                            }
+                            if (!window._authChecked) return;
                             applyPaywall('.picks-list', '#inversiones');
                             applyPaywall('.papers-grid', '#papersGrid');
                             applyWarrenPaywall();
