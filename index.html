@@ -1664,6 +1664,11 @@
           var memResp = await fetch('https://manfredi-memberships.nachito2502.workers.dev/verificar-membresia?email=' + encodeURIComponent(user.email));
           var memData = await memResp.json();
           window._isMiembro = memData.miembro === true;
+          if (window._isMiembro) {
+            localStorage.setItem('mi_member_token', user.uid);
+          } else {
+            localStorage.removeItem('mi_member_token');
+          }
         } catch(e) {
           window._isMiembro = false;
         }
