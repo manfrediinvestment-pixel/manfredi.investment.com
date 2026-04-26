@@ -8792,8 +8792,13 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
                 }, 50);
               };
 
-              function checkMembership() {
+                            function checkMembership() {
                             if (isMember()) return;
+                            // Esperar a que Firebase resuelva el auth antes de aplicar paywall
+                            if (!window._authChecked) {
+                                setTimeout(checkMembership, 500);
+                                return;
+                            }
                             applyPaywall('.picks-list', '#inversiones');
                             applyPaywall('.papers-grid', '#papersGrid');
                             applyWarrenPaywall();
