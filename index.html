@@ -1547,7 +1547,7 @@
     .warren-header-name{font-size:12px;font-weight:600;color:#F2C94C;letter-spacing:.08em}
     .warren-header-status{font-size:10px;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:4px;margin-top:1px}
     .warren-status-dot{width:5px;height:5px;background:#10B981;border-radius:50%}
-    .warren-expand-btn{background:none;border:none;color:rgba(255,255,255,.3);font-size:14px;cursor:pointer;padding:0 4px;line-height:1}
+    .warren-expand-btn{background:none;border:none;color:rgba(255,255,255,0.6);cursor:pointer;font-size:14px;padding:4px 8px}
     .warren-expand-btn:hover{color:#F2C94C}
     .warren-close-btn{background:none;border:none;color:rgba(255,255,255,.3);font-size:18px;cursor:pointer;padding:0;line-height:1}
     .warren-close-btn:hover{color:#F2C94C}
@@ -8441,7 +8441,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
         } catch(e) {}
         return '<pre style="background:#f4f4f4;padding:10px;border-radius:6px;font-size:11px;overflow-x:auto;white-space:pre-wrap;color:#333">' + block.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</pre>';
       });
-      div.innerHTML = html;
+      div.innerHTML = '<div class="warren-content">' + html + '</div>';
       chartPendingData.forEach(function(cd) {
         var chartBox = buildWarrenChart(cd);
         if (chartBox) {
