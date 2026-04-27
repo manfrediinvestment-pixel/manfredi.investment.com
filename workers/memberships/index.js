@@ -31,7 +31,53 @@ export default {
                       return await verificarMembresia(request, env);
             }
 
-            return new Response(
+                        // GET /consultas?email=xxx — devuelve consultas restantes del mes
+            if (url.pathname === '/consultas' && request.method === 'GET') {
+                const email = url.searchParams.get('email');
+                if (!email) {
+                    return new Response(JSON.stringify({ error: 'Email requerido' }), { status: 400, headers: CORS_HEADERS });
+                }
+                const key = email + ':consultas';
+                const resetKey = email + ':reset';
+                const ahora = new Date();
+                const mesActual = ahora.getFullYear() + '-' + String(ahora.getMonth() + 1).padStart(2, '0');
+                const mesGuardado = await env.MEMBERS.get(resetKey);
+                let consultas;
+                if (mesGuardado !== mesActual) {
+                    // Reset automático de mes
+                    consultas = 50;
+                    await env.MEMBERS.put(key, '50');
+                    await env.MEMBERS.put(resetKey, mesActual);
+                } else {
+                    const val = await env.MEMBERS.get(key);
+                    consultas = val !== null ? parseInt(val) : 50;
+                    if (val === null) {
+                        await env.MEMBERS.put(key, '50');
+                        await env.MEMBERS.put(resetKey, mesActual);
+                    }
+                }
+                return new Response(JSON.stringify({ consultas, reset: mesActual }), { status: 200, headers: CORS_HEADERS });
+            }
+
+            // POST /restar-consulta — resta 1 consulta al usuario
+            if (url.pathname === '/restar-consulta' && request.method === 'POST') {
+                const body = await request.json();
+                const email = body.email;
+                if (!email) {
+                    return new Response(JSON.stringify({ error: 'Email requerido' }), { status: 400, headers: CORS_HEADERS });
+                }
+                const key = email + ':consultas';
+                const val = await env.MEMBERS.get(key);
+                const consultas = val !== null ? parseInt(val) : 50;
+                if (consultas <= 0) {
+                    return new Response(JSON.stringify({ error: 'No quedan consultas disponibles', consultas: 0 }), { status: 429, headers: CORS_HEADERS });
+                }
+                const nuevas = consultas - 1;
+                await env.MEMBERS.put(key, String(nuevas));
+                return new Response(JSON.stringify({ ok: true, consultas: nuevas }), { status: 200, headers: CORS_HEADERS });
+            }
+
+return new Response(
                       JSON.stringify({ error: 'Ruta no encontrada' }),
               { status: 404, headers: CORS_HEADERS }
                     );
