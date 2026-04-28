@@ -29,8 +29,8 @@ exports.handler = async function(event, context) {
                     const body = JSON.parse(event.body);
                     const { messages, systemPrompt, email } = body;
 
-            // CAMBIO 2 — Verificar consultas disponibles antes de llamar a Anthropic
-            if (email) {
+            // Verificar consultas disponibles (admin no tiene límite)        const ADMIN_EMAILS = ['nachito2502@gmail.com'];
+            if (email && !ADMIN_EMAILS.includes(email.toLowerCase())) {
                             const consultasRes = await fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(email)}`);
                             const consultasData = await consultasRes.json();
                             if (consultasData.consultas === 0) {
@@ -78,7 +78,7 @@ exports.handler = async function(event, context) {
                                     : 'No pude procesar tu consulta. Intenta de nuevo.';
 
             // Restar 1 consulta después de respuesta exitosa
-            if (email) {
+            if (email && !ADMIN_EMAILS.includes(email.toLowerCase())) {
                             await fetch('https://manfredi-memberships.nachito2502.workers.dev/restar-consulta', {
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json' },
