@@ -1530,8 +1530,7 @@
       font-size: 12px;
       color: var(--text-sec);
       font-style: italic;
-    }
-
+warren-header-info
     /* ─── WARREN CHAT ─── */
     .warren-fab{position:fixed;bottom:28px;right:28px;z-index:8000;width:56px;height:56px;background:#0A0F1E;border-radius:50%;border:1px solid rgba(242,201,76,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(0,0,0,.4);transition:transform .2s,box-shadow .2s}
     .warren-fab:hover{transform:scale(1.06);box-shadow:0 6px 32px rgba(242,201,76,.2)}
@@ -8280,7 +8279,7 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
         <div class="warren-header-name">Warren &mdash; Asesor Financiero IA</div>
         <div class="warren-header-status">
           <div class="warren-status-dot"></div>
-          Manfredi Investment · En línea
+          Manfredi Investment · En línea            </div>            <div id="warrenConsultasRestantes" style="font-size:10px;color:rgba(255,255,255,.35);margin-top:3px;">50 consultas restantes</div>            </div>
         </div>
       </div>
       <button class="warren-expand-btn" onclick="toggleWarrenSize()" id="warrenExpandBtn" title="Expandir"> ⤢ </button>
@@ -8593,7 +8592,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
   async function warrenSend() {
     const input = document.getElementById('warrenInput');
     const text = input.value.trim();
-    if (!text) return;
+    if (!text) return;    // Verificar consultas disponibles antes de enviar    if (currentUser && currentUser.email) {      try {        const consultasCheck = await fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(currentUser.email)}`);        const consultasData = await consultasCheck.json();        if (consultasData.consultas === 0) {          warrenAddMessage('assistant', 'Agotaste tus 50 consultas del mes. Se renuevan el 1 del próximo mes.');          return;        }      } catch(e) {        console.warn('No se pudo verificar consultas:', e);      }    }    // Verificar consultas disponibles antes de enviar    if (currentUser && currentUser.email) {      try {        const consultasCheck = await fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(currentUser.email)}`);        const consultasData = await consultasCheck.json();        if (consultasData.consultas === 0) {          warrenAddMessage('assistant', 'Agotaste tus 50 consultas del mes. Se renuevan el 1 del próximo mes.');          return;        }      } catch(e) {        console.warn('No se pudo verificar consultas:', e);    // Verificar consultas disponibles antes de enviar    if (currentUser && currentUser.email) {      try {        const consultasCheck = await fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(currentUser.email)}`);        const consultasData = await consultasCheck.json();        if (consultasData.consultas === 0) {          warrenAddMessage('assistant', 'Agotaste tus 50 consultas del mes. Se renuevan el 1 del próximo mes.');          return;        }    // Verificar consultas disponibles antes de enviar    if (currentUser && currentUser.email) {      try {        const consultasCheck = await fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(currentUser.email)}`);        const consultasData = await consultasCheck.json();        if (consultasData.consultas === 0) {          warrenAddMessage('assistant', 'Agotaste tus 50 consultas del mes. Se renuevan el 1 del próximo mes.');    // Verificar consultas disponibles antes de enviar    if (currentUser && currentUser.email) {      try {        const consultasCheck = await fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(currentUser.email)}`);        const consultasData = await consultasCheck.json();    // Verificar consultas disponibles antes de enviar    if (currentUser && currentUser.email) {      try {    // Verificar consultas disponibles antes de enviar
 
     // Hide suggestions after first message
     document.getElementById('warrenSuggestions').style.display = 'none';
@@ -8629,7 +8628,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
             const attempt = await fetch(ep, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ messages: warrenHistory, systemPrompt: WARREN_SYSTEM })
+              body: JSON.stringify({ messages: warrenHistory, systemPrompt: WARREN_SYSTEM, email: currentUser ? currentUser.email : null })
             });
             if (attempt.ok) { res = attempt; break; }
           } catch(epErr) { console.warn('AI endpoint failed:', ep); }
@@ -8642,7 +8641,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
       let reply = data.response || 'No pude procesar tu consulta. Intentá de nuevo.';
 
       warrenHistory.push({ role: 'assistant', content: reply });
-      warrenAddMessage('assistant', reply);
+      warrenAddMessage('assistant', reply);        // Actualizar contador de consultas        if (currentUser && currentUser.email) {          fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(currentUser.email)}`)            .then(r => r.json())            .then(d => {              const el = document.getElementById('warrenConsultasRestantes');              if (el) el.textContent = `${d.consultas}/50 consultas restantes`;            })            .catch(() => {});        }        // Actualizar contador de consultas        if (currentUser && currentUser.email) {          fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(currentUser.email)}`)            .then(r => r.json())            .then(d => {              const el = document.getElementById('warrenConsultasRestantes');              if (el) el.textContent = `${d.consultas}/50 consultas restantes`;            })            .catch(() => {});        // Actualizar contador de consultas        if (currentUser && currentUser.email) {          fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(currentUser.email)}`)            .then(r => r.json())            .then(d => {              const el = document.getElementById('warrenConsultasRestantes');              if (el) el.textContent = `${d.consultas}/50 consultas restantes`;        // Actualizar contador de consultas        if (currentUser && currentUser.email) {          fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(currentUser.email)}`)            .then(r => r.json())            .then(d => {        // Actualizar contador de consultas        if (currentUser && currentUser.email) {          fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(currentUser.email)}`)        // Actualizar contador de consultas
 
     } catch (err) {
       thinkDiv.remove();
