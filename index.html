@@ -8600,9 +8600,9 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
     input.value = '';
     warrenAutoResize(input);
 
-    const aiEndpoints = [
-                '/.netlify/functions/warren'
-              ];        warrenAddMessage('user', text);
+    
+                
+              warrenAddMessage('user', text);
     warrenHistory.push({ role: 'user', content: text });
 
     const btn = document.getElementById('warrenSendBtn');
@@ -8619,8 +8619,8 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
       // Llamada al Cloudflare Worker que protege la API key
       // Probar worker primero, luego Netlify como fallback
         const aiEndpoints = [
-          'https://warren.nachito2502.workers.dev',
-          '/.netlify/functions/warren'
+          'https://warren.nachito2502.workers.dev'
+          
         ];
         let res = null;
         for (const ep of aiEndpoints) {
