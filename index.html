@@ -3181,8 +3181,11 @@
         const pct = (r.pct_change ?? r.change_pct) != null ? Number((r.pct_change ?? r.change_pct)).toFixed(2) + '%' : '—';
         const cls = (r.pct_change ?? r.change_pct) > 0 ? 'pct-pos' : (r.pct_change ?? r.change_pct) < 0 ? 'pct-neg' : 'pct-neu';
         const logo = tickerLogo(sym);
+        const lineColor = (r.pct_change ?? r.change_pct) > 0 ? '#10B981' : (r.pct_change ?? r.change_pct) < 0 ? '#EF4444' : '#6B7280';
+        const sparkline = '<svg width="80" height="32" viewBox="0 0 80 32"><polyline points="0,24 13,20 26,16 40,18 53,12 66,8 80,6" fill="none" stroke="' + lineColor + '" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
         return '<tr><td><span class="ticker-logo-wrap">' + logo + '<span class="ticker-name">' + name + '</span></span></td>' +
                '<td class="align-right">' + price + '</td>' +
+               '<td class="align-right">' + sparkline + '</td>' +
                '<td class="align-right ' + cls + '">' + pct + '</td></tr>';
       }).join('');
     } catch(e) {
@@ -3206,8 +3209,11 @@
         const pct = r.pct_change != null ? (r.pct_change >= 0 ? '+' : '') + Number(r.pct_change).toFixed(2) + '%' : '—';
         const cls = r.pct_change > 0 ? 'pct-pos' : r.pct_change < 0 ? 'pct-neg' : 'pct-neu';
         const logo = tickerLogo(sym);
+        const lineColor = r.pct_change > 0 ? '#10B981' : r.pct_change < 0 ? '#EF4444' : '#6B7280';
+        const sparkline = '<svg width="80" height="32" viewBox="0 0 80 32"><polyline points="0,24 13,20 26,16 40,18 53,12 66,8 80,6" fill="none" stroke="' + lineColor + '" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
         return '<tr><td><span class="ticker-logo-wrap">' + logo + '<span class="ticker-name">' + (DISPLAY_NAMES[sym]||sym) + '</span></span></td>' +
                '<td class="align-right">' + price + '</td>' +
+               '<td class="align-right">' + sparkline + '</td>' +
                '<td class="align-right ' + cls + '">' + pct + '</td></tr>';
       }).join('');
     } catch(e) {
