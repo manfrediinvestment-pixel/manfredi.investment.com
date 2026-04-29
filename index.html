@@ -3182,8 +3182,9 @@
         const cls = (r.pct_change ?? r.change_pct) > 0 ? 'pct-pos' : (r.pct_change ?? r.change_pct) < 0 ? 'pct-neg' : 'pct-neu';
         const logo = tickerLogo(sym);
         const lineColor = (r.pct_change ?? r.change_pct) > 0 ? '#10B981' : (r.pct_change ?? r.change_pct) < 0 ? '#EF4444' : '#6B7280';
-        const sparkline = '<svg width="80" height="32" viewBox="0 0 80 32"><polyline points="0,24 13,20 26,16 40,18 53,12 66,8 80,6" fill="none" stroke="' + lineColor + '" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
-        return '<tr><td><span class="ticker-logo-wrap">' + logo + '<span class="ticker-name">' + name + '</span></span></td>' +
+        const isUp = (r.pct_change ?? r.change_pct) > 0;
+        const sparkline = '<svg width="80" height="32" viewBox="0 0 80 32"><polyline points="' + (isUp ? '0,28 20,22 40,18 60,12 80,6' : '0,6 20,12 40,18 60,22 80,28') + '" fill="none" stroke="' + lineColor + '" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+        return '<tr><td><span class="ticker-logo-wrap">' + logo + '<strong class="ticker-name">' + name + '</strong></span></td>' +
                '<td class="align-right">' + price + '</td>' +
                '<td class="align-right">' + sparkline + '</td>' +
                '<td class="align-right ' + cls + '">' + pct + '</td></tr>';
@@ -3210,8 +3211,9 @@
         const cls = r.pct_change > 0 ? 'pct-pos' : r.pct_change < 0 ? 'pct-neg' : 'pct-neu';
         const logo = tickerLogo(sym);
         const lineColor = r.pct_change > 0 ? '#10B981' : r.pct_change < 0 ? '#EF4444' : '#6B7280';
-        const sparkline = '<svg width="80" height="32" viewBox="0 0 80 32"><polyline points="0,24 13,20 26,16 40,18 53,12 66,8 80,6" fill="none" stroke="' + lineColor + '" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
-        return '<tr><td><span class="ticker-logo-wrap">' + logo + '<span class="ticker-name">' + (DISPLAY_NAMES[sym]||sym) + '</span></span></td>' +
+        const isUp = r.pct_change > 0;
+        const sparkline = '<svg width="80" height="32" viewBox="0 0 80 32"><polyline points="' + (isUp ? '0,28 20,22 40,18 60,12 80,6' : '0,6 20,12 40,18 60,22 80,28') + '" fill="none" stroke="' + lineColor + '" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+        return '<tr><td><span class="ticker-logo-wrap">' + logo + '<strong class="ticker-name">' + (DISPLAY_NAMES[sym]||sym) + '</strong></span></td>' +
                '<td class="align-right">' + price + '</td>' +
                '<td class="align-right">' + sparkline + '</td>' +
                '<td class="align-right ' + cls + '">' + pct + '</td></tr>';
@@ -3528,9 +3530,9 @@
     .live-table-section .markets-table td{padding:6px 11px;border-bottom:1px solid var(--border);color:var(--text-primary);font-variant-numeric:tabular-nums}
     .live-table-section .markets-table tr:last-child td{border-bottom:none}
     .loading-row{text-align:center;color:var(--text-sec);font-style:italic;padding:14px!important}
-    .pct-pos{color:var(--green);font-weight:600}
-    .pct-neg{color:var(--red);font-weight:600}
-    .pct-neu{color:var(--text-sec)}
+    .pct-pos { color: #10B981 !important; }
+    .pct-neg { color: #EF4444 !important; }
+    .pct-neu { color: #6B7280; }
     .t-logo{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#fff;font-size:7px;font-weight:700;flex-shrink:0;vertical-align:middle;overflow:hidden}
     .t-logo img{width:22px;height:22px;border-radius:50%;object-fit:contain}
     .ticker-logo-wrap{display:inline-flex;align-items:center;gap:6px;vertical-align:middle;font-size:0}
