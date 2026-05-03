@@ -2476,7 +2476,13 @@
         body.appendChild(canvas);
       }
     } catch(e) {
-      body.innerHTML = `<div class="pdf-viewer-loading">No se pudo cargar el PDF.<br><small style="opacity:.5">${e.message}</small></div>`;
+      body.innerHTML = `<div class="pdf-viewer-loading">
+        No se pudo cargar el visor.<br>
+        <small style="opacity:.5">${e.message}</small><br><br>
+        <a href="${url}" target="_blank" style="color:#F2C94C;font-weight:600;font-size:13px;">
+          → Abrir PDF en nueva pestaña
+        </a>
+      </div>`;
     }
   }
 
