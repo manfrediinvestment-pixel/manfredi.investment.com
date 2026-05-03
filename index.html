@@ -8626,7 +8626,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
             const attempt = await fetch(ep, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ messages: warrenHistory, systemPrompt: WARREN_SYSTEM })
+              body: JSON.stringify({ messages: warrenHistory, systemPrompt: WARREN_SYSTEM, email: (window._currentUser ? window._currentUser.email : null) })
             });
             if (attempt.ok) { res = attempt; break; }
           } catch(epErr) { console.warn('AI endpoint failed:', ep); }
@@ -8640,6 +8640,17 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
 
       warrenHistory.push({ role: 'assistant', content: reply });
       warrenAddMessage('assistant', reply);
+       const userEmail = window._currentUser ? window._currentUser.email : null;
+       const ADMIN_EMAILS = ['nachito2502@gmail.com'];
+       if (userEmail && !ADMIN_EMAILS.includes(userEmail.toLowerCase())) {
+         fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(userEmail)}`)
+           .then(r => r.json())
+           .then(d => {
+             const el = document.getElementById('warrenConsultasRestantes');
+             if (el && d.consultas !== undefined) el.textContent = `${d.consultas}/50 consultas restantes`;
+           })
+           .catch(() => {});
+       }
 
     } catch (err) {
       thinkDiv.remove();
