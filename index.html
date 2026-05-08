@@ -8643,6 +8643,13 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
        const userEmail = window._currentUser ? window._currentUser.email : null;
        const ADMIN_EMAILS = ['nachito2502@gmail.com'];
        if (userEmail && !ADMIN_EMAILS.includes(userEmail.toLowerCase())) {
+         fetch('https://manfredi-memberships.nachito2502.workers.dev/restar-consulta', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ email: userEmail })
+         }).catch(() => {});
+       }
+       if (userEmail && !ADMIN_EMAILS.includes(userEmail.toLowerCase())) {
          fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(userEmail)}`)
            .then(r => r.json())
            .then(d => {
