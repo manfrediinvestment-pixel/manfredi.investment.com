@@ -1720,18 +1720,19 @@
         }
         // Scroll trigger para membresía (users logueados sin membresía)
         if (!window._isMiembro) {
-          let memberScrollTriggered = false;
+          window._memberScrollTriggered = false;
           function onMemberScrollAttempt() {
-            if (memberScrollTriggered) return;
+            if (window._memberScrollTriggered) return;
             const scrollY = window.scrollY || document.documentElement.scrollTop;
             if (scrollY > 80) {
-              memberScrollTriggered = true;
+              window._memberScrollTriggered = true;
               openPaymentModal();
               window.scrollTo({top: 0, behavior: 'smooth'});
               window.removeEventListener('scroll', onMemberScrollAttempt);
             }
           }
-          window.addEventListener('scroll', onMemberScrollAttempt, {passive: true});
+          window._onMemberScrollAttempt = onMemberScrollAttempt;
+            window.addEventListener('scroll', onMemberScrollAttempt, {passive: true});
         }
                 window._authChecked = true;
                 window._currentUser = user;
@@ -1854,7 +1855,7 @@
 
     function showLoginOverlay() {
       const overlay = document.getElementById('loginOverlay');
-      if (overlay) overlay.style.display = 'flex';
+      if (overlay) overlay.style.removeProperty('display');
     }
 
     window.showLoginOverlay = showLoginOverlay;
@@ -3628,10 +3629,9 @@
     .payment-overlay {
       position: fixed; inset: 0; z-index: 3000;
       background: rgba(0,0,0,.78);
-      display: none;
-      opacity: 0; pointer-events: none; transition: opacity .3s;
+      display: none !important; transition: opacity .3s;
     }
-    .payment-overlay.open { opacity: 1; pointer-events: auto; }
+    .payment-overlay.open { display: flex !important; align-items: center; justify-content: center; opacity: 1; pointer-events: auto; }
     .payment-modal-box {
       background: var(--bg-card, #111827);
       border: 1px solid rgba(242,201,76,.25);
@@ -8690,7 +8690,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
     function openPaymentModal() {
   const overlay = document.getElementById('paymentOverlay');
   if (overlay) {
-    overlay.removeAttribute('style');
+    overlay.style.removeProperty('display');
     overlay.classList.add('open');
   }
 }// ===== SISTEMA DE MEMBRESIA =====
@@ -8710,8 +8710,10 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
     }
 
     function closePaymentModal() {
-      document.getElementById('paymentOverlay').classList.remove('open');
+      const _po = document.getElementById('paymentOverlay'); if(_po){_po.classList.remove('open');_po.style.display='none';}
       document.body.style.overflow = '';
+              if (typeof window._miCheckMembership === 'function') { window._miCheckMembership(); }
+            if (window._authChecked && !window._isMiembro && window._onMemberScrollAttempt) { window._memberScrollTriggered = false; window.addEventListener('scroll', window._onMemberScrollAttempt, {passive: true}); }
     }
 
     function selectPlan(plan) {
