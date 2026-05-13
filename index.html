@@ -9369,7 +9369,7 @@ Solo temas financieros y econÃ³micos. No respondÃ©s sobre otros temas. Siemp
   </script>
 <script>
 (function() {
-  // Navbar scroll effect
+  // Navbar scroll shadow
   var navbar = document.querySelector('.navbar');
   if (navbar) {
     window.addEventListener('scroll', function() {
@@ -9377,30 +9377,41 @@ Solo temas financieros y econÃ³micos. No respondÃ©s sobre otros temas. Siemp
     }, { passive: true });
   }
 
-  // Scroll reveal para secciones principales
-  var sections = document.querySelectorAll('#mercados, #informes, #university, #inversiones, .stats-strip, .asesoria-section');
-  sections.forEach(function(el) {
-    el.classList.add('reveal-section');
-  });
+  // Solo animar elementos que están FUERA del viewport inicial
+  function initReveal() {
+    var candidates = document.querySelectorAll(
+      '#informes .report-card-daily, #informes .paper-card, ' +
+      '#university .course-card, ' +
+      '#inversiones .pick-card, ' +
+      '.stats-strip, .asesoria-section, ' +
+      '.section-informes, #university, #inversiones'
+    );
 
-  // Reveal para cards dentro de secciones
-  var cards = document.querySelectorAll('.dash-card, .course-card, .pick-card, .report-card-daily');
-  cards.forEach(function(el) {
-    el.classList.add('reveal-section');
-  });
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -20px 0px' });
 
-  var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
+    candidates.forEach(function(el) {
+      var rect = el.getBoundingClientRect();
+      // Solo aplicar a los que están fuera del viewport visible
+      if (rect.top > window.innerHeight * 0.9) {
+        el.classList.add('reveal-section');
+        observer.observe(el);
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  }
 
-  document.querySelectorAll('.reveal-section').forEach(function(el) {
-    observer.observe(el);
-  });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initReveal);
+  } else {
+    // Pequeño delay para que el layout esté estable
+    setTimeout(initReveal, 150);
+  }
 })();
 </script>
 </body>
