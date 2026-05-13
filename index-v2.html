@@ -1808,11 +1808,19 @@
     .at-live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse-dot 1.4s ease-in-out infinite; }
     .at-cols { display: grid; padding: 8px 18px; background: var(--bg-alt); border-bottom: 1px solid var(--border); }
     .at-col-label { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-sec); }
-    .at-row { display: grid; padding: 10px 18px; border-bottom: 1px solid var(--border); align-items: center; font-size: 13px; }
+    .at-row { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 12px; align-items: center; padding: 13px 22px; border-bottom: 1px solid var(--border); transition: background .15s; }
     .at-row:last-child { border-bottom: none; }
-    .at-chg { font-size: 12px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
-    .at-chg.up { color: var(--green); }
-    .at-chg.down { color: var(--red); }
+    .at-row:hover { background: var(--bg-alt); }
+    .at-row:nth-child(even) { background: #FCFCFD; }
+    .at-chg { font-size: 12px; font-weight: 600; text-align: right; padding: 3px 8px; font-variant-numeric: tabular-nums; }
+    .at-chg.pos { color: #10B981; background: rgba(16,185,129,.1); }
+    .at-chg.neg { color: #EF4444; background: rgba(239,68,68,.1); }
+    .at-name { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+    .at-ticker { font-size: 12.5px; font-weight: 700; color: var(--primary); letter-spacing: .04em; }
+    .at-fullname { font-size: 11.5px; color: var(--text-sec); }
+    .at-name-main { font-size: 13px; font-weight: 600; color: var(--primary); }
+    .at-price { font-size: 13px; font-weight: 600; color: var(--primary); text-align: right; font-variant-numeric: tabular-nums; }
+    .at-spark { display: flex; justify-content: center; }
     /* PPP MARKETS V2 HEADER PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP */
     .markets-v2-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
     .markets-v2-live { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--green); background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.2); border-radius: 20px; padding: 4px 10px; margin-bottom: 10px; }
@@ -3512,28 +3520,31 @@
       const resp = await fetch('https://data912.com/live/' + endpoint);
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       const rows = await resp.json();
-      // Filter to allowList order
       const ordered = allowList
         ? allowList.map(sym => rows.find(r => r.symbol === sym || r.ticker === sym)).filter(Boolean)
         : rows.slice(0, 10);
-      if (!ordered.length) { tbody.innerHTML = '<tr><td colspan="3" class="loading-cell">Sin datos</td></tr>'; return; }
+      if (!ordered.length) { tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Sin datos</span></div>'; return; }
       tbody.innerHTML = ordered.map(r => {
-        const sym = r.symbol || r.ticker || '';
+        const sym  = r.symbol || r.ticker || '';
         const name = DISPLAY_NAMES[sym] || r.name || sym;
-        const price = (r.c ?? r.price) != null ? '$' + Number((r.c ?? r.price)).toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2}) : 'â';
-        const pct = (r.pct_change ?? r.change_pct) != null ? Number((r.pct_change ?? r.change_pct)).toFixed(2) + '%' : 'â';
-        const cls = (r.pct_change ?? r.change_pct) > 0 ? 'pct-pos' : (r.pct_change ?? r.change_pct) < 0 ? 'pct-neg' : 'pct-neu';
-        const logo = tickerLogo(sym);
-        const lineColor = (r.pct_change ?? r.change_pct) > 0 ? '#10B981' : (r.pct_change ?? r.change_pct) < 0 ? '#EF4444' : '#6B7280';
-        const isUp = (r.pct_change ?? r.change_pct) > 0;
-        const sparkline = '<svg width="80" height="32" viewBox="0 0 80 32"><polyline points="' + (isUp ? '0,28 20,22 40,18 60,12 80,6' : '0,6 20,12 40,18 60,22 80,28') + '" fill="none" stroke="' + lineColor + '" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
-        return '<tr><td class="at-name"><span class="ticker-logo-wrap">' + logo + '<strong class="ticker-name">' + name + '</strong></span></td>' +
-               '<td class="at-price align-right"><strong>' + price + '</strong></td>' +
-               '<td class="at-spark align-right">' + sparkline + '</td>' +
-               '<td class="at-chg align-right ' + cls + '">' + pct + '</td></tr>';
+        const rawPrice = r.c ?? r.price;
+        const price = rawPrice != null ? '$' + Number(rawPrice).toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—';
+        const rawPct = r.pct_change ?? r.change_pct;
+        const sign  = rawPct > 0 ? '▲ +' : (rawPct < 0 ? '▼ ' : '');
+        const pct   = rawPct != null ? sign + Math.abs(Number(rawPct)).toFixed(2) + '%' : '—';
+        const cls   = rawPct > 0 ? 'pos' : (rawPct < 0 ? 'neg' : '');
+        const stroke = rawPct > 0 ? '#10B981' : (rawPct < 0 ? '#EF4444' : '#6B7280');
+        const pts   = rawPct > 0 ? '0,18 17,14 35,10 52,6 70,2' : (rawPct < 0 ? '0,2 17,6 35,10 52,14 70,18' : '0,10 17,10 35,10 52,10 70,10');
+        const spark = '<svg width="70" height="20" viewBox="0 0 70 20"><polyline points="' + pts + '" fill="none" stroke="' + stroke + '" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+        return '<div class="at-row">' +
+          '<div class="at-name"><span class="at-ticker">' + sym + '</span><span class="at-fullname">' + name + '</span></div>' +
+          '<div class="at-price">' + price + '</div>' +
+          '<div class="at-spark">' + spark + '</div>' +
+          '<div class="at-chg ' + cls + '">' + pct + '</div>' +
+          '</div>';
       }).join('');
     } catch(e) {
-      tbody.innerHTML = '<tr><td colspan="3" class="loading-cell">Error: ' + e.message + '</td></tr>';
+      tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error: ' + e.message + '</span></div>';
     }
   }
 
@@ -3546,23 +3557,27 @@
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       const rows = await resp.json();
       const ordered = tickers.map(sym => rows.find(r => r.symbol === sym)).filter(Boolean);
-      if (!ordered.length) { tbody.innerHTML = '<tr><td colspan="3" class="loading-cell">Sin datos</td></tr>'; return; }
+      if (!ordered.length) { tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Sin datos</span></div>'; return; }
       tbody.innerHTML = ordered.map(r => {
-        const sym = r.symbol || '';
-        const price = r.c != null ? '$' + Number(r.c).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : 'â';
-        const pct = r.pct_change != null ? (r.pct_change >= 0 ? '+' : '') + Number(r.pct_change).toFixed(2) + '%' : 'â';
-        const cls = r.pct_change > 0 ? 'pct-pos' : r.pct_change < 0 ? 'pct-neg' : 'pct-neu';
-        const logo = tickerLogo(sym);
-        const lineColor = r.pct_change > 0 ? '#10B981' : r.pct_change < 0 ? '#EF4444' : '#6B7280';
-        const isUp = r.pct_change > 0;
-        const sparkline = '<svg width="80" height="32" viewBox="0 0 80 32"><polyline points="' + (isUp ? '0,28 20,22 40,18 60,12 80,6' : '0,6 20,12 40,18 60,22 80,28') + '" fill="none" stroke="' + lineColor + '" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
-        return '<tr><td class="at-name"><span class="ticker-logo-wrap">' + logo + '<strong class="ticker-name">' + (DISPLAY_NAMES[sym]||sym) + '</strong></span></td>' +
-               '<td class="at-price align-right"><strong>' + price + '</strong></td>' +
-               '<td class="at-spark align-right">' + sparkline + '</td>' +
-               '<td class="at-chg align-right ' + cls + '">' + pct + '</td></tr>';
+        const sym  = r.symbol || '';
+        const name = DISPLAY_NAMES[sym] || sym;
+        const price = r.c != null ? '$' + Number(r.c).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—';
+        const rawPct = r.pct_change;
+        const sign  = rawPct > 0 ? '▲ +' : (rawPct < 0 ? '▼ ' : '');
+        const pct   = rawPct != null ? sign + Math.abs(Number(rawPct)).toFixed(2) + '%' : '—';
+        const cls   = rawPct > 0 ? 'pos' : (rawPct < 0 ? 'neg' : '');
+        const stroke = rawPct > 0 ? '#10B981' : (rawPct < 0 ? '#EF4444' : '#6B7280');
+        const pts   = rawPct > 0 ? '0,18 17,14 35,10 52,6 70,2' : (rawPct < 0 ? '0,2 17,6 35,10 52,14 70,18' : '0,10 17,10 35,10 52,10 70,10');
+        const spark = '<svg width="70" height="20" viewBox="0 0 70 20"><polyline points="' + pts + '" fill="none" stroke="' + stroke + '" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+        return '<div class="at-row">' +
+          '<div class="at-name"><span class="at-ticker">' + sym + '</span><span class="at-fullname">' + name + '</span></div>' +
+          '<div class="at-price">' + price + '</div>' +
+          '<div class="at-spark">' + spark + '</div>' +
+          '<div class="at-chg ' + cls + '">' + pct + '</div>' +
+          '</div>';
       }).join('');
     } catch(e) {
-      tbody.innerHTML = '<tr><td colspan="3" class="loading-cell">Error: ' + e.message + '</td></tr>';
+      tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error: ' + e.message + '</span></div>';
     }
   }
 
@@ -3570,16 +3585,16 @@
     const tbody = document.getElementById('fxBody');
     if (!tbody) return;
     const FX_CONFIG = [
-      { key:'mep',   label:'D&oacute;lar MEP',          flag:'&#127462;&#127479;', type:'dolar', casa:'bolsa' },
-      { key:'ccl',   label:'D&oacute;lar CCL',          flag:'&#127462;&#127479;', type:'dolar', casa:'contadoconliqui' },
-      { key:'blue',  label:'D&oacute;lar Blue',         flag:'&#127462;&#127479;', type:'dolar', casa:'blue' },
-      { key:'ofic',  label:'D&oacute;lar Oficial',      flag:'&#127462;&#127479;', type:'dolar', casa:'oficial' },
-      { key:'eur',   label:'Euro',                      flag:'&#127466;&#127482;', type:'fx', code:'EUR' },
-      { key:'brl',   label:'Real brasilero',            flag:'&#127463;&#127479;', type:'fx', code:'BRL' },
-      { key:'cny',   label:'Yuan chino',                flag:'&#127464;&#127475;', type:'fx', code:'CNY' },
-      { key:'gbp',   label:'Libra esterlina',           flag:'&#127468;&#127463;', type:'fx', code:'GBP' },
-      { key:'chf',   label:'Franco suizo',              flag:'&#127464;&#127469;', type:'fx', code:'CHF' },
-      { key:'jpy',   label:'Yen japon&eacute;s',        flag:'&#127471;&#127477;', type:'fx', code:'JPY' },
+      { key:'mep',   label:'Dólar MEP',          flag:'🇦🇷', type:'dolar', casa:'bolsa' },
+      { key:'ccl',   label:'Dólar CCL',          flag:'🇦🇷', type:'dolar', casa:'contadoconliqui' },
+      { key:'blue',  label:'Dólar Blue',         flag:'🇦🇷', type:'dolar', casa:'blue' },
+      { key:'ofic',  label:'Dólar Oficial',      flag:'🇦🇷', type:'dolar', casa:'oficial' },
+      { key:'eur',   label:'Euro',                    flag:'🇪🇺', type:'fx', code:'EUR' },
+      { key:'brl',   label:'Real brasilero',          flag:'🇧🇷', type:'fx', code:'BRL' },
+      { key:'cny',   label:'Yuan chino',              flag:'🇨🇳', type:'fx', code:'CNY' },
+      { key:'gbp',   label:'Libra esterlina',         flag:'🇬🇧', type:'fx', code:'GBP' },
+      { key:'chf',   label:'Franco suizo',            flag:'🇨🇭', type:'fx', code:'CHF' },
+      { key:'jpy',   label:'Yen japonés',        flag:'🇯🇵', type:'fx', code:'JPY' },
     ];
     try {
       const [dolarResp, fxResp] = await Promise.all([
@@ -3587,13 +3602,13 @@
         fetch('https://open.er-api.com/v6/latest/USD'),
       ]);
       const dolarData = dolarResp.ok ? await dolarResp.json() : [];
-      const fxData = fxResp.ok ? await fxResp.json() : {};
-      const dolarMap = {};
+      const fxData    = fxResp.ok   ? await fxResp.json()    : {};
+      const dolarMap  = {};
       if (Array.isArray(dolarData)) dolarData.forEach(d => { dolarMap[d.casa?.toLowerCase()] = d; });
       const usdBlue = dolarMap['blue']?.venta || null;
       const fxRates = fxData.rates || {};
       tbody.innerHTML = FX_CONFIG.map(cfg => {
-        let compra = 'â', venta = 'â';
+        let compra = '—', venta = '—';
         if (cfg.type === 'dolar') {
           const d = dolarMap[cfg.casa] || null;
           if (d) { compra = '$' + d.compra; venta = '$' + d.venta; }
@@ -3602,15 +3617,17 @@
           if (rateVsUSD && usdBlue) {
             const arsVal = usdBlue / rateVsUSD;
             compra = '$' + Math.round(arsVal).toLocaleString('es-AR');
-            venta = compra;
+            venta  = compra;
           }
         }
-        return '<tr><td class="at-name"><span class="ticker-logo-wrap"><span class="ticker-flag">' + cfg.flag + '</span><span class="ticker-name">' + cfg.label + '</span></span></td>' +
-               '<td class="at-price align-right">' + compra + '</td>' +
-               '<td class="at-price align-right">' + venta + '</td></tr>';
+        return '<div class="at-row" style="grid-template-columns:1.6fr 1fr 1fr;">' +
+          '<div class="at-name"><span class="at-name-main">' + cfg.flag + ' ' + cfg.label + '</span></div>' +
+          '<div class="at-price">' + compra + '</div>' +
+          '<div class="at-price">' + venta  + '</div>' +
+          '</div>';
       }).join('');
     } catch(e) {
-      tbody.innerHTML = '<tr><td colspan="3" class="loading-cell">Error: ' + e.message + '</td></tr>';
+      tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error: ' + e.message + '</span></div>';
     }
   }
 
