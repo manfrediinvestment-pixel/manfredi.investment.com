@@ -2577,7 +2577,7 @@
           </div>
           <div class="pick-right">
             <span class="pick-sentiment bull">Alcista</span>
-            <a href="#" class="pick-btn">Ver análisis &rarr;</a>
+            <a href="#" class="pick-btn" data-ticker="NVDA">Ver análisis &rarr;</a>
           </div>
         </div>
 
@@ -2597,7 +2597,7 @@
           </div>
           <div class="pick-right">
             <span class="pick-sentiment bull">Alcista</span>
-            <a href="#" class="pick-btn">Ver análisis &rarr;</a>
+            <a href="#" class="pick-btn" data-ticker="GGAL">Ver análisis &rarr;</a>
           </div>
         </div>
 
@@ -2617,7 +2617,7 @@
           </div>
           <div class="pick-right">
             <span class="pick-sentiment bear">Bajista</span>
-            <a href="#" class="pick-btn">Ver análisis &rarr;</a>
+            <a href="#" class="pick-btn" data-ticker="META">Ver análisis &rarr;</a>
           </div>
         </div>
 
@@ -2637,7 +2637,7 @@
           </div>
           <div class="pick-right">
             <span class="pick-sentiment bull">Alcista</span>
-            <a href="#" class="pick-btn">Ver análisis &rarr;</a>
+            <a href="#" class="pick-btn" data-ticker="YPF">Ver análisis &rarr;</a>
           </div>
         </div>
 
@@ -2657,7 +2657,7 @@
           </div>
           <div class="pick-right">
             <span class="pick-sentiment neutral">Neutral</span>
-            <a href="#" class="pick-btn">Ver análisis &rarr;</a>
+            <a href="#" class="pick-btn" data-ticker="AMZN">Ver análisis &rarr;</a>
           </div>
         </div>
 
@@ -9377,5 +9377,368 @@ AOS.init({
   offset: 60
 });
 </script>
+<!-- ─── OVERLAY BACKDROP ─── -->
+<div id="mi-overlay-backdrop">
+  <div class="mi-panel" id="mi-panel">
+    <button class="mi-close" id="mi-close-btn">✕</button>
+    <div class="mi-header">
+      <div class="mi-ticker-block">
+        <div class="mi-ticker" id="ov-ticker"></div>
+        <div class="mi-fullname" id="ov-fullname"></div>
+        <div class="mi-tags" id="ov-tags"></div>
+      </div>
+      <div class="mi-price-block">
+        <div class="mi-price" id="ov-price"><span class="mi-blink">Cargando…</span></div>
+        <div class="mi-change" id="ov-change"></div>
+        <div class="mi-rec" id="ov-rec"></div>
+      </div>
+    </div>
+    <div class="mi-nav" id="mi-nav">
+      <div class="mi-nav-item active" data-tab="resumen">Resumen</div>
+      <div class="mi-nav-item" data-tab="precio">Precio</div>
+      <div class="mi-nav-item" data-tab="revenue">Revenue</div>
+      <div class="mi-nav-item" data-tab="margenes">Márgenes</div>
+      <div class="mi-nav-item" data-tab="fcf">Free Cash Flow</div>
+      <div class="mi-nav-item" data-tab="deuda">Deuda</div>
+      <div class="mi-nav-item" data-tab="tesis">Tesis</div>
+    </div>
+    <div class="mi-body">
+      <div class="mi-section active" id="tab-resumen">
+        <div class="mi-sl">Métricas clave</div>
+        <div class="mi-metrics" id="ov-metrics"></div>
+        <div class="mi-sl" style="margin-top:24px">Tesis resumida</div>
+        <div class="mi-thesis"><p id="ov-thesis-short"></p></div>
+        <div class="mi-sl" style="margin-top:24px">Bull vs Bear</div>
+        <div class="mi-bb-grid">
+          <div class="mi-bbc"><div class="mi-bbh bull">● Caso alcista</div><div id="ov-bull"></div></div>
+          <div class="mi-bbc"><div class="mi-bbh bear">● Caso bajista</div><div id="ov-bear"></div></div>
+        </div>
+      </div>
+      <div class="mi-section" id="tab-precio">
+        <div class="mi-sl">Evolución del precio — 52 semanas</div>
+        <div class="mi-chart-box">
+          <div class="mi-chart-header"><div class="mi-chart-title">Precio de cierre semanal (USD)</div><div class="mi-chart-note" id="note-precio"></div></div>
+          <div class="mi-chart-area"><div class="mi-loading" id="loading-precio"><div class="mi-ld"></div><div class="mi-ld"></div><div class="mi-ld"></div><span>Cargando precio…</span></div><canvas id="chart-precio"></canvas></div>
+        </div>
+      </div>
+      <div class="mi-section" id="tab-revenue">
+        <div class="mi-sl">Revenue trimestral — últimos 8 períodos · SEC EDGAR</div>
+        <div class="mi-chart-box">
+          <div class="mi-chart-header"><div class="mi-chart-title">Ingresos totales (USD billions)</div><div class="mi-chart-note" id="note-revenue"></div></div>
+          <div class="mi-chart-area"><div class="mi-loading" id="loading-revenue"><div class="mi-ld"></div><div class="mi-ld"></div><div class="mi-ld"></div><span>Leyendo SEC EDGAR…</span></div><canvas id="chart-revenue"></canvas></div>
+        </div>
+      </div>
+      <div class="mi-section" id="tab-margenes">
+        <div class="mi-sl">Evolución de márgenes — últimos 8 períodos · SEC EDGAR</div>
+        <div class="mi-chart-box">
+          <div class="mi-chart-header"><div class="mi-chart-title">Margen bruto vs Margen operativo (%)</div><div class="mi-chart-note" id="note-margenes"></div></div>
+          <div class="mi-chart-area"><div class="mi-loading" id="loading-margenes"><div class="mi-ld"></div><div class="mi-ld"></div><div class="mi-ld"></div><span>Leyendo SEC EDGAR…</span></div><canvas id="chart-margenes"></canvas></div>
+        </div>
+      </div>
+      <div class="mi-section" id="tab-fcf">
+        <div class="mi-sl">Free Cash Flow trimestral — últimos 8 períodos · SEC EDGAR</div>
+        <div class="mi-chart-box">
+          <div class="mi-chart-header"><div class="mi-chart-title">Operating Cash Flow − CapEx (USD billions)</div><div class="mi-chart-note" id="note-fcf"></div></div>
+          <div class="mi-chart-area"><div class="mi-loading" id="loading-fcf"><div class="mi-ld"></div><div class="mi-ld"></div><div class="mi-ld"></div><span>Leyendo SEC EDGAR…</span></div><canvas id="chart-fcf"></canvas></div>
+        </div>
+      </div>
+      <div class="mi-section" id="tab-deuda">
+        <div class="mi-sl">Deuda LP vs Efectivo — evolución anual · SEC EDGAR</div>
+        <div class="mi-chart-box">
+          <div class="mi-chart-header"><div class="mi-chart-title">Deuda largo plazo vs Cash (USD billions)</div><div class="mi-chart-note" id="note-deuda"></div></div>
+          <div class="mi-chart-area"><div class="mi-loading" id="loading-deuda"><div class="mi-ld"></div><div class="mi-ld"></div><div class="mi-ld"></div><span>Leyendo SEC EDGAR…</span></div><canvas id="chart-deuda"></canvas></div>
+        </div>
+      </div>
+      <div class="mi-section" id="tab-tesis">
+        <div class="mi-sl">Tesis de inversión</div>
+        <div class="mi-thesis" style="margin-bottom:24px"><p id="ov-thesis-full"></p></div>
+        <div class="mi-sl">Bull vs Bear — análisis completo</div>
+        <div class="mi-bb-grid">
+          <div class="mi-bbc"><div class="mi-bbh bull">● Caso alcista</div><div id="ov-bull-full"></div></div>
+          <div class="mi-bbc"><div class="mi-bbh bear">● Caso bajista</div><div id="ov-bear-full"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="mi-footer">
+      <div class="mi-footer-date" id="ov-update-date"></div>
+      <div class="mi-footer-disc">Posiciones con fines ilustrativos. No constituyen recomendación de inversión.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ESTILOS DEL OVERLAY ─── -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600&display=swap');
+#mi-overlay-backdrop{display:none;position:fixed;inset:0;background:rgba(4,11,20,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:99999;overflow-y:auto;padding:24px 16px}
+#mi-overlay-backdrop.active{display:flex;justify-content:center;align-items:flex-start}
+.mi-panel{background:#060d18;border:1px solid #1a2f4a;border-radius:14px;width:100%;max-width:880px;overflow:hidden;margin:auto;position:relative;animation:miSlideUp .3s cubic-bezier(.16,1,.3,1);font-family:'Inter',sans-serif}
+@keyframes miSlideUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.mi-header{background:#040b14;border-bottom:1px solid #1a2f4a;padding:22px 28px 18px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.mi-ticker{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:#f0f5ff;letter-spacing:-1px;line-height:1}
+.mi-ticker em{color:#3b82f6;font-style:normal}
+.mi-fullname{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#4a6a8a;margin-top:5px}
+.mi-tags{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.mi-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;border:1px solid #1e3f64;color:#60a5fa;padding:2px 8px;border-radius:3px;text-transform:uppercase;letter-spacing:1px}
+.mi-price-block{text-align:right;flex-shrink:0}
+.mi-price{font-family:'IBM Plex Mono',monospace;font-size:28px;color:#f0f5ff;font-weight:500}
+.mi-blink{animation:miBlink 1.4s infinite;color:#3b82f6;font-size:14px}
+@keyframes miBlink{0%,100%{opacity:1}50%{opacity:.3}}
+.mi-change{font-family:'IBM Plex Mono',monospace;font-size:13px;margin-top:4px}
+.mi-change.pos{color:#4ade80}.mi-change.neg{color:#f87171}
+.mi-rec{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:4px 12px;border-radius:3px;display:inline-block;margin-top:8px;text-transform:uppercase;letter-spacing:1.5px}
+.mi-rec.alcista{background:#081a10;color:#4ade80;border:1px solid #1a5c35}
+.mi-rec.bajista{background:#1a0808;color:#f87171;border:1px solid #5c1a1a}
+.mi-rec.neutral{background:#0d1525;color:#94a3b8;border:1px solid #1e3354}
+.mi-close{position:absolute;top:18px;right:22px;background:none;border:1px solid #1a2f4a;color:#4a6a8a;width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:10}
+.mi-close:hover{background:#1a2f4a;color:#f0f5ff}
+.mi-nav{background:#040b14;border-bottom:1px solid #1a2f4a;display:flex;overflow-x:auto;scrollbar-width:none}
+.mi-nav::-webkit-scrollbar{display:none}
+.mi-nav-item{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#2e4f6e;padding:12px 20px;text-transform:uppercase;letter-spacing:1.2px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:color .2s;user-select:none}
+.mi-nav-item:hover{color:#6aa3cc}
+.mi-nav-item.active{color:#60a5fa;border-bottom:2px solid #3b82f6}
+.mi-body{padding:24px 28px}
+.mi-section{display:none}.mi-section.active{display:block}
+.mi-sl{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#3b82f6;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:14px}
+.mi-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.mi-metric{background:#0a1525;border:1px solid #1a2f4a;padding:14px;border-radius:6px}
+.mi-metric-label{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#2e4f6e;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+.mi-metric-val{font-family:'IBM Plex Mono',monospace;font-size:17px;color:#d4e3f7;font-weight:500}
+.mi-metric-val.pos{color:#4ade80}.mi-metric-val.neg{color:#f87171}.mi-metric-val.blue{color:#60a5fa}
+.mi-chart-box{background:#0a1525;border:1px solid #1a2f4a;border-radius:8px;padding:18px 20px}
+.mi-chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.mi-chart-title{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#2e4f6e;text-transform:uppercase;letter-spacing:1.5px}
+.mi-chart-note{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#1e3a58}
+.mi-chart-area{position:relative;height:180px}
+.mi-chart-area canvas{display:none;width:100% !important;height:180px !important}
+.mi-loading{display:flex;align-items:center;justify-content:center;height:180px;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2e4f6e}
+.mi-ld{width:6px;height:6px;background:#3b82f6;border-radius:50%;animation:miLd 1.2s infinite}
+.mi-ld:nth-child(2){animation-delay:.2s}.mi-ld:nth-child(3){animation-delay:.4s}
+@keyframes miLd{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
+.mi-thesis{background:#0a1525;border-left:2px solid #3b82f6;border-radius:0 8px 8px 0;padding:16px 20px}
+.mi-thesis p{font-size:13px;color:#9ab8d8;line-height:1.75;margin:0}
+.mi-bb-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mi-bbc{background:#0a1525;border:1px solid #1a2f4a;border-radius:8px;padding:16px}
+.mi-bbh{font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+.mi-bbh.bull{color:#4ade80}.mi-bbh.bear{color:#f87171}
+.mi-bbi{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start}
+.mi-bbd{width:5px;height:5px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.mi-bbd.bull{background:#4ade80}.mi-bbd.bear{background:#f87171}
+.mi-bbt{font-size:12px;color:#9ab8d8;line-height:1.55}
+.mi-footer{background:#040b14;border-top:1px solid #1a2f4a;padding:13px 28px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.mi-footer-date{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#1e3a58}
+.mi-footer-disc{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#1a2f48;text-align:right}
+@media(max-width:620px){.mi-metrics{grid-template-columns:repeat(2,1fr)}.mi-bb-grid{grid-template-columns:1fr}.mi-header{flex-wrap:wrap}.mi-price-block{text-align:left}.mi-body{padding:18px 16px}}
+</style>
+
+<!-- ─── SCRIPT DEL OVERLAY ─── -->
+<script>
+(function(){
+'use strict';
+
+const MI_ASSETS={
+NVDA:{fullname:'NVIDIA Corporation · NASDAQ',tags:['USA','Semiconductores','Mega Cap'],rec:'alcista',recLabel:'● ALCISTA',updatedAt:'Mayo 2026',targetPrice:'$165',upside:'+46%',pe:'34.2x',evEbitda:'28.7x',revGrowth:'+69%',opMargin:'61%',fcf:'$44.9B',debtEbitda:'0.2x',thesis:'NVDA mantiene posición dominante en infraestructura de IA con más del 80% de market share en GPUs para data centers. La arquitectura Blackwell expande el TAM hacia inferencia. El ecosistema CUDA representa un moat estructural difícil de replicar.',bull:['Demanda de GPUs para IA sin señales de desaceleración en FY2026','Márgenes brutos en expansión hacia 78–80% con arquitectura Blackwell','Ecosistema CUDA como ventaja competitiva estructural inreplicable','FCF de $44.9B habilita recompras masivas y dividendos crecientes'],bear:['Múltiplos 34x P/E dejan margen de error mínimo ante cualquier miss','Restricciones de exportación a China erosionan ~25% del revenue','AMD e Intel aceleran competencia en el segmento de inferencia','Hyperscalers desarrollan chips propios: TPU, Trainium, Maia']},
+GGAL:{fullname:'Grupo Financiero Galicia · BYMA / NASDAQ',tags:['ARG','Financiero','ADR'],rec:'alcista',recLabel:'● ALCISTA',updatedAt:'Mayo 2026',targetPrice:'$68',upside:'+35%',pe:'8.1x',evEbitda:'6.4x',revGrowth:'+42%',opMargin:'38%',fcf:'$1.2B',debtEbitda:'1.8x',thesis:'GGAL es el principal beneficiario del proceso de normalización macroeconómica argentina. La estabilización cambiaria y la baja de inflación mejoran estructuralmente los márgenes financieros.',bull:['Reactivación del crédito privado desde mínimos históricos en Argentina','Normalización macro mejora calidad de cartera y márgenes netos','Valuación deprimida vs peers regionales: P/E 8x vs 14x promedio LatAm','Potencial reingreso al índice MSCI Emerging Markets'],bear:['Alta exposición al riesgo soberano argentino','Reversión del proceso de estabilización macro destruiría la tesis','Concentración geográfica en un solo mercado de alto riesgo','Riesgo regulatorio y de tipos de cambio diferenciales']},
+META:{fullname:'Meta Platforms Inc. · NASDAQ',tags:['USA','Tech','Mega Cap'],rec:'bajista',recLabel:'● BAJISTA',updatedAt:'Mayo 2026',targetPrice:'$480',upside:'-12%',pe:'23.1x',evEbitda:'15.8x',revGrowth:'+19%',opMargin:'41%',fcf:'$32.1B',debtEbitda:'0.1x',thesis:'META muestra métricas operativas sólidas pero enfrenta riesgos estructurales crecientes. El capex masivo para IA ($65B en 2025) comprime el FCF yield. Reality Labs acumula pérdidas de más de $50B sin un camino claro a la rentabilidad.',bull:['Familia de apps con 3.3B de usuarios diarios: moat de red excepcional','Monetización de IA en WhatsApp Business y Reels en etapa temprana','Balance sólido: efectivo neto positivo, recompras agresivas','Llama 4 posiciona a META competitivamente en IA open source'],bear:['Capex de $65B en IA con ROI incierto y presión sobre FCF','Reality Labs: $50B+ en pérdidas acumuladas sin monetización visible','Riesgo regulatorio antimonopolio en Europa y EEUU','Dependencia publicitaria: vulnerable ante desaceleración económica global']},
+YPF:{fullname:'YPF S.A. · NYSE / BYMA',tags:['ARG','Energía','ADR'],rec:'alcista',recLabel:'● ALCISTA',updatedAt:'Mayo 2026',targetPrice:'$42',upside:'+28%',pe:'5.2x',evEbitda:'4.1x',revGrowth:'+31%',opMargin:'22%',fcf:'$2.8B',debtEbitda:'2.4x',thesis:'YPF es el principal vehículo de inversión en Vaca Muerta, la segunda reserva de shale gas y cuarta de shale oil a nivel mundial. El acuerdo RIGI y la normalización cambiaria desbloquean inversiones diferidas por años.',bull:['Vaca Muerta: reservas equivalentes a décadas de producción al ritmo actual','RIGI habilita $30B+ en inversiones comprometidas por majors internacionales','Producción shale creciendo 30% YoY con costos competitivos globalmente','Valuación en mínimos históricos vs valor de reservas: EV/EBITDA de 4x'],bear:['Riesgo soberano argentino: intervención estatal históricamente recurrente','Deuda neta elevada: $9B con vencimientos concentrados 2026–2028','Sensibilidad al precio del petróleo: brent bajo $60 destruye la tesis','Infraestructura de transporte insuficiente limita el ritmo de crecimiento']},
+AMZN:{fullname:'Amazon.com Inc. · NASDAQ',tags:['USA','Consumo','Mega Cap'],rec:'neutral',recLabel:'● NEUTRAL',updatedAt:'Mayo 2026',targetPrice:'$215',upside:'+8%',pe:'38.4x',evEbitda:'18.2x',revGrowth:'+11%',opMargin:'11%',fcf:'$68.3B',debtEbitda:'0.8x',thesis:'AMZN presenta un perfil de calidad excepcional pero valuación ajustada que limita el upside en el corto plazo. AWS sigue siendo el motor de rentabilidad con márgenes operativos del 37%. Bedrock y Amazon Q representan el catalizador de mediano plazo más relevante.',bull:['AWS: liderazgo en cloud con márgenes del 37% y crecimiento del 17% YoY','Publicidad digital: negocio de $56B creciendo 18% con márgenes tipo Google','FCF de $68B habilita recompras significativas y reinversión en IA','Bedrock y Amazon Q posicionan AWS como plataforma líder de IA empresarial'],bear:['Valuación 38x P/E descuenta aceleración que puede no materializarse','Retail core con márgenes bajos y presión de Temu y Shein','Capex de $100B en IA en 2025 con ROI de largo plazo incierto','Riesgo regulatorio antimonopolio sobre AWS y marketplace']}
+};
+
+let miCurrentTicker=null,miFundamentals=null;
+const miCharts={};
+
+function miBaseOpts(yLabel){return{responsive:true,maintainAspectRatio:false,animation:{duration:600},plugins:{legend:{display:true,position:'top',labels:{color:'#4a6a8a',boxWidth:10,padding:14,font:{family:"'IBM Plex Mono',monospace",size:10}}},tooltip:{backgroundColor:'#0a1525',borderColor:'#1a2f4a',borderWidth:1,titleColor:'#60a5fa',bodyColor:'#9ab8d8',padding:10,titleFont:{family:"'IBM Plex Mono',monospace"},bodyFont:{family:"'IBM Plex Mono',monospace"}}},scales:{x:{grid:{color:'#0d1e30'},ticks:{color:'#2e4f6e',font:{family:"'IBM Plex Mono',monospace",size:9},maxTicksLimit:8}},y:{grid:{color:'#0d1e30'},ticks:{color:'#2e4f6e',font:{family:"'IBM Plex Mono',monospace",size:9}},title:yLabel?{display:true,text:yLabel,color:'#2e4f6e',font:{family:"'IBM Plex Mono',monospace",size:9}}:{display:false}}}};}
+
+function miDestroyChart(id){if(miCharts[id]){miCharts[id].destroy();delete miCharts[id];}}
+function miShowCanvas(lId,cId){var l=document.getElementById(lId),c=document.getElementById(cId);if(l)l.style.display='none';if(c)c.style.display='block';}
+function miShowError(lId,msg){var l=document.getElementById(lId);if(l)l.innerHTML='<span style="color:#2e4f6e;font-family:IBM Plex Mono,monospace;font-size:11px">'+ msg +'</span>';}
+
+function miOpen(ticker){
+  miCurrentTicker=ticker;
+  var asset=MI_ASSETS[ticker];
+  if(!asset)return;
+  Object.keys(miCharts).forEach(miDestroyChart);
+  ['precio','revenue','margenes','fcf','deuda'].forEach(function(t){
+    var l=document.getElementById('loading-'+t),c=document.getElementById('chart-'+t);
+    if(l){l.style.display='flex';l.innerHTML='<div class="mi-ld"></div><div class="mi-ld"></div><div class="mi-ld"></div><span>Cargando…</span>';}
+    if(c)c.style.display='none';
+  });
+  document.getElementById('ov-ticker').innerHTML=ticker.length>1?ticker.slice(0,-1)+'<em>'+ticker.slice(-1)+'</em>':'<em>'+ticker+'</em>';
+  document.getElementById('ov-fullname').textContent=asset.fullname;
+  document.getElementById('ov-tags').innerHTML=asset.tags.map(function(t){return'<span class="mi-tag">'+t+'</span>';}).join('');
+  document.getElementById('ov-price').innerHTML='<span class="mi-blink">Cargando…</span>';
+  document.getElementById('ov-change').textContent='';
+  var recEl=document.getElementById('ov-rec');
+  recEl.textContent=asset.recLabel;
+  recEl.className='mi-rec '+asset.rec;
+  var mDefs=[['P/E Ratio',asset.pe,'blue'],['EV/EBITDA',asset.evEbitda,'blue'],['Rev. Growth YoY',asset.revGrowth,'pos'],['Margen Operativo',asset.opMargin,'pos'],['Free Cash Flow',asset.fcf,''],['Deuda / EBITDA',asset.debtEbitda,asset.rec==='bajista'?'neg':'pos'],['Precio Objetivo',asset.targetPrice,'blue'],['Upside Potencial',asset.upside,parseFloat(asset.upside)>=0?'pos':'neg']];
+  document.getElementById('ov-metrics').innerHTML=mDefs.map(function(m){return'<div class="mi-metric"><div class="mi-metric-label">'+m[0]+'</div><div class="mi-metric-val '+m[2]+'">'+m[1]+'</div></div>';}).join('');
+  ['ov-thesis-short','ov-thesis-full'].forEach(function(id){document.getElementById(id).textContent=asset.thesis;});
+  [['ov-bull','ov-bull-full'],['ov-bear','ov-bear-full']].forEach(function(pair,idx){
+    var items=idx===0?asset.bull:asset.bear,cls=idx===0?'bull':'bear';
+    var html=items.map(function(t){return'<div class="mi-bbi"><div class="mi-bbd '+cls+'"></div><div class="mi-bbt">'+t+'</div></div>';}).join('');
+    document.getElementById(pair[0]).innerHTML=html;
+    document.getElementById(pair[1]).innerHTML=html;
+  });
+  document.getElementById('ov-update-date').textContent='Análisis actualizado: '+asset.updatedAt;
+  document.getElementById('mi-overlay-backdrop').classList.add('active');
+  document.body.style.overflow='hidden';
+  miSwitchTab('resumen');
+  miLoadPrice(ticker);
+}
+
+function miClose(){document.getElementById('mi-overlay-backdrop').classList.remove('active');document.body.style.overflow='';}
+
+function miSwitchTab(tab){
+  document.querySelectorAll('.mi-section').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.mi-nav-item').forEach(function(n){n.classList.remove('active');});
+  var sec=document.getElementById('tab-'+tab);
+  var nav=document.querySelector('.mi-nav-item[data-tab="'+tab+'"]');
+  if(sec)sec.classList.add('active');
+  if(nav)nav.classList.add('active');
+  if(tab==='precio')miLoadPriceChart(miCurrentTicker);
+  if(tab==='revenue')miLoadFromFundamentals(miCurrentTicker,'revenue');
+  if(tab==='margenes')miLoadFromFundamentals(miCurrentTicker,'margenes');
+  if(tab==='fcf')miLoadFromFundamentals(miCurrentTicker,'fcf');
+  if(tab==='deuda')miLoadFromFundamentals(miCurrentTicker,'deuda');
+}
+
+async function miLoadPrice(ticker){
+  try{
+    var r=await fetch('/reports/wallstreet.json');
+    if(r.ok){
+      var d=await r.json();
+      var entry=d[ticker.toLowerCase()]||d[ticker];
+      if(entry&&entry.valor){miRenderPrice(entry.valor,entry.variacion);return;}
+    }
+  }catch(e){}
+  try{
+    for(var host of['query1','query2']){
+      try{
+        var r2=await fetch('https://'+host+'.finance.yahoo.com/v8/finance/chart/'+ticker+'?interval=1d&range=5d');
+        if(!r2.ok)continue;
+        var d2=await r2.json();
+        var meta=d2.chart.result[0].meta;
+        var price=meta.regularMarketPrice||meta.regularMarketPreviousClose;
+        var pct=meta.regularMarketChangePercent||0;
+        miRenderPrice(price.toFixed(2),(pct>=0?'+':'')+pct.toFixed(2)+'%');
+        return;
+      }catch(e2){continue;}
+    }
+  }catch(e){}
+  document.getElementById('ov-price').textContent='N/D';
+}
+
+function miRenderPrice(valor,variacion){
+  document.getElementById('ov-price').textContent='$'+(typeof valor==='number'?valor.toFixed(2):valor);
+  var pct=parseFloat(variacion);
+  var el=document.getElementById('ov-change');
+  el.textContent=(pct>=0?'▲ +':'▼ ')+Math.abs(pct).toFixed(2)+'% hoy';
+  el.className='mi-change '+(pct>=0?'pos':'neg');
+}
+
+async function miLoadPriceChart(ticker){
+  if(miCharts['precio'])return;
+  try{
+    for(var host of['query1','query2']){
+      try{
+        var r=await fetch('https://'+host+'.finance.yahoo.com/v8/finance/chart/'+ticker+'?interval=1wk&range=1y');
+        if(!r.ok)continue;
+        var d=await r.json();
+        var result=d.chart.result[0];
+        var closes=result.indicators.quote[0].close;
+        var times=result.timestamp;
+        var labels=times.map(function(t){var dt=new Date(t*1000);return dt.toLocaleDateString('es-AR',{month:'short',day:'numeric']);});
+        var prices=closes.map(function(p){return p?+p.toFixed(2):null;});
+        var valid=prices.filter(Boolean);
+        document.getElementById('note-precio').textContent='Min: $'+Math.min.apply(null,valid).toFixed(0)+' · Max: $'+Math.max.apply(null,valid).toFixed(0);
+        miShowCanvas('loading-precio','chart-precio');
+        var opts=miBaseOpts('USD');
+        opts.plugins.legend.display=false;
+        opts.elements={point:{radius:0},line:{tension:.35,borderWidth:2}};
+        miCharts['precio']=new Chart(document.getElementById('chart-precio'),{type:'line',data:{labels:labels,datasets:[{data:prices,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.07)',fill:true}]},options:opts});
+        return;
+      }catch(e2){continue;}
+    }
+    miShowError('loading-precio','No se pudo cargar el precio histórico.');
+  }catch(e){miShowError('loading-precio','Error al conectar.');}
+}
+
+async function miGetFundamentals(){
+  if(miFundamentals)return miFundamentals;
+  var r=await fetch('/reports/fundamentals.json');
+  if(!r.ok)throw new Error('fundamentals.json no disponible');
+  miFundamentals=await r.json();
+  return miFundamentals;
+}
+
+async function miLoadFromFundamentals(ticker,type){
+  if(miCharts[type])return;
+  if(ticker==='GGAL'){miShowError('loading-'+type,'GGAL reporta en CNV/BYMA, no en SEC EDGAR. Datos disponibles próximamente.');return;}
+  try{
+    var fund=await miGetFundamentals();
+    var data=fund[ticker];
+    if(!data){miShowError('loading-'+type,'Datos no disponibles para '+ticker);return;}
+    if(type==='revenue')miRenderRevenue(ticker,data);
+    if(type==='margenes')miRenderMargenes(ticker,data);
+    if(type==='fcf')miRenderFCF(ticker,data);
+    if(type==='deuda')miRenderDeuda(ticker,data);
+  }catch(e){miShowError('loading-'+type,'Error cargando datos de SEC EDGAR.');}
+}
+
+function miRenderRevenue(ticker,data){
+  if(!data.revenue||!data.revenue.length){miShowError('loading-revenue','Sin datos de revenue.');return;}
+  var labels=data.revenue.map(function(d){return d.label;}),vals=data.revenue.map(function(d){return d.val;});
+  document.getElementById('note-revenue').textContent='Último: '+labels[labels.length-1];
+  miShowCanvas('loading-revenue','chart-revenue');
+  var opts=miBaseOpts('USD B');opts.plugins.legend.display=false;
+  miCharts['revenue']=new Chart(document.getElementById('chart-revenue'),{type:'bar',data:{labels:labels,datasets:[{label:'Revenue (B USD)',data:vals,backgroundColor:vals.map(function(_,i){return i===vals.length-1?'rgba(59,130,246,.7)':'rgba(59,130,246,.3)';}),borderColor:'#3b82f6',borderWidth:1,borderRadius:4}]},options:opts});
+}
+
+function miRenderMargenes(ticker,data){
+  var gm=data.grossMargin,om=data.opMargin;
+  if((!gm||!gm.length)&&(!om||!om.length)){miShowError('loading-margenes','Sin datos de márgenes.');return;}
+  var labels=(gm||om).map(function(d){return d.label;});
+  document.getElementById('note-margenes').textContent='Último: '+labels[labels.length-1];
+  miShowCanvas('loading-margenes','chart-margenes');
+  var opts=miBaseOpts('%');opts.elements={point:{radius:3},line:{tension:.3,borderWidth:2}};
+  var datasets=[];
+  if(gm&&gm.length)datasets.push({label:'Margen Bruto %',data:gm.map(function(d){return d.val;}),borderColor:'#60a5fa',backgroundColor:'transparent'});
+  if(om&&om.length)datasets.push({label:'Margen Operativo %',data:om.map(function(d){return d.val;}),borderColor:'#4ade80',backgroundColor:'transparent'});
+  miCharts['margenes']=new Chart(document.getElementById('chart-margenes'),{type:'line',data:{labels:labels,datasets:datasets},options:opts});
+}
+
+function miRenderFCF(ticker,data){
+  if(!data.fcf||!data.fcf.length){miShowError('loading-fcf','Sin datos de Free Cash Flow.');return;}
+  var labels=data.fcf.map(function(d){return d.label;}),vals=data.fcf.map(function(d){return d.val;});
+  document.getElementById('note-fcf').textContent='Último: '+labels[labels.length-1];
+  miShowCanvas('loading-fcf','chart-fcf');
+  var opts=miBaseOpts('USD B');opts.plugins.legend.display=false;
+  miCharts['fcf']=new Chart(document.getElementById('chart-fcf'),{type:'bar',data:{labels:labels,datasets:[{label:'FCF (B USD)',data:vals,backgroundColor:vals.map(function(v){return v>=0?'rgba(74,222,128,.4)':'rgba(248,113,113,.4)';}),borderColor:vals.map(function(v){return v>=0?'#4ade80':'#f87171';}),borderWidth:1,borderRadius:4}]},options:opts});
+}
+
+function miRenderDeuda(ticker,data){
+  if(!data.debt||!data.debt.length){miShowError('loading-deuda','Sin datos de deuda.');return;}
+  var labels=data.debt.map(function(d){return d.label;});
+  document.getElementById('note-deuda').textContent='Último: '+labels[labels.length-1];
+  miShowCanvas('loading-deuda','chart-deuda');
+  var opts=miBaseOpts('USD B');opts.elements={point:{radius:3},line:{tension:.3,borderWidth:2}};
+  var datasets=[{label:'Deuda LP (B USD)',data:data.debt.map(function(d){return d.val;}),borderColor:'#f87171',backgroundColor:'transparent'}];
+  if(data.cash&&data.cash.length)datasets.push({label:'Efectivo (B USD)',data:data.cash.map(function(d){return d.val;}),borderColor:'#4ade80',backgroundColor:'transparent'});
+  miCharts['deuda']=new Chart(document.getElementById('chart-deuda'),{type:'line',data:{labels:labels,datasets:datasets},options:opts});
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('mi-overlay-backdrop').addEventListener('click',function(e){if(e.target===this)miClose();});
+  document.getElementById('mi-close-btn').addEventListener('click',miClose);
+  document.querySelectorAll('.mi-nav-item').forEach(function(el){el.addEventListener('click',function(){miSwitchTab(this.dataset.tab);});});
+  document.querySelectorAll('.pick-btn[data-ticker]').forEach(function(btn){btn.addEventListener('click',function(e){e.preventDefault();miOpen(this.dataset.ticker);});});
+  document.querySelectorAll('.pick-btn:not([data-ticker])').forEach(function(btn){btn.addEventListener('click',function(e){e.preventDefault();var card=this.closest('.pick-card');if(!card)return;var el=card.querySelector('.pick-ticker');if(el)miOpen(el.textContent.trim());});});
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')miClose();});
+window.miOpenOverlay=miOpen;
+
+})();
+</script>
+
 </body>
 </html>
