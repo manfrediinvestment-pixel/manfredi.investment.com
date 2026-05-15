@@ -167,6 +167,10 @@ nq   = yahoo("%5EIXIC", "Nasdaq")
 oro  = yahoo("GC%3DF",  "Oro")
 wti  = yahoo("CL%3DF",  "WTI")
 soja = yahoo("ZS%3DF",  "Soja")
+nvda = yahoo("NVDA", "Nvidia")
+meta = yahoo("META", "Meta")
+amzn = yahoo("AMZN", "Amazon")
+ypf  = yahoo("YPF",  "YPF")
 
 sp_v  = sp.get("valor",  "N/D"); sp_var  = sp.get("variacion",  "N/D")
 dj_v  = dj.get("valor",  "N/D"); dj_var  = dj.get("variacion",  "N/D")
@@ -201,7 +205,13 @@ wallstreet = {
     },
     "impacto_argentina": "Mercados globales actualizados al " + fecha + ".",
     "noticias": noticias_ws,
-    "conclusion": "Datos actualizados automaticamente a las " + hora + " hs del " + fecha + "."
+    "conclusion": "Datos actualizados automaticamente a las " + hora + " hs del " + fecha + ".",
+    "acciones": {
+        "NVDA": nvda,
+        "META": meta,
+        "AMZN": amzn,
+        "YPF":  ypf
+    }
 }
 
 with open("reports/wallstreet.json", "w", encoding="utf-8") as f:
