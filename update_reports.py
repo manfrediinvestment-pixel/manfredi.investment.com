@@ -219,8 +219,7 @@ def fetch_fundamentals(ticker, cik):
     url = f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
     headers = {
         "User-Agent": "manfrediinvestment-pixel contact@manfredi.com",
-        "Accept-Encoding": "gzip, deflate",
-        "Host": "data.sec.gov",
+        "Accept": "application/json",
     }
     try:
         req = urllib.request.Request(url, headers=headers)
