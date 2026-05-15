@@ -9647,7 +9647,7 @@ async function miLoadPriceChart(ticker){
         var result=d.chart.result[0];
         var closes=result.indicators.quote[0].close;
         var times=result.timestamp;
-        var labels=times.map(function(t){var dt=new Date(t*1000);return dt.toLocaleDateString('es-AR',{month:'short',day:'numeric'}));});
+        var labels=times.map(function(t){var dt=new Date(t*1000);return dt.toLocaleDateString('es-AR',{month:'short',day:'numeric'});});
         var prices=closes.map(function(p){return p?+p.toFixed(2):null;});
         var valid=prices.filter(Boolean);
         document.getElementById('note-precio').textContent='Min: $'+Math.min.apply(null,valid).toFixed(0)+' · Max: $'+Math.max.apply(null,valid).toFixed(0);
