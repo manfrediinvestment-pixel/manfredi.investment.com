@@ -219,10 +219,11 @@ with open("reports/wallstreet.json", "w", encoding="utf-8") as f:
 print("reports/wallstreet.json OK")
 # -- FUNDAMENTALS (SEC EDGAR) ------------------------------------------------
 TICKERS_CIK = {
-    "NVDA": "0001045810",
-    "META": "0001326801",
-    "AMZN": "0001018724",
-    "YPF":  "0000904851",
+    "NVDA": {"cik": "0001045810", "foreign": False},
+    "META": {"cik": "0001326801", "foreign": False},
+    "AMZN": {"cik": "0001018724", "foreign": False},
+    "YPF":  {"cik": "0000904851", "foreign": True},
+    "GGAL": {"cik": "0001114700", "foreign": True},
 }
 
 def fetch_fundamentals(ticker, cik):
@@ -246,28 +247,31 @@ def fetch_fundamentals(ticker, cik):
         for concept in concept_names:
             node = us_gaap.get(concept, {})
             usd_list = node.get("units", {}).get("USD", [])
-            filtered = [e for e in usd_list if e.get("form") in ("10-Q","10-K") and e.get("end")]
+            filtered = [e for e in usd_list if e.get("form") in ("10-Q","10-K","20-F","6-K") and e.get("end")]
 
             if is_balance:
-                # Balance sheet: dedup simple por end date, filed más reciente
                 by_end = {}
                 for e in filtered:
                     end = e["end"]
                     if end not in by_end or e.get("filed","") > by_end[end].get("filed",""):
                         by_end[end] = e
             else:
-                # P&L / Cash flow: preferir trimestral puro (60-135 días) sobre YTD
+                # Priorizar entradas con fp=Q1/Q2/Q3/Q4 (trimestral puro)
+                # Si no hay fp, usar filtro de días 60-135
                 by_end = {}
                 for e in filtered:
-                    if not e.get("start"):
-                        continue
                     end = e["end"]
-                    try:
-                        days = (datetime.date.fromisoformat(end) -
-                                datetime.date.fromisoformat(e["start"])).days
-                    except:
-                        continue
-                    is_q = 60 <= days <= 135
+                    fp = e.get("fp","")
+                    is_q = fp in ("Q1","Q2","Q3","Q4")
+                    if not is_q:
+                        if not e.get("start"):
+                            continue
+                        try:
+                            days = (datetime.date.fromisoformat(end) -
+                                    datetime.date.fromisoformat(e["start"])).days
+                            is_q = 60 <= days <= 135
+                        except:
+                            continue
                     if end not in by_end:
                         by_end[end] = (e, is_q)
                     else:
@@ -276,13 +280,11 @@ def fetch_fundamentals(ticker, cik):
                             by_end[end] = (e, is_q)
                         elif is_q == prev_is_q and e.get("filed","") > prev_e.get("filed",""):
                             by_end[end] = (e, is_q)
-                # Reconstruir dict simple y filtrar solo trimestrales
                 by_end = {k: v[0] for k, v in by_end.items() if v[1]}
 
             unique = sorted(by_end.values(), key=lambda x: x["end"])[-max_q:]
             if not unique:
                 continue
-
             result = []
             for e in unique:
                 d = datetime.date.fromisoformat(e["end"])
@@ -360,9 +362,9 @@ def fetch_fundamentals(ticker, cik):
 
 print("Generando reports/fundamentals.json...")
 fundamentals = {}
-for ticker, cik in TICKERS_CIK.items():
+for ticker, info in TICKERS_CIK.items():
     print(f"  Fetching fundamentals: {ticker}...")
-    result = fetch_fundamentals(ticker, cik)
+    result = fetch_fundamentals(ticker, info["cik"])
     if result:
         fundamentals[ticker] = result
         print(f"  {ticker} OK -- {len(result.get('revenue', []))} quarters")
