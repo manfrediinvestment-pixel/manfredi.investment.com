@@ -293,7 +293,6 @@ def fetch_fundamentals(ticker, cik):
     capex_raw = get_quarterly_series(["PaymentsToAcquirePropertyPlantAndEquipment"])
     debt      = get_quarterly_series(["LongTermDebt", "LongTermDebtNoncurrent"], is_balance=True)
     cash      = get_quarterly_series(["CashAndCashEquivalentsAtCarryingValue", "CashCashEquivalentsAndShortTermInvestments"], is_balance=True)
-                                      "CashCashEquivalentsAndShortTermInvestments"])
 
     # Construir mapas por label
     rev_map   = {e["label"]: e["val"] for e in revenue}
