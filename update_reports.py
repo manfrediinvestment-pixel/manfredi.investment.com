@@ -240,7 +240,8 @@ def fetch_fundamentals(ticker, cik):
         print(f"[fundamentals] Error fetching {ticker}: {e}")
         return None
 
-    us_gaap = data.get("facts", {}).get("us-gaap", {})
+    facts = data.get("facts", {})
+    us_gaap = facts.get("us-gaap") or facts.get("ifrs-full") or {}
 
     def get_quarterly_series(concept_names, scale=1e9, max_q=8, is_balance=False):
         import datetime
@@ -292,19 +293,44 @@ def fetch_fundamentals(ticker, cik):
                 result.append({"label": f"Q{q} {d.year}", "val": round(e["val"] / scale, 2)})
             return result
         return []
-    revenue   = get_quarterly_series(["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues"])
+    revenue   = get_quarterly_series([
+        "Revenues",
+        "RevenueFromContractWithCustomerExcludingAssessedTax",
+        "SalesRevenueNet",
+        "RevenueFromContractWithCustomerIncludingAssessedTax"
+    ])
     cogs      = get_quarterly_series([
         "CostOfRevenue",
         "CostOfGoodsAndServicesSold",
         "CostOfSales",
         "CostOfRevenueExcludingDepreciationDepletionAndAmortization"
     ])
-    gross     = get_quarterly_series(["GrossProfit"])
-    op_income = get_quarterly_series(["OperatingIncomeLoss", "OperatingIncome"])
-    cfo       = get_quarterly_series(["NetCashProvidedByUsedInOperatingActivities"])
+    gross     = get_quarterly_series([
+        "GrossProfit",
+        "ProfitLossFromOperatingActivities",
+        "GrossProfit"
+    ])
+    op_income = get_quarterly_series([
+        "OperatingIncomeLoss",
+        "ProfitLossFromOperatingActivities",
+        "ProfitFromOperations"
+    ])
+    cfo       = get_quarterly_series([
+        "NetCashProvidedByUsedInOperatingActivities",
+        "CashFlowsFromUsedInOperatingActivities"
+    ])
     capex_raw = get_quarterly_series(["PaymentsToAcquirePropertyPlantAndEquipment"])
-    debt      = get_quarterly_series(["LongTermDebt", "LongTermDebtNoncurrent"], is_balance=True)
-    cash      = get_quarterly_series(["CashAndCashEquivalentsAtCarryingValue", "CashCashEquivalentsAndShortTermInvestments"], is_balance=True)
+    debt      = get_quarterly_series([
+        "LongTermDebt",
+        "LongTermDebtNoncurrent",
+        "Borrowings",
+        "BorrowingsFromFinancialInstitutions"
+    ], is_balance=True)
+    cash      = get_quarterly_series([
+        "CashAndCashEquivalentsAtCarryingValue",
+        "CashCashEquivalentsAndShortTermInvestments",
+        "CashAndCashEquivalents"
+    ], is_balance=True)
 
     # Construir mapas por label
     rev_map   = {e["label"]: e["val"] for e in revenue}
