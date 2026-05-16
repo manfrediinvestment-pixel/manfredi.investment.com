@@ -246,51 +246,40 @@ def fetch_fundamentals(ticker, cik):
         for concept in concept_names:
             node = us_gaap.get(concept, {})
             usd_list = node.get("units", {}).get("USD", [])
+            filtered = [e for e in usd_list if e.get("form") in ("10-Q","10-K") and e.get("end")]
 
             if is_balance:
-                # Balance sheet: filtrar por form 10-Q/10-K, sin restriccion de dias
-                quarterly = [
-                    e for e in usd_list
-                    if e.get("form") in ("10-Q", "10-K") and e.get("end")
-                ]
+                # Balance sheet: dedup simple por end date, filed más reciente
+                by_end = {}
+                for e in filtered:
+                    end = e["end"]
+                    if end not in by_end or e.get("filed","") > by_end[end].get("filed",""):
+                        by_end[end] = e
             else:
-                # P&L / Cash flow: filtrar por duracion trimestral (60-135 dias)
-                quarterly = []
-                for e in usd_list:
-                    if e.get("form") not in ("10-Q", "10-K"): continue
-                    if not e.get("end") or not e.get("start"): continue
+                # P&L / Cash flow: preferir trimestral puro (60-135 días) sobre YTD
+                by_end = {}
+                for e in filtered:
+                    if not e.get("start"):
+                        continue
+                    end = e["end"]
                     try:
-                        days = (datetime.date.fromisoformat(e["end"]) -
-                                 datetime.date.fromisoformat(e["start"])).days
-                        if 60 <= days <= 135:
-                            quarterly.append(e)
-                    except: continue
+                        days = (datetime.date.fromisoformat(end) -
+                                datetime.date.fromisoformat(e["start"])).days
+                    except:
+                        continue
+                    is_q = 60 <= days <= 135
+                    if end not in by_end:
+                        by_end[end] = (e, is_q)
+                    else:
+                        prev_e, prev_is_q = by_end[end]
+                        if is_q and not prev_is_q:
+                            by_end[end] = (e, is_q)
+                        elif is_q == prev_is_q and e.get("filed","") > prev_e.get("filed",""):
+                            by_end[end] = (e, is_q)
+                # Reconstruir dict simple y filtrar solo trimestrales
+                by_end = {k: v[0] for k, v in by_end.items() if v[1]}
 
-            # Deduplicar por end date — preferir trimestral puro sobre YTD
-            import datetime
-            by_end = {}
-            for e in quarterly:
-                end = e["end"]
-                if not e.get("start"):
-                    continue
-                try:
-                    days = (datetime.date.fromisoformat(end) -
-                             datetime.date.fromisoformat(e["start"])).days
-                except:
-                    continue
-                is_quarterly = 60 <= days <= 135
-                if end not in by_end:
-                    by_end[end] = (e, is_quarterly)
-                else:
-                    prev_e, prev_is_q = by_end[end]
-                    # Preferir siempre el trimestral puro sobre YTD
-                    if is_quarterly and not prev_is_q:
-                        by_end[end] = (e, is_quarterly)
-                    elif is_quarterly == prev_is_q:
-                        if e.get("filed","") > prev_e.get("filed",""):
-                            by_end[end] = (e, is_quarterly)
-
-            unique = sorted([v[0] for v in by_end.values()], key=lambda x: x["end"])[-max_q:]
+            unique = sorted(by_end.values(), key=lambda x: x["end"])[-max_q:]
             if not unique:
                 continue
 
@@ -301,7 +290,6 @@ def fetch_fundamentals(ticker, cik):
                 result.append({"label": f"Q{q} {d.year}", "val": round(e["val"] / scale, 2)})
             return result
         return []
-
     revenue   = get_quarterly_series(["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues"])
     cogs      = get_quarterly_series([
         "CostOfRevenue",
