@@ -240,6 +240,21 @@ def fetch_fundamentals(ticker, cik):
         return None
 
     us_gaap = data.get("facts", {}).get("us-gaap", {})
+    if ticker == "NVDA":
+        import datetime
+        for concept in ["CostOfRevenue", "GrossProfit", "OperatingIncomeLoss"]:
+            node = us_gaap.get(concept, {})
+            usd_list = node.get("units", {}).get("USD", [])
+            quarterly_forms = [e for e in usd_list if e.get("form") in ("10-Q","10-K")]
+            print(f"[debug] {concept}: {len(usd_list)} total, {len(quarterly_forms)} en 10-Q/10-K")
+            for e in quarterly_forms[-5:]:
+                start = e.get("start","?")
+                end = e.get("end","?")
+                try:
+                    days = (datetime.date.fromisoformat(end) - datetime.date.fromisoformat(start)).days
+                except:
+                    days = "?"
+                print(f"  start={start} end={end} days={days} val={e.get('val')} form={e.get('form')} fp={e.get('fp')}")
 
     def get_quarterly_series(concept_names, scale=1e9, max_q=8, is_balance=False):
         import datetime
