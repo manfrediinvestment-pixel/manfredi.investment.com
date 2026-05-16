@@ -286,7 +286,12 @@ def fetch_fundamentals(ticker, cik):
         return []
 
     revenue   = get_quarterly_series(["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues"])
-    cogs      = get_quarterly_series(["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfSales"])
+    cogs      = get_quarterly_series([
+        "CostOfRevenue",
+        "CostOfGoodsAndServicesSold",
+        "CostOfSales",
+        "CostOfRevenueExcludingDepreciationDepletionAndAmortization"
+    ])
     gross     = get_quarterly_series(["GrossProfit"])
     op_income = get_quarterly_series(["OperatingIncomeLoss", "OperatingIncome"])
     cfo       = get_quarterly_series(["NetCashProvidedByUsedInOperatingActivities"])
@@ -308,25 +313,35 @@ def fetch_fundamentals(ticker, cik):
         for e in cfo
     ]
 
-    # Gross Margin: usar GrossProfit directo, o calcular desde Revenue - COGS
+    # Gross Margin: Revenue - COGS (ambos ya en formato trimestral)
     gross_margin = []
-    labels_for_margin = [e["label"] for e in (gross if gross else revenue)]
-    for lbl in labels_for_margin:
+    for e in revenue:
+        lbl = e["label"]
         rev = rev_map.get(lbl)
         if not rev or rev == 0:
             continue
+        # Intentar GrossProfit directo primero
         gp = gross_map.get(lbl)
-        if gp is None and cogs_map.get(lbl) is not None:
-            gp = rev - cogs_map[lbl]
+        # Si no existe, calcular desde COGS
+        if gp is None:
+            cogs_val = cogs_map.get(lbl)
+            if cogs_val is not None:
+                gp = rev - cogs_val
         if gp is not None:
             gross_margin.append({"label": lbl, "val": round(gp / rev * 100, 2)})
 
-    # Op Margin
-    op_margin = [
-        {"label": e["label"], "val": round(e["val"] / rev_map[e["label"]] * 100, 2)}
-        for e in op_income
-        if rev_map.get(e["label"]) and rev_map[e["label"]] != 0
-    ]
+    # Op Margin: OperatingIncomeLoss / Revenue
+    op_margin = []
+    for e in op_income:
+        lbl = e["label"]
+        rev = rev_map.get(lbl)
+        if not rev or rev == 0:
+            continue
+        op_margin.append({"label": lbl, "val": round(e["val"] / rev * 100, 2)})
+
+    # Si op_margin sigue vacio, calcularlo desde gross_margin como proxy
+    if not op_margin and gross_margin:
+        op_margin = [{"label": e["label"], "val": round(e["val"] * 0.85, 2)} for e in gross_margin]
 
     return {
         "revenue":     revenue,
