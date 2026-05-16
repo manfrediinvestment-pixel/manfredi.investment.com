@@ -291,7 +291,6 @@ def fetch_fundamentals(ticker, cik):
                             by_end[end] = (e, is_quarterly)
 
             unique = sorted([v[0] for v in by_end.values()], key=lambda x: x["end"])[-max_q:]
-            unique = sorted(by_end.values(), key=lambda x: x["end"])[-max_q:]
             if not unique:
                 continue
 
