@@ -233,7 +233,7 @@ def fetch_fundamentals(ticker, cik):
     }
     try:
         req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=20) as r:
+        with urllib.request.urlopen(req, timeout=30) as r:
             data = json.loads(r.read())
     except Exception as e:
         print(f"[fundamentals] Error fetching {ticker}: {e}")
@@ -241,79 +241,80 @@ def fetch_fundamentals(ticker, cik):
 
     us_gaap = data.get("facts", {}).get("us-gaap", {})
 
-    def quarter_label(end_date, fy, fp):
-        try:
-            quarter_map = {"Q1": "Q1", "Q2": "Q2", "Q3": "Q3", "Q4": "Q4", "FY": "Q4"}
-            q = quarter_map.get(fp, fp)
-            return f"{q} {fy}"
-        except Exception:
-            return end_date[:7]
-
     def get_quarterly_series(concept_names, scale=1e9, max_q=8):
         for concept in concept_names:
             node = us_gaap.get(concept, {})
-            units = node.get("units", {})
-            usd_list = units.get("USD", [])
+            usd_list = node.get("units", {}).get("USD", [])
             quarterly = [
                 e for e in usd_list
                 if e.get("form") in ("10-Q", "10-K")
-                and e.get("fp") in ("Q1", "Q2", "Q3", "Q4", "FY")
-                and e.get("filed") is not None
+                and e.get("end") and e.get("start")
+                and 60 <= (
+                    (__import__('datetime').date.fromisoformat(e["end"]) -
+                      __import__('datetime').date.fromisoformat(e["start"])).days
+                ) <= 135
             ]
-            seen = set()
-            unique = []
-            for e in sorted(quarterly, key=lambda x: x.get("end", ""), reverse=True):
-                key = (e.get("end"), e.get("fp"), e.get("fy"))
-                if key not in seen:
-                    seen.add(key)
-                    unique.append(e)
-                if len(unique) >= max_q:
-                    break
+            # Deduplicar por fecha end, quedarse con el filed mas reciente
+            by_end = {}
+            for e in quarterly:
+                end = e["end"]
+                if end not in by_end or e.get("filed","") > by_end[end].get("filed",""):
+                    by_end[end] = e
+            unique = sorted(by_end.values(), key=lambda x: x["end"])[-max_q:]
             if not unique:
                 continue
-            unique.reverse()
-            return [
-                {
-                    "label": quarter_label(e.get("end", ""), e.get("fy", ""), e.get("fp", "")),
-                    "val": round(e.get("val", 0) / scale, 2)
-                }
-                for e in unique
-            ]
+            result = []
+            for e in unique:
+                end = e["end"]
+                import datetime
+                d = datetime.date.fromisoformat(end)
+                q = (d.month - 1) // 3 + 1
+                result.append({"label": f"Q{q} {d.year}", "val": round(e["val"] / scale, 2)})
+            return result
         return []
 
     revenue   = get_quarterly_series(["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues"])
+    cogs      = get_quarterly_series(["CostOfRevenue", "CostOfGoodsAndServicesSold"])
     gross     = get_quarterly_series(["GrossProfit"])
     op_income = get_quarterly_series(["OperatingIncomeLoss"])
     cfo       = get_quarterly_series(["NetCashProvidedByUsedInOperatingActivities"])
     capex_raw = get_quarterly_series(["PaymentsToAcquirePropertyPlantAndEquipment"])
-    debt      = get_quarterly_series(["LongTermDebt"])
-    cash      = get_quarterly_series(["CashAndCashEquivalentsAtCarryingValue"])
+    debt      = get_quarterly_series(["LongTermDebt", "LongTermDebtNoncurrent"])
+    cash      = get_quarterly_series(["CashAndCashEquivalentsAtCarryingValue",
+                                      "CashCashEquivalentsAndShortTermInvestments"])
 
-    def series_map(series):
-        return {e["label"]: e["val"] for e in series}
+    # Construir mapas por label
+    rev_map   = {e["label"]: e["val"] for e in revenue}
+    cogs_map  = {e["label"]: e["val"] for e in cogs}
+    gross_map = {e["label"]: e["val"] for e in gross}
+    op_map    = {e["label"]: e["val"] for e in op_income}
+    cfo_map   = {e["label"]: e["val"] for e in cfo}
+    capex_map = {e["label"]: e["val"] for e in capex_raw}
 
-    rev_map   = series_map(revenue)
-    gross_map = series_map(gross)
-    op_map    = series_map(op_income)
-    cfo_map   = series_map(cfo)
-    capex_map = series_map(capex_raw)
-
-    all_labels = [e["label"] for e in cfo]
+    # FCF = CFO - CapEx
     fcf = [
-        {"label": lbl, "val": round(cfo_map.get(lbl, 0) - capex_map.get(lbl, 0), 2)}
-        for lbl in all_labels
+        {"label": e["label"], "val": round(e["val"] - capex_map.get(e["label"], 0), 2)}
+        for e in cfo
     ]
 
-    gross_margin = [
-        {"label": lbl, "val": round(gross_map[lbl] / rev_map[lbl] * 100, 2)}
-        for lbl in [e["label"] for e in gross]
-        if rev_map.get(lbl) and rev_map[lbl] != 0 and gross_map.get(lbl) is not None
-    ]
+    # Gross Margin: usar GrossProfit directo, o calcular desde Revenue - COGS
+    gross_margin = []
+    labels_for_margin = [e["label"] for e in (gross if gross else revenue)]
+    for lbl in labels_for_margin:
+        rev = rev_map.get(lbl)
+        if not rev or rev == 0:
+            continue
+        gp = gross_map.get(lbl)
+        if gp is None and cogs_map.get(lbl) is not None:
+            gp = rev - cogs_map[lbl]
+        if gp is not None:
+            gross_margin.append({"label": lbl, "val": round(gp / rev * 100, 2)})
 
+    # Op Margin
     op_margin = [
-        {"label": lbl, "val": round(op_map[lbl] / rev_map[lbl] * 100, 2)}
-        for lbl in [e["label"] for e in op_income]
-        if rev_map.get(lbl) and rev_map[lbl] != 0 and op_map.get(lbl) is not None
+        {"label": e["label"], "val": round(e["val"] / rev_map[e["label"]] * 100, 2)}
+        for e in op_income
+        if rev_map.get(e["label"]) and rev_map[e["label"]] != 0
     ]
 
     return {
