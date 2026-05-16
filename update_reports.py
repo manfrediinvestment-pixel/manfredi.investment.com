@@ -242,10 +242,19 @@ def fetch_fundamentals(ticker, cik):
 
     facts = data.get("facts", {})
     if ticker == "GGAL":
-        print(f"  GGAL namespaces: {list(facts.keys())}")
-        for ns, concepts in facts.items():
-            keys = list(concepts.keys())
-            print(f"  GGAL {ns} ({len(keys)} concepts): {keys[:30]}")
+        ifrs = facts.get("ifrs-full", {})
+        all_keys = list(ifrs.keys())
+        print(f"  GGAL all concepts: {all_keys}")
+        for concept in ["Revenue", "GrossProfit", "ProfitLoss", "ProfitLossFromOperatingActivities",
+                        "Borrowings", "CashAndCashEquivalents", "Cash",
+                        "CashFlowsFromUsedInOperatingActivities",
+                        "CashFlowsFromUsedInInvestingActivities",
+                        "NetInterestIncome", "InterestIncome", "FeeAndCommissionIncome"]:
+            node = ifrs.get(concept, {})
+            entries = node.get("units", {}).get("USD", []) or node.get("units", {}).get("ARS", [])
+            print(f"  {concept}: {len(entries)} entries, forms={list(set(e.get('form') for e in entries[:10]))}")
+            if entries:
+                print(f"    sample: {entries[-1]}")
     us_gaap = facts.get("us-gaap") or facts.get("ifrs-full") or {}
 
     def get_quarterly_series(concept_names, scale=1e9, max_q=8, is_balance=False):
