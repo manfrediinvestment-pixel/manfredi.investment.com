@@ -241,6 +241,11 @@ def fetch_fundamentals(ticker, cik):
         return None
 
     facts = data.get("facts", {})
+    if ticker == "GGAL":
+        print(f"  GGAL namespaces: {list(facts.keys())}")
+        for ns, concepts in facts.items():
+            keys = list(concepts.keys())
+            print(f"  GGAL {ns} ({len(keys)} concepts): {keys[:30]}")
     us_gaap = facts.get("us-gaap") or facts.get("ifrs-full") or {}
 
     def get_quarterly_series(concept_names, scale=1e9, max_q=8, is_balance=False):
