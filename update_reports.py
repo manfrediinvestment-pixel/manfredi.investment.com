@@ -240,21 +240,6 @@ def fetch_fundamentals(ticker, cik):
         return None
 
     us_gaap = data.get("facts", {}).get("us-gaap", {})
-    if ticker == "NVDA":
-        import datetime
-        for concept in ["CostOfRevenue", "GrossProfit", "OperatingIncomeLoss"]:
-            node = us_gaap.get(concept, {})
-            usd_list = node.get("units", {}).get("USD", [])
-            quarterly_forms = [e for e in usd_list if e.get("form") in ("10-Q","10-K")]
-            print(f"[debug] {concept}: {len(usd_list)} total, {len(quarterly_forms)} en 10-Q/10-K")
-            for e in quarterly_forms[-5:]:
-                start = e.get("start","?")
-                end = e.get("end","?")
-                try:
-                    days = (datetime.date.fromisoformat(end) - datetime.date.fromisoformat(start)).days
-                except:
-                    days = "?"
-                print(f"  start={start} end={end} days={days} val={e.get('val')} form={e.get('form')} fp={e.get('fp')}")
 
     def get_quarterly_series(concept_names, scale=1e9, max_q=8, is_balance=False):
         import datetime
@@ -281,13 +266,31 @@ def fetch_fundamentals(ticker, cik):
                             quarterly.append(e)
                     except: continue
 
-            # Deduplicar por end date
+            # Deduplicar por end date — preferir trimestral puro sobre YTD
+            import datetime
             by_end = {}
             for e in quarterly:
                 end = e["end"]
-                if end not in by_end or e.get("filed","") > by_end[end].get("filed",""):
-                    by_end[end] = e
+                if not e.get("start"):
+                    continue
+                try:
+                    days = (datetime.date.fromisoformat(end) -
+                             datetime.date.fromisoformat(e["start"])).days
+                except:
+                    continue
+                is_quarterly = 60 <= days <= 135
+                if end not in by_end:
+                    by_end[end] = (e, is_quarterly)
+                else:
+                    prev_e, prev_is_q = by_end[end]
+                    # Preferir siempre el trimestral puro sobre YTD
+                    if is_quarterly and not prev_is_q:
+                        by_end[end] = (e, is_quarterly)
+                    elif is_quarterly == prev_is_q:
+                        if e.get("filed","") > prev_e.get("filed",""):
+                            by_end[end] = (e, is_quarterly)
 
+            unique = sorted([v[0] for v in by_end.values()], key=lambda x: x["end"])[-max_q:]
             unique = sorted(by_end.values(), key=lambda x: x["end"])[-max_q:]
             if not unique:
                 continue
