@@ -241,46 +241,58 @@ def fetch_fundamentals(ticker, cik):
 
     us_gaap = data.get("facts", {}).get("us-gaap", {})
 
-    def get_quarterly_series(concept_names, scale=1e9, max_q=8):
+    def get_quarterly_series(concept_names, scale=1e9, max_q=8, is_balance=False):
+        import datetime
         for concept in concept_names:
             node = us_gaap.get(concept, {})
             usd_list = node.get("units", {}).get("USD", [])
-            quarterly = [
-                e for e in usd_list
-                if e.get("form") in ("10-Q", "10-K")
-                and e.get("end") and e.get("start")
-                and 60 <= (
-                    (__import__('datetime').date.fromisoformat(e["end"]) -
-                      __import__('datetime').date.fromisoformat(e["start"])).days
-                ) <= 135
-            ]
-            # Deduplicar por fecha end, quedarse con el filed mas reciente
+
+            if is_balance:
+                # Balance sheet: filtrar por form 10-Q/10-K, sin restriccion de dias
+                quarterly = [
+                    e for e in usd_list
+                    if e.get("form") in ("10-Q", "10-K") and e.get("end")
+                ]
+            else:
+                # P&L / Cash flow: filtrar por duracion trimestral (60-135 dias)
+                quarterly = []
+                for e in usd_list:
+                    if e.get("form") not in ("10-Q", "10-K"): continue
+                    if not e.get("end") or not e.get("start"): continue
+                    try:
+                        days = (datetime.date.fromisoformat(e["end"]) -
+                                 datetime.date.fromisoformat(e["start"])).days
+                        if 60 <= days <= 135:
+                            quarterly.append(e)
+                    except: continue
+
+            # Deduplicar por end date
             by_end = {}
             for e in quarterly:
                 end = e["end"]
                 if end not in by_end or e.get("filed","") > by_end[end].get("filed",""):
                     by_end[end] = e
+
             unique = sorted(by_end.values(), key=lambda x: x["end"])[-max_q:]
             if not unique:
                 continue
+
             result = []
             for e in unique:
-                end = e["end"]
-                import datetime
-                d = datetime.date.fromisoformat(end)
+                d = datetime.date.fromisoformat(e["end"])
                 q = (d.month - 1) // 3 + 1
                 result.append({"label": f"Q{q} {d.year}", "val": round(e["val"] / scale, 2)})
             return result
         return []
 
     revenue   = get_quarterly_series(["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues"])
-    cogs      = get_quarterly_series(["CostOfRevenue", "CostOfGoodsAndServicesSold"])
+    cogs      = get_quarterly_series(["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfSales"])
     gross     = get_quarterly_series(["GrossProfit"])
-    op_income = get_quarterly_series(["OperatingIncomeLoss"])
+    op_income = get_quarterly_series(["OperatingIncomeLoss", "OperatingIncome"])
     cfo       = get_quarterly_series(["NetCashProvidedByUsedInOperatingActivities"])
     capex_raw = get_quarterly_series(["PaymentsToAcquirePropertyPlantAndEquipment"])
-    debt      = get_quarterly_series(["LongTermDebt", "LongTermDebtNoncurrent"])
-    cash      = get_quarterly_series(["CashAndCashEquivalentsAtCarryingValue",
+    debt      = get_quarterly_series(["LongTermDebt", "LongTermDebtNoncurrent"], is_balance=True)
+    cash      = get_quarterly_series(["CashAndCashEquivalentsAtCarryingValue", "CashCashEquivalentsAndShortTermInvestments"], is_balance=True)
                                       "CashCashEquivalentsAndShortTermInvestments"])
 
     # Construir mapas por label
