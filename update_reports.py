@@ -241,27 +241,16 @@ def fetch_fundamentals(ticker, cik):
         return None
 
     facts = data.get("facts", {})
-    if ticker == "GGAL":
-        ifrs = facts.get("ifrs-full", {})
-        all_keys = list(ifrs.keys())
-        print(f"  GGAL all concepts: {all_keys}")
-        for concept in ["Revenue", "GrossProfit", "ProfitLoss", "ProfitLossFromOperatingActivities",
-                        "Borrowings", "CashAndCashEquivalents", "Cash",
-                        "CashFlowsFromUsedInOperatingActivities",
-                        "CashFlowsFromUsedInInvestingActivities",
-                        "NetInterestIncome", "InterestIncome", "FeeAndCommissionIncome"]:
-            node = ifrs.get(concept, {})
-            entries = node.get("units", {}).get("USD", []) or node.get("units", {}).get("ARS", [])
-            print(f"  {concept}: {len(entries)} entries, forms={list(set(e.get('form') for e in entries[:10]))}")
-            if entries:
-                print(f"    sample: {entries[-1]}")
+    is_ifrs = "ifrs-full" in facts and "us-gaap" not in facts
+    currency_unit = "ARS" if is_ifrs else "USD"
+    scale = 1e12 if is_ifrs else 1e9  # ARS en billones, USD en billions
     us_gaap = facts.get("us-gaap") or facts.get("ifrs-full") or {}
 
     def get_quarterly_series(concept_names, scale=1e9, max_q=8, is_balance=False):
         import datetime
         for concept in concept_names:
             node = us_gaap.get(concept, {})
-            usd_list = node.get("units", {}).get("USD", [])
+            usd_list = node.get("units", {}).get(currency_unit, [])
             filtered = [e for e in usd_list if e.get("form") in ("10-Q","10-K","20-F","6-K") and e.get("end")]
 
             if is_balance:
@@ -308,43 +297,38 @@ def fetch_fundamentals(ticker, cik):
             return result
         return []
     revenue   = get_quarterly_series([
-        "Revenues",
-        "RevenueFromContractWithCustomerExcludingAssessedTax",
-        "SalesRevenueNet",
-        "RevenueFromContractWithCustomerIncludingAssessedTax"
-    ])
+        "Revenues", "RevenueAndOperatingIncome", "FeeAndCommissionIncome"
+    ], scale=scale)
     cogs      = get_quarterly_series([
         "CostOfRevenue",
         "CostOfGoodsAndServicesSold",
         "CostOfSales",
         "CostOfRevenueExcludingDepreciationDepletionAndAmortization"
-    ])
+    ], scale=scale)
     gross     = get_quarterly_series([
-        "GrossProfit",
-        "ProfitLossFromOperatingActivities",
         "GrossProfit"
-    ])
+    ], scale=scale)
     op_income = get_quarterly_series([
         "OperatingIncomeLoss",
         "ProfitLossFromOperatingActivities",
         "ProfitFromOperations"
-    ])
+    ], scale=scale)
     cfo       = get_quarterly_series([
         "NetCashProvidedByUsedInOperatingActivities",
         "CashFlowsFromUsedInOperatingActivities"
-    ])
-    capex_raw = get_quarterly_series(["PaymentsToAcquirePropertyPlantAndEquipment"])
+    ], scale=scale)
+    capex_raw = get_quarterly_series([
+        "PaymentsToAcquirePropertyPlantAndEquipment",
+        "CashFlowsFromUsedInInvestingActivities"
+    ], scale=scale)
     debt      = get_quarterly_series([
-        "LongTermDebt",
-        "LongTermDebtNoncurrent",
-        "Borrowings",
-        "BorrowingsFromFinancialInstitutions"
-    ], is_balance=True)
+        "LongTermDebt", "LongTermDebtNoncurrent", "Borrowings"
+    ], scale=scale, is_balance=True)
     cash      = get_quarterly_series([
         "CashAndCashEquivalentsAtCarryingValue",
         "CashCashEquivalentsAndShortTermInvestments",
         "CashAndCashEquivalents"
-    ], is_balance=True)
+    ], scale=scale, is_balance=True)
 
     # Construir mapas por label
     rev_map   = {e["label"]: e["val"] for e in revenue}
