@@ -9395,7 +9395,6 @@ AOS.init({
     </div>
     <div class="mi-nav" id="mi-nav">
       <div class="mi-nav-item active" data-tab="resumen">Resumen</div>
-      <div class="mi-nav-item" data-tab="precio">Precio</div>
       <div class="mi-nav-item" data-tab="revenue">Revenue</div>
       <div class="mi-nav-item" data-tab="margenes">Márgenes</div>
       <div class="mi-nav-item" data-tab="fcf">Free Cash Flow</div>
@@ -9412,13 +9411,6 @@ AOS.init({
         <div class="mi-bb-grid">
           <div class="mi-bbc"><div class="mi-bbh bull">● Caso alcista</div><div id="ov-bull"></div></div>
           <div class="mi-bbc"><div class="mi-bbh bear">● Caso bajista</div><div id="ov-bear"></div></div>
-        </div>
-      </div>
-      <div class="mi-section" id="tab-precio">
-        <div class="mi-sl">Evolución del precio — 52 semanas</div>
-        <div class="mi-chart-box">
-          <div class="mi-chart-header"><div class="mi-chart-title">Precio de cierre semanal (USD)</div><div class="mi-chart-note" id="note-precio"></div></div>
-          <div class="mi-chart-area"><div class="mi-loading" id="loading-precio"><div class="mi-ld"></div><div class="mi-ld"></div><div class="mi-ld"></div><span>Cargando precio…</span></div><canvas id="chart-precio"></canvas></div>
         </div>
       </div>
       <div class="mi-section" id="tab-revenue">
@@ -9595,7 +9587,6 @@ function miSwitchTab(tab){
   var nav=document.querySelector('.mi-nav-item[data-tab="'+tab+'"]');
   if(sec)sec.classList.add('active');
   if(nav)nav.classList.add('active');
-  if(tab==='precio')miLoadPriceChart(miCurrentTicker);
   if(tab==='revenue')miLoadFromFundamentals(miCurrentTicker,'revenue');
   if(tab==='margenes')miLoadFromFundamentals(miCurrentTicker,'margenes');
   if(tab==='fcf')miLoadFromFundamentals(miCurrentTicker,'fcf');
@@ -9634,33 +9625,6 @@ function miRenderPrice(valor,variacion){
   var el=document.getElementById('ov-change');
   el.textContent=(pct>=0?'▲ +':'▼ ')+Math.abs(pct).toFixed(2)+'% hoy';
   el.className='mi-change '+(pct>=0?'pos':'neg');
-}
-
-async function miLoadPriceChart(ticker){
-  if(miCharts['precio'])return;
-  try{
-    for(var host of['query1','query2']){
-      try{
-        var r=await fetch('https://'+host+'.finance.yahoo.com/v8/finance/chart/'+ticker+'?interval=1wk&range=1y');
-        if(!r.ok)continue;
-        var d=await r.json();
-        var result=d.chart.result[0];
-        var closes=result.indicators.quote[0].close;
-        var times=result.timestamp;
-        var labels=times.map(function(t){var dt=new Date(t*1000);return dt.toLocaleDateString('es-AR',{month:'short',day:'numeric'});});
-        var prices=closes.map(function(p){return p?+p.toFixed(2):null;});
-        var valid=prices.filter(Boolean);
-        document.getElementById('note-precio').textContent='Min: $'+Math.min.apply(null,valid).toFixed(0)+' · Max: $'+Math.max.apply(null,valid).toFixed(0);
-        miShowCanvas('loading-precio','chart-precio');
-        var opts=miBaseOpts('USD');
-        opts.plugins.legend.display=false;
-        opts.elements={point:{radius:0},line:{tension:.35,borderWidth:2}};
-        miCharts['precio']=new Chart(document.getElementById('chart-precio'),{type:'line',data:{labels:labels,datasets:[{data:prices,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.07)',fill:true}]},options:opts});
-        return;
-      }catch(e2){continue;}
-    }
-    miShowError('loading-precio','No se pudo cargar el precio histórico.');
-  }catch(e){miShowError('loading-precio','Error al conectar.');}
 }
 
 async function miGetFundamentals(){
