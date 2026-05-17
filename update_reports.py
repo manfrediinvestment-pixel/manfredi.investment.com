@@ -244,6 +244,19 @@ def fetch_fundamentals(ticker, cik):
     is_ifrs = "ifrs-full" in facts and "us-gaap" not in facts
     currency_unit = "ARS" if is_ifrs else "USD"
     scale = 1e12 if is_ifrs else 1e9  # ARS en billones, USD en billions
+    if ticker == "YPF":
+        facts_debug = data.get("facts", {})
+        us_gaap_debug = facts_debug.get("us-gaap") or facts_debug.get("ifrs-full") or {}
+        all_keys = list(us_gaap_debug.keys())
+        print(f"  YPF namespaces: {list(facts_debug.keys())}")
+        print(f"  YPF concepts (primeros 50): {all_keys[:50]}")
+        for concept in ["Revenues","GrossProfit","OperatingIncomeLoss","ProfitLossFromOperatingActivities",
+                        "NetCashProvidedByUsedInOperatingActivities","CashFlowsFromUsedInOperatingActivities",
+                        "LongTermDebt","Borrowings","CashAndCashEquivalentsAtCarryingValue","CashAndCashEquivalents"]:
+            node = us_gaap_debug.get(concept, {})
+            units = node.get("units", {})
+            for curr, entries in units.items():
+                print(f"  YPF {concept} ({curr}): {len(entries)} entries, sample={entries[-1] if entries else None}")
     us_gaap = facts.get("us-gaap") or facts.get("ifrs-full") or {}
 
     def get_quarterly_series(concept_names, scale=1e9, max_q=8, is_balance=False):
