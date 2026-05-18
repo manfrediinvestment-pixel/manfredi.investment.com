@@ -15,7 +15,7 @@ export default {
       const { email } = await request.json();
       if (!email) return new Response(JSON.stringify({ error: 'Email requerido' }), { status: 400, headers });
 
-      // Reusar lÃ³gica de autenticaciÃ³n Google
+      // Reusar lógica de autenticación Google
       const privateKey = env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
       const serviceEmail = env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
       const sheetId = env.GOOGLE_SHEETS_ID;
