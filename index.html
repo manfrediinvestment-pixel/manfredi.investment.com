@@ -2872,10 +2872,8 @@
     const tendIcon = merval.tendencia === 'alcista' ? '&#9650;' : merval.tendencia === 'bajista' ? '&#9660;' : 'â';
     return `
       <div class="rpt-body">
-        <div class="rpt-summary">${d.resumen || ''}</div>
-
         <div class="rpt-section">
-          <div class="rpt-section-label">Tipo de cambio</div>
+          <div class="rpt-section-label" style="color: #B8943F;">Tipo de cambio</div>
           <div class="rpt-kv-grid">
             <div class="rpt-kv"><span class="rpt-kv-key">Blue</span><span class="rpt-kv-val">${dolar.blue || '&mdash;'}</span></div>
             <div class="rpt-kv"><span class="rpt-kv-key">Oficial</span><span class="rpt-kv-val">${dolar.oficial || '&mdash;'}</span></div>
@@ -2886,7 +2884,7 @@
         </div>
 
         <div class="rpt-section">
-          <div class="rpt-section-label">Merval</div>
+          <div class="rpt-section-label" style="color: #B8943F;">Merval</div>
           <div class="rpt-kv-grid">
             <div class="rpt-kv"><span class="rpt-kv-key">Valor</span><span class="rpt-kv-val">${merval.valor ? Number(merval.valor).toLocaleString('es-AR') : '&mdash;'}</span></div>
             <div class="rpt-kv"><span class="rpt-kv-key">Variación</span><span class="rpt-kv-val ${varMerval}">${merval.variacion || '&mdash;'}</span></div>
@@ -2894,22 +2892,8 @@
           </div>
         </div>
 
-        <div class="rpt-section">
-          <div class="rpt-section-label">BCRA</div>
-          <div class="rpt-kv-grid">
-            <div class="rpt-kv"><span class="rpt-kv-key">Reservas</span><span class="rpt-kv-val" style="font-size:11px">${bcra.reservas || '&mdash;'}</span></div>
-            <div class="rpt-kv"><span class="rpt-kv-key">Tasa</span><span class="rpt-kv-val">${bcra.tasa || '&mdash;'}</span></div>
-            ${bcra.nota ? `<div class="rpt-kv-note">${bcra.nota}</div>` : ''}
-          </div>
-        </div>
-
         ${renderNoticias(d.noticias, 'impacto')}
 
-        ${d.conclusion ? `
-        <div class="rpt-conclusion">
-          <div class="rpt-conclusion-label">Conclusión del día</div>
-          <div class="rpt-conclusion-text">${d.conclusion}</div>
-        </div>` : ''}
       </div>`;
   }
 
@@ -2922,10 +2906,8 @@
     const fedClass = fed.postura_fed === 'hawkish' ? 'down' : fed.postura_fed === 'dovish' ? 'up' : 'neut';
     return `
       <div class="rpt-body">
-        <div class="rpt-summary">${d.resumen || ''}${d.horario_datos ? `<br><span style="font-size:10.5px;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.07em">${d.horario_datos}</span>` : ''}</div>
-
         <div class="rpt-section">
-          <div class="rpt-section-label">Índices</div>
+          <div class="rpt-section-label" style="color: #B8943F;">Índices</div>
           <div class="rpt-kv-grid">
             <div class="rpt-kv"><span class="rpt-kv-key">S&amp;P 500</span><span class="rpt-kv-val ${varClass(sp.variacion)}">${sp.valor ? Number(sp.valor).toLocaleString('en-US') : '&mdash;'} <small style="font-size:10px">${sp.variacion || ''}</small></span></div>
             <div class="rpt-kv"><span class="rpt-kv-key">Dow Jones</span><span class="rpt-kv-val ${varClass(dw.variacion)}">${dw.valor ? Number(dw.valor).toLocaleString('en-US') : '&mdash;'} <small style="font-size:10px">${dw.variacion || ''}</small></span></div>
@@ -2936,19 +2918,11 @@
         </div>
 
         <div class="rpt-section">
-          <div class="rpt-section-label">Commodities</div>
+          <div class="rpt-section-label" style="color: #B8943F;">Commodities</div>
           <div class="rpt-kv-grid">
             ${comm.soja ? `<div class="rpt-kv"><span class="rpt-kv-key">Soja</span><span class="rpt-kv-val ${varClass(comm.soja.variacion)}">${comm.soja.precio || '&mdash;'} <small style="font-size:10px">${comm.soja.variacion || ''}</small></span></div>` : ''}
             ${comm.wti  ? `<div class="rpt-kv"><span class="rpt-kv-key">WTI</span><span class="rpt-kv-val ${varClass(comm.wti.variacion)}">${comm.wti.precio || '&mdash;'} <small style="font-size:10px">${comm.wti.variacion || ''}</small></span></div>` : ''}
             ${comm.oro  ? `<div class="rpt-kv"><span class="rpt-kv-key">Oro</span><span class="rpt-kv-val ${varClass(comm.oro.variacion)}">${comm.oro.precio || '&mdash;'} <small style="font-size:10px">${comm.oro.variacion || ''}</small></span></div>` : ''}
-          </div>
-        </div>
-
-        <div class="rpt-section">
-          <div class="rpt-section-label">Fed &amp; Macro</div>
-          <div class="rpt-kv-grid">
-            <div class="rpt-kv"><span class="rpt-kv-key">Postura Fed</span><span class="rpt-kv-val ${fedClass}" style="text-transform:capitalize">${fed.postura_fed || '&mdash;'}</span></div>
-            ${fed.nota ? `<div class="rpt-kv-note">${fed.nota}</div>` : ''}
           </div>
         </div>
 
@@ -2960,11 +2934,6 @@
 
         ${renderNoticias(d.noticias, 'relevancia')}
 
-        ${d.conclusion ? `
-        <div class="rpt-conclusion">
-          <div class="rpt-conclusion-label">Conclusión del día</div>
-          <div class="rpt-conclusion-text">${d.conclusion}</div>
-        </div>` : ''}
       </div>`;
   }
 
