@@ -91,8 +91,8 @@ def yahoo(ticker, nombre):
 # NOTICIAS ARGENTINA
 print("Obteniendo noticias Argentina...")
 noticias_arg = []
-noticias_arg.extend(fetch_rss("https://www.ambito.com/rss/economia.xml", 3))
-noticias_arg.extend(fetch_rss("https://www.infobae.com/feeds/rss/economia.xml", 3))
+noticias_arg.extend(fetch_rss("https://www.ambito.com/rss/economia.xml", 5))
+noticias_arg.extend(fetch_rss("https://www.infobae.com/feeds/rss/economia.xml", 5))
 noticias_arg.extend(fetch_rss("https://cronista.com/files/rss/economia.xml", 2))
 if not noticias_arg:
     noticias_arg = [{"titulo": "Mercado argentino en operacion", "link": "", "resumen": "Consulte Ambito.com e Infobae.com para noticias del dia."}]
@@ -101,8 +101,8 @@ noticias_arg = noticias_arg[:5]
 # NOTICIAS WALL STREET
 print("Obteniendo noticias Wall Street...")
 noticias_ws = []
-noticias_ws.extend(fetch_rss("https://feeds.reuters.com/reuters/businessNews", 3))
-noticias_ws.extend(fetch_rss("https://feeds.finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US", 3))
+noticias_ws.extend(fetch_rss("https://feeds.reuters.com/reuters/businessNews", 5))
+noticias_ws.extend(fetch_rss("https://feeds.finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US", 5))
 if not noticias_ws:
     noticias_ws = [{"titulo": "Wall Street en operacion", "link": "", "resumen": "Consulte Reuters.com para noticias globales."}]
 noticias_ws = noticias_ws[:5]
