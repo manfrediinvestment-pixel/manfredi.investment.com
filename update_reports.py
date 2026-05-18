@@ -358,16 +358,13 @@ def fetch_fundamentals(ticker, cik):
         for e in cfo
     ]
 
-    # Gross Margin: Revenue - COGS (ambos ya en formato trimestral)
     gross_margin = []
     for e in revenue:
         lbl = e["label"]
         rev = rev_map.get(lbl)
         if not rev or rev == 0:
             continue
-        # Intentar GrossProfit directo primero
         gp = gross_map.get(lbl)
-        # Si no existe, calcular desde COGS
         if gp is None:
             cogs_val = cogs_map.get(lbl)
             if cogs_val is not None:
@@ -375,18 +372,18 @@ def fetch_fundamentals(ticker, cik):
         if gp is not None:
             gross_margin.append({"label": lbl, "val": round(gp / rev * 100, 2)})
 
-    # Op Margin: OperatingIncomeLoss / Revenue
     op_margin = []
     for e in op_income:
         lbl = e["label"]
         rev = rev_map.get(lbl)
-        if not rev or rev == 0:
-            continue
-        op_margin.append({"label": lbl, "val": round(e["val"] / rev * 100, 2)})
-
-    # Si op_margin sigue vacio, calcularlo desde gross_margin como proxy
-    if not op_margin and gross_margin:
-        op_margin = [{"label": e["label"], "val": round(e["val"] * 0.85, 2)} for e in gross_margin]
+        if rev and rev != 0:
+            op_margin.append({"label": lbl, "val": round(e["val"] / rev * 100, 2)})
+        else:
+            # Buscar label más cercano en rev_map por fecha
+            for rev_lbl, rev_val in rev_map.items():
+                if rev_lbl == lbl and rev_val != 0:
+                    op_margin.append({"label": lbl, "val": round(e["val"] / rev_val * 100, 2)})
+                    break
 
     return {
         "revenue":     revenue,
