@@ -309,7 +309,9 @@ def fetch_fundamentals(ticker, cik):
             return result
         return []
     revenue   = get_quarterly_series([
-        "Revenues", "RevenueAndOperatingIncome", "FeeAndCommissionIncome"
+        "Revenues", "Revenue", "RevenueAndOperatingIncome",
+        "RevenueFromContractWithCustomerExcludingAssessedTax",
+        "SalesRevenueNet", "FeeAndCommissionIncome"
     ], scale=scale)
     cogs      = get_quarterly_series([
         "CostOfRevenue",
@@ -318,12 +320,11 @@ def fetch_fundamentals(ticker, cik):
         "CostOfRevenueExcludingDepreciationDepletionAndAmortization"
     ], scale=scale)
     gross     = get_quarterly_series([
-        "GrossProfit"
+        "GrossProfit", "GrossProfitLoss"
     ], scale=scale)
     op_income = get_quarterly_series([
-        "OperatingIncomeLoss",
-        "ProfitLossFromOperatingActivities",
-        "ProfitFromOperations"
+        "OperatingIncomeLoss", "ProfitLossFromOperatingActivities",
+        "ProfitFromOperations", "ProfitLoss"
     ], scale=scale)
     cfo       = get_quarterly_series([
         "NetCashProvidedByUsedInOperatingActivities",
@@ -331,6 +332,7 @@ def fetch_fundamentals(ticker, cik):
     ], scale=scale)
     capex_raw = get_quarterly_series([
         "PaymentsToAcquirePropertyPlantAndEquipment",
+        "PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
         "CashFlowsFromUsedInInvestingActivities"
     ], scale=scale)
     debt      = get_quarterly_series([
