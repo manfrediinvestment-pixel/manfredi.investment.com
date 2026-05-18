@@ -170,7 +170,6 @@ soja = yahoo("ZS%3DF",  "Soja")
 nvda = yahoo("NVDA", "Nvidia")
 meta = yahoo("META", "Meta")
 amzn = yahoo("AMZN", "Amazon")
-ypf  = yahoo("YPF",  "YPF")
 
 sp_v  = sp.get("valor",  "N/D"); sp_var  = sp.get("variacion",  "N/D")
 dj_v  = dj.get("valor",  "N/D"); dj_var  = dj.get("variacion",  "N/D")
@@ -210,7 +209,6 @@ wallstreet = {
         "NVDA": nvda,
         "META": meta,
         "AMZN": amzn,
-        "YPF":  ypf
     }
 }
 
@@ -222,8 +220,6 @@ TICKERS_CIK = {
     "NVDA": {"cik": "0001045810", "foreign": False},
     "META": {"cik": "0001326801", "foreign": False},
     "AMZN": {"cik": "0001018724", "foreign": False},
-    "YPF":  {"cik": "0000904851", "foreign": True},
-    "GGAL": {"cik": "0001114700", "foreign": True},
 }
 
 def fetch_fundamentals(ticker, cik):
@@ -250,13 +246,8 @@ def fetch_fundamentals(ticker, cik):
     else:
         us_gaap = usgaap
         is_ifrs = False
-    # GGAL reporta en ARS, YPF en USD (cotiza NYSE)
-    if ticker == "GGAL":
-        currency_unit = "ARS"
-        scale = 1e12
-    else:
-        currency_unit = "USD"
-        scale = 1e9
+    currency_unit = "USD"
+    scale = 1e9
 
     def get_quarterly_series(concept_names, scale=1e9, max_q=8, is_balance=False):
         import datetime
@@ -309,9 +300,9 @@ def fetch_fundamentals(ticker, cik):
             return result
         return []
     revenue   = get_quarterly_series([
-        "Revenues", "Revenue", "RevenueAndOperatingIncome",
         "RevenueFromContractWithCustomerExcludingAssessedTax",
-        "SalesRevenueNet", "FeeAndCommissionIncome"
+        "RevenueFromContractWithCustomerIncludingAssessedTax",
+        "Revenues", "Revenue"
     ], scale=scale)
     cogs      = get_quarterly_series([
         "CostOfRevenue",
