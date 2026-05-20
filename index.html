@@ -9380,6 +9380,50 @@ AOS.init({
           <div class="mi-bbc"><div class="mi-bbh bull">● Caso alcista</div><div id="ov-bull-full"></div></div>
           <div class="mi-bbc"><div class="mi-bbh bear">● Caso bajista</div><div id="ov-bear-full"></div></div>
         </div>
+        <!-- INDICADORES TÉCNICOS -->
+        <div id="mi-ind-wrap" style="margin-top:20px; padding-top:18px; border-top:1px solid #1a2f4a;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:1.5px; color:#3b82f6; margin-bottom:14px;">
+            Indicadores técnicos
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px;">
+            <div style="background:#0a1525; border:1px solid #1a2f4a; border-radius:8px; padding:12px 14px;">
+              <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:#4a6a8a; margin-bottom:6px;">RSI (14)</div>
+              <div id="mi-ind-rsi" style="font-size:20px; font-weight:500; color:#e8edf2; margin-bottom:6px;">—</div>
+              <div id="mi-ind-rsi-badge" style="display:inline-block; font-size:10px; padding:2px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em;">—</div>
+              <div style="margin-top:8px; background:#1a2f4a; border-radius:4px; height:4px; overflow:hidden;">
+                <div id="mi-ind-rsi-bar" style="height:4px; border-radius:4px; background:#3b82f6; width:0%; transition:width 0.4s ease;"></div>
+              </div>
+            </div>
+
+            <div style="background:#0a1525; border:1px solid #1a2f4a; border-radius:8px; padding:12px 14px;">
+              <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:#4a6a8a; margin-bottom:6px;">MACD</div>
+              <div id="mi-ind-macd" style="font-size:20px; font-weight:500; color:#e8edf2; margin-bottom:6px;">—</div>
+              <div id="mi-ind-macd-badge" style="display:inline-block; font-size:10px; padding:2px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em;">—</div>
+            </div>
+
+            <div style="background:#0a1525; border:1px solid #1a2f4a; border-radius:8px; padding:12px 14px;">
+              <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:#4a6a8a; margin-bottom:6px;">ADX (14)</div>
+              <div id="mi-ind-adx" style="font-size:20px; font-weight:500; color:#e8edf2; margin-bottom:6px;">—</div>
+              <div id="mi-ind-adx-badge" style="display:inline-block; font-size:10px; padding:2px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em;">—</div>
+            </div>
+
+            <div style="background:#0a1525; border:1px solid #1a2f4a; border-radius:8px; padding:12px 14px;">
+              <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:#4a6a8a; margin-bottom:6px;">Medias móviles</div>
+              <div id="mi-ind-ema" style="font-size:20px; font-weight:500; color:#e8edf2; margin-bottom:6px;">—</div>
+              <div id="mi-ind-ema-badge" style="display:inline-block; font-size:10px; padding:2px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em;">—</div>
+            </div>
+          </div>
+
+          <div id="mi-ind-summary" style="display:none; justify-content:space-between; align-items:center; background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.2); border-radius:8px; padding:12px 16px; margin-bottom:10px;">
+            <span id="mi-ind-summary-text" style="font-size:13px; color:#9ab8d8;">—</span>
+            <span id="mi-ind-score" style="font-size:18px; font-weight:500; color:#3b82f6;">—</span>
+          </div>
+
+          <div style="font-size:11px; color:#2a4a6a; text-align:right;">
+            Datos actualizados diariamente · Alpha Vantage
+          </div>
+        </div>
       </div>
     </div>
     <div class="mi-footer">
@@ -9504,6 +9548,7 @@ function miOpen(ticker){
   document.getElementById('mi-overlay-backdrop').classList.add('active');
   document.body.style.overflow='hidden';
   miSwitchTab('resumen');
+  miLoadIndicadores(ticker);
   miLoadPrice(ticker);
 }
 
@@ -9520,6 +9565,79 @@ function miSwitchTab(tab){
   if(tab==='margenes')miLoadFromFundamentals(miCurrentTicker,'margenes');
   if(tab==='fcf')miLoadFromFundamentals(miCurrentTicker,'fcf');
   if(tab==='deuda')miLoadFromFundamentals(miCurrentTicker,'deuda');
+}
+function miLoadIndicadores(ticker) {
+  var ids = ['mi-ind-rsi','mi-ind-rsi-badge','mi-ind-rsi-bar',
+             'mi-ind-macd','mi-ind-macd-badge',
+             'mi-ind-adx','mi-ind-adx-badge',
+             'mi-ind-ema','mi-ind-ema-badge',
+             'mi-ind-summary','mi-ind-summary-text','mi-ind-score'];
+  ids.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (id === 'mi-ind-summary') { el.style.display = 'none'; return; }
+    if (id === 'mi-ind-rsi-bar') { el.style.width = '0%'; return; }
+    el.textContent = '—';
+    el.style.background = '';
+    el.style.color = '';
+    el.style.border = '';
+  });
+
+  fetch('/data/indicators/' + ticker + '.json')
+    .then(function(r) { if (!r.ok) throw new Error('no data'); return r.json(); })
+    .then(function(d) {
+      var rsi = d.rsi;
+      document.getElementById('mi-ind-rsi').textContent = rsi.toFixed(1);
+      document.getElementById('mi-ind-rsi-bar').style.width = rsi + '%';
+      var rsiSignal = rsi > 70 ? ['Sobrecomprado','#f87171','rgba(248,113,113,0.12)','rgba(248,113,113,0.25)']
+                   : rsi < 30 ? ['Sobrevendido','#4ade80','rgba(74,222,128,0.12)','rgba(74,222,128,0.25)']
+                   : ['Neutral','#f59e0b','rgba(245,158,11,0.12)','rgba(245,158,11,0.25)'];
+      miSetBadge('mi-ind-rsi-badge', rsiSignal[0], rsiSignal[1], rsiSignal[2], rsiSignal[3]);
+
+      var macd = d.macd;
+      var macdEl = document.getElementById('mi-ind-macd');
+      macdEl.textContent = (macd >= 0 ? '+' : '') + macd.toFixed(2);
+      macdEl.style.color = macd >= 0 ? '#4ade80' : '#f87171';
+      macd >= 0
+        ? miSetBadge('mi-ind-macd-badge','Alcista','#4ade80','rgba(74,222,128,0.12)','rgba(74,222,128,0.25)')
+        : miSetBadge('mi-ind-macd-badge','Bajista','#f87171','rgba(248,113,113,0.12)','rgba(248,113,113,0.25)');
+
+      var adx = d.adx;
+      document.getElementById('mi-ind-adx').textContent = adx.toFixed(1);
+      adx > 25
+        ? miSetBadge('mi-ind-adx-badge','Tendencia fuerte','#4ade80','rgba(74,222,128,0.12)','rgba(74,222,128,0.25)')
+        : miSetBadge('mi-ind-adx-badge','Débil','#f59e0b','rgba(245,158,11,0.12)','rgba(245,158,11,0.25)');
+
+      var ema = d.ema;
+      var aboveAll = ema.price > ema.ema20 && ema.price > ema.ema50 && ema.price > ema.ema200;
+      var belowAll = ema.price < ema.ema20 && ema.price < ema.ema50 && ema.price < ema.ema200;
+      document.getElementById('mi-ind-ema').textContent = aboveAll ? 'Por encima' : belowAll ? 'Por debajo' : 'Mixto';
+      aboveAll
+        ? miSetBadge('mi-ind-ema-badge','Alcista','#4ade80','rgba(74,222,128,0.12)','rgba(74,222,128,0.25)')
+        : belowAll
+          ? miSetBadge('mi-ind-ema-badge','Bajista','#f87171','rgba(248,113,113,0.12)','rgba(248,113,113,0.25)')
+          : miSetBadge('mi-ind-ema-badge','Neutral','#f59e0b','rgba(245,158,11,0.12)','rgba(245,158,11,0.25)');
+
+      var bulls = [macd >= 0, rsi > 40 && rsi < 70, adx > 25, aboveAll].filter(Boolean).length;
+      var score = Math.round((bulls / 4) * 100);
+      document.getElementById('mi-ind-score').textContent = score + '%';
+      document.getElementById('mi-ind-summary-text').textContent =
+        score >= 70 ? 'Señal técnica: Compra moderada' :
+        score <= 30 ? 'Señal técnica: Precaución' : 'Señal técnica: Neutral';
+      document.getElementById('mi-ind-summary').style.display = 'flex';
+    })
+    .catch(function() {
+      // Sin datos disponibles — el bloque queda en "—" silenciosamente
+    });
+}
+
+function miSetBadge(id, text, color, bg, border) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.style.color = color;
+  el.style.background = bg;
+  el.style.border = '1px solid ' + border;
 }
 
 async function miLoadPrice(ticker){
