@@ -1,0 +1,51 @@
+name: Fetch Technical Indicators
+
+on:
+  schedule:
+    - cron: '0 14 * * 1-5'   # Lunes a viernes 14:00 UTC (después del market open)
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract tickers from MI_ASSETS
+        id: tickers
+        run: |
+          TICKERS=$(node -e "
+            const fs = require('fs');
+            const html = fs.readFileSync('index.html', 'utf8');
+            const match = html.match(/const MI_ASSETS\s*=\s*\{/);
+            if (!match) { console.log('[]'); process.exit(0); }
+            const start = html.indexOf('const MI_ASSETS=');
+            const altStart = html.indexOf('const MI_ASSETS =');
+            const idx = start !== -1 ? start : altStart;
+            const brace = html.indexOf('{', idx);
+            let depth = 0, i = brace;
+            while (i < html.length) {
+              if (html[i] === '{') depth++;
+              else if (html[i] === '}') { depth--; if (depth === 0) break; }
+              i++;
+            }
+            const objStr = html.slice(brace, i+1);
+            const keys = [];
+            const re = /^([A-Z0-9\.]+):/gm;
+            let m;
+            while ((m = re.exec(objStr)) !== null) keys.push(m[1]);
+            console.log(JSON.stringify(keys));
+          ")
+          echo "list=$TICKERS" >> $GITHUB_OUTPUT
+
+      - name: Fetch indicators
+        env:
+          AV_API_KEY: ${{ secrets.AV_API_KEY }}
+          MI_TICKERS: ${{ steps.tickers.outputs.list }}
+        run: node scripts/fetch-indicators.js
+
+      - name: Commit JSON files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: update technical indicators'
+          file_pattern: 'data/indicators/*.json'
