@@ -17,11 +17,8 @@ jobs:
           TICKERS=$(node -e "
             const fs = require('fs');
             const html = fs.readFileSync('index.html', 'utf8');
-            const match = html.match(/const MI_ASSETS\s*=\s*\{/);
-            if (!match) { console.log('[]'); process.exit(0); }
-            const start = html.indexOf('const MI_ASSETS=');
-            const altStart = html.indexOf('const MI_ASSETS =');
-            const idx = start !== -1 ? start : altStart;
+            const idx = html.indexOf('const MI_ASSETS={');
+            if (idx === -1) { console.log('[]'); process.exit(0); }
             const brace = html.indexOf('{', idx);
             let depth = 0, i = brace;
             while (i < html.length) {
@@ -31,7 +28,7 @@ jobs:
             }
             const objStr = html.slice(brace, i+1);
             const keys = [];
-            const re = /^([A-Z0-9\.]+):/gm;
+            const re = /([A-Z0-9\.]+):\{/g;
             let m;
             while ((m = re.exec(objStr)) !== null) keys.push(m[1]);
             console.log(JSON.stringify(keys));
