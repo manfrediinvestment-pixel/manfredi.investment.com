@@ -9373,53 +9373,74 @@ AOS.init({
         </div>
       </div>
       <div class="mi-section" id="tab-tesis">
-        <div class="mi-sl">Tesis de inversión</div>
-        <div class="mi-thesis" style="margin-bottom:24px"><p id="ov-thesis-full"></p></div>
-<!-- INDICADORES TÉCNICOS -->
-        <div id="mi-ind-wrap" style="margin-top:20px; padding-top:18px; border-top:1px solid #1a2f4a;">
-          <div style="font-family:'IBM Plex Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:1.5px; color:#3b82f6; margin-bottom:14px;">
-            Indicadores técnicos
-          </div>
-
-          <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px;">
-            <div style="background:#0a1525; border:1px solid #1a2f4a; border-radius:8px; padding:12px 14px;">
-              <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:#4a6a8a; margin-bottom:6px;">RSI (14)</div>
-              <div id="mi-ind-rsi" style="font-size:20px; font-weight:500; color:#e8edf2; margin-bottom:6px;">—</div>
-              <div id="mi-ind-rsi-badge" style="display:inline-block; font-size:10px; padding:2px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em;">—</div>
-              <div style="margin-top:8px; background:#1a2f4a; border-radius:4px; height:4px; overflow:hidden;">
-                <div id="mi-ind-rsi-bar" style="height:4px; border-radius:4px; background:#3b82f6; width:0%; transition:width 0.4s ease;"></div>
-              </div>
-            </div>
-
-            <div style="background:#0a1525; border:1px solid #1a2f4a; border-radius:8px; padding:12px 14px;">
-              <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:#4a6a8a; margin-bottom:6px;">MACD</div>
-              <div id="mi-ind-macd" style="font-size:20px; font-weight:500; color:#e8edf2; margin-bottom:6px;">—</div>
-              <div id="mi-ind-macd-badge" style="display:inline-block; font-size:10px; padding:2px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em;">—</div>
-            </div>
-
-            <div style="background:#0a1525; border:1px solid #1a2f4a; border-radius:8px; padding:12px 14px;">
-              <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:#4a6a8a; margin-bottom:6px;">ADX (14)</div>
-              <div id="mi-ind-adx" style="font-size:20px; font-weight:500; color:#e8edf2; margin-bottom:6px;">—</div>
-              <div id="mi-ind-adx-badge" style="display:inline-block; font-size:10px; padding:2px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em;">—</div>
-            </div>
-
-            <div style="background:#0a1525; border:1px solid #1a2f4a; border-radius:8px; padding:12px 14px;">
-              <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:#4a6a8a; margin-bottom:6px;">Medias móviles</div>
-              <div id="mi-ind-ema" style="font-size:20px; font-weight:500; color:#e8edf2; margin-bottom:6px;">—</div>
-              <div id="mi-ind-ema-badge" style="display:inline-block; font-size:10px; padding:2px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em;">—</div>
-            </div>
-          </div>
-
-          <div id="mi-ind-summary" style="display:none; justify-content:space-between; align-items:center; background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.2); border-radius:8px; padding:12px 16px; margin-bottom:10px;">
-            <span id="mi-ind-summary-text" style="font-size:13px; color:#9ab8d8;">—</span>
-            <span id="mi-ind-score" style="font-size:18px; font-weight:500; color:#3b82f6;">—</span>
-          </div>
-
-          <div style="font-size:11px; color:#2a4a6a; text-align:right;">
-            Datos actualizados diariamente · Alpha Vantage
-          </div>
+    <div class="mi-sl">Argumento central</div>
+  <div class="mi-thesis" style="margin-bottom:16px">
+    <p id="ov-thesis-full"></p>
+    <div style="display:flex;align-items:center;gap:16px;margin-top:14px;flex-wrap:wrap">
+      <div id="ov-tesis-badge" style="font-family:'IBM Plex Mono',monospace;font-size:11px;padding:5px 14px;border-radius:4px;letter-spacing:1.5px;text-transform:uppercase"></div>
+      <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#3a5a7a;text-transform:uppercase;letter-spacing:1px">Convicción Wall Street</span>
+        <div style="background:#0d1e33;border-radius:3px;height:6px;overflow:hidden">
+          <div id="ov-conv-bar" style="height:6px;border-radius:3px;background:#3b82f6;transition:width 0.4s ease"></div>
         </div>
       </div>
+      <span id="ov-conv-val" style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#60a5fa"></span>
+    </div>
+  </div>
+  <div class="mi-sl" style="margin-top:20px">Proyecciones de revenue</div>
+  <div style="background:#0a1525;border:1px solid #1a2f4a;border-radius:8px;padding:16px 18px;margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#2e4f6e;text-transform:uppercase;letter-spacing:1.5px">USD billions · Real vs proyectado · SEC + guidance</span>
+      <span id="ov-proj-note" style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#1e3a58"></span>
+    </div>
+    <div style="position:relative;height:160px">
+      <div id="loading-proj" style="display:flex;align-items:center;justify-content:center;height:160px;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2e4f6e">
+        <div class="mi-ld"></div><div class="mi-ld"></div><div class="mi-ld"></div>
+        <span>Cargando proyecciones…</span>
+      </div>
+      <canvas id="chart-proj" style="display:none" role="img" aria-label="Revenue real vs proyectado"></canvas>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+    <div>
+      <div class="mi-sl">Catalizadores</div>
+      <div style="background:#0a1525;border:1px solid #1a2f4a;border-radius:8px;padding:16px 18px">
+        <div id="ov-catalysts" style="display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+    </div>
+    <div>
+      <div class="mi-sl">Valoración vs peers</div>
+      <div style="background:#0a1525;border:1px solid #1a2f4a;border-radius:8px;padding:16px 18px">
+        <div id="ov-peers-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px"></div>
+        <div style="position:relative;height:80px">
+          <canvas id="chart-peers" role="img" aria-label="P/E comparativo vs peers"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mi-sl">Bull vs Bear — análisis completo</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+    <div style="background:#0a1525;border:1px solid #1a2f4a;border-radius:8px;padding:16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#4ade80;margin-bottom:12px">● Caso alcista</div>
+      <div id="ov-bull-full"></div>
+    </div>
+    <div style="background:#0a1525;border:1px solid #1a2f4a;border-radius:8px;padding:16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#f87171;margin-bottom:12px">● Caso bajista</div>
+      <div id="ov-bear-full"></div>
+    </div>
+  </div>
+  <div class="mi-sl">Condiciones de salida</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div style="background:#081a10;border:1px solid #1a3d20;border-radius:8px;padding:14px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#4ade80;margin-bottom:10px">● Tomás ganancia si…</div>
+      <div id="ov-exit-up"></div>
+    </div>
+    <div style="background:#1a0808;border:1px solid #3d1a1a;border-radius:8px;padding:14px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#f87171;margin-bottom:10px">● Cortás pérdida si…</div>
+      <div id="ov-exit-dn"></div>
+    </div>
+  </div>
+</div>
     </div>
     <div class="mi-footer">
       <div class="mi-footer-date" id="ov-update-date"></div>
@@ -9498,9 +9519,9 @@ AOS.init({
 'use strict';
 
 const MI_ASSETS={
-NVDA:{fullname:'NVIDIA Corporation · NASDAQ',tags:['USA','Semiconductores','Mega Cap'],rec:'alcista',recLabel:'● ALCISTA',updatedAt:'Mayo 2026',targetPrice:'$165',upside:'+46%',pe:'34.2x',evEbitda:'28.7x',revGrowth:'+69%',opMargin:'61%',fcf:'$44.9B',debtEbitda:'0.2x',thesis:'NVDA mantiene posición dominante en infraestructura de IA con más del 80% de market share en GPUs para data centers. La arquitectura Blackwell expande el TAM hacia inferencia. El ecosistema CUDA representa un moat estructural difícil de replicar.',bull:['Demanda de GPUs para IA sin señales de desaceleración en FY2026','Márgenes brutos en expansión hacia 78–80% con arquitectura Blackwell','Ecosistema CUDA como ventaja competitiva estructural inreplicable','FCF de $44.9B habilita recompras masivas y dividendos crecientes'],bear:['Múltiplos 34x P/E dejan margen de error mínimo ante cualquier miss','Restricciones de exportación a China erosionan ~25% del revenue','AMD e Intel aceleran competencia en el segmento de inferencia','Hyperscalers desarrollan chips propios: TPU, Trainium, Maia']},
-META:{fullname:'Meta Platforms Inc. · NASDAQ',tags:['USA','Tech','Mega Cap'],rec:'bajista',recLabel:'● BAJISTA',updatedAt:'Mayo 2026',targetPrice:'$480',upside:'-12%',pe:'23.1x',evEbitda:'15.8x',revGrowth:'+19%',opMargin:'41%',fcf:'$32.1B',debtEbitda:'0.1x',thesis:'META muestra métricas operativas sólidas pero enfrenta riesgos estructurales crecientes. El capex masivo para IA ($65B en 2025) comprime el FCF yield. Reality Labs acumula pérdidas de más de $50B sin un camino claro a la rentabilidad.',bull:['Familia de apps con 3.3B de usuarios diarios: moat de red excepcional','Monetización de IA en WhatsApp Business y Reels en etapa temprana','Balance sólido: efectivo neto positivo, recompras agresivas','Llama 4 posiciona a META competitivamente en IA open source'],bear:['Capex de $65B en IA con ROI incierto y presión sobre FCF','Reality Labs: $50B+ en pérdidas acumuladas sin monetización visible','Riesgo regulatorio antimonopolio en Europa y EEUU','Dependencia publicitaria: vulnerable ante desaceleración económica global']},
-AMZN:{fullname:'Amazon.com Inc. · NASDAQ',tags:['USA','Consumo','Mega Cap'],rec:'neutral',recLabel:'● NEUTRAL',updatedAt:'Mayo 2026',targetPrice:'$215',upside:'+8%',pe:'38.4x',evEbitda:'18.2x',revGrowth:'+11%',opMargin:'11%',fcf:'$68.3B',debtEbitda:'0.8x',thesis:'AMZN presenta un perfil de calidad excepcional pero valuación ajustada que limita el upside en el corto plazo. AWS sigue siendo el motor de rentabilidad con márgenes operativos del 37%. Bedrock y Amazon Q representan el catalizador de mediano plazo más relevante.',bull:['AWS: liderazgo en cloud con márgenes del 37% y crecimiento del 17% YoY','Publicidad digital: negocio de $56B creciendo 18% con márgenes tipo Google','FCF de $68B habilita recompras significativas y reinversión en IA','Bedrock y Amazon Q posicionan AWS como plataforma líder de IA empresarial'],bear:['Valuación 38x P/E descuenta aceleración que puede no materializarse','Retail core con márgenes bajos y presión de Temu y Shein','Capex de $100B en IA en 2025 con ROI de largo plazo incierto','Riesgo regulatorio antimonopolio sobre AWS y marketplace']}
+NVDA:{fullname:'NVIDIA Corporation · NASDAQ',tags:['USA','Semiconductores','Mega Cap'],rec:'alcista',recLabel:'● ALCISTA',updatedAt:'Mayo 2026',targetPrice:'$294',upside:'+32%',pe:'34.2x',evEbitda:'28.7x',revGrowth:'+85%',opMargin:'61%',fcf:'$44.9B',debtEbitda:'0.2x',conviction:92,convictionLabel:'92% Strong Buy · 62 analistas',thesis:'NVDA es el pick y pala de la revolución de IA con moat estructural vía ecosistema CUDA. La demanda de GPUs para data centers supera la oferta por al menos 4 trimestres. Q1 FY2027 reportó $81.6B (+85% YoY), superando consenso. Guidance Q2 en $91B por encima de los $86.84B esperados por el mercado.',bull:['Demanda de GPUs para IA sin señales de desaceleración en FY2027','Márgenes brutos en expansión hacia 78–80% con arquitectura Blackwell','Ecosistema CUDA como ventaja competitiva estructural irreplicable','FCF de $44.9B habilita recompras masivas y dividendos crecientes'],bear:['Múltiplos 34x P/E dejan margen de error mínimo ante cualquier miss','Restricciones de exportación a China erosionan ~$4.5B por trimestre','AMD e Intel aceleran competencia en el segmento de inferencia','Hyperscalers desarrollan chips propios: TPU, Trainium, Maia'],exitUp:['Precio alcanza $294 (target consenso Wall Street)','P/E supera 45x sin aceleración proporcional de EPS','Rubin supera expectativas en lanzamiento Q3 2026'],exitDn:['Miss de revenue por 2 trimestres consecutivos','Restricciones China se expanden a H100/B200','Hyperscaler anuncia reducción de capex en IA'],catalysts:[{date:'May 2026',text:'Q1 FY2027: $81.6B revenue +85% YoY. Beat consenso. Guía Q2 en $91B.',done:true},{date:'Jul 2026',text:'Lanzamiento Rubin — expansión TAM hacia edge e inferencia.',done:false},{date:'Ago 2026',text:'Earnings Q2 FY2027 — consenso $91B. Validación ciclo Blackwell Ultra.',done:false},{date:'Continuo',text:'Regulación exportación China H20 — riesgo $4.5B/trimestre.',risk:true}],peers:[{name:'NVDA',val:'34.2x',active:true},{name:'AMD',val:'24.1x',active:false},{name:'INTC',val:'18.3x',active:false},{name:'AVGO',val:'28.7x',active:false}],peersData:[34.2,24.1,18.3,28.7],projLabels:['Q3 2024','Q4 2024','Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e','Q4 2026e'],projReal:[35.08,60.92,44.06,89.83,141.07,null,81.62,null,null,null],projEst:[null,null,null,null,null,147.81,null,91.0,105.0,128.0]},
+META:{fullname:'Meta Platforms Inc. · NASDAQ',tags:['USA','Tech','Mega Cap'],rec:'bajista',recLabel:'● BAJISTA',updatedAt:'Mayo 2026',targetPrice:'$840',upside:'+40%',pe:'23.1x',evEbitda:'15.8x',revGrowth:'+19%',opMargin:'41%',fcf:'$32.1B',debtEbitda:'0.1x',conviction:68,convictionLabel:'68% Buy · 67 analistas',thesis:'META muestra métricas operativas sólidas pero enfrenta riesgos estructurales crecientes. El capex masivo para IA ($115-135B en 2026) comprime el FCF yield en el corto plazo. La familia de apps con 3.3B de usuarios diarios representa un moat de red excepcional, pero Reality Labs acumula pérdidas de más de $50B sin camino claro a la rentabilidad.',bull:['Familia de apps con 3.3B de usuarios diarios: moat de red excepcional','Monetización de IA en WhatsApp Business y Reels en etapa temprana','Balance sólido: efectivo neto positivo, recompras agresivas sostenidas','Llama 4 posiciona a META competitivamente en IA open source'],bear:['Capex de $115-135B en IA 2026 con ROI incierto y presión sobre FCF','Reality Labs: $50B+ en pérdidas acumuladas sin monetización visible','Riesgo regulatorio antimonopolio activo en Europa y EEUU','Dependencia publicitaria: vulnerable ante desaceleración económica global'],exitUp:['Precio alcanza $840 (target mediano consenso)','Reality Labs anuncia monetización concreta de AR/VR','Capex IA genera retorno visible en márgenes operativos'],exitDn:['Dos trimestres consecutivos de desaceleración en publicidad','Regulación antimonopolio fuerza desinversión de Instagram/WhatsApp','Capex supera $150B sin mejora de márgenes'],catalysts:[{date:'Jul 2026',text:'Earnings Q2 2026 — validación de márgenes operativos post-capex.',done:false},{date:'2026',text:'Lanzamiento gafas AR Ray-Ban generación 3 — catalizador hardware.',done:false},{date:'Continuo',text:'Proceso antimonopolio FTC sobre Instagram/WhatsApp.',risk:true},{date:'Continuo',text:'Capex IA $115-135B 2026 — presión sobre FCF yield.',risk:true}],peers:[{name:'META',val:'23.1x',active:true},{name:'GOOGL',val:'19.8x',active:false},{name:'SNAP',val:'45.2x',active:false},{name:'PINS',val:'22.4x',active:false}],peersData:[23.1,19.8,45.2,22.4],projLabels:['Q2 2024','Q3 2024','Q4 2024','Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e'],projReal:[39.07,40.59,48.39,42.31,89.83,141.07,null,42.31,null,null],projEst:[null,null,null,null,null,null,48.39,null,47.0,51.0]},
+AMZN:{fullname:'Amazon.com Inc. · NASDAQ',tags:['USA','Consumo','Mega Cap'],rec:'neutral',recLabel:'● NEUTRAL',updatedAt:'Mayo 2026',targetPrice:'$296',upside:'+30%',pe:'38.4x',evEbitda:'18.2x',revGrowth:'+11%',opMargin:'11%',fcf:'$68.3B',debtEbitda:'0.8x',conviction:78,convictionLabel:'78% Strong Buy · 55 analistas',thesis:'AMZN presenta un perfil de calidad excepcional pero valuación ajustada que limita el upside en el corto plazo. AWS con márgenes operativos del 37% y crecimiento del 17% YoY es el motor real de rentabilidad. Bedrock y Amazon Q posicionan AWS como plataforma líder de IA empresarial con un TAM en expansión acelerada.',bull:['AWS: liderazgo en cloud con márgenes del 37% y crecimiento 17% YoY','Publicidad digital: $56B creciendo 18% con márgenes tipo Google','FCF de $68B habilita recompras y reinversión masiva en IA','Bedrock y Amazon Q consolidan AWS como plataforma de IA empresarial'],bear:['Valuación 38x P/E descuenta aceleración que puede no materializarse','Retail core con márgenes bajos y presión competitiva de Temu y Shein','Capex $100B en IA 2025 con ROI de largo plazo incierto','Riesgo regulatorio antimonopolio sobre AWS y marketplace'],exitUp:['Precio alcanza $296 (target consenso analistas)','AWS acelera crecimiento por encima del 20% YoY','Márgenes operativos consolidados superan 15%'],exitDn:['AWS desacelera por debajo del 12% YoY dos trimestres','Retail no mejora márgenes ante presión competitiva','Regulación fuerza separación de AWS del negocio retail'],catalysts:[{date:'Ago 2026',text:'Earnings Q2 2026 — foco en márgenes AWS y publicidad.',done:false},{date:'2026',text:'Expansión Amazon Q en enterprise — catalizador adopción IA.',done:false},{date:'Continuo',text:'Investigación antimonopolio DOJ sobre AWS y marketplace.',risk:true},{date:'Continuo',text:'Presión competitiva retail de Temu/Shein en márgenes core.',risk:true}],peers:[{name:'AMZN',val:'38.4x',active:true},{name:'MSFT',val:'32.1x',active:false},{name:'GOOGL',val:'19.8x',active:false},{name:'SHOP',val:'65.3x',active:false}],peersData:[38.4,32.1,19.8,65.3],projLabels:['Q2 2024','Q3 2024','Q4 2024','Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e'],projReal:[148.0,159.0,187.8,155.7,159.3,null,187.8,155.7,null,null],projEst:[null,null,null,null,null,166.0,null,null,172.0,180.0]}
 };
 
 let miCurrentTicker=null,miFundamentals=null;
@@ -9566,7 +9587,8 @@ function miSwitchTab(tab){
   if(tab==='margenes')miLoadFromFundamentals(miCurrentTicker,'margenes');
   if(tab==='fcf')miLoadFromFundamentals(miCurrentTicker,'fcf');
   if(tab==='deuda')miLoadFromFundamentals(miCurrentTicker,'deuda');
-}
+
+  if(tab==='tesis')miRenderTesis(miCurrentTicker);}
 function miLoadIndicadores(ticker) {
   var ids = ['mi-ind-rsi','mi-ind-rsi-badge','mi-ind-rsi-bar',
              'mi-ind-macd','mi-ind-macd-badge',
@@ -9748,6 +9770,41 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 document.addEventListener('keydown',function(e){if(e.key==='Escape')miClose();});
 window.miOpenOverlay=miOpen;
+
+
+function miRenderTesis(ticker){
+  var asset=MI_ASSETS[ticker];
+  if(!asset)return;
+  var badge=document.getElementById('ov-tesis-badge');
+  if(badge){badge.textContent=asset.recLabel;badge.className='mi-rec '+asset.rec;}
+  var bar=document.getElementById('ov-conv-bar');
+  if(bar)bar.style.width=(asset.conviction||0)+'%';
+  var val=document.getElementById('ov-conv-val');
+  if(val)val.textContent=asset.convictionLabel||'';
+  var cats=document.getElementById('ov-catalysts');
+  if(cats&&asset.catalysts){cats.innerHTML=asset.catalysts.map(function(c){var color=c.done?'#4ade80':c.risk?'#f87171':'#3b82f6';return '<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:8px;height:8px;border-radius:50%;background:'+color+';margin-top:4px;flex-shrink:0"></div><div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:'+color+';margin-bottom:2px">'+c.date+'</div><div style="font-size:12px;color:#9ab8d8;line-height:1.5">'+c.text+'</div></div></div>';}).join('');}
+  var exitUp=document.getElementById('ov-exit-up');
+  if(exitUp&&asset.exitUp){exitUp.innerHTML=asset.exitUp.map(function(t){return '<div style="display:flex;gap:8px;margin-bottom:7px;align-items:flex-start"><div style="width:4px;height:4px;border-radius:50%;background:#4ade80;margin-top:6px;flex-shrink:0"></div><div style="font-size:12px;color:#9ab8d8;line-height:1.5">'+t+'</div></div>';}).join('');}
+  var exitDn=document.getElementById('ov-exit-dn');
+  if(exitDn&&asset.exitDn){exitDn.innerHTML=asset.exitDn.map(function(t){return '<div style="display:flex;gap:8px;margin-bottom:7px;align-items:flex-start"><div style="width:4px;height:4px;border-radius:50%;background:#f87171;margin-top:6px;flex-shrink:0"></div><div style="font-size:12px;color:#9ab8d8;line-height:1.5">'+t+'</div></div>';}).join('');}
+  var peersGrid=document.getElementById('ov-peers-grid');
+  if(peersGrid&&asset.peers){peersGrid.innerHTML=asset.peers.map(function(p){return '<div style="background:'+(p.active?'#0a1a30':'#0d1e33')+';border:1px solid '+(p.active?'#3b82f6':'#1a2f4a')+';border-radius:6px;padding:10px 12px;text-align:center"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#3a5a7a;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">'+p.name+'</div><div style="font-family:'IBM Plex Mono',monospace;font-size:16px;color:'+(p.active?'#60a5fa':'#d4e3f7')+';font-weight:500">'+p.val+'</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#2a4a68;margin-top:2px">P/E fwd</div></div>';}).join('');}
+  miDestroyChart('proj');miDestroyChart('peers');
+  if(asset.projLabels){
+    document.getElementById('loading-proj').style.display='none';
+    var canvas=document.getElementById('chart-proj');
+    canvas.style.display='block';canvas.height=160;
+    var opts=miBaseOpts('USD B');
+    opts.plugins.legend={display:true,position:'top',labels:{color:'#3a5a7a',boxWidth:8,padding:10,font:{family:"'IBM Plex Mono',monospace",size:9}}};
+    opts.scales.x.ticks.maxRotation=45;
+    miCharts['proj']=new Chart(canvas,{type:'bar',data:{labels:asset.projLabels,datasets:[{label:'Real (SEC)',data:asset.projReal,backgroundColor:'rgba(59,130,246,0.55)',borderColor:'#3b82f6',borderWidth:1,borderRadius:3},{label:'Proyectado',data:asset.projEst,backgroundColor:'rgba(74,222,128,0.25)',borderColor:'#4ade80',borderWidth:1,borderRadius:3}]},options:opts});
+  }
+  if(asset.peersData&&asset.peers){
+    var pc=document.getElementById('chart-peers');pc.height=80;
+    var pOpts=miBaseOpts('x');pOpts.indexAxis='y';pOpts.plugins.legend={display:false};
+    miCharts['peers']=new Chart(pc,{type:'bar',data:{labels:asset.peers.map(function(p){return p.name;}),datasets:[{data:asset.peersData,backgroundColor:asset.peers.map(function(p){return p.active?'rgba(59,130,246,0.7)':'rgba(59,130,246,0.25)';}),borderColor:asset.peers.map(function(p){return p.active?'#3b82f6':'#1a2f4a';}),borderWidth:1,borderRadius:3}]},options:pOpts});
+  }
+}
 
 })();
 </script>
