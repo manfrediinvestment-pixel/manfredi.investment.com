@@ -9533,11 +9533,17 @@ function miOpen(ticker){
   var mDefs=[['P/E Ratio',asset.pe,'blue'],['EV/EBITDA',asset.evEbitda,'blue'],['Rev. Growth YoY',asset.revGrowth,'pos'],['Margen Operativo',asset.opMargin,'pos'],['Free Cash Flow',asset.fcf,''],['Deuda / EBITDA',asset.debtEbitda,asset.rec==='bajista'?'neg':'pos'],['Precio Objetivo',asset.targetPrice,'blue'],['Upside Potencial',asset.upside,parseFloat(asset.upside)>=0?'pos':'neg']];
   document.getElementById('ov-metrics').innerHTML=mDefs.map(function(m){return'<div class="mi-metric"><div class="mi-metric-label">'+m[0]+'</div><div class="mi-metric-val '+m[2]+'">'+m[1]+'</div></div>';}).join('');
   ['ov-thesis-short','ov-thesis-full'].forEach(function(id){document.getElementById(id).textContent=asset.thesis;});
-  [['ov-bull','ov-bull-full'],['ov-bear','ov-bear-full']].forEach(function(pair,idx){
-    var items=idx===0?asset.bull:asset.bear,cls=idx===0?'bull':'bear';
-    var html=items.map(function(t){return'<div class="mi-bbi"><div class="mi-bbd '+cls+'"></div><div class="mi-bbt">'+t+'</div></div>';}).join('');
-    document.getElementById(pair[0]).innerHTML=html;
-    document.getElementById(pair[1]).innerHTML=html;
+[['ov-bull','ov-bull-full'], ['ov-bear','ov-bear-full']].forEach(function(pair, idx) {
+      var items = idx === 0 ? asset.bull : asset.bear;
+      var cls   = idx === 0 ? 'bull' : 'bear';
+      var html  = items.map(function(t) {
+        return '<div class="mi-bbi"><div class="mi-bbd ' + cls + '"></div>'
+             + '<div class="mi-bbt">' + t + '</div></div>';
+  }).join('');
+      var el0 = document.getElementById(pair[0]);
+      var el1 = document.getElementById(pair[1]);
+      if (el0) el0.innerHTML = html;
+      if (el1) el1.innerHTML = html;
   });
   document.getElementById('ov-update-date').textContent='Análisis actualizado: '+asset.updatedAt;
   document.getElementById('mi-overlay-backdrop').classList.add('active');
