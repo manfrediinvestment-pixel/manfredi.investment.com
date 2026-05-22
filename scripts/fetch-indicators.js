@@ -59,6 +59,12 @@ async function fetchTicker(ticker) {
     await sleep(12000);
 
     // Extraer último valor de cada indicador
+        console.log(`[${ticker}] RSI keys:`, Object.keys(rsiData).join(', '));
+            console.log(`[${ticker}] MACD keys:`, Object.keys(macdData).join(', '));
+            console.log(`[${ticker}] ADX keys:`, Object.keys(adxData).join(', '));
+            if (rsiData['Note'] || rsiData['Information']) {
+                        console.warn(`[${ticker}] API limit msg:`, rsiData['Note'] || rsiData['Information']);
+            }
     const rsiVals  = rsiData['Technical Analysis: RSI']  || {};
     const macdVals = macdData['Technical Analysis: MACD'] || {};
     const adxVals  = adxData['Technical Analysis: ADX']  || {};
