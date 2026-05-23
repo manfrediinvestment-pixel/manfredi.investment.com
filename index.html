@@ -3185,7 +3185,9 @@
         const data = await res.json();
         if (data?.merval?.valor) {
           console.info('[MI] Merval via argentina.json');
-          return { price: data.merval.valor, change: data.merval.variacion };
+          const rawChange = data.merval.variacion;
+          const change = rawChange ? parseFloat(rawChange.replace('%', '')) : null;
+          return { price: data.merval.valor, change: change };
         }
       }
     } catch (e) { console.warn('[MI] Merval/argentina.json:', e.message); }
