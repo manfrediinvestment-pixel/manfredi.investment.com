@@ -3183,9 +3183,9 @@
       const res = await fetch('/reports/argentina.json', { signal: AbortSignal.timeout(5000) });
       if (res.ok) {
         const data = await res.json();
-        if (data?.merval?.precio) {
+        if (data?.merval?.valor) {
           console.info('[MI] Merval via argentina.json');
-          return { price: data.merval.precio, change: data.merval.variacion };
+          return { price: data.merval.valor, change: data.merval.variacion };
         }
       }
     } catch (e) { console.warn('[MI] Merval/argentina.json:', e.message); }
