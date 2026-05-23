@@ -3178,6 +3178,17 @@
 
   // ââ Merval: data912 â ArgentinaDatos â Finnhub â Yahoo ââââââââââ
   async function fetchMerval() {
+    // Intento 0: argentina.json (fuente local siempre disponible)
+    try {
+      const res = await fetch('reports/argentina.json', { signal: AbortSignal.timeout(5000) });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.merval?.precio) {
+          console.info('[MI] Merval via argentina.json');
+          return { price: data.merval.precio, change: data.merval.variacion };
+        }
+      }
+    } catch (e) { console.warn('[MI] Merval/argentina.json:', e.message); }
     // Intento 1: data912 arg_stocks (prueba los tickers más comunes del índice)
     try {
       for (const sym of ['MERVAL', 'I.MER', '$MERVAL']) {
