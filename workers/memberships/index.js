@@ -264,7 +264,7 @@ async function procesarWebhook(request, env) {
     }
 
   // Guardar en KV: email -> "true"
-  await env.MEMBERS.put(email.toLowerCase(), 'true');
+  await env.MEMBERS.put(email.toLowerCase(), 'true', { expirationTtl: 2678400 });
   // Marcar como miembro en Google Sheets
   fetch('https://log-user.nachito2502.workers.dev/marcar-miembro', {
     method: 'POST',
