@@ -271,6 +271,20 @@ async function procesarWebhook(request, env) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: email.toLowerCase() })
   }).catch(err => console.error('Error marcando miembro en Sheets:', err));
+    // Enviar notificación por email a Nacho
+    fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'onboarding@resend.dev',
+        to: 'nachito2502@gmail.com',
+        subject: '💰 Nuevo miembro en Manfredi Investment',
+        html: `<h2>Nuevo miembro registrado</h2><p><strong>Email:</strong> ${email}</p><p><strong>Fecha:</strong> ${new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })}</p>`
+      })
+    }).catch(err => console.error('Error enviando email:', err));
     console.log(`Membresía activada para: ${email}`);
 
   return new Response(
