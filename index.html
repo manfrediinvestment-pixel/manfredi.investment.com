@@ -779,66 +779,21 @@
     }
 
     /* ── Research papers grid ── */
-    .papers-carousel-wrapper {
-      position: relative;
-      margin: 0 24px;
-      overflow: hidden;
-    }
     .papers-grid {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 1px;
       background: rgba(255,255,255,.07);
       border: 1px solid rgba(255,255,255,.07);
-      transition: transform 0.35s ease;
     }
     .papers-grid .paper-card {
-      min-width: calc(33.333% - 1px);
-      flex-shrink: 0;
+      width: 100%;
     }
-    .papers-nav-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: #07101E;
-      border: 1px solid rgba(255,255,255,.12);
-      color: var(--gold);
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 10;
-      transition: border-color 0.2s;
-      line-height: 1;
-      padding: 0;
-    }
-    .papers-nav-btn:hover { border-color: var(--gold); }
-    .papers-nav-btn.disabled { opacity: 0.2; cursor: default; }
-    .papers-nav-btn.left { left: -24px; }
-    .papers-nav-btn.right { right: -24px; }
-    .papers-carousel-dots {
-      display: flex;
-      gap: 5px;
-      justify-content: center;
-      margin-top: 16px;
-    }
-    .papers-carousel-dots .dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.15);
-      transition: background 0.2s;
-    }
-    .papers-carousel-dots .dot.active { background: var(--gold); }
     @media (max-width: 900px) {
-      .papers-grid .paper-card { min-width: calc(50% - 1px); }
+      .papers-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
-      .papers-grid .paper-card { min-width: 100%; }
-      .papers-nav-btn { display: none; }
+      .papers-grid { grid-template-columns: 1fr; }
     }
     .paper-card {
       background: #07101E;
@@ -2520,15 +2475,9 @@
         <span class="inf-sub-title">Biblioteca de Informes</span>
         <span class="inf-sub-meta">Resumen semanal económico y financiero</span>
       </div>
-      <div class="papers-carousel-wrapper">
-        <button class="papers-nav-btn left disabled" id="papersNavLeft" aria-label="Anterior">&#8249;</button>
         <div class="papers-grid" id="papersGrid">
           <!-- Se carga dinámicamente desde papers/manifest.json -->
         </div>
-        <button class="papers-nav-btn right" id="papersNavRight" aria-label="Siguiente">&#8250;</button>
-      </div>
-      <div class="papers-carousel-dots" id="papersCarouselDots"></div>
-    </div>
   </section>
 
   <!-- ── UNIVERSITY ───────────────────────────────────────────────── -->
@@ -2817,51 +2766,6 @@
         </div>
       `).join('');
 
-      // — Carousel logic —
-      (function initPapersCarousel() {
-        const grid    = document.getElementById('papersGrid');
-        const btnL    = document.getElementById('papersNavLeft');
-        const btnR    = document.getElementById('papersNavRight');
-        const dotsEl  = document.getElementById('papersCarouselDots');
-        const cards   = grid.querySelectorAll('.paper-card');
-        const total   = cards.length;
-        const getVisible = () => window.innerWidth <= 560 ? 1 : window.innerWidth <= 900 ? 2 : 3;
-        let current   = 0;
-
-        function buildDots() {
-          dotsEl.innerHTML = '';
-          const pages = total - getVisible() + 1;
-          for (let i = 0; i < pages; i++) {
-            const d = document.createElement('div');
-            d.className = 'dot' + (i === 0 ? ' active' : '');
-            dotsEl.appendChild(d);
-          }
-        }
-
-        function update() {
-          const vis      = getVisible();
-          const maxIdx   = total - vis;
-          if (current > maxIdx) current = maxIdx;
-          const cardW    = cards[0].offsetWidth + 1;
-          grid.style.transform = `translateX(-${current * cardW}px)`;
-          btnL.classList.toggle('disabled', current === 0);
-          btnR.classList.toggle('disabled', current === maxIdx);
-          dotsEl.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
-        }
-
-        buildDots();
-        update();
-
-        btnL.addEventListener('click', function() {
-          if (current > 0) { current--; update(); }
-        });
-        btnR.addEventListener('click', function() {
-          const maxIdx = total - getVisible();
-          if (current < maxIdx) { current++; update(); }
-        });
-
-        window.addEventListener('resize', function() { buildDots(); update(); });
-      })();
 
       // Re-apply paywall after papers load dynamically
       if (window._miCheckMembership) window._miCheckMembership();
