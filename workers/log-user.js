@@ -11,24 +11,11 @@ export default {
                   const pathname = new URL(request.url).pathname;
 
           // Ruta para marcar usuario como miembro
-          if (new URL(request.url).pathname === '/marcar-miembro') {export default {
-        async fetch(request, env) {
-                  const headers = {
-                              'Access-Control-Allow-Origin': '*',
-                              'Access-Control-Allow-Headers': 'Content-Type',
-                              'Access-Control-Allow-Methods': 'POST, OPTIONS'
-                  };
-
-          if (request.method === 'OPTIONS') return new Response('', { headers });
-                  if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers });
-                  const pathname = new URL(request.url).pathname;
-
-          // Ruta para marcar usuario como miembro
           if (new URL(request.url).pathname === '/marcar-miembro') {
                       const { email } = await request.json();
                       if (!email) return new Response(JSON.stringify({ error: 'Email requerido' }), { status: 400, headers });
 
-                    // Reusar lógica de autenticación Google
+                    // Reusar lÃ³gica de autenticaciÃ³n Google
                     const privateKey = env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
                       const serviceEmail = env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
                       const sheetId = env.GOOGLE_SHEETS_ID;
@@ -57,7 +44,7 @@ export default {
                     });
                       const { access_token } = await tokenRes.json();
 
-                    // Obtener sheetId numérico de la hoja "Usuarios"
+                    // Obtener sheetId numÃ©rico de la hoja "Usuarios"
                     const sheetMetaRes = await fetch(
                                   `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties`,
                           { headers: { 'Authorization': `Bearer ${access_token}` } }
@@ -98,7 +85,7 @@ export default {
                                                 body: JSON.stringify({ values: [[new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' }), email, '', '', 'Google', 'miembro']] })
                               }
                                       );
-                                  // Obtener total de filas para saber en qué fila quedó
+                                  // Obtener total de filas para saber en quÃ© fila quedÃ³
                         const afterAppendRes = await fetch(
                                         `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Usuarios!A:A`,
                               { headers: { 'Authorization': `Bearer ${access_token}` } }
@@ -200,7 +187,7 @@ export default {
                     // Registrar en Google Sheets: insertar en fila 2 (empuja las existentes hacia abajo)
                     const fecha = new Date(loginTime || Date.now()).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
 
-                    // PASO A: Insertar fila vacía en posición 2
+                    // PASO A: Insertar fila vacÃ­a en posiciÃ³n 2
                     await fetch(
                                   `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`,
                           {
@@ -222,7 +209,7 @@ export default {
                           }
                                 );
 
-                    // PASO B: Escribir los datos en la fila 2 recién creada
+                    // PASO B: Escribir los datos en la fila 2 reciÃ©n creada
                     await fetch(
                                   `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Usuarios!A2:E2?valueInputOption=USER_ENTERED`,
                           {
@@ -243,7 +230,7 @@ export default {
                                                   from: 'Manfredi Investment <hola@manfredinvestment.com>',
                                                   to: email,
                                                   subject: 'Bienvenido a Manfredi Investment',
-                                                  html: `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;padding:0;background-color:#0a0e1a;font-family:'Helvetica Neue',Arial,sans-serif;"><table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0e1a;padding:40px 20px;"><tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#111827;border:1px solid #B8943F;border-radius:8px;overflow:hidden;"><tr><td style="background-color:#0d1424;padding:32px 40px;border-bottom:1px solid #B8943F;"><table cellpadding="0" cellspacing="0"><tr><td style="background-color:#B8943F;width:40px;height:40px;border-radius:4px;text-align:center;vertical-align:middle;"><span style="color:#0a0e1a;font-weight:700;font-size:16px;line-height:40px;">MI</span></td><td style="padding-left:12px;vertical-align:middle;"><span style="color:#ffffff;font-size:18px;font-weight:600;letter-spacing:0.5px;">Manfredi Investment</span><br><span style="color:#B8943F;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Research &amp; Markets</span></td></tr></table></td></tr><tr><td style="padding:40px;"><h1 style="color:#ffffff;font-size:24px;font-weight:600;margin:0 0 16px 0;">Bienvenido a Manfredi Investment</h1><p style="color:#9ca3af;font-size:15px;line-height:1.6;margin:0 0 24px 0;">Su cuenta ha sido creada exitosamente. A partir de ahora tiene acceso a análisis de mercados argentinos y de Wall Street, reportes diarios y datos en tiempo real.</p><table cellpadding="0" cellspacing="0" style="background-color:#0d1424;border:1px solid #1e2d4a;border-radius:6px;width:100%;margin-bottom:32px;"><tr><td style="padding:24px;"><p style="color:#B8943F;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:0 0 16px 0;">Acceso gratuito incluye</p><table cellpadding="0" cellspacing="0"><tr><td style="padding:6px 0;color:#d1d5db;font-size:14px;">&#10003; &nbsp;Reportes diarios de Argentina y Wall Street</td></tr><tr><td style="padding:6px 0;color:#d1d5db;font-size:14px;">&#10003; &nbsp;Datos de mercado en tiempo real</td></tr><tr><td style="padding:6px 0;color:#d1d5db;font-size:14px;">&#10003; &nbsp;Cursos de educación financiera</td></tr></table></td></tr></table><table cellpadding="0" cellspacing="0" style="background-color:#0d1424;border:1px solid #B8943F;border-radius:6px;width:100%;margin-bottom:32px;"><tr><td style="padding:24px;"><p style="color:#B8943F;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:0 0 12px 0;">Membresía Premium — $10 USD / mes</p><table cellpadding="0" cellspacing="0"><tr><td style="padding:5px 0;color:#d1d5db;font-size:14px;">&#9733; &nbsp;Informes de análisis en profundidad</td></tr><tr><td style="padding:5px 0;color:#d1d5db;font-size:14px;">&#9733; &nbsp;Warren IA — Asesor financiero con inteligencia artificial</td></tr><tr><td style="padding:5px 0;color:#d1d5db;font-size:14px;">&#9733; &nbsp;Seguimiento de inversiones con métricas avanzadas</td></tr></table><table cellpadding="0" cellspacing="0" style="margin-top:20px;"><tr><td style="background-color:#B8943F;border-radius:4px;padding:12px 28px;text-align:center;"><a href="https://manfredinvestment.com" style="color:#0a0e1a;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.5px;">Obtener acceso Premium</a></td></tr></table></td></tr></table><p style="color:#6b7280;font-size:13px;line-height:1.6;margin:0;">Este mensaje fue enviado porque se registró en Manfredi Investment. Si no reconoce esta acción, puede ignorar este correo.</p></td></tr><tr><td style="background-color:#0d1424;padding:20px 40px;border-top:1px solid #1e2d4a;text-align:center;"><p style="color:#4b5563;font-size:12px;margin:0;">© 2026 Manfredi Investment · Buenos Aires, Argentina</p></td></tr></table></td></tr></table></body></html>`
+                                                  html: `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;padding:0;background-color:#0a0e1a;font-family:'Helvetica Neue',Arial,sans-serif;"><table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0e1a;padding:40px 20px;"><tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#111827;border:1px solid #B8943F;border-radius:8px;overflow:hidden;"><tr><td style="background-color:#0d1424;padding:32px 40px;border-bottom:1px solid #B8943F;"><table cellpadding="0" cellspacing="0"><tr><td style="background-color:#B8943F;width:40px;height:40px;border-radius:4px;text-align:center;vertical-align:middle;"><span style="color:#0a0e1a;font-weight:700;font-size:16px;line-height:40px;">MI</span></td><td style="padding-left:12px;vertical-align:middle;"><span style="color:#ffffff;font-size:18px;font-weight:600;letter-spacing:0.5px;">Manfredi Investment</span><br><span style="color:#B8943F;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Research &amp; Markets</span></td></tr></table></td></tr><tr><td style="padding:40px;"><h1 style="color:#ffffff;font-size:24px;font-weight:600;margin:0 0 16px 0;">Bienvenido a Manfredi Investment</h1><p style="color:#9ca3af;font-size:15px;line-height:1.6;margin:0 0 24px 0;">Su cuenta ha sido creada exitosamente. A partir de ahora tiene acceso a anÃ¡lisis de mercados argentinos y de Wall Street, reportes diarios y datos en tiempo real.</p><table cellpadding="0" cellspacing="0" style="background-color:#0d1424;border:1px solid #1e2d4a;border-radius:6px;width:100%;margin-bottom:32px;"><tr><td style="padding:24px;"><p style="color:#B8943F;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:0 0 16px 0;">Acceso gratuito incluye</p><table cellpadding="0" cellspacing="0"><tr><td style="padding:6px 0;color:#d1d5db;font-size:14px;">&#10003; &nbsp;Reportes diarios de Argentina y Wall Street</td></tr><tr><td style="padding:6px 0;color:#d1d5db;font-size:14px;">&#10003; &nbsp;Datos de mercado en tiempo real</td></tr><tr><td style="padding:6px 0;color:#d1d5db;font-size:14px;">&#10003; &nbsp;Cursos de educaciÃ³n financiera</td></tr></table></td></tr></table><table cellpadding="0" cellspacing="0" style="background-color:#0d1424;border:1px solid #B8943F;border-radius:6px;width:100%;margin-bottom:32px;"><tr><td style="padding:24px;"><p style="color:#B8943F;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:0 0 12px 0;">MembresÃ­a Premium â $10 USD / mes</p><table cellpadding="0" cellspacing="0"><tr><td style="padding:5px 0;color:#d1d5db;font-size:14px;">&#9733; &nbsp;Informes de anÃ¡lisis en profundidad</td></tr><tr><td style="padding:5px 0;color:#d1d5db;font-size:14px;">&#9733; &nbsp;Warren IA â Asesor financiero con inteligencia artificial</td></tr><tr><td style="padding:5px 0;color:#d1d5db;font-size:14px;">&#9733; &nbsp;Seguimiento de inversiones con mÃ©tricas avanzadas</td></tr></table><table cellpadding="0" cellspacing="0" style="margin-top:20px;"><tr><td style="background-color:#B8943F;border-radius:4px;padding:12px 28px;text-align:center;"><a href="https://manfredinvestment.com" style="color:#0a0e1a;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.5px;">Obtener acceso Premium</a></td></tr></table></td></tr></table><p style="color:#6b7280;font-size:13px;line-height:1.6;margin:0;">Este mensaje fue enviado porque se registrÃ³ en Manfredi Investment. Si no reconoce esta acciÃ³n, puede ignorar este correo.</p></td></tr><tr><td style="background-color:#0d1424;padding:20px 40px;border-top:1px solid #1e2d4a;text-align:center;"><p style="color:#4b5563;font-size:12px;margin:0;">Â© 2026 Manfredi Investment Â· Rosario, Argentina</p></td></tr></table></td></tr></table></body></html>`
                                   })
                     }).catch(err => console.error('Error enviando email bienvenida:', err));
 
