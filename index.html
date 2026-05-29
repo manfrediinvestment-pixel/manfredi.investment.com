@@ -2478,7 +2478,61 @@
   </section>
 
   <!-- ── INFORMES ─────────────────────────────────────────────────── -->
-  <section class="section-informes member-protected locked" id="informes">
+  <section style="background:#07101E;padding:72px 32px 68px;" id="calendario">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Seguimiento macro</span>
+      <h2 class="section-title" style="color:var(--white);">Calendario Económico</h2>
+      <p class="section-sub" style="color:rgba(255,255,255,.4);">Variables clave Argentina &amp; EE.UU. · Tocá cualquier indicador para ver el detalle. Eventos actualizados cada lunes.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;" data-aos="fade-up">
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:22px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06);">
+          <div style="display:flex;align-items:center;gap:9px;font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.45);"><span style="font-size:18px;">🇦🇷</span>Argentina</div>
+          <span style="font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--green);border:1px solid rgba(16,185,129,.3);padding:3px 8px;">En vivo</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="cal-kpi" onclick="calShowDetail('ar-pbi',this)"><div class="cal-kpi-label">Crecimiento PBI</div><div class="cal-kpi-main cal-up" id="ar-pbi-val">+5.5%</div><div class="cal-kpi-sub" id="ar-pbi-sub">Anual · Q1 2026</div><div class="cal-kpi-bar"></div></div>
+          <div class="cal-kpi" onclick="calShowDetail('ar-inf',this)"><div class="cal-kpi-label">Inflación</div><div class="cal-kpi-main cal-down" id="ar-inf-val">Cargando…</div><div class="cal-kpi-sub" id="ar-inf-sub">Mensual</div><div class="cal-kpi-bar"></div></div>
+          <div class="cal-kpi" onclick="calShowDetail('ar-desemp',this)"><div class="cal-kpi-label">Desempleo</div><div class="cal-kpi-main cal-down" id="ar-desemp-val">7.2%</div><div class="cal-kpi-sub" id="ar-desemp-sub">EPH INDEC · Q4 2025</div><div class="cal-kpi-bar"></div></div>
+          <div class="cal-kpi" onclick="calShowDetail('ar-riesgo',this)"><div class="cal-kpi-label">Riesgo País</div><div class="cal-kpi-main cal-gold" id="ar-riesgo-val">Cargando…</div><div class="cal-kpi-sub" id="ar-riesgo-sub">EMBI+</div><div class="cal-kpi-bar"></div></div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:22px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06);">
+          <div style="display:flex;align-items:center;gap:9px;font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.45);"><span style="font-size:18px;">🇺🇸</span>Estados Unidos</div>
+          <span style="font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--green);border:1px solid rgba(16,185,129,.3);padding:3px 8px;">En vivo</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="cal-kpi" onclick="calShowDetail('us-pbi',this)"><div class="cal-kpi-label">Crecimiento PBI</div><div class="cal-kpi-main cal-down" id="us-pbi-val">Cargando…</div><div class="cal-kpi-sub" id="us-pbi-sub">Anual</div><div class="cal-kpi-bar"></div></div>
+          <div class="cal-kpi" onclick="calShowDetail('us-inf',this)"><div class="cal-kpi-label">Inflación</div><div class="cal-kpi-main cal-up" id="us-inf-val">Cargando…</div><div class="cal-kpi-sub" id="us-inf-sub">CPI Anual</div><div class="cal-kpi-bar"></div></div>
+          <div class="cal-kpi" onclick="calShowDetail('us-desemp',this)"><div class="cal-kpi-label">Desempleo</div><div class="cal-kpi-main" id="us-desemp-val">Cargando…</div><div class="cal-kpi-sub" id="us-desemp-sub">Mensual</div><div class="cal-kpi-bar"></div></div>
+          <div class="cal-kpi" onclick="calShowDetail('us-treasury',this)"><div class="cal-kpi-label">Treasury 10Y</div><div class="cal-kpi-main cal-gold" id="us-treasury-val">Cargando…</div><div class="cal-kpi-sub" id="us-treasury-sub">Yield</div><div class="cal-kpi-bar"></div></div>
+        </div>
+      </div>
+    </div>
+    <div id="calDetailBox" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:18px 22px;margin-bottom:28px;display:flex;align-items:center;gap:16px;min-height:68px;transition:border-color .2s,background .2s;" data-aos="fade-up">
+      <div style="width:36px;height:36px;background:rgba(242,201,76,.1);border:1px solid rgba(242,201,76,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📊</div>
+      <div><div id="calDetailTitle" style="font-size:11px;font-weight:600;color:var(--gold);letter-spacing:.04em;margin-bottom:4px;">Seleccioná un indicador</div><div id="calDetailText" style="font-size:12.5px;color:rgba(255,255,255,.45);line-height:1.6;">Tocá cualquier cuadro para ver el contexto, la tendencia y qué significa para los mercados.</div></div>
+    </div>
+    <div data-aos="fade-up">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px;">Eventos de la semana — <span id="calSemanaLabel">cargando...</span></div>
+      <div id="calWeekGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+        <div class="cal-day"><div class="cal-day-head"><span class="cal-day-name">Lun</span></div></div>
+        <div class="cal-day"><div class="cal-day-head"><span class="cal-day-name">Mar</span></div></div>
+        <div class="cal-day"><div class="cal-day-head"><span class="cal-day-name">Mié</span></div></div>
+        <div class="cal-day"><div class="cal-day-head"><span class="cal-day-name">Jue</span></div></div>
+        <div class="cal-day"><div class="cal-day-head"><span class="cal-day-name">Vie</span></div></div>
+      </div>
+      <div style="display:flex;gap:18px;margin-top:12px;">
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.3);"><div style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;"></div>Argentina</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.3);"><div style="width:6px;height:6px;border-radius:50%;background:#60A5FA;flex-shrink:0;"></div>EE.UU.</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.3);"><div style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>Alta relevancia</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section-informes member-protected locked" id="informes">
       
     <div class="container">
       <div class="section-header">
