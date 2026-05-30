@@ -3805,38 +3805,37 @@
   async function fetchCommTable() {
     var tbody = document.getElementById('commTableBody');
     if (!tbody) return;
-    var comms = [
-      {ticker:'XAU',name:'Oro',sym:'OANDA:XAU_USD'},
-      {ticker:'XAG',name:'Plata',sym:'OANDA:XAG_USD'},
-      {ticker:'WTI',name:'Petr\u00f3leo WTI',sym:'NYMEX:CL1!'},
-      {ticker:'BRENT',name:'Petr\u00f3leo Brent',sym:'NYMEX:BZ1!'},
-      {ticker:'NG',name:'Gas Natural',sym:'NYMEX:NG1!'},
-      {ticker:'SOJA',name:'Soja',sym:'CBOT:ZS1!'},
-      {ticker:'MAIZ',name:'Ma\u00edz',sym:'CBOT:ZC1!'},
-      {ticker:'TRIGO',name:'Trigo',sym:'CBOT:ZW1!'}
-    ];
     try {
-      var results = await Promise.all(comms.map(async function(c, i) {
-        try {
-          var r = await fetch('https://finnhub.io/api/v1/quote?symbol='+encodeURIComponent(c.sym)+'&token='+CONFIG.FINNHUB_KEY);
-          var d = await r.json();
-          var price = (d.c && d.c > 0) ? 'US$ '+d.c.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : '\u2014';
-          var pct = (d.c && d.pc && d.pc > 0) ? ((d.c - d.pc) / d.pc * 100) : null;
-          var sign = pct != null ? (pct >= 0 ? '\u25b2 +' : '\u25bc ') : '';
-          var pctStr = pct != null ? sign+Math.abs(pct).toFixed(2)+'%' : '\u2014';
-          var cls = pct != null ? (pct >= 0 ? 'pos' : 'neg') : '';
-          var spark = genSparkSVG(i, pct != null ? (pct >= 0 ? 'up' : 'down') : 'neutral');
-          return '<div class="at-row">'+
-            '<div class="at-name"><span class="at-ticker">'+c.ticker+'</span><span class="at-fullname">'+c.name+'</span></div>'+
-            '<div class="at-price">'+price+'</div>'+
-            '<div class="at-spark">'+spark+'</div>'+
-            '<div class="at-chg '+cls+'">'+pctStr+'</div>'+
-            '</div>';
-        } catch(e) { return ''; }
-      }));
-      tbody.innerHTML = results.join('') || '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Sin datos</span></div>';
+      var r = await fetch('https://manfredi-calendario.nachito2502.workers.dev/commodities', {signal: AbortSignal.timeout(6000)});
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      var data = await r.json();
+      var items = [
+        {ticker:'XAU', name:'Oro', key:'XAU'},
+        {ticker:'XAG', name:'Plata', key:'XAG'},
+        {ticker:'WTI', name:'Petóleo WTI', key:'WTI'},
+        {ticker:'BRENT', name:'Petóleo Brent', key:'BRENT'},
+        {ticker:'MAIZ', name:'Maíz', key:'CORN'},
+        {ticker:'SOJA', name:'Soja', key:'SOYBEAN'},
+        {ticker:'TRIGO', name:'Trigo', key:'WHEAT'},
+        {ticker:'NG', name:'Gas Natural', key:'NG'},
+      ];
+      tbody.innerHTML = items.map(function(item, i) {
+        var d = data[item.key];
+        var price = d && d.price ? 'US$ ' + parseFloat(d.price).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—';
+        var pct = d && d.change != null ? parseFloat(d.change) : null;
+        var sign = pct != null ? (pct >= 0 ? '▲ +' : '▼ ') : '';
+        var pctStr = pct != null ? sign + Math.abs(pct).toFixed(2) + '%' : '—';
+        var cls = pct != null ? (pct >= 0 ? 'pos' : 'neg') : '';
+        var spark = genSparkSVG(i, pct != null ? (pct >= 0 ? 'up' : 'down') : 'neutral');
+        return '<div class="at-row">' +
+          '<div class="at-name"><span class="at-ticker">' + item.ticker + '</span><span class="at-fullname">' + item.name + '</span></div>' +
+          '<div class="at-price">' + price + '</div>' +
+          '<div class="at-spark">' + spark + '</div>' +
+          '<div class="at-chg ' + cls + '">' + pctStr + '</div>' +
+          '</div>';
+      }).join('');
     } catch(e) {
-      tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error</span></div>';
+      tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error: ' + e.message + '</span></div>';
     }
   }
 
