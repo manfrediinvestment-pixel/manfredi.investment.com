@@ -10146,7 +10146,7 @@ function miRenderTesis(ticker){
 </div>
 
 <script>
-(function(){
+var qzCur=0,qzAnswers=[];
 var QZQs=[
 {q:"¿Cómo reaccionarías si tu inversión cae un 20% en un mes?",opts:["La vendo inmediatamente para no perder más","Me preocupa pero espero a ver qué pasa","Es parte del proceso, no hago nada","Aprovecharía para comprar más barato"],pts:[0,1,2,3]},
 {q:"¿Cuánto tiempo podés dejar invertido tu dinero sin necesitarlo?",opts:["Menos de 1 año","Entre 1 y 3 años","Entre 3 y 7 años","Más de 7 años"],pts:[0,1,2,3]},
@@ -10162,8 +10162,6 @@ var QZProfiles=[
 {name:"Inversor Moderado",color:"#F2C94C",bg:"rgba(242,201,76,.12)",emoji:"⚖",desc:"Buscás un balance entre seguridad y crecimiento. Podés tolerar cierta volatilidad si el potencial de retorno lo justifica. Un portafolio diversificado con acciones sólidas y activos de renta fija es ideal para vos.",riesgo:"Medio",horizonte:"Mediano plazo",activos:"Acciones · ETFs · Bonos"},
 {name:"Inversor Agresivo",color:"#10B981",bg:"rgba(16,185,129,.12)",emoji:"🚀",desc:"Buscás maximizar el crecimiento a largo plazo y podés tolerar volatilidad significativa. Tu horizonte temporal largo te permite tomar más riesgo. Acciones de crecimiento, CEDEARs y activos alternativos son tu territorio.",riesgo:"Alto",horizonte:"Largo plazo",activos:"Acciones growth · CEDEARs · Crypto"}
 ];
-var qzCur=0, qzAnswers=[];
-
 function qzRender(){
   var c=document.getElementById('qzContent');
   var p=document.getElementById('qzProgFill');
@@ -10171,7 +10169,7 @@ function qzRender(){
   if(qzCur>=QZQs.length){qzShowResult();return;}
   var q=QZQs[qzCur];
   c.innerHTML='<div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Pregunta '+(qzCur+1)+' de '+QZQs.length+'</div>'+
-  '<div style="font-family:\'DM Serif Display\',Georgia,serif;font-size:22px;color:#fff;line-height:1.35;margin-bottom:24px;">'+q.q+'</div>'+
+  '<div style="font-family:sans-serif;font-size:22px;color:#fff;line-height:1.35;margin-bottom:24px;">'+q.q+'</div>'+
   '<div style="display:flex;flex-direction:column;gap:10px;">'+
   q.opts.map(function(o,i){return '<button onclick="qzPick('+i+')" style="background:'+(qzAnswers[qzCur]===i?'rgba(242,201,76,.08)':'rgba(255,255,255,.04)')+';border:1px solid '+(qzAnswers[qzCur]===i?'#F2C94C':'rgba(255,255,255,.08)')+';padding:14px 18px;cursor:pointer;font-size:14px;color:'+(qzAnswers[qzCur]===i?'#fff':'rgba(255,255,255,.75)')+';text-align:left;line-height:1.45;width:100%;font-family:inherit;">'+o+'</button>';}).join('')+
   '</div>'+
@@ -10180,39 +10178,33 @@ function qzRender(){
   '<button onclick="qzNext()" style="background:'+(qzAnswers[qzCur]!==undefined?'#F2C94C':'transparent')+';border:1px solid '+(qzAnswers[qzCur]!==undefined?'#F2C94C':'rgba(255,255,255,.2)')+';color:'+(qzAnswers[qzCur]!==undefined?'#0A0F1E':'rgba(255,255,255,.7)')+';padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;"'+(qzAnswers[qzCur]===undefined?' disabled':'')+'>'+(qzCur===QZQs.length-1?'Ver resultado →':'Siguiente →')+'</button>'+
   '</div>';
 }
-
 function qzPick(i){qzAnswers[qzCur]=i;qzRender();}
 function qzPrev(){if(qzCur>0){qzCur--;qzRender();}}
 function qzNext(){if(qzAnswers[qzCur]!==undefined){qzCur++;qzRender();}}
-
 function qzShowResult(){
   var total=qzAnswers.reduce(function(s,a,i){return s+(a!==undefined?QZQs[i].pts[a]:0);},0);
   var pct=total/(QZQs.length*3);
   var idx=pct<0.35?0:pct<0.65?1:2;
-  var p=QZProfiles[idx];
+  var pr=QZProfiles[idx];
   document.getElementById('qzProgFill').style.width='100%';
   document.getElementById('qzContent').innerHTML=
   '<div style="text-align:center;padding:8px 0;">'+
-  '<div style="width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;background:'+p.bg+';">'+p.emoji+'</div>'+
-  '<div style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:'+p.color+';margin-bottom:8px;">Tu perfil de inversor</div>'+
-  '<div style="font-family:\'DM Serif Display\',Georgia,serif;font-size:28px;color:#fff;margin-bottom:16px;">'+p.name+'</div>'+
-  '<div style="font-size:14px;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto;">'+p.desc+'</div>'+
+  '<div style="width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;background:'+pr.bg+';">'+pr.emoji+'</div>'+
+  '<div style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:'+pr.color+';margin-bottom:8px;">Tu perfil de inversor</div>'+
+  '<div style="font-size:28px;color:#fff;margin-bottom:16px;">'+pr.name+'</div>'+
+  '<div style="font-size:14px;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto;">'+pr.desc+'</div>'+
   '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px;">'+
-  '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:16px 14px;"><div style="font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;">Riesgo</div><div style="font-size:18px;font-weight:600;color:'+p.color+';">'+p.riesgo+'</div></div>'+
-  '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:16px 14px;"><div style="font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;">Horizonte</div><div style="font-size:18px;font-weight:600;color:'+p.color+';">'+p.horizonte+'</div></div>'+
-  '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:16px 14px;"><div style="font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;">Activos ideales</div><div style="font-size:11px;font-weight:600;color:'+p.color+';">'+p.activos+'</div></div>'+
+  '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:16px 14px;"><div style="font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;">Riesgo</div><div style="font-size:18px;font-weight:600;color:'+pr.color+';">'+pr.riesgo+'</div></div>'+
+  '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:16px 14px;"><div style="font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;">Horizonte</div><div style="font-size:18px;font-weight:600;color:'+pr.color+';">'+pr.horizonte+'</div></div>'+
+  '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:16px 14px;"><div style="font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;">Activos ideales</div><div style="font-size:11px;font-weight:600;color:'+pr.color+';">'+pr.activos+'</div></div>'+
   '</div>'+
-  '<button onclick="document.getElementById('warrenBtn')&&document.getElementById('warrenBtn').click();closeQuiz();" style="background:#F2C94C;border:none;color:#0A0F1E;padding:14px 32px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.04em;width:100%;margin-bottom:12px;font-family:inherit;">Consultar a Warren sobre mi perfil →</button>'+
+  '<button onclick="closeQuiz()" style="background:#F2C94C;border:none;color:#0A0F1E;padding:14px 32px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.04em;width:100%;margin-bottom:12px;font-family:inherit;">Consultar a Warren sobre mi perfil →</button>'+
   '<button onclick="qzRestart()" style="background:transparent;border:none;color:rgba(255,255,255,.35);font-size:12px;cursor:pointer;text-decoration:underline;font-family:inherit;">Repetir el quiz</button>'+
   '</div>';
 }
-
 function qzRestart(){qzCur=0;qzAnswers=[];qzRender();}
-})();
-window.openQuiz=function(){qzCur=0;qzAnswers=[];document.getElementById('quizModal').style.display='block';document.body.style.overflow='hidden';qzRender();};
-window.closeQuiz=function(){document.getElementById('quizModal').style.display='none';document.body.style.overflow='';};
-window.qzPick=qzPick;window.qzPrev=qzPrev;window.qzNext=qzNext;window.qzRestart=qzRestart;
-
+function openQuiz(){qzCur=0;qzAnswers=[];document.getElementById('quizModal').style.display='block';document.body.style.overflow='hidden';qzRender();}
+function closeQuiz(){document.getElementById('quizModal').style.display='none';document.body.style.overflow='';}
 </script>
 </body>
 </html>
