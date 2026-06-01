@@ -10203,8 +10203,8 @@ function qzShowResult(){
   '</div>';
 }
 function qzRestart(){qzCur=0;qzAnswers=[];qzRender();}
-function openQuiz(){qzCur=0;qzAnswers=[];var m=document.getElementById('quizModal');if(m){m.style.display='block';m.scrollTop=0;document.body.style.overflow='hidden';document.documentElement.style.overflow='hidden';qzRender();window.scrollTo(0,0);}}
-function closeQuiz(){document.getElementById('quizModal').style.display='none';document.body.style.overflow='';}
+function openQuiz(){qzCur=0;qzAnswers=[];var m=document.getElementById('quizModal');var bd=document.getElementById('mi-overlay-backdrop');if(m&&bd){bd.classList.add('active');m.style.display='block';m.scrollTop=0;document.body.style.overflow='hidden';document.documentElement.style.overflow='hidden';qzRender();window.scrollTo(0,0);}}
+function closeQuiz(){var m=document.getElementById('quizModal');var bd=document.getElementById('mi-overlay-backdrop');if(m) m.style.display='none';if(bd) bd.classList.remove('active');document.body.style.overflow='';document.documentElement.style.overflow='';}
 </script>
 </body>
 </html>
