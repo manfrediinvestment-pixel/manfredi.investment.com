@@ -10084,7 +10084,7 @@ async function miLoadPrice(ticker){
     var r=await fetch('/reports/wallstreet.json');
     if(r.ok){
       var d=await r.json();
-      const entry=(d.acciones&&d.acciones[ticker])||d[ticker.toLowerCase()];
+            const entry=d.acciones ? d.acciones[ticker] : d[ticker];
       if(entry&&entry.valor){miRenderPrice(entry.valor,entry.variacion);return;}
     }
   }catch(e){}
