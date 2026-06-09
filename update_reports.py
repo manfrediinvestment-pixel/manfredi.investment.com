@@ -170,6 +170,14 @@ soja = yahoo("ZS%3DF",  "Soja")
 nvda = yahoo("NVDA", "Nvidia")
 meta = yahoo("META", "Meta")
 amzn = yahoo("AMZN", "Amazon")
+aapl = yahoo("AAPL", "Apple")
+msft = yahoo("MSFT", "Microsoft")
+tsla = yahoo("TSLA", "Tesla")
+googl = yahoo("GOOGL", "Alphabet")
+jpm  = yahoo("JPM", "JPMorgan")
+meli = yahoo("MELI", "MercadoLibre")
+adbe = yahoo("ADBE", "Adobe")
+uber = yahoo("UBER", "Uber")
 
 sp_v  = sp.get("valor",  "N/D"); sp_var  = sp.get("variacion",  "N/D")
 dj_v  = dj.get("valor",  "N/D"); dj_var  = dj.get("variacion",  "N/D")
@@ -209,6 +217,14 @@ wallstreet = {
         "NVDA": nvda,
         "META": meta,
         "AMZN": amzn,
+        "AAPL": aapl,
+        "MSFT": msft,
+        "TSLA": tsla,
+        "GOOGL": googl,
+        "JPM": jpm,
+        "MELI": meli,
+        "ADBE": adbe,
+        "UBER": uber,
     }
 }
 
