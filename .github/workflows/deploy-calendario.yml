@@ -1,0 +1,22 @@
+name: Deploy Calendario Worker
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'workers/calendario/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy Calendario Worker
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy with Wrangler
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --config workers/calendario/wrangler.toml
