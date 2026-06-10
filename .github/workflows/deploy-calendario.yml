@@ -30,30 +30,45 @@ jobs:
         run: |
           set -e
           
-          # Get list of KV namespaces
+          # Get list of KV namespaces via API
           echo "Fetching KV namespaces..."
-          KV_LIST=$(wrangler kv namespace list --json 2>/dev/null || echo "[]")
-          echo "KV list: $KV_LIST"
+          KV_RESPONSE=$(curl -s "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json")
           
-          # Look for existing namespace named 'manfredi-calendario-CALENDARIO_KV'
-          KV_ID=$(echo "$KV_LIST" | node -e "
-            const d = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
-            const ns = d.find(x => x.title === 'manfredi-calendario-CALENDARIO_KV');
-            process.stdout.write(ns ? ns.id : '');
+          echo "API Response (truncated): $(echo $KV_RESPONSE | head -c 200)"
+          
+          # Parse existing namespace ID
+          KV_ID=$(echo "$KV_RESPONSE" | node -e "
+            let d = '';
+            process.stdin.on('data', c => d += c);
+            process.stdin.on('end', () => {
+              try {
+                const j = JSON.parse(d);
+                const ns = (j.result || []).find(x => x.title === 'manfredi-calendario-CALENDARIO_KV');
+                process.stdout.write(ns ? ns.id : '');
+              } catch(e) { process.stdout.write(''); }
+            });
           " 2>/dev/null || echo "")
           
           if [ -z "$KV_ID" ]; then
-            echo "Creating new KV namespace CALENDARIO_KV..."
-            CREATE_OUTPUT=$(wrangler kv namespace create CALENDARIO_KV --json 2>&1)
-            echo "Create output: $CREATE_OUTPUT"
-            KV_ID=$(echo "$CREATE_OUTPUT" | node -e "
-              const lines = require('fs').readFileSync('/dev/stdin','utf8').split('\n');
-              for (const line of lines) {
+            echo "Creating new KV namespace..."
+            CREATE_RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces" \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              --data '{"title": "manfredi-calendario-CALENDARIO_KV"}')
+            
+            echo "Create response: $CREATE_RESPONSE"
+            
+            KV_ID=$(echo "$CREATE_RESPONSE" | node -e "
+              let d = '';
+              process.stdin.on('data', c => d += c);
+              process.stdin.on('end', () => {
                 try {
-                  const d = JSON.parse(line);
-                  if (d.id) { process.stdout.write(d.id); break; }
-                } catch(e) {}
-              }
+                  const j = JSON.parse(d);
+                  process.stdout.write((j.result && j.result.id) ? j.result.id : '');
+                } catch(e) { process.stdout.write(''); }
+              });
             " 2>/dev/null || echo "")
           fi
           
