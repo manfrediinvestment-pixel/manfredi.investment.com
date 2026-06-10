@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install Wrangler
         run: npm install -g wrangler@latest
@@ -34,56 +34,3 @@ jobs:
           echo "Fetching KV namespaces..."
           KV_RESPONSE=$(curl -s "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces" \
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-            -H "Content-Type: application/json")
-          
-          echo "API Response (truncated): $(echo $KV_RESPONSE | head -c 200)"
-          
-          # Parse existing namespace ID
-          KV_ID=$(echo "$KV_RESPONSE" | node -e "
-            let d = '';
-            process.stdin.on('data', c => d += c);
-            process.stdin.on('end', () => {
-              try {
-                const j = JSON.parse(d);
-                const ns = (j.result || []).find(x => x.title === 'manfredi-calendario-CALENDARIO_KV');
-                process.stdout.write(ns ? ns.id : '');
-              } catch(e) { process.stdout.write(''); }
-            });
-          " 2>/dev/null || echo "")
-          
-          if [ -z "$KV_ID" ]; then
-            echo "Creating new KV namespace..."
-            CREATE_RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces" \
-              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-              -H "Content-Type: application/json" \
-              --data '{"title": "manfredi-calendario-CALENDARIO_KV"}')
-            
-            echo "Create response: $CREATE_RESPONSE"
-            
-            KV_ID=$(echo "$CREATE_RESPONSE" | node -e "
-              let d = '';
-              process.stdin.on('data', c => d += c);
-              process.stdin.on('end', () => {
-                try {
-                  const j = JSON.parse(d);
-                  process.stdout.write((j.result && j.result.id) ? j.result.id : '');
-                } catch(e) { process.stdout.write(''); }
-              });
-            " 2>/dev/null || echo "")
-          fi
-          
-          echo "Using KV namespace ID: $KV_ID"
-          
-          if [ -z "$KV_ID" ]; then
-            echo "ERROR: Could not get or create KV namespace ID"
-            exit 1
-          fi
-          
-          # Update wrangler.toml with the real KV ID
-          sed -i "s/REEMPLAZAR_CON_ID_REAL_DEL_KV/$KV_ID/" workers/calendario/wrangler.toml
-          echo "Updated wrangler.toml:"
-          cat workers/calendario/wrangler.toml
-          
-          # Deploy
-          echo "Deploying worker..."
-          wrangler deploy --config workers/calendario/wrangler.toml
