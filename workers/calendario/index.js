@@ -146,6 +146,31 @@ export default {
 
     }
 
+  if (url.pathname === '/debug-ff') {
+    try {
+      const resp = await fetch('https://nfs.faireconomy.media/ff_calendar_thisweek.json', {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ManfrediInvestment/1.0)', 'Accept': 'application/json' },
+      });
+      const text = await resp.text();
+      return new Response(JSON.stringify({ status: resp.status, body: text.substring(0, 2000) }), { headers });
+    } catch(e) {
+      return new Response(JSON.stringify({ error: e.message }), { headers });
+    }
+  }
+
+  if (url.pathname === '/debug-indec') {
+    try {
+      const resp = await fetch('https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_1sem2026.pdf', {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ManfrediInvestment/1.0)' },
+      });
+      const buf = await resp.arrayBuffer();
+      const text = extractTextFromPDF(buf);
+      return new Response(JSON.stringify({ status: resp.status, bytes: buf.byteLength, textSample: text.substring(0, 2000) }), { headers });
+    } catch(e) {
+      return new Response(JSON.stringify({ error: e.message }), { headers });
+    }
+  }
+
     return new Response('Manfredi Calendario Worker OK', { headers: { 'Content-Type': 'text/plain' } });
 
   },
