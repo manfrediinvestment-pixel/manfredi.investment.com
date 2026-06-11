@@ -3,10 +3,8 @@ name: Deploy Calendario Worker
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
-    paths:
-      - 'workers/calendario/**'
+    branches: [main]
+    paths: ['workers/calendario/**']
 
 jobs:
   deploy:
@@ -14,23 +12,8 @@ jobs:
     name: Deploy Calendario Worker
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: cloudflare/wrangler-action@v3
         with:
-          node-version: '22'
-
-      - name: Install Wrangler
-        run: npm install -g wrangler@latest
-
-      - name: Get or create KV namespace and deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          set -e
-          
-          # Get list of KV namespaces via API
-          echo "Fetching KV namespaces..."
-          KV_RESPONSE=$(curl -s "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces" \
-            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --config workers/calendario/wrangler.toml
