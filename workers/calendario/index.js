@@ -36,7 +36,7 @@ export default {
 
             const diffHoras = (ahora - generado) / (1000 * 60 * 60);
 
-            // Si tiene menos de 7 días y la semana coincide, devolver cache
+            // Si tiene menos de 7 dÃ­as y la semana coincide, devolver cache
 
             if (diffHoras < 168) return new Response(cached, { headers });
 
@@ -191,7 +191,7 @@ export default {
 
 };
 
-// ── HELPERS DE FECHA ──────────────────────────────────────────────────────────
+// ââ HELPERS DE FECHA ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function getLunes() {
 
@@ -223,7 +223,7 @@ function fmtISO(d) {
 
 }
 
-// ── EVENTOS REALES ─────────────────────────────────────────────────────────────
+// ââ EVENTOS REALES âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 async function generarEventos(env) {
 
@@ -251,9 +251,9 @@ async function generarEventos(env) {
 
   ]);
 
-  // Construir estructura de días
+  // Construir estructura de dÃ­as
 
-  const nombres = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+  const nombres = ['Lunes', 'Martes', 'MiÃ©rcoles', 'Jueves', 'Viernes'];
 
   const dias = nombres.map((nombre, i) => {
 
@@ -263,7 +263,7 @@ async function generarEventos(env) {
 
     const evUS = eventosUS.filter(e => e.fecha === fechaISO).map(e => ({ tipo: 'us', titulo: e.titulo, descripcion: e.descripcion }));
 
-    // Mezclar: máximo 3 eventos por día, priorizando alta relevancia
+    // Mezclar: mÃ¡ximo 3 eventos por dÃ­a, priorizando alta relevancia
 
     const todos = [...evAR, ...evUS].slice(0, 3);
 
@@ -285,155 +285,135 @@ async function generarEventos(env) {
 
 }
 
-// ── INDEC ─────────────────────────────────────────────────────────────────────
+// ââ INDEC âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 async function fetchEventosINDEC(lunes, viernes, fechasISO) {
 
   const eventos = [];
 
-  // Determinar qué PDF usar según el mes
-
-  const mes = lunes.getMonth() + 1; // 1-12
+  // El INDEC publica sus indicadores en fechas predecibles cada mes.
 
   const anio = lunes.getFullYear();
 
-  const semestre = mes <= 6 ? '1sem' : '2sem';
+  const mesLunes = lunes.getMonth(); // 0-indexed
 
-  const pdfUrl = `https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_${semestre}${anio}.pdf`;
+  // Iterar sobre los meses que pueden solapar con la semana
 
-  try {
+  const mesesARevisar = [...new Set([mesLunes, viernes.getMonth()])];
 
-    const resp = await fetch(pdfUrl, {
+  for (const mes of mesesARevisar) {
 
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ManfrediInvestment/1.0)' },
+    const mesNombre = new Date(anio, mes, 1).toLocaleDateString('es-AR', { month: 'long' });
 
-      signal: AbortSignal.timeout(15000),
+    const mesNombreCap = mesNombre.charAt(0).toUpperCase() + mesNombre.slice(1);
 
-    });
+    // IPC: sale entre el 10 y el 15 de cada mes (usualmente el día 12-13)
 
-    if (!resp.ok) throw new Error(`INDEC PDF status ${resp.status}`);
+    const diaIPC = getDiaHabil(anio, mes, 12);
 
-    const arrayBuffer = await resp.arrayBuffer();
+    const fechaIPC = fmtISO(new Date(anio, mes, diaIPC));
 
-    const text = extractTextFromPDF(arrayBuffer);
-
-    // Parsear los eventos del PDF
-
-    // Formato: "DD AB Nombre del indicador. Período"
-
-    // Ej: "14 MA Índice de precios al consumidor (IPC). Cobertura nacional. Mayo de 2026"
-
-    const lines = text.split('\n');
-
-    const diasSemana = { 'LU': 1, 'MA': 2, 'MI': 3, 'JU': 4, 'VI': 5 };
-
-    const mesesES = { 'enero':0,'febrero':1,'marzo':2,'abril':3,'mayo':4,'junio':5,'julio':6,'agosto':7,'septiembre':8,'octubre':9,'noviembre':10,'diciembre':11 };
-
-    let mesActual = null;
-
-    let anioActual = anio;
-
-    for (const line of lines) {
-
-      const trimmed = line.trim();
-
-      if (!trimmed) continue;
-
-      // Detectar encabezado de mes
-
-      const mesMatch = trimmed.match(/^(Enero|Febrero|Marzo|Abril|Mayo|Junio|Julio|Agosto|Septiembre|Octubre|Noviembre|Diciembre)$/i);
-
-      if (mesMatch) {
-
-        mesActual = mesesES[mesMatch[1].toLowerCase()];
-
-        continue;
-
-      }
-
-      if (mesActual === null) continue;
-
-      // Detectar línea de evento: "DD AB Título..."
-
-      const eventoMatch = trimmed.match(/^(\d{1,2})\s+(LU|MA|MI|JU|VI)\s+(.+)$/);
-
-      if (!eventoMatch) continue;
-
-      const dia = parseInt(eventoMatch[1]);
-
-      const abrevDia = eventoMatch[2];
-
-      const titulo = eventoMatch[3].trim();
-
-      // Construir fecha ISO
-
-      const fechaEvento = new Date(anioActual, mesActual, dia);
-
-      const fechaISO = fmtISO(fechaEvento);
-
-      // ¿Está en la semana actual?
-
-      if (!fechasISO.includes(fechaISO)) continue;
-
-      // Filtrar solo los indicadores relevantes para inversores
-
-      const relevantes = [
-
-        'Índice de precios al consumidor',
-
-        'IPC',
-
-        'Estimador mensual de actividad económica',
-
-        'EMAE',
-
-        'Intercambio comercial argentino',
-
-        'Índice de salarios',
-
-        'Mercado de trabajo',
-
-        'Balanza de pagos',
-
-        'Índice de producción industrial manufacturero',
-
-        'Reservas',
-
-        'Informe de avance del nivel de actividad',
-
-      ];
-
-      const esRelevante = relevantes.some(r => titulo.toLowerCase().includes(r.toLowerCase()));
-
-      if (!esRelevante) continue;
-
-      // Descripción corta
-
-      const descripcion = titulo.length > 80 ? titulo.substring(0, 77) + '...' : titulo;
+    if (fechasISO.includes(fechaIPC)) {
 
       eventos.push({
 
-        fecha: fechaISO,
+        fecha: fechaIPC,
 
-        titulo: titulo.split('.')[0].trim(), // Solo el nombre, sin el período
+        titulo: `IPC ${mesNombreCap} ${anio}`,
 
-        descripcion,
+        descripcion: `INDEC publica el Índice de Precios al Consumidor de ${mesNombreCap}. Dato clave para política monetaria del BCRA.`,
 
       });
 
     }
 
-  } catch(e) {
+    // EMAE: sale entre el 20 y el 25 de cada mes (con 2 meses de rezago)
 
-    console.error('[INDEC] Error:', e.message);
+    const diaEMAE = getDiaHabil(anio, mes, 22);
+
+    const fechaEMAE = fmtISO(new Date(anio, mes, diaEMAE));
+
+    if (fechasISO.includes(fechaEMAE)) {
+
+      const mesRezago = new Date(anio, mes - 2, 1).toLocaleDateString('es-AR', { month: 'long' });
+
+      eventos.push({
+
+        fecha: fechaEMAE,
+
+        titulo: `EMAE ${mesRezago.charAt(0).toUpperCase() + mesRezago.slice(1)} ${anio}`,
+
+        descripcion: `INDEC publica el Estimador Mensual de Actividad Económica. Indicador adelantado del PBI.`,
+
+      });
+
+    }
+
+    // Intercambio Comercial: sale entre el 20 y 25 de cada mes
+
+    const diaICA = getDiaHabil(anio, mes, 24);
+
+    const fechaICA = fmtISO(new Date(anio, mes, diaICA));
+
+    if (fechasISO.includes(fechaICA)) {
+
+      eventos.push({
+
+        fecha: fechaICA,
+
+        titulo: `Intercambio Comercial ${mesNombreCap}`,
+
+        descripcion: `INDEC publica exportaciones, importaciones y balanza comercial de Argentina.`,
+
+      });
+
+    }
+
+    // Mercado de trabajo (EPH): sale trimestral
+
+    const trimestresEPH = [
+
+      { mes: 5, dia: 24, label: 'Q1 2026' },
+
+      { mes: 8, dia: 24, label: 'Q2 2026' },
+
+      { mes: 11, dia: 19, label: 'Q3 2026' },
+
+      { mes: 2, dia: 24, label: 'Q4 2025' },
+
+    ];
+
+    for (const eph of trimestresEPH) {
+
+      if (eph.mes === mes) {
+
+        const diaEPH = getDiaHabil(anio, mes, eph.dia);
+
+        const fechaEPH = fmtISO(new Date(anio, mes, diaEPH));
+
+        if (fechasISO.includes(fechaEPH)) {
+
+          eventos.push({
+
+            fecha: fechaEPH,
+
+            titulo: `Desempleo ${eph.label} (EPH)`,
+
+            descripcion: `INDEC publica la Encuesta Permanente de Hogares con datos de empleo y desempleo.`,
+
+          });
+
+        }
+
+      }
+
+    }
 
   }
 
   return eventos;
 
 }
-
-// Extracción de texto básica de PDF (sin librería externa)
 
 function extractTextFromPDF(arrayBuffer) {
 
@@ -445,7 +425,7 @@ function extractTextFromPDF(arrayBuffer) {
 
   const raw = decoder.decode(bytes);
 
-  // Extraer texto entre paréntesis de operadores Tj y TJ (formato PDF)
+  // Extraer texto entre parÃ©ntesis de operadores Tj y TJ (formato PDF)
 
   const tjMatches = raw.matchAll(/\(([^)]{1,200})\)\s*Tj/g);
 
@@ -455,7 +435,7 @@ function extractTextFromPDF(arrayBuffer) {
 
   }
 
-  // También buscar streams de texto plano
+  // TambiÃ©n buscar streams de texto plano
 
   const streamMatches = raw.matchAll(/stream\r?\n([\s\S]*?)\r?\nendstream/g);
 
@@ -465,7 +445,7 @@ function extractTextFromPDF(arrayBuffer) {
 
     // Solo agregar si parece texto legible
 
-    if (/[a-záéíóúñA-ZÁÉÍÓÚÑ]{3,}/.test(chunk)) {
+    if (/[a-zÃ¡Ã©Ã­Ã³ÃºÃ±A-ZÃÃÃÃÃÃ]{3,}/.test(chunk)) {
 
       text += chunk + '\n';
 
@@ -481,7 +461,7 @@ function extractTextFromPDF(arrayBuffer) {
 
 }
 
-// ── FOREXFACTORY (EEUU) ───────────────────────────────────────────────────────
+// ââ FOREXFACTORY (EEUU) âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 async function fetchEventosForexFactory(fechasISO) {
 
@@ -509,17 +489,15 @@ async function fetchEventosForexFactory(fechasISO) {
 
     if (!Array.isArray(data)) throw new Error('Formato inesperado de ForexFactory');
 
-    // Filtrar: solo USD, solo alto impacto
+    // FIX: el campo es "country" no "currency", e "impact" puede ser "High"
 
     const eventosAltos = data.filter(e =>
 
-      e.currency === 'USD' &&
+      e.country === 'USD' &&
 
       e.impact === 'High'
 
     );
-
-    // Traducciones de títulos comunes
 
     const traducciones = {
 
@@ -539,7 +517,9 @@ async function fetchEventosForexFactory(fechasISO) {
 
       'Fed Chair Press Conference': 'Conferencia de Prensa Fed',
 
-      'GDP q/q': 'PBI Trimestral (preliminar)',
+      'GDP q/q': 'PBI Trimestral',
+
+      'Prelim GDP q/q': 'PBI Trimestral (preliminar)',
 
       'Retail Sales m/m': 'Ventas Minoristas',
 
@@ -557,11 +537,23 @@ async function fetchEventosForexFactory(fechasISO) {
 
       'Core PCE Price Index m/m': 'PCE Core (Inflación Fed)',
 
+      'ADP Non-Farm Employment Change': 'Empleo ADP (privado)',
+
+      'Average Hourly Earnings m/m': 'Salarios por hora',
+
+      'CB Consumer Confidence': 'Confianza del Consumidor CB',
+
+      'Empire State Manufacturing Index': 'Índice Manufacturero NY',
+
+      'Existing Home Sales': 'Ventas de Viviendas Existentes',
+
+      'New Home Sales': 'Ventas de Viviendas Nuevas',
+
+      'Durable Goods Orders m/m': 'Pedidos de Bienes Duraderos',
+
     };
 
     for (const ev of eventosAltos) {
-
-      // Parsear fecha del evento (formato: "2026-06-10T12:30:00")
 
       const fechaISO = ev.date ? ev.date.split('T')[0] : null;
 
@@ -569,7 +561,21 @@ async function fetchEventosForexFactory(fechasISO) {
 
       const tituloES = traducciones[ev.title] || ev.title;
 
-      const hora = ev.date && ev.date.includes('T') ? ev.date.split('T')[1].substring(0, 5) + ' UTC' : '';
+      // Extraer hora UTC del date string
+
+      let horaStr = '';
+
+      try {
+
+        const d = new Date(ev.date);
+
+        const hh = String(d.getUTCHours()).padStart(2, '0');
+
+        const mm = String(d.getUTCMinutes()).padStart(2, '0');
+
+        horaStr = `${hh}:${mm} UTC`;
+
+      } catch(e) {}
 
       eventos.push({
 
@@ -577,7 +583,7 @@ async function fetchEventosForexFactory(fechasISO) {
 
         titulo: tituloES,
 
-        descripcion: hora ? `${tituloES}. Publicación: ${hora}` : tituloES,
+        descripcion: horaStr ? `${tituloES} — ${horaStr}` : tituloES,
 
       });
 
@@ -601,7 +607,7 @@ async function generarYGuardar(env) {
 
 }
 
-// ── FRED ──────────────────────────────────────────────────────────────────────
+// ââ FRED ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 async function fetchFRED(env) {
 
@@ -665,7 +671,7 @@ async function fetchYGuardarFRED(env) {
 
 }
 
-// ── COMMODITIES ───────────────────────────────────────────────────────────────
+// ââ COMMODITIES âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 async function fetchCommodities(env) {
 
@@ -762,5 +768,21 @@ async function fetchYGuardarCommodities(env) {
   const data = await fetchCommodities(env);
 
   await env.CALENDARIO_KV.put('commodities', JSON.stringify(data), { expirationTtl: 60 * 60 * 6 });
+
+}
+
+// Devuelve el día hábil más cercano a "dia" en el mes dado (evita sábado y domingo)
+
+function getDiaHabil(anio, mes, dia) {
+
+  const d = new Date(anio, mes, dia);
+
+  const dow = d.getDay();
+
+  if (dow === 6) return dia - 1; // sábado → viernes
+
+  if (dow === 0) return dia + 1; // domingo → lunes
+
+  return dia;
 
 }
