@@ -36,7 +36,7 @@ export default {
 
             const diffHoras = (ahora - generado) / (1000 * 60 * 60);
 
-            // Si tiene menos de 7 dÃ­as y la semana coincide, devolver cache
+            // Si tiene menos de 7 dÃÂ­as y la semana coincide, devolver cache
 
             if (diffHoras < 168) return new Response(cached, { headers });
 
@@ -191,7 +191,7 @@ export default {
 
 };
 
-// ââ HELPERS DE FECHA ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ HELPERS DE FECHA Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 
 function getLunes() {
 
@@ -223,7 +223,7 @@ function fmtISO(d) {
 
 }
 
-// ââ EVENTOS REALES âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ EVENTOS REALES Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 
 async function generarEventos(env) {
 
@@ -251,9 +251,9 @@ async function generarEventos(env) {
 
   ]);
 
-  // Construir estructura de dÃ­as
+  // Construir estructura de dÃÂ­as
 
-  const nombres = ['Lunes', 'Martes', 'MiÃ©rcoles', 'Jueves', 'Viernes'];
+  const nombres = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
 
   const dias = nombres.map((nombre, i) => {
 
@@ -263,7 +263,7 @@ async function generarEventos(env) {
 
     const evUS = eventosUS.filter(e => e.fecha === fechaISO).map(e => ({ tipo: 'us', titulo: e.titulo, descripcion: e.descripcion }));
 
-    // Mezclar: mÃ¡ximo 3 eventos por dÃ­a, priorizando alta relevancia
+    // Mezclar: mÃÂ¡ximo 3 eventos por dÃÂ­a, priorizando alta relevancia
 
     const todos = [...evAR, ...evUS].slice(0, 3);
 
@@ -285,7 +285,7 @@ async function generarEventos(env) {
 
 }
 
-// ââ INDEC âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ INDEC Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 
 async function fetchEventosINDEC(lunes, viernes, fechasISO) {
 
@@ -307,7 +307,7 @@ async function fetchEventosINDEC(lunes, viernes, fechasISO) {
 
     const mesNombreCap = mesNombre.charAt(0).toUpperCase() + mesNombre.slice(1);
 
-    // IPC: sale entre el 10 y el 15 de cada mes (usualmente el día 12-13)
+    // IPC: sale entre el 10 y el 15 de cada mes (usualmente el dÃ­a 12-13)
 
     const diaIPC = getDiaHabil(anio, mes, 12);
 
@@ -319,9 +319,13 @@ async function fetchEventosINDEC(lunes, viernes, fechasISO) {
 
         fecha: fechaIPC,
 
-        titulo: `IPC ${mesNombreCap} ${anio}`,
+        const mesAnterior = new Date(anio, mes - 1, 1).toLocaleDateString('es-AR', { month: 'long' });
 
-        descripcion: `INDEC publica el Índice de Precios al Consumidor de ${mesNombreCap}. Dato clave para política monetaria del BCRA.`,
+        const mesAnteriorCap = mesAnterior.charAt(0).toUpperCase() + mesAnterior.slice(1);
+
+        titulo: `IPC ${mesAnteriorCap} ${anio}`,
+
+        descripcion: `INDEC publica el Índice de Precios al Consumidor de ${mesAnteriorCap}. Dato clave para política monetaria del BCRA.`,
 
       });
 
@@ -343,7 +347,7 @@ async function fetchEventosINDEC(lunes, viernes, fechasISO) {
 
         titulo: `EMAE ${mesRezago.charAt(0).toUpperCase() + mesRezago.slice(1)} ${anio}`,
 
-        descripcion: `INDEC publica el Estimador Mensual de Actividad Económica. Indicador adelantado del PBI.`,
+        descripcion: `INDEC publica el Estimador Mensual de Actividad EconÃ³mica. Indicador adelantado del PBI.`,
 
       });
 
@@ -425,7 +429,7 @@ function extractTextFromPDF(arrayBuffer) {
 
   const raw = decoder.decode(bytes);
 
-  // Extraer texto entre parÃ©ntesis de operadores Tj y TJ (formato PDF)
+  // Extraer texto entre parÃÂ©ntesis de operadores Tj y TJ (formato PDF)
 
   const tjMatches = raw.matchAll(/\(([^)]{1,200})\)\s*Tj/g);
 
@@ -435,7 +439,7 @@ function extractTextFromPDF(arrayBuffer) {
 
   }
 
-  // TambiÃ©n buscar streams de texto plano
+  // TambiÃÂ©n buscar streams de texto plano
 
   const streamMatches = raw.matchAll(/stream\r?\n([\s\S]*?)\r?\nendstream/g);
 
@@ -445,7 +449,7 @@ function extractTextFromPDF(arrayBuffer) {
 
     // Solo agregar si parece texto legible
 
-    if (/[a-zÃ¡Ã©Ã­Ã³ÃºÃ±A-ZÃÃÃÃÃÃ]{3,}/.test(chunk)) {
+    if (/[a-zÃÂ¡ÃÂ©ÃÂ­ÃÂ³ÃÂºÃÂ±A-ZÃÂÃÂÃÂÃÂÃÂÃÂ]{3,}/.test(chunk)) {
 
       text += chunk + '\n';
 
@@ -461,7 +465,7 @@ function extractTextFromPDF(arrayBuffer) {
 
 }
 
-// ââ FOREXFACTORY (EEUU) âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ FOREXFACTORY (EEUU) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 
 async function fetchEventosForexFactory(fechasISO) {
 
@@ -501,19 +505,19 @@ async function fetchEventosForexFactory(fechasISO) {
 
     const traducciones = {
 
-      'CPI m/m': 'IPC (Inflación) mensual',
+      'CPI m/m': 'IPC (InflaciÃ³n) mensual',
 
       'Core CPI m/m': 'IPC Core mensual',
 
-      'PPI m/m': 'Índice de Precios al Productor',
+      'PPI m/m': 'Ãndice de Precios al Productor',
 
-      'Non-Farm Employment Change': 'Nóminas No Agrícolas',
+      'Non-Farm Employment Change': 'NÃ³minas No AgrÃ­colas',
 
       'Unemployment Rate': 'Tasa de Desempleo',
 
       'FOMC Statement': 'Comunicado FOMC (Fed)',
 
-      'Federal Funds Rate': 'Decisión de Tasas Fed',
+      'Federal Funds Rate': 'DecisiÃ³n de Tasas Fed',
 
       'Fed Chair Press Conference': 'Conferencia de Prensa Fed',
 
@@ -533,9 +537,9 @@ async function fetchEventosForexFactory(fechasISO) {
 
       'Trade Balance': 'Balanza Comercial',
 
-      'PCE Price Index m/m': 'PCE (Inflación Fed)',
+      'PCE Price Index m/m': 'PCE (InflaciÃ³n Fed)',
 
-      'Core PCE Price Index m/m': 'PCE Core (Inflación Fed)',
+      'Core PCE Price Index m/m': 'PCE Core (InflaciÃ³n Fed)',
 
       'ADP Non-Farm Employment Change': 'Empleo ADP (privado)',
 
@@ -543,7 +547,7 @@ async function fetchEventosForexFactory(fechasISO) {
 
       'CB Consumer Confidence': 'Confianza del Consumidor CB',
 
-      'Empire State Manufacturing Index': 'Índice Manufacturero NY',
+      'Empire State Manufacturing Index': 'Ãndice Manufacturero NY',
 
       'Existing Home Sales': 'Ventas de Viviendas Existentes',
 
@@ -583,7 +587,7 @@ async function fetchEventosForexFactory(fechasISO) {
 
         titulo: tituloES,
 
-        descripcion: horaStr ? `${tituloES} — ${horaStr}` : tituloES,
+        descripcion: horaStr ? `${tituloES} â ${horaStr}` : tituloES,
 
       });
 
@@ -607,7 +611,7 @@ async function generarYGuardar(env) {
 
 }
 
-// ââ FRED ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ FRED Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 
 async function fetchFRED(env) {
 
@@ -671,7 +675,7 @@ async function fetchYGuardarFRED(env) {
 
 }
 
-// ââ COMMODITIES âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ COMMODITIES Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 
 async function fetchCommodities(env) {
 
@@ -771,7 +775,7 @@ async function fetchYGuardarCommodities(env) {
 
 }
 
-// Devuelve el día hábil más cercano a "dia" en el mes dado (evita sábado y domingo)
+// Devuelve el dÃ­a hÃ¡bil mÃ¡s cercano a "dia" en el mes dado (evita sÃ¡bado y domingo)
 
 function getDiaHabil(anio, mes, dia) {
 
@@ -779,9 +783,9 @@ function getDiaHabil(anio, mes, dia) {
 
   const dow = d.getDay();
 
-  if (dow === 6) return dia - 1; // sábado → viernes
+  if (dow === 6) return dia - 1; // sÃ¡bado â viernes
 
-  if (dow === 0) return dia + 1; // domingo → lunes
+  if (dow === 0) return dia + 1; // domingo â lunes
 
   return dia;
 
