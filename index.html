@@ -4757,7 +4757,7 @@ function RSFP() {
   const total = lesson.slides.length;
   const dots = Array.from({length:total},(_,i)=>`<div class="sdot ${i===CSFP?'active':''}" onclick="GSlFP(${i})"></div>`).join('');
 
-  ((el=document.getElementById('slideWrapper'))&&el).innerHTML = `
+  document.getElementById('slideWrapper').innerHTML = `
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
@@ -5288,7 +5288,7 @@ function RSIB() {
     `<div class="sdot ${i===CSIB?'active':''}" onclick="GSlIB(${i})"></div>`
   ).join('');
 
-  ((el=document.getElementById('slideWrapper'))&&el).innerHTML = `
+  document.getElementById('slideWrapper').innerHTML = `
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
@@ -6044,14 +6044,14 @@ function RSAF() {
   const lesson = LSAF[CLAF];
   const slide = lesson.slides[currentSlideIdx];
   const total = lesson.slides.length;
-  const wrapper = document.getElementById('slideWrapper');
+  const wrapper = (document.getElementById('slideWrapper') || {});
 
   // Build dots
   const dots = Array.from({length: total}, (_,i) =>
     `<div class="sdot ${i === currentSlideIdx ? 'active' : ''}" onclick="GSlAF(${i})"></div>`
   ).join('');
 
-  if (wrapper) wrapper.innerHTML =
+  wrapper.innerHTML =
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
@@ -6569,7 +6569,7 @@ function RSMA() {
   const total = lesson.slides.length;
   const dots = Array.from({length:total},(_,i)=>`<div class="sdot ${i===CSMA?'active':''}" onclick="GSlMA(${i})"></div>`).join('');
 
-  ((el=document.getElementById('slideWrapper'))&&el).innerHTML = `
+  document.getElementById('slideWrapper').innerHTML = `
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
@@ -10297,5 +10297,7 @@ function qzRestart(){qzCur=0;qzAnswers=[];qzRender();}
 function openQuiz(){qzCur=0;qzAnswers=[];var m=document.getElementById('quizModal');if(m){m.style.display='block';m.scrollTop=0;document.body.style.overflow='hidden';document.documentElement.style.overflow='hidden';qzRender();}}
 function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.display='none';document.body.style.overflow='';document.documentElement.style.overflow='';}
 </script>
+
+<div id="slideWrapper" style="display:none"></div>
 </body>
 </html>
