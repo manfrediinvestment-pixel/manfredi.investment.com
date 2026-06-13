@@ -4757,7 +4757,7 @@ function RSFP() {
   const total = lesson.slides.length;
   const dots = Array.from({length:total},(_,i)=>`<div class="sdot ${i===CSFP?'active':''}" onclick="GSlFP(${i})"></div>`).join('');
 
-  document.getElementById('slideWrapper').innerHTML = `
+  ((el=document.getElementById('slideWrapper'))&&el).innerHTML = `
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
@@ -5288,7 +5288,7 @@ function RSIB() {
     `<div class="sdot ${i===CSIB?'active':''}" onclick="GSlIB(${i})"></div>`
   ).join('');
 
-  document.getElementById('slideWrapper').innerHTML = `
+  ((el=document.getElementById('slideWrapper'))&&el).innerHTML = `
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
@@ -6051,7 +6051,7 @@ function RSAF() {
     `<div class="sdot ${i === currentSlideIdx ? 'active' : ''}" onclick="GSlAF(${i})"></div>`
   ).join('');
 
-  wrapper.innerHTML = `
+  if (wrapper) wrapper.innerHTML =
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
@@ -6569,7 +6569,7 @@ function RSMA() {
   const total = lesson.slides.length;
   const dots = Array.from({length:total},(_,i)=>`<div class="sdot ${i===CSMA?'active':''}" onclick="GSlMA(${i})"></div>`).join('');
 
-  document.getElementById('slideWrapper').innerHTML = `
+  ((el=document.getElementById('slideWrapper'))&&el).innerHTML = `
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
