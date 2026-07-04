@@ -88,24 +88,63 @@ def yahoo(ticker, nombre):
             continue
     return {"valor": None, "variacion": "N/D"}
 
+# --- Fallback: leer noticias publicadas actualmente en produccion ---
+def fetch_previous_noticias(url):
+    try:
+        data = fetch(url)
+        if isinstance(data, dict):
+            return data.get("noticias", [])
+        return []
+    except Exception as e:
+        print(f"Error leyendo noticias previas de {url}: {e}")
+        return []
+
+try:
+    prev_arg_noticias = fetch_previous_noticias("https://manfredinvestment.com/reports/argentina.json")
+    prev_ws_noticias = fetch_previous_noticias("https://manfredinvestment.com/reports/wallstreet.json")
+except Exception as e:
+    print(f"Error obteniendo noticias previas para fallback: {e}")
+    prev_arg_noticias = []
+    prev_ws_noticias = []
+
+def pick_noticia(items, idx, prev_list, pos):
+    if len(items) > idx:
+        return items[idx]
+    if len(prev_list) > pos and prev_list[pos]:
+        return prev_list[pos]
+    return None
+
 # NOTICIAS ARGENTINA
 print("Obteniendo noticias Argentina...")
-noticias_arg = []
-noticias_arg.extend(fetch_rss("https://www.ambito.com/rss/economia.xml", 5))
-noticias_arg.extend(fetch_rss("https://www.infobae.com/feeds/rss/economia.xml", 5))
-noticias_arg.extend(fetch_rss("https://cronista.com/files/rss/economia.xml", 2))
-if not noticias_arg:
-    noticias_arg = [{"titulo": "Mercado argentino en operacion", "link": "", "resumen": "Consulte Ambito.com e Infobae.com para noticias del dia."}]
-noticias_arg = noticias_arg[:5]
+ambito_arg_items = fetch_rss("https://www.ambito.com/rss/economia.xml", 2)
+infobae_items = fetch_rss("https://www.infobae.com/arc/outboundfeeds/rss/category/economia/", 1)
+cronista_items = fetch_rss("https://www.cronista.com/arc/outboundfeeds/rss/category/economia-politica/", 1)
+bloomberglinea_items = fetch_rss("https://www.bloomberglinea.com/arc/outboundfeeds/rss/latinoamerica/argentina.xml", 1)
+
+noticias_arg = [
+    pick_noticia(ambito_arg_items, 0, prev_arg_noticias, 0),
+    pick_noticia(infobae_items, 0, prev_arg_noticias, 1),
+    pick_noticia(cronista_items, 0, prev_arg_noticias, 2),
+    pick_noticia(bloomberglinea_items, 0, prev_arg_noticias, 3),
+    pick_noticia(ambito_arg_items, 1, prev_arg_noticias, 4),
+]
+noticias_arg = [n for n in noticias_arg if n]
 
 # NOTICIAS WALL STREET
 print("Obteniendo noticias Wall Street...")
-noticias_ws = []
-noticias_ws.extend(fetch_rss("https://feeds.reuters.com/reuters/businessNews", 5))
-noticias_ws.extend(fetch_rss("https://feeds.finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US", 5))
-if not noticias_ws:
-    noticias_ws = [{"titulo": "Wall Street en operacion", "link": "", "resumen": "Consulte Reuters.com para noticias globales."}]
-noticias_ws = noticias_ws[:5]
+yahoo_ws_items = fetch_rss("https://feeds.finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US", 2)
+investing_items = fetch_rss("https://www.investing.com/rss/news_25.rss", 1)
+seekingalpha_items = fetch_rss("https://seekingalpha.com/market_currents.xml", 1)
+economist_items = fetch_rss("https://www.economist.com/finance-and-economics/rss.xml", 1)
+
+noticias_ws = [
+    pick_noticia(yahoo_ws_items, 0, prev_ws_noticias, 0),
+    pick_noticia(investing_items, 0, prev_ws_noticias, 1),
+    pick_noticia(seekingalpha_items, 0, prev_ws_noticias, 2),
+    pick_noticia(economist_items, 0, prev_ws_noticias, 3),
+    pick_noticia(yahoo_ws_items, 1, prev_ws_noticias, 4),
+]
+noticias_ws = [n for n in noticias_ws if n]
 
 # ARGENTINA
 print("Generando argentina.json...")
