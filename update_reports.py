@@ -113,13 +113,76 @@ def pick_noticia(items, idx, prev_list, pos):
     if len(prev_list) > pos and prev_list[pos]:
         return prev_list[pos]
     return None
+# ==== INICIO BLOQUE DIAGNOSTICO TEMPORAL (borrar despues) ====
 
+def fetch_text_diag(url):
+    """Version diagnostico de fetch_text: reporta tipo de excepcion y status HTTP si existe."""
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=12) as r:
+            status = getattr(r, "status", None) or r.getcode()
+            raw = r.read()
+            print(f"    [DIAG] HTTP status: {status} | bytes recibidos: {len(raw)}")
+            return raw.decode("utf-8", errors="ignore")
+    except urllib.error.HTTPError as e:
+        print(f"    [DIAG] Excepcion: HTTPError | status code: {e.code} | razon: {e.reason}")
+        return None
+    except urllib.error.URLError as e:
+        print(f"    [DIAG] Excepcion: URLError | razon: {e.reason} | (sin status HTTP, no llego a conectar)")
+        return None
+    except Exception as e:
+        print(f"    [DIAG] Excepcion: {type(e).__name__} | {e} | (sin status HTTP)")
+        return None
+
+def fetch_rss_diag(nombre, url, max_items=2):
+    """Wrapper diagnostico alrededor de fetch_rss (misma logica, mas logging)."""
+    print(f"  -> Fuente: {nombre} | URL: {url}")
+    text = fetch_text_diag(url)
+    if not text:
+        return []
+    try:
+        root = ET.fromstring(text)
+        items = root.findall(".//item")
+        if len(items) == 0:
+            print(f"    [DIAG] 0 items, sin excepcion de red/XML. Primeros 500 caracteres de la respuesta:")
+            print(f"    {text[:500]!r}")
+        else:
+            print(f"    [DIAG] {len(items)} items encontrados en el feed (se usaran hasta {max_items}).")
+        results = []
+        for item in items[:max_items]:
+            title_el = item.find("title")
+            link_el = item.find("link")
+            desc_el = item.find("description")
+            title = title_el.text.strip() if title_el is not None and title_el.text else ""
+            link = link_el.text.strip() if link_el is not None and link_el.text else ""
+            desc = desc_el.text.strip() if desc_el is not None and desc_el.text else ""
+            desc = re.sub(r"<[^>]+>", "", desc)[:250]
+            if title:
+                results.append({"titulo": title, "link": link, "resumen": desc})
+        return results
+    except ET.ParseError as e:
+        print(f"    [DIAG] Excepcion parseando XML: ParseError | {e}")
+        print(f"    [DIAG] Primeros 500 caracteres de la respuesta cruda:")
+        print(f"    {text[:500]!r}")
+        return []
+    except Exception as e:
+        print(f"    [DIAG] Excepcion inesperada: {type(e).__name__} | {e}")
+        return []
+
+print("[DIAG] Verificando IP/region publica del runner de GitHub Actions...")
+_diag_ip_info = fetch_text_diag("https://api.ipify.org?format=json")
+if _diag_ip_info:
+    print(f"    [DIAG] IP publica del runner: {_diag_ip_info.strip()}")
+else:
+    print("    [DIAG] No se pudo obtener la IP publica del runner (ver excepcion arriba).")
+
+# ==== FIN BLOQUE DIAGNOSTICO TEMPORAL ====
 # NOTICIAS ARGENTINA
 print("Obteniendo noticias Argentina...")
-ambito_arg_items = fetch_rss("https://www.ambito.com/rss/economia.xml", 2)
-infobae_items = fetch_rss("https://www.infobae.com/arc/outboundfeeds/rss/category/economia/", 1)
-cronista_items = fetch_rss("https://www.cronista.com/arc/outboundfeeds/rss/category/economia-politica/", 1)
-bloomberglinea_items = fetch_rss("https://www.bloomberglinea.com/arc/outboundfeeds/rss/latinoamerica/argentina.xml", 1)
+ambito_arg_items = fetch_rss_diag("Ambito", "https://www.ambito.com/rss/economia.xml", 2)
+infobae_items = fetch_rss_diag("Infobae", "https://www.infobae.com/arc/outboundfeeds/rss/category/economia/", 1)
+cronista_items = fetch_rss_diag("Cronista", "https://www.cronista.com/arc/outboundfeeds/rss/category/economia-politica/", 1)
+bloomberglinea_items = fetch_rss_diag("BloombergLinea", "https://www.bloomberglinea.com/arc/outboundfeeds/rss/latinoamerica/argentina.xml", 1)
 
 noticias_arg = [
     pick_noticia(ambito_arg_items, 0, prev_arg_noticias, 0),
@@ -132,10 +195,10 @@ noticias_arg = [n for n in noticias_arg if n]
 
 # NOTICIAS WALL STREET
 print("Obteniendo noticias Wall Street...")
-yahoo_ws_items = fetch_rss("https://feeds.finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US", 2)
-investing_items = fetch_rss("https://www.investing.com/rss/news_25.rss", 1)
-seekingalpha_items = fetch_rss("https://seekingalpha.com/market_currents.xml", 1)
-economist_items = fetch_rss("https://www.economist.com/finance-and-economics/rss.xml", 1)
+yahoo_ws_items = fetch_rss_diag("Yahoo", "https://feeds.finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US", 2)
+investing_items = fetch_rss_diag("Investing", "https://www.investing.com/rss/news_25.rss", 1)
+seekingalpha_items = fetch_rss_diag("SeekingAlpha", "https://seekingalpha.com/market_currents.xml", 1)
+economist_items = fetch_rss_diag("Economist", "https://www.economist.com/finance-and-economics/rss.xml", 1)
 
 noticias_ws = [
     pick_noticia(yahoo_ws_items, 0, prev_ws_noticias, 0),
