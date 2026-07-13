@@ -3854,80 +3854,89 @@
   fetchAllLiveTables();
   setInterval(fetchAllLiveTables, 60000);
 
-  // Crypto
-  async function fetchCryptoTable() {
-    var tbody = document.getElementById('cryptoTableBody');
-    if (!tbody) return;
-    var coins = [
-      {id:'bitcoin',ticker:'BTC',name:'Bitcoin'},
-      {id:'ethereum',ticker:'ETH',name:'Ethereum'},
-      {id:'solana',ticker:'SOL',name:'Solana'},
-      {id:'binancecoin',ticker:'BNB',name:'BNB'},
-      {id:'ripple',ticker:'XRP',name:'XRP'},
-      {id:'cardano',ticker:'ADA',name:'Cardano'},
-      {id:'avalanche-2',ticker:'AVAX',name:'Avalanche'},
-      {id:'dogecoin',ticker:'DOGE',name:'Dogecoin'},
-      {id:'chainlink',ticker:'LINK',name:'Chainlink'},
-      {id:'polkadot',ticker:'DOT',name:'Polkadot'}
-    ];
-    try {
-      var ids = coins.map(function(c){return c.id;}).join(',');
-      var r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids='+ids+'&vs_currencies=usd&include_24hr_change=true');
-      var data = await r.json();
-      tbody.innerHTML = coins.map(function(c, i) {
-        var d = data[c.id];
-        var price = d ? 'US$ '+d.usd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : '\u2014';
-        var pct = d && d.usd_24h_change != null ? d.usd_24h_change : null;
-        var sign = pct != null ? (pct >= 0 ? '\u25b2 +' : '\u25bc ') : '';
-        var pctStr = pct != null ? sign+Math.abs(pct).toFixed(2)+'%' : '\u2014';
-        var cls = pct != null ? (pct >= 0 ? 'pos' : 'neg') : '';
-        var spark = genSparkSVG(i, pct != null ? (pct >= 0 ? 'up' : 'down') : 'neutral');
-        return '<div class="at-row">'+
-          '<div class="at-name"><span class="at-ticker">'+c.ticker+'</span><span class="at-fullname">'+c.name+'</span></div>'+
-          '<div class="at-price">'+price+'</div>'+
-          '<div class="at-spark">'+spark+'</div>'+
-          '<div class="at-chg '+cls+'">'+pctStr+'</div>'+
-          '</div>';
-      }).join('');
+var cryptoLoadedOnce = false;
+    var commLoadedOnce = false;
+    
+    // Crypto
+async function fetchCryptoTable() {
+      var tbody = document.getElementById('cryptoTableBody');
+      if (!tbody) return;
+      var coins = [
+    {id:'bitcoin',ticker:'BTC',name:'Bitcoin'},
+    {id:'ethereum',ticker:'ETH',name:'Ethereum'},
+    {id:'solana',ticker:'SOL',name:'Solana'},
+    {id:'binancecoin',ticker:'BNB',name:'BNB'},
+    {id:'ripple',ticker:'XRP',name:'XRP'},
+    {id:'cardano',ticker:'ADA',name:'Cardano'},
+    {id:'avalanche-2',ticker:'AVAX',name:'Avalanche'},
+    {id:'dogecoin',ticker:'DOGE',name:'Dogecoin'},
+    {id:'chainlink',ticker:'LINK',name:'Chainlink'},
+    {id:'polkadot',ticker:'DOT',name:'Polkadot'}
+      ];
+      try {
+        var r = await fetch('https://manfredi-calendario.nachito2502.workers.dev/crypto', {signal: AbortSignal.timeout(6000)});
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        var data = await r.json();
+        tbody.innerHTML = coins.map(function(c, i) {
+          var d = data[c.ticker];
+          var price = d && d.price != null ? 'US$ '+parseFloat(d.price).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+          var pct = d && d.change != null ? parseFloat(d.change) : null;
+          var sign = pct != null ? (pct >= 0 ? '▲ +' : '▼ ') : '';
+          var pctStr = pct != null ? sign+Math.abs(pct).toFixed(2)+'%' : '—';
+          var cls = pct != null ? (pct >= 0 ? 'pos' : 'neg') : '';
+          var spark = genSparkSVG(i, pct != null ? (pct >= 0 ? 'up' : 'down') : 'neutral');
+          return '<div class="at-row">'+
+            '<div class="at-name"><span class="at-ticker">'+c.ticker+'</span><span class="at-fullname">'+c.name+'</span></div>'+
+            '<div class="at-price">'+price+'</div>'+
+            '<div class="at-spark">'+spark+'</div>'+
+            '<div class="at-chg '+cls+'">'+pctStr+'</div>'+
+            '</div>';
+    }).join('');
+        cryptoLoadedOnce = true;
     } catch(e) {
-      tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error: '+e.message+'</span></div>';
+        if (!cryptoLoadedOnce) {
+          tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error: '+e.message+'</span></div>';
     }
-  }
+    }
+    }
 
   // Commodities via Finnhub
   async function fetchCommTable() {
-    var tbody = document.getElementById('commTableBody');
-    if (!tbody) return;
-    try {
-      var r = await fetch('https://manfredi-calendario.nachito2502.workers.dev/commodities', {signal: AbortSignal.timeout(6000)});
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      var data = await r.json();
-      var items = [
-        {ticker:'XAU', name:'Oro', key:'XAU'},
-        {ticker:'XAG', name:'Plata', key:'XAG'},
-        {ticker:'WTI', name:'Petróleo WTI', key:'WTI'},
-        {ticker:'BRENT', name:'Petróleo Brent', key:'BRENT'},
-        {ticker:'MAIZ', name:'Maíz', key:'CORN'},
-      ];
-      tbody.innerHTML = items.map(function(item, i) {
-        var d = data[item.key];
-        var price = d && d.price ? 'US$ ' + parseFloat(d.price).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—';
-        var pct = d && d.change != null ? parseFloat(d.change) : null;
-        var sign = pct != null ? (pct >= 0 ? '▲ +' : '▼ ') : '';
-        var pctStr = pct != null ? sign + Math.abs(pct).toFixed(2) + '%' : '—';
-        var cls = pct != null ? (pct >= 0 ? 'pos' : 'neg') : '';
-        var spark = genSparkSVG(i, pct != null ? (pct >= 0 ? 'up' : 'down') : 'neutral');
-        return '<div class="at-row">' +
-          '<div class="at-name"><span class="at-ticker">' + item.ticker + '</span><span class="at-fullname">' + item.name + '</span></div>' +
-          '<div class="at-price">' + price + '</div>' +
-          '<div class="at-spark">' + spark + '</div>' +
-          '<div class="at-chg ' + cls + '">' + pctStr + '</div>' +
-          '</div>';
-      }).join('');
+      var tbody = document.getElementById('commTableBody');
+      if (!tbody) return;
+      try {
+        var r = await fetch('https://manfredi-calendario.nachito2502.workers.dev/commodities', {signal: AbortSignal.timeout(6000)});
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        var data = await r.json();
+        var items = [
+    {ticker:'XAU', name:'Oro', key:'XAU'},
+    {ticker:'XAG', name:'Plata', key:'XAG'},
+    {ticker:'WTI', name:'Petróleo WTI', key:'WTI'},
+    {ticker:'BRENT', name:'Petróleo Brent', key:'BRENT'},
+    {ticker:'MAIZ', name:'Maíz', key:'CORN'},
+        ];
+        tbody.innerHTML = items.map(function(item, i) {
+          var d = data[item.key];
+          var price = d && d.price ? 'US$ ' + parseFloat(d.price).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—';
+          var pct = d && d.change != null ? parseFloat(d.change) : null;
+          var sign = pct != null ? (pct >= 0 ? '▲ +' : '▼ ') : '';
+          var pctStr = pct != null ? sign + Math.abs(pct).toFixed(2) + '%' : '—';
+          var cls = pct != null ? (pct >= 0 ? 'pos' : 'neg') : '';
+          var spark = genSparkSVG(i, pct != null ? (pct >= 0 ? 'up' : 'down') : 'neutral');
+          return '<div class="at-row">' +
+            '<div class="at-name"><span class="at-ticker">' + item.ticker + '</span><span class="at-fullname">' + item.name + '</span></div>' +
+            '<div class="at-price">' + price + '</div>' +
+            '<div class="at-spark">' + spark + '</div>' +
+            '<div class="at-chg ' + cls + '">' + pctStr + '</div>' +
+            '</div>';
+    }).join('');
+        commLoadedOnce = true;
     } catch(e) {
-      tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error: ' + e.message + '</span></div>';
+        if (!commLoadedOnce) {
+          tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error: ' + e.message + '</span></div>';
     }
-  }
+    }
+    }
 
   // ETFs via Finnhub
   async function fetchETFTable() {
