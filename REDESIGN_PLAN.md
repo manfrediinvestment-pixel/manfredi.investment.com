@@ -167,7 +167,7 @@ Llevar Mercados, Calendario e Inversiones al mismo sistema de fondo oscuro que y
 4. ~~Resolver `index.html` vs `index-v2.html`~~ — **confirmado, ver §0**: `index.html` es producción
 
 ### Impacto alto / esfuerzo medio-alto (siguiente tramo)
-5. ~~Unificación light/dark por sección (§5.8)~~ — **decisión tomada: terminal oscuro (§7). Inversiones ya migrada, ver §9**; falta extender el mismo criterio a Mercados y Calendario
+5. ~~Unificación light/dark por sección (§5.8)~~ — **decisión tomada: terminal oscuro (§7). Inversiones ya migrada (§9); Calendario ya estaba oscuro**; falta solo Mercados
 6. Watchlist/personalización (§5.2)
 7. Command palette (§5.5)
 8. Paywall más honesto con preview real (§5.7)
@@ -196,7 +196,7 @@ Mantener sin discusión: navy oscuro (no negro puro), dorado como acento, serif 
 En la práctica, esto ordena las secciones existentes así (de más "terminal" a más "editorial"):
 
 1. **Warren, Informes, Inversiones, Asesoría** (contenido pago/premium) → navy más oscuro de la escalera (`#07101E`), máxima densidad de dato, dorado reservado para CTAs/live/marca — Informes y Warren ya estaban acá; **Inversiones se migró en esta sesión (§9)**.
-2. **Mercados, Calendario** (gratis pero es el corazón "terminal" del producto — datos en vivo) → misma familia de navys, un escalón más liviano si hace falta distinguir jerarquía de sección, pero oscuro — **pendiente de migrar**, hoy siguen en `#F9FAFB` claro.
+2. **Mercados** (gratis pero es el corazón "terminal" del producto — datos en vivo) → misma familia de navys — **pendiente de migrar**, hoy sigue en `#F9FAFB` claro (`.section-alt`, `id="mercados"`, línea 2260 de `index.html`). **Calendario Económico ya está oscuro** (`#07101E` inline, `id="calendario"`) — verificado visualmente con Playwright, no hace falta tocarlo. (Corrección: la versión anterior de este documento decía que Calendario también estaba pendiente; era un supuesto sin verificar, la captura de pantalla lo desmintió.)
 3. **Manfredi University** (educativo, gratis, tono más "revista/curso") → es el único bloque donde un fondo más claro/editorial puede tener sentido a propósito, si se quiere marcar que es contenido de otra naturaleza — a decidir, no es automático.
 
 ---
@@ -216,9 +216,11 @@ A pedido explícito, se ejecutaron dos fixes puntuales sobre `index.html`, en es
    - `.pick-btn` ("Ver análisis →"): de botón sólido navy-sobre-navy (que se volvía invisible en el fondo nuevo) a botón fantasma con borde dorado que se rellena de dorado en hover — aplica directamente la regla "más premium → más dorado."
    - `.inv-disclaimer`: de amber claro a amber translúcido sobre navy, manteniendo el mismo borde de advertencia.
    - El overlay de paywall (`.member-lock-overlay`/`.member-lock-card`) no necesitó cambios — ya estaba diseñado en tonos oscuros/dorados, lo que confirma que el fondo claro de Inversiones era la pieza fuera de lugar, no el resto del sistema.
-   - **Nota**: no se validó visualmente en navegador (no hay entorno de browser disponible en esta sesión) — recomiendo una revisión visual rápida antes de mergear.
+   - **Validado visualmente** con Playwright + Chromium headless contra un `http.server` local sirviendo `index.html` (screenshots de `#inversiones` completo, un `.pick-card` individual, y `#calDetailBox` antes/después de un click). Resultado: cards, tags, badges y botón se ven como se diseñaron, contraste correcto, sin solapamientos ni texto ilegible. El emoji del calendario renderiza bien.
+   - **Corrección al propio plan, encontrada por la captura**: la versión anterior de este documento (§7) afirmaba que Calendario Económico también estaba pendiente de pasar a oscuro — falso, ya estaba en `#07101E` (verificado en el screenshot y en el código, línea 2516). Se corrigió §7. Solo Mercados sigue pendiente.
+   - **Observación sin resolver, fuera de alcance de este pedido**: en el entorno de prueba local (sin Firebase real accesible) aparece un modal de login a pantalla completa automáticamente al cargar, incluso sin interacción del usuario. No tengo forma de confirmar desde acá si es el comportamiento real en producción (con Firebase andando) o un artefacto de probar sin backend — lo marco para que lo confirmes vos, no lo asumo como bug.
 
-Consolidación de fuentes (§0.1) y la migración de Mercados/Calendario **no** se ejecutaron todavía — quedan en el backlog priorizado del §6.
+Consolidación de fuentes (§0.1) y la migración de Mercados **no** se ejecutaron todavía — quedan en el backlog priorizado del §6.
 
 ---
 
