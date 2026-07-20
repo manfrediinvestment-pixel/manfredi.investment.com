@@ -1,21 +1,45 @@
 # Plan de rediseño — Manfredi Investment
 
-Documento de investigación y estrategia. **No incluye cambios de código.** Preparado para revisión antes de tocar nada en `index.html`.
+Documento de investigación y estrategia, más un primer lote de fixes puntuales ya implementados (ver §9). Preparado para revisión antes de seguir tocando `index.html`.
 
 ---
 
-## 0. Nota importante: brief vs. código real
+## 0. Fuente de verdad: `index.html` es producción, confirmado
 
-El brief describía la identidad actual como *Lora/Playfair Display + Poppins*, navy `#060f1e`/`#0A1628`, dorado `#C9A84C`, azul `#4A9EFF`. Audité el repo (`index.html`, `index-v2.html`, y las ramas abiertas `fix/remove-stats-strip-hero`, `feature/diversificar-fuentes-noticias`, `fix/crypto-proxy-and-resilience`) y **ninguno de esos valores exactos aparece en el código**. Tampoco pude resolver `manfredi.investment.com` desde este entorno para chequear el sitio en vivo (DNS no resuelve), así que la fuente de verdad que uso abajo es el repo.
+`index.html` es el archivo que se sirve en producción — no `index-v2.html`. Evidencia:
 
-Lo que sí encontré, en `index.html` (el archivo servido desde la raíz):
+- `wrangler.jsonc` define `assets.directory: "."` sin un worker script propio (`main`) que rutee manualmente — es un deploy de Cloudflare Workers Static Assets puro, que por convención sirve `index.html` en `/`. No hay ningún `_redirects`/routing que apunte a `index-v2.html`, y ningún archivo del repo lo enlaza.
+- `index.html` tiene commits activos hasta el 2026-06-13 (incluyendo el merge de `feature/cotiz-calendario`); `index-v2.html` no recibe commits desde el 2026-05-18 — es un experimento de rediseño abandonado, no la base actual.
 
-- **Tipografía real**: `DM Serif Display` (headlines/números hero) + `IBM Plex Sans` (todo lo demás), con `Playfair Display` cargado y usado en algunos bloques puntuales — mezcla de dos serif de display, no una. **Poppins y Lora no están en ningún archivo del repo.**
-- **Paleta real**: navy primario `#0A0F1E` (no `#060f1e`/`#0A1628`), dorado `#F2C94C` (no `#C9A84C`), azules `#1a56db` / `#3b82f6` (no `#4A9EFF`). La *dirección* de marca que describís — navy + dorado + azul de apoyo — es correcta; los valores hex concretos no coinciden.
+El brief original describía la identidad como *Lora/Playfair Display + Poppins*, navy `#060f1e`/`#0A1628`, dorado `#C9A84C`, azul `#4A9EFF`. Ninguno de esos valores exactos aparece en `index.html`. Puede que el brief viniera de memoria o de una spec previa que no llegó a implementarse — a partir de acá el análisis usa exclusivamente lo que `index.html` ejecuta hoy.
 
-No es un detalle menor: si `manfredi.investment.com` en vivo usa esos otros valores, hay una divergencia entre lo deployado y lo que está en `main` de este repo que vale la pena resolver antes de rediseñar sobre una base equivocada. Te lo marco como primer punto a confirmar con vos, no lo asumo.
+---
 
-Todo lo que sigue está basado en el código real de `main`.
+## 0.1 Veredicto: sistema tipográfico y de color real, y qué hacer con él
+
+### Tipografía: tres capas conviven hoy, no dos
+
+Encontré **tres** cargas de fuente distintas en `index.html`, no una:
+
+1. **Shell principal** (`<link>` en el `<head>`, cubre ~el 95% del sitio): `DM Serif Display` (headlines, hero, títulos de sección, números de stats) + `IBM Plex Sans` (todo el resto — nav, botones, tablas, cuerpo). 30 usos combinados.
+2. **Un uso aislado**: `Playfair Display` en un solo selector (`.mi-ticker`, el ticker grande del modal de tesis de acciones) — cargado vía un `@import` distinto (línea ~9861) junto con `Inter`.
+3. **El modal de tesis de acciones** (`.mi-*`, se abre con `miOpen()` al hacer click en un pick): usa `IBM Plex Mono` de forma sistemática y disciplinada — 28 usos, en *todos* los labels, precios, métricas y ejes de chart. `Inter` está cargado en el mismo `@import` pero **no se usa en ningún selector real** — es peso muerto, una request de red que no hace nada.
+
+**Veredicto — no cambiar la familia base, consolidar lo que ya existe:**
+
+- **`IBM Plex Sans` es una elección genuinamente buena y superior a `Poppins`** para este producto. Es una fuente institucional (comisionada por IBM, no un Google Font genérico de moda), con figuras tabulares bien resueltas, en la misma liga que Söhne (Stripe) o Inter (Linear). `Poppins` es geométrica/circular — sus formas redondeadas pierden diferenciación a tamaños chicos, justo donde vive el dato denso (celdas de tabla, timestamps, labels) — sería un downgrade real de legibilidad, no solo estético, además de ser una fuente aún más asociada a templates genéricos que las que ya están en uso. **No cambiar.**
+- **`DM Serif Display` + `Playfair Display` mezclados es el problema real, no la elección de ninguna de las dos.** Ambas son de las serif de display más usadas en Google Fonts para "hacer que algo se vea elegante" — separadas, cualquiera es una elección razonable (ninguna es tan distintiva como el Financier comisionado por FT, pero no hace falta ir tan lejos); usadas *juntas* en el mismo sitio se lee como decisiones acumuladas, no una elección tipográfica. Dado que `DM Serif Display` ya carga el 90%+ de la superficie de headlines, **la consolidación de menor esfuerzo es eliminar el único uso de `Playfair Display`** (`.mi-ticker`) y reemplazarlo por `DM Serif Display`, y borrar el `@import` de `Inter` (no se usa en ningún lado — limpieza pura, cero riesgo visual).
+- **El hallazgo más valioso es que `IBM Plex Mono` ya está resolviendo, dentro del modal de tesis, exactamente el patrón que Bloomberg/Coinbase usan para datos financieros** (glifos monoespaciados dedicados para cifras — cross-cutting pattern #1 de la investigación, §3). Es la pieza mejor ejecutada de todo el sitio y hoy vive aislada en un solo componente. Propuesta: **extender `IBM Plex Mono` a todo número que vive en tabla o card en el resto del sitio** (precios de mercado, KPIs del calendario, precios de picks) — no es una fuente nueva a introducir, es tomar lo que ya funciona y dejar de limitarlo a un modal.
+
+### Color: dos escalas de navy conviven, hay que elegir una
+
+El shell principal usa un navy plano (`#0A0F1E`) sin escalones de elevación. El modal `.mi-*` ya construye una escalera de navys más refinada (`#07101E` → `#0A0F1E` → `#0a1525` → `#0C1828` → `#1a2f4a`, aclarando progresivamente) — es exactamente el principio de "elevación por aclarado, no por sombra" (patrón #5 de la investigación) ya implementado, otra vez aislado en un solo componente.
+
+Esto también resuelve algo del brief original: el **azul `#4A9EFF` que describiste no es una invención** — el modal ya usa un acento azul (`#3b82f6`/`#60a5fa`) para datos secundarios/links, en paralelo al dorado. Es real, solo que vive en un componente, no en el sistema global.
+
+**Veredicto**: no hace falta elegir entre dorado y azul — el modal ya demuestra la división de trabajo correcta: **dorado = acento de marca/premium (CTAs, live, marca)**, **azul = acento informativo/dato secundario (tags, links, series secundarias de chart)**, sobre la escalera de navys ya construida en `.mi-*`. Recomiendo adoptar esa escalera de navys y esa división dorado/azul como el sistema único de todo el sitio, en vez de definir uno nuevo desde cero.
+
+Comparado contra los referentes investigados: esto deja a Manfredi más cerca de Linear (tema derivado de pocos inputs base + un acento escaso) y de Coinbase (tokens semánticos, mono dedicado para datos) que de Stripe (que es predominantemente claro) — coherente con la decisión de ir hacia "terminal" del §7/§9.
 
 ---
 
@@ -137,13 +161,13 @@ Llevar Mercados, Calendario e Inversiones al mismo sistema de fondo oscuro que y
 ## 6. Priorización
 
 ### Impacto alto / esfuerzo bajo-medio (hacer primero)
-1. Fix del encoding roto en `CAL_DETAILS` (bug, no diseño — 15 minutos, visible ahora mismo en producción)
-2. Sistema de "flash on update" (§5.1) — el gap de mayor impacto/esfuerzo de todo el plan
-3. Auditoría y reemplazo de hex literales por tokens (`--gold`, `--primary`, etc.) — desbloquea todo lo demás y reduce el costo de los próximos cambios
-4. Resolver `index.html` vs `index-v2.html` (decidir fuente de verdad) — bloquea que cualquier trabajo posterior se pierda
+1. ~~Fix del encoding roto en `CAL_DETAILS`~~ — **hecho, ver §9**
+2. Sistema de "flash on update" (§5.1) — el gap de mayor impacto/esfuerzo de todo el plan, sigue pendiente
+3. Auditoría y reemplazo de hex literales por tokens (`--gold`, `--primary`, etc.), adoptando la escalera de navys de `.mi-*` como el token de elevación único (§0.1)
+4. ~~Resolver `index.html` vs `index-v2.html`~~ — **confirmado, ver §0**: `index.html` es producción
 
 ### Impacto alto / esfuerzo medio-alto (siguiente tramo)
-5. Unificación light/dark por sección (§5.8) — la decisión estructural más grande, requiere tu confirmación primero
+5. ~~Unificación light/dark por sección (§5.8)~~ — **decisión tomada: terminal oscuro (§7). Inversiones ya migrada, ver §9**; falta extender el mismo criterio a Mercados y Calendario
 6. Watchlist/personalización (§5.2)
 7. Command palette (§5.5)
 8. Paywall más honesto con preview real (§5.7)
@@ -161,18 +185,45 @@ Llevar Mercados, Calendario e Inversiones al mismo sistema de fondo oscuro que y
 
 ---
 
-## 7. Identidad de marca: qué mantener
+## 7. Identidad de marca: qué mantener, y la regla de densidad/oscuridad
 
-Mantener sin discusión: navy oscuro (no negro puro — ya es la elección correcta según §3), dorado como acento, serif de display + sans de cuerpo, el "carácter" editorial-financiero del copy. Nada de esto se toca.
+Mantener sin discusión: navy oscuro (no negro puro), dorado como acento, serif de display + sans de cuerpo, el "carácter" editorial-financiero del copy. Nada de esto se toca.
 
-Lo que sí conviene decidir con vos antes de ejecutar el §5.8:
+**Decisión tomada**: Manfredi va hacia *terminal* (oscuro consistente en toda la superficie de producto, como Bloomberg Terminal/Linear/Coinbase), no hacia *revista financiera* de fondo claro (FT/Economist). Regla operativa para aplicar esta decisión sección por sección:
 
-**Pregunta abierta**: ¿el objetivo es que Manfredi se sienta como una *terminal* (oscuro consistente en toda la superficie de producto, como Bloomberg Terminal/Linear/Coinbase) o como una *revista financiera* (claro consistente con acentos oscuros, como FT/Economist)? Hoy el sitio no eligió ninguno de los dos — tiene ambos mezclados. Es la decisión de mayor impacto visual de todo este plan y la única que cambia sustancialmente cómo se ve el sitio, así que prefiero que la definas antes de que arme el plan de implementación.
+> **Cuanto más premium el contenido, más oscuro y denso en datos, con más presencia de acentos dorados.**
+
+En la práctica, esto ordena las secciones existentes así (de más "terminal" a más "editorial"):
+
+1. **Warren, Informes, Inversiones, Asesoría** (contenido pago/premium) → navy más oscuro de la escalera (`#07101E`), máxima densidad de dato, dorado reservado para CTAs/live/marca — Informes y Warren ya estaban acá; **Inversiones se migró en esta sesión (§9)**.
+2. **Mercados, Calendario** (gratis pero es el corazón "terminal" del producto — datos en vivo) → misma familia de navys, un escalón más liviano si hace falta distinguir jerarquía de sección, pero oscuro — **pendiente de migrar**, hoy siguen en `#F9FAFB` claro.
+3. **Manfredi University** (educativo, gratis, tono más "revista/curso") → es el único bloque donde un fondo más claro/editorial puede tener sentido a propósito, si se quiere marcar que es contenido de otra naturaleza — a decidir, no es automático.
+
+---
+
+## 9. Cambios ya implementados en esta sesión (en `index.html`)
+
+A pedido explícito, se ejecutaron dos fixes puntuales sobre `index.html`, en esta misma rama (no `main`):
+
+1. **Fix de encoding roto en `CAL_DETAILS`** (bug independiente del rediseño). Los 8 íconos del panel de detalle del calendario económico estaban doble-codificados en UTF-8 (mojibake — se veían como `ð`, `ð¥`, etc.). Se decodificaron y corrigieron a los emojis correctos: `📈` (PBI AR), `🔥` (Inflación AR), `👷` (Desempleo AR), `🌡` (Riesgo País), `📉` (PBI US), `📊` (Inflación US), `💼` (Desempleo US), `🏦` (Treasury 10Y). 9 ocurrencias corregidas.
+2. **Inversiones migrada a fondo oscuro**, consistente con Informes/Warren, aplicando la regla del §7:
+   - `#inversiones` pasó de `.section-alt` (`#F9FAFB` claro) a `#07101E` (misma base que Informes).
+   - `.section-title`/`.section-sub` de la sección, con override a blanco/blanco-translúcido (mismo patrón que ya usaba `.section-informes`).
+   - `.pick-card`: superficie `#0C1828` (el mismo tono de elevación que ya usa el modal `.mi-*` — reutilizado, no inventado), borde hairline en vez de `box-shadow` (que no se ve sobre navy), hover con borde dorado en vez de sombra.
+   - `.pick-ticker` pasó a `IBM Plex Mono` (consistente con el veredicto tipográfico del §0.1) y color claro; `.pick-name` a blanco translúcido.
+   - `.pick-tag-us`/`.pick-tag-ar`: de pills pastel claros a pills translúcidos oscuros, reusando el azul (`#60A5FA`) y verde del sistema existente.
+   - `.pick-sentiment.bull/bear/neutral`: mismo patrón visual que ya usan los badges de recomendación de Warren (`rgba(color,.15)` + borde), en vez del pastel claro anterior.
+   - `.pick-btn` ("Ver análisis →"): de botón sólido navy-sobre-navy (que se volvía invisible en el fondo nuevo) a botón fantasma con borde dorado que se rellena de dorado en hover — aplica directamente la regla "más premium → más dorado."
+   - `.inv-disclaimer`: de amber claro a amber translúcido sobre navy, manteniendo el mismo borde de advertencia.
+   - El overlay de paywall (`.member-lock-overlay`/`.member-lock-card`) no necesitó cambios — ya estaba diseñado en tonos oscuros/dorados, lo que confirma que el fondo claro de Inversiones era la pieza fuera de lugar, no el resto del sistema.
+   - **Nota**: no se validó visualmente en navegador (no hay entorno de browser disponible en esta sesión) — recomiendo una revisión visual rápida antes de mergear.
+
+Consolidación de fuentes (§0.1) y la migración de Mercados/Calendario **no** se ejecutaron todavía — quedan en el backlog priorizado del §6.
 
 ---
 
 ## 8. Próximos pasos
 
-Este documento vive en la rama `research/premium-redesign-plan` (no en `main`), junto con la skill `web-design-expert` (`.claude/skills/web-design-expert/`) que usé para armarlo y que va a guiar la ejecución. No se tocó ningún archivo de producto.
+Este documento vive en la rama `research/premium-redesign-plan` (no en `main`), junto con la skill `web-design-expert` (`.claude/skills/web-design-expert/`) que usé para armarlo y que va a guiar la ejecución. `index.html` sí tiene cambios de código en esta rama (§9) — el resto del plan sigue sin ejecutar.
 
 Cuando lo revisemos: confirmamos (a) si hay que reconciliar esto contra el sitio deployado en vivo dado que no pude verificarlo desde acá, (b) la pregunta abierta del §7, y (c) el orden de §6 — y recién ahí paso a plan de implementación y código, en una rama nueva por feature, como marca `CLAUDE.md`.

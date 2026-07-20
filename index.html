@@ -1413,18 +1413,24 @@
     .instrument-tag.high{background:#fee2e2;color:#991b1b;}
 
 
-    /* âââ INVERSIONES ââââââââââââââââââââââââââââââââââââââââââââ */
+    /* âââ INVERSIONES (dark, terminal-consistent) âââ */
+    .section-inversiones {
+      background: #07101E;
+      position: relative;
+    }
+    .section-inversiones .section-title { color: var(--white); }
+    .section-inversiones .section-sub   { color: rgba(255,255,255,.38); }
     .inv-disclaimer {
       display: flex;
       gap: 10px;
       align-items: flex-start;
-      background: #FFFBEB;
+      background: rgba(217,119,6,.08);
       border-left: 3px solid #D97706;
       padding: 10px 16px;
       border-radius: 0 8px 8px 0;
       margin-bottom: 32px;
       font-size: 12px;
-      color: #92400E;
+      color: #E8B968;
       line-height: 1.55;
     }
     .picks-list {
@@ -1433,20 +1439,20 @@
       gap: 12px;
     }
     .pick-card {
-      background: var(--white);
-      border: 1px solid var(--border);
+      background: #0C1828;
+      border: 1px solid rgba(255,255,255,.08);
       border-radius: 16px;
       padding: 20px 24px;
       display: flex;
       align-items: center;
       gap: 18px;
-      transition: box-shadow .2s, transform .2s, border-color .2s;
+      transition: background .2s, transform .2s, border-color .2s;
       cursor: pointer;
     }
     .pick-card:hover {
-      box-shadow: 0 8px 24px rgba(10,15,30,.08);
+      background: #0F1E32;
       transform: translateY(-2px);
-      border-color: #c8d0e0;
+      border-color: rgba(242,201,76,.25);
     }
     .pick-accent {
       width: 4px;
@@ -1461,12 +1467,13 @@
     .pick-ticker {
       font-size: 16px;
       font-weight: 700;
-      color: var(--primary);
+      color: #F5F7FA;
       letter-spacing: .03em;
+      font-family: 'IBM Plex Mono', monospace;
     }
     .pick-name {
       font-size: 12px;
-      color: var(--text-sec);
+      color: rgba(255,255,255,.45);
       margin-top: 1px;
     }
     .pick-tag {
@@ -1478,8 +1485,8 @@
       letter-spacing: .06em;
       text-transform: uppercase;
     }
-    .pick-tag-us { background: #EFF6FF; color: #1D4ED8; }
-    .pick-tag-ar { background: #F0FDF4; color: #166534; }
+    .pick-tag-us { background: rgba(59,130,246,.12); color: #60A5FA; }
+    .pick-tag-ar { background: rgba(16,185,129,.12); color: #34D399; }
     .pick-sparkline { flex-shrink: 0; opacity: .85; }
     .pick-card:hover .pick-sparkline { opacity: 1; }
     .pick-right {
@@ -1497,33 +1504,33 @@
       border-radius: 4px;
       text-transform: uppercase;
     }
-    .pick-sentiment.bull { background: #DCFCE7; color: #166534; }
-    .pick-sentiment.bear { background: #FEE2E2; color: #991B1B; }
-    .pick-sentiment.neutral { background: #F1F5F9; color: #475569; }
+    .pick-sentiment.bull { background: rgba(16,185,129,.15); color: #10B981; border: 1px solid rgba(16,185,129,.25); }
+    .pick-sentiment.bear { background: rgba(239,68,68,.15); color: #EF4444; border: 1px solid rgba(239,68,68,.25); }
+    .pick-sentiment.neutral { background: rgba(255,255,255,.06); color: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.12); }
     .pick-btn {
       flex-shrink: 0;
       font-size: 11px;
       font-weight: 600;
       letter-spacing: .04em;
       padding: 8px 18px;
-      background: var(--primary);
-      color: var(--white);
-      border: none;
+      background: transparent;
+      color: var(--gold);
+      border: 1px solid rgba(242,201,76,.35);
       border-radius: 8px;
       cursor: pointer;
       font-family: 'IBM Plex Sans', sans-serif;
-      transition: opacity .2s;
+      transition: background .2s, color .2s, border-color .2s;
       text-decoration: none;
       display: inline-block;
     }
-    .pick-btn:hover { opacity: .85; }
+    .pick-btn:hover { background: var(--gold); color: var(--primary); border-color: var(--gold); }
     .pick-coming {
-      border: 1px dashed var(--border);
+      border: 1px dashed rgba(255,255,255,.15);
       border-radius: 16px;
       padding: 18px 24px;
       text-align: center;
       font-size: 12px;
-      color: var(--text-sec);
+      color: rgba(255,255,255,.35);
       font-style: italic;
     }
 
@@ -2540,7 +2547,7 @@
       </div>
     </div>
     <div id="calDetailBox" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:18px 22px;margin-bottom:28px;display:flex;align-items:center;gap:16px;min-height:68px;transition:border-color .2s,background .2s;" data-aos="fade-up">
-      <div style="width:36px;height:36px;background:rgba(242,201,76,.1);border:1px solid rgba(242,201,76,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">ð</div>
+      <div style="width:36px;height:36px;background:rgba(242,201,76,.1);border:1px solid rgba(242,201,76,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📊</div>
       <div><div id="calDetailTitle" style="font-size:11px;font-weight:600;color:var(--gold);letter-spacing:.04em;margin-bottom:4px;">Seleccioná un indicador</div><div id="calDetailText" style="font-size:12.5px;color:rgba(255,255,255,.45);line-height:1.6;">Tocá cualquier cuadro para ver el contexto, la tendencia y qué significa para los mercados.</div></div>
     </div>
     <div data-aos="fade-up">
@@ -2696,7 +2703,7 @@
 
 
   <!-- ââ INVERSIONES âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="section section-alt member-protected locked" id="inversiones">
+  <section class="section section-inversiones member-protected locked" id="inversiones">
     <div class="container">
       
       <div class="section-header">
@@ -4004,7 +4011,7 @@
     }
   }
 
-  const CAL_DETAILS={'ar-pbi':{icon:'ð',title:'PBI Argentina',text:'La economía retomó el crecimiento liderada por agro, construcción y servicios. <strong>Para los mercados:</strong> positivo para acciones del Merval y bonos soberanos.'},'ar-inf':{icon:'ð¥',title:'Inflación Argentina',text:'La inflación mensual continúa desacelerando. Crawling peg y ancla cambiaria son los drivers. <strong>Próximo dato:</strong> IPC INDEC el 12 de cada mes.'},'ar-desemp':{icon:'ð·',title:'Desempleo Argentina',text:'Resiliencia pese al ajuste del sector público. <strong>Publicación:</strong> trimestral por EPH-INDEC.'},'ar-riesgo':{icon:'ð¡',title:'Riesgo País EMBI+',text:'Compresión por acuerdo FMI y disciplina fiscal. <strong>Para los mercados:</strong> cada 100 bps de caída impulsa GD30/AL30 un ~8-12%.'},'us-pbi':{icon:'ð',title:'PBI Estados Unidos',text:'Contracción leve por caída de exportaciones ante aranceles. Consumo privado resisó.'},'us-inf':{icon:'ð',title:'Inflación EE.UU. CPI',text:'Desacelerando hacia el target del 2%. <strong>Dato más importante para la Fed:</strong> PCE Core, último jueves de cada mes.'},'us-desemp':{icon:'ð¼',title:'Desempleo EE.UU.',text:'Mercado laboral resiliente. <strong>Próximo dato clave:</strong> Nonfarm Payrolls el primer viernes de cada mes.'},'us-treasury':{icon:'ð¦',title:'Treasury 10Y Yield',text:'Yields altos comprimen valuaciones tech. <strong>Para los mercados:</strong> impacta en CEDEARs y bonos argentinos en USD.'}}; function calShowDetail(key,el){var d=CAL_DETAILS[key];if(!d)return;document.querySelectorAll('.cal-kpi').forEach(function(k){k.classList.remove('active');});el.classList.add('active');var box=document.getElementById('calDetailBox');box.children[0].textContent=d.icon;document.getElementById('calDetailTitle').textContent=d.title;document.getElementById('calDetailText').innerHTML=d.text;box.style.borderColor='rgba(242,201,76,.4)';box.style.background='rgba(242,201,76,.04)';} async function loadMacroAR(){try{var infR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/inflacion').catch(function(){return null;});var riesgoR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais').catch(function(){return null;});if(infR&&infR.ok){var infD=await infR.json();if(Array.isArray(infD)&&infD.length){var last=infD[infD.length-1];var val=last.valor!=null?last.valor:last.value;if(val!=null){document.getElementById('ar-inf-val').textContent=val.toFixed(1)+'%';document.getElementById('ar-inf-sub').textContent='Mensual · '+(last.fecha||'');}}}if(riesgoR&&riesgoR.ok){var riesgoD=await riesgoR.json();if(Array.isArray(riesgoD)&&riesgoD.length){var rLast=riesgoD[riesgoD.length-1];var rVal=rLast.valor!=null?rLast.valor:rLast.value;if(rVal!=null){document.getElementById('ar-riesgo-val').textContent=Math.round(rVal)+' bps';document.getElementById('ar-riesgo-sub').textContent='EMBI+ · '+(rLast.fecha||'');}}}}catch(e){console.warn('[MI] MacroAR:',e.message);}} async function loadMacroUS(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/macro-us',{signal:AbortSignal.timeout(5000)});if(r.ok){var d=await r.json();if(d.gdp!=null){var v=parseFloat(d.gdp);document.getElementById('us-pbi-val').textContent=(v>=0?'+':'')+v.toFixed(1)+'%';document.getElementById('us-pbi-val').className='cal-kpi-main '+(v>=0?'cal-up':'cal-down');}if(d.cpi!=null)document.getElementById('us-inf-val').textContent=parseFloat(d.cpi).toFixed(1)+'%';if(d.unemp!=null)document.getElementById('us-desemp-val').textContent=parseFloat(d.unemp).toFixed(1)+'%';if(d.treasury!=null)document.getElementById('us-treasury-val').textContent=parseFloat(d.treasury).toFixed(2)+'%';}}catch(e){console.warn('[MI] MacroUS:',e.message);}} async function loadCalSemana(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/calendario',{signal:AbortSignal.timeout(8000)});if(r.ok){var d=await r.json();if(d.dias&&d.dias.length){document.getElementById('calSemanaLabel').textContent=d.semana||'';var dow=new Date().getDay();var grid=document.getElementById('calWeekGrid');grid.innerHTML=d.dias.map(function(dia,i){var isToday=(i+1)===dow;var evs=dia.eventos&&dia.eventos.length?dia.eventos.map(function(ev){return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+ev.titulo+'</strong>'+ev.descripcion+'</div></div>';}).join(''):'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Sin eventos</span>';return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+dia.nombre+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+dia.fecha+'</span></div>'+evs+'</div>';}).join('');return;}}}catch(e){console.warn('[MI] CalSemana:',e.message);}var hoy=new Date();var dow=hoy.getDay();var lun=new Date(hoy);lun.setDate(hoy.getDate()-(dow===0?6:dow-1));var nombres=['Lun','Mar','Mié','Jue','Vie'];var fmt=function(d){return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});};var fin=new Date(lun);fin.setDate(lun.getDate()+4);document.getElementById('calSemanaLabel').textContent=fmt(lun)+' al '+fmt(fin);document.getElementById('calWeekGrid').innerHTML=nombres.map(function(n,i){var d=new Date(lun);d.setDate(lun.getDate()+i);var isToday=(i+1)===dow;return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+n+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+fmt(d)+'</span></div>'+'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Cargando...</span></div>';}).join('');} loadMacroAR(); loadMacroUS(); loadCalSemana(); setInterval(loadMacroAR,300000); setInterval(loadMacroUS,300000);
+  const CAL_DETAILS={'ar-pbi':{icon:'📈',title:'PBI Argentina',text:'La economía retomó el crecimiento liderada por agro, construcción y servicios. <strong>Para los mercados:</strong> positivo para acciones del Merval y bonos soberanos.'},'ar-inf':{icon:'🔥',title:'Inflación Argentina',text:'La inflación mensual continúa desacelerando. Crawling peg y ancla cambiaria son los drivers. <strong>Próximo dato:</strong> IPC INDEC el 12 de cada mes.'},'ar-desemp':{icon:'👷',title:'Desempleo Argentina',text:'Resiliencia pese al ajuste del sector público. <strong>Publicación:</strong> trimestral por EPH-INDEC.'},'ar-riesgo':{icon:'🌡',title:'Riesgo País EMBI+',text:'Compresión por acuerdo FMI y disciplina fiscal. <strong>Para los mercados:</strong> cada 100 bps de caída impulsa GD30/AL30 un ~8-12%.'},'us-pbi':{icon:'📉',title:'PBI Estados Unidos',text:'Contracción leve por caída de exportaciones ante aranceles. Consumo privado resisó.'},'us-inf':{icon:'📊',title:'Inflación EE.UU. CPI',text:'Desacelerando hacia el target del 2%. <strong>Dato más importante para la Fed:</strong> PCE Core, último jueves de cada mes.'},'us-desemp':{icon:'💼',title:'Desempleo EE.UU.',text:'Mercado laboral resiliente. <strong>Próximo dato clave:</strong> Nonfarm Payrolls el primer viernes de cada mes.'},'us-treasury':{icon:'🏦',title:'Treasury 10Y Yield',text:'Yields altos comprimen valuaciones tech. <strong>Para los mercados:</strong> impacta en CEDEARs y bonos argentinos en USD.'}}; function calShowDetail(key,el){var d=CAL_DETAILS[key];if(!d)return;document.querySelectorAll('.cal-kpi').forEach(function(k){k.classList.remove('active');});el.classList.add('active');var box=document.getElementById('calDetailBox');box.children[0].textContent=d.icon;document.getElementById('calDetailTitle').textContent=d.title;document.getElementById('calDetailText').innerHTML=d.text;box.style.borderColor='rgba(242,201,76,.4)';box.style.background='rgba(242,201,76,.04)';} async function loadMacroAR(){try{var infR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/inflacion').catch(function(){return null;});var riesgoR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais').catch(function(){return null;});if(infR&&infR.ok){var infD=await infR.json();if(Array.isArray(infD)&&infD.length){var last=infD[infD.length-1];var val=last.valor!=null?last.valor:last.value;if(val!=null){document.getElementById('ar-inf-val').textContent=val.toFixed(1)+'%';document.getElementById('ar-inf-sub').textContent='Mensual · '+(last.fecha||'');}}}if(riesgoR&&riesgoR.ok){var riesgoD=await riesgoR.json();if(Array.isArray(riesgoD)&&riesgoD.length){var rLast=riesgoD[riesgoD.length-1];var rVal=rLast.valor!=null?rLast.valor:rLast.value;if(rVal!=null){document.getElementById('ar-riesgo-val').textContent=Math.round(rVal)+' bps';document.getElementById('ar-riesgo-sub').textContent='EMBI+ · '+(rLast.fecha||'');}}}}catch(e){console.warn('[MI] MacroAR:',e.message);}} async function loadMacroUS(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/macro-us',{signal:AbortSignal.timeout(5000)});if(r.ok){var d=await r.json();if(d.gdp!=null){var v=parseFloat(d.gdp);document.getElementById('us-pbi-val').textContent=(v>=0?'+':'')+v.toFixed(1)+'%';document.getElementById('us-pbi-val').className='cal-kpi-main '+(v>=0?'cal-up':'cal-down');}if(d.cpi!=null)document.getElementById('us-inf-val').textContent=parseFloat(d.cpi).toFixed(1)+'%';if(d.unemp!=null)document.getElementById('us-desemp-val').textContent=parseFloat(d.unemp).toFixed(1)+'%';if(d.treasury!=null)document.getElementById('us-treasury-val').textContent=parseFloat(d.treasury).toFixed(2)+'%';}}catch(e){console.warn('[MI] MacroUS:',e.message);}} async function loadCalSemana(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/calendario',{signal:AbortSignal.timeout(8000)});if(r.ok){var d=await r.json();if(d.dias&&d.dias.length){document.getElementById('calSemanaLabel').textContent=d.semana||'';var dow=new Date().getDay();var grid=document.getElementById('calWeekGrid');grid.innerHTML=d.dias.map(function(dia,i){var isToday=(i+1)===dow;var evs=dia.eventos&&dia.eventos.length?dia.eventos.map(function(ev){return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+ev.titulo+'</strong>'+ev.descripcion+'</div></div>';}).join(''):'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Sin eventos</span>';return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+dia.nombre+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+dia.fecha+'</span></div>'+evs+'</div>';}).join('');return;}}}catch(e){console.warn('[MI] CalSemana:',e.message);}var hoy=new Date();var dow=hoy.getDay();var lun=new Date(hoy);lun.setDate(hoy.getDate()-(dow===0?6:dow-1));var nombres=['Lun','Mar','Mié','Jue','Vie'];var fmt=function(d){return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});};var fin=new Date(lun);fin.setDate(lun.getDate()+4);document.getElementById('calSemanaLabel').textContent=fmt(lun)+' al '+fmt(fin);document.getElementById('calWeekGrid').innerHTML=nombres.map(function(n,i){var d=new Date(lun);d.setDate(lun.getDate()+i);var isToday=(i+1)===dow;return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+n+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+fmt(d)+'</span></div>'+'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Cargando...</span></div>';}).join('');} loadMacroAR(); loadMacroUS(); loadCalSemana(); setInterval(loadMacroAR,300000); setInterval(loadMacroUS,300000);
   fetchCryptoTable();
   fetchCommTable();
   fetchETFTable();
