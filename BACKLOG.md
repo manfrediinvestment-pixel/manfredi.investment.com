@@ -20,6 +20,7 @@ Formato por item: descripción corta · prioridad (alta/media/baja) · estado (p
 | 3 | Modal de login (`#loginOverlay`) aparecía automáticamente a pantalla completa al hacer scroll como guest. Se eliminó el trigger por scroll y el intercept de clicks en nav — el login ahora es siempre voluntario o contextual a contenido premium. | Media | Hecho |
 | 4 | Contenido de curso duplicado: bloques de "Calculá tu presupuesto en dólares CCL..." y cards de ahorro para el retiro aparecen dos veces en `index.html` (líneas ~4527/6838 y ~4616/6927). | Baja | Pendiente |
 | 5 | Encoding roto en íconos de `CAL_DETAILS` (calendario económico) | Alta | Hecho |
+| 20 | Encoding roto en el modal de pago: botón "Pagar con Mercado Pago" y aviso de seguridad se veían con mojibake (mismo bug que el ítem 5, en otra parte del archivo). Encontrado al validar visualmente el nuevo CTA de membresía. | Alta | Hecho |
 
 ## Diseño
 
@@ -33,6 +34,10 @@ Formato por item: descripción corta · prioridad (alta/media/baja) · estado (p
 | 10 | Sistema de "flash on update" para datos en vivo (precios, KPIs): flash breve de color direccional al cambiar un valor, decae en ~600–900ms, sobre tabular-nums para que no salte el ancho. Gap de mayor impacto/esfuerzo del plan. | Alta | Pendiente |
 | 11 | Soporte de `prefers-reduced-motion` — ausente en todo el CSS. | Baja | Pendiente |
 | 12 | Letter-spacing progresivo por tamaño de tipografía (hoy ad-hoc, sin regla consistente). | Baja | Pendiente |
+| 21 | Estado activo de las pestañas de nav: pasa de texto dorado + subrayado a un pill con borde/texto azul, igual que el botón "Asesoría" del navbar. | Media | Hecho |
+| 22 | Botón "Ingresar" del navbar: pasa de ghost dorado improvisado a outline consistente con el resto de los botones del sitio (colores neutros, no dorado). | Media | Hecho |
+| 23 | Hero / "Mercados ahora": se sacaron los íconos de bandera/emoji por fila y se reemplazaron por un acento de color fino (reusa la paleta ya definida en Mercados: MERV azul, SPX verde, BTC ámbar, MEP gris). Ticker a IBM Plex Mono. | Media | Hecho |
+| 24 | Franja "+10 Reportes Diarios / +25 Activos..." eliminada de la home; reemplazada por un banner de membresía (Warren + Inversiones) con CTA a `openPaymentModal()`. | Alta | Hecho |
 
 ## Features futuros
 
