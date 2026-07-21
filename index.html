@@ -128,7 +128,9 @@
       font-weight: 500;
       color: var(--text-sec);
       cursor: pointer;
-      transition: color var(--transition);
+      border: 1px solid transparent;
+      border-radius: 20px;
+      transition: color var(--transition), background var(--transition), border-color var(--transition);
       white-space: nowrap;
       letter-spacing: .01em;
     }
@@ -211,6 +213,19 @@
       font-family: 'IBM Plex Sans', sans-serif;
     }
     .btn-cta:hover { background: transparent; color: var(--primary); }
+    .nav-login-btn {
+      background: transparent;
+      color: var(--primary);
+      padding: 9px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: background var(--transition), color var(--transition), border-color var(--transition);
+      letter-spacing: .02em;
+      font-family: 'IBM Plex Sans', sans-serif;
+    }
+    .nav-login-btn:hover { background: var(--primary); color: var(--white); border-color: var(--primary); }
 
     /* âââ HERO ââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .hero {
@@ -297,40 +312,89 @@
     .btn-outline:hover { border-color: rgba(255,255,255,.5); color: rgba(255,255,255,.9); }
 
     /* âââ STATS STRIP âââââââââââââââââââââââââââââââââââââââââââââ */
-    .stats-strip {
-      background: var(--white);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 40px 32px;
+    .membership-promo {
+      background: var(--primary);
+      padding: 64px 32px;
     }
-    .stats-grid {
+    .mp-inner {
       max-width: 1200px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 48px;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(242,201,76,.06), rgba(242,201,76,0) 60%), rgba(255,255,255,.03);
+      border: 1px solid rgba(242,201,76,.22);
+      border-radius: 16px;
+      padding: 44px 48px;
     }
-    .stat-item {
-      padding: 0 32px;
-      border-right: 1px solid var(--border);
-    }
-    .stat-item:first-child { padding-left: 0; }
-    .stat-item:last-child  { border-right: none; }
-    .stat-item h3 {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: 36px;
-      font-weight: 400;
-      color: var(--primary);
-      letter-spacing: -.01em;
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-    .stat-item p {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-sec);
-      letter-spacing: .06em;
+    .mp-eyebrow {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
       text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+    .mp-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: clamp(24px, 2.6vw, 32px);
+      font-weight: 400;
+      color: var(--white);
+      line-height: 1.25;
+      letter-spacing: -.01em;
+      max-width: 480px;
+      margin-bottom: 14px;
+    }
+    .mp-sub {
+      font-size: 14.5px;
+      color: rgba(255,255,255,.6);
+      line-height: 1.65;
+      max-width: 440px;
+      margin-bottom: 28px;
+    }
+    .mp-cta {
+      background: var(--gold);
+      color: var(--primary);
+      border: 1px solid var(--gold);
+      padding: 14px 26px;
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      cursor: pointer;
+      border-radius: 6px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .mp-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .mp-right { display: flex; flex-direction: column; gap: 14px; }
+    .mp-feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .mp-feature-icon {
+      flex: none;
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: rgba(242,201,76,.12);
+      border: 1px solid rgba(242,201,76,.3);
+      color: var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 15px;
+    }
+    .mp-feature-text { display: flex; flex-direction: column; gap: 3px; }
+    .mp-feature-text strong { font-size: 13.5px; font-weight: 600; color: var(--white); }
+    .mp-feature-text span { font-size: 12px; color: rgba(255,255,255,.5); line-height: 1.5; }
+    @media(max-width:860px) {
+      .mp-inner { grid-template-columns: 1fr; padding: 32px 24px; }
+      .mp-title, .mp-sub { max-width: 100%; }
     }
 
     /* âââ SECTIONS ââââââââââââââââââââââââââââââââââââââââââââââââ */
@@ -1366,9 +1430,6 @@
     }
     @media (max-width: 768px) {
       .footer-grid { grid-template-columns: 1fr 1fr; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .stat-item { padding: 20px 0; border-right: none; border-bottom: 1px solid var(--border); }
-      .stat-item:last-child, .stat-item:nth-child(even) { border-right: none; }
     }
     @media (max-width: 480px) {
       .footer-grid { grid-template-columns: 1fr; }
@@ -1376,7 +1437,6 @@
       .hero { padding: 72px 20px 64px; }
       .section { padding: 64px 20px; }
       .nav-links { display: none; }
-      .stats-grid { grid-template-columns: 1fr; }
       .markets-table thead th:nth-child(4),
       .markets-table td:nth-child(4) { display: none; }
     }
@@ -1693,27 +1753,22 @@
     @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
     .spot-row {
       display: grid;
-      grid-template-columns: 36px 1fr 80px 72px;
+      grid-template-columns: 1fr 80px 72px;
       align-items: center;
       gap: 8px;
-      padding: 10px 0;
+      padding: 11px 0 11px 12px;
       border-bottom: 1px solid rgba(255,255,255,.05);
+      border-left: 3px solid var(--spot-accent, rgba(255,255,255,.15));
+      transition: background var(--transition);
     }
+    .spot-row:hover { background: rgba(255,255,255,.025); }
     .spot-row:last-child { border-bottom: none; }
-    .spot-region {
-      width: 34px; height: 34px;
-      border-radius: 8px;
-      background: rgba(255,255,255,.07);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-    }
     .spot-ticker {
-      font-size: 12px;
-      font-weight: 700;
-      color: rgba(255,255,255,.9);
-      letter-spacing: .04em;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: rgba(255,255,255,.92);
+      letter-spacing: .02em;
     }
     .spot-fullname {
       font-size: 10px;
@@ -1856,8 +1911,11 @@
 
     /* PPP NAVEGACION POR PESTANAS: una seccion visible a la vez PPP */
     [data-tab].tab-hidden { display: none !important; }
-    .nav-link.tab-nav-active { color: var(--gold); }
-    .nav-link.tab-nav-active::after { content:''; display:block; height:2px; background:var(--gold); margin-top:4px; border-radius:2px; }
+    .nav-link.tab-nav-active {
+      color: #60A5FA;
+      background: rgba(59,130,246,.08);
+      border-color: rgba(59,130,246,.4);
+    }
 
 
   /* ââ CALENDARIO ECONÓMICO ââââââââââââââââââââââââââââââââââââââââ */
@@ -2083,7 +2141,7 @@
       // secciones/paneles. Aca solo dejamos un acceso discreto y voluntario.
       const navEl = document.getElementById('navUserArea');
       if (navEl) {
-        navEl.innerHTML = '<button onclick="window.showLoginOverlay && window.showLoginOverlay()" style="font-size:12.5px;padding:6px 14px;border:1px solid rgba(242,201,76,.35);border-radius:6px;cursor:pointer;background:transparent;color:var(--gold);">Ingresar</button>';
+        navEl.innerHTML = '<button class="nav-login-btn" onclick="window.showLoginOverlay && window.showLoginOverlay()">Ingresar</button>';
       }
     }
 
@@ -2203,8 +2261,7 @@
             <span>Mercados ahora</span>
             <span class="s-live">LIVE</span>
           </div>
-          <div class="spot-row">
-            <div class="spot-region">&#127462;&#127479;</div>
+          <div class="spot-row" style="--spot-accent:#3B82F6;">
             <div class="spot-name">
               <div class="spot-ticker">MERV</div>
               <div class="spot-fullname">Merval</div>
@@ -2218,8 +2275,7 @@
               <span class="spot-chg" id="hspot-merv-chg">&#8212;</span>
             </div>
           </div>
-          <div class="spot-row">
-            <div class="spot-region">&#127482;&#127480;</div>
+          <div class="spot-row" style="--spot-accent:#10B981;">
             <div class="spot-name">
               <div class="spot-ticker">SPX</div>
               <div class="spot-fullname">S&amp;P 500</div>
@@ -2233,8 +2289,7 @@
               <span class="spot-chg" id="hspot-spx-chg">&#8212;</span>
             </div>
           </div>
-          <div class="spot-row">
-            <div class="spot-region" style="font-size:13px;font-weight:700;color:rgba(255,255,255,.8);">&#8383;</div>
+          <div class="spot-row" style="--spot-accent:#F59E0B;">
             <div class="spot-name">
               <div class="spot-ticker">BTC</div>
               <div class="spot-fullname">Bitcoin</div>
@@ -2248,8 +2303,7 @@
               <span class="spot-chg" id="hspot-btc-chg">&#8212;</span>
             </div>
           </div>
-          <div class="spot-row">
-            <div class="spot-region" style="font-size:13px;">&#128181;</div>
+          <div class="spot-row" style="--spot-accent:#94A3B8;">
             <div class="spot-name">
               <div class="spot-ticker">MEP</div>
               <div class="spot-fullname">D&oacute;lar MEP</div>
@@ -2270,12 +2324,30 @@
   </section>
 
   <!-- ââ STATS âââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="stats-strip" data-tab="inicio">
-    <div class="stats-grid" data-aos="fade-up">
-      <div class="stat-item"><h3>+10</h3><p>REPORTES DIARIOS</p></div>
-      <div class="stat-item"><h3>+25</h3><p>ACTIVOS ANALIZADOS</p></div>
-      <div class="stat-item"><h3>Semanal</h3><p>INFORMES DE ANÁLISIS</p></div>
-      <div class="stat-item"><h3>Gratuito</h3><p>ACCESO GRATUITO + CONTENIDO PREMIUM EXCLUSIVO</p></div>
+  <section class="membership-promo" data-tab="inicio">
+    <div class="mp-inner" data-aos="fade-up">
+      <div class="mp-left">
+        <span class="mp-eyebrow">Membres&iacute;a Manfredi Investment</span>
+        <h2 class="mp-title">Un asesor IA y el an&aacute;lisis completo de cada activo, sin l&iacute;mites.</h2>
+        <p class="mp-sub">Consult&aacute; a Warren cuando quieras y acced&eacute; a la tesis completa de cada pick: catalysts, comparables y proyecciones &mdash; no solo el precio.</p>
+        <button class="mp-cta" onclick="openPaymentModal()">Suscribirme &mdash; USD 10/mes &rarr;</button>
+      </div>
+      <div class="mp-right">
+        <div class="mp-feature">
+          <div class="mp-feature-icon">W</div>
+          <div class="mp-feature-text">
+            <strong>Warren, Asesor IA</strong>
+            <span>Consultas ilimitadas sobre tu cartera y el mercado, 24/7</span>
+          </div>
+        </div>
+        <div class="mp-feature">
+          <div class="mp-feature-icon">&#8599;</div>
+          <div class="mp-feature-text">
+            <strong>Inversiones</strong>
+            <span>Tesis completas, catalysts y comparables de cada activo que seguimos</span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -3303,7 +3375,7 @@
     },
     {
       id:           'gold',
-      flag:         'ð¥',
+      flag:         '🥇',
       name:         'Oro (XAU/USD)',
       source:       'twelvedata',
       tdSymbol:     'XAU/USD',
@@ -9634,9 +9706,9 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
       <p style="text-align:center;margin-bottom:24px;">Accedé a todos los análisis, picks y posiciones con membresía activa.</p>
       <div style="text-align:center;margin-bottom:8px;font-size:42px;font-weight:800;color:var(--gold,#B8943F);font-family:var(--font-display)">$10 <span style="font-size:18px;color:var(--text-sec,#aaa)">USD/mes</span></div>
       <p style="text-align:center;font-size:12px;color:var(--text-sec,#aaa);margin-bottom:28px;">por mes · cancelá cuando quieras</p>
-      <button onclick="handlePayment('mercadopago')" style="width:100%;padding:14px;background:var(--gold,#B8943F);color:#000;font-weight:700;font-size:16px;border:none;border-radius:10px;cursor:pointer;margin-bottom:12px;">ð³ Pagar con Mercado Pago</button>
+      <button onclick="handlePayment('mercadopago')" style="width:100%;padding:14px;background:var(--gold,#B8943F);color:#000;font-weight:700;font-size:16px;border:none;border-radius:10px;cursor:pointer;margin-bottom:12px;">💳 Pagar con Mercado Pago</button>
       <p style="font-size:0.75rem; color:#a0a0a0; margin-top:0.5rem; text-align:center;">
-        â ï¸ Asegurate de pagar con el mismo email con el que iniciaste sesión en la página.
+        ⚠️ Asegurate de pagar con el mismo email con el que iniciaste sesión en la página.
       </p>
       <p style="text-align:center;font-size:12px;color:var(--text-sec,#aaa);margin-top:8px;">¿Ya tenés membresía? <a href="#" onclick="closePaymentModal()" style="color:var(--gold,#B8943F)">Iniciá sesión</a></p>
     </div>
