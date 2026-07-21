@@ -1826,7 +1826,40 @@
     .markets-v2-live { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--green); background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.2); border-radius: 20px; padding: 4px 10px; margin-bottom: 10px; }
     .markets-v2-live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse-dot 1.4s ease-in-out infinite; }
 
-  
+    /* PPP MERCADOS oscuro terminal, consistente con Informes/Warren/Inversiones PPP */
+    .section-mercados { background: #07101E; position: relative; }
+    .section-mercados .section-title { color: var(--white); }
+    .section-mercados .section-sub   { color: rgba(255,255,255,.38); }
+    .section-mercados .f-tab { background: transparent; border-color: rgba(255,255,255,.15); color: rgba(255,255,255,.55); }
+    .section-mercados .f-tab:hover { border-color: rgba(242,201,76,.4); color: var(--gold); }
+    .section-mercados .f-tab.active { background: var(--gold); border-color: var(--gold); color: var(--primary); }
+    .section-mercados .dash-card { background: #0C1828; border: 1px solid rgba(255,255,255,.08); border-left: 4px solid var(--card-accent, #6B7280); }
+    .section-mercados .dash-card:hover { box-shadow: none; background: #0F1E32; }
+    .section-mercados .dash-card.pos { border: 1px solid rgba(16,185,129,.25); border-left: 4px solid var(--card-accent, #6B7280); }
+    .section-mercados .dash-card.neg { border: 1px solid rgba(239,68,68,.25); border-left: 4px solid var(--card-accent, #6B7280); }
+    .section-mercados .dc-ticker { color: rgba(255,255,255,.45); }
+    .section-mercados .dc-name { color: var(--white); }
+    .section-mercados .dc-badge { background: rgba(255,255,255,.07); color: rgba(255,255,255,.55); }
+    .section-mercados .dc-price { color: var(--white); }
+    .section-mercados .dc-meta-label { color: rgba(255,255,255,.32); }
+    .section-mercados .dc-meta-val { color: rgba(255,255,255,.7); }
+    .section-mercados .at-card { background: #0C1828; border: 1px solid rgba(255,255,255,.08); }
+    .section-mercados .at-cols { background: rgba(255,255,255,.03); border-bottom: 1px solid rgba(255,255,255,.06); }
+    .section-mercados .at-col-label { color: rgba(255,255,255,.32); }
+    .section-mercados .at-row { border-bottom: 1px solid rgba(255,255,255,.06); }
+    .section-mercados .at-row:hover { background: rgba(255,255,255,.03); }
+    .section-mercados .at-row:nth-child(even) { background: rgba(255,255,255,.015); }
+    .section-mercados .at-ticker, .section-mercados .at-name-main, .section-mercados .at-price { color: var(--white); font-family: 'IBM Plex Mono', monospace; }
+    .section-mercados .at-fullname { color: rgba(255,255,255,.4); }
+    .section-mercados .last-updated { color: rgba(255,255,255,.32) !important; }
+    .section-mercados #apiStatus { color: rgba(255,255,255,.5); }
+
+    /* PPP NAVEGACION POR PESTANAS: una seccion visible a la vez PPP */
+    [data-tab].tab-hidden { display: none !important; }
+    .nav-link.tab-nav-active { color: var(--gold); }
+    .nav-link.tab-nav-active::after { content:''; display:block; height:2px; background:var(--gold); margin-top:4px; border-radius:2px; }
+
+
   /* ââ CALENDARIO ECONÓMICO ââââââââââââââââââââââââââââââââââââââââ */
   .cal-kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);padding:16px 14px 13px;cursor:pointer;transition:border-color .18s,background .18s;position:relative;overflow:hidden;}
   .cal-kpi:hover{background:rgba(255,255,255,.07);border-color:rgba(242,201,76,.3);}
@@ -2045,25 +2078,13 @@
 
     // ââ Guest Mode: show login overlay on scroll or protected nav click âââââââââ
     function setupGuestMode() {
-      let scrollTriggered = false;
-      function onScrollAttempt() {
-        if (scrollTriggered) return;
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
-        if (scrollY > 80) {
-          scrollTriggered = true;
-          showLoginOverlay();
-          window.scrollTo({top: 0, behavior: 'smooth'});
-          window.removeEventListener('scroll', onScrollAttempt);
-        }
+      // Sin bloqueo de pagina completa: el login solo se pide al entrar a
+      // contenido premium (Inversiones, Warren) via los gates propios de esas
+      // secciones/paneles. Aca solo dejamos un acceso discreto y voluntario.
+      const navEl = document.getElementById('navUserArea');
+      if (navEl) {
+        navEl.innerHTML = '<button onclick="window.showLoginOverlay && window.showLoginOverlay()" style="font-size:12.5px;padding:6px 14px;border:1px solid rgba(242,201,76,.35);border-radius:6px;cursor:pointer;background:transparent;color:var(--gold);">Ingresar</button>';
       }
-      window.addEventListener('scroll', onScrollAttempt, {passive: true});
-      document.querySelectorAll('[data-member-required], a[href="#informes"], a[href="#reportes"], a[href="#inversiones"]').forEach(function(el) {
-        el.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          showLoginOverlay();
-        }, {capture: true});
-      });
     }
 
     function showLoginOverlay() {
@@ -2114,7 +2135,7 @@
   <!-- ââ NAVBAR ââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
   <header class="navbar">
     <div class="nav-inner">
-      <a href="#" class="logo">
+      <a href="#" class="logo" data-tab-target="inicio">
         <div class="logo-mark">MI</div>
         <div class="logo-text">
           <span class="logo-name">Manfredi Investment</span>
@@ -2124,31 +2145,33 @@
 
       <ul class="nav-links">
         <li>
-          <span class="nav-link" data-member-required="true">
+          <span class="nav-link">
             Informes &amp; Reportes
             <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 6l4 4 4-4"/></svg>
           </span>
           <div class="dropdown">
             <div class="dropdown-label">Contenido</div>
-            <a href="#informes" class="dropdown-item">
+            <a href="#informes" class="dropdown-item" data-tab-target="informes">
               <span class="dropdown-icon">IN</span>
               <span class="dropdown-item-text">Informes<small>Análisis profundos semanales</small></span>
             </a>
-            <a href="#reportes" class="dropdown-item">
+            <a href="#reportes" class="dropdown-item" data-tab-target="informes">
               <span class="dropdown-icon">IA</span>
               <span class="dropdown-item-text">Reportes Diarios<small>Actualizados por agente IA</small></span>
             </a>
           </div>
         </li>
-        <li><a href="#mercados" class="nav-link">Mercados</a></li>
-        <li><a href="#university" class="nav-link">University</a></li>
-        <li><a href="#inversiones" class="nav-link" data-member-required="true">Inversiones</a></li>
+        <li><a href="#mercados" class="nav-link" data-tab-target="mercados">Mercados</a></li>
+        <li><a href="#calendario" class="nav-link" data-tab-target="calendario">Calendario</a></li>
+        <li><a href="#university" class="nav-link" data-tab-target="university">University</a></li>
+        <li><a href="#inversiones" class="nav-link" data-member-required="true" data-tab-target="inversiones">Inversiones</a></li>
+        <li><a href="#asesoria" class="nav-link" data-tab-target="asesoria">Asesoría</a></li>
         <li>
-          <span class="nav-link" data-member-required="true" onclick="if(window._isMiembro){toggleWarren()}" style="cursor:pointer;">
+          <span class="nav-link" data-member-required="true" onclick="toggleWarren()" style="cursor:pointer;">
             Asesor IA <span style="display:inline-block;width:8px;height:8px;background:#10B981;border-radius:50%;margin-left:4px;vertical-align:middle;"></span>
           </span>
         </li>
-        
+
       </ul>
 
       <button class="btn-cta" onclick="openModal()">Asesoría</button>
@@ -2158,7 +2181,7 @@
   </header>
 
   <!-- ââ HERO ââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="hero-v2">
+  <section class="hero-v2" data-tab="inicio">
     <div class="hero-v2-inner">
       <div class="hero-v2-left">
         <div class="hero-eyebrow">
@@ -2170,8 +2193,8 @@
         </h1>
         <p class="hero-sub">An&aacute;lisis semanales profundos, reportes diarios automatizados y educaci&oacute;n financiera gratuita. Todo en un solo lugar.</p>
         <div class="hero-actions">
-          <button class="btn-primary" onclick="document.getElementById('informes').scrollIntoView({behavior:'smooth'})">Ver &uacute;ltimo Informe</button>
-          <button class="btn-outline" onclick="document.getElementById('university').scrollIntoView({behavior:'smooth'})">Explorar University &rarr;</button>
+          <button class="btn-primary" onclick="location.hash='#informes'">Ver &uacute;ltimo Informe</button>
+          <button class="btn-outline" onclick="location.hash='#university'">Explorar University &rarr;</button>
         </div>
       </div>
       <div class="hero-v2-right">
@@ -2247,7 +2270,7 @@
   </section>
 
   <!-- ââ STATS âââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="stats-strip">
+  <section class="stats-strip" data-tab="inicio">
     <div class="stats-grid" data-aos="fade-up">
       <div class="stat-item"><h3>+10</h3><p>REPORTES DIARIOS</p></div>
       <div class="stat-item"><h3>+25</h3><p>ACTIVOS ANALIZADOS</p></div>
@@ -2257,7 +2280,7 @@
   </section>
 
   <!-- ââ MERCADOS âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="section section-alt" id="mercados">
+  <section class="section section-mercados" id="mercados" data-tab="mercados">
     <div class="container">
       <div class="markets-v2-header">
         <div class="markets-v2-title-block">
@@ -2277,7 +2300,7 @@
         </div>
       </div>
       <div class="dash-grid" id="dashGrid">
-        <div class="dash-card" data-aos="fade-up" data-region="AR" style="--card-accent:#1E3A5F;">
+        <div class="dash-card" data-aos="fade-up" data-region="AR" style="--card-accent:#3B82F6;">
           <div class="dc-top">
             <div class="dc-meta-top"><div class="dc-ticker">MERV</div><div class="dc-name">Merval</div></div>
             <span class="dc-badge">AR</span>
@@ -2294,7 +2317,7 @@
             <div class="dc-meta-item"><span class="dc-meta-label">M&iacute;n</span><span class="dc-meta-val" id="dc-merv-min">&#8212;</span></div>
           </div>
         </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="80" data-region="US" style="--card-accent:#1E5F4E;">
+        <div class="dash-card" data-aos="fade-up" data-aos-delay="80" data-region="US" style="--card-accent:#10B981;">
           <div class="dc-top">
             <div class="dc-meta-top"><div class="dc-ticker">SPX</div><div class="dc-name">S&amp;P 500</div></div>
             <span class="dc-badge">US</span>
@@ -2311,7 +2334,7 @@
             <div class="dc-meta-item"><span class="dc-meta-label">M&iacute;n</span><span class="dc-meta-val" id="dc-spx-min">&#8212;</span></div>
           </div>
         </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="160" data-region="US" style="--card-accent:#2D5F1E;">
+        <div class="dash-card" data-aos="fade-up" data-aos-delay="160" data-region="US" style="--card-accent:#22D3EE;">
           <div class="dc-top">
             <div class="dc-meta-top"><div class="dc-ticker">NDX</div><div class="dc-name">Nasdaq 100</div></div>
             <span class="dc-badge">US</span>
@@ -2328,7 +2351,7 @@
             <div class="dc-meta-item"><span class="dc-meta-label">M&iacute;n</span><span class="dc-meta-val" id="dc-ndx-min">&#8212;</span></div>
           </div>
         </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="240" data-region="CR" style="--card-accent:#8B6914;">
+        <div class="dash-card" data-aos="fade-up" data-aos-delay="240" data-region="CR" style="--card-accent:#F59E0B;">
           <div class="dc-top">
             <div class="dc-meta-top"><div class="dc-ticker">BTC</div><div class="dc-name">Bitcoin</div></div>
             <span class="dc-badge">Crypto</span>
@@ -2345,7 +2368,7 @@
             <div class="dc-meta-item"><span class="dc-meta-label">M&iacute;n</span><span class="dc-meta-val" id="dc-btc-min">&#8212;</span></div>
           </div>
         </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="320" data-region="AR" style="--card-accent:#4A5568;">
+        <div class="dash-card" data-aos="fade-up" data-aos-delay="320" data-region="AR" style="--card-accent:#94A3B8;">
           <div class="dc-top">
             <div class="dc-meta-top"><div class="dc-ticker">MEP</div><div class="dc-name">D&oacute;lar MEP</div></div>
             <span class="dc-badge">AR</span>
@@ -2361,7 +2384,7 @@
             <div class="dc-meta-item"><span class="dc-meta-label">Venta</span><span class="dc-meta-val" id="dc-mep-sell">&#8212;</span></div>
           </div>
         </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="400" data-region="CM" style="--card-accent:#92400E;">
+        <div class="dash-card" data-aos="fade-up" data-aos-delay="400" data-region="CM" style="--card-accent:#F2C94C;">
           <div class="dc-top">
             <div class="dc-meta-top"><div class="dc-ticker">XAU</div><div class="dc-name">Oro</div></div>
             <span class="dc-badge">Commod.</span>
@@ -2513,7 +2536,7 @@
     </div>
   </section>
 
-  <section style="background:#07101E;padding:72px 32px 68px;" id="calendario">
+  <section style="background:#07101E;padding:72px 32px 68px;" id="calendario" data-tab="calendario">
   <div class="container">
     <div class="section-header">
       <span class="section-label">Seguimiento macro</span>
@@ -2568,7 +2591,7 @@
   </div>
 </section>
   <!-- ââ INFORMES âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-<section class="section-informes member-protected locked" id="informes">
+<section class="section-informes" id="informes" data-tab="informes">
       
     <div class="container">
       <div class="section-header">
@@ -2637,7 +2660,7 @@
   </section>
 
   <!-- ââ UNIVERSITY âââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="section section-alt" id="university">
+  <section class="section section-alt" id="university" data-tab="university">
     <div class="container">
       <div class="section-header">
         <span class="section-label">Educación Financiera</span>
@@ -2703,7 +2726,7 @@
 
 
   <!-- ââ INVERSIONES âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="section section-inversiones member-protected locked" id="inversiones">
+  <section class="section section-inversiones member-protected locked" id="inversiones" data-tab="inversiones">
     <div class="container">
       
       <div class="section-header">
@@ -2869,7 +2892,7 @@
   </section>
 
   <!-- ââ ASESORÍA ââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="asesoria-section member-protected locked" id="asesoria">
+  <section class="asesoria-section" id="asesoria" data-tab="asesoria">
       
     <div class="asesoria-inner">
       <div class="asesoria-left">
@@ -9583,16 +9606,14 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
               var _origToggleWarren = window.toggleWarren;
               window.toggleWarren = function() {
                 if (_origToggleWarren) _origToggleWarren.apply(this, arguments);
-                if (window._authChecked && !isMember()) {
+                if (!isMember()) {
                   applyWarrenPaywall();
                 }
               };
 
                             function checkMembership() {
                             if (isMember()) return;
-                            if (!window._authChecked) return;
                             applyPaywall('.picks-list', '#inversiones');
-                            applyPaywall('.papers-grid', '#papersGrid');
                             applyWarrenPaywall();
               }
               window._miCheckMembership = checkMembership;
@@ -10306,5 +10327,62 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
 </script>
 
 <div id="slideWrapper" style="display:none"></div>
+
+<script>
+  // ââ Navegacion por pestanas: una sola seccion visible a la vez âââââââââââ
+  (function() {
+    var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'asesoria'];
+    var TAB_TITLES = {
+      inicio: 'Inicio', mercados: 'Mercados', calendario: 'Calendario Economico',
+      informes: 'Informes & Reportes', university: 'University', inversiones: 'Inversiones',
+      asesoria: 'Asesoria'
+    };
+
+    function resolveTab(hash) {
+      hash = (hash || '').replace('#', '');
+      if (!hash) return 'inicio';
+      if (hash === 'reportes') return 'informes';
+      if (TAB_IDS.indexOf(hash) !== -1) return hash;
+      return 'inicio';
+    }
+
+    function activateTab(tab) {
+      document.querySelectorAll('[data-tab]').forEach(function(el) {
+        el.classList.toggle('tab-hidden', el.getAttribute('data-tab') !== tab);
+      });
+      document.querySelectorAll('[data-tab-target]').forEach(function(el) {
+        el.classList.toggle('tab-nav-active', el.getAttribute('data-tab-target') === tab);
+      });
+      document.title = 'Manfredi Investment' + (TAB_TITLES[tab] ? ' - ' + TAB_TITLES[tab] : '');
+      // AOS ("fade-up al hacer scroll") calcula visibilidad por posicion de
+      // scroll: como las pestanas cambian instantaneo (sin scroll real), los
+      // elementos [data-aos] de una pestana recien mostrada nunca reciben el
+      // trigger de AOS y quedan invisibles. Forzamos el estado "ya animado"
+      // al activar la pestana para que el contenido siempre se vea.
+      document.querySelectorAll('[data-tab="' + tab + '"] [data-aos]').forEach(function(el) {
+        el.classList.add('aos-animate');
+      });
+    }
+
+    function route() {
+      var hash = location.hash;
+      var tab = resolveTab(hash);
+      activateTab(tab);
+      var subTarget = hash.replace('#', '');
+      if (subTarget && subTarget !== tab) {
+        var target = document.getElementById(subTarget);
+        if (target) {
+          requestAnimationFrame(function() { target.scrollIntoView({ block: 'start' }); });
+          return;
+        }
+      }
+      window.scrollTo(0, 0);
+    }
+
+    window.addEventListener('hashchange', route);
+    if (document.readyState !== 'loading') route();
+    else document.addEventListener('DOMContentLoaded', route);
+  })();
+</script>
 </body>
 </html>
