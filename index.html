@@ -612,44 +612,45 @@
       transition: border-color var(--transition);
     }
     .report-card-daily:hover { border-color: rgba(242,201,76,.2); }
-    .terminal-header {
+    .rpt-header {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 13px 20px;
-      border-bottom: 1px solid rgba(255,255,255,.05);
-      background: rgba(0,0,0,.25);
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
     }
-    .terminal-dots { display: flex; gap: 6px; }
-    .terminal-dots span { width: 9px; height: 9px; border-radius: 50%; }
-    .td-red    { background: #FF5F57; }
-    .td-yellow { background: #FEBC2E; }
-    .td-green  { background: #28C840; }
-    .terminal-title {
-      font-size: 10px;
-      font-weight: 500;
-      color: rgba(255,255,255,.22);
-      letter-spacing: .07em;
+    .rpt-header-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: -.01em;
+      color: rgba(255,255,255,.9);
       flex: 1;
-      text-align: center;
-      text-transform: uppercase;
     }
-    .terminal-live {
+    .rpt-header-meta {
+      font-size: 10px;
+      color: rgba(255,255,255,.25);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-right: 4px;
+    }
+    .rpt-live {
       display: flex;
       align-items: center;
       gap: 5px;
       font-size: 10px;
       font-weight: 600;
-      color: var(--green);
+      color: #10B981;
       letter-spacing: .08em;
+      text-transform: uppercase;
     }
-    .terminal-live-dot {
+    .rpt-live-dot {
       width: 5px; height: 5px;
       border-radius: 50%;
-      background: var(--green);
+      background: #10B981;
       animation: pulse 1.5s infinite;
     }
-    .terminal-body { padding: 4px 0; }
+    .rpt-loading-wrap { padding: 4px 0; }
     .feed-item {
       display: flex;
       align-items: flex-start;
@@ -735,44 +736,58 @@
       letter-spacing: .12em;
       text-transform: uppercase;
       color: rgba(255,255,255,.25);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
-    .rpt-kv-grid {
+    .rpt-tiles {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px 16px;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 12px;
     }
-    .rpt-kv {
+    .rpt-tile {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 7px;
+      padding: 14px;
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.05);
     }
-    .rpt-kv-key {
+    .rpt-tile-label {
       font-size: 9.5px;
-      color: rgba(255,255,255,.25);
-      letter-spacing: .06em;
-      text-transform: uppercase;
-    }
-    .rpt-kv-val {
-      font-size: 13px;
       font-weight: 600;
-      color: rgba(255,255,255,.82);
-      font-variant-numeric: tabular-nums;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.35);
     }
-    .rpt-kv-val.up   { color: var(--green); }
-    .rpt-kv-val.down { color: var(--red); }
-    .rpt-kv-val.neut { color: var(--yellow); }
-    .rpt-kv-note {
+    .rpt-tile-value {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 20px;
+      font-weight: 600;
+      color: rgba(255,255,255,.85);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -.01em;
+    }
+    .rpt-tile-value small { font-size: 11px; font-weight: 500; opacity: .8; }
+    .rpt-tile-value.up   { color: #10B981; }
+    .rpt-tile-value.down { color: #EF4444; }
+    .rpt-tile-value.neut { color: var(--yellow); }
+    .rpt-tile-featured {
+      grid-column: span 2;
+      padding: 16px 18px;
+      background: linear-gradient(135deg, rgba(242,201,76,.09), rgba(242,201,76,.02));
+      border-color: rgba(242,201,76,.2);
+    }
+    .rpt-tile-featured .rpt-tile-label { color: rgba(242,201,76,.75); }
+    .rpt-tile-featured .rpt-tile-value { font-size: 28px; }
+    .rpt-tile-note {
       font-size: 11px;
       color: rgba(255,255,255,.35);
       line-height: 1.5;
-      grid-column: 1 / -1;
-      margin-top: 4px;
+      margin-top: 10px;
     }
 
     /* News items */
     .rpt-news-item {
-      padding: 12px 20px;
+      padding: 18px 20px;
       border-bottom: 1px solid rgba(255,255,255,.04);
       display: flex;
       gap: 10px;
@@ -783,21 +798,30 @@
       width: 6px; height: 6px;
       border-radius: 50%;
       flex-shrink: 0;
-      margin-top: 5px;
+      margin-top: 6px;
     }
-    .rpt-news-dot.pos  { background: var(--green); }
-    .rpt-news-dot.neg  { background: var(--red); }
+    .rpt-news-dot.pos  { background: #10B981; }
+    .rpt-news-dot.neg  { background: #EF4444; }
     .rpt-news-dot.neut { background: var(--yellow); }
+    .rpt-news-source {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: rgba(242,201,76,.6);
+      margin-right: 7px;
+    }
     .rpt-news-title {
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 600;
-      color: rgba(255,255,255,.72);
-      margin-bottom: 3px;
+      color: rgba(255,255,255,.78);
+      margin-bottom: 5px;
+      line-height: 1.4;
     }
     .rpt-news-text {
       font-size: 11.5px;
-      color: rgba(255,255,255,.38);
-      line-height: 1.5;
+      color: rgba(255,255,255,.4);
+      line-height: 1.65;
     }
     .rpt-news-badge {
       font-size: 8.5px;
@@ -2697,16 +2721,12 @@
 
         <!-- Card Argentina -->
         <div class="report-card-daily" data-aos="fade-up">
-          <div class="terminal-header">
-            <div class="terminal-dots">
-              <span class="td-red"></span>
-              <span class="td-yellow"></span>
-              <span class="td-green"></span>
-            </div>
-            <span class="terminal-title"><span class="report-country-flag">&#127462;&#127479;</span>argentina &mdash; agente IA</span>
-            <div class="terminal-live"><span class="terminal-live-dot"></span>LIVE</div>
+          <div class="rpt-header">
+            <span class="rpt-header-title"><span class="report-country-flag">&#127462;&#127479;</span>Argentina</span>
+            <span class="rpt-header-meta">Agente IA</span>
+            <div class="rpt-live"><span class="rpt-live-dot"></span>LIVE</div>
           </div>
-          <div class="terminal-body" id="argFeed">
+          <div class="rpt-loading-wrap" id="argFeed">
             <div class="report-loading">Cargando reporte&hellip;</div>
           </div>
           <div class="report-signal" id="argSignal" style="display:none">
@@ -2717,16 +2737,12 @@
 
         <!-- Card Wall Street -->
         <div class="report-card-daily" data-aos="fade-up">
-          <div class="terminal-header">
-            <div class="terminal-dots">
-              <span class="td-red"></span>
-              <span class="td-yellow"></span>
-              <span class="td-green"></span>
-            </div>
-            <span class="terminal-title"><span class="report-country-flag">&#127482;&#127480;</span>wall street &mdash; agente IA</span>
-            <div class="terminal-live"><span class="terminal-live-dot"></span>LIVE</div>
+          <div class="rpt-header">
+            <span class="rpt-header-title"><span class="report-country-flag">&#127482;&#127480;</span>Wall Street</span>
+            <span class="rpt-header-meta">Agente IA</span>
+            <div class="rpt-live"><span class="rpt-live-dot"></span>LIVE</div>
           </div>
-          <div class="terminal-body" id="wsFeed">
+          <div class="rpt-loading-wrap" id="wsFeed">
             <div class="report-loading">Cargando reporte&hellip;</div>
           </div>
           <div class="report-signal" id="wsSignal" style="display:none">
@@ -3209,7 +3225,7 @@
         <div class="rpt-news-item">
           <div class="rpt-news-dot ${dotCls}"></div>
           <div>
-            <div class="rpt-news-title">${n.link ? `<a href="${n.link}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none; border-bottom: 1px solid rgba(184,148,63,0.4);">${n.titulo}</a>` : (n.titulo || '')}${badge ? `<span class="rpt-news-badge ${badgeCls}">${badge}</span>` : ''}</div>
+            <div class="rpt-news-title">${n.fuente ? `<span class="rpt-news-source">${n.fuente}</span>` : ''}${n.link ? `<a href="${n.link}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none; border-bottom: 1px solid rgba(184,148,63,0.4);">${n.titulo}</a>` : (n.titulo || '')}${badge ? `<span class="rpt-news-badge ${badgeCls}">${badge}</span>` : ''}</div>
             <div class="rpt-news-text">${n.resumen || ''}</div>
           </div>
         </div>`;
@@ -3226,25 +3242,28 @@
       <div class="rpt-body">
         <div class="rpt-section">
           <div class="rpt-section-label" style="color: #B8943F;">Tipo de cambio</div>
-          <div class="rpt-kv-grid">
-            <div class="rpt-kv"><span class="rpt-kv-key">Blue</span><span class="rpt-kv-val">${dolar.blue || '&mdash;'}</span></div>
-            <div class="rpt-kv"><span class="rpt-kv-key">Oficial</span><span class="rpt-kv-val">${dolar.oficial || '&mdash;'}</span></div>
-            <div class="rpt-kv"><span class="rpt-kv-key">MEP</span><span class="rpt-kv-val">${dolar.mep || '&mdash;'}</span></div>
-            <div class="rpt-kv"><span class="rpt-kv-key">CCL</span><span class="rpt-kv-val">${dolar.ccl || '&mdash;'}</span></div>
-            ${dolar.brecha ? `<div class="rpt-kv-note">Brecha blue/oficial: <strong>${dolar.brecha}</strong></div>` : ''}
+          <div class="rpt-tiles">
+            <div class="rpt-tile rpt-tile-featured"><span class="rpt-tile-label">Blue</span><span class="rpt-tile-value">${dolar.blue || '&mdash;'}</span></div>
+            <div class="rpt-tile"><span class="rpt-tile-label">Oficial</span><span class="rpt-tile-value">${dolar.oficial || '&mdash;'}</span></div>
+            <div class="rpt-tile"><span class="rpt-tile-label">MEP</span><span class="rpt-tile-value">${dolar.mep || '&mdash;'}</span></div>
+            <div class="rpt-tile"><span class="rpt-tile-label">CCL</span><span class="rpt-tile-value">${dolar.ccl || '&mdash;'}</span></div>
           </div>
+          ${dolar.brecha ? `<div class="rpt-tile-note">Brecha blue/oficial: <strong>${dolar.brecha}</strong></div>` : ''}
         </div>
 
         <div class="rpt-section">
           <div class="rpt-section-label" style="color: #B8943F;">Merval</div>
-          <div class="rpt-kv-grid">
-            <div class="rpt-kv"><span class="rpt-kv-key">Valor</span><span class="rpt-kv-val">${merval.valor ? Number(merval.valor).toLocaleString('es-AR') : '&mdash;'}</span></div>
-            <div class="rpt-kv"><span class="rpt-kv-key">Variación</span><span class="rpt-kv-val ${varMerval}">${merval.variacion || '&mdash;'}</span></div>
-            ${merval.tendencia ? `<div class="rpt-kv-note">${tendIcon} Tendencia ${merval.tendencia}</div>` : ''}
+          <div class="rpt-tiles">
+            <div class="rpt-tile"><span class="rpt-tile-label">Valor</span><span class="rpt-tile-value">${merval.valor ? Number(merval.valor).toLocaleString('es-AR') : '&mdash;'}</span></div>
+            <div class="rpt-tile"><span class="rpt-tile-label">Variación</span><span class="rpt-tile-value ${varMerval}">${merval.variacion || '&mdash;'}</span></div>
           </div>
+          ${merval.tendencia ? `<div class="rpt-tile-note">${tendIcon} Tendencia ${merval.tendencia}</div>` : ''}
         </div>
 
-        ${renderNoticias(d.noticias, 'impacto')}
+        <div class="rpt-section" style="border-bottom:none">
+          <div class="rpt-section-label">Noticias</div>
+          ${renderNoticias(d.noticias, 'impacto')}
+        </div>
 
       </div>`;
   }
@@ -3260,21 +3279,21 @@
       <div class="rpt-body">
         <div class="rpt-section">
           <div class="rpt-section-label" style="color: #B8943F;">Índices</div>
-          <div class="rpt-kv-grid">
-            <div class="rpt-kv"><span class="rpt-kv-key">S&amp;P 500</span><span class="rpt-kv-val ${varClass(sp.variacion)}">${sp.valor ? Number(sp.valor).toLocaleString('en-US') : '&mdash;'} <small style="font-size:10px">${sp.variacion || ''}</small></span></div>
-            <div class="rpt-kv"><span class="rpt-kv-key">Dow Jones</span><span class="rpt-kv-val ${varClass(dw.variacion)}">${dw.valor ? Number(dw.valor).toLocaleString('en-US') : '&mdash;'} <small style="font-size:10px">${dw.variacion || ''}</small></span></div>
-            <div class="rpt-kv"><span class="rpt-kv-key">Nasdaq</span><span class="rpt-kv-val ${varClass(nq.variacion)}">${nq.valor ? Number(nq.valor).toLocaleString('en-US') : '&mdash;'} <small style="font-size:10px">${nq.variacion || ''}</small></span></div>
-            <div class="rpt-kv"><span class="rpt-kv-key">T10 Yield</span><span class="rpt-kv-val ${varClass(bonos.lectura === 'subiendo' ? '+' : bonos.lectura === 'bajando' ? '-' : '')}">${bonos.t10_yield || '&mdash;'}</span></div>
+          <div class="rpt-tiles">
+            <div class="rpt-tile rpt-tile-featured"><span class="rpt-tile-label">S&amp;P 500</span><span class="rpt-tile-value ${varClass(sp.variacion)}">${sp.valor ? Number(sp.valor).toLocaleString('en-US') : '&mdash;'} <small>${sp.variacion || ''}</small></span></div>
+            <div class="rpt-tile"><span class="rpt-tile-label">Dow Jones</span><span class="rpt-tile-value ${varClass(dw.variacion)}">${dw.valor ? Number(dw.valor).toLocaleString('en-US') : '&mdash;'} <small>${dw.variacion || ''}</small></span></div>
+            <div class="rpt-tile"><span class="rpt-tile-label">Nasdaq</span><span class="rpt-tile-value ${varClass(nq.variacion)}">${nq.valor ? Number(nq.valor).toLocaleString('en-US') : '&mdash;'} <small>${nq.variacion || ''}</small></span></div>
+            <div class="rpt-tile"><span class="rpt-tile-label">T10 Yield</span><span class="rpt-tile-value ${varClass(bonos.lectura === 'subiendo' ? '+' : bonos.lectura === 'bajando' ? '-' : '')}">${bonos.t10_yield || '&mdash;'}</span></div>
           </div>
-          ${bonos.nota ? `<div class="rpt-kv-note" style="margin-top:8px">${bonos.nota}</div>` : ''}
+          ${bonos.nota ? `<div class="rpt-tile-note">${bonos.nota}</div>` : ''}
         </div>
 
         <div class="rpt-section">
           <div class="rpt-section-label" style="color: #B8943F;">Commodities</div>
-          <div class="rpt-kv-grid">
-            ${comm.soja ? `<div class="rpt-kv"><span class="rpt-kv-key">Soja</span><span class="rpt-kv-val ${varClass(comm.soja.variacion)}">${comm.soja.precio || '&mdash;'} <small style="font-size:10px">${comm.soja.variacion || ''}</small></span></div>` : ''}
-            ${comm.wti  ? `<div class="rpt-kv"><span class="rpt-kv-key">WTI</span><span class="rpt-kv-val ${varClass(comm.wti.variacion)}">${comm.wti.precio || '&mdash;'} <small style="font-size:10px">${comm.wti.variacion || ''}</small></span></div>` : ''}
-            ${comm.oro  ? `<div class="rpt-kv"><span class="rpt-kv-key">Oro</span><span class="rpt-kv-val ${varClass(comm.oro.variacion)}">${comm.oro.precio || '&mdash;'} <small style="font-size:10px">${comm.oro.variacion || ''}</small></span></div>` : ''}
+          <div class="rpt-tiles">
+            ${comm.soja ? `<div class="rpt-tile"><span class="rpt-tile-label">Soja</span><span class="rpt-tile-value ${varClass(comm.soja.variacion)}">${comm.soja.precio || '&mdash;'} <small>${comm.soja.variacion || ''}</small></span></div>` : ''}
+            ${comm.wti  ? `<div class="rpt-tile"><span class="rpt-tile-label">WTI</span><span class="rpt-tile-value ${varClass(comm.wti.variacion)}">${comm.wti.precio || '&mdash;'} <small>${comm.wti.variacion || ''}</small></span></div>` : ''}
+            ${comm.oro  ? `<div class="rpt-tile"><span class="rpt-tile-label">Oro</span><span class="rpt-tile-value ${varClass(comm.oro.variacion)}">${comm.oro.precio || '&mdash;'} <small>${comm.oro.variacion || ''}</small></span></div>` : ''}
           </div>
         </div>
 
@@ -3284,7 +3303,10 @@
           <div style="font-size:12px;color:rgba(255,255,255,.45);line-height:1.6">${d.impacto_argentina}</div>
         </div>` : ''}
 
-        ${renderNoticias(d.noticias, 'relevancia')}
+        <div class="rpt-section" style="border-bottom:none">
+          <div class="rpt-section-label">Noticias</div>
+          ${renderNoticias(d.noticias, 'relevancia')}
+        </div>
 
       </div>`;
   }
