@@ -3313,12 +3313,25 @@
 
   async function loadDailyReports() {
     try {
-      const [argRes, wsRes] = await Promise.all([
+      const [argRes, wsRes, noticiasRes] = await Promise.all([
         fetch('reports/argentina.json?t=' + Date.now()),
         fetch('reports/wallstreet.json?t=' + Date.now()),
+        fetch('https://manfredi-noticias.nachito2502.workers.dev/noticias', { signal: AbortSignal.timeout(8000) }).catch(() => null),
       ]);
       const argData = await argRes.json();
       const wsData  = await wsRes.json();
+
+      // Noticias frescas (TTL 30-60min) del Worker dedicado; si falla, quedan
+      // las que ya trae reports/*.json (generadas por update_reports.py).
+      if (noticiasRes && noticiasRes.ok) {
+        try {
+          const noticiasData = await noticiasRes.json();
+          if (Array.isArray(noticiasData.argentina) && noticiasData.argentina.length) argData.noticias = noticiasData.argentina;
+          if (Array.isArray(noticiasData.wallstreet) && noticiasData.wallstreet.length) wsData.noticias = noticiasData.wallstreet;
+        } catch (e) {
+          console.warn('[MI] Noticias worker devolvió datos inválidos:', e.message);
+        }
+      }
 
       const argFeed = document.getElementById('argFeed');
       const wsFeed  = document.getElementById('wsFeed');
