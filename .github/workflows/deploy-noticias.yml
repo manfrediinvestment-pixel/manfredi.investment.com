@@ -12,7 +12,17 @@ jobs:
     name: Deploy Noticias Worker
     steps:
       - uses: actions/checkout@v4
+      - name: Verificar que el KV namespace este configurado
+        id: check
+        run: |
+          if grep -q 'REEMPLAZAR_CON_ID_REAL' workers/noticias/wrangler.toml; then
+            echo "::warning::NOTICIAS_KV todavia no tiene un id real en workers/noticias/wrangler.toml -- se salta el deploy. Corre 'wrangler kv namespace create NOTICIAS_KV' y pega el id para activarlo."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
       - uses: cloudflare/wrangler-action@v3
+        if: steps.check.outputs.skip == 'false'
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
