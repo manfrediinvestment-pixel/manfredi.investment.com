@@ -1,0 +1,62 @@
+# Backlog — Manfredi Investment
+
+Lista viva de pendientes: bugs, mejoras de diseño, decisiones de producto sin resolver y features a futuro. Se actualiza cada vez que aparece algo nuevo mientras se trabaja en otra tarea, no solo se menciona en el chat.
+
+Formato por item: descripción corta · prioridad (alta/media/baja) · estado (pendiente/en progreso/hecho).
+
+---
+
+## Decisiones de producto
+
+| # | Descripción | Prioridad | Estado |
+|---|---|---|---|
+| 1 | **Login gate**: se sacó el modal de login a pantalla completa. Ahora el login solo se pide de forma contextual al entrar a contenido premium (Inversiones, Warren), vía el gate suave existente (preview parcial + tarjeta de suscripción). Informes y Asesoría pasaron a ser 100% libres (decisión explícita, ya no son premium). Queda un botón discreto "Ingresar" en el navbar. | Alta | Hecho |
+| 2 | Manfredi University: decidir si mantiene fondo claro/editorial como excepción intencional al resto del sitio (terminal oscuro) o si se unifica también. No es automático, requiere decisión explícita. | Media | Pendiente |
+
+## Bugs
+
+| # | Descripción | Prioridad | Estado |
+|---|---|---|---|
+| 3 | Modal de login (`#loginOverlay`) aparecía automáticamente a pantalla completa al hacer scroll como guest. Se eliminó el trigger por scroll y el intercept de clicks en nav — el login ahora es siempre voluntario o contextual a contenido premium. | Media | Hecho |
+| 4 | Contenido de curso duplicado: bloques de "Calculá tu presupuesto en dólares CCL..." y cards de ahorro para el retiro aparecen dos veces en `index.html` (líneas ~4527/6838 y ~4616/6927). | Baja | Pendiente |
+| 5 | Encoding roto en íconos de `CAL_DETAILS` (calendario económico) | Alta | Hecho |
+| 20 | Encoding roto en el modal de pago: botón "Pagar con Mercado Pago" y aviso de seguridad se veían con mojibake (mismo bug que el ítem 5, en otra parte del archivo). Encontrado al validar visualmente el nuevo CTA de membresía. | Alta | Hecho |
+| 25 | Modal de membresía (`#paymentOverlay`) renderizaba título/precio/botón duplicados y superpuestos. Causa real: CSS corrupto (llaves de cierre faltantes en `.instrument-card`/`.instrument-icon` + una llave de más en `.member-lock-fine`) hacía que el parser del navegador descartara las reglas reales de `.payment-overlay`/`.payment-modal-box` como parte de un selector anidado inválido — el modal solo se veía "andando" por una regla `.payment-overlay.open` duplicada y mal ubicada dentro del CSS de `.feed-item` (que además forzaba `.feed-item{display:none}` sitewide). Se corrigieron ambas corrupciones y se eliminó la regla duplicada. | Alta | Hecho |
+| 26 | Efecto colateral del ítem 25: al arreglar el CSS corrupto se reactivó sin querer un sistema de blur/paywall legacy (`.member-protected.locked::after` + `.member-lock-*`, sin contraparte en el HTML actual) que duplicaba el gate de Inversiones/Warren por encima del sistema real (JS `applyPaywall`/`paywallCardHTML`), volviendo a blurear título y aviso legal que debían quedar visibles (ver ítem 18). Detectado al validar con Playwright antes de dar por cerrado el ítem 25. Se eliminó el CSS legacy. | Alta | Hecho |
+| 27 | `--font-display` y `--bg-card` se usaban en varias reglas (modal de pago, member-lock, etc.) pero nunca estaban definidas en `:root` — caían silenciosamente al valor por defecto del navegador. Se definieron ambas. | Media | Hecho |
+| 28 | Filtros de Mercados (AR/US/Crypto/Commod.): las 6 tarjetas superiores (`dash-grid`) nunca se filtraban al tocar un tab — no había JS para eso, solo las tablas de abajo reaccionaban, dando la sensación de layout "congelado". Además, cuando un filtro dejaba una sola tarjeta visible en un grid de 2 columnas fijas, la columna vacía no colapsaba y quedaba un hueco grande sin usar. Se agregó filtrado por `data-region` a las dash-cards y se pasó `.dash-grid`/`.at-grid` a `auto-fit`/flex con columnas con clase propia (`.at-col`) que colapsan cuando quedan vacías. | Alta | Hecho |
+| 29 | Errores de consola pre-existentes (no introducidos en esta sesión, detectados al validar con Playwright): `RSFP`/`RSIB`/`RSMA` (renderers de cursos de University) tiran `TypeError: Cannot set properties of null (setting 'innerHTML')` al navegar — mismo tipo de bug que ya se había parchado parcialmente para otros cursos (`slideWrapper`, ver historial de commits) pero no para estos tres. Sparklines de picks con paths SVG inválidos (`<path d="...">` cortado) también tiran error de consola. No se tocó en esta sesión, fuera de alcance de las tareas pedidas. | Media | Pendiente |
+
+## Diseño
+
+| # | Descripción | Prioridad | Estado |
+|---|---|---|---|
+| 6 | Migrar `#mercados` a fondo oscuro, consistente con Informes/Warren/Inversiones. Incluyó reajustar los colores de acento de las dash-cards (MERV, SPX, NDX, BTC, MEP, XAU) que eran ilegibles sobre navy oscuro. | Alta | Hecho |
+| 19 | Navegación por pestañas: una sola sección visible a la vez (Inicio/Mercados/Calendario/Informes/University/Inversiones/Asesoría), con hash propio por sección (`#mercados`, etc.), botón atrás y deep-links funcionando. Se encontró y corrigió un bug de integración con AOS (animaciones fade-up) que dejaba el contenido de una pestaña recién activada invisible. | Alta | Hecho |
+| 7 | Consolidar tipografía serif: eliminar el único uso de `Playfair Display` (`.mi-ticker`) y reemplazar por `DM Serif Display`; borrar `@import` de `Inter` (no se usa en ningún selector). | Media | Pendiente |
+| 8 | Extender `IBM Plex Mono` a todo número en tabla/card del resto del sitio (precios de mercado, KPIs de calendario, precios de picks) — hoy solo vive en el modal de tesis de acciones. | Media | Pendiente |
+| 9 | Auditar y reemplazar hex literales sueltos por tokens (`--gold`, `--primary`, etc.), adoptando la escalera de navys del modal `.mi-*` (`#07101E → #0A0F1E → #0a1525 → #0C1828 → #1a2f4a`) como sistema único de elevación. **Hallazgo relacionado (2026-07-22):** hay un segundo bloque `:root` (dentro del CSS de los cursos de University, ~línea 4119) que redefine `--red`/`--green`/`--border` con tonos apagados (`#991b1b`/`#166534`) pensados solo para esos cursos, pero como `:root` es global, esos valores pisan a los `--red`/`--green` reales (`#EF4444`/`#10B981`) en **todo el sitio** — confirmado que esto afectaba el color de `.spot-chg` (filas de precios del hero) y se corrigió puntualmente ahí con hex directo. Sigue pendiente escopar ese segundo `:root` (ej. a `.app`/`.course-modal`) para no tener que parchear cada uso de `var(--red)`/`var(--green)` uno por uno. | Alta | Pendiente |
+| 10 | Sistema de "flash on update" para datos en vivo (precios, KPIs): flash breve de color direccional al cambiar un valor, decae en ~600–900ms, sobre tabular-nums para que no salte el ancho. Implementado para el número de Riesgo País del hero (ítem 31); falta extender a Mercados/Calendario/resto del sitio. | Alta | En progreso |
+| 11 | Soporte de `prefers-reduced-motion` — ausente en todo el CSS. Agregado para las animaciones nuevas del hero (flash de Riesgo País, hover magnético del CTA); falta auditar y agregar al resto del sitio. | Baja | En progreso |
+| 12 | Letter-spacing progresivo por tamaño de tipografía (hoy ad-hoc, sin regla consistente). | Baja | Pendiente |
+| 21 | Estado activo de las pestañas de nav: pasa de texto dorado + subrayado a un pill con borde/texto azul, igual que el botón "Asesoría" del navbar. | Media | Hecho |
+| 22 | Botón "Ingresar" del navbar: pasa de ghost dorado improvisado a outline consistente con el resto de los botones del sitio (colores neutros, no dorado). | Media | Hecho |
+| 23 | Hero / "Mercados ahora": se sacaron los íconos de bandera/emoji por fila y se reemplazaron por un acento de color fino (reusa la paleta ya definida en Mercados: MERV azul, SPX verde, BTC ámbar, MEP gris). Ticker a IBM Plex Mono. | Media | Hecho |
+| 24 | Franja "+10 Reportes Diarios / +25 Activos..." eliminada de la home; reemplazada por un banner de membresía (Warren + Inversiones) con CTA a `openPaymentModal()`. | Alta | Hecho |
+| 30 | Rediseño del modal de membresía (fintech premium, post fix del ítem 25): eyebrow + headline propio ("Todo el análisis, sin límites"), un solo precio destacado, lista de 3 beneficios concretos con check en vez del precio suelto, un solo CTA dorado principal ("Suscribirme ahora") y Mercado Pago degradado a aviso de pago seguro secundario (ya no un botón que compite visualmente con el precio). | Alta | Hecho |
+| 31 | Rediseño de la pantalla principal (hero): headline más grande y con más aire (clamp 44–76px, tracking -0.02em, sin salto de línea forzado). La tarjeta "Mercados ahora" pasa de 4 filas parejas a un número hero — Riesgo País (EMBI+), a pedido explícito en vez de Merval/S&P — con gráfico de área de datos históricos reales (`api.argentinadatos.com`, no hardcodeado) + 3 filas secundarias (Merval, S&P 500, Bitcoin). Flash direccional de color al actualizar el valor (rojo si sube el riesgo, verde si baja) refrescado cada 90s. Micro-interacción magnética en el CTA principal, acotada a ese único botón. | Alta | Hecho |
+
+## Features futuros
+
+| # | Descripción | Prioridad | Estado |
+|---|---|---|---|
+| 13 | Dashboard personalizado / watchlist: usuario logueado fija 5-8 activos de las tablas de Mercados, persistidos por usuario, mostrados primero. | Media | Pendiente |
+| 14 | Command palette (⌘K) para búsqueda global sobre calendario, tablas, informes, picks y cursos. | Media | Pendiente |
+| 15 | Sparklines reales con Chart.js en picks de Inversiones (hoy son `<polyline>` con puntos hardcodeados, no representan datos reales). | Media | Pendiente |
+| 16 | Rediseño de jerarquía tipográfica del modal de tesis de acciones (mismo contenido, un número hero por vista). | Media | Pendiente |
+| 17 | Sistema de alertas/notificaciones (ej. "avisame si el riesgo país cambia más de X" o antes de un evento del calendario). | Media | Pendiente |
+| 18 | Paywall más honesto con preview real: Inversiones ya mostraba el primer pick sin blur + tarjeta de suscripción; ese mismo gate ahora también se aplica a Warren (antes no se activaba para usuarios anónimos que nunca habían intentado loguearse). Informes/Asesoría dejaron de necesitarlo al pasar a ser libres (ver item 1). | Media | Hecho |
+
+---
+
+Detalle y justificación de cada item en `REDESIGN_PLAN.md`. Este archivo es el índice accionable; el plan es el research/racional detrás.

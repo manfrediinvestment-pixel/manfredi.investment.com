@@ -24,6 +24,8 @@
       --red:         #EF4444;
       --yellow:      #F59E0B;
       --transition:  .2s cubic-bezier(.4,0,.2,1);
+      --font-display:'DM Serif Display', Georgia, serif;
+      --bg-card:     #0D1526;
     }
 
     html { scroll-behavior: smooth; }
@@ -128,7 +130,9 @@
       font-weight: 500;
       color: var(--text-sec);
       cursor: pointer;
-      transition: color var(--transition);
+      border: 1px solid transparent;
+      border-radius: 20px;
+      transition: color var(--transition), background var(--transition), border-color var(--transition);
       white-space: nowrap;
       letter-spacing: .01em;
     }
@@ -211,6 +215,19 @@
       font-family: 'IBM Plex Sans', sans-serif;
     }
     .btn-cta:hover { background: transparent; color: var(--primary); }
+    .nav-login-btn {
+      background: transparent;
+      color: var(--primary);
+      padding: 9px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: background var(--transition), color var(--transition), border-color var(--transition);
+      letter-spacing: .02em;
+      font-family: 'IBM Plex Sans', sans-serif;
+    }
+    .nav-login-btn:hover { background: var(--primary); color: var(--white); border-color: var(--primary); }
 
     /* âââ HERO ââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .hero {
@@ -277,7 +294,7 @@
       font-weight: 600;
       cursor: pointer;
       border: 1px solid var(--white);
-      transition: background var(--transition), color var(--transition);
+      transition: background var(--transition), color var(--transition), transform .2s cubic-bezier(.34,1.56,.64,1);
       font-family: 'IBM Plex Sans', sans-serif;
       letter-spacing: .02em;
     }
@@ -297,40 +314,89 @@
     .btn-outline:hover { border-color: rgba(255,255,255,.5); color: rgba(255,255,255,.9); }
 
     /* âââ STATS STRIP âââââââââââââââââââââââââââââââââââââââââââââ */
-    .stats-strip {
-      background: var(--white);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 40px 32px;
+    .membership-promo {
+      background: var(--primary);
+      padding: 64px 32px;
     }
-    .stats-grid {
+    .mp-inner {
       max-width: 1200px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 48px;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(242,201,76,.06), rgba(242,201,76,0) 60%), rgba(255,255,255,.03);
+      border: 1px solid rgba(242,201,76,.22);
+      border-radius: 16px;
+      padding: 44px 48px;
     }
-    .stat-item {
-      padding: 0 32px;
-      border-right: 1px solid var(--border);
-    }
-    .stat-item:first-child { padding-left: 0; }
-    .stat-item:last-child  { border-right: none; }
-    .stat-item h3 {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: 36px;
-      font-weight: 400;
-      color: var(--primary);
-      letter-spacing: -.01em;
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-    .stat-item p {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-sec);
-      letter-spacing: .06em;
+    .mp-eyebrow {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
       text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+    .mp-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: clamp(24px, 2.6vw, 32px);
+      font-weight: 400;
+      color: var(--white);
+      line-height: 1.25;
+      letter-spacing: -.01em;
+      max-width: 480px;
+      margin-bottom: 14px;
+    }
+    .mp-sub {
+      font-size: 14.5px;
+      color: rgba(255,255,255,.6);
+      line-height: 1.65;
+      max-width: 440px;
+      margin-bottom: 28px;
+    }
+    .mp-cta {
+      background: var(--gold);
+      color: var(--primary);
+      border: 1px solid var(--gold);
+      padding: 14px 26px;
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      cursor: pointer;
+      border-radius: 6px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .mp-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .mp-right { display: flex; flex-direction: column; gap: 14px; }
+    .mp-feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .mp-feature-icon {
+      flex: none;
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: rgba(242,201,76,.12);
+      border: 1px solid rgba(242,201,76,.3);
+      color: var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 15px;
+    }
+    .mp-feature-text { display: flex; flex-direction: column; gap: 3px; }
+    .mp-feature-text strong { font-size: 13.5px; font-weight: 600; color: var(--white); }
+    .mp-feature-text span { font-size: 12px; color: rgba(255,255,255,.5); line-height: 1.5; }
+    @media(max-width:860px) {
+      .mp-inner { grid-template-columns: 1fr; padding: 32px 24px; }
+      .mp-title, .mp-sub { max-width: 100%; }
     }
 
     /* âââ SECTIONS ââââââââââââââââââââââââââââââââââââââââââââââââ */
@@ -590,19 +656,7 @@
       gap: 12px;
       padding: 13px 20px;
       border-bottom: 1px solid rgba(255,255,255,.04);
-    display: none;
-    }
-        .payment-overlay.open {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 1;
-  pointer-events: auto;
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: rgba(0,0,0,0.85);
-}transition: background var(--transition);
+      transition: background var(--transition);
     }
     .feed-item:last-child { border-bottom: none; }
     .feed-item:hover { background: rgba(255,255,255,.02); }
@@ -1366,9 +1420,6 @@
     }
     @media (max-width: 768px) {
       .footer-grid { grid-template-columns: 1fr 1fr; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .stat-item { padding: 20px 0; border-right: none; border-bottom: 1px solid var(--border); }
-      .stat-item:last-child, .stat-item:nth-child(even) { border-right: none; }
     }
     @media (max-width: 480px) {
       .footer-grid { grid-template-columns: 1fr; }
@@ -1376,7 +1427,6 @@
       .hero { padding: 72px 20px 64px; }
       .section { padding: 64px 20px; }
       .nav-links { display: none; }
-      .stats-grid { grid-template-columns: 1fr; }
       .markets-table thead th:nth-child(4),
       .markets-table td:nth-child(4) { display: none; }
     }
@@ -1413,18 +1463,24 @@
     .instrument-tag.high{background:#fee2e2;color:#991b1b;}
 
 
-    /* âââ INVERSIONES ââââââââââââââââââââââââââââââââââââââââââââ */
+    /* âââ INVERSIONES (dark, terminal-consistent) âââ */
+    .section-inversiones {
+      background: #07101E;
+      position: relative;
+    }
+    .section-inversiones .section-title { color: var(--white); }
+    .section-inversiones .section-sub   { color: rgba(255,255,255,.38); }
     .inv-disclaimer {
       display: flex;
       gap: 10px;
       align-items: flex-start;
-      background: #FFFBEB;
+      background: rgba(217,119,6,.08);
       border-left: 3px solid #D97706;
       padding: 10px 16px;
       border-radius: 0 8px 8px 0;
       margin-bottom: 32px;
       font-size: 12px;
-      color: #92400E;
+      color: #E8B968;
       line-height: 1.55;
     }
     .picks-list {
@@ -1433,20 +1489,20 @@
       gap: 12px;
     }
     .pick-card {
-      background: var(--white);
-      border: 1px solid var(--border);
+      background: #0C1828;
+      border: 1px solid rgba(255,255,255,.08);
       border-radius: 16px;
       padding: 20px 24px;
       display: flex;
       align-items: center;
       gap: 18px;
-      transition: box-shadow .2s, transform .2s, border-color .2s;
+      transition: background .2s, transform .2s, border-color .2s;
       cursor: pointer;
     }
     .pick-card:hover {
-      box-shadow: 0 8px 24px rgba(10,15,30,.08);
+      background: #0F1E32;
       transform: translateY(-2px);
-      border-color: #c8d0e0;
+      border-color: rgba(242,201,76,.25);
     }
     .pick-accent {
       width: 4px;
@@ -1461,12 +1517,13 @@
     .pick-ticker {
       font-size: 16px;
       font-weight: 700;
-      color: var(--primary);
+      color: #F5F7FA;
       letter-spacing: .03em;
+      font-family: 'IBM Plex Mono', monospace;
     }
     .pick-name {
       font-size: 12px;
-      color: var(--text-sec);
+      color: rgba(255,255,255,.45);
       margin-top: 1px;
     }
     .pick-tag {
@@ -1478,8 +1535,8 @@
       letter-spacing: .06em;
       text-transform: uppercase;
     }
-    .pick-tag-us { background: #EFF6FF; color: #1D4ED8; }
-    .pick-tag-ar { background: #F0FDF4; color: #166534; }
+    .pick-tag-us { background: rgba(59,130,246,.12); color: #60A5FA; }
+    .pick-tag-ar { background: rgba(16,185,129,.12); color: #34D399; }
     .pick-sparkline { flex-shrink: 0; opacity: .85; }
     .pick-card:hover .pick-sparkline { opacity: 1; }
     .pick-right {
@@ -1497,33 +1554,33 @@
       border-radius: 4px;
       text-transform: uppercase;
     }
-    .pick-sentiment.bull { background: #DCFCE7; color: #166534; }
-    .pick-sentiment.bear { background: #FEE2E2; color: #991B1B; }
-    .pick-sentiment.neutral { background: #F1F5F9; color: #475569; }
+    .pick-sentiment.bull { background: rgba(16,185,129,.15); color: #10B981; border: 1px solid rgba(16,185,129,.25); }
+    .pick-sentiment.bear { background: rgba(239,68,68,.15); color: #EF4444; border: 1px solid rgba(239,68,68,.25); }
+    .pick-sentiment.neutral { background: rgba(255,255,255,.06); color: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.12); }
     .pick-btn {
       flex-shrink: 0;
       font-size: 11px;
       font-weight: 600;
       letter-spacing: .04em;
       padding: 8px 18px;
-      background: var(--primary);
-      color: var(--white);
-      border: none;
+      background: transparent;
+      color: var(--gold);
+      border: 1px solid rgba(242,201,76,.35);
       border-radius: 8px;
       cursor: pointer;
       font-family: 'IBM Plex Sans', sans-serif;
-      transition: opacity .2s;
+      transition: background .2s, color .2s, border-color .2s;
       text-decoration: none;
       display: inline-block;
     }
-    .pick-btn:hover { opacity: .85; }
+    .pick-btn:hover { background: var(--gold); color: var(--primary); border-color: var(--gold); }
     .pick-coming {
-      border: 1px dashed var(--border);
+      border: 1px dashed rgba(255,255,255,.15);
       border-radius: 16px;
       padding: 18px 24px;
       text-align: center;
       font-size: 12px;
-      color: var(--text-sec);
+      color: rgba(255,255,255,.35);
       font-style: italic;
     }
 
@@ -1686,27 +1743,22 @@
     @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
     .spot-row {
       display: grid;
-      grid-template-columns: 36px 1fr 80px 72px;
+      grid-template-columns: 1fr 80px 72px;
       align-items: center;
       gap: 8px;
-      padding: 10px 0;
+      padding: 11px 0 11px 12px;
       border-bottom: 1px solid rgba(255,255,255,.05);
+      border-left: 3px solid var(--spot-accent, rgba(255,255,255,.15));
+      transition: background var(--transition);
     }
+    .spot-row:hover { background: rgba(255,255,255,.025); }
     .spot-row:last-child { border-bottom: none; }
-    .spot-region {
-      width: 34px; height: 34px;
-      border-radius: 8px;
-      background: rgba(255,255,255,.07);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-    }
     .spot-ticker {
-      font-size: 12px;
-      font-weight: 700;
-      color: rgba(255,255,255,.9);
-      letter-spacing: .04em;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: rgba(255,255,255,.92);
+      letter-spacing: .02em;
     }
     .spot-fullname {
       font-size: 10px;
@@ -1729,18 +1781,50 @@
       display: block;
       text-align: right;
     }
-    .spot-chg.up { color: var(--green); }
-    .spot-chg.down { color: var(--red); }
+    .spot-chg.up { color: #10B981; }
+    .spot-chg.down { color: #EF4444; }
     .spotlight-foot {
       margin-top: 16px;
       font-size: 10px;
       color: rgba(255,255,255,.25);
       text-align: center;
     }
+    .spot-feature {
+      padding: 2px 4px 18px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .spot-feature-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+    .spot-feature-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+    .spot-feature-label em { font-style: normal; color: rgba(255,255,255,.32); font-weight: 500; margin-left: 4px; }
+    .spot-feature-chg { font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .spot-feature-chg.up { color: #EF4444; }
+    .spot-feature-chg.down { color: #10B981; }
+    .spot-feature-value {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 40px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1;
+      letter-spacing: -.01em;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      transition: background-color .15s ease-out;
+    }
+    .spot-feature-value.flash-up { animation: flash-red 900ms ease-out; }
+    .spot-feature-value.flash-down { animation: flash-green 900ms ease-out; }
+    @keyframes flash-red { 0% { background-color: rgba(239,68,68,.28); } 100% { background-color: transparent; } }
+    @keyframes flash-green { 0% { background-color: rgba(16,185,129,.28); } 100% { background-color: transparent; } }
+    .spot-feature-chart { width: 100%; height: 80px; display: block; overflow: visible; }
     @media(max-width:900px){
       .hero-v2-inner { grid-template-columns: 1fr; }
       .hero-v2-right { justify-content: center; }
       .spotlight-card { max-width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .spot-feature-value.flash-up, .spot-feature-value.flash-down { animation: none; }
+      #heroCta { transform: none !important; }
     }
     /* PPP FILTER TABS PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP */
     .filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -1761,11 +1845,10 @@
     /* PPP DASH CARDS PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP */
     .dash-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 16px;
       margin-bottom: 32px;
     }
-    @media(max-width:900px){ .dash-grid { grid-template-columns: repeat(2,1fr); } }
     @media(max-width:560px){ .dash-grid { grid-template-columns: 1fr; } }
     .dash-card {
       background: var(--white);
@@ -1792,8 +1875,9 @@
     .dc-meta-label { font-size: 9.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--text-sec); }
     .dc-meta-val { font-size: 11.5px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
     /* PPP AT-CARDS (TABLES) PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP */
-    .at-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 8px; }
-    @media(max-width:760px){ .at-grid { grid-template-columns: 1fr; } }
+    .at-grid { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 8px; }
+    .at-col { display: flex; flex-direction: column; gap: 20px; flex: 1 1 460px; }
+    @media(max-width:760px){ .at-col { flex-basis: 100% !important; } }
     .at-card { background: var(--white); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
     .at-head { background: var(--primary); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
     .at-head-title { font-size: 13px; font-weight: 600; color: var(--white); display: flex; align-items: center; gap: 8px; }
@@ -1819,7 +1903,43 @@
     .markets-v2-live { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--green); background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.2); border-radius: 20px; padding: 4px 10px; margin-bottom: 10px; }
     .markets-v2-live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse-dot 1.4s ease-in-out infinite; }
 
-  
+    /* PPP MERCADOS oscuro terminal, consistente con Informes/Warren/Inversiones PPP */
+    .section-mercados { background: #07101E; position: relative; }
+    .section-mercados .section-title { color: var(--white); }
+    .section-mercados .section-sub   { color: rgba(255,255,255,.38); }
+    .section-mercados .f-tab { background: transparent; border-color: rgba(255,255,255,.15); color: rgba(255,255,255,.55); }
+    .section-mercados .f-tab:hover { border-color: rgba(242,201,76,.4); color: var(--gold); }
+    .section-mercados .f-tab.active { background: var(--gold); border-color: var(--gold); color: var(--primary); }
+    .section-mercados .dash-card { background: #0C1828; border: 1px solid rgba(255,255,255,.08); border-left: 4px solid var(--card-accent, #6B7280); }
+    .section-mercados .dash-card:hover { box-shadow: none; background: #0F1E32; }
+    .section-mercados .dash-card.pos { border: 1px solid rgba(16,185,129,.25); border-left: 4px solid var(--card-accent, #6B7280); }
+    .section-mercados .dash-card.neg { border: 1px solid rgba(239,68,68,.25); border-left: 4px solid var(--card-accent, #6B7280); }
+    .section-mercados .dc-ticker { color: rgba(255,255,255,.45); }
+    .section-mercados .dc-name { color: var(--white); }
+    .section-mercados .dc-badge { background: rgba(255,255,255,.07); color: rgba(255,255,255,.55); }
+    .section-mercados .dc-price { color: var(--white); }
+    .section-mercados .dc-meta-label { color: rgba(255,255,255,.32); }
+    .section-mercados .dc-meta-val { color: rgba(255,255,255,.7); }
+    .section-mercados .at-card { background: #0C1828; border: 1px solid rgba(255,255,255,.08); }
+    .section-mercados .at-cols { background: rgba(255,255,255,.03); border-bottom: 1px solid rgba(255,255,255,.06); }
+    .section-mercados .at-col-label { color: rgba(255,255,255,.32); }
+    .section-mercados .at-row { border-bottom: 1px solid rgba(255,255,255,.06); }
+    .section-mercados .at-row:hover { background: rgba(255,255,255,.03); }
+    .section-mercados .at-row:nth-child(even) { background: rgba(255,255,255,.015); }
+    .section-mercados .at-ticker, .section-mercados .at-name-main, .section-mercados .at-price { color: var(--white); font-family: 'IBM Plex Mono', monospace; }
+    .section-mercados .at-fullname { color: rgba(255,255,255,.4); }
+    .section-mercados .last-updated { color: rgba(255,255,255,.32) !important; }
+    .section-mercados #apiStatus { color: rgba(255,255,255,.5); }
+
+    /* PPP NAVEGACION POR PESTANAS: una seccion visible a la vez PPP */
+    [data-tab].tab-hidden { display: none !important; }
+    .nav-link.tab-nav-active {
+      color: #60A5FA;
+      background: rgba(59,130,246,.08);
+      border-color: rgba(59,130,246,.4);
+    }
+
+
   /* ââ CALENDARIO ECONÓMICO ââââââââââââââââââââââââââââââââââââââââ */
   .cal-kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);padding:16px 14px 13px;cursor:pointer;transition:border-color .18s,background .18s;position:relative;overflow:hidden;}
   .cal-kpi:hover{background:rgba(255,255,255,.07);border-color:rgba(242,201,76,.3);}
@@ -2038,25 +2158,13 @@
 
     // ââ Guest Mode: show login overlay on scroll or protected nav click âââââââââ
     function setupGuestMode() {
-      let scrollTriggered = false;
-      function onScrollAttempt() {
-        if (scrollTriggered) return;
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
-        if (scrollY > 80) {
-          scrollTriggered = true;
-          showLoginOverlay();
-          window.scrollTo({top: 0, behavior: 'smooth'});
-          window.removeEventListener('scroll', onScrollAttempt);
-        }
+      // Sin bloqueo de pagina completa: el login solo se pide al entrar a
+      // contenido premium (Inversiones, Warren) via los gates propios de esas
+      // secciones/paneles. Aca solo dejamos un acceso discreto y voluntario.
+      const navEl = document.getElementById('navUserArea');
+      if (navEl) {
+        navEl.innerHTML = '<button class="nav-login-btn" onclick="window.showLoginOverlay && window.showLoginOverlay()">Ingresar</button>';
       }
-      window.addEventListener('scroll', onScrollAttempt, {passive: true});
-      document.querySelectorAll('[data-member-required], a[href="#informes"], a[href="#reportes"], a[href="#inversiones"]').forEach(function(el) {
-        el.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          showLoginOverlay();
-        }, {capture: true});
-      });
     }
 
     function showLoginOverlay() {
@@ -2107,7 +2215,7 @@
   <!-- ââ NAVBAR ââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
   <header class="navbar">
     <div class="nav-inner">
-      <a href="#" class="logo">
+      <a href="#" class="logo" data-tab-target="inicio">
         <div class="logo-mark">MI</div>
         <div class="logo-text">
           <span class="logo-name">Manfredi Investment</span>
@@ -2117,31 +2225,33 @@
 
       <ul class="nav-links">
         <li>
-          <span class="nav-link" data-member-required="true">
+          <span class="nav-link">
             Informes &amp; Reportes
             <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 6l4 4 4-4"/></svg>
           </span>
           <div class="dropdown">
             <div class="dropdown-label">Contenido</div>
-            <a href="#informes" class="dropdown-item">
+            <a href="#informes" class="dropdown-item" data-tab-target="informes">
               <span class="dropdown-icon">IN</span>
               <span class="dropdown-item-text">Informes<small>Análisis profundos semanales</small></span>
             </a>
-            <a href="#reportes" class="dropdown-item">
+            <a href="#reportes" class="dropdown-item" data-tab-target="informes">
               <span class="dropdown-icon">IA</span>
               <span class="dropdown-item-text">Reportes Diarios<small>Actualizados por agente IA</small></span>
             </a>
           </div>
         </li>
-        <li><a href="#mercados" class="nav-link">Mercados</a></li>
-        <li><a href="#university" class="nav-link">University</a></li>
-        <li><a href="#inversiones" class="nav-link" data-member-required="true">Inversiones</a></li>
+        <li><a href="#mercados" class="nav-link" data-tab-target="mercados">Mercados</a></li>
+        <li><a href="#calendario" class="nav-link" data-tab-target="calendario">Calendario</a></li>
+        <li><a href="#university" class="nav-link" data-tab-target="university">University</a></li>
+        <li><a href="#inversiones" class="nav-link" data-member-required="true" data-tab-target="inversiones">Inversiones</a></li>
+        <li><a href="#asesoria" class="nav-link" data-tab-target="asesoria">Asesoría</a></li>
         <li>
-          <span class="nav-link" data-member-required="true" onclick="if(window._isMiembro){toggleWarren()}" style="cursor:pointer;">
+          <span class="nav-link" data-member-required="true" onclick="toggleWarren()" style="cursor:pointer;">
             Asesor IA <span style="display:inline-block;width:8px;height:8px;background:#10B981;border-radius:50%;margin-left:4px;vertical-align:middle;"></span>
           </span>
         </li>
-        
+
       </ul>
 
       <button class="btn-cta" onclick="openModal()">Asesoría</button>
@@ -2151,20 +2261,20 @@
   </header>
 
   <!-- ââ HERO ââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="hero-v2">
+  <section class="hero-v2" data-tab="inicio">
     <div class="hero-v2-inner">
       <div class="hero-v2-left">
         <div class="hero-eyebrow">
           <span class="hero-eyebrow-line"></span>
           Argentina &amp; Estados Unidos &middot; An&aacute;lisis financiero institucional
         </div>
-        <h1 style="font-family:'DM Serif Display',Georgia,serif;font-size:clamp(36px,5vw,60px);font-weight:400;color:var(--white);line-height:1.1;letter-spacing:-.01em;max-width:600px;margin-bottom:24px;">
-          Inteligencia financiera <em style="font-style:italic;color:var(--gold)">institucional</em><br>para el inversor.
+        <h1 style="font-family:'DM Serif Display',Georgia,serif;font-size:clamp(44px,6vw,76px);font-weight:400;color:var(--white);line-height:1.06;letter-spacing:-.02em;max-width:660px;margin-bottom:24px;">
+          Inteligencia financiera <em style="font-style:italic;color:var(--gold)">institucional</em> para el inversor.
         </h1>
         <p class="hero-sub">An&aacute;lisis semanales profundos, reportes diarios automatizados y educaci&oacute;n financiera gratuita. Todo en un solo lugar.</p>
         <div class="hero-actions">
-          <button class="btn-primary" onclick="document.getElementById('informes').scrollIntoView({behavior:'smooth'})">Ver &uacute;ltimo Informe</button>
-          <button class="btn-outline" onclick="document.getElementById('university').scrollIntoView({behavior:'smooth'})">Explorar University &rarr;</button>
+          <button class="btn-primary" id="heroCta" onclick="location.hash='#informes'">Ver &uacute;ltimo Informe</button>
+          <button class="btn-outline" onclick="location.hash='#university'">Explorar University &rarr;</button>
         </div>
       </div>
       <div class="hero-v2-right">
@@ -2173,8 +2283,15 @@
             <span>Mercados ahora</span>
             <span class="s-live">LIVE</span>
           </div>
-          <div class="spot-row">
-            <div class="spot-region">&#127462;&#127479;</div>
+          <div class="spot-feature">
+            <div class="spot-feature-top">
+              <span class="spot-feature-label">Riesgo Pa&iacute;s <em>EMBI+</em></span>
+              <span class="spot-feature-chg" id="hero-riesgo-chg">&#8212;</span>
+            </div>
+            <div class="spot-feature-value" id="hero-riesgo-value">&#8212;</div>
+            <svg class="spot-feature-chart" id="hero-riesgo-chart" viewBox="0 0 400 110" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="spot-row" style="--spot-accent:#3B82F6;">
             <div class="spot-name">
               <div class="spot-ticker">MERV</div>
               <div class="spot-fullname">Merval</div>
@@ -2188,8 +2305,7 @@
               <span class="spot-chg" id="hspot-merv-chg">&#8212;</span>
             </div>
           </div>
-          <div class="spot-row">
-            <div class="spot-region">&#127482;&#127480;</div>
+          <div class="spot-row" style="--spot-accent:#10B981;">
             <div class="spot-name">
               <div class="spot-ticker">SPX</div>
               <div class="spot-fullname">S&amp;P 500</div>
@@ -2203,8 +2319,7 @@
               <span class="spot-chg" id="hspot-spx-chg">&#8212;</span>
             </div>
           </div>
-          <div class="spot-row">
-            <div class="spot-region" style="font-size:13px;font-weight:700;color:rgba(255,255,255,.8);">&#8383;</div>
+          <div class="spot-row" style="--spot-accent:#F59E0B;">
             <div class="spot-name">
               <div class="spot-ticker">BTC</div>
               <div class="spot-fullname">Bitcoin</div>
@@ -2218,21 +2333,6 @@
               <span class="spot-chg" id="hspot-btc-chg">&#8212;</span>
             </div>
           </div>
-          <div class="spot-row">
-            <div class="spot-region" style="font-size:13px;">&#128181;</div>
-            <div class="spot-name">
-              <div class="spot-ticker">MEP</div>
-              <div class="spot-fullname">D&oacute;lar MEP</div>
-            </div>
-            <svg class="spot-sparkline" viewBox="0 0 80 32" fill="none">
-              <polyline points="0,20 10,22 20,18 30,20 40,16 50,18 60,14 70,16 80,12" stroke="#6B7280" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              <polygon points="0,20 10,22 20,18 30,20 40,16 50,18 60,14 70,16 80,12 80,32 0,32" fill="rgba(107,114,128,.1)"/>
-            </svg>
-            <div class="spot-price">
-              <span class="spot-amt" id="hspot-mep-price">&#8212;</span>
-              <span class="spot-chg" id="hspot-mep-chg">&#8212;</span>
-            </div>
-          </div>
           <div class="spotlight-foot">Actualizado autom&aacute;ticamente &middot; fuentes m&uacute;ltiples</div>
         </div>
       </div>
@@ -2240,17 +2340,35 @@
   </section>
 
   <!-- ââ STATS âââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="stats-strip">
-    <div class="stats-grid" data-aos="fade-up">
-      <div class="stat-item"><h3>+10</h3><p>REPORTES DIARIOS</p></div>
-      <div class="stat-item"><h3>+25</h3><p>ACTIVOS ANALIZADOS</p></div>
-      <div class="stat-item"><h3>Semanal</h3><p>INFORMES DE ANÁLISIS</p></div>
-      <div class="stat-item"><h3>Gratuito</h3><p>ACCESO GRATUITO + CONTENIDO PREMIUM EXCLUSIVO</p></div>
+  <section class="membership-promo" data-tab="inicio">
+    <div class="mp-inner" data-aos="fade-up">
+      <div class="mp-left">
+        <span class="mp-eyebrow">Membres&iacute;a Manfredi Investment</span>
+        <h2 class="mp-title">Un asesor IA y el an&aacute;lisis completo de cada activo, sin l&iacute;mites.</h2>
+        <p class="mp-sub">Consult&aacute; a Warren cuando quieras y acced&eacute; a la tesis completa de cada pick: catalysts, comparables y proyecciones &mdash; no solo el precio.</p>
+        <button class="mp-cta" onclick="openPaymentModal()">Suscribirme &mdash; USD 10/mes &rarr;</button>
+      </div>
+      <div class="mp-right">
+        <div class="mp-feature">
+          <div class="mp-feature-icon">W</div>
+          <div class="mp-feature-text">
+            <strong>Warren, Asesor IA</strong>
+            <span>Consultas ilimitadas sobre tu cartera y el mercado, 24/7</span>
+          </div>
+        </div>
+        <div class="mp-feature">
+          <div class="mp-feature-icon">&#8599;</div>
+          <div class="mp-feature-text">
+            <strong>Inversiones</strong>
+            <span>Tesis completas, catalysts y comparables de cada activo que seguimos</span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- ââ MERCADOS âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="section section-alt" id="mercados">
+  <section class="section section-mercados" id="mercados" data-tab="mercados">
     <div class="container">
       <div class="markets-v2-header">
         <div class="markets-v2-title-block">
@@ -2270,7 +2388,7 @@
         </div>
       </div>
       <div class="dash-grid" id="dashGrid">
-        <div class="dash-card" data-aos="fade-up" data-region="AR" style="--card-accent:#1E3A5F;">
+        <div class="dash-card" data-aos="fade-up" data-region="AR" style="--card-accent:#3B82F6;">
           <div class="dc-top">
             <div class="dc-meta-top"><div class="dc-ticker">MERV</div><div class="dc-name">Merval</div></div>
             <span class="dc-badge">AR</span>
@@ -2287,7 +2405,7 @@
             <div class="dc-meta-item"><span class="dc-meta-label">M&iacute;n</span><span class="dc-meta-val" id="dc-merv-min">&#8212;</span></div>
           </div>
         </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="80" data-region="US" style="--card-accent:#1E5F4E;">
+        <div class="dash-card" data-aos="fade-up" data-aos-delay="80" data-region="US" style="--card-accent:#10B981;">
           <div class="dc-top">
             <div class="dc-meta-top"><div class="dc-ticker">SPX</div><div class="dc-name">S&amp;P 500</div></div>
             <span class="dc-badge">US</span>
@@ -2304,7 +2422,7 @@
             <div class="dc-meta-item"><span class="dc-meta-label">M&iacute;n</span><span class="dc-meta-val" id="dc-spx-min">&#8212;</span></div>
           </div>
         </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="160" data-region="US" style="--card-accent:#2D5F1E;">
+        <div class="dash-card" data-aos="fade-up" data-aos-delay="160" data-region="US" style="--card-accent:#22D3EE;">
           <div class="dc-top">
             <div class="dc-meta-top"><div class="dc-ticker">NDX</div><div class="dc-name">Nasdaq 100</div></div>
             <span class="dc-badge">US</span>
@@ -2321,7 +2439,7 @@
             <div class="dc-meta-item"><span class="dc-meta-label">M&iacute;n</span><span class="dc-meta-val" id="dc-ndx-min">&#8212;</span></div>
           </div>
         </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="240" data-region="CR" style="--card-accent:#8B6914;">
+        <div class="dash-card" data-aos="fade-up" data-aos-delay="240" data-region="CR" style="--card-accent:#F59E0B;">
           <div class="dc-top">
             <div class="dc-meta-top"><div class="dc-ticker">BTC</div><div class="dc-name">Bitcoin</div></div>
             <span class="dc-badge">Crypto</span>
@@ -2338,7 +2456,7 @@
             <div class="dc-meta-item"><span class="dc-meta-label">M&iacute;n</span><span class="dc-meta-val" id="dc-btc-min">&#8212;</span></div>
           </div>
         </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="320" data-region="AR" style="--card-accent:#4A5568;">
+        <div class="dash-card" data-aos="fade-up" data-aos-delay="320" data-region="AR" style="--card-accent:#94A3B8;">
           <div class="dc-top">
             <div class="dc-meta-top"><div class="dc-ticker">MEP</div><div class="dc-name">D&oacute;lar MEP</div></div>
             <span class="dc-badge">AR</span>
@@ -2354,7 +2472,7 @@
             <div class="dc-meta-item"><span class="dc-meta-label">Venta</span><span class="dc-meta-val" id="dc-mep-sell">&#8212;</span></div>
           </div>
         </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="400" data-region="CM" style="--card-accent:#92400E;">
+        <div class="dash-card" data-aos="fade-up" data-aos-delay="400" data-region="CM" style="--card-accent:#F2C94C;">
           <div class="dc-top">
             <div class="dc-meta-top"><div class="dc-ticker">XAU</div><div class="dc-name">Oro</div></div>
             <span class="dc-badge">Commod.</span>
@@ -2373,7 +2491,7 @@
         </div>
       </div>
       <div class="at-grid" data-aos="fade-up">
-        <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="at-col">
           <div class="at-card" data-table="adrs">
             <div class="at-head">
               <div class="at-head-title">&#127462;&#127479; ADRs Argentina</div>
@@ -2404,7 +2522,7 @@
             </div>
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="at-col">
           <div class="at-card" data-table="ar">
             <div class="at-head">
               <div class="at-head-title">&#127462;&#127479; Bonos AR <span style="font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);margin-left:6px;">MERVAL</span></div>
@@ -2436,8 +2554,8 @@
         </div>
       </div>
       <table style="display:none;"><tbody id="marketsTableBody"></tbody></table>
-      <div class="at-grid" data-aos="fade-up" style="margin-top:20px;grid-template-columns:1fr 1fr;">
-        <div style="display:flex;flex-direction:column;gap:20px;">
+      <div class="at-grid" data-aos="fade-up" style="margin-top:20px;">
+        <div class="at-col">
           <div class="at-card" data-table="crypto">
             <div class="at-head">
               <div class="at-head-title">&#8383; Crypto</div>
@@ -2469,7 +2587,7 @@
             </div>
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="at-col">
           <div class="at-card" data-table="etf">
             <div class="at-head">
               <div class="at-head-title">&#127482;&#127480; ETFs USA</div>
@@ -2506,7 +2624,7 @@
     </div>
   </section>
 
-  <section style="background:#07101E;padding:72px 32px 68px;" id="calendario">
+  <section style="background:#07101E;padding:72px 32px 68px;" id="calendario" data-tab="calendario">
   <div class="container">
     <div class="section-header">
       <span class="section-label">Seguimiento macro</span>
@@ -2540,7 +2658,7 @@
       </div>
     </div>
     <div id="calDetailBox" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:18px 22px;margin-bottom:28px;display:flex;align-items:center;gap:16px;min-height:68px;transition:border-color .2s,background .2s;" data-aos="fade-up">
-      <div style="width:36px;height:36px;background:rgba(242,201,76,.1);border:1px solid rgba(242,201,76,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">ð</div>
+      <div style="width:36px;height:36px;background:rgba(242,201,76,.1);border:1px solid rgba(242,201,76,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📊</div>
       <div><div id="calDetailTitle" style="font-size:11px;font-weight:600;color:var(--gold);letter-spacing:.04em;margin-bottom:4px;">Seleccioná un indicador</div><div id="calDetailText" style="font-size:12.5px;color:rgba(255,255,255,.45);line-height:1.6;">Tocá cualquier cuadro para ver el contexto, la tendencia y qué significa para los mercados.</div></div>
     </div>
     <div data-aos="fade-up">
@@ -2561,7 +2679,7 @@
   </div>
 </section>
   <!-- ââ INFORMES âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-<section class="section-informes member-protected locked" id="informes">
+<section class="section-informes" id="informes" data-tab="informes">
       
     <div class="container">
       <div class="section-header">
@@ -2630,7 +2748,7 @@
   </section>
 
   <!-- ââ UNIVERSITY âââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="section section-alt" id="university">
+  <section class="section section-alt" id="university" data-tab="university">
     <div class="container">
       <div class="section-header">
         <span class="section-label">Educación Financiera</span>
@@ -2696,7 +2814,7 @@
 
 
   <!-- ââ INVERSIONES âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="section section-alt member-protected locked" id="inversiones">
+  <section class="section section-inversiones member-protected locked" id="inversiones" data-tab="inversiones">
     <div class="container">
       
       <div class="section-header">
@@ -2862,7 +2980,7 @@
   </section>
 
   <!-- ââ ASESORÍA ââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="asesoria-section member-protected locked" id="asesoria">
+  <section class="asesoria-section" id="asesoria" data-tab="asesoria">
       
     <div class="asesoria-inner">
       <div class="asesoria-left">
@@ -3273,7 +3391,7 @@
     },
     {
       id:           'gold',
-      flag:         'ð¥',
+      flag:         '🥇',
       name:         'Oro (XAU/USD)',
       source:       'twelvedata',
       tdSymbol:     'XAU/USD',
@@ -4004,7 +4122,7 @@
     }
   }
 
-  const CAL_DETAILS={'ar-pbi':{icon:'ð',title:'PBI Argentina',text:'La economía retomó el crecimiento liderada por agro, construcción y servicios. <strong>Para los mercados:</strong> positivo para acciones del Merval y bonos soberanos.'},'ar-inf':{icon:'ð¥',title:'Inflación Argentina',text:'La inflación mensual continúa desacelerando. Crawling peg y ancla cambiaria son los drivers. <strong>Próximo dato:</strong> IPC INDEC el 12 de cada mes.'},'ar-desemp':{icon:'ð·',title:'Desempleo Argentina',text:'Resiliencia pese al ajuste del sector público. <strong>Publicación:</strong> trimestral por EPH-INDEC.'},'ar-riesgo':{icon:'ð¡',title:'Riesgo País EMBI+',text:'Compresión por acuerdo FMI y disciplina fiscal. <strong>Para los mercados:</strong> cada 100 bps de caída impulsa GD30/AL30 un ~8-12%.'},'us-pbi':{icon:'ð',title:'PBI Estados Unidos',text:'Contracción leve por caída de exportaciones ante aranceles. Consumo privado resisó.'},'us-inf':{icon:'ð',title:'Inflación EE.UU. CPI',text:'Desacelerando hacia el target del 2%. <strong>Dato más importante para la Fed:</strong> PCE Core, último jueves de cada mes.'},'us-desemp':{icon:'ð¼',title:'Desempleo EE.UU.',text:'Mercado laboral resiliente. <strong>Próximo dato clave:</strong> Nonfarm Payrolls el primer viernes de cada mes.'},'us-treasury':{icon:'ð¦',title:'Treasury 10Y Yield',text:'Yields altos comprimen valuaciones tech. <strong>Para los mercados:</strong> impacta en CEDEARs y bonos argentinos en USD.'}}; function calShowDetail(key,el){var d=CAL_DETAILS[key];if(!d)return;document.querySelectorAll('.cal-kpi').forEach(function(k){k.classList.remove('active');});el.classList.add('active');var box=document.getElementById('calDetailBox');box.children[0].textContent=d.icon;document.getElementById('calDetailTitle').textContent=d.title;document.getElementById('calDetailText').innerHTML=d.text;box.style.borderColor='rgba(242,201,76,.4)';box.style.background='rgba(242,201,76,.04)';} async function loadMacroAR(){try{var infR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/inflacion').catch(function(){return null;});var riesgoR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais').catch(function(){return null;});if(infR&&infR.ok){var infD=await infR.json();if(Array.isArray(infD)&&infD.length){var last=infD[infD.length-1];var val=last.valor!=null?last.valor:last.value;if(val!=null){document.getElementById('ar-inf-val').textContent=val.toFixed(1)+'%';document.getElementById('ar-inf-sub').textContent='Mensual · '+(last.fecha||'');}}}if(riesgoR&&riesgoR.ok){var riesgoD=await riesgoR.json();if(Array.isArray(riesgoD)&&riesgoD.length){var rLast=riesgoD[riesgoD.length-1];var rVal=rLast.valor!=null?rLast.valor:rLast.value;if(rVal!=null){document.getElementById('ar-riesgo-val').textContent=Math.round(rVal)+' bps';document.getElementById('ar-riesgo-sub').textContent='EMBI+ · '+(rLast.fecha||'');}}}}catch(e){console.warn('[MI] MacroAR:',e.message);}} async function loadMacroUS(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/macro-us',{signal:AbortSignal.timeout(5000)});if(r.ok){var d=await r.json();if(d.gdp!=null){var v=parseFloat(d.gdp);document.getElementById('us-pbi-val').textContent=(v>=0?'+':'')+v.toFixed(1)+'%';document.getElementById('us-pbi-val').className='cal-kpi-main '+(v>=0?'cal-up':'cal-down');}if(d.cpi!=null)document.getElementById('us-inf-val').textContent=parseFloat(d.cpi).toFixed(1)+'%';if(d.unemp!=null)document.getElementById('us-desemp-val').textContent=parseFloat(d.unemp).toFixed(1)+'%';if(d.treasury!=null)document.getElementById('us-treasury-val').textContent=parseFloat(d.treasury).toFixed(2)+'%';}}catch(e){console.warn('[MI] MacroUS:',e.message);}} async function loadCalSemana(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/calendario',{signal:AbortSignal.timeout(8000)});if(r.ok){var d=await r.json();if(d.dias&&d.dias.length){document.getElementById('calSemanaLabel').textContent=d.semana||'';var dow=new Date().getDay();var grid=document.getElementById('calWeekGrid');grid.innerHTML=d.dias.map(function(dia,i){var isToday=(i+1)===dow;var evs=dia.eventos&&dia.eventos.length?dia.eventos.map(function(ev){return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+ev.titulo+'</strong>'+ev.descripcion+'</div></div>';}).join(''):'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Sin eventos</span>';return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+dia.nombre+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+dia.fecha+'</span></div>'+evs+'</div>';}).join('');return;}}}catch(e){console.warn('[MI] CalSemana:',e.message);}var hoy=new Date();var dow=hoy.getDay();var lun=new Date(hoy);lun.setDate(hoy.getDate()-(dow===0?6:dow-1));var nombres=['Lun','Mar','Mié','Jue','Vie'];var fmt=function(d){return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});};var fin=new Date(lun);fin.setDate(lun.getDate()+4);document.getElementById('calSemanaLabel').textContent=fmt(lun)+' al '+fmt(fin);document.getElementById('calWeekGrid').innerHTML=nombres.map(function(n,i){var d=new Date(lun);d.setDate(lun.getDate()+i);var isToday=(i+1)===dow;return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+n+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+fmt(d)+'</span></div>'+'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Cargando...</span></div>';}).join('');} loadMacroAR(); loadMacroUS(); loadCalSemana(); setInterval(loadMacroAR,300000); setInterval(loadMacroUS,300000);
+  const CAL_DETAILS={'ar-pbi':{icon:'📈',title:'PBI Argentina',text:'La economía retomó el crecimiento liderada por agro, construcción y servicios. <strong>Para los mercados:</strong> positivo para acciones del Merval y bonos soberanos.'},'ar-inf':{icon:'🔥',title:'Inflación Argentina',text:'La inflación mensual continúa desacelerando. Crawling peg y ancla cambiaria son los drivers. <strong>Próximo dato:</strong> IPC INDEC el 12 de cada mes.'},'ar-desemp':{icon:'👷',title:'Desempleo Argentina',text:'Resiliencia pese al ajuste del sector público. <strong>Publicación:</strong> trimestral por EPH-INDEC.'},'ar-riesgo':{icon:'🌡',title:'Riesgo País EMBI+',text:'Compresión por acuerdo FMI y disciplina fiscal. <strong>Para los mercados:</strong> cada 100 bps de caída impulsa GD30/AL30 un ~8-12%.'},'us-pbi':{icon:'📉',title:'PBI Estados Unidos',text:'Contracción leve por caída de exportaciones ante aranceles. Consumo privado resisó.'},'us-inf':{icon:'📊',title:'Inflación EE.UU. CPI',text:'Desacelerando hacia el target del 2%. <strong>Dato más importante para la Fed:</strong> PCE Core, último jueves de cada mes.'},'us-desemp':{icon:'💼',title:'Desempleo EE.UU.',text:'Mercado laboral resiliente. <strong>Próximo dato clave:</strong> Nonfarm Payrolls el primer viernes de cada mes.'},'us-treasury':{icon:'🏦',title:'Treasury 10Y Yield',text:'Yields altos comprimen valuaciones tech. <strong>Para los mercados:</strong> impacta en CEDEARs y bonos argentinos en USD.'}}; function calShowDetail(key,el){var d=CAL_DETAILS[key];if(!d)return;document.querySelectorAll('.cal-kpi').forEach(function(k){k.classList.remove('active');});el.classList.add('active');var box=document.getElementById('calDetailBox');box.children[0].textContent=d.icon;document.getElementById('calDetailTitle').textContent=d.title;document.getElementById('calDetailText').innerHTML=d.text;box.style.borderColor='rgba(242,201,76,.4)';box.style.background='rgba(242,201,76,.04)';} async function loadMacroAR(){try{var infR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/inflacion').catch(function(){return null;});var riesgoR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais').catch(function(){return null;});if(infR&&infR.ok){var infD=await infR.json();if(Array.isArray(infD)&&infD.length){var last=infD[infD.length-1];var val=last.valor!=null?last.valor:last.value;if(val!=null){document.getElementById('ar-inf-val').textContent=val.toFixed(1)+'%';document.getElementById('ar-inf-sub').textContent='Mensual · '+(last.fecha||'');}}}if(riesgoR&&riesgoR.ok){var riesgoD=await riesgoR.json();if(Array.isArray(riesgoD)&&riesgoD.length){var rLast=riesgoD[riesgoD.length-1];var rVal=rLast.valor!=null?rLast.valor:rLast.value;if(rVal!=null){document.getElementById('ar-riesgo-val').textContent=Math.round(rVal)+' bps';document.getElementById('ar-riesgo-sub').textContent='EMBI+ · '+(rLast.fecha||'');}}}}catch(e){console.warn('[MI] MacroAR:',e.message);}} async function loadMacroUS(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/macro-us',{signal:AbortSignal.timeout(5000)});if(r.ok){var d=await r.json();if(d.gdp!=null){var v=parseFloat(d.gdp);document.getElementById('us-pbi-val').textContent=(v>=0?'+':'')+v.toFixed(1)+'%';document.getElementById('us-pbi-val').className='cal-kpi-main '+(v>=0?'cal-up':'cal-down');}if(d.cpi!=null)document.getElementById('us-inf-val').textContent=parseFloat(d.cpi).toFixed(1)+'%';if(d.unemp!=null)document.getElementById('us-desemp-val').textContent=parseFloat(d.unemp).toFixed(1)+'%';if(d.treasury!=null)document.getElementById('us-treasury-val').textContent=parseFloat(d.treasury).toFixed(2)+'%';}}catch(e){console.warn('[MI] MacroUS:',e.message);}} async function loadCalSemana(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/calendario',{signal:AbortSignal.timeout(8000)});if(r.ok){var d=await r.json();if(d.dias&&d.dias.length){document.getElementById('calSemanaLabel').textContent=d.semana||'';var dow=new Date().getDay();var grid=document.getElementById('calWeekGrid');grid.innerHTML=d.dias.map(function(dia,i){var isToday=(i+1)===dow;var evs=dia.eventos&&dia.eventos.length?dia.eventos.map(function(ev){return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+ev.titulo+'</strong>'+ev.descripcion+'</div></div>';}).join(''):'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Sin eventos</span>';return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+dia.nombre+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+dia.fecha+'</span></div>'+evs+'</div>';}).join('');return;}}}catch(e){console.warn('[MI] CalSemana:',e.message);}var hoy=new Date();var dow=hoy.getDay();var lun=new Date(hoy);lun.setDate(hoy.getDate()-(dow===0?6:dow-1));var nombres=['Lun','Mar','Mié','Jue','Vie'];var fmt=function(d){return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});};var fin=new Date(lun);fin.setDate(lun.getDate()+4);document.getElementById('calSemanaLabel').textContent=fmt(lun)+' al '+fmt(fin);document.getElementById('calWeekGrid').innerHTML=nombres.map(function(n,i){var d=new Date(lun);d.setDate(lun.getDate()+i);var isToday=(i+1)===dow;return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+n+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+fmt(d)+'</span></div>'+'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Cargando...</span></div>';}).join('');} loadMacroAR(); loadMacroUS(); loadCalSemana(); setInterval(loadMacroAR,300000); setInterval(loadMacroUS,300000);
   fetchCryptoTable();
   fetchCommTable();
   fetchETFTable();
@@ -4164,9 +4282,11 @@
   .vs-sep { text-align: center; font-family: sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--gray); }
   .instrument-card {
     padding: 1rem 1.25rem; margin: 8px 0;
+  }
   .instrument-icon {
     width: 36px; height: 36px; border-radius: 8px;
     font-size: 16px; flex-shrink: 0; font-weight: 700;
+  }
   .instrument-name { font-size: 0.95rem; font-weight: 700; color: #111; margin-bottom: 3px; }
   .instrument-desc { font-size: 0.82rem; color: var(--gray); line-height: 1.45; }
   .instrument-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-top: 5px; }
@@ -4283,117 +4403,67 @@
     .member-badge{display:inline-block;font-size:9px;font-weight:700;color:var(--white);background:var(--gold);padding:1px 5px;border-radius:3px;letter-spacing:.05em;text-transform:uppercase;margin-left:5px;vertical-align:middle}
     #navUserArea{display:flex;align-items:center;gap:6px;margin-left:16px}
 
-    /* ===== MEMBRESIA: BLUR & LOCK OVERLAY ===== */
+    /* ===== MEMBRESIA: gate real lo maneja el JS de applyPaywall/paywallCardHTML mas abajo ===== */
     .member-protected { position: relative; }
-    .member-protected.locked::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      background: rgba(5,8,18,0.72);
-      z-index: 10;
-      border-radius: inherit;
-      pointer-events: none;
-    }
-        .member-lock-overlay {
-      display: none;
-      position: absolute;
-      inset: 0;
-      z-index: 11;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      text-align: center;
-      padding: 40px 24px;
-      background: rgba(5,8,18,0.78);
-      backdrop-filter: blur(2px);
-    }
-    .member-protected.locked .member-lock-overlay { display: flex; }
-    .member-lock-card {
-      display: flex; flex-direction: column; align-items: center; gap: 14px;
-      background: #0A0F1E;
-      border: 1px solid var(--gold, #B8943F);
-      border-radius: 12px; padding: 36px 40px; max-width: 340px; width: 100%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-    }
-    .member-lock-logo {
-      width: 48px; height: 48px;
-      background: var(--gold, #B8943F);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      color: #0A0F1E; font-weight: 800; font-size: 18px;
-      letter-spacing: 0.02em; font-family: var(--font-display, serif);
-    }
-    .member-lock-label {
-      color: var(--gold, #B8943F);
-      font-size: 11px; font-weight: 700;
-      letter-spacing: .12em; text-transform: uppercase;
-      margin-bottom: -4px;
-    }
-    .member-lock-price {
-      display: flex; align-items: baseline; gap: 2px;
-      margin: 4px 0;
-    }
-    .member-lock-price-amount {
-      font-size: 48px; font-weight: 800; color: #ffffff;
-      font-family: var(--font-display, serif); line-height: 1;
-    }
-    .member-lock-price-period {
-      font-size: 15px; color: rgba(255,255,255,0.5); font-weight: 400;
-    }
-    .member-unlock-btn {
-      background: var(--gold, #B8943F);
-      color: #0A0F1E; border: none; border-radius: 6px;
-      padding: 13px 0; margin-top: 4px;
-      font-size: 14px; font-weight: 800; cursor: pointer;
-      letter-spacing: 0.04em;
-      transition: opacity .15s, transform .15s;
-      width: 100%;
-    }
-    .member-unlock-btn:hover { opacity: .88; transform: translateY(-1px); }
-    .member-lock-fine {
-      font-size: 11px; color: rgba(255,255,255,0.35);
-      letter-spacing: .02em; margin-top: -4px;
-    }margin-top: 1px; }
         /* ===== MODAL PAGO ===== */
     .payment-overlay {
       position: fixed; inset: 0; z-index: 3000;
-      background: rgba(0,0,0,.78);
+      background: rgba(5,8,16,.82);
+      backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
       display: none !important; transition: opacity .3s;
+      padding: 24px;
     }
     .payment-overlay.open { display: flex !important; align-items: center; justify-content: center; opacity: 1; pointer-events: auto; }
     .payment-modal-box {
-      background: var(--bg-card, #111827);
-      border: 1px solid rgba(242,201,76,.25);
-      border-radius: 16px; padding: 36px 32px;
-      width: 100%; max-width: 480px; position: relative;
+      background: linear-gradient(180deg, #101B2E 0%, #0C1526 100%);
+      border: 1px solid rgba(242,201,76,.18);
+      border-radius: 18px; padding: 40px 36px 32px;
+      width: 100%; max-width: 440px; position: relative;
+      box-shadow: 0 24px 70px rgba(0,0,0,.55);
     }
-    .payment-modal-box h2 { font-family: var(--font-display); font-size: 22px; color: var(--gold); margin-bottom: 6px; }
-    .payment-modal-box > p { color: var(--text-sec); font-size: 14px; line-height: 1.6; margin-bottom: 22px; }
-    .pay-plan-card {
-      background: rgba(255,255,255,.04); border: 1px solid rgba(242,201,76,.2);
-      border-radius: 12px; padding: 18px 20px; margin-bottom: 10px;
-      cursor: pointer; transition: border-color .2s, background .2s;
+    .pay-close {
+      position: absolute; top: 16px; right: 16px; width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,.06); border: none; border-radius: 50%;
+      color: rgba(255,255,255,.55); font-size: 18px; line-height: 1; cursor: pointer;
+      transition: background .15s, color .15s;
     }
-    .pay-plan-card.selected, .pay-plan-card:hover { border-color: var(--gold); background: rgba(242,201,76,.07); }
-    .pay-plan-name { font-weight: 700; color: var(--text-primary, #fff); font-size: 15px; }
-    .pay-plan-price { color: var(--gold); font-size: 20px; font-weight: 800; margin: 3px 0; }
-    .pay-plan-desc { color: var(--text-sec); font-size: 12px; }
-    .pay-methods { margin: 20px 0 0; }
-    .pay-methods h4 { color: var(--text-primary, #fff); font-size: 13px; margin-bottom: 10px; }
-    .pay-btns { display: flex; gap: 10px; flex-wrap: wrap; }
-    .pay-btn {
-      flex: 1; min-width: 120px; padding: 11px 8px;
-      border: 1px solid rgba(255,255,255,.1); border-radius: 8px;
-      background: rgba(255,255,255,.04); color: var(--text-primary, #fff);
-      font-size: 13px; font-weight: 600; cursor: pointer; text-align: center;
-      transition: background .2s, border-color .2s;
+    .pay-close:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .pay-mark {
+      width: 44px; height: 44px; background: var(--gold); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; color: var(--primary);
+      font-family: var(--font-display); margin-bottom: 20px;
     }
-    .pay-btn:hover { background: rgba(242,201,76,.1); border-color: var(--gold); }
-    .pay-note { text-align:center; color: var(--text-sec); font-size:12px; margin-top:16px; line-height:1.6; }
-    .pay-note a { color: var(--gold); text-decoration: none; }
-    .pay-close { position: absolute; top: 14px; right: 16px; background: none; border: none; color: var(--text-sec); font-size: 22px; cursor: pointer; line-height: 1; }
+    .pay-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+    .payment-modal-box h2 { font-family: var(--font-display); font-weight: 400; font-size: 26px; letter-spacing: -0.01em; color: #fff; line-height: 1.18; margin-bottom: 10px; }
+    .payment-modal-box .pay-sub { color: rgba(255,255,255,.6); font-size: 14px; line-height: 1.55; margin-bottom: 26px; }
+    .pay-price-row { display: flex; align-items: baseline; gap: 6px; }
+    .pay-price-amount { font-family: var(--font-display); font-size: 46px; font-weight: 400; color: var(--gold); line-height: 1; font-variant-numeric: tabular-nums; }
+    .pay-price-period { font-size: 15px; color: rgba(255,255,255,.5); font-weight: 500; }
+    .pay-price-fine { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 6px; margin-bottom: 24px; }
+    .pay-benefits {
+      list-style: none; margin: 0 0 26px; padding: 18px 0;
+      border-top: 1px solid rgba(255,255,255,.08); border-bottom: 1px solid rgba(255,255,255,.08);
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .pay-benefits li { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; color: rgba(255,255,255,.85); line-height: 1.5; }
+    .pay-benefits svg { flex-shrink: 0; margin-top: 2px; }
+    .pay-cta {
+      display: block; width: 100%; text-align: center; padding: 15px 0;
+      background: var(--gold); color: var(--primary); font-weight: 700; font-size: 15px;
+      letter-spacing: .01em; border: none; border-radius: 10px; cursor: pointer;
+      transition: transform .15s, box-shadow .15s, background .15s;
+    }
+    .pay-cta:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 10px 24px rgba(242,201,76,.22); }
+    .pay-cta:disabled { opacity: .6; cursor: wait; transform: none; box-shadow: none; }
+    .pay-secondary {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      margin-top: 16px; font-size: 11.5px; color: rgba(255,255,255,.4); letter-spacing: .01em;
+    }
+    .pay-note { text-align: center; color: rgba(255,255,255,.42); font-size: 11.5px; margin-top: 18px; line-height: 1.6; }
+    .pay-note a { color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(242,201,76,.3); }
+    .pay-note a:hover { border-color: var(--gold); }
 
   
   /* === SCROLL ANIMATIONS === */
@@ -9576,16 +9646,14 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
               var _origToggleWarren = window.toggleWarren;
               window.toggleWarren = function() {
                 if (_origToggleWarren) _origToggleWarren.apply(this, arguments);
-                if (window._authChecked && !isMember()) {
+                if (!isMember()) {
                   applyWarrenPaywall();
                 }
               };
 
                             function checkMembership() {
                             if (isMember()) return;
-                            if (!window._authChecked) return;
                             applyPaywall('.picks-list', '#inversiones');
-                            applyPaywall('.papers-grid', '#papersGrid');
                             applyWarrenPaywall();
               }
               window._miCheckMembership = checkMembership;
@@ -9600,17 +9668,30 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
 
   <div id="paymentOverlay" class="payment-overlay" style="display:none !important">
     <div class="payment-modal-box">
-      <button class="pay-close" onclick="closePaymentModal()">&times;</button>
-      <div style="width:56px;height:56px;background:var(--gold,#B8943F);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-weight:800;font-size:20px;color:#000;font-family:var(--font-display)">MI</div>
-      <h2 style="text-align:center;margin-bottom:6px;">Membresía Manfredi Investment</h2>
-      <p style="text-align:center;margin-bottom:24px;">Accedé a todos los análisis, picks y posiciones con membresía activa.</p>
-      <div style="text-align:center;margin-bottom:8px;font-size:42px;font-weight:800;color:var(--gold,#B8943F);font-family:var(--font-display)">$10 <span style="font-size:18px;color:var(--text-sec,#aaa)">USD/mes</span></div>
-      <p style="text-align:center;font-size:12px;color:var(--text-sec,#aaa);margin-bottom:28px;">por mes · cancelá cuando quieras</p>
-      <button onclick="handlePayment('mercadopago')" style="width:100%;padding:14px;background:var(--gold,#B8943F);color:#000;font-weight:700;font-size:16px;border:none;border-radius:10px;cursor:pointer;margin-bottom:12px;">ð³ Pagar con Mercado Pago</button>
-      <p style="font-size:0.75rem; color:#a0a0a0; margin-top:0.5rem; text-align:center;">
-        â ï¸ Asegurate de pagar con el mismo email con el que iniciaste sesión en la página.
+      <button class="pay-close" onclick="closePaymentModal()" aria-label="Cerrar">&times;</button>
+      <div class="pay-mark">MI</div>
+      <div class="pay-eyebrow">Membresía Manfredi Investment</div>
+      <h2>Todo el análisis, sin límites.</h2>
+      <p class="pay-sub">Acceso completo a Warren (asesor IA) y a todos los picks y tesis de inversión, sin vista parcial.</p>
+      <div class="pay-price-row">
+        <span class="pay-price-amount">$10</span>
+        <span class="pay-price-period">USD/mes</span>
+      </div>
+      <p class="pay-price-fine">Facturación mensual · cancelás cuando quieras</p>
+      <ul class="pay-benefits">
+        <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F2C94C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Warren, tu asesor IA &mdash; consultas ilimitadas 24/7</li>
+        <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F2C94C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Picks y tesis de inversión completos, sin blur</li>
+        <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F2C94C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Cancelás cuando quieras, sin permanencia</li>
+      </ul>
+      <button class="pay-cta" onclick="handlePayment('mercadopago')">Suscribirme ahora &rarr;</button>
+      <div class="pay-secondary">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V8a5 5 0 0 1 10 0v3"/></svg>
+        Pago seguro procesado por Mercado Pago
+      </div>
+      <p class="pay-note">
+        ⚠️ Asegurate de pagar con el mismo email con el que iniciaste sesión en la página.<br>
+        ¿Ya tenés membresía? <a href="#" onclick="closePaymentModal()">Iniciá sesión</a>
       </p>
-      <p style="text-align:center;font-size:12px;color:var(--text-sec,#aaa);margin-top:8px;">¿Ya tenés membresía? <a href="#" onclick="closePaymentModal()" style="color:var(--gold,#B8943F)">Iniciá sesión</a></p>
     </div>
   </div>
   <script>
@@ -9665,6 +9746,14 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
             var id = card.getAttribute('data-table');
             card.style.display = (filter === 'all' || showTables.some(function(s){ return card.contains(document.getElementById(s)); })) ? '' : 'none';
           });
+          document.querySelectorAll('.at-col').forEach(function(col) {
+            var hasVisible = Array.from(col.querySelectorAll('.at-card')).some(function(c){ return c.style.display !== 'none'; });
+            col.style.display = hasVisible ? '' : 'none';
+          });
+          document.querySelectorAll('.dash-card[data-region]').forEach(function(card) {
+            var region = card.getAttribute('data-region');
+            card.style.display = (filter === 'all' || region === filter) ? '' : 'none';
+          });
         });
       });
     }
@@ -9713,9 +9802,68 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
         }
       } catch(e) { console.warn('[v2] xau:', e.message); }
     }
+    async function loadHeroRiesgo() {
+      try {
+        var r = await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais', {signal: AbortSignal.timeout(8000)});
+        if (!r.ok) return;
+        var data = await r.json();
+        if (!Array.isArray(data) || !data.length) return;
+        var series = data.slice(-60).map(function(d){ return d.valor != null ? d.valor : d.value; }).filter(function(v){ return v != null; });
+        if (!series.length) return;
+        var last = series[series.length - 1];
+        var prev = series.length > 1 ? series[series.length - 2] : last;
+        var delta = last - prev;
+        var isUp = delta > 0;
+        var valEl = document.getElementById('hero-riesgo-value');
+        var chgEl = document.getElementById('hero-riesgo-chg');
+        var chartEl = document.getElementById('hero-riesgo-chart');
+        if (valEl) {
+          var prevText = valEl.textContent;
+          var newText = Math.round(last) + ' pb';
+          if (prevText !== '—' && prevText !== newText) {
+            valEl.classList.remove('flash-up', 'flash-down');
+            void valEl.offsetWidth;
+            valEl.classList.add(isUp ? 'flash-up' : 'flash-down');
+          }
+          valEl.textContent = newText;
+        }
+        if (chgEl) {
+          chgEl.textContent = (delta >= 0 ? '+' : '') + Math.round(delta) + ' pb hoy';
+          chgEl.className = 'spot-feature-chg ' + (isUp ? 'up' : 'down');
+        }
+        if (chartEl) {
+          var w = 400, h = 110, pad = 10;
+          var min = Math.min.apply(null, series), max = Math.max.apply(null, series);
+          var range = (max - min) || 1;
+          var step = series.length > 1 ? w / (series.length - 1) : w;
+          var pts = series.map(function(v, i) {
+            var x = i * step;
+            var y = pad + (1 - (v - min) / range) * (h - pad * 2);
+            return x.toFixed(1) + ',' + y.toFixed(1);
+          });
+          var lineColor = isUp ? '#EF4444' : '#10B981';
+          var fillColor = isUp ? 'rgba(239,68,68,.14)' : 'rgba(16,185,129,.14)';
+          var polygonPts = pts.concat([w.toFixed(1) + ',' + h, '0,' + h]).join(' ');
+          chartEl.innerHTML = '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + lineColor + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '<polygon points="' + polygonPts + '" fill="' + fillColor + '"/>';
+        }
+      } catch (e) { console.warn('[hero] riesgo pais:', e.message); }
+    }
+    function initHeroMagneticCta() {
+      var btn = document.getElementById('heroCta');
+      if (!btn || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      btn.addEventListener('mousemove', function(e) {
+        var rect = btn.getBoundingClientRect();
+        var x = e.clientX - rect.left - rect.width / 2;
+        var y = e.clientY - rect.top - rect.height / 2;
+        btn.style.transform = 'translate(' + (x * 0.18).toFixed(1) + 'px,' + (y * 0.3).toFixed(1) + 'px)';
+      });
+      btn.addEventListener('mouseleave', function() { btn.style.transform = ''; });
+    }
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() { initFilterTabs(); loadMarketCards(); });
-    } else { initFilterTabs(); loadMarketCards(); }
+      document.addEventListener('DOMContentLoaded', function() { initFilterTabs(); loadMarketCards(); loadHeroRiesgo(); initHeroMagneticCta(); });
+    } else { initFilterTabs(); loadMarketCards(); loadHeroRiesgo(); initHeroMagneticCta(); }
+    setInterval(loadHeroRiesgo, 90000);
   })();
   </script>
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
@@ -10299,5 +10447,62 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
 </script>
 
 <div id="slideWrapper" style="display:none"></div>
+
+<script>
+  // ââ Navegacion por pestanas: una sola seccion visible a la vez âââââââââââ
+  (function() {
+    var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'asesoria'];
+    var TAB_TITLES = {
+      inicio: 'Inicio', mercados: 'Mercados', calendario: 'Calendario Economico',
+      informes: 'Informes & Reportes', university: 'University', inversiones: 'Inversiones',
+      asesoria: 'Asesoria'
+    };
+
+    function resolveTab(hash) {
+      hash = (hash || '').replace('#', '');
+      if (!hash) return 'inicio';
+      if (hash === 'reportes') return 'informes';
+      if (TAB_IDS.indexOf(hash) !== -1) return hash;
+      return 'inicio';
+    }
+
+    function activateTab(tab) {
+      document.querySelectorAll('[data-tab]').forEach(function(el) {
+        el.classList.toggle('tab-hidden', el.getAttribute('data-tab') !== tab);
+      });
+      document.querySelectorAll('[data-tab-target]').forEach(function(el) {
+        el.classList.toggle('tab-nav-active', el.getAttribute('data-tab-target') === tab);
+      });
+      document.title = 'Manfredi Investment' + (TAB_TITLES[tab] ? ' - ' + TAB_TITLES[tab] : '');
+      // AOS ("fade-up al hacer scroll") calcula visibilidad por posicion de
+      // scroll: como las pestanas cambian instantaneo (sin scroll real), los
+      // elementos [data-aos] de una pestana recien mostrada nunca reciben el
+      // trigger de AOS y quedan invisibles. Forzamos el estado "ya animado"
+      // al activar la pestana para que el contenido siempre se vea.
+      document.querySelectorAll('[data-tab="' + tab + '"] [data-aos]').forEach(function(el) {
+        el.classList.add('aos-animate');
+      });
+    }
+
+    function route() {
+      var hash = location.hash;
+      var tab = resolveTab(hash);
+      activateTab(tab);
+      var subTarget = hash.replace('#', '');
+      if (subTarget && subTarget !== tab) {
+        var target = document.getElementById(subTarget);
+        if (target) {
+          requestAnimationFrame(function() { target.scrollIntoView({ block: 'start' }); });
+          return;
+        }
+      }
+      window.scrollTo(0, 0);
+    }
+
+    window.addEventListener('hashchange', route);
+    if (document.readyState !== 'loading') route();
+    else document.addEventListener('DOMContentLoaded', route);
+  })();
+</script>
 </body>
 </html>
