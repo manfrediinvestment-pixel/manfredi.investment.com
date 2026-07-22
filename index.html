@@ -294,7 +294,7 @@
       font-weight: 600;
       cursor: pointer;
       border: 1px solid var(--white);
-      transition: background var(--transition), color var(--transition);
+      transition: background var(--transition), color var(--transition), transform .2s cubic-bezier(.34,1.56,.64,1);
       font-family: 'IBM Plex Sans', sans-serif;
       letter-spacing: .02em;
     }
@@ -1789,10 +1789,42 @@
       color: rgba(255,255,255,.25);
       text-align: center;
     }
+    .spot-feature {
+      padding: 2px 4px 18px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .spot-feature-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+    .spot-feature-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+    .spot-feature-label em { font-style: normal; color: rgba(255,255,255,.32); font-weight: 500; margin-left: 4px; }
+    .spot-feature-chg { font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .spot-feature-chg.up { color: var(--red); }
+    .spot-feature-chg.down { color: var(--green); }
+    .spot-feature-value {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 40px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1;
+      letter-spacing: -.01em;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      transition: background-color .15s ease-out;
+    }
+    .spot-feature-value.flash-up { animation: flash-red 900ms ease-out; }
+    .spot-feature-value.flash-down { animation: flash-green 900ms ease-out; }
+    @keyframes flash-red { 0% { background-color: rgba(239,68,68,.28); } 100% { background-color: transparent; } }
+    @keyframes flash-green { 0% { background-color: rgba(16,185,129,.28); } 100% { background-color: transparent; } }
+    .spot-feature-chart { width: 100%; height: 80px; display: block; overflow: visible; }
     @media(max-width:900px){
       .hero-v2-inner { grid-template-columns: 1fr; }
       .hero-v2-right { justify-content: center; }
       .spotlight-card { max-width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .spot-feature-value.flash-up, .spot-feature-value.flash-down { animation: none; }
+      #heroCta { transform: none !important; }
     }
     /* PPP FILTER TABS PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP */
     .filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -2236,12 +2268,12 @@
           <span class="hero-eyebrow-line"></span>
           Argentina &amp; Estados Unidos &middot; An&aacute;lisis financiero institucional
         </div>
-        <h1 style="font-family:'DM Serif Display',Georgia,serif;font-size:clamp(36px,5vw,60px);font-weight:400;color:var(--white);line-height:1.1;letter-spacing:-.01em;max-width:600px;margin-bottom:24px;">
-          Inteligencia financiera <em style="font-style:italic;color:var(--gold)">institucional</em><br>para el inversor.
+        <h1 style="font-family:'DM Serif Display',Georgia,serif;font-size:clamp(44px,6vw,76px);font-weight:400;color:var(--white);line-height:1.06;letter-spacing:-.02em;max-width:660px;margin-bottom:24px;">
+          Inteligencia financiera <em style="font-style:italic;color:var(--gold)">institucional</em> para el inversor.
         </h1>
         <p class="hero-sub">An&aacute;lisis semanales profundos, reportes diarios automatizados y educaci&oacute;n financiera gratuita. Todo en un solo lugar.</p>
         <div class="hero-actions">
-          <button class="btn-primary" onclick="location.hash='#informes'">Ver &uacute;ltimo Informe</button>
+          <button class="btn-primary" id="heroCta" onclick="location.hash='#informes'">Ver &uacute;ltimo Informe</button>
           <button class="btn-outline" onclick="location.hash='#university'">Explorar University &rarr;</button>
         </div>
       </div>
@@ -2250,6 +2282,14 @@
           <div class="spotlight-head">
             <span>Mercados ahora</span>
             <span class="s-live">LIVE</span>
+          </div>
+          <div class="spot-feature">
+            <div class="spot-feature-top">
+              <span class="spot-feature-label">Riesgo Pa&iacute;s <em>EMBI+</em></span>
+              <span class="spot-feature-chg" id="hero-riesgo-chg">&#8212;</span>
+            </div>
+            <div class="spot-feature-value" id="hero-riesgo-value">&#8212;</div>
+            <svg class="spot-feature-chart" id="hero-riesgo-chart" viewBox="0 0 400 110" preserveAspectRatio="none"></svg>
           </div>
           <div class="spot-row" style="--spot-accent:#3B82F6;">
             <div class="spot-name">
@@ -2291,20 +2331,6 @@
             <div class="spot-price">
               <span class="spot-amt" id="hspot-btc-price">&#8212;</span>
               <span class="spot-chg" id="hspot-btc-chg">&#8212;</span>
-            </div>
-          </div>
-          <div class="spot-row" style="--spot-accent:#94A3B8;">
-            <div class="spot-name">
-              <div class="spot-ticker">MEP</div>
-              <div class="spot-fullname">D&oacute;lar MEP</div>
-            </div>
-            <svg class="spot-sparkline" viewBox="0 0 80 32" fill="none">
-              <polyline points="0,20 10,22 20,18 30,20 40,16 50,18 60,14 70,16 80,12" stroke="#6B7280" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              <polygon points="0,20 10,22 20,18 30,20 40,16 50,18 60,14 70,16 80,12 80,32 0,32" fill="rgba(107,114,128,.1)"/>
-            </svg>
-            <div class="spot-price">
-              <span class="spot-amt" id="hspot-mep-price">&#8212;</span>
-              <span class="spot-chg" id="hspot-mep-chg">&#8212;</span>
             </div>
           </div>
           <div class="spotlight-foot">Actualizado autom&aacute;ticamente &middot; fuentes m&uacute;ltiples</div>
@@ -4377,79 +4403,8 @@
     .member-badge{display:inline-block;font-size:9px;font-weight:700;color:var(--white);background:var(--gold);padding:1px 5px;border-radius:3px;letter-spacing:.05em;text-transform:uppercase;margin-left:5px;vertical-align:middle}
     #navUserArea{display:flex;align-items:center;gap:6px;margin-left:16px}
 
-    /* ===== MEMBRESIA: BLUR & LOCK OVERLAY ===== */
+    /* ===== MEMBRESIA: gate real lo maneja el JS de applyPaywall/paywallCardHTML mas abajo ===== */
     .member-protected { position: relative; }
-    .member-protected.locked::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      background: rgba(5,8,18,0.72);
-      z-index: 10;
-      border-radius: inherit;
-      pointer-events: none;
-    }
-        .member-lock-overlay {
-      display: none;
-      position: absolute;
-      inset: 0;
-      z-index: 11;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      text-align: center;
-      padding: 40px 24px;
-      background: rgba(5,8,18,0.78);
-      backdrop-filter: blur(2px);
-    }
-    .member-protected.locked .member-lock-overlay { display: flex; }
-    .member-lock-card {
-      display: flex; flex-direction: column; align-items: center; gap: 14px;
-      background: #0A0F1E;
-      border: 1px solid var(--gold, #B8943F);
-      border-radius: 12px; padding: 36px 40px; max-width: 340px; width: 100%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-    }
-    .member-lock-logo {
-      width: 48px; height: 48px;
-      background: var(--gold, #B8943F);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      color: #0A0F1E; font-weight: 800; font-size: 18px;
-      letter-spacing: 0.02em; font-family: var(--font-display, serif);
-    }
-    .member-lock-label {
-      color: var(--gold, #B8943F);
-      font-size: 11px; font-weight: 700;
-      letter-spacing: .12em; text-transform: uppercase;
-      margin-bottom: -4px;
-    }
-    .member-lock-price {
-      display: flex; align-items: baseline; gap: 2px;
-      margin: 4px 0;
-    }
-    .member-lock-price-amount {
-      font-size: 48px; font-weight: 800; color: #ffffff;
-      font-family: var(--font-display, serif); line-height: 1;
-    }
-    .member-lock-price-period {
-      font-size: 15px; color: rgba(255,255,255,0.5); font-weight: 400;
-    }
-    .member-unlock-btn {
-      background: var(--gold, #B8943F);
-      color: #0A0F1E; border: none; border-radius: 6px;
-      padding: 13px 0; margin-top: 4px;
-      font-size: 14px; font-weight: 800; cursor: pointer;
-      letter-spacing: 0.04em;
-      transition: opacity .15s, transform .15s;
-      width: 100%;
-    }
-    .member-unlock-btn:hover { opacity: .88; transform: translateY(-1px); }
-    .member-lock-fine {
-      font-size: 11px; color: rgba(255,255,255,0.35);
-      letter-spacing: .02em; margin-top: -4px;
-    }
         /* ===== MODAL PAGO ===== */
     .payment-overlay {
       position: fixed; inset: 0; z-index: 3000;
@@ -9847,9 +9802,68 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
         }
       } catch(e) { console.warn('[v2] xau:', e.message); }
     }
+    async function loadHeroRiesgo() {
+      try {
+        var r = await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais', {signal: AbortSignal.timeout(8000)});
+        if (!r.ok) return;
+        var data = await r.json();
+        if (!Array.isArray(data) || !data.length) return;
+        var series = data.slice(-60).map(function(d){ return d.valor != null ? d.valor : d.value; }).filter(function(v){ return v != null; });
+        if (!series.length) return;
+        var last = series[series.length - 1];
+        var prev = series.length > 1 ? series[series.length - 2] : last;
+        var delta = last - prev;
+        var isUp = delta > 0;
+        var valEl = document.getElementById('hero-riesgo-value');
+        var chgEl = document.getElementById('hero-riesgo-chg');
+        var chartEl = document.getElementById('hero-riesgo-chart');
+        if (valEl) {
+          var prevText = valEl.textContent;
+          var newText = Math.round(last) + ' pb';
+          if (prevText !== '—' && prevText !== newText) {
+            valEl.classList.remove('flash-up', 'flash-down');
+            void valEl.offsetWidth;
+            valEl.classList.add(isUp ? 'flash-up' : 'flash-down');
+          }
+          valEl.textContent = newText;
+        }
+        if (chgEl) {
+          chgEl.textContent = (delta >= 0 ? '+' : '') + Math.round(delta) + ' pb hoy';
+          chgEl.className = 'spot-feature-chg ' + (isUp ? 'up' : 'down');
+        }
+        if (chartEl) {
+          var w = 400, h = 110, pad = 10;
+          var min = Math.min.apply(null, series), max = Math.max.apply(null, series);
+          var range = (max - min) || 1;
+          var step = series.length > 1 ? w / (series.length - 1) : w;
+          var pts = series.map(function(v, i) {
+            var x = i * step;
+            var y = pad + (1 - (v - min) / range) * (h - pad * 2);
+            return x.toFixed(1) + ',' + y.toFixed(1);
+          });
+          var lineColor = isUp ? '#EF4444' : '#10B981';
+          var fillColor = isUp ? 'rgba(239,68,68,.14)' : 'rgba(16,185,129,.14)';
+          var polygonPts = pts.concat([w.toFixed(1) + ',' + h, '0,' + h]).join(' ');
+          chartEl.innerHTML = '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + lineColor + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '<polygon points="' + polygonPts + '" fill="' + fillColor + '"/>';
+        }
+      } catch (e) { console.warn('[hero] riesgo pais:', e.message); }
+    }
+    function initHeroMagneticCta() {
+      var btn = document.getElementById('heroCta');
+      if (!btn || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      btn.addEventListener('mousemove', function(e) {
+        var rect = btn.getBoundingClientRect();
+        var x = e.clientX - rect.left - rect.width / 2;
+        var y = e.clientY - rect.top - rect.height / 2;
+        btn.style.transform = 'translate(' + (x * 0.18).toFixed(1) + 'px,' + (y * 0.3).toFixed(1) + 'px)';
+      });
+      btn.addEventListener('mouseleave', function() { btn.style.transform = ''; });
+    }
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() { initFilterTabs(); loadMarketCards(); });
-    } else { initFilterTabs(); loadMarketCards(); }
+      document.addEventListener('DOMContentLoaded', function() { initFilterTabs(); loadMarketCards(); loadHeroRiesgo(); initHeroMagneticCta(); });
+    } else { initFilterTabs(); loadMarketCards(); loadHeroRiesgo(); initHeroMagneticCta(); }
+    setInterval(loadHeroRiesgo, 90000);
   })();
   </script>
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
