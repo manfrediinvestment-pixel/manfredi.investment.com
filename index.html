@@ -24,6 +24,8 @@
       --red:         #EF4444;
       --yellow:      #F59E0B;
       --transition:  .2s cubic-bezier(.4,0,.2,1);
+      --font-display:'DM Serif Display', Georgia, serif;
+      --bg-card:     #0D1526;
     }
 
     html { scroll-behavior: smooth; }
@@ -654,19 +656,7 @@
       gap: 12px;
       padding: 13px 20px;
       border-bottom: 1px solid rgba(255,255,255,.04);
-    display: none;
-    }
-        .payment-overlay.open {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 1;
-  pointer-events: auto;
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: rgba(0,0,0,0.85);
-}transition: background var(--transition);
+      transition: background var(--transition);
     }
     .feed-item:last-child { border-bottom: none; }
     .feed-item:hover { background: rgba(255,255,255,.02); }
@@ -1823,11 +1813,10 @@
     /* PPP DASH CARDS PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP */
     .dash-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 16px;
       margin-bottom: 32px;
     }
-    @media(max-width:900px){ .dash-grid { grid-template-columns: repeat(2,1fr); } }
     @media(max-width:560px){ .dash-grid { grid-template-columns: 1fr; } }
     .dash-card {
       background: var(--white);
@@ -1854,8 +1843,9 @@
     .dc-meta-label { font-size: 9.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--text-sec); }
     .dc-meta-val { font-size: 11.5px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
     /* PPP AT-CARDS (TABLES) PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP */
-    .at-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 8px; }
-    @media(max-width:760px){ .at-grid { grid-template-columns: 1fr; } }
+    .at-grid { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 8px; }
+    .at-col { display: flex; flex-direction: column; gap: 20px; flex: 1 1 460px; }
+    @media(max-width:760px){ .at-col { flex-basis: 100% !important; } }
     .at-card { background: var(--white); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
     .at-head { background: var(--primary); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
     .at-head-title { font-size: 13px; font-weight: 600; color: var(--white); display: flex; align-items: center; gap: 8px; }
@@ -2475,7 +2465,7 @@
         </div>
       </div>
       <div class="at-grid" data-aos="fade-up">
-        <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="at-col">
           <div class="at-card" data-table="adrs">
             <div class="at-head">
               <div class="at-head-title">&#127462;&#127479; ADRs Argentina</div>
@@ -2506,7 +2496,7 @@
             </div>
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="at-col">
           <div class="at-card" data-table="ar">
             <div class="at-head">
               <div class="at-head-title">&#127462;&#127479; Bonos AR <span style="font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);margin-left:6px;">MERVAL</span></div>
@@ -2538,8 +2528,8 @@
         </div>
       </div>
       <table style="display:none;"><tbody id="marketsTableBody"></tbody></table>
-      <div class="at-grid" data-aos="fade-up" style="margin-top:20px;grid-template-columns:1fr 1fr;">
-        <div style="display:flex;flex-direction:column;gap:20px;">
+      <div class="at-grid" data-aos="fade-up" style="margin-top:20px;">
+        <div class="at-col">
           <div class="at-card" data-table="crypto">
             <div class="at-head">
               <div class="at-head-title">&#8383; Crypto</div>
@@ -2571,7 +2561,7 @@
             </div>
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="at-col">
           <div class="at-card" data-table="etf">
             <div class="at-head">
               <div class="at-head-title">&#127482;&#127480; ETFs USA</div>
@@ -4266,9 +4256,11 @@
   .vs-sep { text-align: center; font-family: sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--gray); }
   .instrument-card {
     padding: 1rem 1.25rem; margin: 8px 0;
+  }
   .instrument-icon {
     width: 36px; height: 36px; border-radius: 8px;
     font-size: 16px; flex-shrink: 0; font-weight: 700;
+  }
   .instrument-name { font-size: 0.95rem; font-weight: 700; color: #111; margin-bottom: 3px; }
   .instrument-desc { font-size: 0.82rem; color: var(--gray); line-height: 1.45; }
   .instrument-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-top: 5px; }
@@ -4457,45 +4449,66 @@
     .member-lock-fine {
       font-size: 11px; color: rgba(255,255,255,0.35);
       letter-spacing: .02em; margin-top: -4px;
-    }margin-top: 1px; }
+    }
         /* ===== MODAL PAGO ===== */
     .payment-overlay {
       position: fixed; inset: 0; z-index: 3000;
-      background: rgba(0,0,0,.78);
+      background: rgba(5,8,16,.82);
+      backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
       display: none !important; transition: opacity .3s;
+      padding: 24px;
     }
     .payment-overlay.open { display: flex !important; align-items: center; justify-content: center; opacity: 1; pointer-events: auto; }
     .payment-modal-box {
-      background: var(--bg-card, #111827);
-      border: 1px solid rgba(242,201,76,.25);
-      border-radius: 16px; padding: 36px 32px;
-      width: 100%; max-width: 480px; position: relative;
+      background: linear-gradient(180deg, #101B2E 0%, #0C1526 100%);
+      border: 1px solid rgba(242,201,76,.18);
+      border-radius: 18px; padding: 40px 36px 32px;
+      width: 100%; max-width: 440px; position: relative;
+      box-shadow: 0 24px 70px rgba(0,0,0,.55);
     }
-    .payment-modal-box h2 { font-family: var(--font-display); font-size: 22px; color: var(--gold); margin-bottom: 6px; }
-    .payment-modal-box > p { color: var(--text-sec); font-size: 14px; line-height: 1.6; margin-bottom: 22px; }
-    .pay-plan-card {
-      background: rgba(255,255,255,.04); border: 1px solid rgba(242,201,76,.2);
-      border-radius: 12px; padding: 18px 20px; margin-bottom: 10px;
-      cursor: pointer; transition: border-color .2s, background .2s;
+    .pay-close {
+      position: absolute; top: 16px; right: 16px; width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,.06); border: none; border-radius: 50%;
+      color: rgba(255,255,255,.55); font-size: 18px; line-height: 1; cursor: pointer;
+      transition: background .15s, color .15s;
     }
-    .pay-plan-card.selected, .pay-plan-card:hover { border-color: var(--gold); background: rgba(242,201,76,.07); }
-    .pay-plan-name { font-weight: 700; color: var(--text-primary, #fff); font-size: 15px; }
-    .pay-plan-price { color: var(--gold); font-size: 20px; font-weight: 800; margin: 3px 0; }
-    .pay-plan-desc { color: var(--text-sec); font-size: 12px; }
-    .pay-methods { margin: 20px 0 0; }
-    .pay-methods h4 { color: var(--text-primary, #fff); font-size: 13px; margin-bottom: 10px; }
-    .pay-btns { display: flex; gap: 10px; flex-wrap: wrap; }
-    .pay-btn {
-      flex: 1; min-width: 120px; padding: 11px 8px;
-      border: 1px solid rgba(255,255,255,.1); border-radius: 8px;
-      background: rgba(255,255,255,.04); color: var(--text-primary, #fff);
-      font-size: 13px; font-weight: 600; cursor: pointer; text-align: center;
-      transition: background .2s, border-color .2s;
+    .pay-close:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .pay-mark {
+      width: 44px; height: 44px; background: var(--gold); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; color: var(--primary);
+      font-family: var(--font-display); margin-bottom: 20px;
     }
-    .pay-btn:hover { background: rgba(242,201,76,.1); border-color: var(--gold); }
-    .pay-note { text-align:center; color: var(--text-sec); font-size:12px; margin-top:16px; line-height:1.6; }
-    .pay-note a { color: var(--gold); text-decoration: none; }
-    .pay-close { position: absolute; top: 14px; right: 16px; background: none; border: none; color: var(--text-sec); font-size: 22px; cursor: pointer; line-height: 1; }
+    .pay-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+    .payment-modal-box h2 { font-family: var(--font-display); font-weight: 400; font-size: 26px; letter-spacing: -0.01em; color: #fff; line-height: 1.18; margin-bottom: 10px; }
+    .payment-modal-box .pay-sub { color: rgba(255,255,255,.6); font-size: 14px; line-height: 1.55; margin-bottom: 26px; }
+    .pay-price-row { display: flex; align-items: baseline; gap: 6px; }
+    .pay-price-amount { font-family: var(--font-display); font-size: 46px; font-weight: 400; color: var(--gold); line-height: 1; font-variant-numeric: tabular-nums; }
+    .pay-price-period { font-size: 15px; color: rgba(255,255,255,.5); font-weight: 500; }
+    .pay-price-fine { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 6px; margin-bottom: 24px; }
+    .pay-benefits {
+      list-style: none; margin: 0 0 26px; padding: 18px 0;
+      border-top: 1px solid rgba(255,255,255,.08); border-bottom: 1px solid rgba(255,255,255,.08);
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .pay-benefits li { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; color: rgba(255,255,255,.85); line-height: 1.5; }
+    .pay-benefits svg { flex-shrink: 0; margin-top: 2px; }
+    .pay-cta {
+      display: block; width: 100%; text-align: center; padding: 15px 0;
+      background: var(--gold); color: var(--primary); font-weight: 700; font-size: 15px;
+      letter-spacing: .01em; border: none; border-radius: 10px; cursor: pointer;
+      transition: transform .15s, box-shadow .15s, background .15s;
+    }
+    .pay-cta:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 10px 24px rgba(242,201,76,.22); }
+    .pay-cta:disabled { opacity: .6; cursor: wait; transform: none; box-shadow: none; }
+    .pay-secondary {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      margin-top: 16px; font-size: 11.5px; color: rgba(255,255,255,.4); letter-spacing: .01em;
+    }
+    .pay-note { text-align: center; color: rgba(255,255,255,.42); font-size: 11.5px; margin-top: 18px; line-height: 1.6; }
+    .pay-note a { color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(242,201,76,.3); }
+    .pay-note a:hover { border-color: var(--gold); }
 
   
   /* === SCROLL ANIMATIONS === */
@@ -9700,17 +9713,30 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
 
   <div id="paymentOverlay" class="payment-overlay" style="display:none !important">
     <div class="payment-modal-box">
-      <button class="pay-close" onclick="closePaymentModal()">&times;</button>
-      <div style="width:56px;height:56px;background:var(--gold,#B8943F);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-weight:800;font-size:20px;color:#000;font-family:var(--font-display)">MI</div>
-      <h2 style="text-align:center;margin-bottom:6px;">Membresía Manfredi Investment</h2>
-      <p style="text-align:center;margin-bottom:24px;">Accedé a todos los análisis, picks y posiciones con membresía activa.</p>
-      <div style="text-align:center;margin-bottom:8px;font-size:42px;font-weight:800;color:var(--gold,#B8943F);font-family:var(--font-display)">$10 <span style="font-size:18px;color:var(--text-sec,#aaa)">USD/mes</span></div>
-      <p style="text-align:center;font-size:12px;color:var(--text-sec,#aaa);margin-bottom:28px;">por mes · cancelá cuando quieras</p>
-      <button onclick="handlePayment('mercadopago')" style="width:100%;padding:14px;background:var(--gold,#B8943F);color:#000;font-weight:700;font-size:16px;border:none;border-radius:10px;cursor:pointer;margin-bottom:12px;">💳 Pagar con Mercado Pago</button>
-      <p style="font-size:0.75rem; color:#a0a0a0; margin-top:0.5rem; text-align:center;">
-        ⚠️ Asegurate de pagar con el mismo email con el que iniciaste sesión en la página.
+      <button class="pay-close" onclick="closePaymentModal()" aria-label="Cerrar">&times;</button>
+      <div class="pay-mark">MI</div>
+      <div class="pay-eyebrow">Membresía Manfredi Investment</div>
+      <h2>Todo el análisis, sin límites.</h2>
+      <p class="pay-sub">Acceso completo a Warren (asesor IA) y a todos los picks y tesis de inversión, sin vista parcial.</p>
+      <div class="pay-price-row">
+        <span class="pay-price-amount">$10</span>
+        <span class="pay-price-period">USD/mes</span>
+      </div>
+      <p class="pay-price-fine">Facturación mensual · cancelás cuando quieras</p>
+      <ul class="pay-benefits">
+        <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F2C94C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Warren, tu asesor IA &mdash; consultas ilimitadas 24/7</li>
+        <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F2C94C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Picks y tesis de inversión completos, sin blur</li>
+        <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F2C94C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Cancelás cuando quieras, sin permanencia</li>
+      </ul>
+      <button class="pay-cta" onclick="handlePayment('mercadopago')">Suscribirme ahora &rarr;</button>
+      <div class="pay-secondary">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V8a5 5 0 0 1 10 0v3"/></svg>
+        Pago seguro procesado por Mercado Pago
+      </div>
+      <p class="pay-note">
+        ⚠️ Asegurate de pagar con el mismo email con el que iniciaste sesión en la página.<br>
+        ¿Ya tenés membresía? <a href="#" onclick="closePaymentModal()">Iniciá sesión</a>
       </p>
-      <p style="text-align:center;font-size:12px;color:var(--text-sec,#aaa);margin-top:8px;">¿Ya tenés membresía? <a href="#" onclick="closePaymentModal()" style="color:var(--gold,#B8943F)">Iniciá sesión</a></p>
     </div>
   </div>
   <script>
@@ -9764,6 +9790,14 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
           document.querySelectorAll('.at-card[data-table]').forEach(function(card) {
             var id = card.getAttribute('data-table');
             card.style.display = (filter === 'all' || showTables.some(function(s){ return card.contains(document.getElementById(s)); })) ? '' : 'none';
+          });
+          document.querySelectorAll('.at-col').forEach(function(col) {
+            var hasVisible = Array.from(col.querySelectorAll('.at-card')).some(function(c){ return c.style.display !== 'none'; });
+            col.style.display = hasVisible ? '' : 'none';
+          });
+          document.querySelectorAll('.dash-card[data-region]').forEach(function(card) {
+            var region = card.getAttribute('data-region');
+            card.style.display = (filter === 'all' || region === filter) ? '' : 'none';
           });
         });
       });
