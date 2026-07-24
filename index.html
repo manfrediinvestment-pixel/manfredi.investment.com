@@ -1674,7 +1674,9 @@
     }
 
     #loginOverlay{position:fixed;inset:0;background:rgba(10,15,30,0.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .3s}
-    .login-card{background:var(--white);border-radius:12px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+    .login-card{position:relative;background:var(--white);border-radius:12px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+    .login-close{position:absolute;top:14px;right:14px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:var(--bg-alt);border:none;border-radius:50%;color:var(--text-sec);font-size:18px;line-height:1;cursor:pointer;transition:background .15s,color .15s}
+    .login-close:hover{background:var(--border);color:var(--text-primary)}
     .login-logo-mark{width:52px;height:52px;background:var(--primary);border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px;letter-spacing:.02em;margin-bottom:20px}
     .login-title{font-family:'DM Serif Display',Georgia,serif;font-size:26px;color:var(--primary);margin-bottom:8px}
     .login-sub{font-size:14px;color:var(--text-sec);margin-bottom:32px;line-height:1.5}
@@ -1997,7 +1999,7 @@
   <!-- Firebase SDK (Authentication + Firestore) -->
   <script type="module">
     import { initializeApp }           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut }
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut }
                                         from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
     import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp }
                                         from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -2090,6 +2092,9 @@
       } else {
         window._isMiembro = false;
         window._currentUser = null;
+        // Sin esto, el token de membresia del usuario anterior quedaba en
+        // localStorage y isMember() seguia devolviendo true tras el logout.
+        localStorage.removeItem('mi_member_token');
         // Re-aplicar el paywall: si el usuario anterior estaba desbloqueado
         // (miembro o el owner), el logout tiene que volver a taparlo sin
         // esperar a un reload completo de la pagina.
@@ -2155,6 +2160,52 @@
       }
     };
 
+    window.signUpWithEmail = async function() {
+      const emailInput = document.getElementById('loginEmailInput');
+      const passInput = document.getElementById('loginPassInput');
+      const btn = document.getElementById('loginEmailBtn');
+      const errorEl = document.getElementById('loginError');
+      if (!emailInput || !passInput) return;
+      const email = emailInput.value.trim();
+      const pass = passInput.value;
+      if (!email || !pass) {
+        if (errorEl) { errorEl.textContent = 'Completá email y contraseña.'; errorEl.style.display = 'block'; }
+        return;
+      }
+      if (pass.length < 6) {
+        if (errorEl) { errorEl.textContent = 'La contraseña debe tener al menos 6 caracteres.'; errorEl.style.display = 'block'; }
+        return;
+      }
+      if (btn) { btn.disabled = true; btn.textContent = 'Creando cuenta...'; }
+      if (errorEl) { errorEl.style.display = 'none'; }
+      try {
+        await createUserWithEmailAndPassword(auth, email, pass);
+      } catch(e) {
+        if (btn) { btn.disabled = false; btn.textContent = 'Crear cuenta'; }
+        let msg = 'Error al crear la cuenta. Intentá de nuevo.';
+        if (e.code === 'auth/email-already-in-use') msg = 'Ese email ya tiene una cuenta. Iniciá sesión.';
+        else if (e.code === 'auth/weak-password') msg = 'La contraseña es muy débil.';
+        else if (e.code === 'auth/invalid-email') msg = 'Email inválido.';
+        if (errorEl) { errorEl.textContent = msg; errorEl.style.display = 'block'; }
+      }
+    };
+
+    window._authMode = 'login';
+    window.toggleAuthMode = function() {
+      const emailBtn = document.getElementById('loginEmailBtn');
+      const toggleLink = document.getElementById('loginModeToggle');
+      const errorEl = document.getElementById('loginError');
+      if (errorEl) errorEl.style.display = 'none';
+      window._authMode = window._authMode === 'login' ? 'signup' : 'login';
+      if (window._authMode === 'signup') {
+        if (emailBtn) { emailBtn.textContent = 'Crear cuenta'; emailBtn.onclick = window.signUpWithEmail; }
+        if (toggleLink) toggleLink.textContent = '¿Ya tenés cuenta? Iniciá sesión';
+      } else {
+        if (emailBtn) { emailBtn.textContent = 'Ingresar con email'; emailBtn.onclick = window.signInWithEmail; }
+        if (toggleLink) toggleLink.textContent = '¿No tenés cuenta? Registrate';
+      }
+    };
+
     // ââ Password Reset ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
     window.resetPassword = async function() {
       const emailInput = document.getElementById('loginEmailInput');
@@ -2204,14 +2255,25 @@
       if (overlay) overlay.style.display = 'flex';
     }
 
+    function hideLoginOverlay() {
+      const overlay = document.getElementById('loginOverlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') hideLoginOverlay();
+    });
+
     window.showLoginOverlay = showLoginOverlay;
+    window.hideLoginOverlay = hideLoginOverlay;
   </script>
 <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 </head>
 <body>
   <!-- ââ Login Overlay ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <div id="loginOverlay" style="display:none">
+  <div id="loginOverlay" style="display:none" onclick="if(event.target===this) window.hideLoginOverlay && window.hideLoginOverlay()">
     <div class="login-card">
+      <button class="login-close" onclick="window.hideLoginOverlay && window.hideLoginOverlay()" aria-label="Cerrar">&times;</button>
       <div class="login-logo-mark">MI</div>
       <h1 class="login-title">Manfredi Investment</h1>
       <p class="login-sub">Ingresá con tu cuenta de Google o con tu email y contraseña.</p>
@@ -2223,6 +2285,7 @@
       <input id="loginEmailInput" class="login-input" type="email" placeholder="Correo electrónico" autocomplete="email">
       <input id="loginPassInput" class="login-input" type="password" placeholder="Contraseña" autocomplete="current-password">
       <button id="loginEmailBtn" onclick="window.signInWithEmail && window.signInWithEmail()">Ingresar con email</button>
+      <button id="loginModeToggle" class="login-forgot" style="text-align:center;width:100%" onclick="window.toggleAuthMode && window.toggleAuthMode()">¿No tenés cuenta? Registrate</button>
       <button class="login-forgot" onclick="window.resetPassword && window.resetPassword()">¿Olvidaste tu contraseña?</button>
       <p id="loginError" class="login-error"></p>
       <p class="login-footer">Al acceder aceptás los Términos de Uso.</p>
@@ -4434,7 +4497,9 @@
     .live-table-section .markets-table-wrap{max-height:260px;overflow-y:auto}
     .loading-cell{text-align:center;color:var(--text-sec);font-style:italic;padding:14px!important}
     #loginOverlay{position:fixed;inset:0;background:rgba(10,15,30,0.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .3s}
-    .login-card{background:var(--white);border-radius:12px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+    .login-card{position:relative;background:var(--white);border-radius:12px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+    .login-close{position:absolute;top:14px;right:14px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:var(--bg-alt);border:none;border-radius:50%;color:var(--text-sec);font-size:18px;line-height:1;cursor:pointer;transition:background .15s,color .15s}
+    .login-close:hover{background:var(--border);color:var(--text-primary)}
     .login-logo-mark{width:52px;height:52px;background:var(--primary);border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px;letter-spacing:.02em;margin-bottom:20px}
     .login-title{font-family:'DM Serif Display',Georgia,serif;font-size:26px;color:var(--primary);margin-bottom:8px}
     .login-sub{font-size:14px;color:var(--text-sec);margin-bottom:32px;line-height:1.5}
@@ -9648,7 +9713,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
                 + '<div style="margin-bottom:6px;"><span style="font-size:2rem;font-weight:800;color:var(--gold,#F2C94C);">$10</span><span style="font-size:1rem;color:rgba(255,255,255,0.7);margin-left:4px;">USD</span></div>'
                 + '<p style="margin:0 0 20px;font-size:0.78rem;color:rgba(255,255,255,0.5);">por mes · cancelá cuando quieras</p>'
                 + '<a href="#" onclick="event.preventDefault();openPaymentModal();" style="display:block;background:var(--gold,#F2C94C);color:var(--primary,#0A0F1E);font-weight:700;font-size:1rem;padding:12px 0;border-radius:8px;text-decoration:none;margin-bottom:12px;">Suscribirse ahora</a>'
-                + '<p style="margin:0;font-size:0.8rem;color:rgba(255,255,255,0.5);">¿Ya tenés membresía? <a href="#" onclick="document.getElementById(\'loginModal\') && (document.getElementById(\'loginModal\').style.display=\'flex\');return false;" style="color:var(--gold,#F2C94C);text-decoration:underline;">Iniciá sesión</a></p>'
+                + '<p style="margin:0;font-size:0.8rem;color:rgba(255,255,255,0.5);">¿Ya tenés membresía? <a href="#" onclick="event.preventDefault();window.showLoginOverlay && window.showLoginOverlay();" style="color:var(--gold,#F2C94C);text-decoration:underline;">Iniciá sesión</a></p>'
                 + '</div></div>';
 
               function applyPaywall(containerSel, wrapperSel) {
