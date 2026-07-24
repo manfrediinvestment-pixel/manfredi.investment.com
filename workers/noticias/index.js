@@ -11,18 +11,24 @@ const CORS_HEADERS = {
 const KV_KEY = 'noticias';
 const KV_TTL = 60 * 45; // 45 min — dentro del rango 30-60 pedido; el cron de 30 min lo mantiene tibio.
 
+// Ámbito/Cronista/Bloomberg Línea confirmados estables desde el Worker.
+// Infobae devuelve 0 items de forma consistente al pedirse desde IPs de
+// Cloudflare Workers (probable bloqueo anti-bot del lado del sitio, el mismo
+// feed funciona perfecto pedido desde fuera) -- se deja con max bajo como
+// bonus best-effort, pero el resto de las fuentes ya suma 10 por su cuenta
+// para no depender de que Infobae responda.
 const FUENTES_ARG = [
-  { fuente: 'Ámbito',         url: 'https://www.ambito.com/rss/economia.xml',                                          max: 2 },
+  { fuente: 'Ámbito',         url: 'https://www.ambito.com/rss/economia.xml',                                          max: 4 },
   { fuente: 'Infobae',        url: 'https://www.infobae.com/arc/outboundfeeds/rss/category/economia/',                 max: 2 },
-  { fuente: 'El Cronista',    url: 'https://www.cronista.com/arc/outboundfeeds/rss/category/economia-politica/',       max: 2 },
-  { fuente: 'Bloomberg Línea', url: 'https://www.bloomberglinea.com/arc/outboundfeeds/rss/latinoamerica/argentina.xml', max: 1 },
+  { fuente: 'El Cronista',    url: 'https://www.cronista.com/arc/outboundfeeds/rss/category/economia-politica/',       max: 4 },
+  { fuente: 'Bloomberg Línea', url: 'https://www.bloomberglinea.com/arc/outboundfeeds/rss/latinoamerica/argentina.xml', max: 2 },
 ];
 
 const FUENTES_US = [
-  { fuente: 'Yahoo Finance',  url: 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US', max: 2 },
-  { fuente: 'Investing.com',  url: 'https://www.investing.com/rss/news_25.rss',                                       max: 2 },
-  { fuente: 'Seeking Alpha',  url: 'https://seekingalpha.com/market_currents.xml',                                    max: 1 },
-  { fuente: 'The Economist',  url: 'https://www.economist.com/finance-and-economics/rss.xml',                          max: 1 },
+  { fuente: 'Yahoo Finance',  url: 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US', max: 3 },
+  { fuente: 'Investing.com',  url: 'https://www.investing.com/rss/news_25.rss',                                       max: 3 },
+  { fuente: 'Seeking Alpha',  url: 'https://seekingalpha.com/market_currents.xml',                                    max: 2 },
+  { fuente: 'The Economist',  url: 'https://www.economist.com/finance-and-economics/rss.xml',                          max: 2 },
 ];
 
 export default {
