@@ -1938,29 +1938,119 @@
     .section-mercados { background: var(--navy-1); position: relative; }
     .section-mercados .section-title { color: var(--white); }
     .section-mercados .section-sub   { color: rgba(255,255,255,.38); }
-    .section-mercados .f-tab { background: transparent; border-color: rgba(255,255,255,.15); color: rgba(255,255,255,.55); }
-    .section-mercados .f-tab:hover { border-color: rgba(242,201,76,.4); color: var(--gold); }
-    .section-mercados .f-tab.active { background: var(--gold); border-color: var(--gold); color: var(--primary); }
-    .section-mercados .dash-card { background: var(--navy-4); border: 1px solid rgba(255,255,255,.08); border-left: 4px solid var(--card-accent, var(--text-sec)); }
-    .section-mercados .dash-card:hover { box-shadow: none; background: #0F1E32; }
-    .section-mercados .dash-card.pos { border: 1px solid rgba(16,185,129,.25); border-left: 4px solid var(--card-accent, var(--text-sec)); }
-    .section-mercados .dash-card.neg { border: 1px solid rgba(239,68,68,.25); border-left: 4px solid var(--card-accent, var(--text-sec)); }
-    .section-mercados .dc-ticker { color: rgba(255,255,255,.45); }
-    .section-mercados .dc-name { color: var(--white); }
-    .section-mercados .dc-badge { background: rgba(255,255,255,.07); color: rgba(255,255,255,.55); }
-    .section-mercados .dc-price { color: var(--white); }
-    .section-mercados .dc-meta-label { color: rgba(255,255,255,.32); }
-    .section-mercados .dc-meta-val { color: rgba(255,255,255,.7); }
-    .section-mercados .at-card { background: var(--navy-4); border: 1px solid rgba(255,255,255,.08); }
-    .section-mercados .at-cols { background: rgba(255,255,255,.03); border-bottom: 1px solid rgba(255,255,255,.06); }
-    .section-mercados .at-col-label { color: rgba(255,255,255,.32); }
-    .section-mercados .at-row { border-bottom: 1px solid rgba(255,255,255,.06); }
-    .section-mercados .at-row:hover { background: rgba(255,255,255,.03); }
-    .section-mercados .at-row:nth-child(even) { background: rgba(255,255,255,.015); }
-    .section-mercados .at-ticker, .section-mercados .at-name-main, .section-mercados .at-price { color: var(--white); font-family: 'IBM Plex Mono', monospace; }
-    .section-mercados .at-fullname { color: rgba(255,255,255,.4); }
     .section-mercados .last-updated { color: rgba(255,255,255,.32) !important; }
     .section-mercados #apiStatus { color: rgba(255,255,255,.5); }
+
+    /* Buscador */
+    .mkt-search-wrap { position: relative; margin: 22px 0 6px; }
+    .mkt-search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,.35); pointer-events: none; }
+    .mkt-search-input {
+      width: 100%; background: var(--navy-4); border: 1px solid rgba(255,255,255,.12); border-radius: 8px;
+      padding: 13px 44px; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; color: var(--white);
+    }
+    .mkt-search-input::placeholder { color: rgba(255,255,255,.32); }
+    .mkt-search-input:focus { outline: none; border-color: rgba(242,201,76,.5); }
+    .mkt-search-clear {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none;
+      color: rgba(255,255,255,.4); font-size: 18px; line-height: 1; cursor: pointer; padding: 4px 6px;
+    }
+    .mkt-search-clear:hover { color: var(--gold); }
+    .mkt-search-results {
+      background: var(--navy-4); border: 1px solid rgba(255,255,255,.1); border-radius: 8px;
+      margin-bottom: 18px; max-height: 420px; overflow-y: auto;
+    }
+    .mkt-search-empty { padding: 18px; text-align: center; font-size: 12.5px; color: rgba(255,255,255,.4); }
+
+    /* Layout 2 columnas */
+    .mkt-body { display: grid; grid-template-columns: 260px 1fr; gap: 18px; align-items: start; }
+    @media (max-width: 860px) { .mkt-body { grid-template-columns: 1fr; } }
+
+    .mkt-hero-col { display: flex; flex-direction: column; gap: 8px; }
+    .mkt-hero-skeleton { color: rgba(255,255,255,.3); font-size: 12.5px; padding: 12px 2px; }
+    .mkt-hero-card {
+      background: var(--navy-4); border: 1px solid rgba(255,255,255,.08); border-left: 3px solid var(--gold);
+      border-radius: 6px; padding: 12px 14px;
+    }
+    .mkt-hero-card .mh-name {
+      color: rgba(255,255,255,.5); font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em;
+      font-family: 'IBM Plex Mono', monospace; display: flex; align-items: center; gap: 6px;
+    }
+    .mkt-hero-card .mh-price {
+      color: var(--white); font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 4px;
+    }
+    .mkt-hero-card .mh-chg { font-size: 11.5px; font-variant-numeric: tabular-nums; margin-top: 2px; }
+    .mkt-hero-card .mh-chg.pos { color: #10B981; }
+    .mkt-hero-card .mh-chg.neg { color: #EF4444; }
+    .mkt-hero-card .mh-chg.neutral { color: rgba(255,255,255,.35); }
+    .mkt-hero-card .mh-chart { margin-top: 8px; height: 34px; line-height: 0; }
+
+    /* Modal de detalle de activo */
+    .mkt-modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(4,7,14,.72); z-index: 500;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .mkt-modal-overlay.open { display: flex; }
+    .mkt-modal-box {
+      width: 420px; max-width: 100%; background: var(--navy-3); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.5); max-height: 88vh; overflow-y: auto;
+    }
+    .mkt-modal-inner { padding: 22px 24px; }
+    .mkt-modal-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+    .mkt-modal-ticker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .06em; color: var(--gold); text-transform: uppercase; }
+    .mkt-modal-name { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 21px; color: var(--white); margin: 3px 0 0; }
+    .mkt-modal-close {
+      background: none; border: 1px solid rgba(255,255,255,.18); color: rgba(255,255,255,.6);
+      width: 28px; height: 28px; border-radius: 50%; font-size: 15px; cursor: pointer; flex-shrink: 0; line-height: 1;
+    }
+    .mkt-modal-close:hover { border-color: rgba(242,201,76,.5); color: var(--gold); }
+    .mkt-modal-price-row { display: flex; align-items: baseline; gap: 12px; margin: 14px 0 4px; }
+    .mkt-modal-price { font-size: 30px; font-weight: 700; color: var(--white); font-variant-numeric: tabular-nums; }
+    .mkt-modal-chg { font-size: 13.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .mkt-modal-chg.pos { color: #10B981; } .mkt-modal-chg.neg { color: #EF4444; } .mkt-modal-chg.neutral { color: rgba(255,255,255,.35); }
+    .mkt-modal-range { font-size: 11px; color: rgba(255,255,255,.4); margin-bottom: 16px; font-family: 'IBM Plex Mono', monospace; min-height: 14px; }
+    .mkt-modal-chart-wrap { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: 8px; padding: 14px 10px 8px; min-height: 130px; }
+    .mkt-modal-loading { color: rgba(255,255,255,.35); font-size: 12.5px; text-align: center; padding: 48px 10px; }
+    .mkt-modal-meta { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.07); }
+    .mkt-modal-meta .mmd-label { font-size: 9.5px; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.32); font-family: 'IBM Plex Mono', monospace; }
+    .mkt-modal-meta .mmd-val { font-size: 13px; color: var(--white); margin-top: 3px; font-variant-numeric: tabular-nums; }
+
+    /* Tabs de categoria */
+    .mkt-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .mkt-tab {
+      font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em;
+      padding: 7px 12px; border-radius: 5px; border: 1px solid rgba(255,255,255,.15); background: transparent;
+      color: rgba(255,255,255,.55); cursor: pointer;
+    }
+    .mkt-tab:hover { border-color: rgba(242,201,76,.4); color: var(--gold); }
+    .mkt-tab.active { background: var(--gold); border-color: var(--gold); color: var(--primary); }
+
+    /* Tabla de categoria */
+    .mkt-table-wrap { background: var(--navy-4); border: 1px solid rgba(255,255,255,.08); border-radius: 8px; overflow: hidden; }
+    .mkt-table-head {
+      display: grid; grid-template-columns: 1.6fr 1fr 1fr; padding: 9px 16px; background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.06); font-size: 10px; letter-spacing: .06em; text-transform: uppercase;
+      color: rgba(255,255,255,.32); font-family: 'IBM Plex Mono', monospace;
+    }
+    .mkt-row {
+      display: grid; grid-template-columns: 1.6fr 1fr 1fr; padding: 10px 16px; align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,.06); font-size: 13px; cursor: pointer;
+    }
+    .mkt-row:last-child { border-bottom: none; }
+    .mkt-row:hover { background: rgba(255,255,255,.03); }
+    .mkt-row .mr-ticker { color: var(--white); font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+    .mkt-row .mr-name { color: rgba(255,255,255,.4); font-size: 11.5px; margin-left: 7px; }
+    .mkt-row .mr-price { color: var(--white); text-align: right; font-variant-numeric: tabular-nums; }
+    .mkt-row .mr-chg { text-align: right; font-variant-numeric: tabular-nums; }
+    .mkt-row .mr-chg.pos { color: #10B981; }
+    .mkt-row .mr-chg.neg { color: #EF4444; }
+    .mkt-row .mr-chg.neutral { color: rgba(255,255,255,.35); }
+    .mkt-row-msg { padding: 16px; text-align: center; font-size: 12px; color: rgba(255,255,255,.35); }
+    .mkt-show-all {
+      display: block; width: 100%; padding: 11px; text-align: center; background: rgba(242,201,76,.06);
+      border: none; border-top: 1px solid rgba(255,255,255,.06); color: var(--gold); font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; cursor: pointer;
+    }
+    .mkt-show-all:hover { background: rgba(242,201,76,.12); }
 
     /* PPP NAVEGACION POR PESTANAS: una seccion visible a la vez PPP */
     [data-tab].tab-hidden { display: none !important; }
@@ -2474,255 +2564,63 @@
         <div class="markets-v2-title-block">
           <div class="markets-v2-live">LIVE</div>
           <h2 class="section-title" style="margin-bottom:6px;">El pulso del mercado</h2>
-          <p class="section-sub" style="margin-bottom:0;">Cotizaciones consolidadas Argentina &middot; EE.UU. &middot; Crypto &middot; Commodities.</p>
+          <p class="section-sub" style="margin-bottom:0;">Buscá entre miles de activos &mdash; acciones, CEDEARs, ADRs, bonos, cripto, commodities y divisas.</p>
         </div>
-        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-          <div class="filter-tabs" id="marketFilterTabs">
-            <button class="f-tab active" data-filter="all">Todos</button>
-            <button class="f-tab" data-filter="AR">AR</button>
-            <button class="f-tab" data-filter="US">US</button>
-            <button class="f-tab" data-filter="CR">Crypto</button>
-            <button class="f-tab" data-filter="CM">Commod.</button>
-          </div>
-          <span class="api-status loading" id="apiStatus"><span class="api-status-dot"></span></span>
-        </div>
+        <span class="api-status loading" id="apiStatus"><span class="api-status-dot"></span></span>
       </div>
-      <div class="dash-grid" id="dashGrid">
-        <div class="dash-card" data-aos="fade-up" data-region="AR" style="--card-accent:#3B82F6;">
-          <div class="dc-top">
-            <div class="dc-meta-top"><div class="dc-ticker">MERV</div><div class="dc-name">Merval</div></div>
-            <span class="dc-badge">AR</span>
-          </div>
-          <div class="dc-price" id="dc-merv-price">&#8212;</div>
-          <div class="dc-chg" id="dc-merv-chg">&#8212;</div>
-          <svg class="dc-sparkline" viewBox="0 0 200 36" fill="none">
-            <polyline points="0,28 25,22 50,26 75,18 100,20 125,14 150,12 175,8 200,6" stroke="var(--green)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <polygon points="0,28 25,22 50,26 75,18 100,20 125,14 150,12 175,8 200,6 200,36 0,36" fill="rgba(16,185,129,.08)"/>
-          </svg>
-          <div class="dc-meta">
-            <div class="dc-meta-item"><span class="dc-meta-label">Vol</span><span class="dc-meta-val" id="dc-merv-vol">&#8212;</span></div>
-            <div class="dc-meta-item"><span class="dc-meta-label">M&aacute;x</span><span class="dc-meta-val" id="dc-merv-max">&#8212;</span></div>
-            <div class="dc-meta-item"><span class="dc-meta-label">M&iacute;n</span><span class="dc-meta-val" id="dc-merv-min">&#8212;</span></div>
-          </div>
-        </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="80" data-region="US" style="--card-accent:var(--green);">
-          <div class="dc-top">
-            <div class="dc-meta-top"><div class="dc-ticker">SPX</div><div class="dc-name">S&amp;P 500</div></div>
-            <span class="dc-badge">US</span>
-          </div>
-          <div class="dc-price" id="dc-spx-price">&#8212;</div>
-          <div class="dc-chg" id="dc-spx-chg">&#8212;</div>
-          <svg class="dc-sparkline" viewBox="0 0 200 36" fill="none">
-            <polyline points="0,22 25,18 50,24 75,14 100,16 125,10 150,12 175,8 200,10" stroke="var(--green)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <polygon points="0,22 25,18 50,24 75,14 100,16 125,10 150,12 175,8 200,10 200,36 0,36" fill="rgba(16,185,129,.08)"/>
-          </svg>
-          <div class="dc-meta">
-            <div class="dc-meta-item"><span class="dc-meta-label">Vol</span><span class="dc-meta-val" id="dc-spx-vol">&#8212;</span></div>
-            <div class="dc-meta-item"><span class="dc-meta-label">M&aacute;x</span><span class="dc-meta-val" id="dc-spx-max">&#8212;</span></div>
-            <div class="dc-meta-item"><span class="dc-meta-label">M&iacute;n</span><span class="dc-meta-val" id="dc-spx-min">&#8212;</span></div>
-          </div>
-        </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="160" data-region="US" style="--card-accent:#22D3EE;">
-          <div class="dc-top">
-            <div class="dc-meta-top"><div class="dc-ticker">NDX</div><div class="dc-name">Nasdaq 100</div></div>
-            <span class="dc-badge">US</span>
-          </div>
-          <div class="dc-price" id="dc-ndx-price">&#8212;</div>
-          <div class="dc-chg" id="dc-ndx-chg">&#8212;</div>
-          <svg class="dc-sparkline" viewBox="0 0 200 36" fill="none">
-            <polyline points="0,26 25,20 50,24 75,16 100,18 125,12 150,10 175,6 200,8" stroke="var(--green)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <polygon points="0,26 25,20 50,24 75,16 100,18 125,12 150,10 175,6 200,8 200,36 0,36" fill="rgba(16,185,129,.08)"/>
-          </svg>
-          <div class="dc-meta">
-            <div class="dc-meta-item"><span class="dc-meta-label">Vol</span><span class="dc-meta-val" id="dc-ndx-vol">&#8212;</span></div>
-            <div class="dc-meta-item"><span class="dc-meta-label">M&aacute;x</span><span class="dc-meta-val" id="dc-ndx-max">&#8212;</span></div>
-            <div class="dc-meta-item"><span class="dc-meta-label">M&iacute;n</span><span class="dc-meta-val" id="dc-ndx-min">&#8212;</span></div>
-          </div>
-        </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="240" data-region="CR" style="--card-accent:var(--yellow);">
-          <div class="dc-top">
-            <div class="dc-meta-top"><div class="dc-ticker">BTC</div><div class="dc-name">Bitcoin</div></div>
-            <span class="dc-badge">Crypto</span>
-          </div>
-          <div class="dc-price" id="dc-btc-price">&#8212;</div>
-          <div class="dc-chg" id="dc-btc-chg">&#8212;</div>
-          <svg class="dc-sparkline" viewBox="0 0 200 36" fill="none">
-            <polyline points="0,30 25,24 50,28 75,20 100,16 125,18 150,12 175,14 200,8" stroke="var(--yellow)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <polygon points="0,30 25,24 50,28 75,20 100,16 125,18 150,12 175,14 200,8 200,36 0,36" fill="rgba(245,158,11,.08)"/>
-          </svg>
-          <div class="dc-meta">
-            <div class="dc-meta-item"><span class="dc-meta-label">Vol</span><span class="dc-meta-val" id="dc-btc-vol">&#8212;</span></div>
-            <div class="dc-meta-item"><span class="dc-meta-label">M&aacute;x</span><span class="dc-meta-val" id="dc-btc-max">&#8212;</span></div>
-            <div class="dc-meta-item"><span class="dc-meta-label">M&iacute;n</span><span class="dc-meta-val" id="dc-btc-min">&#8212;</span></div>
-          </div>
-        </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="320" data-region="AR" style="--card-accent:#94A3B8;">
-          <div class="dc-top">
-            <div class="dc-meta-top"><div class="dc-ticker">MEP</div><div class="dc-name">D&oacute;lar MEP</div></div>
-            <span class="dc-badge">AR</span>
-          </div>
-          <div class="dc-price" id="dc-mep-price">&#8212;</div>
-          <div class="dc-chg" id="dc-mep-chg">&#8212;</div>
-          <svg class="dc-sparkline" viewBox="0 0 200 36" fill="none">
-            <polyline points="0,22 25,24 50,20 75,22 100,18 125,20 150,16 175,18 200,14" stroke="var(--text-sec)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <polygon points="0,22 25,24 50,20 75,22 100,18 125,20 150,16 175,18 200,14 200,36 0,36" fill="rgba(107,114,128,.08)"/>
-          </svg>
-          <div class="dc-meta">
-            <div class="dc-meta-item"><span class="dc-meta-label">Compra</span><span class="dc-meta-val" id="dc-mep-buy">&#8212;</span></div>
-            <div class="dc-meta-item"><span class="dc-meta-label">Venta</span><span class="dc-meta-val" id="dc-mep-sell">&#8212;</span></div>
-          </div>
-        </div>
-        <div class="dash-card" data-aos="fade-up" data-aos-delay="400" data-region="CM" style="--card-accent:var(--gold);">
-          <div class="dc-top">
-            <div class="dc-meta-top"><div class="dc-ticker">XAU</div><div class="dc-name">Oro</div></div>
-            <span class="dc-badge">Commod.</span>
-          </div>
-          <div class="dc-price" id="dc-xau-price">&#8212;</div>
-          <div class="dc-chg" id="dc-xau-chg">&#8212;</div>
-          <svg class="dc-sparkline" viewBox="0 0 200 36" fill="none">
-            <polyline points="0,24 25,20 50,22 75,16 100,18 125,12 150,14 175,10 200,8" stroke="var(--gold)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <polygon points="0,24 25,20 50,22 75,16 100,18 125,12 150,14 175,10 200,8 200,36 0,36" fill="rgba(242,201,76,.08)"/>
-          </svg>
-          <div class="dc-meta">
-            <div class="dc-meta-item"><span class="dc-meta-label">Vol</span><span class="dc-meta-val" id="dc-xau-vol">&#8212;</span></div>
-            <div class="dc-meta-item"><span class="dc-meta-label">M&aacute;x</span><span class="dc-meta-val" id="dc-xau-max">&#8212;</span></div>
-            <div class="dc-meta-item"><span class="dc-meta-label">M&iacute;n</span><span class="dc-meta-val" id="dc-xau-min">&#8212;</span></div>
-          </div>
-        </div>
+
+      <div class="mkt-search-wrap">
+        <svg class="mkt-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="mktSearchInput" class="mkt-search-input" placeholder="Buscar activo &mdash; &quot;GGAL&quot;, &quot;Apple&quot;, &quot;AL30&quot;&hellip;" autocomplete="off">
+        <button type="button" id="mktSearchClear" class="mkt-search-clear" hidden aria-label="Limpiar b&uacute;squeda">&times;</button>
       </div>
-      <div class="at-grid" data-aos="fade-up">
-        <div class="at-col">
-          <div class="at-card" data-table="adrs">
-            <div class="at-head">
-              <div class="at-head-title">&#127462;&#127479; ADRs Argentina</div>
-              <div class="at-live">LIVE</div>
+      <div id="mktSearchResults" class="mkt-search-results" hidden></div>
+
+      <div class="mkt-body" id="mktBody" data-aos="fade-up">
+        <aside class="mkt-hero-col" id="mktHeroCol">
+          <div class="mkt-hero-skeleton">Cargando cotizaciones&hellip;</div>
+        </aside>
+        <div class="mkt-main">
+          <div class="mkt-tabs" id="mktTabs" role="tablist"></div>
+          <div class="mkt-table-wrap">
+            <div class="mkt-table-head" id="mktTableHead">
+              <span>Activo</span><span style="text-align:right;">Precio</span><span style="text-align:right;">Var%</span>
             </div>
-            <div class="at-cols" style="grid-template-columns:1.6fr 1fr 1fr 1fr;">
-              <span class="at-col-label">Activo</span>
-              <span class="at-col-label" style="text-align:right;">Precio</span>
-              <span class="at-col-label" style="text-align:right;">Tendencia</span>
-              <span class="at-col-label" style="text-align:right;">Var%</span>
+            <div id="mktTableBody" class="mkt-table-body">
+              <div class="mkt-row-msg">Cargando...</div>
             </div>
-            <div id="argAdrsBody">
-              <div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Cargando...</span></div>
-            </div>
-          </div>
-          <div class="at-card" data-table="us">
-            <div class="at-head">
-              <div class="at-head-title">&#127482;&#127480; Acciones USA</div>
-              <div class="at-live">LIVE</div>
-            </div>
-            <div class="at-cols" style="grid-template-columns:1.6fr 1fr 1fr 1fr;">
-              <span class="at-col-label">Activo</span>
-              <span class="at-col-label" style="text-align:right;">Precio</span>
-              <span class="at-col-label" style="text-align:right;">Var%</span>
-            </div>
-            <div id="usaStocksBody">
-              <div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Cargando...</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="at-col">
-          <div class="at-card" data-table="ar">
-            <div class="at-head">
-              <div class="at-head-title">&#127462;&#127479; Bonos AR <span style="font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);margin-left:6px;">MERVAL</span></div>
-              <div class="at-live">LIVE</div>
-            </div>
-            <div class="at-cols" style="grid-template-columns:1.6fr 1fr 1fr 1fr;">
-              <span class="at-col-label">Activo</span>
-              <span class="at-col-label" style="text-align:right;">Precio</span>
-              <span class="at-col-label" style="text-align:right;">Var%</span>
-            </div>
-            <div id="argBondsBody">
-              <div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Cargando...</span></div>
-            </div>
-          </div>
-          <div class="at-card" data-table="fx">
-            <div class="at-head">
-              <div class="at-head-title">Divisas FX <span style="font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);margin-left:6px;">FX</span></div>
-              <div class="at-live">LIVE</div>
-            </div>
-            <div class="at-cols" style="grid-template-columns:1.6fr 1fr 1fr 1fr;">
-              <span class="at-col-label">Divisa</span>
-              <span class="at-col-label" style="text-align:right;">Compra</span>
-              <span class="at-col-label" style="text-align:right;">Venta</span>
-            </div>
-            <div id="fxBody">
-              <div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Cargando...</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <table style="display:none;"><tbody id="marketsTableBody"></tbody></table>
-      <div class="at-grid" data-aos="fade-up" style="margin-top:20px;">
-        <div class="at-col">
-          <div class="at-card" data-table="crypto">
-            <div class="at-head">
-              <div class="at-head-title">&#8383; Crypto</div>
-              <div class="at-live">LIVE</div>
-            </div>
-            <div class="at-cols" style="grid-template-columns:1.6fr 1fr 1fr 1fr;">
-              <span class="at-col-label">Activo</span>
-              <span class="at-col-label" style="text-align:right;">Precio</span>
-              <span class="at-col-label" style="text-align:right;">Tendencia</span>
-              <span class="at-col-label" style="text-align:right;">Var%</span>
-            </div>
-            <div id="cryptoTableBody">
-              <div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Cargando...</span></div>
-            </div>
-          </div>
-          <div class="at-card" data-table="comm">
-            <div class="at-head">
-              <div class="at-head-title">&#127919; Commodities</div>
-              <div class="at-live">LIVE</div>
-            </div>
-            <div class="at-cols" style="grid-template-columns:1.6fr 1fr 1fr 1fr;">
-              <span class="at-col-label">Activo</span>
-              <span class="at-col-label" style="text-align:right;">Precio</span>
-              <span class="at-col-label" style="text-align:right;">Tendencia</span>
-              <span class="at-col-label" style="text-align:right;">Var%</span>
-            </div>
-            <div id="commTableBody">
-              <div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Cargando...</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="at-col">
-          <div class="at-card" data-table="etf">
-            <div class="at-head">
-              <div class="at-head-title">&#127482;&#127480; ETFs USA</div>
-              <div class="at-live">LIVE</div>
-            </div>
-            <div class="at-cols" style="grid-template-columns:1.6fr 1fr 1fr 1fr;">
-              <span class="at-col-label">Activo</span>
-              <span class="at-col-label" style="text-align:right;">Precio</span>
-              <span class="at-col-label" style="text-align:right;">Tendencia</span>
-              <span class="at-col-label" style="text-align:right;">Var%</span>
-            </div>
-            <div id="etfTableBody">
-              <div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Cargando...</span></div>
-            </div>
-          </div>
-          <div class="at-card" data-table="idx">
-            <div class="at-head">
-              <div class="at-head-title">&#127482;&#127480; Índices USA <span style="font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);margin-left:6px;">ÍNDICES</span></div>
-              <div class="at-live">LIVE</div>
-            </div>
-            <div class="at-cols" style="grid-template-columns:1.6fr 1fr 1fr 1fr;">
-              <span class="at-col-label">Activo</span>
-              <span class="at-col-label" style="text-align:right;">Precio</span>
-              <span class="at-col-label" style="text-align:right;">Tendencia</span>
-              <span class="at-col-label" style="text-align:right;">Var%</span>
-            </div>
-            <div id="idxTableBody">
-              <div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Cargando...</span></div>
-            </div>
+            <button type="button" id="mktShowAllBtn" class="mkt-show-all" hidden>Ver los <span id="mktShowAllCount">&mdash;</span> restantes &rarr;</button>
           </div>
         </div>
       </div>
       <p class="last-updated" id="lastUpdated" style="margin-top:16px;text-align:right;font-size:11px;color:var(--text-sec);"></p>
     </div>
   </section>
+
+  <div class="mkt-modal-overlay" id="mktModalOverlay">
+    <div class="mkt-modal-box">
+      <div class="mkt-modal-inner">
+        <div class="mkt-modal-top">
+          <div>
+            <div class="mkt-modal-ticker" id="mktModalTicker">&mdash;</div>
+            <h3 class="mkt-modal-name" id="mktModalName">&mdash;</h3>
+          </div>
+          <button type="button" class="mkt-modal-close" id="mktModalClose" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="mkt-modal-price-row">
+          <span class="mkt-modal-price" id="mktModalPrice">&mdash;</span>
+          <span class="mkt-modal-chg" id="mktModalChg">&mdash;</span>
+        </div>
+        <div class="mkt-modal-range" id="mktModalRange"></div>
+        <div class="mkt-modal-chart-wrap" id="mktModalChart"></div>
+        <div class="mkt-modal-meta">
+          <div><div class="mmd-label">Volumen</div><div class="mmd-val" id="mktModalVol">&mdash;</div></div>
+          <div><div class="mmd-label">Categoría</div><div class="mmd-val" id="mktModalCat">&mdash;</div></div>
+          <div><div class="mmd-label">Moneda</div><div class="mmd-val" id="mktModalCurrency">&mdash;</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <section style="background:var(--navy-1);padding:72px 32px 68px;" id="calendario" data-tab="calendario">
   <div class="container">
@@ -3450,379 +3348,322 @@
   /* Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
      CONFIGURACIÓN
      Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ */
-  const CONFIG = {
-    FINNHUB_KEY:    'd70o99hr01ql6rg01oj0d70o99hr01ql6rg01ojg',
-    TWELVEDATA_KEY: '81122aa6f3ff463dafc8535e7fcdf81d',
-    REFRESH_INTERVAL_MS: 60_000,
-  };
+  // Las API keys de Finnhub/TwelveData vivían acá antes, expuestas a cualquiera
+  // que abriera el código fuente. Ahora esas llamadas las hace el Worker
+  // manfredi-mercados del lado del servidor. Ver workers/mercados/index.js.
+  const MKT_WORKER_BASE = 'https://manfredi-mercados.nachito2502.workers.dev';
+  const MERCADOS_ENDPOINT = MKT_WORKER_BASE + '/mercados';
+  const MKT_HISTORICO_ENDPOINT = MKT_WORKER_BASE + '/historico';
+  const MKT_REFRESH_MS = 60_000;
 
   /* Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
      DEFINICIÓN DE ACTIVOS
      Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ */
-  const ASSETS = [
-    {
-      id:      'sp500',
-      flag:    '&#127482;&#127480;',
-      name:    'S&P 500',
-      source:  'finnhub',
-      symbol:  'SPY',           // ETF que replica el S&P 500
-      spark:   'M0,30 Q10,20 20,22 Q30,24 40,18 Q50,12 60,16 Q70,20 80,10 Q90,5 100,8',
-      price:   null,
-      change:  null,
-    },
-    {
-      id:      'nasdaq',
-      flag:    '&#127482;&#127480;',
-      name:    'Nasdaq 100',
-      source:  'finnhub',
-      symbol:  'QQQ',           // ETF que replica el Nasdaq 100
-      spark:   'M0,32 Q15,22 30,20 Q45,18 60,12 Q75,8 90,4 100,6',
-      price:   null,
-      change:  null,
-    },
-    {
-      id:      'ccl',
-      flag:    '&#127462;&#127479;',
-      name:    'Dólar CCL',
-      source:  'dolarapi',
-      endpoint:'contadoconliqui',
-      spark:   'M0,30 Q25,25 50,22 Q75,19 100,16',
-      price:   null,
-      change:  null,
-    },
-    {
-      id:      'btc',
-      flag:    'â¿',
-      name:    'Bitcoin',
-      source:  'coingecko',   // CoinGecko: gratis, sin key, CORS OK
-      cgId:    'bitcoin',
-      spark:   'M0,30 Q15,22 30,28 Q45,15 60,20 Q75,10 90,14 100,8',
-      price:   null,
-      change:  null,
-    },
-    {
-      id:           'gold',
-      flag:         '🥇',
-      name:         'Oro (XAU/USD)',
-      source:       'twelvedata',
-      tdSymbol:     'XAU/USD',
-      spark:        'M0,25 Q20,20 40,18 Q60,15 80,12 100,10',
-      price:        null,
-      change:       null,
-    },
-  ];
+  // ASSETS, CONFIG con las API keys, y todas las llamadas directas a
+  // Finnhub/Yahoo/CoinGecko/dolarapi/TwelveData/data912 que vivían acá se
+  // movieron al Worker manfredi-mercados (server-side). Ver workers/mercados/index.js.
 
-  /* Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-     FETCHERS
-     Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ */
+  let MERCADOS = null;
 
-  // Á¢ÂÂÁ¢ÂÂ Finnhub Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-  async function fetchFinnhub(symbol) {
-    const url  = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${CONFIG.FINNHUB_KEY}`;
-    const res  = await fetch(url);
-    if (!res.ok) throw new Error(`Finnhub HTTP ${res.status}`);
-    const data = await res.json();
-    // data.c == null  Á¢ÂÂ  símbolo no disponible en este plan
-    // data.c == 0     Á¢ÂÂ  mercado cerrado o símbolo inválido
-    if (data.c == null || data.c === 0) return null;
-    const pct = data.pc > 0 ? ((data.c - data.pc) / data.pc * 100).toFixed(2) : null;
-    return { price: data.c, change: pct };
-  }
-
-  // Á¢ÂÂÁ¢ÂÂ Yahoo Finance via CORS proxy (con fallback a segundo proxy) Á¢ÂÂÁ¢ÂÂ
-  async function fetchYahoo(symbol) {
-    const yahoo = `https://query1.finance.yahoo.com/v8/finance/quote?symbols=${encodeURIComponent(symbol)}`;
-    const proxies = [
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(yahoo)}`,
-      `https://corsproxy.io/?${encodeURIComponent(yahoo)}`,
-    ];
-    for (const proxy of proxies) {
-      try {
-        const res  = await fetch(proxy, { signal: AbortSignal.timeout(8000) });
-        if (!res.ok) continue;
-        const data = await res.json();
-        const q    = data?.quoteResponse?.result?.[0];
-        if (!q?.regularMarketPrice) continue;
-        return {
-          price:  q.regularMarketPrice,
-          change: q.regularMarketChangePercent?.toFixed(2) ?? null,
-        };
-      } catch (_) {}
-    }
-    return null;
-  }
-
-  // Á¢ÂÂÁ¢ÂÂ CoinGecko &mdash; Bitcoin (sin key, CORS OK) Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-  async function fetchCoinGecko(cgId) {
-    const url  = `https://api.coingecko.com/api/v3/simple/price?ids=${cgId}&vs_currencies=usd&include_24hr_change=true`;
-    const res  = await fetch(url);
-    if (!res.ok) throw new Error(`CoinGecko HTTP ${res.status}`);
-    const data = await res.json();
-    if (!data[cgId]?.usd) return null;
-    return {
-      price:  data[cgId].usd,
-      change: data[cgId].usd_24h_change?.toFixed(2) ?? null,
-    };
-  }
-
-  // Á¢ÂÂÁ¢ÂÂ dolarapi.com &mdash; CCL (sin key, CORS OK) Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-  async function fetchDolarApi(endpoint) {
-    const url  = `https://dolarapi.com/v1/dolares/${endpoint}`;
-    const res  = await fetch(url);
-    if (!res.ok) throw new Error(`DolarAPI HTTP ${res.status}`);
-    const data = await res.json();
-    return { price: data.venta, change: null };
-  }
-
-  // Á¢ÂÂÁ¢ÂÂ Twelve Data &mdash; Oro y Petróleo Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-  async function fetchTwelveData(symbol) {
-    const url = `https://api.twelvedata.com/quote?symbol=${encodeURIComponent(symbol)}&apikey=${CONFIG.TWELVEDATA_KEY}`;
-    const res  = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    if (!res.ok) throw new Error(`TwelveData HTTP ${res.status}`);
-    const data = await res.json();
-    if (data.status === 'error' || !data.close) throw new Error(data.message || 'Sin datos');
-    const price = parseFloat(data.close);
-    const prev  = parseFloat(data.previous_close);
-    const pct   = prev > 0 ? ((price - prev) / prev * 100).toFixed(2) : null;
-    return { price, change: pct };
-  }
-
-  // Á¢ÂÂÁ¢ÂÂ data912.com &mdash; BYMA y USA stocks (sin key) Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-  const _d912cache = {};
-  async function fetchData912(endpoint) {
-    if (_d912cache[endpoint] && Date.now() - _d912cache[endpoint].ts < 55000) {
-      return _d912cache[endpoint].data;
-    }
-    const res = await fetch(`https://data912.com/live/${endpoint}`, { signal: AbortSignal.timeout(8000) });
-    if (!res.ok) throw new Error(`data912 HTTP ${res.status}`);
-    const data = await res.json();
-    _d912cache[endpoint] = { data, ts: Date.now() };
-    return data;
-  }
-
-  async function fetchData912Stock(endpoint, symbol) {
-    const list = await fetchData912(endpoint);
-    const item = list.find(d => d.symbol === symbol);
-    if (!item?.c) return null;
-    return { price: item.c, change: item.pct_change != null ? parseFloat(item.pct_change).toFixed(2) : null };
-  }
-
-  // Á¢ÂÂÁ¢ÂÂ data912 &mdash; Dólar MEP (promedio mark de todos los tickers) Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-  async function fetchData912Mep() {
-    const list = await fetchData912('mep');
-    if (!Array.isArray(list) || !list.length) return null;
-    const marks = list.map(d => d.mark).filter(v => v > 0);
-    if (!marks.length) return null;
-    const price = marks.reduce((a, b) => a + b, 0) / marks.length;
-    return { price: parseFloat(price.toFixed(2)), change: null };
-  }
-
-  // Á¢ÂÂÁ¢ÂÂ Petróleo WTI: data912(USO) Á¢ÂÂ TwelveData(USOIL) Á¢ÂÂ Yahoo(CL=F) Á¢ÂÂ
-  async function fetchOil() {
-    // Intento 1: data912 usa_stocks con ETF USO
+  async function fetchMercadosData() {
     try {
-      const r = await fetchData912Stock('usa_stocks', 'USO');
-      if (r) { console.info('[MI] Oil via data912 USO'); return r; }
-    } catch (e) { console.warn('[MI] Oil/data912:', e.message); }
-    // Intento 2: Twelve Data con símbolo USOIL
-    for (const sym of ['USOIL', 'WTI/USD', 'CL1!']) {
-      try {
-        const r = await fetchTwelveData(sym);
-        if (r) { console.info(`[MI] Oil via TwelveData (${sym})`); return r; }
-      } catch (e) { console.warn(`[MI] Oil/TwelveData(${sym}):`, e.message); }
-    }
-    // Intento 3: Yahoo Futures CL=F
-    try {
-      const r = await fetchYahoo('CL=F');
-      if (r) { console.info('[MI] Oil via Yahoo CL=F'); return r; }
-    } catch (e) { console.warn('[MI] Oil/Yahoo:', e.message); }
-    return null;
-  }
-
-  // Á¢ÂÂÁ¢ÂÂ Merval: data912 Á¢ÂÂ ArgentinaDatos Á¢ÂÂ Finnhub Á¢ÂÂ Yahoo Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-  async function fetchMerval() {
-    // Intento 0: argentina.json (fuente local siempre disponible)
-    try {
-      const res = await fetch('/reports/argentina.json', { signal: AbortSignal.timeout(5000) });
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.merval?.valor) {
-          console.info('[MI] Merval via argentina.json');
-          const rawChange = data.merval.variacion;
-          const change = rawChange ? parseFloat(rawChange.replace('%', '')) : null;
-          return { price: data.merval.valor, change: change };
-        }
-      }
-    } catch (e) { console.warn('[MI] Merval/argentina.json:', e.message); }
-    // Intento 1: data912 arg_stocks (prueba los tickers más comunes del índice)
-    try {
-      for (const sym of ['MERVAL', 'I.MER', '$MERVAL']) {
-        const r = await fetchData912Stock('arg_stocks', sym);
-        if (r) { console.info(`[MI] Merval via data912 (${sym})`); return r; }
-      }
-    } catch (e) { console.warn('[MI] Merval/data912:', e.message); }
-    // Intento 2: ArgentinaDatos
-    try {
-      const url  = 'https://api.argentinadatos.com/v1/cotizaciones/indices/merval';
-      const res  = await fetch(url, { signal: AbortSignal.timeout(8000) });
-      if (res.ok) {
-        const data = await res.json();
-        const last = Array.isArray(data) ? data[data.length - 1] : null;
-        if (last?.valor) {
-          const prev = data.length > 1 ? data[data.length - 2]?.valor : null;
-          const pct  = prev > 0 ? ((last.valor - prev) / prev * 100).toFixed(2) : null;
-          console.info('[MI] Merval via ArgentinaDatos');
-          return { price: last.valor, change: pct };
-        }
-      }
-    } catch (e) { console.warn('[MI] Merval/ArgentinaDatos:', e.message); }
-    // Intento 3: Finnhub / Yahoo
-    try {
-      const r = await fetchFinnhub('BYMA:MERVAL');
-      if (r) return r;
-    } catch (e) { console.warn('[MI] Merval/Finnhub:', e.message); }
-    try {
-      const r = await fetchYahoo('^MERV');
-      if (r) return r;
-    } catch (e) { console.warn('[MI] Merval/Yahoo:', e.message); }
-    return null;
-  }
-
-  /* Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-     ORQUESTADOR
-     Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ */
-
-  async function fetchAsset(asset) {
-    try {
-      let result = null;
-
-      if (asset.source === 'finnhub') {
-        result = await fetchFinnhub(asset.symbol);
-        if (!result && asset.etfSymbol) {
-          result = await fetchFinnhub(asset.etfSymbol);
-        }
-      }
-      if (asset.source === 'twelvedata') {
-        try {
-          result = await fetchTwelveData(asset.tdSymbol);
-        } catch (e) { console.warn(`[MI] TwelveData ${asset.tdSymbol}:`, e.message); }
-      }
-      if (asset.source === 'data912mep') result = await fetchData912Mep();
-      if (asset.source === 'yahoo')      result = await fetchYahoo(asset.ySymbol);
-      if (asset.source === 'coingecko') result = await fetchCoinGecko(asset.cgId);
-      if (asset.source === 'dolarapi')  result = await fetchDolarApi(asset.endpoint);
-      if (result) {
-        asset.price  = result.price;
-        asset.change = result.change;
-        asset.error  = false;
-      }
+      const res = await fetch(MERCADOS_ENDPOINT, { signal: AbortSignal.timeout(12000) });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      MERCADOS = await res.json();
+      return MERCADOS;
     } catch (e) {
-      asset.error = true;
-      console.warn(`[MI] Error cargando ${asset.name}:`, e.message);
-    }
-    return asset;
-  }
-
-  async function fetchAllAssets() {
-    setApiStatus('loading', 'Actualizando&hellip;');
-    const results = await Promise.allSettled(ASSETS.map(fetchAsset));
-    const anySuccess = results.some(r => r.status === 'fulfilled' && !r.value?.error);
-    renderMarkets();
-    renderTicker();
-    if (anySuccess) {
-      const now = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-      setApiStatus('live', 'Datos en vivo');
-      document.getElementById('lastUpdated').textContent = `Última actualización: ${now} hs`;
-    } else {
-      setApiStatus('error', 'Sin conexión a APIs');
+      console.warn('[MI] manfredi-mercados:', e.message);
+      return null;
     }
   }
 
-  /* Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-     RENDER: MARKET TABLE
-     Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ */
-
-  function formatPrice(asset) {
-    if (asset.price == null) return '&mdash;';
-    const isARS = asset.source === 'dolarapi' || asset.id === 'merval';
-    if (isARS) {
-      return '$' + Number(asset.price).toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-    }
-    return '$' + Number(asset.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  function mktFmtPrice(price, unit) {
+    if (price == null) return '&mdash;';
+    const n = Number(price);
+    const decimals = Math.abs(n) >= 1000 ? 0 : 2;
+    return (unit || '') + n.toLocaleString('es-AR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   }
 
-  function formatChange(change) {
+  function mktFmtChange(change) {
     if (change == null) return { text: '&mdash;', cls: 'neutral' };
-    const n   = parseFloat(change);
+    const n = parseFloat(change);
+    if (isNaN(n)) return { text: '&mdash;', cls: 'neutral' };
     const pos = n >= 0;
-    return {
-      text: (pos ? '&#9650; +' : '&#9660; ') + Math.abs(n).toFixed(2) + '%',
-      cls:  pos ? 'pos' : 'neg',
-    };
+    return { text: (pos ? '&#9650; +' : '&#9660; ') + Math.abs(n).toFixed(2) + '%', cls: pos ? 'pos' : 'neg' };
   }
 
-  function renderMarkets() {
-    const tbody = document.getElementById('marketsTableBody');
-    tbody.innerHTML = ASSETS.map(asset => {
-      const { text, cls } = formatChange(asset.change);
-      const isLive = asset.price != null && !asset.error;
-      const sparkColor = cls === 'pos' ? '#10B981' : cls === 'neg' ? '#EF4444' : '#9CA3AF';
+  // Dibuja una linea de tendencia SVG a partir de una serie real de precios.
+  function mktDrawChart(containerId, data, w, h, opts) {
+    const el = document.getElementById(containerId);
+    if (!el || !data || data.length < 2) return;
+    opts = opts || {};
+    const pad = opts.dot === false ? 2 : 8;
+    const min = Math.min.apply(null, data), max = Math.max.apply(null, data);
+    const range = (max - min) || 1;
+    const up = data[data.length - 1] >= data[0];
+    const color = up ? '#10B981' : '#EF4444';
+    const fill = up ? 'rgba(16,185,129,.14)' : 'rgba(239,68,68,.14)';
+    const step = (w - pad * 2) / (data.length - 1);
+    const pts = data.map(function(v, i) {
+      const x = pad + i * step;
+      const y = pad + (1 - (v - min) / range) * (h - pad * 2);
+      return [x.toFixed(1), y.toFixed(1)];
+    });
+    const line = pts.map(function(p) { return p.join(','); }).join(' ');
+    let svg = '<svg width="100%" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" style="overflow:visible;">';
+    if (opts.grid !== false) {
+      for (let i = 1; i < 3; i++) {
+        const gy = pad + (h - pad * 2) * (i / 3);
+        svg += '<line x1="' + pad + '" y1="' + gy.toFixed(1) + '" x2="' + (w - pad) + '" y2="' + gy.toFixed(1) + '" stroke="rgba(255,255,255,.05)" stroke-width="1"/>';
+      }
+    }
+    svg += '<polygon points="' + line + ' ' + (w - pad) + ',' + (h - pad) + ' ' + pad + ',' + (h - pad) + '" fill="' + fill + '"/>';
+    svg += '<polyline points="' + line + '" fill="none" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>';
+    if (opts.dot !== false) {
+      const last = pts[pts.length - 1];
+      svg += '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="3.5" fill="' + color + '"/>';
+      svg += '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="7" fill="' + color + '" opacity=".18"/>';
+    }
+    svg += '</svg>';
+    el.innerHTML = svg;
+  }
+
+  function renderHeroCards() {
+    const col = document.getElementById('mktHeroCol');
+    if (!col || !MERCADOS) return;
+    col.innerHTML = MERCADOS.featured.map(item => {
+      const { text, cls } = mktFmtChange(item.change);
+      const unit = item.unit ? item.unit + ' ' : '';
       return `
-        <tr>
-          <td>
-            <div class="mt-asset">
-              <span class="mt-flag">${asset.flag}</span>
-              <span class="mt-name">${asset.name}</span>
-            </div>
-          </td>
-          <td class="mt-price">${formatPrice(asset)}</td>
-          <td class="mt-change">
-            <span class="mt-change-val ${cls}">${text}</span>
-          </td>
-          <td class="mt-spark">
-            <svg class="market-sparkline" viewBox="0 0 100 40" preserveAspectRatio="none">
-              <path d="${asset.spark}" fill="none"
-                stroke="${sparkColor}"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </td>
-          <td class="align-right">
-            ${isLive
-              ? '<span class="mt-badge badge-live">LIVE</span>'
-              : '<span class="mt-badge badge-stale">&mdash;</span>'}
-          </td>
-        </tr>
+        <div class="mkt-hero-card">
+          <div class="mh-name"><span>${item.flag}</span>${item.name}</div>
+          <div class="mh-price">${mktFmtPrice(item.price, unit)}</div>
+          <div class="mh-chg ${cls}">${text}</div>
+          <div class="mh-chart" id="mh-chart-${item.id}"></div>
+        </div>
       `;
     }).join('');
+    MERCADOS.featured.forEach(item => {
+      if (item.spark && item.spark.length >= 2) {
+        mktDrawChart('mh-chart-' + item.id, item.spark, 220, 34, { grid: false, dot: false });
+      }
+    });
   }
 
-  /* Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-     RENDER: TICKER
-     Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ */
+  const MKT_CATEGORIES = [
+    { key: 'arg_stocks',  label: 'Acciones AR' },
+    { key: 'arg_cedears', label: 'CEDEARs' },
+    { key: 'usa_stocks',  label: 'Acciones USA' },
+    { key: 'usa_adrs',    label: 'ADRs' },
+    { key: 'arg_bonds',   label: 'Bonos' },
+    { key: 'cripto',      label: 'Cripto' },
+    { key: 'commodities', label: 'Commodities' },
+    { key: 'dolares',     label: 'Dólares & Divisas' },
+  ];
+  let mktActiveCategory = MKT_CATEGORIES[0].key;
+  let mktShowingAll = false;
+
+  function renderTabs() {
+    const wrap = document.getElementById('mktTabs');
+    if (!wrap) return;
+    wrap.innerHTML = MKT_CATEGORIES.map(c =>
+      `<button type="button" class="mkt-tab${c.key === mktActiveCategory ? ' active' : ''}" data-cat="${c.key}">${c.label}</button>`
+    ).join('');
+    wrap.querySelectorAll('.mkt-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        mktActiveCategory = btn.getAttribute('data-cat');
+        mktShowingAll = false;
+        wrap.querySelectorAll('.mkt-tab').forEach(b => b.classList.toggle('active', b === btn));
+        renderCategoryTable();
+      });
+    });
+  }
+
+  function mktRowHTML(item, currency, category) {
+    const { text, cls } = mktFmtChange(item.change);
+    const unit = currency === 'USD' ? 'US$ ' : '$ ';
+    const name = (item.name && item.name !== item.symbol) ? item.name : '';
+    return `
+      <div class="mkt-row" data-symbol="${item.symbol}" data-category="${category}" data-currency="${currency}">
+        <div><span class="mr-ticker">${item.symbol}</span><span class="mr-name">${name}</span></div>
+        <div class="mr-price">${mktFmtPrice(item.price, unit)}</div>
+        <div class="mr-chg ${cls}">${text}</div>
+      </div>
+    `;
+  }
+
+  function renderCategoryTable() {
+    const body = document.getElementById('mktTableBody');
+    const btn  = document.getElementById('mktShowAllBtn');
+    if (!body || !MERCADOS) return;
+    const cat = MERCADOS.categorias[mktActiveCategory];
+    if (!cat || !cat.items.length) {
+      body.innerHTML = '<div class="mkt-row-msg">Sin datos disponibles</div>';
+      if (btn) btn.hidden = true;
+      return;
+    }
+    const items = mktShowingAll ? cat.items : cat.items.slice(0, 10);
+    body.innerHTML = items.map(item => mktRowHTML(item, cat.currency, mktActiveCategory)).join('');
+    const remaining = cat.items.length - 10;
+    if (btn) {
+      if (!mktShowingAll && remaining > 0) {
+        btn.hidden = false;
+        const countEl = document.getElementById('mktShowAllCount');
+        if (countEl) countEl.textContent = remaining;
+      } else {
+        btn.hidden = true;
+      }
+    }
+  }
+
+  function mktSearch(query) {
+    const q = query.trim().toUpperCase();
+    const resultsEl = document.getElementById('mktSearchResults');
+    const bodyEl = document.getElementById('mktBody');
+    if (!resultsEl || !bodyEl) return;
+    if (!q) {
+      resultsEl.hidden = true;
+      bodyEl.hidden = false;
+      return;
+    }
+    bodyEl.hidden = true;
+    resultsEl.hidden = false;
+    if (!MERCADOS) { resultsEl.innerHTML = '<div class="mkt-search-empty">Cargando datos&hellip;</div>'; return; }
+    const matches = [];
+    for (const cat of MKT_CATEGORIES) {
+      const catData = MERCADOS.categorias[cat.key];
+      if (!catData) continue;
+      for (const item of catData.items) {
+        if (item.symbol.toUpperCase().includes(q) || (item.name && item.name.toUpperCase().includes(q))) {
+          matches.push(mktRowHTML(item, catData.currency, cat.key));
+          if (matches.length >= 40) break;
+        }
+      }
+      if (matches.length >= 40) break;
+    }
+    resultsEl.innerHTML = matches.length ? matches.join('') : '<div class="mkt-search-empty">Sin resultados</div>';
+  }
+
+  function initMktSearch() {
+    const input = document.getElementById('mktSearchInput');
+    const clearBtn = document.getElementById('mktSearchClear');
+    if (!input || !clearBtn) return;
+    input.addEventListener('input', () => {
+      clearBtn.hidden = !input.value;
+      mktSearch(input.value);
+    });
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      clearBtn.hidden = true;
+      mktSearch('');
+      input.focus();
+    });
+  }
+
+  // ─── Modal de detalle: click en cualquier activo (tabla o buscador) ───────
+  const MKT_DETAIL_CACHE = {};
+
+  function mktCategoryLabel(key) {
+    const c = MKT_CATEGORIES.find(c => c.key === key);
+    return c ? c.label : key;
+  }
+
+  function openAssetModal(item, category, currency) {
+    const overlay = document.getElementById('mktModalOverlay');
+    if (!overlay || !item) return;
+    const { text, cls } = mktFmtChange(item.change);
+    const unit = currency === 'USD' ? 'US$ ' : '$ ';
+    document.getElementById('mktModalTicker').textContent = item.symbol + ' · ' + mktCategoryLabel(category);
+    document.getElementById('mktModalName').textContent = (item.name && item.name !== item.symbol) ? item.name : item.symbol;
+    document.getElementById('mktModalPrice').innerHTML = mktFmtPrice(item.price, unit);
+    const chgEl = document.getElementById('mktModalChg');
+    chgEl.innerHTML = text;
+    chgEl.className = 'mkt-modal-chg ' + cls;
+    document.getElementById('mktModalRange').textContent = '';
+    document.getElementById('mktModalVol').textContent = item.volume ? Number(item.volume).toLocaleString('es-AR', { maximumFractionDigits: 0 }) : '—';
+    document.getElementById('mktModalCat').textContent = mktCategoryLabel(category);
+    document.getElementById('mktModalCurrency').textContent = currency === 'USD' ? 'USD' : 'ARS';
+    document.getElementById('mktModalChart').innerHTML = '<div class="mkt-modal-loading">Cargando gráfico&hellip;</div>';
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    const cacheKey = category + ':' + item.symbol;
+    const renderCloses = (closes) => {
+      const chartEl = document.getElementById('mktModalChart');
+      if (!closes || closes.length < 2) {
+        chartEl.innerHTML = '<div class="mkt-modal-loading">Sin datos históricos disponibles para este activo.</div>';
+        return;
+      }
+      chartEl.innerHTML = '';
+      mktDrawChart('mktModalChart', closes, 372, 130, {});
+      const min = Math.min.apply(null, closes), max = Math.max.apply(null, closes);
+      const fmtN = (v) => mktFmtPrice(v, unit).replace('&mdash;', '—');
+      document.getElementById('mktModalRange').textContent = 'Rango últimos ' + closes.length + ' días hábiles: ' + fmtN(min) + ' — ' + fmtN(max);
+    };
+
+    if (MKT_DETAIL_CACHE[cacheKey]) {
+      renderCloses(MKT_DETAIL_CACHE[cacheKey]);
+      return;
+    }
+    fetch(MKT_HISTORICO_ENDPOINT + '?category=' + encodeURIComponent(category) + '&symbol=' + encodeURIComponent(item.symbol), { signal: AbortSignal.timeout(10000) })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)))
+      .then(data => {
+        MKT_DETAIL_CACHE[cacheKey] = data.closes || [];
+        renderCloses(data.closes);
+      })
+      .catch(() => {
+        document.getElementById('mktModalChart').innerHTML = '<div class="mkt-modal-loading">No se pudo cargar el histórico.</div>';
+      });
+  }
+
+  function closeAssetModal() {
+    const overlay = document.getElementById('mktModalOverlay');
+    if (overlay) overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function mktRowClickHandler(e) {
+    const row = e.target.closest('.mkt-row');
+    if (!row) return;
+    const symbol = row.getAttribute('data-symbol');
+    const category = row.getAttribute('data-category');
+    const currency = row.getAttribute('data-currency');
+    if (!symbol || !category || !MERCADOS) return;
+    const cat = MERCADOS.categorias[category];
+    const item = cat && cat.items.find(i => i.symbol === symbol);
+    if (item) openAssetModal(item, category, currency);
+  }
+
+  function initAssetModal() {
+    const tableBody = document.getElementById('mktTableBody');
+    const searchResults = document.getElementById('mktSearchResults');
+    if (tableBody) tableBody.addEventListener('click', mktRowClickHandler);
+    if (searchResults) searchResults.addEventListener('click', mktRowClickHandler);
+    const closeBtn = document.getElementById('mktModalClose');
+    if (closeBtn) closeBtn.addEventListener('click', closeAssetModal);
+    const overlay = document.getElementById('mktModalOverlay');
+    if (overlay) overlay.addEventListener('click', function(e) { if (e.target === overlay) closeAssetModal(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeAssetModal(); });
+  }
 
   function renderTicker() {
-    const items = ASSETS.filter(a => a.price != null);
+    const track = document.getElementById('tickerTrack');
+    if (!track || !MERCADOS) return;
+    const items = MERCADOS.featured.filter(a => a.price != null);
     if (!items.length) return;
-
     const html = items.map(a => {
-      const { text, cls } = formatChange(a.change);
+      const { text, cls } = mktFmtChange(a.change);
+      const unit = a.unit ? a.unit + ' ' : '';
       return `
         <span class="ticker-item">
           <span class="t-label">${a.name}</span>
-          <span class="t-price">${formatPrice(a)}</span>
+          <span class="t-price">${mktFmtPrice(a.price, unit)}</span>
           <span class="t-change ${cls === 'pos' ? 'up' : cls === 'neg' ? 'down' : ''}">${text}</span>
         </span>
       `;
     }).join('');
-
-    const track = document.getElementById('tickerTrack');
-    // Duplicamos para el loop continuo
     track.innerHTML = html + html;
   }
-
-  /* Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-     UI HELPERS
-     Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ */
 
   function setApiStatus(type, text) {
     const el = document.getElementById('apiStatus');
@@ -3863,387 +3704,58 @@
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 4000);
   }
-
-  /* Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-     INIT
-     Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ */
-
-  // Render inmediato con skeleton (loading state)
-  renderMarkets();
-
-  // Primera carga de datos reales
-  fetchAllAssets();
-
-  // Auto-refresh cada 60 segundos
-  setInterval(fetchAllAssets, CONFIG.REFRESH_INTERVAL_MS);
-
-  // ââ TICKER CONFIG âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-  const TICKER_LISTS = {
-    argStocksBody:  ['YPFD','GGAL','BMA','PAMP','LOMA','TXAR','ALUA','BYMA','TECO2','CEPU'],
-    argCedearsBody: ['AAPL','TSLA','AMZN','GOOGL','MSFT','NVDA','META','JPM','KO','DIS'],
-    argAdrsBody:    ['YPF','GGAL','BMA','PAM','TEO','LOM','TX','IRS','SUPV','EDN'],
-    argBondsBody:   ['AL30','GD30','AL35','GD35','AE38','GD38','AL41','GD41','GD46','TV24'],
-    usaStocksBody:  ['AAPL','TSLA','AMZN','MSFT','NVDA','META','GOOGL','JPM','NFLX','BRK.B'],
-  };
-
-  const LOGO_MAP = {
-    YPFD:'ypf.com', YPF:'ypf.com',
-    GGAL:'galiciaseguros.com.ar', BMA:'macro.com.ar',
-    PAMP:'pampaenergia.com', PAM:'pampaenergia.com',
-    LOMA:'lomanegra.com', LOM:'lomanegra.com',
-    TXAR:'ternium.com', TX:'ternium.com',
-    ALUA:'aluar.com',
-    BYMA:'byma.com.ar',
-    TECO2:'telecom.com.ar', TEO:'telecom.com.ar',
-    CEPU:'centralpuerto.com',
-    AAPL:'apple.com', TSLA:'tesla.com', AMZN:'amazon.com',
-    GOOGL:'google.com', MSFT:'microsoft.com', NVDA:'nvidia.com',
-    META:'meta.com', JPM:'jpmorgan.com', KO:'cocacola.com',
-    DIS:'disney.com', NFLX:'netflix.com',
-    'BRK.B':'berkshirehathaway.com',
-    IRS:'irsa.com', SUPV:'supervielle.com.ar', EDN:'edenor.com',
-  };
-
-  function tickerLogo(sym) {
-    const domain = LOGO_MAP[sym];
-    const initials = sym.replace('.','').substring(0,3).toUpperCase();
-    return '<span class="t-logo" data-d="' + (domain||'') + '"></span>';
-  }
-
-  const DISPLAY_NAMES = {
-    YPFD:'YPF', GGAL:'Galicia', BMA:'Macro', PAMP:'Pampa Energ', LOMA:'Loma Negra',
-    TXAR:'Ternium AR', ALUA:'Aluar', BYMA:'BYMA', TECO2:'Telecom', CEPU:'Cen. Puerto',
-    AAPL:'Apple', TSLA:'Tesla', AMZN:'Amazon', GOOGL:'Alphabet', MSFT:'Microsoft',
-    NVDA:'Nvidia', META:'Meta', JPM:'JPMorgan', KO:'Coca-Cola', DIS:'Disney',
-    YPF:'YPF ADR', GGAL:'Galicia ADR', BMA:'Macro ADR', PAM:'Pampa ADR', TEO:'Telecom ADR',
-    LOM:'Loma ADR', TX:'Ternium ADR', IRS:'IRSA ADR', SUPV:'Supervielle', EDN:'Edenor ADR',
-    NFLX:'Netflix', 'BRK.B':'Berkshire',
-    AL30:'AL30', GD30:'GD30', AL35:'AL35', GD35:'GD35', AE38:'AE38',
-    GD38:'GD38', AL41:'AL41', GD41:'GD41', GD46:'GD46', TV24:'TV24',
-  };
-
-  function genSparkSVG(seed, dir, w=70, h=20) {
-    let x = seed * 9301 + 49297;
-    const rand = () => { x = (x * 9301 + 49297) % 233280; return x / 233280; };
-    const pts = [];
-    const N = 32;
-    let v = 50;
-    const drift = dir === 'up' ? -0.7 : dir === 'down' ? 0.7 : 0;
-    for (let i = 0; i < N; i++) {
-      v += (rand() - 0.5) * 12 + drift;
-      pts.push(v);
-    }
-    const min = Math.min(...pts), max = Math.max(...pts);
-    const norm = pts.map(p => h - ((p - min) / (max - min || 1)) * h);
-    const stepX = w / (N - 1);
-    const path = norm.map((y, i) => `${i===0?'M':'L'}${(i*stepX).toFixed(1)},${y.toFixed(1)}`).join(' ');
-    const stroke = dir === 'up' ? '#10B981' : '#EF4444';
-    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><path d="${path}" fill="none" stroke="${stroke}" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
-  }
-
-  async function fetchD912(endpoint, bodyId) {
-    const allowList = TICKER_LISTS[bodyId];
-    const tbody = document.getElementById(bodyId);
-    if (!tbody) return;
-    try {
-      const resp = await fetch('https://data912.com/live/' + endpoint);
-      if (!resp.ok) throw new Error('HTTP ' + resp.status);
-      const rows = await resp.json();
-      const ordered = allowList
-        ? allowList.map(sym => rows.find(r => r.symbol === sym || r.ticker === sym)).filter(Boolean)
-        : rows.slice(0, 10);
-      if (!ordered.length) { tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Sin datos</span></div>'; return; }
-      tbody.innerHTML = ordered.map((r, i) => {
-        const sym  = r.symbol || r.ticker || '';
-        const name = DISPLAY_NAMES[sym] || r.name || sym;
-        const rawPrice = r.c ?? r.price;
-        const price = rawPrice != null ? '$' + Number(rawPrice).toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—';
-        const rawPct = r.pct_change ?? r.change_pct;
-        const sign  = rawPct > 0 ? '▲ +' : (rawPct < 0 ? '▼ ' : '');
-        const pct   = rawPct != null ? sign + Math.abs(Number(rawPct)).toFixed(2) + '%' : '—';
-        const cls   = rawPct > 0 ? 'pos' : (rawPct < 0 ? 'neg' : '');
-        const dir   = rawPct > 0 ? 'up' : (rawPct < 0 ? 'down' : 'neutral');
-        const spark = genSparkSVG(i, dir);
-        return '<div class="at-row">' +
-          '<div class="at-name"><span class="at-ticker">' + sym + '</span><span class="at-fullname">' + name + '</span></div>' +
-          '<div class="at-price">' + price + '</div>' +
-          '<div class="at-spark">' + spark + '</div>' +
-          '<div class="at-chg ' + cls + '">' + pct + '</div>' +
-          '</div>';
-      }).join('');
-    } catch(e) {
-      tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error: ' + e.message + '</span></div>';
-    }
-  }
-
-  async function fetchUSAStocks() {
-    const tbody = document.getElementById('usaStocksBody');
-    if (!tbody) return;
-    const tickers = TICKER_LISTS.usaStocksBody;
-    try {
-      const resp = await fetch('https://data912.com/live/usa_stocks');
-      if (!resp.ok) throw new Error('HTTP ' + resp.status);
-      const rows = await resp.json();
-      const ordered = tickers.map(sym => rows.find(r => r.symbol === sym)).filter(Boolean);
-      if (!ordered.length) { tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Sin datos</span></div>'; return; }
-      tbody.innerHTML = ordered.map((r, i) => {
-        const sym  = r.symbol || '';
-        const name = DISPLAY_NAMES[sym] || sym;
-        const price = r.c != null ? '$' + Number(r.c).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—';
-        const rawPct = r.pct_change;
-        const sign  = rawPct > 0 ? '▲ +' : (rawPct < 0 ? '▼ ' : '');
-        const pct   = rawPct != null ? sign + Math.abs(Number(rawPct)).toFixed(2) + '%' : '—';
-        const cls   = rawPct > 0 ? 'pos' : (rawPct < 0 ? 'neg' : '');
-        const dir   = rawPct > 0 ? 'up' : (rawPct < 0 ? 'down' : 'neutral');
-        const spark = genSparkSVG(i, dir);
-        return '<div class="at-row">' +
-          '<div class="at-name"><span class="at-ticker">' + sym + '</span><span class="at-fullname">' + name + '</span></div>' +
-          '<div class="at-price">' + price + '</div>' +
-          '<div class="at-spark">' + spark + '</div>' +
-          '<div class="at-chg ' + cls + '">' + pct + '</div>' +
-          '</div>';
-      }).join('');
-    } catch(e) {
-      tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error: ' + e.message + '</span></div>';
-    }
-  }
-
-  async function fetchFX() {
-    const tbody = document.getElementById('fxBody');
-    if (!tbody) return;
-    const FX_CONFIG = [
-      { key:'mep',   label:'Dólar MEP',          flag:'🇦🇷', type:'dolar', casa:'bolsa' },
-      { key:'ccl',   label:'Dólar CCL',          flag:'🇦🇷', type:'dolar', casa:'contadoconliqui' },
-      { key:'blue',  label:'Dólar Blue',         flag:'🇦🇷', type:'dolar', casa:'blue' },
-      { key:'ofic',  label:'Dólar Oficial',      flag:'🇦🇷', type:'dolar', casa:'oficial' },
-      { key:'eur',   label:'Euro',                    flag:'🇪🇺', type:'fx', code:'EUR' },
-      { key:'brl',   label:'Real brasilero',          flag:'🇧🇷', type:'fx', code:'BRL' },
-      { key:'cny',   label:'Yuan chino',              flag:'🇨🇳', type:'fx', code:'CNY' },
-      { key:'gbp',   label:'Libra esterlina',         flag:'🇬🇧', type:'fx', code:'GBP' },
-      { key:'chf',   label:'Franco suizo',            flag:'🇨🇭', type:'fx', code:'CHF' },
-      { key:'jpy',   label:'Yen japonés',        flag:'🇯🇵', type:'fx', code:'JPY' },
-    ];
-    try {
-      const [dolarResp, fxResp] = await Promise.all([
-        fetch('https://dolarapi.com/v1/dolares'),
-        fetch('https://open.er-api.com/v6/latest/USD'),
-      ]);
-      const dolarData = dolarResp.ok ? await dolarResp.json() : [];
-      const fxData    = fxResp.ok   ? await fxResp.json()    : {};
-      const dolarMap  = {};
-      if (Array.isArray(dolarData)) dolarData.forEach(d => { dolarMap[d.casa?.toLowerCase()] = d; });
-      const usdBlue = dolarMap['blue']?.venta || null;
-      const fxRates = fxData.rates || {};
-      tbody.innerHTML = FX_CONFIG.map(cfg => {
-        let compra = '—', venta = '—';
-        if (cfg.type === 'dolar') {
-          const d = dolarMap[cfg.casa] || null;
-          if (d) { compra = '$' + d.compra; venta = '$' + d.venta; }
-        } else {
-          const rateVsUSD = fxRates[cfg.code];
-          if (rateVsUSD && usdBlue) {
-            const arsVal = usdBlue / rateVsUSD;
-            compra = '$' + Math.round(arsVal).toLocaleString('es-AR');
-            venta  = compra;
-          }
-        }
-        return '<div class="at-row" style="grid-template-columns:1.6fr 1fr 1fr;">' +
-          '<div class="at-name"><span class="at-name-main">' + cfg.flag + ' ' + cfg.label + '</span></div>' +
-          '<div class="at-price">' + compra + '</div>' +
-          '<div class="at-price">' + venta  + '</div>' +
-          '</div>';
-      }).join('');
-    } catch(e) {
-      tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error: ' + e.message + '</span></div>';
-    }
-  }
-
-  function fetchAllLiveTables() {
-    fetchD912('arg_stocks',  'argStocksBody');
-    fetchD912('arg_cedears', 'argCedearsBody');
-    fetchD912('arg_bonds',   'argBondsBody');
-    fetchD912('usa_adrs',    'argAdrsBody');
-    fetchUSAStocks();
-    fetchFX();
-  }
-
-
-  function loadTickerLogos() {
-    document.querySelectorAll('.t-logo[data-d]').forEach(function(el) {
-      const d = el.getAttribute('data-d');
-      if (!d) return;
-      const img = document.createElement('img');
-      img.onload = function() { el.innerHTML = ''; el.appendChild(img); el.style.background='none'; };
-      img.src = 'https://logo.clearbit.com/' + d;
-      img.width = img.height = 22;
+  // Hero "spot" del banner principal (arriba del todo): Merval, S&P 500, Bitcoin.
+  // Antes llamaba a Finnhub/CoinGecko directo (loadMarketCards); ahora reusa lo
+  // que ya trajo fetchMercadosData().
+  function renderHeroSpot() {
+    if (!MERCADOS) return;
+    const map = { merval: 'merv', sp500: 'spx', btc: 'btc' };
+    MERCADOS.featured.forEach(item => {
+      const spotId = map[item.id];
+      if (!spotId) return;
+      const priceEl = document.getElementById('hspot-' + spotId + '-price');
+      const chgEl   = document.getElementById('hspot-' + spotId + '-chg');
+      const unit    = item.unit ? item.unit + ' ' : '';
+      if (priceEl) priceEl.textContent = item.price != null ? mktFmtPrice(item.price, unit).replace(/&mdash;/, '—') : '—';
+      if (chgEl) {
+        const { text, cls } = mktFmtChange(item.change);
+        chgEl.textContent = text.replace(/&#9650; \+/, '+').replace(/&#9660; /, '-').replace(/&mdash;/, '—');
+        chgEl.className = 'spot-chg ' + (cls === 'pos' ? 'up' : cls === 'neg' ? 'down' : '');
+      }
     });
   }
-  setTimeout(loadTickerLogos, 800);
-  setTimeout(loadTickerLogos, 4000);
-  fetchAllLiveTables();
-  setInterval(fetchAllLiveTables, 60000);
 
-  // Crypto
-  async function fetchCryptoTable() {
-    var tbody = document.getElementById('cryptoTableBody');
-    if (!tbody) return;
-    var coins = [
-      {id:'bitcoin',ticker:'BTC',name:'Bitcoin'},
-      {id:'ethereum',ticker:'ETH',name:'Ethereum'},
-      {id:'solana',ticker:'SOL',name:'Solana'},
-      {id:'binancecoin',ticker:'BNB',name:'BNB'},
-      {id:'ripple',ticker:'XRP',name:'XRP'},
-      {id:'cardano',ticker:'ADA',name:'Cardano'},
-      {id:'avalanche-2',ticker:'AVAX',name:'Avalanche'},
-      {id:'dogecoin',ticker:'DOGE',name:'Dogecoin'},
-      {id:'chainlink',ticker:'LINK',name:'Chainlink'},
-      {id:'polkadot',ticker:'DOT',name:'Polkadot'}
-    ];
-    try {
-      var ids = coins.map(function(c){return c.id;}).join(',');
-      var r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids='+ids+'&vs_currencies=usd&include_24hr_change=true');
-      var data = await r.json();
-      tbody.innerHTML = coins.map(function(c, i) {
-        var d = data[c.id];
-        var price = d ? 'US$ '+d.usd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : '\u2014';
-        var pct = d && d.usd_24h_change != null ? d.usd_24h_change : null;
-        var sign = pct != null ? (pct >= 0 ? '\u25b2 +' : '\u25bc ') : '';
-        var pctStr = pct != null ? sign+Math.abs(pct).toFixed(2)+'%' : '\u2014';
-        var cls = pct != null ? (pct >= 0 ? 'pos' : 'neg') : '';
-        var spark = genSparkSVG(i, pct != null ? (pct >= 0 ? 'up' : 'down') : 'neutral');
-        return '<div class="at-row">'+
-          '<div class="at-name"><span class="at-ticker">'+c.ticker+'</span><span class="at-fullname">'+c.name+'</span></div>'+
-          '<div class="at-price">'+price+'</div>'+
-          '<div class="at-spark">'+spark+'</div>'+
-          '<div class="at-chg '+cls+'">'+pctStr+'</div>'+
-          '</div>';
-      }).join('');
-    } catch(e) {
-      tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error: '+e.message+'</span></div>';
+  // Primera carga: trae todo del Worker manfredi-mercados y dispara los renders
+  async function initMercados() {
+    setApiStatus('loading', 'Actualizando&hellip;');
+    const data = await fetchMercadosData();
+    renderHeroCards();
+    renderTabs();
+    renderCategoryTable();
+    renderTicker();
+    renderHeroSpot();
+    if (data) {
+      const now = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+      setApiStatus('live', 'Datos en vivo');
+      const lu = document.getElementById('lastUpdated');
+      if (lu) lu.textContent = `Última actualización: ${now} hs`;
+    } else {
+      setApiStatus('error', 'Sin conexión a APIs');
     }
   }
 
-  // Commodities via Finnhub
-  async function fetchCommTable() {
-    var tbody = document.getElementById('commTableBody');
-    if (!tbody) return;
-    try {
-      var r = await fetch('https://manfredi-calendario.nachito2502.workers.dev/commodities', {signal: AbortSignal.timeout(6000)});
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      var data = await r.json();
-      var items = [
-        {ticker:'XAU', name:'Oro', key:'XAU'},
-        {ticker:'XAG', name:'Plata', key:'XAG'},
-        {ticker:'WTI', name:'Petróleo WTI', key:'WTI'},
-        {ticker:'BRENT', name:'Petróleo Brent', key:'BRENT'},
-        {ticker:'MAIZ', name:'Maíz', key:'CORN'},
-      ];
-      tbody.innerHTML = items.map(function(item, i) {
-        var d = data[item.key];
-        var price = d && d.price ? 'US$ ' + parseFloat(d.price).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—';
-        var pct = d && d.change != null ? parseFloat(d.change) : null;
-        var sign = pct != null ? (pct >= 0 ? '▲ +' : '▼ ') : '';
-        var pctStr = pct != null ? sign + Math.abs(pct).toFixed(2) + '%' : '—';
-        var cls = pct != null ? (pct >= 0 ? 'pos' : 'neg') : '';
-        var spark = genSparkSVG(i, pct != null ? (pct >= 0 ? 'up' : 'down') : 'neutral');
-        return '<div class="at-row">' +
-          '<div class="at-name"><span class="at-ticker">' + item.ticker + '</span><span class="at-fullname">' + item.name + '</span></div>' +
-          '<div class="at-price">' + price + '</div>' +
-          '<div class="at-spark">' + spark + '</div>' +
-          '<div class="at-chg ' + cls + '">' + pctStr + '</div>' +
-          '</div>';
-      }).join('');
-    } catch(e) {
-      tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error: ' + e.message + '</span></div>';
-    }
+  initMktSearch();
+  initAssetModal();
+  const mktShowAllBtnEl = document.getElementById('mktShowAllBtn');
+  if (mktShowAllBtnEl) {
+    mktShowAllBtnEl.addEventListener('click', () => {
+      mktShowingAll = true;
+      renderCategoryTable();
+    });
   }
+  initMercados();
+  setInterval(initMercados, MKT_REFRESH_MS);
 
-  // ETFs via Finnhub
-  async function fetchETFTable() {
-    var tbody = document.getElementById('etfTableBody');
-    if (!tbody) return;
-    var etfs = [
-      {ticker:'SPY',name:'SPDR S&P 500'},
-      {ticker:'QQQ',name:'Nasdaq 100'},
-      {ticker:'VOO',name:'Vanguard S&P 500'},
-      {ticker:'VT',name:'Vanguard Total World'},
-      {ticker:'GLD',name:'SPDR Gold'},
-      {ticker:'TLT',name:'Treasury Bond 20Y+'},
-      {ticker:'BND',name:'Vanguard Bonds'},
-      {ticker:'XLK',name:'Technology SPDR'}
-    ];
-    try {
-      var results = await Promise.all(etfs.map(async function(c, i) {
-        try {
-          var r = await fetch('https://finnhub.io/api/v1/quote?symbol='+c.ticker+'&token='+CONFIG.FINNHUB_KEY);
-          var d = await r.json();
-          var price = (d.c && d.c > 0) ? 'US$ '+d.c.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : '\u2014';
-          var pct = (d.c && d.pc && d.pc > 0) ? ((d.c - d.pc) / d.pc * 100) : null;
-          var sign = pct != null ? (pct >= 0 ? '\u25b2 +' : '\u25bc ') : '';
-          var pctStr = pct != null ? sign+Math.abs(pct).toFixed(2)+'%' : '\u2014';
-          var cls = pct != null ? (pct >= 0 ? 'pos' : 'neg') : '';
-          var spark = genSparkSVG(i, pct != null ? (pct >= 0 ? 'up' : 'down') : 'neutral');
-          return '<div class="at-row">'+
-            '<div class="at-name"><span class="at-ticker">'+c.ticker+'</span><span class="at-fullname">'+c.name+'</span></div>'+
-            '<div class="at-price">'+price+'</div>'+
-            '<div class="at-spark">'+spark+'</div>'+
-            '<div class="at-chg '+cls+'">'+pctStr+'</div>'+
-            '</div>';
-        } catch(e) { return ''; }
-      }));
-      tbody.innerHTML = results.join('') || '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Sin datos</span></div>';
-    } catch(e) {
-      tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error</span></div>';
-    }
-  }
-
-  // \u00cdndices via Finnhub
-  async function fetchIdxTable() {
-    var tbody = document.getElementById('idxTableBody');
-    if (!tbody) return;
-    var idxs = [
-      {ticker:'S&P 500',name:'SPDR S&P 500',sym:'SPY'},
-      {ticker:'NASDAQ',name:'Nasdaq 100',sym:'QQQ'},
-      {ticker:'DOW',name:'Dow Jones ETF',sym:'DIA'},
-      {ticker:'RUSSELL',name:'Russell 2000',sym:'IWM'},
-      {ticker:'VIX',name:'Volatilidad',sym:'UVXY'}
-    ];
-    try {
-      var results = await Promise.all(idxs.map(async function(c, i) {
-        try {
-          var r = await fetch('https://finnhub.io/api/v1/quote?symbol='+c.sym+'&token='+CONFIG.FINNHUB_KEY);
-          var d = await r.json();
-          var price = (d.c && d.c > 0) ? 'US$ '+d.c.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : '\u2014';
-          var pct = (d.c && d.pc && d.pc > 0) ? ((d.c - d.pc) / d.pc * 100) : null;
-          var sign = pct != null ? (pct >= 0 ? '\u25b2 +' : '\u25bc ') : '';
-          var pctStr = pct != null ? sign+Math.abs(pct).toFixed(2)+'%' : '\u2014';
-          var cls = pct != null ? (pct >= 0 ? 'pos' : 'neg') : '';
-          var spark = genSparkSVG(i, pct != null ? (pct >= 0 ? 'up' : 'down') : 'neutral');
-          return '<div class="at-row">'+
-            '<div class="at-name"><span class="at-ticker">'+c.ticker+'</span><span class="at-fullname">'+c.name+'</span></div>'+
-            '<div class="at-price">'+price+'</div>'+
-            '<div class="at-spark">'+spark+'</div>'+
-            '<div class="at-chg '+cls+'">'+pctStr+'</div>'+
-            '</div>';
-        } catch(e) { return ''; }
-      }));
-      tbody.innerHTML = results.join('') || '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Sin datos</span></div>';
-    } catch(e) {
-      tbody.innerHTML = '<div class="at-row" style="grid-template-columns:1fr;"><span style="color:var(--text-sec);font-size:12px;">Error</span></div>';
-    }
-  }
-
-  const CAL_DETAILS={'ar-pbi':{icon:'📈',title:'PBI Argentina',text:'La economía retomó el crecimiento liderada por agro, construcción y servicios. <strong>Para los mercados:</strong> positivo para acciones del Merval y bonos soberanos.'},'ar-inf':{icon:'🔥',title:'Inflación Argentina',text:'La inflación mensual continúa desacelerando. Crawling peg y ancla cambiaria son los drivers. <strong>Próximo dato:</strong> IPC INDEC el 12 de cada mes.'},'ar-desemp':{icon:'👷',title:'Desempleo Argentina',text:'Resiliencia pese al ajuste del sector público. <strong>Publicación:</strong> trimestral por EPH-INDEC.'},'ar-riesgo':{icon:'🌡',title:'Riesgo País EMBI+',text:'Compresión por acuerdo FMI y disciplina fiscal. <strong>Para los mercados:</strong> cada 100 bps de caída impulsa GD30/AL30 un ~8-12%.'},'us-pbi':{icon:'📉',title:'PBI Estados Unidos',text:'Contracción leve por caída de exportaciones ante aranceles. Consumo privado resisó.'},'us-inf':{icon:'📊',title:'Inflación EE.UU. CPI',text:'Desacelerando hacia el target del 2%. <strong>Dato más importante para la Fed:</strong> PCE Core, último jueves de cada mes.'},'us-desemp':{icon:'💼',title:'Desempleo EE.UU.',text:'Mercado laboral resiliente. <strong>Próximo dato clave:</strong> Nonfarm Payrolls el primer viernes de cada mes.'},'us-treasury':{icon:'🏦',title:'Treasury 10Y Yield',text:'Yields altos comprimen valuaciones tech. <strong>Para los mercados:</strong> impacta en CEDEARs y bonos argentinos en USD.'}}; function calShowDetail(key,el){var d=CAL_DETAILS[key];if(!d)return;document.querySelectorAll('.cal-kpi').forEach(function(k){k.classList.remove('active');});el.classList.add('active');var box=document.getElementById('calDetailBox');box.children[0].textContent=d.icon;document.getElementById('calDetailTitle').textContent=d.title;document.getElementById('calDetailText').innerHTML=d.text;box.style.borderColor='rgba(242,201,76,.4)';box.style.background='rgba(242,201,76,.04)';} async function loadMacroAR(){try{var infR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/inflacion').catch(function(){return null;});var riesgoR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais').catch(function(){return null;});if(infR&&infR.ok){var infD=await infR.json();if(Array.isArray(infD)&&infD.length){var last=infD[infD.length-1];var val=last.valor!=null?last.valor:last.value;if(val!=null){document.getElementById('ar-inf-val').textContent=val.toFixed(1)+'%';document.getElementById('ar-inf-sub').textContent='Mensual · '+(last.fecha||'');}}}if(riesgoR&&riesgoR.ok){var riesgoD=await riesgoR.json();if(Array.isArray(riesgoD)&&riesgoD.length){var rLast=riesgoD[riesgoD.length-1];var rVal=rLast.valor!=null?rLast.valor:rLast.value;if(rVal!=null){document.getElementById('ar-riesgo-val').textContent=Math.round(rVal)+' bps';document.getElementById('ar-riesgo-sub').textContent='EMBI+ · '+(rLast.fecha||'');}}}}catch(e){console.warn('[MI] MacroAR:',e.message);}} async function loadMacroUS(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/macro-us',{signal:AbortSignal.timeout(5000)});if(r.ok){var d=await r.json();if(d.gdp!=null){var v=parseFloat(d.gdp);document.getElementById('us-pbi-val').textContent=(v>=0?'+':'')+v.toFixed(1)+'%';document.getElementById('us-pbi-val').className='cal-kpi-main '+(v>=0?'cal-up':'cal-down');}if(d.cpi!=null)document.getElementById('us-inf-val').textContent=parseFloat(d.cpi).toFixed(1)+'%';if(d.unemp!=null)document.getElementById('us-desemp-val').textContent=parseFloat(d.unemp).toFixed(1)+'%';if(d.treasury!=null)document.getElementById('us-treasury-val').textContent=parseFloat(d.treasury).toFixed(2)+'%';}}catch(e){console.warn('[MI] MacroUS:',e.message);}} async function loadCalSemana(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/calendario',{signal:AbortSignal.timeout(8000)});if(r.ok){var d=await r.json();if(d.dias&&d.dias.length){document.getElementById('calSemanaLabel').textContent=d.semana||'';var dow=new Date().getDay();var grid=document.getElementById('calWeekGrid');grid.innerHTML=d.dias.map(function(dia,i){var isToday=(i+1)===dow;var evs=dia.eventos&&dia.eventos.length?dia.eventos.map(function(ev){return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+ev.titulo+'</strong>'+ev.descripcion+'</div></div>';}).join(''):'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Sin eventos</span>';return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+dia.nombre+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+dia.fecha+'</span></div>'+evs+'</div>';}).join('');return;}}}catch(e){console.warn('[MI] CalSemana:',e.message);}var hoy=new Date();var dow=hoy.getDay();var lun=new Date(hoy);lun.setDate(hoy.getDate()-(dow===0?6:dow-1));var nombres=['Lun','Mar','Mié','Jue','Vie'];var fmt=function(d){return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});};var fin=new Date(lun);fin.setDate(lun.getDate()+4);document.getElementById('calSemanaLabel').textContent=fmt(lun)+' al '+fmt(fin);document.getElementById('calWeekGrid').innerHTML=nombres.map(function(n,i){var d=new Date(lun);d.setDate(lun.getDate()+i);var isToday=(i+1)===dow;return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+n+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+fmt(d)+'</span></div>'+'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Cargando...</span></div>';}).join('');} loadMacroAR(); loadMacroUS(); loadCalSemana(); setInterval(loadMacroAR,300000); setInterval(loadMacroUS,300000);
-  fetchCryptoTable();
-  fetchCommTable();
-  fetchETFTable();
-  fetchIdxTable();
-  setInterval(fetchCryptoTable, 60000);
-  setInterval(fetchCommTable, 120000);
-  setInterval(fetchETFTable, 60000);
-  setInterval(fetchIdxTable, 60000);
-  setInterval(fetchUSAStocks, 120000);
-  setInterval(fetchFX, 120000);
 
 
   </script>
@@ -7592,111 +7104,11 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
   <script>
   /* === INDEX-V2 EXTRAS: spotlight + dash cards + filter tabs === */
   (function() {
-    function fmt(n, prefix, dec) {
-      if (n == null || isNaN(+n)) return '—';
-      prefix = prefix || ''; dec = dec != null ? dec : 2;
-      const abs = Math.abs(n);
-      if (abs >= 1e9) return prefix + (n/1e9).toFixed(1) + 'B';
-      if (abs >= 1e6) return prefix + (n/1e6).toFixed(1) + 'M';
-      if (abs >= 1e3) return prefix + n.toLocaleString('es-AR', {minimumFractionDigits:dec,maximumFractionDigits:dec});
-      return prefix + (+n).toFixed(dec);
-    }
-    function fmtChg(c) {
-      if (c == null || isNaN(+c)) return { txt:'—', cls:'' };
-      const v = parseFloat(c);
-      return { txt:(v >= 0 ? '+' : '') + v.toFixed(2) + '%', cls: v >= 0 ? 'up' : 'down' };
-    }
-    function setSpot(id, price, chg, prefix) {
-      const pEl = document.getElementById('hspot-' + id + '-price');
-      const cEl = document.getElementById('hspot-' + id + '-chg');
-      if (pEl) pEl.textContent = price != null ? fmt(price, prefix, 2) : '—';
-      if (cEl) { const r = fmtChg(chg); cEl.textContent = r.txt; cEl.className = 'spot-chg ' + r.cls; }
-    }
-    function setDash(id, price, chg, prefix, vol, max, min) {
-      const sel = function(s) { return document.getElementById('dc-' + id + '-' + s); };
-      const pEl = sel('price'), cEl = sel('chg'), vEl = sel('vol'), xEl = sel('max'), nEl = sel('min');
-      if (pEl) pEl.textContent = price != null ? fmt(price, prefix, 2) : '—';
-      if (cEl) { const r = fmtChg(chg); cEl.textContent = r.txt; cEl.className = 'dc-chg ' + r.cls; }
-      if (vEl && vol != null) vEl.textContent = fmt(vol, '', 0);
-      if (xEl && max != null) xEl.textContent = fmt(max, prefix, 2);
-      if (nEl && min != null) nEl.textContent = fmt(min, prefix, 2);
-    }
-    function initFilterTabs() {
-      var tabs = document.querySelectorAll('#marketFilterTabs .f-tab');
-      tabs.forEach(function(tab) {
-        tab.addEventListener('click', function() {
-          tabs.forEach(function(t) { t.classList.remove('active'); });
-          tab.classList.add('active');
-          var filter = tab.getAttribute('data-filter');
-          var tableMap = {
-            'all': ['argAdrsBody','usaStocksBody','argBondsBody','fxBody','cryptoTableBody','commTableBody','etfTableBody','idxTableBody'],
-            'AR':  ['argAdrsBody','argBondsBody','fxBody'],
-            'US':  ['usaStocksBody','etfTableBody','idxTableBody'],
-            'CR':  ['cryptoTableBody'],
-            'CM':  ['commTableBody']
-          };
-          var allTables = ['at-card-adrs','at-card-usastocks','at-card-bonds','at-card-fx','at-card-crypto','at-card-comm','at-card-etf','at-card-idx'];
-          var showTables = tableMap[filter] || tableMap['all'];
-          document.querySelectorAll('.at-card[data-table]').forEach(function(card) {
-            var id = card.getAttribute('data-table');
-            card.style.display = (filter === 'all' || showTables.some(function(s){ return card.contains(document.getElementById(s)); })) ? '' : 'none';
-          });
-          document.querySelectorAll('.at-col').forEach(function(col) {
-            var hasVisible = Array.from(col.querySelectorAll('.at-card')).some(function(c){ return c.style.display !== 'none'; });
-            col.style.display = hasVisible ? '' : 'none';
-          });
-          document.querySelectorAll('.dash-card[data-region]').forEach(function(card) {
-            var region = card.getAttribute('data-region');
-            card.style.display = (filter === 'all' || region === filter) ? '' : 'none';
-          });
-        });
-      });
-    }
-    async function loadMarketCards() {
-      try {
-        if (typeof fetchMerval === 'function') {
-          var r = await fetchMerval();
-          if (r) { setSpot('merv', r.price, r.change, 'AR$ '); setDash('merv', r.price, r.change, 'AR$ '); }
-        }
-      } catch(e) { console.warn('[v2] merv:', e.message); }
-      try {
-        if (typeof fetchFinnhub === 'function') {
-          var r = await fetchFinnhub('SPY');
-          if (r) { setSpot('spx', r.price, r.change, 'US$ '); setDash('spx', r.price, r.change, 'US$ '); }
-        }
-      } catch(e) { console.warn('[v2] spx:', e.message); }
-      try {
-        if (typeof fetchFinnhub === 'function') {
-          var r = await fetchFinnhub('QQQ');
-          if (r) { setDash('ndx', r.price, r.change, 'US$ '); }
-        }
-      } catch(e) { console.warn('[v2] ndx:', e.message); }
-      try {
-        if (typeof fetchCoinGecko === 'function') {
-          var r = await fetchCoinGecko('bitcoin');
-          if (r) { setSpot('btc', r.price, r.change, 'US$ '); setDash('btc', r.price, r.change, 'US$ '); }
-        }
-      } catch(e) { console.warn('[v2] btc:', e.message); }
-      try {
-        if (typeof fetchDolarApi === 'function') {
-          var r = await fetchDolarApi('bolsa');
-          if (r) {
-            setSpot('mep', r.price, r.change, 'AR$ ');
-            setDash('mep', r.price, r.change, 'AR$ ');
-            var buyEl = document.getElementById('dc-mep-buy');
-            var sellEl = document.getElementById('dc-mep-sell');
-            if (buyEl && r.compra != null) buyEl.textContent = fmt(r.compra, 'AR$ ', 2);
-            if (sellEl && r.price != null) sellEl.textContent = fmt(r.price, 'AR$ ', 2);
-          }
-        }
-      } catch(e) { console.warn('[v2] mep:', e.message); }
-      try {
-        if (typeof fetchTwelveData === 'function') {
-          var r = await fetchTwelveData('XAU/USD');
-          if (r) { setDash('xau', r.price, r.change, 'US$ ', r.volume, r.high, r.low); }
-        }
-      } catch(e) { console.warn('[v2] xau:', e.message); }
-    }
+    // setSpot/setDash/initFilterTabs/loadMarketCards vivían acá — llamaban directo
+    // a Finnhub/CoinGecko/dolarapi/TwelveData con las keys expuestas. Ahora el hero
+    // spot (Merval/S&P500/Bitcoin) lo llena renderHeroSpot() reusando los datos que
+    // ya trajo fetchMercadosData() del Worker manfredi-mercados. El filtro por tabs
+    // (marketFilterTabs) desapareció junto con las tablas viejas de la sección Mercados.
     async function loadHeroRiesgo() {
       try {
         var r = await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais', {signal: AbortSignal.timeout(8000)});
@@ -7756,8 +7168,8 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
       btn.addEventListener('mouseleave', function() { btn.style.transform = ''; });
     }
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() { initFilterTabs(); loadMarketCards(); loadHeroRiesgo(); initHeroMagneticCta(); });
-    } else { initFilterTabs(); loadMarketCards(); loadHeroRiesgo(); initHeroMagneticCta(); }
+      document.addEventListener('DOMContentLoaded', function() { loadHeroRiesgo(); initHeroMagneticCta(); });
+    } else { loadHeroRiesgo(); initHeroMagneticCta(); }
     setInterval(loadHeroRiesgo, 90000);
   })();
   </script>
