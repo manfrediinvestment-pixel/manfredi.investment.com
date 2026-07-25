@@ -249,7 +249,8 @@ async function fetchMerval(finnhubKey) {
       if (last?.valor) {
         const prev = data.length > 1 ? data[data.length - 2]?.valor : null;
         const change = prev > 0 ? ((last.valor - prev) / prev * 100) : null;
-        return { price: last.valor, change };
+        const spark = data.slice(-30).map(d => d.valor).filter(v => v != null);
+        return { price: last.valor, change, spark };
       }
     }
   } catch (e) { console.error('[mercados] Merval/ArgentinaDatos:', e.message); }
@@ -259,21 +260,102 @@ async function fetchMerval(finnhubKey) {
 }
 
 // ─── Commodities (Yahoo futures) ──────────────────────────────────────────
+const COMMODITY_YAHOO_MAP = {
+  XAU: 'GC=F', XAG: 'SI=F', WTI: 'CL=F', BRENT: 'BZ=F', CORN: 'ZC=F', NATGAS: 'NG=F', COPPER: 'HG=F',
+};
+const COMMODITY_NAMES = {
+  XAU: 'Oro', XAG: 'Plata', WTI: 'Petróleo WTI', BRENT: 'Petróleo Brent',
+  CORN: 'Maíz', NATGAS: 'Gas Natural', COPPER: 'Cobre',
+};
+
 async function fetchCommodities() {
-  const specs = [
-    { symbol: 'GC=F', id: 'XAU', name: 'Oro' },
-    { symbol: 'SI=F', id: 'XAG', name: 'Plata' },
-    { symbol: 'CL=F', id: 'WTI', name: 'Petróleo WTI' },
-    { symbol: 'BZ=F', id: 'BRENT', name: 'Petróleo Brent' },
-    { symbol: 'ZC=F', id: 'CORN', name: 'Maíz' },
-    { symbol: 'NG=F', id: 'NATGAS', name: 'Gas Natural' },
-    { symbol: 'HG=F', id: 'COPPER', name: 'Cobre' },
-  ];
-  const results = await Promise.all(specs.map(async s => {
-    const r = await fetchYahoo(s.symbol);
-    return { symbol: s.id, name: s.name, price: r?.price ?? null, change: r?.change ?? null, volume: 0 };
+  const results = await Promise.all(Object.entries(COMMODITY_YAHOO_MAP).map(async ([id, ySymbol]) => {
+    const r = await fetchYahoo(ySymbol);
+    return { symbol: id, name: COMMODITY_NAMES[id], price: r?.price ?? null, change: r?.change ?? null, volume: 0 };
   }));
   return results;
+}
+
+// ─── Histórico bajo demanda (para el gráfico del modal de detalle) ────────
+// A diferencia del resto de este worker, esto NO se cachea en KV: solo se
+// pide cuando alguien hace click en un activo puntual, así que el volumen
+// de pedidos es bajo y no vale la pena gastar el cupo de escrituras de KV.
+function closesFromD912History(rows, n) {
+  if (!Array.isArray(rows) || !rows.length) return [];
+  return rows.filter(r => r.c != null).slice(-n).map(r => r.c);
+}
+
+async function fetchD912Closes(endpoint, symbol, n = 30) {
+  const resp = await fetch(`https://data912.com/historical/${endpoint}/${encodeURIComponent(symbol)}`, { signal: AbortSignal.timeout(10000) });
+  if (!resp.ok) throw new Error(`data912 historical HTTP ${resp.status}`);
+  const rows = await resp.json();
+  return closesFromD912History(rows, n);
+}
+
+async function fetchYahooCloses(symbol, n = 30) {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=3mo`;
+  const resp = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(10000) });
+  if (!resp.ok) throw new Error(`Yahoo HTTP ${resp.status}`);
+  const json = await resp.json();
+  const closes = json?.chart?.result?.[0]?.indicators?.quote?.[0]?.close;
+  if (!Array.isArray(closes)) throw new Error('Yahoo: sin datos');
+  return closes.filter(v => v != null).slice(-n);
+}
+
+// Reverso de KRAKEN_LEGACY_SYMBOLS: "BTC" -> "XXBTZUSD", etc.
+const KRAKEN_SYMBOL_TO_PAIR = Object.fromEntries(
+  Object.entries(KRAKEN_LEGACY_SYMBOLS).map(([pair, symbol]) => [symbol, pair])
+);
+
+async function fetchKrakenCloses(symbol, n = 30) {
+  const pair = KRAKEN_SYMBOL_TO_PAIR[symbol] || `${symbol}USD`;
+  const url = `https://api.kraken.com/0/public/OHLC?pair=${encodeURIComponent(pair)}&interval=1440`;
+  const resp = await fetch(url, { signal: AbortSignal.timeout(10000) });
+  if (!resp.ok) throw new Error(`Kraken HTTP ${resp.status}`);
+  const json = await resp.json();
+  const series = json.result && Object.values(json.result)[0];
+  if (!Array.isArray(series) || !series.length) throw new Error('Kraken: sin datos');
+  return series.slice(-n).map(row => parseFloat(row[4]));
+}
+
+async function fetchDolarCloses(casa, n = 30) {
+  const url = `https://api.argentinadatos.com/v1/cotizaciones/dolares/${encodeURIComponent(casa)}`;
+  const resp = await fetch(url, { signal: AbortSignal.timeout(10000) });
+  if (!resp.ok) throw new Error(`ArgentinaDatos HTTP ${resp.status}`);
+  const rows = await resp.json();
+  if (!Array.isArray(rows) || !rows.length) throw new Error('ArgentinaDatos: sin datos');
+  return rows.slice(-n).map(r => r.venta);
+}
+
+async function fetchHistoricalCloses(category, symbol) {
+  if (category === 'arg_stocks') return fetchD912Closes('stocks', symbol);
+  if (category === 'arg_cedears') return fetchD912Closes('cedears', symbol);
+  if (category === 'arg_bonds') return fetchD912Closes('bonds', symbol);
+  if (category === 'usa_stocks' || category === 'usa_adrs') return fetchYahooCloses(symbol);
+  if (category === 'commodities') {
+    const ySymbol = COMMODITY_YAHOO_MAP[symbol];
+    if (!ySymbol) throw new Error('Commodity desconocida');
+    return fetchYahooCloses(ySymbol);
+  }
+  if (category === 'cripto') return fetchKrakenCloses(symbol);
+  if (category === 'dolares') return fetchDolarCloses(symbol.toLowerCase());
+  throw new Error('Categoría desconocida');
+}
+
+// ─── Sparks de los carteles fijos (columna izquierda) ─────────────────────
+// Llamados extra solo para dibujar la líneita de tendencia — si alguno falla
+// no rompe nada, esa card queda sin gráfico pero con precio/variación igual.
+async function fetchFeaturedSparks() {
+  const safe = async (fn) => { try { return await fn(); } catch (e) { return []; } };
+  const [oro, wti, spx, ndx, btc, ccl] = await Promise.all([
+    safe(() => fetchYahooCloses('GC=F', 20)),
+    safe(() => fetchYahooCloses('CL=F', 20)),
+    safe(() => fetchYahooCloses('SPY', 20)),
+    safe(() => fetchYahooCloses('QQQ', 20)),
+    safe(() => fetchKrakenCloses('BTC', 20)),
+    safe(() => fetchDolarCloses('contadoconliqui', 20)),
+  ]);
+  return { oro, wti, spx, ndx, btc, ccl };
 }
 
 // ─── Agregación completa ──────────────────────────────────────────────────
@@ -284,7 +366,7 @@ async function buildPayload(env) {
   const [
     argStocksRaw, argCedearsRaw, usaStocksRaw, usaAdrsRaw, argBondsRaw,
     cripto, commodities, dolares, divisas,
-    oro, spx, ndx, merval,
+    oro, spx, ndx, merval, sparks,
   ] = await Promise.all([
     fetchD912('arg_stocks'),
     fetchD912('arg_cedears'),
@@ -299,19 +381,20 @@ async function buildPayload(env) {
     fetchFinnhub('SPY', finnhubKey),
     fetchFinnhub('QQQ', finnhubKey),
     fetchMerval(finnhubKey),
+    fetchFeaturedSparks(),
   ]);
 
   const wti = commodities.find(c => c.symbol === 'WTI');
   const btc = cripto.find(r => r.symbol === 'BTC') || null;
 
   const featured = [
-    { id: 'oro', flag: '🥇', name: 'Oro', unit: 'US$', price: oro?.price ?? null, change: oro?.change ?? null },
-    { id: 'merval', flag: '🇦🇷', name: 'Merval', unit: '', price: merval?.price ?? null, change: merval?.change ?? null },
-    { id: 'sp500', flag: '🇺🇸', name: 'S&P 500', unit: 'US$', price: spx?.price ?? null, change: spx?.change ?? null },
-    { id: 'nasdaq', flag: '🇺🇸', name: 'Nasdaq 100', unit: 'US$', price: ndx?.price ?? null, change: ndx?.change ?? null },
-    { id: 'btc', flag: '₿', name: 'Bitcoin', unit: 'US$', price: btc?.price ?? null, change: btc?.change ?? null },
-    { id: 'ccl', flag: '🇦🇷', name: 'Dólar CCL', unit: '$', price: dolares.find(d => d.symbol === 'CONTADOCONLIQUI')?.price ?? null, change: null },
-    { id: 'wti', flag: '🛢️', name: 'Petróleo WTI', unit: 'US$', price: wti?.price ?? null, change: wti?.change ?? null },
+    { id: 'oro', flag: '🥇', name: 'Oro', unit: 'US$', price: oro?.price ?? null, change: oro?.change ?? null, spark: sparks.oro },
+    { id: 'merval', flag: '🇦🇷', name: 'Merval', unit: '', price: merval?.price ?? null, change: merval?.change ?? null, spark: merval?.spark ?? [] },
+    { id: 'sp500', flag: '🇺🇸', name: 'S&P 500', unit: 'US$', price: spx?.price ?? null, change: spx?.change ?? null, spark: sparks.spx },
+    { id: 'nasdaq', flag: '🇺🇸', name: 'Nasdaq 100', unit: 'US$', price: ndx?.price ?? null, change: ndx?.change ?? null, spark: sparks.ndx },
+    { id: 'btc', flag: '₿', name: 'Bitcoin', unit: 'US$', price: btc?.price ?? null, change: btc?.change ?? null, spark: sparks.btc },
+    { id: 'ccl', flag: '🇦🇷', name: 'Dólar CCL', unit: '$', price: dolares.find(d => d.symbol === 'CONTADOCONLIQUI')?.price ?? null, change: null, spark: sparks.ccl },
+    { id: 'wti', flag: '🛢️', name: 'Petróleo WTI', unit: 'US$', price: wti?.price ?? null, change: wti?.change ?? null, spark: sparks.wti },
   ];
 
   const categorias = {
@@ -351,6 +434,24 @@ export default {
         return new Response(json, { headers });
       } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 500, headers });
+      }
+    }
+
+    if (url.pathname === '/historico') {
+      const category = url.searchParams.get('category') || '';
+      const symbol = url.searchParams.get('symbol') || '';
+      if (!category || !symbol) {
+        return new Response(JSON.stringify({ error: 'Faltan category y symbol' }), { status: 400, headers });
+      }
+      try {
+        const closes = await fetchHistoricalCloses(category, symbol);
+        if (!closes.length) throw new Error('Sin datos históricos');
+        return new Response(JSON.stringify({
+          symbol, category, closes,
+          min: Math.min(...closes), max: Math.max(...closes),
+        }), { headers });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), { status: 404, headers });
       }
     }
 

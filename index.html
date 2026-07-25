@@ -1982,6 +1982,37 @@
     .mkt-hero-card .mh-chg.pos { color: #10B981; }
     .mkt-hero-card .mh-chg.neg { color: #EF4444; }
     .mkt-hero-card .mh-chg.neutral { color: rgba(255,255,255,.35); }
+    .mkt-hero-card .mh-chart { margin-top: 8px; height: 34px; line-height: 0; }
+
+    /* Modal de detalle de activo */
+    .mkt-modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(4,7,14,.72); z-index: 500;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .mkt-modal-overlay.open { display: flex; }
+    .mkt-modal-box {
+      width: 420px; max-width: 100%; background: var(--navy-3); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.5); max-height: 88vh; overflow-y: auto;
+    }
+    .mkt-modal-inner { padding: 22px 24px; }
+    .mkt-modal-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+    .mkt-modal-ticker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .06em; color: var(--gold); text-transform: uppercase; }
+    .mkt-modal-name { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 21px; color: var(--white); margin: 3px 0 0; }
+    .mkt-modal-close {
+      background: none; border: 1px solid rgba(255,255,255,.18); color: rgba(255,255,255,.6);
+      width: 28px; height: 28px; border-radius: 50%; font-size: 15px; cursor: pointer; flex-shrink: 0; line-height: 1;
+    }
+    .mkt-modal-close:hover { border-color: rgba(242,201,76,.5); color: var(--gold); }
+    .mkt-modal-price-row { display: flex; align-items: baseline; gap: 12px; margin: 14px 0 4px; }
+    .mkt-modal-price { font-size: 30px; font-weight: 700; color: var(--white); font-variant-numeric: tabular-nums; }
+    .mkt-modal-chg { font-size: 13.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .mkt-modal-chg.pos { color: #10B981; } .mkt-modal-chg.neg { color: #EF4444; } .mkt-modal-chg.neutral { color: rgba(255,255,255,.35); }
+    .mkt-modal-range { font-size: 11px; color: rgba(255,255,255,.4); margin-bottom: 16px; font-family: 'IBM Plex Mono', monospace; min-height: 14px; }
+    .mkt-modal-chart-wrap { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: 8px; padding: 14px 10px 8px; min-height: 130px; }
+    .mkt-modal-loading { color: rgba(255,255,255,.35); font-size: 12.5px; text-align: center; padding: 48px 10px; }
+    .mkt-modal-meta { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.07); }
+    .mkt-modal-meta .mmd-label { font-size: 9.5px; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.32); font-family: 'IBM Plex Mono', monospace; }
+    .mkt-modal-meta .mmd-val { font-size: 13px; color: var(--white); margin-top: 3px; font-variant-numeric: tabular-nums; }
 
     /* Tabs de categoria */
     .mkt-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
@@ -2002,7 +2033,7 @@
     }
     .mkt-row {
       display: grid; grid-template-columns: 1.6fr 1fr 1fr; padding: 10px 16px; align-items: center;
-      border-bottom: 1px solid rgba(255,255,255,.06); font-size: 13px; cursor: default;
+      border-bottom: 1px solid rgba(255,255,255,.06); font-size: 13px; cursor: pointer;
     }
     .mkt-row:last-child { border-bottom: none; }
     .mkt-row:hover { background: rgba(255,255,255,.03); }
@@ -2565,6 +2596,31 @@
       <p class="last-updated" id="lastUpdated" style="margin-top:16px;text-align:right;font-size:11px;color:var(--text-sec);"></p>
     </div>
   </section>
+
+  <div class="mkt-modal-overlay" id="mktModalOverlay">
+    <div class="mkt-modal-box">
+      <div class="mkt-modal-inner">
+        <div class="mkt-modal-top">
+          <div>
+            <div class="mkt-modal-ticker" id="mktModalTicker">&mdash;</div>
+            <h3 class="mkt-modal-name" id="mktModalName">&mdash;</h3>
+          </div>
+          <button type="button" class="mkt-modal-close" id="mktModalClose" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="mkt-modal-price-row">
+          <span class="mkt-modal-price" id="mktModalPrice">&mdash;</span>
+          <span class="mkt-modal-chg" id="mktModalChg">&mdash;</span>
+        </div>
+        <div class="mkt-modal-range" id="mktModalRange"></div>
+        <div class="mkt-modal-chart-wrap" id="mktModalChart"></div>
+        <div class="mkt-modal-meta">
+          <div><div class="mmd-label">Volumen</div><div class="mmd-val" id="mktModalVol">&mdash;</div></div>
+          <div><div class="mmd-label">Categoría</div><div class="mmd-val" id="mktModalCat">&mdash;</div></div>
+          <div><div class="mmd-label">Moneda</div><div class="mmd-val" id="mktModalCurrency">&mdash;</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <section style="background:var(--navy-1);padding:72px 32px 68px;" id="calendario" data-tab="calendario">
   <div class="container">
@@ -3295,7 +3351,9 @@
   // Las API keys de Finnhub/TwelveData vivían acá antes, expuestas a cualquiera
   // que abriera el código fuente. Ahora esas llamadas las hace el Worker
   // manfredi-mercados del lado del servidor. Ver workers/mercados/index.js.
-  const MERCADOS_ENDPOINT = 'https://manfredi-mercados.nachito2502.workers.dev/mercados';
+  const MKT_WORKER_BASE = 'https://manfredi-mercados.nachito2502.workers.dev';
+  const MERCADOS_ENDPOINT = MKT_WORKER_BASE + '/mercados';
+  const MKT_HISTORICO_ENDPOINT = MKT_WORKER_BASE + '/historico';
   const MKT_REFRESH_MS = 60_000;
 
   /* Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
@@ -3334,6 +3392,42 @@
     return { text: (pos ? '&#9650; +' : '&#9660; ') + Math.abs(n).toFixed(2) + '%', cls: pos ? 'pos' : 'neg' };
   }
 
+  // Dibuja una linea de tendencia SVG a partir de una serie real de precios.
+  function mktDrawChart(containerId, data, w, h, opts) {
+    const el = document.getElementById(containerId);
+    if (!el || !data || data.length < 2) return;
+    opts = opts || {};
+    const pad = opts.dot === false ? 2 : 8;
+    const min = Math.min.apply(null, data), max = Math.max.apply(null, data);
+    const range = (max - min) || 1;
+    const up = data[data.length - 1] >= data[0];
+    const color = up ? '#10B981' : '#EF4444';
+    const fill = up ? 'rgba(16,185,129,.14)' : 'rgba(239,68,68,.14)';
+    const step = (w - pad * 2) / (data.length - 1);
+    const pts = data.map(function(v, i) {
+      const x = pad + i * step;
+      const y = pad + (1 - (v - min) / range) * (h - pad * 2);
+      return [x.toFixed(1), y.toFixed(1)];
+    });
+    const line = pts.map(function(p) { return p.join(','); }).join(' ');
+    let svg = '<svg width="100%" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" style="overflow:visible;">';
+    if (opts.grid !== false) {
+      for (let i = 1; i < 3; i++) {
+        const gy = pad + (h - pad * 2) * (i / 3);
+        svg += '<line x1="' + pad + '" y1="' + gy.toFixed(1) + '" x2="' + (w - pad) + '" y2="' + gy.toFixed(1) + '" stroke="rgba(255,255,255,.05)" stroke-width="1"/>';
+      }
+    }
+    svg += '<polygon points="' + line + ' ' + (w - pad) + ',' + (h - pad) + ' ' + pad + ',' + (h - pad) + '" fill="' + fill + '"/>';
+    svg += '<polyline points="' + line + '" fill="none" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>';
+    if (opts.dot !== false) {
+      const last = pts[pts.length - 1];
+      svg += '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="3.5" fill="' + color + '"/>';
+      svg += '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="7" fill="' + color + '" opacity=".18"/>';
+    }
+    svg += '</svg>';
+    el.innerHTML = svg;
+  }
+
   function renderHeroCards() {
     const col = document.getElementById('mktHeroCol');
     if (!col || !MERCADOS) return;
@@ -3345,9 +3439,15 @@
           <div class="mh-name"><span>${item.flag}</span>${item.name}</div>
           <div class="mh-price">${mktFmtPrice(item.price, unit)}</div>
           <div class="mh-chg ${cls}">${text}</div>
+          <div class="mh-chart" id="mh-chart-${item.id}"></div>
         </div>
       `;
     }).join('');
+    MERCADOS.featured.forEach(item => {
+      if (item.spark && item.spark.length >= 2) {
+        mktDrawChart('mh-chart-' + item.id, item.spark, 220, 34, { grid: false, dot: false });
+      }
+    });
   }
 
   const MKT_CATEGORIES = [
@@ -3379,12 +3479,12 @@
     });
   }
 
-  function mktRowHTML(item, currency) {
+  function mktRowHTML(item, currency, category) {
     const { text, cls } = mktFmtChange(item.change);
     const unit = currency === 'USD' ? 'US$ ' : '$ ';
     const name = (item.name && item.name !== item.symbol) ? item.name : '';
     return `
-      <div class="mkt-row">
+      <div class="mkt-row" data-symbol="${item.symbol}" data-category="${category}" data-currency="${currency}">
         <div><span class="mr-ticker">${item.symbol}</span><span class="mr-name">${name}</span></div>
         <div class="mr-price">${mktFmtPrice(item.price, unit)}</div>
         <div class="mr-chg ${cls}">${text}</div>
@@ -3403,7 +3503,7 @@
       return;
     }
     const items = mktShowingAll ? cat.items : cat.items.slice(0, 10);
-    body.innerHTML = items.map(item => mktRowHTML(item, cat.currency)).join('');
+    body.innerHTML = items.map(item => mktRowHTML(item, cat.currency, mktActiveCategory)).join('');
     const remaining = cat.items.length - 10;
     if (btn) {
       if (!mktShowingAll && remaining > 0) {
@@ -3435,7 +3535,7 @@
       if (!catData) continue;
       for (const item of catData.items) {
         if (item.symbol.toUpperCase().includes(q) || (item.name && item.name.toUpperCase().includes(q))) {
-          matches.push(mktRowHTML(item, catData.currency));
+          matches.push(mktRowHTML(item, catData.currency, cat.key));
           if (matches.length >= 40) break;
         }
       }
@@ -3458,6 +3558,92 @@
       mktSearch('');
       input.focus();
     });
+  }
+
+  // ─── Modal de detalle: click en cualquier activo (tabla o buscador) ───────
+  const MKT_DETAIL_CACHE = {};
+
+  function mktCategoryLabel(key) {
+    const c = MKT_CATEGORIES.find(c => c.key === key);
+    return c ? c.label : key;
+  }
+
+  function openAssetModal(item, category, currency) {
+    const overlay = document.getElementById('mktModalOverlay');
+    if (!overlay || !item) return;
+    const { text, cls } = mktFmtChange(item.change);
+    const unit = currency === 'USD' ? 'US$ ' : '$ ';
+    document.getElementById('mktModalTicker').textContent = item.symbol + ' · ' + mktCategoryLabel(category);
+    document.getElementById('mktModalName').textContent = (item.name && item.name !== item.symbol) ? item.name : item.symbol;
+    document.getElementById('mktModalPrice').innerHTML = mktFmtPrice(item.price, unit);
+    const chgEl = document.getElementById('mktModalChg');
+    chgEl.innerHTML = text;
+    chgEl.className = 'mkt-modal-chg ' + cls;
+    document.getElementById('mktModalRange').textContent = '';
+    document.getElementById('mktModalVol').textContent = item.volume ? Number(item.volume).toLocaleString('es-AR', { maximumFractionDigits: 0 }) : '—';
+    document.getElementById('mktModalCat').textContent = mktCategoryLabel(category);
+    document.getElementById('mktModalCurrency').textContent = currency === 'USD' ? 'USD' : 'ARS';
+    document.getElementById('mktModalChart').innerHTML = '<div class="mkt-modal-loading">Cargando gráfico&hellip;</div>';
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    const cacheKey = category + ':' + item.symbol;
+    const renderCloses = (closes) => {
+      const chartEl = document.getElementById('mktModalChart');
+      if (!closes || closes.length < 2) {
+        chartEl.innerHTML = '<div class="mkt-modal-loading">Sin datos históricos disponibles para este activo.</div>';
+        return;
+      }
+      chartEl.innerHTML = '';
+      mktDrawChart('mktModalChart', closes, 372, 130, {});
+      const min = Math.min.apply(null, closes), max = Math.max.apply(null, closes);
+      const fmtN = (v) => mktFmtPrice(v, unit).replace('&mdash;', '—');
+      document.getElementById('mktModalRange').textContent = 'Rango últimos ' + closes.length + ' días hábiles: ' + fmtN(min) + ' — ' + fmtN(max);
+    };
+
+    if (MKT_DETAIL_CACHE[cacheKey]) {
+      renderCloses(MKT_DETAIL_CACHE[cacheKey]);
+      return;
+    }
+    fetch(MKT_HISTORICO_ENDPOINT + '?category=' + encodeURIComponent(category) + '&symbol=' + encodeURIComponent(item.symbol), { signal: AbortSignal.timeout(10000) })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)))
+      .then(data => {
+        MKT_DETAIL_CACHE[cacheKey] = data.closes || [];
+        renderCloses(data.closes);
+      })
+      .catch(() => {
+        document.getElementById('mktModalChart').innerHTML = '<div class="mkt-modal-loading">No se pudo cargar el histórico.</div>';
+      });
+  }
+
+  function closeAssetModal() {
+    const overlay = document.getElementById('mktModalOverlay');
+    if (overlay) overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function mktRowClickHandler(e) {
+    const row = e.target.closest('.mkt-row');
+    if (!row) return;
+    const symbol = row.getAttribute('data-symbol');
+    const category = row.getAttribute('data-category');
+    const currency = row.getAttribute('data-currency');
+    if (!symbol || !category || !MERCADOS) return;
+    const cat = MERCADOS.categorias[category];
+    const item = cat && cat.items.find(i => i.symbol === symbol);
+    if (item) openAssetModal(item, category, currency);
+  }
+
+  function initAssetModal() {
+    const tableBody = document.getElementById('mktTableBody');
+    const searchResults = document.getElementById('mktSearchResults');
+    if (tableBody) tableBody.addEventListener('click', mktRowClickHandler);
+    if (searchResults) searchResults.addEventListener('click', mktRowClickHandler);
+    const closeBtn = document.getElementById('mktModalClose');
+    if (closeBtn) closeBtn.addEventListener('click', closeAssetModal);
+    const overlay = document.getElementById('mktModalOverlay');
+    if (overlay) overlay.addEventListener('click', function(e) { if (e.target === overlay) closeAssetModal(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeAssetModal(); });
   }
 
   function renderTicker() {
@@ -3559,6 +3745,7 @@
   }
 
   initMktSearch();
+  initAssetModal();
   const mktShowAllBtnEl = document.getElementById('mktShowAllBtn');
   if (mktShowAllBtnEl) {
     mktShowAllBtnEl.addEventListener('click', () => {
