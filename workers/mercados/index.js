@@ -168,23 +168,73 @@ async function fetchDivisas() {
   }
 }
 
-// ─── CoinGecko ──────────────────────────────────────────────────────────
+// ─── Cripto: CoinGecko → Binance ────────────────────────────────────────
+// CoinGecko bloquea bastante seguido las IPs de salida de Cloudflare Workers
+// (403), así que si falla o viene vacío caemos a la API pública de Binance.
+async function fetchCriptoCoinGecko() {
+  const url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=150&page=1&sparkline=false&price_change_percentage=24h';
+  const resp = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!resp.ok) throw new Error(`CoinGecko HTTP ${resp.status}`);
+  const rows = await resp.json();
+  if (!Array.isArray(rows) || !rows.length) throw new Error('CoinGecko: respuesta vacía');
+  return rows.map(c => ({
+    symbol: (c.symbol || '').toUpperCase(),
+    name: c.name,
+    price: c.current_price,
+    change: c.price_change_percentage_24h,
+    volume: c.total_volume || 0,
+  }));
+}
+
+// Kraken funciona bien desde IPs de Cloudflare Workers (Binance las bloquea
+// con 403). /Ticker sin parámetro "pair" devuelve TODOS los pares — filtramos
+// los cotizados en USD. Ordenamos por volumen EN USD (precio × volumen en el
+// activo base), no por volumen crudo: si no, monedas tipo SHIB/PEPE con
+// billones de tokens circulando le ganan a BTC en la comparación.
+// Kraken nombra sus 10 pares originales con prefijo legacy X+código+Z (ej.
+// XXBTZUSD), pero esa misma terminación "ZUSD" también aparece en tickers
+// modernos que legítimamente terminan en Z (AI16ZUSD = AI16Z, XTZUSD = XTZ).
+// No hay forma genérica de distinguirlos, así que los 10 legacy van a mano.
+const KRAKEN_LEGACY_SYMBOLS = {
+  XETCZUSD: 'ETC', XETHZUSD: 'ETH', XLTCZUSD: 'LTC', XMLNZUSD: 'MLN',
+  XREPZUSD: 'REP', XXBTZUSD: 'BTC', XXLMZUSD: 'XLM', XXMRZUSD: 'XMR',
+  XXRPZUSD: 'XRP', XZECZUSD: 'ZEC',
+};
+
+async function fetchCriptoKraken() {
+  const resp = await fetch('https://api.kraken.com/0/public/Ticker', { signal: AbortSignal.timeout(10000) });
+  if (!resp.ok) throw new Error(`Kraken HTTP ${resp.status}`);
+  const json = await resp.json();
+  const result = json.result;
+  if (!result) throw new Error('Kraken: respuesta vacía');
+  return Object.entries(result)
+    .filter(([pair]) => pair.endsWith('USD'))
+    .map(([pair, t]) => {
+      const symbol = KRAKEN_LEGACY_SYMBOLS[pair] || pair.slice(0, -3);
+      const last = parseFloat(t.c?.[0]);
+      const open = parseFloat(t.o);
+      const change = open > 0 ? ((last - open) / open * 100) : null;
+      const baseVolume = parseFloat(t.v?.[1]) || 0;
+      return { symbol, name: symbol, price: last, change, volume: last * baseVolume };
+    })
+    .filter(r => r.symbol && r.price > 0)
+    .sort((a, b) => b.volume - a.volume)
+    .slice(0, 200);
+}
+
 async function fetchCripto() {
   try {
-    const url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=150&page=1&sparkline=false&price_change_percentage=24h';
-    const resp = await fetch(url, { signal: AbortSignal.timeout(10000) });
-    if (!resp.ok) return [];
-    const rows = await resp.json();
-    if (!Array.isArray(rows)) return [];
-    return rows.map(c => ({
-      symbol: (c.symbol || '').toUpperCase(),
-      name: c.name,
-      price: c.current_price,
-      change: c.price_change_percentage_24h,
-      volume: c.total_volume || 0,
-    }));
+    return await fetchCriptoCoinGecko();
   } catch (e) {
     console.error('[mercados] coingecko:', e.message);
+  }
+  try {
+    return await fetchCriptoKraken();
+  } catch (e) {
+    console.error('[mercados] kraken:', e.message);
     return [];
   }
 }
@@ -302,6 +352,21 @@ export default {
       } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 500, headers });
       }
+    }
+
+    if (url.pathname === '/debug-cripto') {
+      const attempts = {};
+      const tryOne = async (name, fn) => {
+        try {
+          const rows = await fn();
+          attempts[name] = { ok: true, count: rows.length, sample: rows[0] };
+        } catch (e) {
+          attempts[name] = { ok: false, error: e.message };
+        }
+      };
+      await tryOne('coingecko', fetchCriptoCoinGecko);
+      await tryOne('kraken', fetchCriptoKraken);
+      return new Response(JSON.stringify(attempts, null, 2), { headers });
     }
 
     return new Response('Manfredi Mercados Worker OK', { headers: { 'Content-Type': 'text/plain' } });
