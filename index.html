@@ -1838,25 +1838,37 @@
       padding: 24px;
       width: 100%;
       max-width: 300px;
-      align-self: stretch;
       box-shadow: 0 8px 32px rgba(0,0,0,.35);
       display: flex;
       flex-direction: column;
     }
     .hero-cal-date {
-      font-size: 12.5px;
+      font-size: 15px;
       font-weight: 600;
       color: var(--gold);
-      margin-bottom: 14px;
+      margin-bottom: 18px;
     }
     .hero-cal-events {
-      flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      min-height: 90px;
+      gap: 4px;
+      min-height: 40px;
     }
-    .hero-cal-events .cal-ev-text { font-size: 11px; }
+    .hero-cal-events .cal-ev { margin-bottom: 14px; gap: 10px; }
+    .hero-cal-events .cal-ev-dot { width: 7px; height: 7px; margin-top: 5px; }
+    .hero-cal-events .cal-ev-text { font-size: 13px; line-height: 1.55; }
+    .hero-cal-events .cal-ev-text strong { font-size: 13px; margin-bottom: 2px; }
+    .hero-cal-legend {
+      display: flex;
+      gap: 16px;
+      margin-top: 4px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      font-size: 11px;
+      color: rgba(255,255,255,.4);
+    }
+    .hero-cal-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .hero-cal-legend .cal-ev-dot { width: 7px; height: 7px; }
     .spot-feature {
       padding: 2px 4px 18px;
       margin-bottom: 6px;
@@ -2561,7 +2573,6 @@
               <span class="spot-chg" id="hspot-btc-chg">&#8212;</span>
             </div>
           </div>
-          <div class="spotlight-foot">Actualizado autom&aacute;ticamente &middot; fuentes m&uacute;ltiples</div>
           <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#mercados'">Ver todos los mercados &rarr;</button>
         </div>
         <div class="hero-cal-card" id="heroCalCard">
@@ -2572,6 +2583,10 @@
           <div class="hero-cal-date" id="heroCalDate">&mdash;</div>
           <div class="hero-cal-events" id="heroCalEvents">
             <div class="cal-ev"><div class="cal-ev-dot ar"></div><div class="cal-ev-text">Cargando&hellip;</div></div>
+          </div>
+          <div class="hero-cal-legend">
+            <span><i class="cal-ev-dot us"></i>Estados Unidos</span>
+            <span><i class="cal-ev-dot ar"></i>Argentina</span>
           </div>
           <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#calendario'">Ver calendario completo &rarr;</button>
         </div>
