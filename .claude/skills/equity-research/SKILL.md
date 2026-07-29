@@ -132,6 +132,67 @@ El informe se muestra bajo el disclaimer ya existente del sitio ("Posiciones con
 ilustrativos. No constituyen recomendación...") — no dupliques ese texto dentro del objeto, ya está
 en el `mi-footer` del modal.
 
+## Informe Extendido (companion artifact obligatorio)
+
+Además de la entrada en `MI_ASSETS`, cada ticker cubierto tiene un **informe extendido** — un
+documento HTML autocontenido (publicado como Claude Artifact) con el mismo rigor de una nota de
+mesa de research bulge-bracket (JP Morgan / Morgan Stanley). No es opcional: es el companion piece
+que sostiene con detalle todo lo que `MI_ASSETS` resume en una tarjeta. Usá como plantilla de
+referencia el informe de AAPL (14 secciones). Estructura obligatoria:
+
+1. **Portada** — ticker, Fair Value blend propio vs. precio de mercado (`fv-block`), y un banner de
+   veredicto (`verdict-bar`) con la postura del análisis en lenguaje descriptivo (nunca "Buy/Sell" —
+   ver regla de disclaimer abajo) + nota de que no es recomendación de inversión, visible en la
+   portada, no solo al pie.
+2. Resumen Ejecutivo
+3. Historia y Evolución
+4. Modelo de Negocio y Segmentos
+5. Desarrollos Recientes y Perspectiva
+6. Estados Financieros (últimos 2 trimestres + TTM)
+7. Deuda y Balance
+8. Flujo de Caja y Capital Allocation
+9. Comparables de Industria (3-4 peers reales, con contexto cualitativo de cada uno, no solo la
+   tabla de múltiplos)
+10. **Gobierno Corporativo y Estructura Accionaria** — ownership institucional/insider (GuruFocus,
+    WallStreetZen), directorio, compensación del CEO/ejecutivos (SEC DEF 14A), y cualquier
+    transición de liderazgo relevante. Buscar datos reales vía WebSearch, nunca inventar.
+11. Registro de Riesgos
+12. Catalizadores
+13. **Modelo Financiero Proyectado y Momentum de Estimados** — consenso Street real (EPS/revenue
+    FY+1, FY+2 vía WebSearch a stockanalysis.com/ChartMill/Zacks), estimado del próximo trimestre, y
+    gráfico de revisiones de EPS de los últimos 90 días (al alza vs. a la baja). Nunca fabricar una
+    proyección línea por línea a 5 años que no esté sourceada — para años sin consenso público,
+    remitir explícitamente a los supuestos del DCF (sección siguiente) en vez de inventar precisión.
+14. **Valuación: Cuatro Métodos y el Fair Value** — DCF (3 escenarios) + comparables + reversión
+    histórica + consenso Wall Street, más:
+    - **Grilla de sensibilidad WACC × crecimiento terminal** (5×5): recalculá el DCF con la fórmula
+      real para cada combinación — nunca tipees números a mano. Calibrá el resultado para que la
+      celda del caso Base reproduzca exactamente el price target y el %EV-desde-terminal ya
+      publicados (ver metodología usada en AAPL: PowerShell/script para computar la grilla, ajustar
+      por un factor de calibración si hace falta, y verificar que %EV-terminal coincida).
+    - **Football field** (rango bajo/alto por metodología, con líneas de referencia de precio de
+      mercado y del blend propio).
+15. Limitaciones del Modelo.
+
+**Disclaimer no-negociable (portada + pie):** el autor no es un asesor financiero registrado. Nunca
+un rating tipo "Buy/Hold/Sell" — siempre un Fair Value descriptivo derivado del propio modelo,
+etiquetado como análisis, no como recomendación personalizada. Reforzar esto en el `verdict-bar` de
+portada, no solo en el disclosure del pie.
+
+**Motor de gráficos:** los charts son Canvas 2D propio (sin dependencias externas, ver `<script>` al
+final del HTML de AAPL) — reusá `drawVBars`, `drawHBars`, `drawLines`, `drawRangeBars` (para el
+football field) en vez de introducir una librería nueva.
+
+## Cadencia de rollout (informes extendidos, uno por vez)
+
+Cada informe extendido de este nivel implica varias búsquedas web + un DCF recalculado + ~4000-6000
+palabras — es intensivo en tokens. Ritmo sugerido: **2-3 tickers por día**, no todos de una. Orden
+sugerido para completar la cobertura actual de `MI_ASSETS` (AAPL y NVDA ya están al nivel completo):
+MSFT → GOOGL → AMZN → META (las otras mega-caps del panel de comparables, así se retroalimentan
+entre sí) → JPM → BAC (financieras, requieren ajustar el DCF a un modelo de descuento de dividendos
+o residual income en vez de FCF-to-firm estándar) → MELI → UBER → ADBE → TSLA. Para pedir uno,
+alcanza con: *"hacé el informe institucional de \[TICKER], nivel AAPL"*.
+
 ## Al terminar un ticker
 
 1. Actualizá la entrada correspondiente en `MI_ASSETS` (`index.html`) — no crees un archivo nuevo,
@@ -140,5 +201,7 @@ en el `mi-footer` del modal.
    para los tabs de charts del modal), sumalo a `TICKERS_CIK` en `update_reports.py` y corré el
    script para generar esos datos — sin eso los tabs de gráficos van a mostrar "Cargando…" para
    siempre.
-3. Probá el resultado en el navegador (abrí `#inversiones`, click en "Ver análisis" del ticker,
+3. Generá/actualizá el informe extendido (ver sección de arriba) como Claude Artifact y guardá el
+   link — si el ticker ya tenía uno, republicá en la misma URL (no crear un link nuevo cada vez).
+4. Probá el resultado en el navegador (abrí `#inversiones`, click en "Ver análisis" del ticker,
    revisá los 7 tabs incluyendo el nuevo "Valuación") antes de dar el trabajo por terminado.

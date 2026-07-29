@@ -233,9 +233,8 @@ with open("reports/wallstreet.json", "w", encoding="utf-8") as f:
 print("reports/wallstreet.json OK")
 # -- FUNDAMENTALS (SEC EDGAR) ------------------------------------------------
 TICKERS_CIK = {
-    "NVDA": {"cik": "0001045810", "foreign": False},
-    "META": {"cik": "0001326801", "foreign": False},
-    "AMZN": {"cik": "0001018724", "foreign": False},
+    "AAPL": {"cik": "0000320193", "foreign": False},
+    "MSFT": {"cik": "0000789019", "foreign": False},
 }
 
 def fetch_fundamentals(ticker, cik):
@@ -279,31 +278,23 @@ def fetch_fundamentals(ticker, cik):
                     if end not in by_end or e.get("filed","") > by_end[end].get("filed",""):
                         by_end[end] = e
             else:
-                # Priorizar entradas con fp=Q1/Q2/Q3/Q4 (trimestral puro)
-                # Si no hay fp, usar filtro de días 60-135
+                # Requiere SIEMPRE duración de un trimestre (60-135 días), sin importar el
+                # tag fp — el tag fp por sí solo no distingue un valor trimestral puro de un
+                # acumulado YTD (6/9 meses) que también puede venir tageado como Q2/Q3.
                 by_end = {}
                 for e in filtered:
                     end = e["end"]
-                    fp = e.get("fp","")
-                    is_q = fp in ("Q1","Q2","Q3","Q4")
-                    if not is_q:
-                        if not e.get("start"):
-                            continue
-                        try:
-                            days = (datetime.date.fromisoformat(end) -
-                                    datetime.date.fromisoformat(e["start"])).days
-                            is_q = 60 <= days <= 135
-                        except:
-                            continue
-                    if end not in by_end:
-                        by_end[end] = (e, is_q)
-                    else:
-                        prev_e, prev_is_q = by_end[end]
-                        if is_q and not prev_is_q:
-                            by_end[end] = (e, is_q)
-                        elif is_q == prev_is_q and e.get("filed","") > prev_e.get("filed",""):
-                            by_end[end] = (e, is_q)
-                by_end = {k: v[0] for k, v in by_end.items() if v[1]}
+                    if not e.get("start"):
+                        continue
+                    try:
+                        days = (datetime.date.fromisoformat(end) -
+                                datetime.date.fromisoformat(e["start"])).days
+                    except:
+                        continue
+                    if not (60 <= days <= 135):
+                        continue
+                    if end not in by_end or e.get("filed","") > by_end[end].get("filed",""):
+                        by_end[end] = e
 
             unique = sorted(by_end.values(), key=lambda x: x["end"])[-max_q:]
             if not unique:
