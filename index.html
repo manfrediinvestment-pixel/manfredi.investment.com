@@ -2676,7 +2676,7 @@
               <span class="hero-inv-name">Apple Inc.</span>
               <span class="pick-sentiment bear">Bajista</span>
             </div>
-            <a href="informes/aapl.html" class="pick-btn" target="_blank" rel="noopener">Ver an&aacute;lisis &rarr;</a>
+            <a href="informes/aapl.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AAPL')">Ver an&aacute;lisis &rarr;</a>
           </div>
           <div class="hero-inv-item">
             <div class="hero-inv-item-info">
@@ -2684,7 +2684,7 @@
               <span class="hero-inv-name">Meta Platforms</span>
               <span class="pick-sentiment neutral">Neutral</span>
             </div>
-            <a href="informes/meta.html" class="pick-btn" target="_blank" rel="noopener">Ver an&aacute;lisis &rarr;</a>
+            <a href="informes/meta.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'META')">Ver an&aacute;lisis &rarr;</a>
           </div>
           <div class="hero-inv-item hero-inv-item--soon">
             <div class="hero-inv-item-info">
@@ -3007,7 +3007,7 @@
                 <div class="pick-name">Apple Inc.</div>
               </div>
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,10 15,14 30,18 45,22 60,26 75,30 90,33" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-              <div class="pick-right"><span class="pick-sentiment bear">Bajista</span><a href="informes/aapl.html" class="pick-btn" target="_blank" rel="noopener">Ver análisis &rarr;</a></div>
+              <div class="pick-right"><span class="pick-sentiment bear">Bajista</span><a href="informes/aapl.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AAPL')">Ver análisis &rarr;</a></div>
             </div>
             <div class="pick-card" data-aos="fade-up" data-aos-delay="80">
               <div class="pick-accent neutral"></div>
@@ -3016,7 +3016,7 @@
                 <div class="pick-name">Meta Platforms, Inc.</div>
               </div>
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,20 15,18 30,16 45,14 60,12 75,30 90,34" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-              <div class="pick-right"><span class="pick-sentiment neutral">Neutral</span><a href="informes/meta.html" class="pick-btn" target="_blank" rel="noopener">Ver análisis &rarr;</a></div>
+              <div class="pick-right"><span class="pick-sentiment neutral">Neutral</span><a href="informes/meta.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'META')">Ver análisis &rarr;</a></div>
             </div>
           </div>
         </div>
@@ -7160,6 +7160,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
                                       if (window._currentUser && window._currentUser.email === 'nachito2502@gmail.com') return true;
                                       return !!(localStorage.getItem(MEMBER_KEY) || window._isMiembro);
                         }
+                        window._miIsMember = isMember;
 
                         var paywallCardHTML = '<div style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;justify-content:center;background:linear-gradient(to bottom,rgba(10,15,30,0.05) 0%,rgba(10,15,30,0.92) 38%);border-radius:8px;pointer-events:auto;">'
                           + '<div style="background:var(--primary,#0A0F1E);border:1px solid var(--gold,#F2C94C);border-radius:12px;padding:32px 28px;max-width:340px;width:90%;text-align:center;color:var(--white);box-shadow:0 8px 32px rgba(0,0,0,0.5);">'
@@ -7217,7 +7218,6 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
 
                             function checkMembership() {
                             if (isMember()) return;
-                            applyPaywall('.picks-list', '#inversiones');
                             applyWarrenPaywall();
               }
               window._miCheckMembership = checkMembership;
@@ -7340,6 +7340,53 @@ AOS.init({
 });
 </script>
 <!-- âââ OVERLAY BACKDROP âââ -->
+<div id="mi-analysis-paywall-backdrop" class="mi-ap-backdrop">
+  <div class="mi-ap-card">
+    <button type="button" class="mi-ap-close" onclick="miCloseAnalysisPaywall()">&#10005;</button>
+    <div class="mi-ap-logo">MI</div>
+    <h3>Contenido para miembros</h3>
+    <p>Accedé a todos los análisis, picks y posiciones con membresía activa.</p>
+    <div class="mi-ap-price"><span>$10</span> USD</div>
+    <p class="mi-ap-sub">por mes &middot; cancelá cuando quieras</p>
+    <a href="#" class="mi-ap-btn" onclick="event.preventDefault();miCloseAnalysisPaywall();openPaymentModal();">Suscribirse ahora</a>
+    <p class="mi-ap-login">&iquest;Ya tenés membresía? <a href="#" onclick="event.preventDefault();miCloseAnalysisPaywall();window.showLoginOverlay &amp;&amp; window.showLoginOverlay();">Iniciá sesión</a></p>
+  </div>
+</div>
+<style>
+  .mi-ap-backdrop{display:none;position:fixed;inset:0;background:rgba(4,11,20,.85);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:99999;align-items:center;justify-content:center;padding:24px 16px;}
+  .mi-ap-backdrop.active{display:flex;}
+  .mi-ap-card{position:relative;background:var(--primary,#0A0F1E);border:1px solid var(--gold,#F2C94C);border-radius:12px;padding:32px 28px;max-width:340px;width:100%;text-align:center;color:var(--white,#fff);box-shadow:0 8px 32px rgba(0,0,0,.5);}
+  .mi-ap-close{position:absolute;top:12px;right:12px;background:transparent;border:none;color:rgba(255,255,255,.5);font-size:16px;cursor:pointer;}
+  .mi-ap-close:hover{color:#fff;}
+  .mi-ap-logo{background:var(--gold,#F2C94C);color:var(--primary,#0A0F1E);font-weight:800;font-size:1.1rem;border-radius:8px;width:48px;height:48px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;}
+  .mi-ap-card h3{margin:0 0 8px;font-size:1.2rem;font-weight:700;color:var(--white,#fff);}
+  .mi-ap-card p{margin:0 0 20px;font-size:.9rem;color:rgba(255,255,255,.7);line-height:1.5;}
+  .mi-ap-price{margin-bottom:6px;}
+  .mi-ap-price span{font-size:2rem;font-weight:800;color:var(--gold,#F2C94C);}
+  .mi-ap-sub{font-size:.78rem!important;color:rgba(255,255,255,.5)!important;}
+  .mi-ap-btn{display:block;background:var(--gold,#F2C94C);color:var(--primary,#0A0F1E);font-weight:700;font-size:1rem;padding:12px 0;border-radius:8px;text-decoration:none;margin-bottom:12px;}
+  .mi-ap-login{margin:0!important;font-size:.8rem!important;}
+  .mi-ap-login a{color:var(--gold,#F2C94C);text-decoration:underline;}
+</style>
+<script>
+  function miGateAnalysis(ev, ticker){
+    if (ticker === 'MSFT') return true;
+    if (window._miIsMember && window._miIsMember()) return true;
+    ev.preventDefault();
+    document.getElementById('mi-analysis-paywall-backdrop').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    return false;
+  }
+  function miCloseAnalysisPaywall(){
+    document.getElementById('mi-analysis-paywall-backdrop').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var bd = document.getElementById('mi-analysis-paywall-backdrop');
+    if (bd) bd.addEventListener('click', function(e){ if (e.target === this) miCloseAnalysisPaywall(); });
+  });
+</script>
+
 <div id="mi-overlay-backdrop">
   <div class="mi-panel" id="mi-panel">
     <button class="mi-close" id="mi-close-btn">✕</button>
