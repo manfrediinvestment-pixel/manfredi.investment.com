@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -1897,11 +1897,44 @@
     @keyframes flash-red { 0% { background-color: rgba(239,68,68,.28); } 100% { background-color: transparent; } }
     @keyframes flash-green { 0% { background-color: rgba(16,185,129,.28); } 100% { background-color: transparent; } }
     .spot-feature-chart { width: 100%; height: 80px; display: block; overflow: visible; }
+    .hero-bottom-row {
+      max-width: 1320px;
+      margin: 28px auto 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      position: relative;
+    }
+    .hero-cal-card--wide { max-width: none; width: 100%; }
+    .hero-inv-card { max-width: none; width: 100%; }
+    .hero-inv-list { display: flex; flex-direction: column; gap: 0; }
+    .hero-inv-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .hero-inv-item:last-child { border-bottom: none; }
+    .hero-inv-item-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .hero-inv-ticker {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,.92);
+      letter-spacing: .02em;
+      min-width: 50px;
+    }
+    .hero-inv-name { font-size: 12.5px; color: rgba(255,255,255,.5); }
+    .hero-inv-item--soon { opacity: .5; font-style: italic; }
+    .hero-inv-item--soon .hero-inv-ticker { color: rgba(255,255,255,.3); }
     @media(max-width:900px){
       .hero-v2-inner { grid-template-columns: 1fr; }
       .hero-v2-right { justify-content: center; }
       .spotlight-card { max-width: 100%; }
       .hero-cal-card { max-width: 100%; }
+      .hero-bottom-row { grid-template-columns: 1fr; max-width: 100%; }
     }
     @media (prefers-reduced-motion: reduce) {
       .spot-feature-value.flash-up, .spot-feature-value.flash-down { animation: none; }
@@ -2575,21 +2608,56 @@
           </div>
           <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#mercados'">Ver todos los mercados &rarr;</button>
         </div>
-        <div class="hero-cal-card" id="heroCalCard">
-          <div class="spotlight-head">
-            <span>Calendario econ&oacute;mico</span>
-            <span class="s-live" id="heroCalBadge">HOY</span>
-          </div>
-          <div class="hero-cal-date" id="heroCalDate">&mdash;</div>
-          <div class="hero-cal-events" id="heroCalEvents">
-            <div class="cal-ev"><div class="cal-ev-dot ar"></div><div class="cal-ev-text">Cargando&hellip;</div></div>
-          </div>
-          <div class="hero-cal-legend">
-            <span><i class="cal-ev-dot us"></i>Estados Unidos</span>
-            <span><i class="cal-ev-dot ar"></i>Argentina</span>
-          </div>
-          <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#calendario'">Ver calendario completo &rarr;</button>
+      </div>
+    </div>
+
+    <div class="hero-bottom-row">
+      <div class="hero-cal-card hero-cal-card--wide" id="heroCalCard">
+        <div class="spotlight-head">
+          <span>Calendario econ&oacute;mico</span>
+          <span class="s-live" id="heroCalBadge">HOY</span>
         </div>
+        <div class="hero-cal-date" id="heroCalDate">&mdash;</div>
+        <div class="hero-cal-events" id="heroCalEvents">
+          <div class="cal-ev"><div class="cal-ev-dot ar"></div><div class="cal-ev-text">Cargando&hellip;</div></div>
+        </div>
+        <div class="hero-cal-legend">
+          <span><i class="cal-ev-dot us"></i>Estados Unidos</span>
+          <span><i class="cal-ev-dot ar"></i>Argentina</span>
+        </div>
+        <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#calendario'">Ver calendario completo &rarr;</button>
+      </div>
+
+      <div class="hero-cal-card hero-inv-card" id="heroInvCard">
+        <div class="spotlight-head">
+          <span>Informes institucionales</span>
+          <span style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);">3 activos</span>
+        </div>
+        <div class="hero-inv-list">
+          <div class="hero-inv-item">
+            <div class="hero-inv-item-info">
+              <span class="hero-inv-ticker">AAPL</span>
+              <span class="hero-inv-name">Apple Inc.</span>
+              <span class="pick-sentiment bear">Bajista</span>
+            </div>
+            <a href="informes/aapl.html" class="pick-btn" target="_blank" rel="noopener">Ver an&aacute;lisis &rarr;</a>
+          </div>
+          <div class="hero-inv-item">
+            <div class="hero-inv-item-info">
+              <span class="hero-inv-ticker">MSFT</span>
+              <span class="hero-inv-name">Microsoft Corp.</span>
+              <span class="pick-sentiment neutral">Neutral</span>
+            </div>
+            <a href="informes/msft.html" class="pick-btn" target="_blank" rel="noopener">Ver an&aacute;lisis &rarr;</a>
+          </div>
+          <div class="hero-inv-item hero-inv-item--soon">
+            <div class="hero-inv-item-info">
+              <span class="hero-inv-ticker">&mdash;</span>
+              <span class="hero-inv-name">Pr&oacute;ximo an&aacute;lisis en camino</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#inversiones'">Ver secci&oacute;n Inversiones &rarr;</button>
       </div>
     </div>
   </section>
@@ -2886,149 +2954,24 @@
       <div class="picks-list">
 
         <div class="pick-card" data-aos="fade-up">
-  <div class="pick-accent up"></div>
+  <div class="pick-accent down"></div>
   <div class="pick-info">
     <div class="pick-row1"><span class="pick-ticker">AAPL</span><span class="pick-tag pick-tag-us">USA &middot; Tech</span></div>
     <div class="pick-name">Apple Inc.</div>
   </div>
-  <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,24 30,20 45,15 60,12 75,8 90,5" fill="none" stroke="var(--green)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-  <div class="pick-right"><span class="pick-sentiment bull">Alcista</span><a href="#" class="pick-btn" data-ticker="AAPL">Ver análisis &rarr;</a></div>
+  <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,10 15,14 30,18 45,22 60,26 75,30 90,33" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+  <div class="pick-right"><span class="pick-sentiment bear">Bajista</span><a href="informes/aapl.html" class="pick-btn" target="_blank" rel="noopener">Ver análisis &rarr;</a></div>
 </div>
 <div class="pick-card" data-aos="fade-up" data-aos-delay="80">
-  <div class="pick-accent up"></div>
+  <div class="pick-accent neutral"></div>
   <div class="pick-info">
     <div class="pick-row1"><span class="pick-ticker">MSFT</span><span class="pick-tag pick-tag-us">USA &middot; Tech</span></div>
     <div class="pick-name">Microsoft Corporation</div>
   </div>
-  <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,32 15,26 30,20 45,16 60,11 75,7 90,3" fill="none" stroke="var(--green)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-  <div class="pick-right"><span class="pick-sentiment bull">Alcista</span><a href="#" class="pick-btn" data-ticker="MSFT">Ver análisis &rarr;</a></div>
+  <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,26 15,24 30,20 45,22 60,16 75,18 90,10" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+  <div class="pick-right"><span class="pick-sentiment neutral">Neutral</span><a href="informes/msft.html" class="pick-btn" target="_blank" rel="noopener">Ver análisis &rarr;</a></div>
 </div>
-<div class="pick-card" data-aos="fade-up" data-aos-delay="160">
-  <div class="pick-accent neutral"></div>
-  <div class="pick-info">
-    <div class="pick-row1"><span class="pick-ticker">TSLA</span><span class="pick-tag pick-tag-us">USA &middot; Autos EV</span></div>
-    <div class="pick-name">Tesla Inc.</div>
-  </div>
-  <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,10 15,18 30,14 45,22 60,18 75,25 90,20" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-  <div class="pick-right"><span class="pick-sentiment neutral">Neutral</span><a href="#" class="pick-btn" data-ticker="TSLA">Ver análisis &rarr;</a></div>
-</div>
-<div class="pick-card" data-aos="fade-up" data-aos-delay="240">
-  <div class="pick-accent up"></div>
-  <div class="pick-info">
-    <div class="pick-row1"><span class="pick-ticker">GOOGL</span><span class="pick-tag pick-tag-us">USA &middot; Tech</span></div>
-    <div class="pick-name">Alphabet Inc.</div>
-  </div>
-  <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,28 15,22 30,18 45,13 60,10 75,7 90,4" fill="none" stroke="var(--green)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-  <div class="pick-right"><span class="pick-sentiment bull">Alcista</span><a href="#" class="pick-btn" data-ticker="GOOGL">Ver análisis &rarr;</a></div>
-</div>
-<div class="pick-card" data-aos="fade-up" data-aos-delay="320">
-  <div class="pick-accent up"></div>
-  <div class="pick-info">
-    <div class="pick-row1"><span class="pick-ticker">JPM</span><span class="pick-tag pick-tag-us">USA &middot; Finanzas</span></div>
-    <div class="pick-name">JPMorgan Chase &amp; Co.</div>
-  </div>
-  <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,25 30,20 45,16 60,12 75,9 90,6" fill="none" stroke="var(--green)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-  <div class="pick-right"><span class="pick-sentiment bull">Alcista</span><a href="#" class="pick-btn" data-ticker="JPM">Ver análisis &rarr;</a></div>
-</div>
-<div class="pick-card" data-aos="fade-up" data-aos-delay="400">
-  <div class="pick-accent up"></div>
-  <div class="pick-info">
-    <div class="pick-row1"><span class="pick-ticker">BAC</span><span class="pick-tag pick-tag-us">USA &middot; Finanzas</span></div>
-    <div class="pick-name">Bank of America Corp.</div>
-  </div>
-  <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,32 15,27 30,22 45,18 60,14 75,10 90,7" fill="none" stroke="var(--green)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-  <div class="pick-right"><span class="pick-sentiment bull">Alcista</span><a href="#" class="pick-btn" data-ticker="BAC">Ver análisis &rarr;</a></div>
-</div>
-<div class="pick-card" data-aos="fade-up" data-aos-delay="480">
-  <div class="pick-accent up"></div>
-  <div class="pick-info">
-    <div class="pick-row1"><span class="pick-ticker">MELI</span><span class="pick-tag pick-tag-us">LATAM &middot; E-commerce</span></div>
-    <div class="pick-name">MercadoLibre Inc.</div>
-  </div>
-  <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,35 15,28 30,22 45,16 60,11 75,7 90,3" fill="none" stroke="var(--green)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-  <div class="pick-right"><span class="pick-sentiment bull">Alcista</span><a href="#" class="pick-btn" data-ticker="MELI">Ver análisis &rarr;</a></div>
-</div>
-<div class="pick-card" data-aos="fade-up" data-aos-delay="560">
-  <div class="pick-accent up"></div>
-  <div class="pick-info">
-    <div class="pick-row1"><span class="pick-ticker">ADBE</span><span class="pick-tag pick-tag-us">USA &middot; Software</span></div>
-    <div class="pick-name">Adobe Inc.</div>
-  </div>
-  <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,28 15,23 30,19 45,14 60,11 75,8 90,5" fill="none" stroke="var(--green)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-  <div class="pick-right"><span class="pick-sentiment bull">Alcista</span><a href="#" class="pick-btn" data-ticker="ADBE">Ver análisis &rarr;</a></div>
-</div>
-<div class="pick-card" data-aos="fade-up" data-aos-delay="640">
-  <div class="pick-accent up"></div>
-  <div class="pick-info">
-    <div class="pick-row1"><span class="pick-ticker">UBER</span><span class="pick-tag pick-tag-us">USA &middot; Tech</span></div>
-    <div class="pick-name">Uber Technologies Inc.</div>
-  </div>
-  <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,24 30,19 45,15 60,11 75,8 90,5" fill="none" stroke="var(--green)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-  <div class="pick-right"><span class="pick-sentiment bull">Alcista</span><a href="#" class="pick-btn" data-ticker="UBER">Ver análisis &rarr;</a></div>
-</div>
-<div class="pick-card" data-aos="fade-up">
-          <div class="pick-accent up"></div>
-          <div class="pick-info">
-            <div class="pick-row1">
-              <span class="pick-ticker">NVDA</span>
-              <span class="pick-tag pick-tag-us">USA &middot; Tech</span>
-            </div>
-            <div class="pick-name">Nvidia Corporation</div>
-          </div>
-          <div class="pick-sparkline">
-            <svg width="90" height="40" viewBox="0 0 90 40">
-              <polyline points="0,38 15,34 30,28 45,22 60,16 75,12 90,7" fill="none" stroke="var(--green)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="pick-right">
-            <span class="pick-sentiment bull">Alcista</span>
-            <a href="#" class="pick-btn" data-ticker="NVDA">Ver análisis &rarr;</a>
-          </div>
-        </div>
-
-
-        <div class="pick-card" data-aos="fade-up" data-aos-delay="160">
-          <div class="pick-accent down"></div>
-          <div class="pick-info">
-            <div class="pick-row1">
-              <span class="pick-ticker">META</span>
-              <span class="pick-tag pick-tag-us">USA &middot; Tech</span>
-            </div>
-            <div class="pick-name">Meta Platforms Inc.</div>
-          </div>
-          <div class="pick-sparkline">
-            <svg width="90" height="40" viewBox="0 0 90 40">
-              <polyline points="0,10 15,15 30,12 45,20 60,17 75,24 90,26" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="pick-right">
-            <span class="pick-sentiment bear">Bajista</span>
-            <a href="#" class="pick-btn" data-ticker="META">Ver análisis &rarr;</a>
-          </div>
-        </div>
-
-
-        <div class="pick-card" data-aos="fade-up" data-aos-delay="320">
-          <div class="pick-accent up"></div>
-          <div class="pick-info">
-            <div class="pick-row1">
-              <span class="pick-ticker">AMZN</span>
-              <span class="pick-tag pick-tag-us">USA &middot; Consumo</span>
-            </div>
-            <div class="pick-name">Amazon.com Inc.</div>
-          </div>
-          <div class="pick-sparkline">
-            <svg width="90" height="40" viewBox="0 0 90 40">
-              <polyline points="0,26 15,19 30,23 45,14 60,10 75,7 90,5" fill="none" stroke="var(--green)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="pick-right">
-            <span class="pick-sentiment neutral">Neutral</span>
-            <a href="#" class="pick-btn" data-ticker="AMZN">Ver análisis &rarr;</a>
-          </div>
-        </div>
-
-        <div class="pick-coming">+ Próximo análisis en camino</div>
+<div class="pick-coming">+ Próximo análisis en camino</div>
 
       </div>
     </div>
@@ -7267,12 +7210,13 @@ AOS.init({
       </div>
     </div>
     <div class="mi-nav" id="mi-nav">
-      <div class="mi-nav-item active" data-tab="resumen">Resumen</div>
-      <div class="mi-nav-item" data-tab="revenue">Revenue</div>
-      <div class="mi-nav-item" data-tab="margenes">Márgenes</div>
-      <div class="mi-nav-item" data-tab="fcf">Free Cash Flow</div>
-      <div class="mi-nav-item" data-tab="deuda">Deuda</div>
-      <div class="mi-nav-item" data-tab="tesis">Tesis</div>
+      <div class="mi-nav-item active" data-mitab="resumen">Resumen</div>
+      <div class="mi-nav-item" data-mitab="revenue">Revenue</div>
+      <div class="mi-nav-item" data-mitab="margenes">Márgenes</div>
+      <div class="mi-nav-item" data-mitab="fcf">Free Cash Flow</div>
+      <div class="mi-nav-item" data-mitab="deuda">Deuda</div>
+      <div class="mi-nav-item" data-mitab="valuacion">Valuación</div>
+      <div class="mi-nav-item" data-mitab="tesis">Tesis</div>
     </div>
     <div class="mi-body">
       <div class="mi-section active" id="tab-resumen">
@@ -7312,6 +7256,58 @@ AOS.init({
         <div class="mi-chart-box">
           <div class="mi-chart-header"><div class="mi-chart-title">Deuda largo plazo vs Cash (USD billions)</div><div class="mi-chart-note" id="note-deuda"></div></div>
           <div class="mi-chart-area"><div class="mi-loading" id="loading-deuda"><div class="mi-ld"></div><div class="mi-ld"></div><div class="mi-ld"></div><span>Leyendo SEC EDGAR…</span></div><canvas id="chart-deuda"></canvas></div>
+        </div>
+      </div>
+      <div class="mi-section" id="tab-valuacion">
+        <div id="val-empty" style="display:none;padding:32px 8px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#2e4f6e">Informe institucional completo pendiente de actualización para este ticker.</div>
+        <div id="val-content">
+          <div class="mi-sl">Precio objetivo</div>
+          <div style="background:var(--navy-3);border:1px solid var(--navy-5);border-radius:8px;padding:18px 20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+            <div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#2e4f6e;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px" id="val-methodology">—</div>
+              <div style="font-family:'DM Serif Display',Georgia,serif;font-size:30px;color:#f0f5ff" id="val-target-price">—</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#2e4f6e;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">vs. spot</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600" id="val-upside">—</div>
+            </div>
+          </div>
+          <div id="val-rationale" style="font-size:12.5px;color:#9ab8d8;line-height:1.7;margin-bottom:22px"></div>
+
+          <div class="mi-sl">Escenarios DCF (5 años, flujo de caja descontado)</div>
+          <div style="overflow-x:auto;margin-bottom:8px">
+            <table style="width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:11px" id="val-dcf-table">
+              <thead><tr style="border-bottom:1px solid var(--navy-5)">
+                <th style="text-align:left;padding:8px 10px;color:#2e4f6e;font-weight:500">Escenario</th>
+                <th style="text-align:right;padding:8px 10px;color:#2e4f6e;font-weight:500">Precio objetivo</th>
+                <th style="text-align:right;padding:8px 10px;color:#2e4f6e;font-weight:500">Upside/Downside</th>
+                <th style="text-align:right;padding:8px 10px;color:#2e4f6e;font-weight:500">EV (USD B)</th>
+                <th style="text-align:right;padding:8px 10px;color:#2e4f6e;font-weight:500">% EV en terminal</th>
+              </tr></thead>
+              <tbody id="val-dcf-tbody"></tbody>
+            </table>
+          </div>
+          <div style="font-size:10.5px;color:#2e4f6e;margin-bottom:22px" id="val-dcf-assumptions"></div>
+
+          <div class="mi-sl">Comparables (peers)</div>
+          <div style="overflow-x:auto;margin-bottom:22px">
+            <table style="width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:11px" id="val-comps-table">
+              <thead><tr style="border-bottom:1px solid var(--navy-5)">
+                <th style="text-align:left;padding:8px 10px;color:#2e4f6e;font-weight:500">Ticker</th>
+                <th style="text-align:right;padding:8px 10px;color:#2e4f6e;font-weight:500">Precio</th>
+                <th style="text-align:right;padding:8px 10px;color:#2e4f6e;font-weight:500">Fuente</th>
+              </tr></thead>
+              <tbody id="val-comps-tbody"></tbody>
+            </table>
+            <div style="font-size:10.5px;color:#2e4f6e;margin-top:8px" id="val-comps-implied"></div>
+          </div>
+
+          <div class="mi-sl">Datos base (TTM)</div>
+          <div class="mi-metrics" id="val-ttm-metrics" style="margin-bottom:22px"></div>
+
+          <div class="mi-sl">Límites del modelo</div>
+          <div style="background:var(--navy-3);border-left:2px solid #f59e0b;border-radius:0 8px 8px 0;padding:14px 18px" id="val-limitations"></div>
+          <div style="font-size:10px;color:#1e3a58;margin-top:10px;font-family:'IBM Plex Mono',monospace" id="val-source"></div>
         </div>
       </div>
       <div class="mi-section" id="tab-tesis">
@@ -7448,20 +7444,7 @@ AOS.init({
 (function(){
 'use strict';
 
-const MI_ASSETS={
-AAPL:{fullname:'Apple Inc. · NASDAQ',tags:['USA','Tecnología','Mega Cap'],rec:'alcista',recLabel:'● ALCISTA',updatedAt:'Junio 2026',targetPrice:'$235',upside:'+14%',pe:'32.1x',evEbitda:'24.8x',revGrowth:'+5%',opMargin:'31%',fcf:'$108B',debtEbitda:'0.8x',conviction:78,convictionLabel:'78% Buy · 48 analistas',thesis:'Apple mantiene el ecosistema más rentable del mundo con 2.2B dispositivos activos y servicios creciendo al 14% YoY. iPhone 17 con Apple Intelligence integrado en hardware propio es el catalizador del próximo ciclo de upgrade masivo. Los márgenes de servicios al 75% compensan la madurez del hardware.',bull:['Ciclo de upgrade iPhone 17 con IA nativa impulsará ventas en H2 2026','Servicios alcanzará $130B anualizados con márgenes del 75%','Recompras de $110B anuales reducen float sistemáticamente','Vision Pro establece nueva categoría con TAM de $300B a 5 años'],bear:['China representa el 19% de ventas con riesgo regulatorio creciente','Antitrust EU y DOJ amenazan el modelo App Store con comisiones del 30%','Ciclo de innovación de hardware más lento que competidores Android premium','P/E de 32x exigente para una empresa de crecimiento single digit'],exitUp:['Precio alcanza $235 con aceleración de servicios a 20% YoY','P/E supera 38x sin expansión proporcional de earnings','iPhone 17 ciclo decepciona por debajo de estimaciones'],exitDn:['Revenue China cae más del 15% por represalias arancelarias','Regulador europeo impone apertura del ecosistema reduciendo márgenes de servicios','Dos trimestres consecutivos de miss en guidance de servicios'],catalysts:[{date:'Jun 2026',text:'WWDC 2026 — Apple Intelligence 2.0 y nuevas APIs para developers.',done:false},{date:'Sep 2026',text:'Lanzamiento iPhone 17 — primer ciclo con IA generativa nativa en hardware.',done:false},{date:'Oct 2026',text:'Earnings Q4 FY2026 — validación del ciclo de upgrade masivo.',done:false},{date:'Continuo',text:'Litigios antitrust App Store en EU y USA — riesgo de comisiones.',risk:true}],peers:[{name:'AAPL',val:'32.1x',active:true},{name:'MSFT',val:'34.5x',active:false},{name:'GOOGL',val:'21.3x',active:false},{name:'META',val:'24.8x',active:false}],peersData:[32.1,34.5,21.3,24.8],projLabels:['Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e','Q4 2026e'],projReal:[95.36,85.78,94.93,124.30,95.36,null,null,null],projEst:[null,null,null,null,null,88.5,98.2,138.0]},
-MSFT:{fullname:'Microsoft Corporation · NASDAQ',tags:['USA','Tecnología','Mega Cap'],rec:'alcista',recLabel:'● ALCISTA',updatedAt:'Junio 2026',targetPrice:'$520',upside:'+22%',pe:'34.5x',evEbitda:'26.2x',revGrowth:'+17%',opMargin:'45%',fcf:'$74B',debtEbitda:'0.5x',conviction:88,convictionLabel:'88% Strong Buy · 57 analistas',thesis:'Microsoft es la apuesta más clara en infraestructura de IA enterprise. Azure crece al 33% YoY impulsado por OpenAI y Copilot. La integración de IA en todo el stack de Office 365, Dynamics y GitHub crea un moat de switching costs imposible de replicar. El deal con OpenAI le da ventaja de 2-3 años sobre AWS y Google Cloud.',bull:['Azure AI crece 33% YoY con backlog de $315B en contratos cloud','Copilot M365 en 400M usuarios comerciales con ARPU creciente','GitHub Copilot dominante en desarrollo con 77% market share enterprise','Activision integrado genera sinergias con Xbox Game Pass y cloud gaming'],bear:['Valuación 34x P/E asume continuidad de crecimiento de Azure difícil de mantener','Google y Amazon aceleran inversión en modelos propios reduciendo ventaja OpenAI','Regulación antitrust en EU sobre bundling de Teams y Office','Capex de $80B anuales en data centers comprime FCF margin'],exitUp:['Azure supera 40% de crecimiento YoY por 2 trimestres consecutivos','Copilot alcanza 100M usuarios de pago con ARPU de $30/mes','Target $520 alcanzado con expansión de múltiplo a 38x'],exitDn:['Azure desacelera por debajo del 25% durante 2 trimestres','Ruptura del deal exclusivo con OpenAI por acuerdo con competidor','Miss de guidance de operating income por incremento de capex'],catalysts:[{date:'May 2026',text:'Build 2026 — nuevas capacidades Copilot y Azure AI Foundry.',done:true},{date:'Jul 2026',text:'Earnings Q4 FY2026 — validación de Azure AI acceleration.',done:false},{date:'Sep 2026',text:'Microsoft Ignite — roadmap enterprise AI para FY2027.',done:false},{date:'Continuo',text:'Investigación antitrust EU sobre bundling Teams/Office.',risk:true}],peers:[{name:'MSFT',val:'34.5x',active:true},{name:'GOOGL',val:'21.3x',active:false},{name:'AAPL',val:'32.1x',active:false},{name:'AMZN',val:'38.2x',active:false}],peersData:[34.5,21.3,32.1,38.2],projLabels:['Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e','Q4 2026e'],projReal:[65.59,69.63,70.07,72.74,70.07,null,null,null],projEst:[null,null,null,null,null,73.5,77.0,82.5]},
-TSLA:{fullname:'Tesla Inc. · NASDAQ',tags:['USA','Autos EV','Mega Cap'],rec:'neutral',recLabel:'◆ NEUTRAL',updatedAt:'Junio 2026',targetPrice:'$285',upside:'+5%',pe:'98.4x',evEbitda:'52.1x',revGrowth:'-1%',opMargin:'6%',fcf:'$1.8B',debtEbitda:'1.1x',conviction:42,convictionLabel:'42% Hold · 51 analistas',thesis:'Tesla es la empresa más difícil de valuar del mercado — el precio actual descuenta el éxito total de Robotaxi, Optimus y FSD, todos negocios que no existen aún a escala. El core EV está bajo presión severa de competencia china con márgenes comprimidos al 6%. La tesis depende 100% de ejecución en IA y autonomía.',bull:['Robotaxi launch en Austin Jun 2026 — si escala, TAM de $10T en transporte autónomo','Optimus robot en producción masiva hacia 2027 con costo target de $20k','FSD v13 con 0 intervenciones en 100k millas valida camino a L4/L5','Supercharger network como moat de infraestructura con $500M de revenue propio'],bear:['P/E de 98x no tiene precedente histórico para empresa con -1% revenue growth','BYD supera a Tesla en ventas globales con modelos de menor precio','Márgenes automotrices al 6% vs 25% de Apple — modelo de negocio diferente','Riesgo Elon Musk: DOGE, X y SpaceX absorben tiempo y atención ejecutiva'],exitUp:['Robotaxi Austin logra 10k viajes/día sin accidentes en 3 meses','FSD regulado en California y Texas habilita revenue recurrente','Optimus en línea de producción en Giga Texas antes de Q4 2026'],exitDn:['Accidente fatal Robotaxi genera investigación NHTSA y suspensión','Revenue EV cae más del 10% YoY por guerra de precios China','Elon Musk vende participación adicional mayor a $5B en un trimestre'],catalysts:[{date:'Jun 2026',text:'Launch Robotaxi Austin — primer servicio comercial sin conductor.',done:false},{date:'Jul 2026',text:'Earnings Q2 2026 — margen automotriz y guidance Optimus.',done:false},{date:'Q3 2026',text:'Optimus primera entrega a clientes externos.',done:false},{date:'Continuo',text:'Regulación NHTSA sobre FSD y Autopilot — riesgo recall.',risk:true}],peers:[{name:'TSLA',val:'98.4x',active:true},{name:'TM',val:'8.2x',active:false},{name:'F',val:'5.9x',active:false},{name:'GM',val:'5.4x',active:false}],peersData:[98.4,8.2,5.9,5.4],projLabels:['Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e','Q4 2026e'],projReal:[19.34,22.5,25.18,25.71,19.34,null,null,null],projEst:[null,null,null,null,null,22.0,26.0,28.5]},
-GOOGL:{fullname:'Alphabet Inc. · NASDAQ',tags:['USA','Tecnología','Mega Cap'],rec:'alcista',recLabel:'● ALCISTA',updatedAt:'Junio 2026',targetPrice:'$210',upside:'+28%',pe:'21.3x',evEbitda:'15.8x',revGrowth:'+12%',opMargin:'32%',fcf:'$72B',debtEbitda:'0.1x',conviction:82,convictionLabel:'82% Buy · 61 analistas',thesis:'Google es la empresa de IA más infravalorada del mercado a 21x P/E. Search con AI Overviews mantiene dominancia con 92% de market share. Gemini Ultra compite cabeza a cabeza con GPT-4o. YouTube es el segundo motor de búsqueda mundial. Google Cloud crece al 28% YoY. El riesgo antitrust está priced in.',bull:['Search con AI Overviews mantiene 92% market share — el apocalipsis no llegó','Google Cloud crece 28% YoY con Gemini integrado como diferenciador vs AWS/Azure','YouTube Shorts monetización alcanza paridad con TikTok en CPM','Waymo comercializa en 10 ciudades con 100k viajes/semana — valor oculto enorme'],bear:['DOJ antitrust puede forzar desinversión de Chrome o Android — riesgo existencial','OpenAI con SearchGPT amenaza el modelo de negocio de búsqueda basada en ads','Capex $75B en 2026 comprime FCF margin en el corto plazo','Gemini rezagado vs GPT-4o en percepción pública y adopción enterprise'],exitUp:['Antitrust resuelto sin desinversión estructural significativa','Google Cloud supera 30% crecimiento YoY por 2 trimestres consecutivos','Target $210 con re-rating del mercado hacia P/E de 25x'],exitDn:['Juez ordena desinversión de Chrome o Android generando incertidumbre estructural','AI Overviews reduce CTR en search degradando revenue por query','Miss de earnings por incremento de capex sin aceleración de cloud'],catalysts:[{date:'May 2026',text:'Google I/O — Gemini 2.0 Ultra y nuevas capacidades Workspace AI.',done:true},{date:'Jul 2026',text:'Earnings Q2 2026 — Google Cloud y monetización AI Overviews.',done:false},{date:'Q3 2026',text:'Fallo final DOJ antitrust sobre remedies — resolución definitiva.',done:false},{date:'Continuo',text:'Competencia OpenAI SearchGPT en mercado de búsqueda.',risk:true}],peers:[{name:'GOOGL',val:'21.3x',active:true},{name:'MSFT',val:'34.5x',active:false},{name:'META',val:'24.8x',active:false},{name:'AMZN',val:'38.2x',active:false}],peersData:[21.3,34.5,24.8,38.2],projLabels:['Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e','Q4 2026e'],projReal:[90.23,96.43,88.27,96.47,90.23,null,null,null],projEst:[null,null,null,null,null,97.0,103.0,112.0]},
-JPM:{fullname:'JPMorgan Chase & Co. · NYSE',tags:['USA','Finanzas','Mega Cap'],rec:'alcista',recLabel:'● ALCISTA',updatedAt:'Junio 2026',targetPrice:'$265',upside:'+18%',pe:'13.2x',evEbitda:'9.8x',revGrowth:'+8%',opMargin:'34%',fcf:'$48B',debtEbitda:'N/A',conviction:74,convictionLabel:'74% Buy · 28 analistas',thesis:'JPMorgan es el banco más rentable de la historia con ROE del 17% sostenido. Jamie Dimon construyó la institución financiera más sólida del mundo con ventajas competitivas en escala, tecnología y gestión de riesgo. En un entorno de tasas altas, el NII récord de $91B anualizado es el viento de cola estructural.',bull:['NII de $91B anualizado beneficiado por tasas altas por más tiempo','ROE del 17% — el más alto entre grandes bancos globales por 5 años consecutivos','First Republic integration completada — 200B en activos a precio de ganga','Investment banking recovery con M&A y IPO pipeline creciente en 2026'],bear:['Recesión leve en USA comprimiría NII y elevaría provisiones por créditos incobrables','Regulación Basel IV aumenta requerimientos de capital reduciendo buybacks','Curva de rendimiento invertida reduce spreads en banca comercial','Competencia fintechs en pagos y préstamos personales erosiona márgenes retail'],exitUp:['Fed recorta tasas generando rally en book de bonos y re-rating del sector','M&A boom activa investment banking con fees récord en 2027','Target $265 con normalización del múltiplo hacia 15x earnings'],exitDn:['Desempleo supera 6% generando spike en provisiones de crédito','Regulación Basel IV más dura de lo esperado — CET1 requerido al 13.5%','Crisis crediticia inmobiliaria comercial genera pérdidas no anticipadas'],catalysts:[{date:'Abr 2026',text:'Earnings Q1 2026 — NII guidance y credit quality update.',done:true},{date:'Jul 2026',text:'Earnings Q2 2026 — investment banking recovery metrics.',done:false},{date:'Sep 2026',text:'Fed decision — impacto en NII y estrategia de balance.',done:false},{date:'Continuo',text:'Implementación Basel IV — riesgo de mayor requerimiento de capital.',risk:true}],peers:[{name:'JPM',val:'13.2x',active:true},{name:'BAC',val:'11.8x',active:false},{name:'WFC',val:'12.1x',active:false},{name:'GS',val:'14.3x',active:false}],peersData:[13.2,11.8,12.1,14.3],projLabels:['Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e','Q4 2026e'],projReal:[45.31,44.40,43.22,46.98,45.31,null,null,null],projEst:[null,null,null,null,null,46.0,47.5,50.0]},
-BAC:{fullname:'Bank of America Corp. · NYSE',tags:['USA','Finanzas','Large Cap'],rec:'alcista',recLabel:'● ALCISTA',updatedAt:'Junio 2026',targetPrice:'$48',upside:'+24%',pe:'11.8x',evEbitda:'8.9x',revGrowth:'+6%',opMargin:'28%',fcf:'$28B',debtEbitda:'N/A',conviction:68,convictionLabel:'68% Buy · 31 analistas',thesis:'Bank of America es el banco más sensible a tasas del sector — cada 100bps de incremento de Fed Funds genera $3.5B adicional en NII. Con tasas altas por más tiempo y el portafolio de bonos a vencimiento resolviendo gradualmente, el setup para 2026-2027 es constructivo. ROE expandiéndose hacia 13-15% desde niveles deprimidos.',bull:['Alta sensibilidad a tasas: +$3.5B NII por cada 100bps — el más beneficiado del sector','HTM portfolio de $95B resolviendo gradualmente — menor presión de mark-to-market','Consumer banking con 69M clientes — base de depósitos más estable de USA','Erica AI con 2B interacciones — liderazgo en banking digital que reduce costos'],bear:['HTM portfolio concentrado en MBS de larga duración — riesgo de liquidez latente','ROE del 10% muy por debajo de JPM (17%) — descuento de múltiplo justificado','Exposición a real estate comercial y préstamos a tasas variables en riesgo','Brian Moynihan menos agresivo en buybacks vs peers — menor retorno al accionista'],exitUp:['HTM portfolio resuelto acelera buybacks y normaliza múltiplo hacia 13x','Revenue global banking recovery por encima del 20% YoY en H2 2026','Target $48 con re-rating hacia peers del sector'],exitDn:['Crisis real estate comercial genera pérdidas HTM y capital hit','Fed recorta tasas agresivamente comprimiendo NII guidance','Pérdidas crediticias superen provisiones en 2 trimestres consecutivos'],catalysts:[{date:'Abr 2026',text:'Earnings Q1 2026 — NII trajectory y HTM portfolio update.',done:true},{date:'Jun 2026',text:'Fed stress test — capital adequacy y buyback authorization.',done:false},{date:'Jul 2026',text:'Earnings Q2 2026 — investment banking y trading revenues.',done:false},{date:'Continuo',text:'HTM portfolio unrealized losses — monitoreo trimestral.',risk:true}],peers:[{name:'BAC',val:'11.8x',active:true},{name:'JPM',val:'13.2x',active:false},{name:'WFC',val:'12.1x',active:false},{name:'C',val:'10.2x',active:false}],peersData:[11.8,13.2,12.1,10.2],projLabels:['Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e','Q4 2026e'],projReal:[27.37,25.54,25.35,25.35,27.37,null,null,null],projEst:[null,null,null,null,null,26.5,27.8,29.0]},
-MELI:{fullname:'MercadoLibre Inc. · NASDAQ',tags:['LATAM','E-commerce','Large Cap'],rec:'alcista',recLabel:'● ALCISTA',updatedAt:'Junio 2026',targetPrice:'$2.850',upside:'+28%',pe:'58.3x',evEbitda:'35.2x',revGrowth:'+38%',opMargin:'14%',fcf:'$2.8B',debtEbitda:'1.8x',conviction:85,convictionLabel:'85% Strong Buy · 22 analistas',thesis:'MercadoLibre es el Amazon + PayPal + Shopify de Latinoamérica en una sola empresa. Con 220M usuarios activos en 18 países y Mercado Pago procesando $220B en pagos anualizados, tiene el flywheel más poderoso de la región. Brasil y México representan el 85% del negocio con clases medias en expansión y penetración e-commerce aún baja.',bull:['Mercado Pago procesa $220B TPV — fintech con 58M usuarios activos creciendo 40% YoY','Brasil y México: penetración e-commerce al 15% vs 25% USA — runway enorme','Mercado Crédito con cartera de $5.2B y morosidad controlada por scoring propio','Mercado Ads: $1.5B en revenue publicitario creciendo 70% YoY — margen muy alto'],bear:['P/E de 58x requiere ejecución perfecta en un entorno macroeconómico LATAM volátil','Riesgo tipo de cambio: BRL y MXN depreciación impacta earnings en USD','Competencia Amazon y Shopify en Brasil con inversiones agresivas','Regulación fintech Brasil puede impactar modelo de crédito'],exitUp:['Mercado Pago obtiene licencia bancaria en Brasil — expansión de NIM','Take rate de marketplace supera 15% por mejoras en publicidad','Target $2.850 con continuidad de crecimiento 35%+ por 4 trimestres'],exitDn:['BRL/USD supera 6.5 generando haircut significativo en earnings USD','Morosidad Mercado Crédito supera 10% por deterioro macro Brasil','Amazon duplica market share en Brasil en menos de 12 meses'],catalysts:[{date:'May 2026',text:'Earnings Q1 2026 — TPV Mercado Pago y GMV del marketplace.',done:true},{date:'Ago 2026',text:'Earnings Q2 2026 — margen operativo y guidance de crédito.',done:false},{date:'Q3 2026',text:'Expansión Mercado Pago a Chile y Colombia — nuevos mercados.',done:false},{date:'Continuo',text:'Tipo de cambio BRL/USD y política monetaria Brasil.',risk:true}],peers:[{name:'MELI',val:'58.3x',active:true},{name:'AMZN',val:'38.2x',active:false},{name:'SE',val:'45.1x',active:false},{name:'SHOP',val:'68.4x',active:false}],peersData:[58.3,38.2,45.1,68.4],projLabels:['Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e','Q4 2026e'],projReal:[5.0,5.42,5.31,6.06,5.0,null,null,null],projEst:[null,null,null,null,null,6.2,6.8,7.5]},
-ADBE:{fullname:'Adobe Inc. · NASDAQ',tags:['USA','Software','Large Cap'],rec:'alcista',recLabel:'● ALCISTA',updatedAt:'Junio 2026',targetPrice:'$480',upside:'+26%',pe:'25.8x',evEbitda:'19.4x',revGrowth:'+10%',opMargin:'36%',fcf:'$7.8B',debtEbitda:'0.6x',conviction:72,convictionLabel:'72% Buy · 35 analistas',thesis:'Adobe es el estándar global para creatividad profesional con 30M suscriptores Creative Cloud y Firefly AI integrado nativamente. El fracaso del deal con Figma fue una oportunidad perdida pero la empresa reorientó capital hacia recompras agresivas. Firefly con 18B generaciones acumuladas valida la adopción de IA generativa en creativos.',bull:['Firefly AI con 18B generaciones — monetización acelerando con Firefly Premium','Creative Cloud tiene switching costs altísimos — 30M profesionales capturados','Document Cloud PDF segment creciendo 18% con IA para contracts y workflows','Recompras aceleradas post-Figma: $8B authorized — float reduciéndose sistemáticamente'],bear:['Canva democratiza diseño con AI y amenaza el tier de entrada de Creative Cloud','Figma independiente compite directo en design tools','Crecimiento del 10% YoY moderado para un múltiplo de 25x','Generative AI open source reduce barrera de entrada para competidores'],exitUp:['Firefly Premium alcanza 5M suscriptores de pago en FY2027','Adobe Express penetra mercado SMB reemplazando Canva','Target $480 con aceleración de crecimiento al 14% YoY'],exitDn:['Canva lanza Canva Pro Enterprise con integraciones corporativas robustas','Adobe desacelera por debajo del 8% de revenue growth durante 2 trimestres','Antitrust investiga Adobe Suite por posición dominante en creative tools'],catalysts:[{date:'Jun 2026',text:'Earnings Q2 FY2026 — Firefly monetization y ARR Creative Cloud.',done:false},{date:'Sep 2026',text:'Adobe MAX 2026 — nuevas capacidades Firefly y roadmap FY2027.',done:false},{date:'Q4 2026',text:'Adobe Express Enterprise GA — ataque directo a mercado Canva.',done:false},{date:'Continuo',text:'Competencia Canva y Figma en segmento design tools.',risk:true}],peers:[{name:'ADBE',val:'25.8x',active:true},{name:'CRM',val:'32.1x',active:false},{name:'MSFT',val:'34.5x',active:false},{name:'INTU',val:'38.7x',active:false}],peersData:[25.8,32.1,34.5,38.7],projLabels:['Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e','Q4 2026e'],projReal:[5.71,5.81,5.76,5.61,5.71,null,null,null],projEst:[null,null,null,null,null,5.9,6.1,6.5]},
-UBER:{fullname:'Uber Technologies Inc. · NYSE',tags:['USA','Tecnología','Large Cap'],rec:'alcista',recLabel:'● ALCISTA',updatedAt:'Junio 2026',targetPrice:'$98',upside:'+30%',pe:'28.4x',evEbitda:'22.1x',revGrowth:'+16%',opMargin:'8%',fcf:'$4.2B',debtEbitda:'1.9x',conviction:80,convictionLabel:'80% Buy · 44 analistas',thesis:'Uber completó la transición de startup que quema caja a generador masivo de FCF. Con $4.2B de FCF en los últimos 12 meses y el negocio de Delivery generando márgenes positivos, la tesis de rentabilidad está validada. El riesgo AV/robotaxi es real pero también es una oportunidad — Uber ya tiene deals con Waymo y May Mobility.',bull:['FCF de $4.2B demuestra que el modelo de negocio es rentable a escala global','Delivery (Uber Eats) en breakeven — cross-selling con Mobility reduce CAC','Deals con Waymo y May Mobility posicionan a Uber como capa de distribución AV','67M monthly active drivers imposibles de replicar — moat de supply side único'],bear:['Robotaxis de Tesla y Waymo amenazan el segmento Rides en ciudades clave','Regulación clasificación de conductores en EU aumenta costos estructurales','Márgenes del 8% exigen ejecución perfecta para justificar múltiplo de 28x','Competencia DoorDash y Amazon Fresh comprimen márgenes en delivery'],exitUp:['Waymo partnership genera revenue sharing en 20 ciudades antes de FY2027','Uber One membership supera 30M suscriptores con ARPU de $12/mes','Target $98 con expansión de EBITDA margin al 14% en FY2027'],exitDn:['Tesla Robotaxi escala en 5 ciudades principales en 2026 — pérdida de market share','Regulación EU clasifica conductores como empleados — incremento de costos 25%','Pérdida de acuerdo Waymo a favor de Lyft o plataforma propia'],catalysts:[{date:'May 2026',text:'Earnings Q1 2026 — FCF guidance y Uber One subscriptions.',done:true},{date:'Jun 2026',text:'Waymo expansion a nuevas ciudades con Uber como plataforma.',done:false},{date:'Ago 2026',text:'Earnings Q2 2026 — Delivery margin y rides growth internacional.',done:false},{date:'Continuo',text:'Tesla Robotaxi launch — evaluación de impacto en market share.',risk:true}],peers:[{name:'UBER',val:'28.4x',active:true},{name:'LYFT',val:'18.2x',active:false},{name:'DASH',val:'65.3x',active:false},{name:'ABNB',val:'22.1x',active:false}],peersData:[28.4,18.2,65.3,22.1],projLabels:['Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e','Q4 2026e'],projReal:[11.53,12.07,11.19,12.02,11.53,null,null,null],projEst:[null,null,null,null,null,12.5,13.2,14.0]},
-NVDA:{fullname:'NVIDIA Corporation · NASDAQ',tags:['USA','Semiconductores','Mega Cap'],rec:'alcista',recLabel:'● ALCISTA',updatedAt:'Junio 2026',targetPrice:'$294',upside:'+32%',pe:'34.2x',evEbitda:'28.7x',revGrowth:'+85%',opMargin:'61%',fcf:'$44.9B',debtEbitda:'0.2x',conviction:92,convictionLabel:'92% Strong Buy · 62 analistas',thesis:'NVDA es el pick y pala de la revolución de IA con moat estructural vía ecosistema CUDA. La demanda de GPUs para data centers supera la oferta por al menos 4 trimestres. Q1 FY2027 reportó $81.6B (+85% YoY), superando consenso. Guidance Q2 en $91B por encima de los $86.84B esperados por el mercado.',bull:['Demanda de GPUs para IA sin señales de desaceleración en FY2027','Márgenes brutos en expansión hacia 78–80% con arquitectura Blackwell','Ecosistema CUDA como ventaja competitiva estructural irreplicable','FCF de $44.9B habilita recompras masivas y dividendos crecientes'],bear:['Múltiplos 34x P/E dejan margen de error mínimo ante cualquier miss','Restricciones de exportación a China erosionan ~$4.5B por trimestre','AMD e Intel aceleran competencia en el segmento de inferencia','Hyperscalers desarrollan chips propios: TPU, Trainium, Maia'],exitUp:['Precio alcanza $294 (target consenso Wall Street)','P/E supera 45x sin aceleración proporcional de EPS','Rubin supera expectativas en lanzamiento Q3 2026'],exitDn:['Miss de revenue por 2 trimestres consecutivos','Restricciones China se expanden a H100/B200','Hyperscaler anuncia reducción de capex en IA'],catalysts:[{date:'May 2026',text:'Q1 FY2027: $81.6B revenue +85% YoY. Beat consenso. Guía Q2 en $91B.',done:true},{date:'Jul 2026',text:'Lanzamiento Rubin — expansión TAM hacia edge e inferencia.',done:false},{date:'Ago 2026',text:'Earnings Q2 FY2027 — consenso $91B. Validación ciclo Blackwell Ultra.',done:false},{date:'Continuo',text:'Regulación exportación China H20 — riesgo $4.5B/trimestre.',risk:true}],peers:[{name:'NVDA',val:'34.2x',active:true},{name:'AMD',val:'24.1x',active:false},{name:'INTC',val:'18.3x',active:false},{name:'AVGO',val:'28.7x',active:false}],peersData:[34.2,24.1,18.3,28.7],projLabels:['Q3 2024','Q4 2024','Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e','Q4 2026e'],projReal:[35.08,60.92,44.06,89.83,141.07,null,81.62,null,null,null],projEst:[null,null,null,null,null,147.81,null,91.0,105.0,128.0]},
-META:{fullname:'Meta Platforms Inc. · NASDAQ',tags:['USA','Tech','Mega Cap'],rec:'bajista',recLabel:'● BAJISTA',updatedAt:'Junio 2026',targetPrice:'$840',upside:'+40%',pe:'23.1x',evEbitda:'15.8x',revGrowth:'+19%',opMargin:'41%',fcf:'$32.1B',debtEbitda:'0.1x',conviction:68,convictionLabel:'68% Buy · 67 analistas',thesis:'META muestra métricas operativas sólidas pero enfrenta riesgos estructurales crecientes. El capex masivo para IA ($115-135B en 2026) comprime el FCF yield en el corto plazo. La familia de apps con 3.3B de usuarios diarios representa un moat de red excepcional, pero Reality Labs acumula pérdidas de más de $50B sin camino claro a la rentabilidad.',bull:['Familia de apps con 3.3B de usuarios diarios: moat de red excepcional','Monetización de IA en WhatsApp Business y Reels en etapa temprana','Balance sólido: efectivo neto positivo, recompras agresivas sostenidas','Llama 4 posiciona a META competitivamente en IA open source'],bear:['Capex de $115-135B en IA 2026 con ROI incierto y presión sobre FCF','Reality Labs: $50B+ en pérdidas acumuladas sin monetización visible','Riesgo regulatorio antimonopolio activo en Europa y EEUU','Dependencia publicitaria: vulnerable ante desaceleración económica global'],exitUp:['Precio alcanza $840 (target mediano consenso)','Reality Labs anuncia monetización concreta de AR/VR','Capex IA genera retorno visible en márgenes operativos'],exitDn:['Dos trimestres consecutivos de desaceleración en publicidad','Regulación antimonopolio fuerza desinversión de Instagram/WhatsApp','Capex supera $150B sin mejora de márgenes'],catalysts:[{date:'Jul 2026',text:'Earnings Q2 2026 — validación de márgenes operativos post-capex.',done:false},{date:'2026',text:'Lanzamiento gafas AR Ray-Ban generación 3 — catalizador hardware.',done:false},{date:'Continuo',text:'Proceso antimonopolio FTC sobre Instagram/WhatsApp.',risk:true},{date:'Continuo',text:'Capex IA $115-135B 2026 — presión sobre FCF yield.',risk:true}],peers:[{name:'META',val:'23.1x',active:true},{name:'GOOGL',val:'19.8x',active:false},{name:'SNAP',val:'45.2x',active:false},{name:'PINS',val:'22.4x',active:false}],peersData:[23.1,19.8,45.2,22.4],projLabels:['Q2 2024','Q3 2024','Q4 2024','Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e'],projReal:[39.07,40.59,48.39,42.31,89.83,141.07,null,42.31,null,null],projEst:[null,null,null,null,null,null,48.39,null,47.0,51.0]},
-AMZN:{fullname:'Amazon.com Inc. · NASDAQ',tags:['USA','Consumo','Mega Cap'],rec:'neutral',recLabel:'● NEUTRAL',updatedAt:'Junio 2026',targetPrice:'$296',upside:'+30%',pe:'38.4x',evEbitda:'18.2x',revGrowth:'+11%',opMargin:'11%',fcf:'$68.3B',debtEbitda:'0.8x',conviction:78,convictionLabel:'78% Strong Buy · 55 analistas',thesis:'AMZN presenta un perfil de calidad excepcional pero valuación ajustada que limita el upside en el corto plazo. AWS con márgenes operativos del 37% y crecimiento del 17% YoY es el motor real de rentabilidad. Bedrock y Amazon Q posicionan AWS como plataforma líder de IA empresarial con un TAM en expansión acelerada.',bull:['AWS: liderazgo en cloud con márgenes del 37% y crecimiento 17% YoY','Publicidad digital: $56B creciendo 18% con márgenes tipo Google','FCF de $68B habilita recompras y reinversión masiva en IA','Bedrock y Amazon Q consolidan AWS como plataforma de IA empresarial'],bear:['Valuación 38x P/E descuenta aceleración que puede no materializarse','Retail core con márgenes bajos y presión competitiva de Temu y Shein','Capex $100B en IA 2025 con ROI de largo plazo incierto','Riesgo regulatorio antimonopolio sobre AWS y marketplace'],exitUp:['Precio alcanza $296 (target consenso analistas)','AWS acelera crecimiento por encima del 20% YoY','Márgenes operativos consolidados superan 15%'],exitDn:['AWS desacelera por debajo del 12% YoY dos trimestres','Retail no mejora márgenes ante presión competitiva','Regulación fuerza separación de AWS del negocio retail'],catalysts:[{date:'Ago 2026',text:'Earnings Q2 2026 — foco en márgenes AWS y publicidad.',done:false},{date:'2026',text:'Expansión Amazon Q en enterprise — catalizador adopción IA.',done:false},{date:'Continuo',text:'Investigación antimonopolio DOJ sobre AWS y marketplace.',risk:true},{date:'Continuo',text:'Presión competitiva retail de Temu/Shein en márgenes core.',risk:true}],peers:[{name:'AMZN',val:'38.4x',active:true},{name:'MSFT',val:'32.1x',active:false},{name:'GOOGL',val:'19.8x',active:false},{name:'SHOP',val:'65.3x',active:false}],peersData:[38.4,32.1,19.8,65.3],projLabels:['Q2 2024','Q3 2024','Q4 2024','Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e'],projReal:[148.0,159.0,187.8,155.7,159.3,null,187.8,155.7,null,null],projEst:[null,null,null,null,null,166.0,null,null,172.0,180.0]}
-};
+const MI_ASSETS={};
 
 let miCurrentTicker=null,miFundamentals=null;
 const miCharts={};
@@ -7519,7 +7502,7 @@ function miSwitchTab(tab){
   document.querySelectorAll('.mi-section').forEach(function(s){s.classList.remove('active');});
   document.querySelectorAll('.mi-nav-item').forEach(function(n){n.classList.remove('active');});
   var sec=document.getElementById('tab-'+tab);
-  var nav=document.querySelector('.mi-nav-item[data-tab="'+tab+'"]');
+  var nav=document.querySelector('.mi-nav-item[data-mitab="'+tab+'"]');
   if(sec)sec.classList.add('active');
   if(nav)nav.classList.add('active');
   if(tab==='revenue')miLoadFromFundamentals(miCurrentTicker,'revenue');
@@ -7527,7 +7510,51 @@ function miSwitchTab(tab){
   if(tab==='fcf')miLoadFromFundamentals(miCurrentTicker,'fcf');
   if(tab==='deuda')miLoadFromFundamentals(miCurrentTicker,'deuda');
 
-  if(tab==='tesis')miRenderTesis(miCurrentTicker);}
+  if(tab==='tesis')miRenderTesis(miCurrentTicker);
+  if(tab==='valuacion')miRenderValuacion(miCurrentTicker);}
+function miFmtUsd(n){return n==null?'—':'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function miRenderValuacion(ticker){
+  var asset=MI_ASSETS[ticker];
+  if(!asset)return;
+  var v=asset.valuation;
+  var empty=document.getElementById('val-empty'),content=document.getElementById('val-content');
+  if(!v){if(empty)empty.style.display='block';if(content)content.style.display='none';return;}
+  if(empty)empty.style.display='none';if(content)content.style.display='block';
+
+  document.getElementById('val-methodology').textContent=v.priceTarget.methodology;
+  document.getElementById('val-target-price').textContent=miFmtUsd(v.priceTarget.value);
+  var upEl=document.getElementById('val-upside');
+  var upPct=v.priceTarget.upsidePct;
+  upEl.textContent=(upPct>=0?'▲ +':'▼ ')+Math.abs(upPct).toFixed(1)+'%';
+  upEl.style.color=upPct>=0?'#4ade80':'#f87171';
+  document.getElementById('val-rationale').textContent=v.priceTarget.ratingRationale;
+
+  var scenOrder=[['bear','Bear'],['base','Base'],['bull','Bull']];
+  document.getElementById('val-dcf-tbody').innerHTML=scenOrder.map(function(pair){
+    var s=v.dcf.scenarios[pair[0]];if(!s)return'';
+    var color=pair[0]==='bear'?'#f87171':pair[0]==='bull'?'#4ade80':'#60a5fa';
+    return '<tr style="border-bottom:1px solid #0d1e30"><td style="padding:8px 10px;color:'+color+'">'+pair[1]+'</td>'
+      +'<td style="text-align:right;padding:8px 10px;color:#d4e3f7">'+miFmtUsd(s.priceTarget)+'</td>'
+      +'<td style="text-align:right;padding:8px 10px;color:'+(s.upsidePct>=0?'#4ade80':'#f87171')+'">'+(s.upsidePct>=0?'+':'')+s.upsidePct.toFixed(1)+'%</td>'
+      +'<td style="text-align:right;padding:8px 10px;color:#9ab8d8">'+s.evB.toLocaleString('en-US',{maximumFractionDigits:0})+'</td>'
+      +'<td style="text-align:right;padding:8px 10px;color:#9ab8d8">'+s.pctEVFromTerminal.toFixed(0)+'%</td></tr>';
+  }).join('');
+  document.getElementById('val-dcf-assumptions').textContent='WACC '+(v.dcf.wacc*100).toFixed(1)+'% · Crecimiento terminal '+(v.dcf.terminalGrowth*100).toFixed(1)+'% · '+v.dataSource;
+
+  document.getElementById('val-comps-tbody').innerHTML=(v.comps.peers||[]).map(function(p){
+    return '<tr style="border-bottom:1px solid #0d1e30"><td style="padding:8px 10px;color:#d4e3f7">'+p.ticker+'</td>'
+      +'<td style="text-align:right;padding:8px 10px;color:#9ab8d8">'+miFmtUsd(p.price)+'</td>'
+      +'<td style="text-align:right;padding:8px 10px;color:#2e4f6e;font-size:9px">'+p.source+'</td></tr>';
+  }).join('');
+  document.getElementById('val-comps-implied').textContent='Implícito EV/EBITDA: '+miFmtUsd(v.comps.impliedPriceEvEbitda)+' · Implícito P/E: '+miFmtUsd(v.comps.impliedPricePE)+' · Blend comps: '+miFmtUsd(v.comps.blended);
+
+  var t=v.ttm;
+  var mDefs=[['Revenue TTM','$'+t.revenue.toFixed(1)+'B',''],['EBITDA TTM','$'+t.ebitda.toFixed(1)+'B',''],['Net Income TTM','$'+t.netIncome.toFixed(1)+'B',''],['EPS TTM','$'+t.eps.toFixed(2),''],['Acciones (diluted)',t.sharesOutB.toFixed(2)+'B',''],['Deuda neta',(t.netDebtB>=0?'$'+t.netDebtB.toFixed(2)+'B':'Caja neta $'+Math.abs(t.netDebtB).toFixed(2)+'B'),t.netDebtB>=0?'neg':'pos']];
+  document.getElementById('val-ttm-metrics').innerHTML=mDefs.map(function(m){return'<div class="mi-metric"><div class="mi-metric-label">'+m[0]+'</div><div class="mi-metric-val '+m[2]+'">'+m[1]+'</div></div>';}).join('');
+
+  document.getElementById('val-limitations').innerHTML=(v.limitations||[]).map(function(l){return '<div style="font-size:11.5px;color:#c9a86a;line-height:1.6;margin-bottom:4px">⚠ '+l+'</div>';}).join('');
+  document.getElementById('val-source').textContent='Datos al '+v.asOf+' · '+v.dataSource;
+}
 function miLoadIndicadores(ticker) {
   var ids = ['mi-ind-rsi','mi-ind-rsi-badge','mi-ind-rsi-bar',
              'mi-ind-macd','mi-ind-macd-badge',
@@ -7703,9 +7730,9 @@ function miRenderDeuda(ticker,data){
 document.addEventListener('DOMContentLoaded',function(){
   document.getElementById('mi-overlay-backdrop').addEventListener('click',function(e){if(e.target===this)miClose();});
   document.getElementById('mi-close-btn').addEventListener('click',miClose);
-  document.querySelectorAll('.mi-nav-item').forEach(function(el){el.addEventListener('click',function(){miSwitchTab(this.dataset.tab);});});
+  document.querySelectorAll('.mi-nav-item').forEach(function(el){el.addEventListener('click',function(){miSwitchTab(this.dataset.mitab);});});
   document.querySelectorAll('.pick-btn[data-ticker]').forEach(function(btn){btn.addEventListener('click',function(e){e.preventDefault();miOpen(this.dataset.ticker);});});
-  document.querySelectorAll('.pick-btn:not([data-ticker])').forEach(function(btn){btn.addEventListener('click',function(e){e.preventDefault();var card=this.closest('.pick-card');if(!card)return;var el=card.querySelector('.pick-ticker');if(el)miOpen(el.textContent.trim());});});
+  document.querySelectorAll('.pick-btn:not([data-ticker])').forEach(function(btn){var href=btn.getAttribute('href');if(href&&href!=='#')return;btn.addEventListener('click',function(e){e.preventDefault();var card=this.closest('.pick-card');if(!card)return;var el=card.querySelector('.pick-ticker');if(el)miOpen(el.textContent.trim());});});
 });
 document.addEventListener('keydown',function(e){if(e.key==='Escape')miClose();});
 window.miOpenOverlay=miOpen;
