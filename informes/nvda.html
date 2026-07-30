@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVDA — NVIDIA Corporation | Manfredi Investment Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-dark:#0b1f3a;
+    --navy:#0e2748;
+    --navy2:#15335c;
+    --blue:#2f5f9e;
+    --blue-light:#5f8fc7;
+    --blue-pale:#eaf1f9;
+    --line:#d7e0ea;
+    --text:#161a20;
+    --muted:#69707c;
+    --green:#1a7a54;
+    --red:#a8291f;
+    --serif:'Newsreader',serif;
+    --sans:'Inter',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#fff; color:var(--text); font-family:var(--sans); font-size:15.5px; line-height:1.7;}
+  .wrap{max-width:900px; margin:0 auto; padding:0 30px 90px;}
+
+  .brandbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:26px 30px 20px; max-width:900px; margin:0 auto; border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:38px; height:38px; border:1.5px solid var(--navy-dark); display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-weight:700; color:var(--navy-dark); font-size:16px;
+  }
+  .brand-name{font-family:var(--serif); font-weight:700; font-size:17px; color:var(--text); line-height:1.15;}
+  .brand-sub{font-family:var(--sans); font-size:10px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase;}
+  .brandbar .doctype{font-family:var(--mono); font-size:11px; color:var(--muted); text-align:right;}
+
+  .frontbox{border:1px solid var(--navy-dark); margin:34px 0 8px; padding:0;}
+  .frontbox-top{display:flex; justify-content:space-between; align-items:baseline; padding:22px 28px 14px; border-bottom:1px solid var(--line);}
+  .ticker-big{font-family:var(--serif); font-size:42px; font-weight:700; color:var(--navy-dark);}
+  .exch{font-family:var(--mono); font-size:12px; color:var(--muted); margin-left:10px;}
+  .rating{font-family:var(--mono); font-size:12px; font-weight:600; color:var(--blue); text-align:right; letter-spacing:.03em;}
+  .rating small{display:block; font-family:var(--mono); font-size:10.5px; color:var(--muted); font-weight:400; margin-top:3px; letter-spacing:normal;}
+  .frontbox-body{padding:20px 28px 26px;}
+  .company-line{color:var(--muted); font-size:13.5px; margin-bottom:16px;}
+  .thesis-block{font-family:var(--serif); font-size:17.5px; line-height:1.65; color:var(--text); font-style:italic;}
+
+  .statsrow{display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line);}
+  .statcell{padding:16px 20px; border-right:1px solid var(--line);}
+  .statcell:last-child{border-right:none;}
+  .statcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:6px;}
+  .statcell .v{font-family:var(--mono); font-size:16px; font-weight:600; color:var(--text);}
+  .pos{color:var(--green);} .neg{color:var(--red);}
+
+  .secnum{font-family:var(--mono); font-size:11px; color:var(--blue-light); letter-spacing:.1em; margin:50px 0 2px;}
+  h2{font-family:var(--serif); font-size:24px; font-weight:600; color:var(--navy2); margin:2px 0 18px; padding-bottom:10px; border-bottom:1.5px solid var(--navy-dark); text-wrap:balance;}
+  h3{font-family:var(--serif); font-size:17px; font-weight:600; color:var(--navy2); margin:30px 0 10px;}
+  p{margin:0 0 15px; max-width:68ch;}
+  strong{color:var(--text);}
+
+  .table-scroll{overflow-x:auto; margin:18px 0 22px;}
+  .table-scroll table{margin:0;}
+  table{width:100%; min-width:520px; border-collapse:collapse; font-size:13.5px;}
+  th{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); text-align:left; padding:8px 10px; border-bottom:1.5px solid var(--navy-dark); white-space:nowrap;}
+  td{padding:8px 10px; border-bottom:1px solid var(--line); font-family:var(--mono); color:var(--text); font-variant-numeric:tabular-nums;}
+  td.label{font-family:var(--sans); color:var(--text);}
+  tr.total td{font-weight:600; border-top:1px solid var(--navy-dark); border-bottom:none;}
+  .right-al{text-align:right;}
+
+  .chartbox{border:1px solid var(--line); padding:20px 22px 16px; margin:22px 0;}
+  .chartbox canvas{width:100% !important; display:block;}
+  .chartcap{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:14px; text-align:center;}
+
+  .pull{border-left:2px solid var(--navy-dark); padding-left:18px; margin:22px 0; color:var(--muted); font-size:13.5px; max-width:68ch;}
+
+  .footnote{font-family:var(--mono); font-size:11px; color:var(--muted); margin:-6px 0 18px; max-width:none;}
+
+  .watermark-block{
+    position:relative; margin:60px 0; padding:26px 30px; border:1px solid var(--line); overflow:hidden;
+  }
+  .watermark-block::before{
+    content:"NVDA"; position:absolute; right:10px; top:-30px; font-family:var(--serif); font-weight:700;
+    font-size:110px; color:var(--blue-pale); z-index:0; line-height:1;
+  }
+  .watermark-block > *{position:relative; z-index:1;}
+
+  .toc{border:1px solid var(--line); padding:22px 26px; margin:30px 0;}
+  .toc-title{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px;}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:30px;}
+  .toc li{font-size:13px; margin-bottom:7px; break-inside:avoid;}
+  .toc a{color:var(--navy2); text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  .toc .toc-final a{font-weight:600;}
+
+  .disclosure{margin-top:70px; padding-top:22px; border-top:1px solid var(--navy-dark); font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.8; max-width:none;}
+
+  .fv-block{text-align:right;}
+  .fv-block .fv-label{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+  .fv-block .fv-value{font-family:var(--mono); font-size:22px; font-weight:600; color:var(--navy-dark); line-height:1.3;}
+  .fv-block .fv-gap{font-family:var(--mono); font-size:12.5px; font-weight:600;}
+  .fv-block .fv-gap.neg{color:var(--red);} .fv-block .fv-gap.pos{color:var(--green);}
+
+  .verdict-bar{display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; background:var(--blue-pale); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:14px 28px;}
+  .verdict-stance{font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--navy-dark);}
+  .verdict-stance strong{color:var(--navy-dark);}
+  .verdict-note{font-family:var(--sans); font-size:11.5px; color:var(--muted); max-width:56ch; line-height:1.5;}
+
+  .sens-table td, .sens-table th{text-align:center;}
+  .sens-table td.axis{font-family:var(--mono); font-weight:600; background:#fff; color:var(--text);}
+  .sens-table td.base-cell{outline:2px solid var(--navy-dark); outline-offset:-2px;}
+
+  .govrow{display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:1px solid var(--line); margin:20px 0;}
+  .govcell{padding:16px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .govcell:nth-child(3n){border-right:none;}
+  .govcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px;}
+  .govcell .v{font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text);}
+  .govcell .sub{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.4;}
+
+  a{color:var(--blue);}
+  :focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
+
+  @media (max-width:720px){
+    .statsrow{grid-template-columns:repeat(2,1fr);}
+    .frontbox-top{flex-direction:column; gap:10px;}
+    .rating{text-align:left;}
+    .toc ol{columns:1;}
+    .verdict-bar{flex-direction:column; align-items:flex-start;}
+    .govrow{grid-template-columns:1fr;}
+    .govcell{border-right:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <div class="brand">
+    <div class="brand-mark">MI</div>
+    <div>
+      <div class="brand-name">Manfredi Investment</div>
+      <div class="brand-sub">Research &amp; Markets</div>
+    </div>
+  </div>
+  <div class="doctype">Equity Research · Informe Institucional<br>Datos al Q1 FY2027 (cierre trimestral 26-abr-2026, publicado 20-may-2026)</div>
+</div>
+
+<div class="wrap">
+
+  <div class="frontbox">
+    <div class="frontbox-top">
+      <div><span class="ticker-big">NVDA</span><span class="exch">NASDAQ · NVIDIA Corporation</span></div>
+      <div class="fv-block">
+        <div class="fv-label">Fair value (blend propio)</div>
+        <div class="fv-value">$308.70</div>
+        <div class="fv-gap pos">vs. $195.04 mercado · +58.3%</div>
+      </div>
+    </div>
+    <div class="verdict-bar">
+      <div class="verdict-stance">POSTURA DEL ANÁLISIS: <strong>NEUTRAL — EL DCF UBICA EL FAIR VALUE CASI EN EL PRECIO DE MERCADO; LOS OTROS DOS MÉTODOS ARRASTRAN MÚLTIPLOS DE UNA ESCALA DE NEGOCIO YA SUPERADA</strong> — el blend mecánico da +58% sobre el mercado, pero dos de los tres métodos numéricos dependen de multiplicadores (de un comparable y de la propia historia de NVDA) fijados cuando las bases de ganancias eran una fracción de las actuales (ver Sección 13)</div>
+      <div class="verdict-note">Este documento es análisis independiente con fines informativos y educativos. El autor no es un asesor financiero registrado (no CFA / no matriculado ante la CNV/SEC) y este contenido no constituye una recomendación de compra, venta o mantenimiento para ningún lector en particular. Ver disclosure completo al pie.</div>
+    </div>
+    <div class="frontbox-body">
+      <div class="company-line">Aceleradores de cómputo para IA (Data Center: GPUs + redes) · Edge Computing (gaming, estaciones de trabajo, automotriz) · CUDA y el stack de software</div>
+      <div class="thesis-block">
+        NVIDIA reportó, el 20 de mayo de 2026, ingresos del primer trimestre del año fiscal 2027 de $81.6 mil millones
+        (+85% interanual, +20% secuencial), con Data Center saltando 92% interanual a $75.2 mil millones. El EPS GAAP de
+        $2.39 superó al EPS "core" (no-GAAP, la cifra que la propia compañía reporta y que excluye una ganancia de
+        $15.9 mil millones por la revaluación de participaciones accionarias en startups de IA) de $1.87 — una brecha que
+        se repite, en menor escala, en trimestres anteriores. El directorio aprobó una nueva autorización de recompras de
+        $80 mil millones y elevó el dividendo trimestral 25 veces (de $0.01 a $0.25 por acción) — la política de capital
+        allocation exactamente opuesta a la que este desk documentó en Alphabet, que en el mismo semestre suspendió
+        recompras para financiar capex. NVIDIA, en cambio, casi no tiene capex propio: factura por vender la
+        infraestructura que sus propios clientes —Microsoft, Alphabet, Meta, Amazon— están comprando con el capex que sí
+        les compromete el flujo de caja. Este informe recorre el negocio completo —historia, segmentos, balance,
+        comparables y riesgos— y cierra, recién en la última sección, con la valuación: cuatro metodologías independientes
+        que, en este caso particular, no convergen entre sí, y esa falta de consenso interno es en sí misma el hallazgo
+        central de la Sección 13.
+      </div>
+    </div>
+    <div class="statsrow">
+      <div class="statcell"><div class="k">Ingresos TTM</div><div class="v">$253.5B</div></div>
+      <div class="statcell"><div class="k">Var. ingresos (últ. trim.)</div><div class="v pos">+85%</div></div>
+      <div class="statcell"><div class="k">Margen operativo TTM</div><div class="v">64.0%</div></div>
+      <div class="statcell"><div class="k">Posición de caja neta</div><div class="v pos">+$72.1B</div></div>
+    </div>
+  </div>
+  <p class="footnote">Cifras fundamentales: SEC EDGAR (Form 8-K, Exhibit 99.1 — comunicado de resultados oficial) y Form 10-Q, trimestre cerrado el 26 de abril de 2026 (Q1 FY2027), publicado el 20 de mayo de 2026. Este documento es 100% analítico — no constituye una recomendación de compra, venta ni mantenimiento. Ver disclosure completo al pie.</p>
+
+  <div class="toc">
+    <div class="toc-title">Contenido</div>
+    <ol>
+      <li><a href="#s01">Resumen Ejecutivo</a></li>
+      <li><a href="#s02">Historia y Evolución</a></li>
+      <li><a href="#s03">Modelo de Negocio y Segmentos</a></li>
+      <li><a href="#s04">Desarrollos Recientes y Perspectiva</a></li>
+      <li><a href="#s05">Estados Financieros</a></li>
+      <li><a href="#s06">Deuda y Balance</a></li>
+      <li><a href="#s07">Flujo de Caja y Capital Allocation</a></li>
+      <li><a href="#s08">Comparables de Industria</a></li>
+      <li><a href="#s09">Gobierno Corporativo y Estructura Accionaria</a></li>
+      <li><a href="#s10">Registro de Riesgos</a></li>
+      <li><a href="#s11">Catalizadores</a></li>
+      <li><a href="#s12">Modelo Financiero Proyectado y Momentum de Estimados</a></li>
+      <li class="toc-final"><a href="#s13">Valuación: Cuatro Métodos y el Fair Value</a></li>
+      <li><a href="#s14">Limitaciones del Modelo</a></li>
+    </ol>
+  </div>
+
+  <!-- 01 -->
+  <p class="secnum" id="s01">01 — Resumen Ejecutivo</p>
+  <h2>El proveedor, no el comprador: por qué el capex de todos los demás es el ingreso de NVIDIA</h2>
+  <p>
+    El 20 de mayo de 2026, NVIDIA reportó ingresos del primer trimestre del año fiscal 2027 (terminado el 26 de abril de
+    2026) de $81.6 mil millones, +85% interanual y +20% sobre el trimestre anterior — un resultado que superó el consenso
+    de $78.8 mil millones. Data Center, el segmento que agrupa las GPUs y el hardware de red para centros de datos de IA,
+    saltó 92% interanual a $75.2 mil millones (92% del total de la compañía), con la línea de Networking acelerando aún
+    más rápido que el cómputo (+199% interanual, a $14.8 mil millones) — la señal más clara de que los clientes de NVIDIA
+    ya no compran solo GPUs sueltas sino sistemas completos de infraestructura de IA.
+  </p>
+  <p>
+    El EPS GAAP de $2.39 superó ampliamente al EPS "core" (no-GAAP) de $1.87 — una brecha de $0.52 explicada casi en su
+    totalidad por una ganancia de $15.9 mil millones antes de impuestos en la revaluación de participaciones accionarias
+    que NVIDIA mantiene en startups de inteligencia artificial (Sección 04 y 05). Es el mismo patrón —una utilidad GAAP
+    inflada por ganancias no operativas sobre inversiones de capital en el ecosistema de IA— que este desk documentó en
+    los informes de MSFT y GOOGL, con la diferencia de que en NVIDIA la propia compañía separa explícitamente la cifra
+    "core" cada trimestre en su comunicado oficial, sin que este informe tenga que reconstruirla.
+  </p>
+  <p>
+    El dato de capital allocation es, en sí mismo, la contracara exacta de lo que este desk encontró en Alphabet en el
+    mismo semestre: mientras Alphabet suspendió sus recompras por completo para financiar un capex récord, NVIDIA elevó
+    su dividendo trimestral 25 veces (de $0.01 a $0.25 por acción) y sumó una nueva autorización de recompras de
+    $80 mil millones, devolviendo cerca de $20 mil millones a accionistas en un solo trimestre. La razón estructural es
+    simple: NVIDIA no construye los centros de datos, los vende — su propio capex (~$1.8 mil millones en el trimestre)
+    es una fracción minúscula de los $195-260 mil millones que sus clientes hyperscaler están invirtiendo cada uno. Este
+    informe recorre el negocio completo antes de llegar, en la Sección 13, a una valuación donde —por primera vez en esta
+    cobertura— las cuatro metodologías no convergen entre sí: el DCF ubica el fair value casi exactamente en el precio de
+    mercado, mientras que comparables y reversión histórica sugieren upside sustancial apoyados en múltiplos que, a
+    juicio de este desk, no son directamente aplicables a la escala actual del negocio.
+  </p>
+
+  <!-- 02 -->
+  <p class="secnum" id="s02">02 — Historia y Evolución</p>
+  <h2>De tarjetas gráficas para videojuegos a la infraestructura física de la IA global</h2>
+  <p>
+    NVIDIA fue fundada en 1993 por Jensen Huang, Chris Malachowsky y Curtis Priem, y salió a bolsa en 1999, el mismo año
+    en que acuñó el término "GPU" (unidad de procesamiento gráfico) con el lanzamiento de la GeForce 256. La apuesta que,
+    en retrospectiva, sentó las bases de todo lo que vino después fue CUDA, la plataforma de cómputo paralelo lanzada en
+    2006 para permitir que las GPUs —diseñadas para renderizar gráficos— ejecutaran cálculos de propósito general. Esa
+    apuesta tardó casi una década en dar frutos: el punto de inflexión llegó en 2012, cuando investigadores de la
+    Universidad de Toronto entrenaron AlexNet —una red neuronal que redefinió el estado del arte en reconocimiento de
+    imágenes— sobre GPUs NVIDIA, la primera demostración pública de que el hardware diseñado para videojuegos servía,
+    también, para entrenar inteligencia artificial.
+  </p>
+  <p>
+    La década 2018-2022 fue más volátil de lo que sugiere la narrativa actual: el boom y colapso de la minería de
+    criptomonedas distorsionó la demanda de GPUs de consumo, y el año fiscal 2020 (cerrado ene-2020) cerró con ingresos
+    en contracción. El año fiscal 2023 (cerrado ene-2023) fue prácticamente plano ($26.97 mil millones, +0.2% sobre
+    FY2022) por una corrección de inventario en el canal de gaming — el flujo de caja operativo de ese año fiscal cayó a
+    $5.6 mil millones, desde $9.1 mil millones el año anterior (Sección 07), un recordatorio de que el negocio no es
+    inmune a los ciclos. El quiebre real llegó con el lanzamiento público de ChatGPT (OpenAI) en noviembre de 2022: la
+    demanda de cómputo para entrenar e inferir modelos de lenguaje de gran escala convirtió a las GPUs de centro de datos
+    de NVIDIA en el insumo más escaso de la industria tecnológica, y los ingresos del año fiscal 2024 saltaron 126% a
+    $60.9 mil millones.
+  </p>
+  <p class="pull">
+    El dato que mejor resume el contraste de esta cobertura con Microsoft, Alphabet y Meta no es el crecimiento de
+    ingresos — es el capex propio. Mientras esas tres compañías destinan entre 22% y 41% de sus ingresos a construir
+    centros de datos, el capex de NVIDIA nunca superó el 6.8% de sus ingresos en los últimos cinco años fiscales (FY2023:
+    6.8%; FY2026: apenas 2.8%) — porque NVIDIA no opera los centros de datos, los abastece. Es la empresa que se beneficia
+    del capex de todos los demás sin tener que replicarlo en su propio balance.
+  </p>
+  <div class="chartbox">
+    <canvas id="historyChart" height="320"></canvas>
+    <p class="chartcap">Ingresos anuales reportados, FY2017–FY2026 (año fiscal cerrado a fines de enero de cada año), más TTM al 26-abr-2026. Escala logarítmica por la magnitud del salto reciente. Fuente: SEC EDGAR XBRL.</p>
+  </div>
+  <p>
+    Los hitos de capitalización de mercado acompañaron esta historia con una velocidad inusual: NVIDIA cruzó el $1 billón
+    de valor de mercado en 2023, el $2 billones y $3 billones en 2024, y compitió con Apple y Microsoft por el título de
+    empresa más valiosa del mundo durante 2024-2025. En noviembre de 2025 anunció un compromiso de inversión de hasta
+    $100 mil millones en OpenAI, renegociado en febrero de 2026 hacia una participación de $30 mil millones en una ronda
+    de $110 mil millones (Sección 04) — el episodio más reciente de una estrategia de inversión en el ecosistema de IA
+    que en 2026 ya supera los $40 mil millones acumulados.
+  </p>
+
+  <!-- 03 -->
+  <p class="secnum" id="s03">03 — Modelo de Negocio y Segmentos</p>
+  <h2>Qué vende NVIDIA, y por qué "Gaming" ya casi no aparece en el reporte</h2>
+  <p>
+    Hasta el trimestre anterior, NVIDIA reportaba cinco segmentos (Data Center, Gaming, Professional Visualization,
+    Automotive, OEM &amp; Other). A partir de Q1 FY2027, la compañía simplificó su reporte a solo dos: <strong>Data
+    Center</strong> y <strong>Edge Computing</strong> —este último agrupa todo lo que antes eran cuatro segmentos
+    separados (gaming, estaciones de trabajo profesionales, automotriz y OEM)—. El cambio no es cosmético: reduce la
+    granularidad disponible para el inversor justo en el momento en que Data Center ya es el 92% del negocio, y el resto
+    —que hace cinco años incluía el gaming de consumo como motor de crecimiento— pasó a ser una nota al pie.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Plataforma</th><th class="right-al">Q1 FY2027 (abr-26)</th><th class="right-al">% del total</th><th class="right-al">Var. YoY</th></tr>
+    <tr><td class="label">Data Center — Compute</td><td class="right-al">$60.4B</td><td class="right-al">74.0%</td><td class="right-al pos">+77%</td></tr>
+    <tr><td class="label">Data Center — Networking</td><td class="right-al">$14.8B</td><td class="right-al">18.1%</td><td class="right-al pos">+199%</td></tr>
+    <tr class="total"><td class="label">Data Center total</td><td class="right-al">$75.2B</td><td class="right-al">92.1%</td><td class="right-al pos">+92%</td></tr>
+    <tr><td class="label">Edge Computing (gaming, workstations, auto, OEM)</td><td class="right-al">$6.4B</td><td class="right-al">7.9%</td><td class="right-al pos">+29%</td></tr>
+    <tr class="total"><td class="label">Total</td><td class="right-al">$81.6B</td><td class="right-al">100%</td><td class="right-al pos">+85%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 8-K, Exhibit 99.1 (comunicado de resultados oficial Q1 FY2027), publicado 20-may-2026. Segmentación reducida de 5 a 2 categorías a partir de este trimestre.</p>
+  <div class="chartbox">
+    <canvas id="segmentChart" height="260"></canvas>
+    <p class="chartcap">Mix de ingresos por plataforma, Q1 FY2027 (trimestre cerrado 26-abr-2026).</p>
+  </div>
+  <p>
+    Dentro de Data Center, Networking creciendo más del doble de rápido que Compute (+199% vs. +77% interanual) es el
+    dato más revelador de la sección: los clientes ya no compran GPUs aisladas, compran "fábricas de IA" completas —GPUs
+    interconectadas con switches y NICs de alta velocidad (la familia Spectrum-X y NVLink)— porque el cuello de botella
+    de rendimiento en clusters de miles de GPUs ya no está solo en el chip, está en cómo se comunican entre sí. Edge
+    Computing, pese a crecer 29% interanual, sigue afectado por precios elevados de memoria y componentes que moderan la
+    demanda de PCs de consumo, parcialmente compensado por una fuerte demanda de estaciones de trabajo Blackwell y nuevos
+    acuerdos automotrices (Hyundai, Kia, BYD y Nissan adoptando la plataforma DRIVE Hyperion para vehículos de conducción
+    autónoma de Nivel 4).
+  </p>
+  <div class="chartbox">
+    <canvas id="geoChart" height="260"></canvas>
+    <p class="chartcap">Ingresos totales trimestrales, últimos 4 trimestres reportados (miles de millones USD). Fuente: SEC EDGAR XBRL / 8-K.</p>
+  </div>
+
+  <!-- 04 -->
+  <p class="secnum" id="s04">04 — Desarrollos Recientes y Perspectiva</p>
+  <h2>Tres frentes que van a definir los próximos trimestres</h2>
+  <h3>La ganancia de $15.9 mil millones: la cartera de inversión en IA de NVIDIA se vuelve grande de verdad</h3>
+  <p>
+    NVIDIA reportó una ganancia de $15.9 mil millones antes de impuestos por la revaluación de participaciones
+    accionarias en el trimestre —el ítem que explica por qué el EPS GAAP ($2.39) superó al EPS no-GAAP ($1.87)—. En el
+    balance, las "marketable equity securities" saltaron de $12.9 mil millones a $30.2 mil millones en un solo trimestre
+    (+135%). Buena parte de la historia detrás de esa cifra es la cartera de inversión en IA que NVIDIA construyó durante
+    2025-2026: en 2026 la compañía ya superó los $40 mil millones acumulados en apuestas de capital sobre startups de
+    IA, lideradas por una participación de $30 mil millones tomada en febrero de 2026 en OpenAI —tras la renegociación
+    del compromiso original de $100 mil millones anunciado en 2025— y una posición previa en xAI. Es, otra vez, el mismo
+    patrón de "financiamiento circular" que este desk señaló en los informes de MSFT y GOOGL: NVIDIA invierte capital en
+    compañías que después usan (una porción de) ese capital para comprar chips de NVIDIA, generando ganancias contables
+    vistosas que no son, en sentido estricto, ingreso operativo genuino.
+  </p>
+  <h3>Recompras y dividendo: el capital allocation más agresivo del panel de mega-caps de IA</h3>
+  <p>
+    El 18 de mayo de 2026, el directorio aprobó una autorización adicional de $80 mil millones para recompra de
+    acciones, sumada a los $38.5 mil millones que quedaban de la autorización anterior. En paralelo, NVIDIA elevó su
+    dividendo trimestral 25 veces, de $0.01 a $0.25 por acción, pagadero por primera vez el 26 de junio de 2026 — un
+    salto que, aplicado al conteo actual de acciones (~24.2 mil millones), implica pasar de un compromiso de dividendos
+    de menos de $250 millones por trimestre a más de $6 mil millones por trimestre. Entre recompras y dividendos, NVIDIA
+    devolvió cerca de $20 mil millones a accionistas solo en el primer trimestre del año fiscal 2027 — el nivel más alto
+    de su historia, y la contracara exacta de la decisión de Alphabet, en el mismo semestre, de suspender sus recompras
+    por completo para financiar capex (Sección 07 e informe de GOOGL de este desk).
+  </p>
+  <h3>La guía de Q2 FY2027 excluye a China — y anticipa Vera Rubin</h3>
+  <p>
+    NVIDIA guio ingresos de $91.0 mil millones (±2%) para el segundo trimestre del año fiscal 2027, con márgenes brutos
+    GAAP y no-GAAP de 74.9% y 75.0% respectivamente (±50 puntos básicos) — y aclaró explícitamente que la guía "no asume
+    ningún ingreso de cómputo de Data Center proveniente de China", reflejo de que las restricciones de exportación de
+    EE.UU. siguen vigentes y sin resolución a la fecha de este informe. En el mismo comunicado, la compañía anunció la
+    plataforma Vera Rubin —incluyendo la CPU Vera, que NVIDIA describe como "el primer procesador diseñado
+    específicamente para IA agéntica"— y la puesta en producción de NVIDIA Dynamo 1.0, software que according a la
+    compañía multiplica hasta por 7 veces el rendimiento de inferencia agéntica y generativa sobre GPUs Blackwell.
+  </p>
+
+  <!-- 05 -->
+  <p class="secnum" id="s05">05 — Estados Financieros</p>
+  <h2>Los últimos dos trimestres reportados, línea por línea — GAAP y no-GAAP</h2>
+  <p>
+    A diferencia de Alphabet, donde este desk tuvo que reconstruir una cifra "core" propia, NVIDIA separa explícitamente
+    GAAP de no-GAAP en cada comunicado de resultados — esta sección usa ambas cifras tal como la compañía las reporta,
+    sin ajustes propios.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Q4 FY26 (ene-26)</th><th class="right-al">Q1 FY27 (abr-26)</th><th class="right-al">TTM (abr-26)</th></tr>
+    <tr><td class="label">Ingresos totales</td><td class="right-al">$68.13B</td><td class="right-al">$81.62B</td><td class="right-al">$253.49B</td></tr>
+    <tr><td class="label">Var. interanual</td><td class="right-al pos">+73%</td><td class="right-al pos">+85%</td><td class="right-al pos">+78%</td></tr>
+    <tr><td class="label">Utilidad bruta</td><td class="right-al">$51.09B</td><td class="right-al">$61.16B</td><td class="right-al">$187.95B</td></tr>
+    <tr><td class="label">Margen bruto (GAAP)</td><td class="right-al">75.0%</td><td class="right-al">74.9%</td><td class="right-al">74.2%</td></tr>
+    <tr><td class="label">Utilidad operativa</td><td class="right-al">$44.30B</td><td class="right-al">$53.54B</td><td class="right-al">$162.29B</td></tr>
+    <tr><td class="label">Margen operativo</td><td class="right-al">65.0%</td><td class="right-al">65.6%</td><td class="right-al">64.0%</td></tr>
+    <tr><td class="label">Utilidad neta (GAAP)</td><td class="right-al">$42.96B</td><td class="right-al">$58.32B</td><td class="right-al">$159.61B</td></tr>
+    <tr><td class="label">EPS diluido (GAAP)</td><td class="right-al">$1.76</td><td class="right-al">$2.39</td><td class="right-al">$6.53</td></tr>
+    <tr class="total"><td class="label">EPS diluido (no-GAAP, "core")</td><td class="right-al">$1.62</td><td class="right-al">$1.87</td><td class="right-al">$5.84</td></tr>
+    <tr><td class="label">Gasto en I+D</td><td class="right-al">$5.51B</td><td class="right-al">$6.32B</td><td class="right-al">$20.83B</td></tr>
+    <tr><td class="label">I+D como % de ingresos</td><td class="right-al">8.1%</td><td class="right-al">7.7%</td><td class="right-al">8.2%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 8-K, Exhibit 99.1 y Form 10-Q — comunicados oficiales de Q4/FY2026 (trimestre y año fiscal cerrados 25-ene-2026, publicado 25-feb-2026) y Q1 FY2027 (trimestre cerrado 26-abr-2026, publicado 20-may-2026). El EPS no-GAAP excluye, principalmente, la ganancia/pérdida en equity securities y compensación basada en acciones.</p>
+  <p>
+    La brecha entre el EPS GAAP y el no-GAAP se amplió marcadamente de Q4 FY26 ($1.76 vs. $1.62, diferencia de $0.14) a
+    Q1 FY27 ($2.39 vs. $1.87, diferencia de $0.52) — un patrón consistente con una cartera de inversiones en IA que crece
+    en tamaño y en volatilidad de marca a mercado trimestre a trimestre. La utilidad operativa, que no incluye ninguna de
+    estas ganancias, es el mejor termómetro del negocio real: creció con el margen operativo GAAP expandiéndose de
+    65.0% a 65.6% entre ambos trimestres, sostenido por el apalancamiento operativo de un negocio que ya factura
+    $81.6 mil millones por trimestre con una estructura de costos que crece más lento que el ingreso.
+  </p>
+  <div class="chartbox">
+    <canvas id="marginChart" height="260"></canvas>
+    <p class="chartcap">Margen bruto y margen operativo (GAAP) trimestral, últimos 4 trimestres reportados. Fuente: SEC EDGAR XBRL / 8-K.</p>
+  </div>
+
+  <!-- 06 -->
+  <p class="secnum" id="s06">06 — Deuda y Balance</p>
+  <h2>Sin apalancamiento y con una cartera de inversiones que ya pesa en el balance</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica (al 26 abr 2026)</th><th class="right-al">Valor</th><th class="right-al">Al 25 ene 2026</th></tr>
+    <tr><td class="label">Efectivo y equivalentes</td><td class="right-al">$13.24B</td><td class="right-al">$10.61B</td></tr>
+    <tr><td class="label">Títulos de deuda comercializables</td><td class="right-al">$37.10B</td><td class="right-al">$39.07B</td></tr>
+    <tr><td class="label">Títulos accionarios comercializables</td><td class="right-al">$30.24B</td><td class="right-al">$12.89B</td></tr>
+    <tr class="total"><td class="label">Posición total de caja e inversiones líquidas</td><td class="right-al">$80.57B</td><td class="right-al">$62.56B</td></tr>
+    <tr><td class="label">Deuda de largo plazo (estable desde 2024)</td><td class="right-al">$8.47B</td><td class="right-al">$8.47B</td></tr>
+    <tr class="total"><td class="label">Caja neta (posición neta de deuda)</td><td class="right-al pos">+$72.10B</td><td class="right-al pos">+$54.09B</td></tr>
+    <tr><td class="label">Inventario</td><td class="right-al">$25.80B</td><td class="right-al">$21.40B</td></tr>
+    <tr><td class="label">Activos totales</td><td class="right-al">$259.47B</td><td class="right-al">$206.80B</td></tr>
+    <tr><td class="label">Pasivos totales</td><td class="right-al">$64.00B</td><td class="right-al">$49.51B</td></tr>
+    <tr><td class="label">Patrimonio neto (equity)</td><td class="right-al">$195.47B</td><td class="right-al">$157.29B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 10-Q, Balance Sheets al 26-abr-2026 y 25-ene-2026; GuruFocus (cifra combinada de caja y títulos comercializables).</p>
+  <p>
+    El balance de NVIDIA no tiene, en la práctica, apalancamiento relevante: la deuda de largo plazo se mantiene
+    congelada en ~$8.47 mil millones desde 2024 —NVIDIA no ha necesitado emitir deuda nueva en ningún momento de esta
+    cobertura, a diferencia de Alphabet, que emitió más de $51 mil millones en notas senior en el primer semestre de
+    2026 (Sección 06 del informe de GOOGL)—, mientras que la posición de caja neta saltó de +$54.1 a +$72.1 mil millones
+    en un solo trimestre. El salto en "títulos accionarios comercializables" (de $12.9 a $30.2 mil millones) es la otra
+    cara de la ganancia de $15.9 mil millones reportada en el estado de resultados (Sección 04 y 05): una porción
+    relevante de las participaciones privadas de NVIDIA en startups de IA se volvió negociable o fue revaluada al alza
+    en el trimestre. El inventario también saltó 20.5% secuencial (a $25.8 mil millones) — consistente con una compañía
+    construyendo capacidad de producción por adelantado para sostener el ritmo de demanda guiado.
+  </p>
+
+  <!-- 07 -->
+  <p class="secnum" id="s07">07 — Flujo de Caja y Capital Allocation</p>
+  <h2>El capex más liviano del panel de IA — y el mayor retorno de capital</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">FY2026 (12M)</th><th class="right-al">Q1 FY27 (trimestre)</th><th class="right-al">TTM (abr-26)</th></tr>
+    <tr><td class="label">Flujo de caja operativo (OCF)</td><td class="right-al">$102.72B</td><td class="right-al">$50.34B</td><td class="right-al">$125.65B</td></tr>
+    <tr><td class="label">Capex propio (adiciones a activos productivos)</td><td class="right-al">$6.04B</td><td class="right-al">$1.76B</td><td class="right-al">$6.57B</td></tr>
+    <tr class="total"><td class="label">Flujo de caja libre (FCF)</td><td class="right-al pos">+$96.68B</td><td class="right-al pos">+$48.59B</td><td class="right-al pos">+$119.08B</td></tr>
+    <tr><td class="label">Margen de FCF sobre ingresos (TTM)</td><td class="right-al" colspan="2"></td><td class="right-al">47.0%</td></tr>
+    <tr><td class="label">Capex propio como % de ingresos (TTM)</td><td class="right-al" colspan="2"></td><td class="right-al">2.6%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 8-K y Form 10-Q, Cash Flow Statements. Capex = PaymentsToAcquireProductiveAssets (concepto XBRL usado por NVIDIA para adiciones a propiedad, planta y equipo).</p>
+  <p>
+    Un margen de FCF de 47.0% sobre los últimos doce meses no tiene comparación con ninguna otra cobertura de este desk
+    entre las mega-caps de IA: Alphabet, Microsoft y Meta destinan entre 22% y 41% de sus ingresos a capex propio; NVIDIA
+    destina 2.6%. La razón no es que NVIDIA "gestione mejor" el capital — es que su modelo de negocio es
+    estructuralmente distinto: vende el hardware que los hyperscalers usan para construir sus propios centros de datos,
+    en lugar de operar centros de datos propios. Es, en esencia, la posición de "vendedor de picos y palas" de la fiebre
+    de IA, con la ventaja de margen que eso implica y la desventaja de concentración de clientes que se documenta en la
+    Sección 10.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Año fiscal</th><th class="right-al">Capex propio</th><th class="right-al">Capex/Ingresos</th><th class="right-al">Buybacks</th><th class="right-al">Dividendos pagados</th></tr>
+    <tr><td class="label">FY2023</td><td class="right-al">$1.83B</td><td class="right-al">6.8%</td><td class="right-al">$10.04B</td><td class="right-al">$0.40B</td></tr>
+    <tr><td class="label">FY2024</td><td class="right-al">$1.07B</td><td class="right-al">1.8%</td><td class="right-al">$9.53B</td><td class="right-al">$0.40B</td></tr>
+    <tr><td class="label">FY2025</td><td class="right-al">$3.24B</td><td class="right-al">2.5%</td><td class="right-al">$33.71B</td><td class="right-al">$0.83B</td></tr>
+    <tr><td class="label">FY2026</td><td class="right-al">$6.04B</td><td class="right-al">2.8%</td><td class="right-al">$40.09B</td><td class="right-al">$0.97B</td></tr>
+    <tr class="total"><td class="label">Q1 FY27 (trimestre, dividendo aún al viejo $0.01/acción)</td><td class="right-al">$1.76B</td><td class="right-al">2.2%</td><td class="right-al">$19.31B</td><td class="right-al">$0.24B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL companyconcept API (10-K de cada año fiscal, 10-Q de Q1 FY2027).</p>
+  <p>
+    El contraste temporal es notable: FY2023 fue el año de mayor intensidad de capex relativo (6.8% de ingresos, en un
+    año de ingresos estancados) y, sin embargo, las recompras ($10.04 mil millones) ya eran sustanciales. Desde entonces,
+    el capex se mantuvo en un rango de 1.8%-2.8% pese a que los ingresos se multiplicaron casi por diez (de $27.0 a
+    $215.9 mil millones), mientras que las recompras escalaron en la misma proporción que el negocio (de ~$10 mil
+    millones a $40 mil millones anuales, y ya $19.3 mil millones en un solo trimestre de FY2027). El salto del dividendo
+    a $0.25/acción trimestral —anunciado recién en mayo de 2026— todavía no se refleja en esta tabla; el próximo
+    trimestre debería mostrar un salto de más de 20 veces en esa línea.
+  </p>
+  <div class="chartbox">
+    <canvas id="capexChart" height="280"></canvas>
+    <p class="chartcap">Capex anualizado propio de NVIDIA vs. guía/capex 2026 de sus principales clientes hyperscaler — NVIDIA no bear el costo de construir los centros de datos que sus GPUs equipan. Escala logarítmica.</p>
+  </div>
+
+  <!-- 08 -->
+  <p class="secnum" id="s08">08 — Comparables de Industria</p>
+  <h2>NVDA frente al resto de la cadena de valor de cómputo de IA</h2>
+  <p>
+    A diferencia de las coberturas de MSFT, GOOGL y META —que compiten entre sí por el mismo negocio de cloud e
+    infraestructura de IA—, los comparables más directos de NVIDIA no son sus clientes sino otros proveedores de la
+    misma cadena de valor: AMD (el competidor directo en GPUs de IA), Broadcom (ASICs custom + redes de centro de datos)
+    y TSMC (el fabricante que produce físicamente los chips de NVIDIA y de casi toda la industria).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Ticker</th><th class="right-al">P/E TTM</th><th class="right-al">P/E Forward</th></tr>
+    <tr><td class="label">AMD</td><td class="right-al">162.3x*</td><td class="right-al">68.8x*</td></tr>
+    <tr><td class="label">AVGO (Broadcom)</td><td class="right-al">60.6x</td><td class="right-al">19.4x</td></tr>
+    <tr><td class="label">TSM</td><td class="right-al">35.1x</td><td class="right-al">26.6x</td></tr>
+    <tr class="total"><td class="label">NVDA — no-GAAP ("core")</td><td class="right-al">33.4x</td><td class="right-al">n/d</td></tr>
+    <tr><td class="label">NVDA — GAAP</td><td class="right-al">29.9x**</td><td class="right-al">n/d</td></tr>
+  </table></div>
+  <p class="footnote">*El P/E de AMD está inflado por una base de ganancias todavía chica en relación a su negocio de aceleradores de IA, que recién está escalando — no lo tomamos como referencia principal del panel, aunque lo incluimos por transparencia (ver nota metodológica en Sección 13). **El P/E GAAP de NVDA luce más bajo que el "core" porque el EPS GAAP está inflado por la ganancia en equity securities (Sección 05) — es el mismo tipo de distorsión que este desk señaló en GOOGL, pero en sentido inverso (ahí el EPS GAAP era más alto y el múltiplo GAAP lucía más barato; acá pasa lo mismo). Fuente: cálculo propio sobre precio de cierre ($195.04, Yahoo Finance) y EPS TTM (Sección 05); GuruFocus, fullratio.com, financecharts.com para pares.</p>
+  <div class="chartbox">
+    <canvas id="compsChart" height="260"></canvas>
+    <p class="chartcap">P/E forward comparado — NVDA (core, no-GAAP) se ubica entre TSM y AVGO; AMD queda fuera de la escala visual por su múltiplo atípico (68.8x, ver tabla).</p>
+  </div>
+
+  <h3>AMD — el competidor directo, con una base de ganancias que recién empieza a escalar</h3>
+  <p>
+    AMD compite frente a frente con la línea Instinct MI-series contra los aceleradores Blackwell de NVIDIA. Su forward
+    P/E de 68.8x es, con diferencia, el más alto del panel — no porque el mercado le asigne más valor absoluto que a
+    NVIDIA (la capitalización de mercado de AMD es una fracción de la de NVIDIA), sino porque su negocio de aceleradores
+    de IA todavía representa una porción menor de sus ingresos totales frente al cómputo tradicional (CPUs de servidor y
+    consumo), lo que deja su base de ganancias actual chica en relación al crecimiento que el mercado le proyecta.
+  </p>
+  <h3>Broadcom (AVGO) — el que diseña los ASICs custom que compiten con la GPU de propósito general</h3>
+  <p>
+    Broadcom es, en algún sentido, el mayor riesgo competitivo estructural de NVIDIA: diseña los chips ASIC a medida
+    (TPU de Google, Trainium de Amazon, y otros) que varios hyperscalers usan como alternativa —parcial— a comprar GPUs
+    NVIDIA para determinadas cargas de trabajo de IA, además de vender el equipamiento de redes Ethernet que compite con
+    la línea Spectrum-X de NVIDIA. Cotiza al forward P/E más bajo del panel (19.4x), la lectura más "value" de los
+    cuatro comparables.
+  </p>
+  <h3>TSMC (TSM) — el fabricante que gana con cualquier resultado de la carrera de IA</h3>
+  <p>
+    TSMC fabrica físicamente los chips de NVIDIA, AMD y prácticamente toda la industria de semiconductores de punta —es
+    beneficiario directo del volumen de la industria sin la exposición al riesgo de diseño o de arquitectura que sí tiene
+    NVIDIA frente a la competencia. Cotiza a 26.6x forward, el comparable más directo en términos de perfil
+    riesgo-retorno frente al múltiplo "core" de NVIDIA (33.4x).
+  </p>
+  <p class="pull">
+    El patrón que emerge del panel: NVIDIA cotiza a un múltiplo "core" (33.4x) más alto que Broadcom y TSMC pero muy por
+    debajo del de AMD — un panel donde ningún comparable directo replica exactamente el perfil de NVIDIA (100% del
+    negocio en el centro de la carrera de IA, con el margen bruto más alto de los cuatro). La comparación más honesta,
+    en la Sección 13, corrige explícitamente por la distorsión del múltiplo de AMD en lugar de promediarla sin
+    comentario.
+  </p>
+
+  <!-- 09 -->
+  <p class="secnum" id="s09">09 — Gobierno Corporativo y Estructura Accionaria</p>
+  <h2>Sin doble clase accionaria — el control de Huang es reputacional, no estructural</h2>
+  <p>
+    A diferencia de Alphabet, NVIDIA tiene una sola clase de acciones comunes: no existe una estructura de voto
+    preferencial que blinde a Jensen Huang o a ningún otro insider de un eventual desafío de gobierno corporativo. La
+    influencia de Huang —cofundador, CEO y presidente desde 1993— es reputacional y de historial, no estructural: posee
+    aproximadamente 3.6%-3.9% del capital económico, con voto proporcional idéntico al de cualquier otro accionista.
+  </p>
+  <div class="govrow">
+    <div class="govcell"><div class="k">Ownership institucional</div><div class="v">~66.6%</div><div class="sub">Vanguard ~8.36% y BlackRock ~7.38% son los dos mayores accionistas institucionales.</div></div>
+    <div class="govcell"><div class="k">Ownership insider</div><div class="v">~4.0-4.2%</div><div class="sub">Jensen Huang posee ~3.6%-3.9% del capital (cifras varían según fecha de corte de la fuente), sin estructura de voto diferenciado.</div></div>
+    <div class="govcell"><div class="k">Directorio</div><div class="v">Nueva incorporación jul-2026</div><div class="sub">Suzanne Nora Johnson (ex Vice Chairman de Goldman Sachs) se incorporó el 13-jul-2026 al Comité de Auditoría.</div></div>
+    <div class="govcell"><div class="k">Compensación CEO (FY2026)</div><div class="v">$36.3M</div><div class="sub">Jensen Huang: $1.5M salario + $6.0M bono variable + $24.8M en acciones + $4.0M otros. -27% vs. FY2025 ($49.9M), por una menor asignación de acciones.</div></div>
+    <div class="govcell"><div class="k">Cartera de inversión en IA</div><div class="v">&gt;$40B en 2026</div><div class="sub">Liderada por una participación de $30B en OpenAI (feb-2026) tras la renegociación del compromiso original de $100B; también incluye xAI.</div></div>
+    <div class="govcell"><div class="k">CEO / Presidente</div><div class="v">Jensen Huang</div><div class="sub">Cofundador, CEO y presidente del directorio desde 1993 — sin sucesión en curso ni anunciada.</div></div>
+  </div>
+  <p class="footnote">Fuentes: WallStreetZen, TheStreet, GuruFocus (ownership); Bloomberg, CEOPayWatch, DEF 14A de NVIDIA (12-may-2026) (compensación); comunicados de NVIDIA (directorio, jul-2026).</p>
+  <p>
+    La ausencia de una estructura de doble clase es un contraste directo con Alphabet (Sección 09 del informe de GOOGL
+    de este desk), donde Larry Page y Sergey Brin retienen 52.7% del poder de voto con menos de 10% del capital
+    económico. En NVIDIA, cualquier decisión de capital allocation tan drástica como la elevación de 25 veces del
+    dividendo o la nueva autorización de $80 mil millones en recompras requiere, en los hechos, el respaldo de un
+    directorio y una base accionaria mayoritariamente institucional — no la voluntad unilateral de un bloque fundador.
+  </p>
+
+  <!-- 10 -->
+  <p class="secnum" id="s10">10 — Registro de Riesgos</p>
+  <h2>Qué podría cambiar esta lectura</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Riesgo</th><th>Descripción</th><th class="right-al">Severidad</th></tr>
+    <tr><td class="label">Concentración de clientes</td><td class="label">La mayoría del crecimiento de Data Center depende de un puñado de hyperscalers (Microsoft, Alphabet, Meta, Amazon) que ya muestran señales de tensión de flujo de caja por su propio capex — una moderación del gasto de IA de cualquiera de ellos golpearía a NVIDIA de forma directa y concentrada.</td><td class="right-al">Alta</td></tr>
+    <tr><td class="label">Financiamiento circular</td><td class="label">Más de $40B en apuestas de capital de NVIDIA sobre startups de IA en 2026 (lideradas por el stake de $30B en OpenAI) — parte de ese capital vuelve a NVIDIA como ingreso por chips, generando ganancias contables ($15.9B en Q1 FY27) que no reflejan demanda 100% orgánica.</td><td class="right-al">Alta (estructural)</td></tr>
+    <tr><td class="label">Restricciones de exportación a China</td><td class="label">La guía de Q2 FY2027 excluye explícitamente todo ingreso de cómputo de Data Center proveniente de China — un mercado grande que sigue fuera del negocio sin resolución a la vista.</td><td class="right-al">Media-Alta</td></tr>
+    <tr><td class="label">Competencia de ASICs custom y AMD</td><td class="label">Broadcom (TPU, Trainium) y AMD (Instinct MI-series) buscan capturar parte del mercado de aceleradores de IA; el margen bruto de NVDA (74-75%) podría comprimirse si la competencia gana tracción en cargas de trabajo específicas.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Reducción de granularidad de reporte</td><td class="label">El cambio de 5 a 2 segmentos (Sección 03) reduce la visibilidad del inversor sobre gaming, pro-visualización y automotriz justo cuando esos negocios combinados ya son menos de 8% del total.</td><td class="right-al">Baja-Media</td></tr>
+    <tr><td class="label">Ciclicidad histórica</td><td class="label">NVDA ya sufrió una contracción de ingresos (FY2020) y un estancamiento con caída de OCF de $9.1B a $5.6B (FY2023) por corrección de inventario en gaming — el negocio no es inmune a ciclos de demanda/inventario.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Balance y apalancamiento</td><td class="label">Caja neta de +$72.1B y deuda de largo plazo congelada en $8.47B desde 2024 — el balance no es, al cierre de Q1 FY2027, un riesgo de solvencia.</td><td class="right-al">Baja</td></tr>
+  </table></div>
+
+  <!-- 11 -->
+  <p class="secnum" id="s11">11 — Catalizadores</p>
+  <h2>Agenda de eventos relevantes</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Fecha</th><th>Evento</th></tr>
+    <tr><td class="label">20 May 2026</td><td class="label">Resultados Q1 FY2027 — Data Center +92%, ganancia de $15.9B por equity securities, dividendo elevado 25x, nueva autorización de $80B en recompras. Punto de partida de este informe.</td></tr>
+    <tr><td class="label">18 May 2026</td><td class="label">Directorio aprueba autorización adicional de $80B para recompra de acciones.</td></tr>
+    <tr><td class="label">26 Jun 2026</td><td class="label">Primer pago del dividendo trimestral elevado a $0.25/acción.</td></tr>
+    <tr><td class="label">13 Jul 2026</td><td class="label">Incorporación de Suzanne Nora Johnson (ex Goldman Sachs) al directorio y al Comité de Auditoría.</td></tr>
+    <tr><td class="label">Ago 2026 (estimado)</td><td class="label">Earnings Q2 FY2027 — primera lectura de si se cumple la guía de $91.0B y si el margen bruto se sostiene en el rango 74.9%-75.0% guiado.</td></tr>
+    <tr><td class="label">Sin fecha fija</td><td class="label">Resolución (o no) de las restricciones de exportación de cómputo de Data Center a China.</td></tr>
+    <tr><td class="label">En curso</td><td class="label">Evolución trimestre a trimestre de la cartera de inversión en IA (OpenAI, xAI y otras) y su marca a mercado en el estado de resultados.</td></tr>
+  </table></div>
+
+  <!-- 12 -->
+  <p class="secnum" id="s12">12 — Modelo Financiero Proyectado y Momentum de Estimados</p>
+  <h2>Un beat genuino y limpio — sin la distorsión contable de otras coberturas de este desk</h2>
+  <p>
+    A diferencia de GOOGL, donde el "beat" de EPS GAAP resultó ser casi enteramente una ganancia no operativa, el
+    resultado de NVIDIA de Q1 FY2027 es un beat genuino sobre la base comparable correcta: el consenso pre-reporte
+    esperaba ingresos de $78.8 mil millones y un EPS no-GAAP de $1.76; la compañía entregó $81.6 mil millones (+3.6%
+    sobre consenso) y un EPS no-GAAP de $1.87 (+6.3% sobre consenso) — la 22ª sorpresa positiva de utilidades en los
+    últimos 24 trimestres, según cobertura de mercado.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica — Q1 FY2027</th><th class="right-al">Consenso pre-reporte</th><th class="right-al">Real (reportado)</th><th class="right-al">Sorpresa</th></tr>
+    <tr><td class="label">Ingresos</td><td class="right-al">$78.80B</td><td class="right-al">$81.62B</td><td class="right-al pos">+3.6%</td></tr>
+    <tr><td class="label">EPS diluido no-GAAP ("core")</td><td class="right-al">$1.76</td><td class="right-al">$1.87</td><td class="right-al pos">+6.3%</td></tr>
+  </table></div>
+  <p class="footnote">Consenso pre-reporte: cobertura de mercado agregada (Intellectia, S&amp;P Global), may-2026. Real: SEC EDGAR Form 8-K, Exhibit 99.1, publicado 20-may-2026.</p>
+  <div class="chartbox">
+    <canvas id="revisionChart" height="220"></canvas>
+    <p class="chartcap">EPS diluido no-GAAP: consenso pre-reporte vs. resultado real de Q1 FY2027. Fuente: consenso agregado pre-reporte y 8-K oficial.</p>
+  </div>
+  <p>
+    El consenso de EPS FY2027 (año fiscal completo, hasta ene-2027) es de $8.99 sobre ingresos de $393.6 mil millones
+    (stockanalysis.com, post-reporte) — un salto de 82.5% en ingresos sobre los $215.9 mil millones de FY2026 ya
+    reportados, consistente con la guía de $91.0 mil millones para el segundo trimestre y con el ritmo de aceleración
+    observado en los últimos cuatro trimestres. No existe, al momento de este informe, un consenso agregado público de
+    EPS o ingresos para FY2028 — un límite reconocido de este informe (Sección 14), que remitimos a los supuestos
+    explícitos del DCF (Sección 13) en lugar de fabricar una cifra de consenso inexistente.
+  </p>
+
+  <!-- 13 — VALUACIÓN, AL FINAL -->
+  <p class="secnum" id="s13">13 — Valuación: Cuatro Métodos y el Fair Value</p>
+  <h2>Cuánto vale la acción — y por qué, esta vez, los cuatro métodos no coinciden</h2>
+  <p>
+    Llegamos a la valuación después de recorrer el negocio completo a propósito. Calculamos el valor razonable de la
+    acción con cuatro enfoques independientes entre sí — flujo de caja descontado, múltiplos de comparables, reversión
+    a la media histórica propia, y el consenso de analistas de Wall Street. A diferencia de las coberturas anteriores de
+    este desk, en NVIDIA los tres métodos numéricos no convergen: el DCF ubica el fair value casi exactamente en el
+    precio de mercado, mientras que comparables y reversión histórica —ambos apoyados en multiplicadores fijados durante
+    períodos en que las bases de ganancias de NVIDIA (y de su comparable AMD) eran una fracción de las actuales— sugieren
+    upside sustancial. Reportamos los tres números tal como salen del cálculo, y explicamos por qué este desk no les
+    asigna el mismo peso.
+  </p>
+
+  <h3>Método 1 — Flujo de caja descontado (DCF), tres escenarios</h3>
+  <p>
+    Construimos un modelo de flujo de caja descontado a dos etapas (cinco años explícitos de proyección más valor
+    terminal por crecimiento perpetuo), partiendo de los ingresos de los últimos doce meses ($253.49 mil millones) y de
+    la posición de caja neta y el conteo de acciones diluidas reportados al cierre del trimestre (Sección 06). A
+    diferencia de MSFT, GOOGL y META, el capex de NVIDIA es una fracción menor de sus ingresos en los tres escenarios —
+    la variable que domina el modelo es, en cambio, el ritmo al que se desacelera el crecimiento de ingresos y cuánto se
+    comprime el margen de flujo de caja operativo frente al pico actual. El WACC base se construyó con una tasa libre de
+    riesgo ancla en el rendimiento vigente del Treasury a 10 años más un premio de riesgo accionario de 5.0%, con un beta
+    más alto que el resto de esta cobertura (~1.6-1.8) — consistente con la mayor volatilidad histórica de NVIDIA frente
+    al resto del universo de mega-caps.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Supuesto</th><th class="right-al">Bear</th><th class="right-al">Base</th><th class="right-al">Bull</th></tr>
+    <tr><td class="label">Crecimiento de ingresos (año 1 → año 5)</td><td class="right-al">35% → 8%</td><td class="right-al">55% → 15%</td><td class="right-al">65% → 20%</td></tr>
+    <tr><td class="label">Margen de OCF (año 1 → año 5)</td><td class="right-al">44% → 38%</td><td class="right-al">50% → 46%</td><td class="right-al">54% → 52%</td></tr>
+    <tr><td class="label">Capex propio / Ingresos (año 1 → año 5)</td><td class="right-al">3.0% → 5.0%</td><td class="right-al">3.0% → 4.0%</td><td class="right-al">2.5% → 3.5%</td></tr>
+    <tr><td class="label">WACC</td><td class="right-al">11.0%</td><td class="right-al">10.0%</td><td class="right-al">9.0%</td></tr>
+    <tr><td class="label">Crecimiento terminal</td><td class="right-al">2.5%</td><td class="right-al">3.0%</td><td class="right-al">3.5%</td></tr>
+    <tr><td class="label">FCF año 1 (OCF − Capex)</td><td class="right-al pos">+$140.3B</td><td class="right-al pos">+$184.7B</td><td class="right-al pos">+$215.4B</td></tr>
+    <tr><td class="label">% del EV desde valor terminal</td><td class="right-al">68.9%</td><td class="right-al">76.8%</td><td class="right-al">82.7%</td></tr>
+    <tr class="total"><td class="label">Fair value por acción</td><td class="right-al">$85.12</td><td class="right-al">$192.89</td><td class="right-al">$355.58</td></tr>
+  </table></div>
+  <p>
+    A diferencia de MSFT, GOOGL y META, acá el flujo de caja libre del año 1 es <strong>positivo en los tres
+    escenarios</strong> —incluso en el Bear— porque el capex propio de NVIDIA es demasiado chico para comprometer el
+    flujo de caja bajo ningún supuesto razonable. La variable que realmente mueve el resultado es la velocidad de
+    desaceleración del crecimiento: el escenario Bear asume que la demanda de Data Center se modera hacia tasas de un
+    dígito alto hacia el año 5 (reflejando el riesgo de concentración de clientes y competencia de la Sección 10); el
+    Base asume una desaceleración gradual desde el ritmo actual (+85% interanual) hacia ~15% en el año 5, todavía por
+    encima del crecimiento nominal de la economía; el Bull asume que la demanda de infraestructura de IA sostiene tasas
+    de expansión más altas por más tiempo. El resultado más notable es que el <strong>caso Base ($192.89) prácticamente
+    coincide con el precio de mercado ($195.04)</strong> — a diferencia de todas las demás coberturas de este desk, donde
+    el DCF Base se aparta del mercado en una dirección u otra, acá el mercado parece estar pagando, en promedio, un
+    precio consistente con un escenario de desaceleración razonable y no con hipercrecimiento sostenido a perpetuidad.
+  </p>
+  <h3>Sensibilidad del caso Base: WACC × crecimiento terminal</h3>
+  <p>
+    Dado que 76.8% del valor de empresa del caso Base proviene del valor terminal, mostramos cómo se mueve el fair value
+    únicamente variando WACC y crecimiento terminal, con el resto de los inputs fijos. La celda marcada es el caso Base
+    reportado arriba ($192.89, WACC 10.0%, g 3.0%).
+  </p>
+  <div class="table-scroll"><table class="sens-table">
+    <tr><th>WACC \ g terminal</th><th class="right-al">2.0%</th><th class="right-al">2.5%</th><th class="right-al">3.0%</th><th class="right-al">3.5%</th><th class="right-al">4.0%</th></tr>
+    <tr><td class="axis">9.0%</td><td class="right-al">$199.52</td><td class="right-al">$211.95</td><td class="right-al">$226.44</td><td class="right-al">$243.58</td><td class="right-al">$264.14</td></tr>
+    <tr><td class="axis">9.5%</td><td class="right-al">$185.59</td><td class="right-al">$196.17</td><td class="right-al">$208.37</td><td class="right-al">$222.60</td><td class="right-al">$239.43</td></tr>
+    <tr><td class="axis">10.0%</td><td class="right-al">$173.42</td><td class="right-al">$182.50</td><td class="right-al base-cell">$192.89</td><td class="right-al">$204.87</td><td class="right-al">$218.85</td></tr>
+    <tr><td class="axis">10.5%</td><td class="right-al">$162.69</td><td class="right-al">$170.56</td><td class="right-al">$179.48</td><td class="right-al">$189.68</td><td class="right-al">$201.45</td></tr>
+    <tr><td class="axis">11.0%</td><td class="right-al">$153.16</td><td class="right-al">$160.03</td><td class="right-al">$167.77</td><td class="right-al">$176.53</td><td class="right-al">$186.54</td></tr>
+  </table></div>
+  <p class="footnote">Grilla propia, recalculando el modelo de dos etapas del caso Base (mismo crecimiento explícito, margen de OCF y capex/ingresos por año declarados arriba) para cada combinación WACC/g. La celda base ($192.89) corresponde a WACC 10.0% y g 3.0%, y reproduce 76.8% de EV desde terminal.</p>
+  <p>
+    El precio de mercado ($195.04) cae casi exactamente dentro de la grilla en la celda base — una de las lecturas más
+    "bien comportadas" de esta cobertura: no hace falta forzar supuestos optimistas ni pesimistas para que el DCF
+    reproduzca el precio actual, algo que no ocurrió en ninguno de los otros informes de este desk.
+  </p>
+
+  <h3>Método 2 — Múltiplos de comparables</h3>
+  <p>
+    Aplicamos el P/E forward de los tres comparables de la Sección 08 sobre el consenso de EPS FY2027 de NVIDIA ($8.99).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Múltiplo P/E forward aplicado (sobre EPS consenso $8.99)</th><th class="right-al">Precio implícito</th></tr>
+    <tr><td class="label">19.4x (piso del panel, AVGO)</td><td class="right-al">$174.67</td></tr>
+    <tr><td class="label">26.6x (TSM)</td><td class="right-al">$239.13</td></tr>
+    <tr class="total"><td class="label">38.3x (promedio de los 3 comparables, incl. AMD)</td><td class="right-al">$344.09</td></tr>
+    <tr><td class="label">68.8x (techo del panel, AMD — atípico)</td><td class="right-al">$618.16</td></tr>
+  </table></div>
+  <p>
+    Tomamos $344.09 (el promedio de los tres comparables) como el resultado formal de este método, siguiendo la misma
+    metodología aplicada en el resto de esta cobertura. Pero señalamos explícitamente que ese promedio está dominado por
+    el múltiplo de AMD (68.8x, sobre una base de ganancias todavía chica para su negocio de aceleradores de IA) — sin
+    AMD, el promedio de AVGO y TSM (23.0x) daría un precio implícito de apenas $206.77, mucho más cercano al DCF Base.
+    No excluimos a AMD del cálculo formal porque sería cherry-picking, pero el lector debería ponderar el resultado de
+    este método con ese matiz en mente.
+  </p>
+
+  <h3>Método 3 — Reversión a la media histórica propia</h3>
+  <p>
+    Preguntamos a qué múltiplo cotizó la propia acción en promedio durante la última década, y qué precio resultaría de
+    aplicar ese múltiplo histórico al EPS TTM no-GAAP ($5.84, Sección 05). El P/E promedio de NVDA de los últimos 5 años
+    es de 67.33x; el de los últimos 10 años, 65.93x — ambos muy por encima del P/E TTM actual (29.9x GAAP / 33.4x
+    core, Sección 08).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Referencia histórica</th><th class="right-al">Múltiplo</th><th class="right-al">Precio implícito (sobre EPS core TTM $5.84)</th></tr>
+    <tr><td class="label">Promedio 10 años</td><td class="right-al">65.93x</td><td class="right-al">$385.03</td></tr>
+    <tr class="total"><td class="label">Promedio 5 años</td><td class="right-al">67.33x</td><td class="right-al">$393.20</td></tr>
+  </table></div>
+  <p class="footnote">P/E históricos: fullratio.com, financecharts.com (P/E trimestral histórico máximo de 138.75x en abr-2023, sobre un EPS de apenas $0.17 esa base trimestral). EPS core: Sección 05 de este informe.</p>
+  <p>
+    Tomamos el promedio de los dos (~$389.12) como el resultado formal de este método — pero esta es, de las cuatro
+    metodologías, la que este desk trata con mayor escepticismo. El promedio de 5-10 años incluye trimestres en que
+    NVIDIA facturaba una fracción de sus ingresos actuales (el máximo histórico de P/E, 138.75x, se registró en
+    abr-2023 sobre un EPS trimestral de apenas $0.17) — un múltiplo asignado a una acción especulativa de alto
+    crecimiento desde una base minúscula no es directamente comparable al múltiplo razonable para una compañía que, al
+    cierre de este informe, factura más de $253 mil millones anuales con el margen operativo más alto de su historia. Reportamos el número
+    porque el modelo dice lo que dice, pero no lo tomamos como ancla de valor.
+  </p>
+
+  <h3>Método 4 — Consenso de Wall Street</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Analistas cubriendo NVDA</td><td class="right-al">61</td></tr>
+    <tr><td class="label">Calificación consenso</td><td class="right-al">Strong Buy</td></tr>
+    <tr class="total"><td class="label">Precio objetivo promedio (12 meses)</td><td class="right-al">$302.83</td></tr>
+    <tr><td class="label">Rango de precios objetivo</td><td class="right-al">$218.00 – $500.00</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: S&amp;P Global Market Intelligence, consenso jul-2026; rango de precios objetivo vía MarketBeat, jul-2026.</p>
+  <p>
+    El consenso Wall Street (+55.3% sobre el precio de mercado) es notablemente cercano al blend mecánico de este
+    informe (+58.3%) — una coincidencia que no interpretamos como validación cruzada independiente, dado que no podemos
+    verificar cuánto del optimismo de los 61 analistas responde a la misma lógica de comparables/reversión que este
+    desk trata con cautela, versus un análisis de flujo de caja propio de cada casa de research.
+  </p>
+
+  <h3>Síntesis: los cuatro métodos, uno al lado del otro</h3>
+  <div class="chartbox">
+    <canvas id="footballChart" height="260"></canvas>
+    <p class="chartcap">"Football field" de valuación — el rango de Comparables excluye el extremo de AMD (68.8x, ver Método 2) por claridad visual; el valor completo se detalla en la tabla de síntesis. La línea roja marca el precio de mercado ($195.04); la línea azul marca el blend propio ($308.70).</p>
+  </div>
+  <div class="table-scroll"><table>
+    <tr><th>Método</th><th class="right-al">Fair value</th></tr>
+    <tr><td class="label">DCF — Bear</td><td class="right-al">$85.12</td></tr>
+    <tr><td class="label">DCF — Base</td><td class="right-al">$192.89</td></tr>
+    <tr><td class="label">DCF — Bull</td><td class="right-al">$355.58</td></tr>
+    <tr><td class="label">Comparables (P/E forward promedio del panel, incl. AMD)</td><td class="right-al">$344.09</td></tr>
+    <tr><td class="label">Reversión histórica (P/E promedio 5-10 años propio)</td><td class="right-al">$389.12</td></tr>
+    <tr class="total"><td class="label">Promedio simple — DCF Base, Comparables, Reversión histórica</td><td class="right-al">$308.70</td></tr>
+    <tr><td class="label">Consenso Wall Street (referencia externa, no promediada)</td><td class="right-al">$302.83</td></tr>
+  </table></div>
+  <p>
+    El promedio simple de las tres metodologías numéricas propias da <strong>$308.70 por acción</strong> — 58.3% por
+    encima del precio de mercado de $195.04. Antes de leer esa cifra como una señal de compra, vale repetir la lectura
+    completa: el DCF —la metodología más rigurosa de las cuatro, y la única que modela explícitamente los flujos de caja
+    futuros del negocio— ubica el fair value casi exactamente en el precio de mercado ($192.89 vs. $195.04, una brecha de
+    apenas 1.1%). Los otros dos componentes del blend (comparables y reversión histórica) están apoyados en multiplicadores
+    —el forward P/E de AMD y el propio P/E histórico de NVDA— fijados en períodos en que las bases de ganancias
+    correspondientes eran una fracción de las actuales, y por eso este desk no les asigna el mismo peso que al DCF pese a
+    incluirlos en el cálculo formal del blend. Nuestra lectura: el precio de mercado vigente ya es consistente con
+    un escenario de desaceleración razonable del crecimiento de NVIDIA — el upside que sugieren comparables y reversión
+    histórica depende de que esos múltiplos elevados sigan siendo apropiados para una compañía de esta escala, algo que
+    este informe no da por sentado.
+  </p>
+
+  <!-- 14 -->
+  <p class="secnum" id="s14">14 — Limitaciones del Modelo</p>
+  <h2>Qué asume este análisis, y dónde puede fallar</h2>
+  <div class="watermark-block">
+    <p style="margin-bottom:0;">
+      Esta es la primera cobertura de este desk donde las cuatro metodologías de valuación no convergen entre sí, y el
+      lector debe ponderar esa divergencia con cuidado en lugar de promediarla mecánicamente sin más. El Método 2
+      (comparables) está dominado por el múltiplo de AMD, fijado sobre una base de ganancias que este desk considera no
+      comparable a la escala actual de NVIDIA — excluir a AMD del promedio arrojaría un resultado sustancialmente más
+      bajo (~$206.77) y mucho más cercano al DCF Base. El Método 3 (reversión histórica) usa un P/E promedio de 5-10
+      años que incluye trimestres en que NVIDIA facturaba una fracción de sus ingresos actuales sobre una base
+      accionaria especulativa de alto crecimiento — un múltiplo de esa naturaleza no necesariamente es aplicable a una
+      compañía que, a la fecha de este informe, genera $253 mil millones de ingresos anuales con el margen operativo más alto de su historia. El
+      68.9%-82.7% del valor de empresa del DCF proviene del valor terminal en los tres escenarios — el modelo depende de
+      que el crecimiento se desacelere tal como se supone en los años 2-5, no como se garantiza. La ganancia de $15.9 mil
+      millones en equity securities reportada este trimestre —y su contrapartida en el salto de "títulos accionarios
+      comercializables" del balance (Sección 06)— es, por definición de la propia compañía, una partida no operativa
+      sujeta a alta volatilidad futura: podría revertirse tan rápido como se generó si las valuaciones privadas de
+      OpenAI, xAI u otras posiciones se corrigen a la baja. Finalmente, no existe consenso agregado público de EPS o
+      ingresos para el año fiscal 2028 al momento de este informe — el "momentum" que reportamos en la Sección 12 se
+      basa en la comparación de un solo trimestre contra su consenso pre-reporte, no en una serie histórica de
+      revisiones de 90 días.
+    </p>
+  </div>
+
+  <div class="disclosure">
+    Documento elaborado a partir de fuentes públicas: SEC EDGAR (Form 8-K Exhibit 99.1, 10-Q, 10-K, XBRL companyconcept
+    API), comunicados de resultados y newsroom de NVIDIA, Alphabet, Microsoft, AMD, Broadcom y Taiwan Semiconductor
+    Manufacturing, S&amp;P Global Market Intelligence, stockanalysis.com, fullratio.com, financecharts.com, GuruFocus,
+    WallStreetZen, TheStreet, MarketBeat, CNBC, Fortune, Tom's Hardware, TweakTown, Benzinga y CEOPayWatch. Cifras
+    fundamentales con fecha de corte en el Form 8-K de NVIDIA correspondiente al trimestre cerrado el 26 de abril de
+    2026, publicado el 20 de mayo de 2026; desarrollos corporativos y de mercado con fecha de corte de la misma fecha o
+    posterior donde se indica explícitamente.
+    <br><br>
+    <strong>Sobre el autor y la naturaleza de este documento:</strong> este informe es un análisis independiente
+    elaborado por Manfredi Investment Research &amp; Markets con fines exclusivamente informativos y educativos. El
+    autor no es un asesor de inversión registrado, no está matriculado ante la Comisión Nacional de Valores (CNV), la
+    SEC, ni ningún otro organismo regulador equivalente, y no mantiene una relación de asesoramiento financiero
+    personalizado con el lector. Ninguna cifra de este documento —incluido el "fair value" de portada, los escenarios de
+    DCF, ni la síntesis de la Sección 13— constituye una recomendación de compra, venta o mantenimiento para ningún
+    lector en particular, ni considera la situación financiera, los objetivos o el perfil de riesgo individual de quien
+    lo lee. Los escenarios de DCF son estimaciones propias sujetas a los supuestos declarados explícitamente en la
+    Sección 13, y no representan guidance oficial de ninguna de las compañías mencionadas salvo donde se cita de forma
+    directa y atribuida. Verificar cifras contra el 10-Q/10-K/8-K más reciente de cada compañía, y consultar a un asesor
+    financiero matriculado, antes de tomar cualquier decisión de inversión.
+  </div>
+
+</div>
+
+<script>
+/* ---- Motor de gráficos propio, sin dependencias externas (Canvas 2D) ---- */
+(function(){
+  var PALETTE = {ink:'#161a20', muted:'#69707c', line:'#e3e9f0', navy:'#0b1f3a', navy2:'#15335c', blue:'#2f5f9e', blueLight:'#5f8fc7', pale:'#c7d9ec', red:'#a8291f', gold:'#c99a3c'};
+
+  function setupCanvas(canvas, cssHeight){
+    var dpr = window.devicePixelRatio || 1;
+    var cssWidth = canvas.parentElement.clientWidth - 44; // padding del chartbox
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = Math.max(1, Math.round(cssWidth * dpr));
+    canvas.height = Math.max(1, Math.round(cssHeight * dpr));
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return {ctx: ctx, w: cssWidth, h: cssHeight};
+  }
+
+  function drawVBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+    ctx.font = '11px "IBM Plex Mono", monospace';
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var log = !!opts.log;
+    var padL = 46, padR = 10, padT = 16, padB = 46;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var maxV = Math.max.apply(null, values);
+    var minV = log ? Math.min.apply(null, values) : 0;
+    function scaleY(v){
+      if(log){
+        var lv = Math.log10(Math.max(v,0.01)), lmax = Math.log10(maxV*1.15), lmin = Math.log10(Math.max(minV*0.5,1));
+        return padT + plotH - ((lv - lmin) / (lmax - lmin)) * plotH;
+      }
+      return padT + plotH - (v / (maxV*1.15)) * plotH;
+    }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    var gridSteps = 4;
+    for(var g=0; g<=gridSteps; g++){
+      var yy = padT + (plotH/gridSteps)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    var n = values.length;
+    var slot = plotW / n;
+    var barW = Math.min(slot * 0.56, 64);
+
+    for(var i=0;i<n;i++){
+      var cx = padL + slot*i + slot/2;
+      var y0 = scaleY(values[i]);
+      var yBase = padT + plotH;
+      ctx.fillStyle = colors[i % colors.length];
+      var bw = barW;
+      ctx.fillRect(cx - bw/2, y0, bw, yBase - y0);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'center';
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, cx, y0 - 6);
+
+      ctx.fillStyle = PALETTE.muted;
+      ctx.font = '10px "Inter", sans-serif';
+      wrapLabel(ctx, labels[i], cx, yBase + 16, slot + 6);
+    }
+  }
+
+  function wrapLabel(ctx, text, cx, y, maxW){
+    var words = String(text).split(' ');
+    var lines = [];
+    var cur = '';
+    for(var i=0;i<words.length;i++){
+      var test = cur ? cur + ' ' + words[i] : words[i];
+      if(ctx.measureText(test).width > maxW && cur){ lines.push(cur); cur = words[i]; }
+      else cur = test;
+    }
+    if(cur) lines.push(cur);
+    lines = lines.slice(0,2);
+    ctx.textAlign = 'center';
+    for(var j=0;j<lines.length;j++){
+      ctx.fillText(lines[j], cx, y + j*11);
+    }
+  }
+
+  function drawHBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var padL = 128, padR = 54, padT = 10, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var maxV = Math.max.apply(null, values) * 1.12;
+
+    var n = values.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.5, 30);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, padT+plotH); ctx.stroke();
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = padL;
+      var w = (values[i]/maxV) * plotW;
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, w, barH);
+
+      ctx.fillStyle = PALETTE.text || PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(labels[i], padL - 10, cy + 4);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'left';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, x0 + w + 8, cy + 4);
+    }
+  }
+
+  function drawRangeBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, ranges = opts.ranges, colors = opts.colors, refLines = opts.refLines || [];
+    var padL = 168, padR = 16, padT = 26, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    ranges.forEach(function(r){ allVals.push(r[0], r[1]); });
+    refLines.forEach(function(r){ allVals.push(r.value); });
+    var domMin = Math.min.apply(null, allVals) * 0.94;
+    var domMax = Math.max.apply(null, allVals) * 1.04;
+    function scaleX(v){ return padL + ((v - domMin)/(domMax - domMin)) * plotW; }
+
+    var n = ranges.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.42, 22);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = scaleX(ranges[i][0]), x1 = scaleX(ranges[i][1]);
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, Math.max(x1-x0,2), barH);
+      ctx.beginPath(); ctx.arc(x0, cy, barH/2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x1, cy, barH/2, 0, Math.PI*2); ctx.fill();
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      wrapLabel(ctx, labels[i], padL - 12, cy - 4, padL - 20);
+
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      var vf = opts.valueFmt || function(v){ return '$'+v.toFixed(0); };
+      ctx.textAlign = 'right';
+      ctx.fillText(vf(ranges[i][0]), x0 - 8, cy + 4);
+      ctx.textAlign = 'left';
+      ctx.fillText(vf(ranges[i][1]), x1 + 8, cy + 4);
+    }
+
+    refLines.forEach(function(r){
+      var x = scaleX(r.value);
+      ctx.strokeStyle = r.color; ctx.lineWidth = 1.6; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x, padT-6); ctx.lineTo(x, padT+plotH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = r.color;
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(r.label, x, padT - 12);
+    });
+  }
+
+  function drawLines(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, series = opts.series; // [{name,color,values}]
+    var padL = 40, padR = 14, padT = 16, padB = 54;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    series.forEach(function(s){ allVals = allVals.concat(s.values); });
+    var maxV = Math.max.apply(null, allVals) * 1.08;
+    var minV = Math.min.apply(null, allVals) * 0.92;
+
+    function scaleX(i){ return padL + (plotW/(labels.length-1)) * i; }
+    function scaleY(v){ return padT + plotH - ((v - minV)/(maxV-minV)) * plotH; }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var yy = padT + (plotH/4)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    series.forEach(function(s){
+      ctx.strokeStyle = s.color; ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        ctx.fillStyle = s.color;
+        ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
+      });
+    });
+
+    ctx.fillStyle = PALETTE.muted;
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    labels.forEach(function(l,i){ ctx.fillText(l, scaleX(i), padT+plotH+16); });
+
+    var lx = padL, ly = H - 12;
+    ctx.font = '11px "Inter", sans-serif';
+    series.forEach(function(s){
+      ctx.fillStyle = s.color;
+      ctx.fillRect(lx, ly-8, 10, 10);
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'left';
+      ctx.fillText(s.name, lx+14, ly);
+      lx += 14 + ctx.measureText(s.name).width + 22;
+    });
+  }
+
+  function renderAll(){
+    drawVBars(document.getElementById('historyChart'), {
+      labels:['FY2017','FY2018','FY2019','FY2020','FY2021','FY2022','FY2023','FY2024','FY2025','FY2026','TTM abr-26'],
+      values:[6.91,9.71,11.72,10.92,16.68,26.91,26.97,60.92,130.50,215.94,253.49],
+      colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.blue,PALETTE.navy2,PALETTE.navy2,PALETTE.navy],
+      log:true,
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawHBars(document.getElementById('segmentChart'), {
+      labels:['Data Center — Compute','Data Center — Networking','Edge Computing'],
+      values:[60.4,14.8,6.4],
+      colors:[PALETTE.navy,PALETTE.blue,PALETTE.pale],
+      valueFmt:function(v){ return '$'+v.toFixed(1)+'B'; }
+    });
+
+    drawLines(document.getElementById('geoChart'), {
+      labels:['Q2 FY26','Q3 FY26','Q4 FY26','Q1 FY27'],
+      series:[
+        {name:'Ingresos totales', color:PALETTE.navy, values:[46.74,57.01,68.13,81.62]}
+      ]
+    });
+
+    drawLines(document.getElementById('marginChart'), {
+      labels:['Q2 FY26','Q3 FY26','Q4 FY26','Q1 FY27'],
+      series:[
+        {name:'Margen bruto', color:PALETTE.navy, values:[72.4,73.4,75.0,74.9]},
+        {name:'Margen operativo', color:PALETTE.blueLight, values:[60.9,63.2,65.0,65.6]}
+      ]
+    });
+
+    drawVBars(document.getElementById('capexChart'), {
+      labels:['NVDA (propio)','META (cliente, piso)','GOOGL (cliente, piso)','AMZN (cliente, piso)','MSFT (cliente, piso)'],
+      values:[7,125,195,200,255],
+      colors:[PALETTE.red,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight],
+      log:true,
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawHBars(document.getElementById('compsChart'), {
+      labels:['TSM','NVDA (core)*','AVGO'],
+      values:[26.6,33.4,19.4],
+      colors:[PALETTE.blueLight,PALETTE.red,PALETTE.blueLight],
+      valueFmt:function(v){ return v.toFixed(1)+'x'; }
+    });
+
+    drawRangeBars(document.getElementById('footballChart'), {
+      labels:['DCF (Bear → Bull)','Comparables (AVGO → TSM, excl. AMD)','Reversión histórica (10y → 5y)','Consenso Wall Street (rango objetivo)'],
+      ranges:[[85.12,355.58],[174.67,239.13],[385.03,393.20],[218.00,500.00]],
+      colors:[PALETTE.blue,PALETTE.navy2,PALETTE.blueLight,PALETTE.gold],
+      refLines:[{value:195.04,color:PALETTE.red,label:'Mercado $195'},{value:308.70,color:PALETTE.navy,label:'Blend $309'}],
+      valueFmt:function(v){ return '$'+v.toFixed(0); }
+    });
+
+    drawHBars(document.getElementById('revisionChart'), {
+      labels:['EPS no-GAAP consenso pre-reporte','EPS no-GAAP real Q1 FY27'],
+      values:[1.76,1.87],
+      colors:[PALETTE.pale,PALETTE.blue],
+      valueFmt:function(v){ return '$'+v.toFixed(2); }
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', renderAll);
+  } else {
+    renderAll();
+  }
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderAll, 150);
+  });
+})();
+</script>
+</body>
+</html>
