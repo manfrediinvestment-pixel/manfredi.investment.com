@@ -233,6 +233,26 @@
       font-family: 'IBM Plex Sans', sans-serif;
     }
     .nav-login-btn:hover { background: var(--primary); color: var(--white); border-color: var(--primary); }
+    .nav-notify-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--primary);
+      color: var(--gold-light);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--primary);
+      border-radius: 20px;
+      padding: 9px 16px 9px 12px;
+      cursor: pointer;
+      margin-left: 10px;
+      box-shadow: 0 4px 12px -4px rgba(10,15,30,.4);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .nav-notify-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -4px rgba(10,15,30,.5); }
+    .nav-notify-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .nav-notify-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 2px var(--primary); }
 
     /* âââ HERO ââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .hero {
@@ -2479,13 +2499,111 @@
     }
 
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') hideLoginOverlay();
+      if (e.key === 'Escape') { hideLoginOverlay(); hideNotifyOverlay(true); }
     });
 
     window.showLoginOverlay = showLoginOverlay;
     window.hideLoginOverlay = hideLoginOverlay;
+
+    // ── Notify Overlay: avisos de informes nuevos / cambios / novedades ──────
+    function showNotifyOverlay() {
+      const overlay = document.getElementById('notifyOverlay');
+      if (overlay) overlay.style.display = 'flex';
+    }
+
+    function hideNotifyOverlay(remember) {
+      const overlay = document.getElementById('notifyOverlay');
+      if (overlay) overlay.style.display = 'none';
+      if (remember) localStorage.setItem('mi_notify_dismissed_at', String(Date.now()));
+    }
+
+    function shouldOfferNotify() {
+      if (window._currentUser) return false;
+      if (localStorage.getItem('mi_member_token')) return false;
+      if (localStorage.getItem('mi_notify_subscribed')) return false;
+      const dismissedAt = parseInt(localStorage.getItem('mi_notify_dismissed_at') || '0', 10);
+      const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
+      if (dismissedAt && (Date.now() - dismissedAt) < FOURTEEN_DAYS) return false;
+      return true;
+    }
+
+    function scheduleNotifyPrompt() {
+      setTimeout(function() {
+        if (shouldOfferNotify()) showNotifyOverlay();
+      }, 8000);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', scheduleNotifyPrompt);
+    } else {
+      scheduleNotifyPrompt();
+    }
+
+    window.notifyWithGoogle = function() {
+      hideNotifyOverlay(false);
+      localStorage.setItem('mi_notify_subscribed', '1');
+      showLoginOverlay();
+    };
+
+    window.subscribeNotifyEmail = async function() {
+      const input = document.getElementById('notifyEmailInput');
+      const btn = document.getElementById('notifyEmailBtn');
+      const errorEl = document.getElementById('notifyError');
+      const email = input ? input.value.trim() : '';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        if (errorEl) { errorEl.style.color = '#e74c3c'; errorEl.textContent = 'Ingresá un email válido.'; errorEl.style.display = 'block'; }
+        return;
+      }
+      if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+      try {
+        await fetch('https://log-user.nachito2502.workers.dev', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, name: '', uid: '', loginTime: Date.now(), tipo: 'notificaciones' })
+        });
+        localStorage.setItem('mi_notify_subscribed', '1');
+        if (errorEl) errorEl.style.display = 'none';
+        hideNotifyOverlay(false);
+      } catch (e) {
+        if (errorEl) { errorEl.style.color = '#e74c3c'; errorEl.textContent = 'No se pudo enviar. Probá de nuevo.'; errorEl.style.display = 'block'; }
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Notificarme por email'; }
+      }
+    };
+
+    window.showNotifyOverlay = showNotifyOverlay;
+    window.hideNotifyOverlay = hideNotifyOverlay;
   </script>
 <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<style>
+  #notifyOverlay{position:fixed;inset:0;background:rgba(10,15,30,.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;}
+  .notify-card{position:relative;background:var(--white);border-radius:14px;padding:40px 36px 32px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35);}
+  .notify-close{position:absolute;top:12px;right:12px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:var(--bg-alt);border:none;border-radius:50%;color:var(--text-sec);font-size:17px;line-height:1;cursor:pointer;transition:background .15s,color .15s;}
+  .notify-close:hover{background:var(--border);color:var(--text-primary);}
+  .notify-logo-mark{width:48px;height:48px;background:var(--primary);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--white);font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:16px;margin:0 auto 18px;}
+  .notify-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-light);background:var(--primary);display:inline-flex;padding:4px 9px;border-radius:4px;margin-bottom:14px;}
+  .notify-title{font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:23px;color:var(--primary);margin:0 0 8px;line-height:1.25;}
+  .notify-sub{font-size:13px;color:var(--text-sec);line-height:1.55;margin:0 0 20px;}
+  .notify-list{list-style:none;margin:0 0 24px;padding:0;text-align:left;display:flex;flex-direction:column;gap:11px;}
+  .notify-list li{display:flex;gap:12px;align-items:flex-start;}
+  .notify-icon{width:34px;height:34px;border-radius:10px;flex-shrink:0;background:linear-gradient(150deg, rgba(242,201,76,.22), rgba(242,201,76,.05));border:1px solid rgba(242,201,76,.4);display:flex;align-items:center;justify-content:center;}
+  .notify-icon svg{width:16px;height:16px;stroke:var(--primary);}
+  .notify-text{display:flex;flex-direction:column;gap:1px;padding-top:1px;}
+  .notify-text strong{font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:15px;color:var(--primary);}
+  .notify-text span{font-size:11.5px;color:var(--text-sec);line-height:1.45;}
+  .notify-btn-google{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:8px;background:var(--white);color:var(--text-primary);font-size:13.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'IBM Plex Sans',sans-serif;transition:background .15s,border-color .15s;}
+  .notify-btn-google:hover{background:var(--bg-alt);border-color:var(--gold);}
+  .notify-divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--text-sec);font-size:11.5px;}
+  .notify-divider::before,.notify-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+  .notify-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;margin-bottom:9px;font-family:'IBM Plex Sans',sans-serif;color:var(--text-primary);background:var(--white);outline:none;transition:border-color .15s;box-sizing:border-box;}
+  .notify-input:focus{border-color:var(--gold);}
+  .notify-btn-submit{width:100%;padding:12px 16px;border:1.5px solid var(--gold);border-radius:8px;background:var(--gold);color:var(--primary);font-size:13.5px;font-weight:600;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;transition:background .15s;}
+  .notify-btn-submit:hover{background:var(--gold-light);}
+  .notify-btn-submit:disabled{opacity:.6;cursor:wait;}
+  .notify-skip{margin-top:16px;font-size:11.5px;color:var(--text-sec);background:none;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:2px;font-family:'IBM Plex Sans',sans-serif;}
+  .notify-error{color:#e74c3c;font-size:12px;margin-top:10px;display:none;}
+  .notify-fine{margin:14px 0 0;font-size:10.5px;color:#9CA3AF;line-height:1.5;}
+</style>
 </head>
 <body>
   <!-- ââ Login Overlay ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
@@ -2515,6 +2633,40 @@
   </div>
 
   <!-- ââ Main Content (hidden until auth) ââââââââââââââââââââââââââââââââââââââ -->
+  <div id="notifyOverlay" style="display:none" onclick="if(event.target===this) window.hideNotifyOverlay && window.hideNotifyOverlay(true)">
+    <div class="notify-card">
+      <button class="notify-close" onclick="window.hideNotifyOverlay && window.hideNotifyOverlay(true)" aria-label="Cerrar">&times;</button>
+      <div class="notify-logo-mark">MI</div>
+      <span class="notify-eyebrow">Alertas de Manfredi Investment</span>
+      <h2 class="notify-title">No te pierdas el próximo informe</h2>
+      <p class="notify-sub">Sumate para recibir un aviso apenas publicamos algo nuevo.</p>
+      <ul class="notify-list">
+        <li>
+          <span class="notify-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span>
+          <span class="notify-text"><strong>Informes nuevos</strong><span>AAPL, MSFT, GOOGL y los próximos picks, apenas salen del horno.</span></span>
+        </li>
+        <li>
+          <span class="notify-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.8" fill="currentColor" stroke="none"/></svg></span>
+          <span class="notify-text"><strong>Cambios de rating o precio objetivo</strong><span>Si se mueve algo en un activo que seguís, te enterás primero.</span></span>
+        </li>
+        <li>
+          <span class="notify-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span>
+          <span class="notify-text"><strong>Novedades de la plataforma</strong><span>Secciones nuevas y mejoras, sin tener que andar buscando.</span></span>
+        </li>
+      </ul>
+      <button class="notify-btn-google" id="notifyGoogleBtn" onclick="window.notifyWithGoogle && window.notifyWithGoogle()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google" style="vertical-align:middle">
+        Continuar con Google
+      </button>
+      <div class="notify-divider">o</div>
+      <input id="notifyEmailInput" class="notify-input" type="email" placeholder="Tu email" autocomplete="email">
+      <button id="notifyEmailBtn" class="notify-btn-submit" onclick="window.subscribeNotifyEmail && window.subscribeNotifyEmail()">Notificarme por email</button>
+      <button class="notify-skip" onclick="window.hideNotifyOverlay && window.hideNotifyOverlay(true)">Ahora no</button>
+      <p id="notifyError" class="notify-error"></p>
+      <p class="notify-fine">Sin spam. Cancelás cuando quieras desde tu perfil.</p>
+    </div>
+  </div>
+
   <div id="mainContent" style="">
 
 
@@ -2568,8 +2720,13 @@
       </ul>
 
       <button class="btn-cta" onclick="openModal()">Asesoría</button>
-    
+
       <div id="navUserArea"></div>
+      <button class="nav-notify-btn" id="notifyNavBtn" onclick="window.showNotifyOverlay && window.showNotifyOverlay()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Notificate de todo
+        <span class="nav-notify-dot"></span>
+      </button>
     </div>
   </header>
 

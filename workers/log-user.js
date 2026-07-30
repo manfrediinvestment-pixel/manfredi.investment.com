@@ -141,8 +141,10 @@ export default {
 
           // Ruta principal POST / (registrar nuevo usuario)
           try {
-                      const { email, name, uid, loginTime } = await request.json();
+                      const { email, name, uid, loginTime, tipo } = await request.json();
                       if (!email) return new Response(JSON.stringify({ error: 'Email requerido' }), { status: 400, headers });
+                      const esSoloAvisos = tipo === 'notificaciones';
+                      const fuente = esSoloAvisos ? 'Notificaciones (email)' : 'Google';
 
                     const privateKey = env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
                       const serviceEmail = env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
@@ -215,12 +217,13 @@ export default {
                           {
                                           method: 'PUT',
                                           headers: { 'Authorization': `Bearer ${access_token}`, 'Content-Type': 'application/json' },
-                                          body: JSON.stringify({ values: [[fecha, email, name || '', uid || '', 'Google']] })
+                                          body: JSON.stringify({ values: [[fecha, email, name || '', uid || '', fuente]] })
                           }
                                 );
 
-                    // Email de bienvenida (fire-and-forget)
-                    fetch('https://api.resend.com/emails', {
+                    // Email de bienvenida (fire-and-forget): solo para altas de cuenta,
+                    // no para quienes solo se suscriben a avisos (no crearon cuenta)
+                    if (!esSoloAvisos) fetch('https://api.resend.com/emails', {
                                   method: 'POST',
                                   headers: {
                                                   'Authorization': `Bearer ${env.RESEND_API_KEY}`,
