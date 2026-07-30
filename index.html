@@ -816,6 +816,18 @@
       color: rgba(242,201,76,.6);
       margin-right: 7px;
     }
+    .rpt-news-time {
+      font-size: 9.5px;
+      font-weight: 500;
+      color: rgba(255,255,255,.32);
+      margin-right: 7px;
+      white-space: nowrap;
+    }
+    .rpt-news-time::before {
+      content: '·';
+      margin-right: 7px;
+      color: rgba(255,255,255,.2);
+    }
     .rpt-news-title {
       font-size: 12.5px;
       font-weight: 600;
@@ -3811,17 +3823,38 @@
     return 'neut';
   }
 
+  function timeAgo(iso) {
+    if (!iso) return '';
+    const then = new Date(iso).getTime();
+    if (isNaN(then)) return '';
+    const diffMin = Math.floor((Date.now() - then) / 60000);
+    if (diffMin < 1) return 'ahora';
+    if (diffMin < 60) return `hace ${diffMin} min`;
+    const diffH = Math.floor(diffMin / 60);
+    if (diffH < 24) return `hace ${diffH} h`;
+    const diffD = Math.floor(diffH / 24);
+    return `hace ${diffD} d`;
+  }
+
+  function updateNewsTimestamps() {
+    document.querySelectorAll('.rpt-news-time[data-ts]').forEach(el => {
+      el.textContent = timeAgo(el.getAttribute('data-ts'));
+    });
+  }
+  setInterval(updateNewsTimestamps, 60000);
+
   function renderNoticias(noticias, badgeKey) {
     if (!noticias || !noticias.length) return '';
     return noticias.map(n => {
       const badge = n[badgeKey] || '';
       const dotCls = impactoDot(badge);
       const badgeCls = badge.toLowerCase() === 'alta' ? 'alta' : 'media';
+      const tiempo = timeAgo(n.fecha);
       return `
         <div class="rpt-news-item">
           <div class="rpt-news-dot ${dotCls}"></div>
           <div>
-            <div class="rpt-news-title">${n.fuente ? `<span class="rpt-news-source">${n.fuente}</span>` : ''}${n.link ? `<a href="${n.link}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none; border-bottom: 1px solid rgba(184,148,63,0.4);">${n.titulo}</a>` : (n.titulo || '')}${badge ? `<span class="rpt-news-badge ${badgeCls}">${badge}</span>` : ''}</div>
+            <div class="rpt-news-title">${n.fuente ? `<span class="rpt-news-source">${n.fuente}</span>` : ''}${tiempo ? `<span class="rpt-news-time" data-ts="${n.fecha}">${tiempo}</span>` : ''}${n.link ? `<a href="${n.link}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none; border-bottom: 1px solid rgba(184,148,63,0.4);">${n.titulo}</a>` : (n.titulo || '')}${badge ? `<span class="rpt-news-badge ${badgeCls}">${badge}</span>` : ''}</div>
             <div class="rpt-news-text">${n.resumen || ''}</div>
           </div>
         </div>`;

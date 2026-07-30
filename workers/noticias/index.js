@@ -111,7 +111,10 @@ function parseRSS(xml, maxItems) {
     let resumen = extractTag(block, 'description');
     if (!titulo) continue;
     resumen = resumen.replace(/<[^>]+>/g, '').trim().slice(0, 250);
-    items.push({ titulo: titulo.trim(), link: link.trim(), resumen });
+    const pubDateRaw = extractTag(block, 'pubDate') || extractTag(block, 'dc:date') || extractTag(block, 'published');
+    const parsed = pubDateRaw ? new Date(pubDateRaw) : null;
+    const fecha = parsed && !isNaN(parsed.getTime()) ? parsed.toISOString() : null;
+    items.push({ titulo: titulo.trim(), link: link.trim(), resumen, fecha });
   }
   return items;
 }
