@@ -37,12 +37,20 @@ def fetch_rss(url, max_items=4):
             title_el = item.find("title")
             link_el = item.find("link")
             desc_el = item.find("description")
+            pubdate_el = item.find("pubDate")
             title = title_el.text.strip() if title_el is not None and title_el.text else ""
             link = link_el.text.strip() if link_el is not None and link_el.text else ""
             desc = desc_el.text.strip() if desc_el is not None and desc_el.text else ""
             desc = re.sub(r"<[^>]+>", "", desc)[:250]
+            fecha = None
+            if pubdate_el is not None and pubdate_el.text:
+                try:
+                    from email.utils import parsedate_to_datetime
+                    fecha = parsedate_to_datetime(pubdate_el.text.strip()).astimezone(timezone.utc).isoformat()
+                except Exception:
+                    fecha = None
             if title:
-                results.append({"titulo": title, "link": link, "resumen": desc})
+                results.append({"titulo": title, "link": link, "resumen": desc, "fecha": fecha})
         return results
     except Exception as e:
         print(f"Error RSS {url}: {e}")
