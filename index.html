@@ -1629,6 +1629,17 @@
       color: rgba(255,255,255,.4);
       border: 1px solid rgba(255,255,255,.15);
     }
+    .inv-tabs { margin-bottom: 28px; }
+    .inv-panel { display: none; }
+    .inv-panel.active { display: block; }
+    .inv-panel-progress {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: rgba(255,255,255,.35);
+      letter-spacing: .04em;
+      margin-bottom: 16px;
+    }
+    .sector-cards { display: flex; flex-direction: column; gap: 16px; }
 
     /* âââ WARREN CHAT âââ */
     .warren-fab{position:fixed;bottom:28px;right:28px;z-index:8000;width:56px;height:56px;background:var(--primary);border-radius:50%;border:1px solid rgba(242,201,76,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(0,0,0,.4);transition:transform .2s,box-shadow .2s}
@@ -2648,7 +2659,7 @@
       <div class="hero-cal-card hero-inv-card" id="heroInvCard">
         <div class="spotlight-head">
           <span>Informes institucionales</span>
-          <span style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);">2 de 5</span>
+          <span style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);">3 de 8</span>
         </div>
         <div class="hero-inv-list">
           <div class="hero-inv-item">
@@ -2667,25 +2678,17 @@
             </div>
             <a href="informes/aapl.html" class="pick-btn" target="_blank" rel="noopener">Ver an&aacute;lisis &rarr;</a>
           </div>
-          <div class="hero-inv-item hero-inv-item--soon">
+          <div class="hero-inv-item">
             <div class="hero-inv-item-info">
-              <span class="hero-inv-ticker">LLY</span>
-              <span class="hero-inv-name">Eli Lilly</span>
-              <span class="pick-sentiment soon">Pr&oacute;ximamente</span>
+              <span class="hero-inv-ticker">META</span>
+              <span class="hero-inv-name">Meta Platforms</span>
+              <span class="pick-sentiment neutral">Neutral</span>
             </div>
+            <a href="informes/meta.html" class="pick-btn" target="_blank" rel="noopener">Ver an&aacute;lisis &rarr;</a>
           </div>
           <div class="hero-inv-item hero-inv-item--soon">
             <div class="hero-inv-item-info">
-              <span class="hero-inv-ticker">YPF</span>
-              <span class="hero-inv-name">YPF S.A.</span>
-              <span class="pick-sentiment soon">Pr&oacute;ximamente</span>
-            </div>
-          </div>
-          <div class="hero-inv-item hero-inv-item--soon">
-            <div class="hero-inv-item-info">
-              <span class="hero-inv-ticker">NVDA</span>
-              <span class="hero-inv-name">NVIDIA Corp.</span>
-              <span class="pick-sentiment soon">Pr&oacute;ximamente</span>
+              <span class="hero-inv-name">+ 5 m&aacute;s en camino: NVDA, LLY, JPM, BAC, YPF</span>
             </div>
           </div>
         </div>
@@ -2983,57 +2986,142 @@
         <span>Posiciones con fines exclusivamente ilustrativos. No constituyen recomendación ni asesoramiento financiero. Toda decisión de inversión es responsabilidad exclusiva del inversor.</span>
       </div>
 
-      <div class="picks-list">
+      <div class="mkt-tabs inv-tabs" id="invTabs" role="tablist">
+        <button type="button" class="mkt-tab active" data-sector="bigtech">Big Tech</button>
+        <button type="button" class="mkt-tab" data-sector="software">Software</button>
+        <button type="button" class="mkt-tab" data-sector="semis">Semiconductores</button>
+        <button type="button" class="mkt-tab" data-sector="salud">Salud</button>
+        <button type="button" class="mkt-tab" data-sector="bancos">Bancos</button>
+        <button type="button" class="mkt-tab" data-sector="argentina">Argentina</button>
+      </div>
 
-        <div class="pick-card" data-aos="fade-up">
-  <div class="pick-accent neutral"></div>
-  <div class="pick-info">
-    <div class="pick-row1"><span class="pick-ticker">MSFT</span><span class="pick-tag pick-tag-us">USA &middot; Tech</span></div>
-    <div class="pick-name">Microsoft Corporation</div>
-  </div>
-  <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,26 15,24 30,20 45,22 60,16 75,18 90,10" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-  <div class="pick-right"><span class="pick-sentiment neutral">Neutral</span><a href="informes/msft.html" class="pick-btn" target="_blank" rel="noopener">Ver análisis &rarr;</a></div>
-</div>
-<div class="pick-card" data-aos="fade-up" data-aos-delay="80">
-  <div class="pick-accent down"></div>
-  <div class="pick-info">
-    <div class="pick-row1"><span class="pick-ticker">AAPL</span><span class="pick-tag pick-tag-us">USA &middot; Tech</span></div>
-    <div class="pick-name">Apple Inc.</div>
-  </div>
-  <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,10 15,14 30,18 45,22 60,26 75,30 90,33" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-  <div class="pick-right"><span class="pick-sentiment bear">Bajista</span><a href="informes/aapl.html" class="pick-btn" target="_blank" rel="noopener">Ver análisis &rarr;</a></div>
-</div>
-<div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="160">
-  <div class="pick-accent soon"></div>
-  <div class="pick-info">
-    <div class="pick-row1"><span class="pick-ticker">LLY</span><span class="pick-tag pick-tag-us">USA &middot; Health</span></div>
-    <div class="pick-name">Eli Lilly and Company</div>
-  </div>
-  <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-  <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
-</div>
-<div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="240">
-  <div class="pick-accent soon"></div>
-  <div class="pick-info">
-    <div class="pick-row1"><span class="pick-ticker">YPF</span><span class="pick-tag pick-tag-ar">Argentina &middot; Energía</span></div>
-    <div class="pick-name">YPF S.A.</div>
-  </div>
-  <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-  <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
-</div>
-<div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="320">
-  <div class="pick-accent soon"></div>
-  <div class="pick-info">
-    <div class="pick-row1"><span class="pick-ticker">NVDA</span><span class="pick-tag pick-tag-us">USA &middot; Semis</span></div>
-    <div class="pick-name">NVIDIA Corporation</div>
-  </div>
-  <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-  <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
-</div>
+      <div class="picks-list" style="display:block;">
+
+        <div class="inv-panel active" data-sector-panel="bigtech">
+          <div class="inv-panel-progress">2 de 2 con informe completo</div>
+          <div class="sector-cards">
+            <div class="pick-card" data-aos="fade-up">
+              <div class="pick-accent down"></div>
+              <div class="pick-info">
+                <div class="pick-row1"><span class="pick-ticker">AAPL</span><span class="pick-tag pick-tag-us">USA &middot; Tech</span></div>
+                <div class="pick-name">Apple Inc.</div>
+              </div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,10 15,14 30,18 45,22 60,26 75,30 90,33" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><span class="pick-sentiment bear">Bajista</span><a href="informes/aapl.html" class="pick-btn" target="_blank" rel="noopener">Ver análisis &rarr;</a></div>
+            </div>
+            <div class="pick-card" data-aos="fade-up" data-aos-delay="80">
+              <div class="pick-accent neutral"></div>
+              <div class="pick-info">
+                <div class="pick-row1"><span class="pick-ticker">META</span><span class="pick-tag pick-tag-us">USA &middot; Tech</span></div>
+                <div class="pick-name">Meta Platforms, Inc.</div>
+              </div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,20 15,18 30,16 45,14 60,12 75,30 90,34" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><span class="pick-sentiment neutral">Neutral</span><a href="informes/meta.html" class="pick-btn" target="_blank" rel="noopener">Ver análisis &rarr;</a></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inv-panel" data-sector-panel="software">
+          <div class="inv-panel-progress">1 de 1 con informe completo</div>
+          <div class="sector-cards">
+            <div class="pick-card" data-aos="fade-up">
+              <div class="pick-accent neutral"></div>
+              <div class="pick-info">
+                <div class="pick-row1"><span class="pick-ticker">MSFT</span><span class="pick-tag pick-tag-us">USA &middot; Tech</span></div>
+                <div class="pick-name">Microsoft Corporation</div>
+              </div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,26 15,24 30,20 45,22 60,16 75,18 90,10" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><span class="pick-sentiment neutral">Neutral</span><a href="informes/msft.html" class="pick-btn" target="_blank" rel="noopener">Ver análisis &rarr;</a></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inv-panel" data-sector-panel="semis">
+          <div class="inv-panel-progress">0 de 1 con informe completo</div>
+          <div class="sector-cards">
+            <div class="pick-card pick-card--soon" data-aos="fade-up">
+              <div class="pick-accent soon"></div>
+              <div class="pick-info">
+                <div class="pick-row1"><span class="pick-ticker">NVDA</span><span class="pick-tag pick-tag-us">USA &middot; Semis</span></div>
+                <div class="pick-name">NVIDIA Corporation</div>
+              </div>
+              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
+              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inv-panel" data-sector-panel="salud">
+          <div class="inv-panel-progress">0 de 1 con informe completo</div>
+          <div class="sector-cards">
+            <div class="pick-card pick-card--soon" data-aos="fade-up">
+              <div class="pick-accent soon"></div>
+              <div class="pick-info">
+                <div class="pick-row1"><span class="pick-ticker">LLY</span><span class="pick-tag pick-tag-us">USA &middot; Health</span></div>
+                <div class="pick-name">Eli Lilly and Company</div>
+              </div>
+              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
+              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inv-panel" data-sector-panel="bancos">
+          <div class="inv-panel-progress">0 de 2 con informe completo</div>
+          <div class="sector-cards">
+            <div class="pick-card pick-card--soon" data-aos="fade-up">
+              <div class="pick-accent soon"></div>
+              <div class="pick-info">
+                <div class="pick-row1"><span class="pick-ticker">JPM</span><span class="pick-tag pick-tag-us">USA &middot; Bancos</span></div>
+                <div class="pick-name">JPMorgan Chase &amp; Co.</div>
+              </div>
+              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
+              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+            </div>
+            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="80">
+              <div class="pick-accent soon"></div>
+              <div class="pick-info">
+                <div class="pick-row1"><span class="pick-ticker">BAC</span><span class="pick-tag pick-tag-us">USA &middot; Bancos</span></div>
+                <div class="pick-name">Bank of America Corp.</div>
+              </div>
+              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
+              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inv-panel" data-sector-panel="argentina">
+          <div class="inv-panel-progress">0 de 1 con informe completo</div>
+          <div class="sector-cards">
+            <div class="pick-card pick-card--soon" data-aos="fade-up">
+              <div class="pick-accent soon"></div>
+              <div class="pick-info">
+                <div class="pick-row1"><span class="pick-ticker">YPF</span><span class="pick-tag pick-tag-ar">Argentina &middot; Energía</span></div>
+                <div class="pick-name">YPF S.A.</div>
+              </div>
+              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
+              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>
   </section>
+
+  <script>
+  (function(){
+    var tabs = document.querySelectorAll('#invTabs .mkt-tab');
+    var panels = document.querySelectorAll('.inv-panel');
+    tabs.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        tabs.forEach(function(b){ b.classList.toggle('active', b === btn); });
+        var sec = btn.getAttribute('data-sector');
+        panels.forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-sector-panel') === sec); });
+      });
+    });
+  })();
+  </script>
 
   <!-- ââ ASESORÍA ââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
   <section class="asesoria-section" id="asesoria" data-tab="asesoria">
