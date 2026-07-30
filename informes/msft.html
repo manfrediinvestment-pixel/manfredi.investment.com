@@ -1,0 +1,1198 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSFT — Microsoft Corporation | Manfredi Investment Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-dark:#0b1f3a;
+    --navy:#0e2748;
+    --navy2:#15335c;
+    --blue:#2f5f9e;
+    --blue-light:#5f8fc7;
+    --blue-pale:#eaf1f9;
+    --line:#d7e0ea;
+    --text:#161a20;
+    --muted:#69707c;
+    --green:#1a7a54;
+    --red:#a8291f;
+    --serif:'Newsreader',serif;
+    --sans:'Inter',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#fff; color:var(--text); font-family:var(--sans); font-size:15.5px; line-height:1.7;}
+  .wrap{max-width:900px; margin:0 auto; padding:0 30px 90px;}
+
+  .brandbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:26px 30px 20px; max-width:900px; margin:0 auto; border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:38px; height:38px; border:1.5px solid var(--navy-dark); display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-weight:700; color:var(--navy-dark); font-size:16px;
+  }
+  .brand-name{font-family:var(--serif); font-weight:700; font-size:17px; color:var(--text); line-height:1.15;}
+  .brand-sub{font-family:var(--sans); font-size:10px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase;}
+  .brandbar .doctype{font-family:var(--mono); font-size:11px; color:var(--muted); text-align:right;}
+
+  .frontbox{border:1px solid var(--navy-dark); margin:34px 0 8px; padding:0;}
+  .frontbox-top{display:flex; justify-content:space-between; align-items:baseline; padding:22px 28px 14px; border-bottom:1px solid var(--line);}
+  .ticker-big{font-family:var(--serif); font-size:42px; font-weight:700; color:var(--navy-dark);}
+  .exch{font-family:var(--mono); font-size:12px; color:var(--muted); margin-left:10px;}
+  .rating{font-family:var(--mono); font-size:12px; font-weight:600; color:var(--blue); text-align:right; letter-spacing:.03em;}
+  .rating small{display:block; font-family:var(--mono); font-size:10.5px; color:var(--muted); font-weight:400; margin-top:3px; letter-spacing:normal;}
+  .frontbox-body{padding:20px 28px 26px;}
+  .company-line{color:var(--muted); font-size:13.5px; margin-bottom:16px;}
+  .thesis-block{font-family:var(--serif); font-size:17.5px; line-height:1.65; color:var(--text); font-style:italic;}
+
+  .statsrow{display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line);}
+  .statcell{padding:16px 20px; border-right:1px solid var(--line);}
+  .statcell:last-child{border-right:none;}
+  .statcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:6px;}
+  .statcell .v{font-family:var(--mono); font-size:16px; font-weight:600; color:var(--text);}
+  .pos{color:var(--green);} .neg{color:var(--red);}
+
+  .secnum{font-family:var(--mono); font-size:11px; color:var(--blue-light); letter-spacing:.1em; margin:50px 0 2px;}
+  h2{font-family:var(--serif); font-size:24px; font-weight:600; color:var(--navy2); margin:2px 0 18px; padding-bottom:10px; border-bottom:1.5px solid var(--navy-dark); text-wrap:balance;}
+  h3{font-family:var(--serif); font-size:17px; font-weight:600; color:var(--navy2); margin:30px 0 10px;}
+  p{margin:0 0 15px; max-width:68ch;}
+  strong{color:var(--text);}
+
+  .table-scroll{overflow-x:auto; margin:18px 0 22px;}
+  .table-scroll table{margin:0;}
+  table{width:100%; min-width:520px; border-collapse:collapse; font-size:13.5px;}
+  th{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); text-align:left; padding:8px 10px; border-bottom:1.5px solid var(--navy-dark); white-space:nowrap;}
+  td{padding:8px 10px; border-bottom:1px solid var(--line); font-family:var(--mono); color:var(--text); font-variant-numeric:tabular-nums;}
+  td.label{font-family:var(--sans); color:var(--text);}
+  tr.total td{font-weight:600; border-top:1px solid var(--navy-dark); border-bottom:none;}
+  .right-al{text-align:right;}
+
+  .chartbox{border:1px solid var(--line); padding:20px 22px 16px; margin:22px 0;}
+  .chartbox canvas{width:100% !important; display:block;}
+  .chartcap{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:14px; text-align:center;}
+
+  .pull{border-left:2px solid var(--navy-dark); padding-left:18px; margin:22px 0; color:var(--muted); font-size:13.5px; max-width:68ch;}
+
+  .footnote{font-family:var(--mono); font-size:11px; color:var(--muted); margin:-6px 0 18px; max-width:none;}
+
+  .watermark-block{
+    position:relative; margin:60px 0; padding:26px 30px; border:1px solid var(--line); overflow:hidden;
+  }
+  .watermark-block::before{
+    content:"AAPL"; position:absolute; right:10px; top:-30px; font-family:var(--serif); font-weight:700;
+    font-size:110px; color:var(--blue-pale); z-index:0; line-height:1;
+  }
+  .watermark-block > *{position:relative; z-index:1;}
+
+  .toc{border:1px solid var(--line); padding:22px 26px; margin:30px 0;}
+  .toc-title{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px;}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:30px;}
+  .toc li{font-size:13px; margin-bottom:7px; break-inside:avoid;}
+  .toc a{color:var(--navy2); text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  .toc .toc-final a{font-weight:600;}
+
+  .disclosure{margin-top:70px; padding-top:22px; border-top:1px solid var(--navy-dark); font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.8; max-width:none;}
+
+  .fv-block{text-align:right;}
+  .fv-block .fv-label{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+  .fv-block .fv-value{font-family:var(--mono); font-size:22px; font-weight:600; color:var(--navy-dark); line-height:1.3;}
+  .fv-block .fv-gap{font-family:var(--mono); font-size:12.5px; font-weight:600;}
+  .fv-block .fv-gap.neg{color:var(--red);} .fv-block .fv-gap.pos{color:var(--green);}
+
+  .verdict-bar{display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; background:var(--blue-pale); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:14px 28px;}
+  .verdict-stance{font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--navy-dark);}
+  .verdict-stance strong{color:var(--navy-dark);}
+  .verdict-note{font-family:var(--sans); font-size:11.5px; color:var(--muted); max-width:56ch; line-height:1.5;}
+
+  .sens-table td, .sens-table th{text-align:center;}
+  .sens-table td.axis{font-family:var(--mono); font-weight:600; background:#fff; color:var(--text);}
+  .sens-table td.base-cell{outline:2px solid var(--navy-dark); outline-offset:-2px;}
+
+  .govrow{display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:1px solid var(--line); margin:20px 0;}
+  .govcell{padding:16px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .govcell:nth-child(3n){border-right:none;}
+  .govcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px;}
+  .govcell .v{font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text);}
+  .govcell .sub{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.4;}
+
+  a{color:var(--blue);}
+  :focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
+
+  @media (max-width:720px){
+    .statsrow{grid-template-columns:repeat(2,1fr);}
+    .frontbox-top{flex-direction:column; gap:10px;}
+    .rating{text-align:left;}
+    .toc ol{columns:1;}
+    .verdict-bar{flex-direction:column; align-items:flex-start;}
+    .govrow{grid-template-columns:1fr;}
+    .govcell{border-right:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <div class="brand">
+    <div class="brand-mark">MI</div>
+    <div>
+      <div class="brand-name">Manfredi Investment</div>
+      <div class="brand-sub">Research &amp; Markets</div>
+    </div>
+  </div>
+  <div class="doctype">Equity Research · Informe Institucional<br>Datos al 4Q/FY2026 (cierre fiscal 30 jun 2026, publicado 29 jul 2026)</div>
+</div>
+
+<div class="wrap">
+
+  <div class="frontbox">
+    <div class="frontbox-top">
+      <div><span class="ticker-big">MSFT</span><span class="exch">NASDAQ · Microsoft Corporation</span></div>
+      <div class="fv-block">
+        <div class="fv-label">Fair value (blend propio)</div>
+        <div class="fv-value">$442.12</div>
+        <div class="fv-gap pos">vs. $390.54 mercado · +13.2%</div>
+      </div>
+    </div>
+    <div class="verdict-bar">
+      <div class="verdict-stance">POSTURA DEL ANÁLISIS: <strong>NEUTRAL — CALIDAD EXCEPCIONAL, RIESGO DE FCF EN EL CORTO PLAZO</strong> — el blend propio queda por encima del mercado, pero la guía de capex FY2027 implica free cash flow negativo en el primer año del DCF en los tres escenarios (ver Sección 13)</div>
+      <div class="verdict-note">Este documento es análisis independiente con fines informativos y educativos. El autor no es un asesor financiero registrado (no CFA / no matriculado ante la CNV/SEC) y este contenido no constituye una recomendación de compra, venta o mantenimiento para ningún lector en particular. Ver disclosure completo al pie.</div>
+    </div>
+    <div class="frontbox-body">
+      <div class="company-line">Cloud enterprise (Azure) · Productividad (Microsoft 365, LinkedIn, Dynamics) · Sistemas operativos y gaming · Infraestructura de IA</div>
+      <div class="thesis-block">
+        Microsoft cerró el año fiscal 2026 (reportado el 29-jul-2026) con Azure acelerando a +43% interanual en el
+        trimestre y el RPO comercial saltando 84% a $678.000 millones — la validación más clara hasta ahora de que la
+        apuesta de infraestructura de IA está generando demanda contratada real. El mismo comunicado, sin embargo, elevó
+        la guía de capex para el año fiscal 2027 a $255.000-260.000 millones, más del doble del capex de FY2026
+        ($115.900 millones) — un salto que, en nuestro propio modelo, implica flujo de caja libre negativo en el primer
+        año de proyección bajo los tres escenarios (bear, base y bull). Este informe recorre el negocio completo —
+        historia, segmentos, resultados del trimestre, balance, comparables y riesgos— y cierra, recién en la última sección,
+        con la valuación: cuatro metodologías independientes aplicadas sobre los mismos datos, para que el lector llegue
+        a esa conclusión después de conocer el negocio, no antes.
+      </div>
+    </div>
+    <div class="statsrow">
+      <div class="statcell"><div class="k">Ingresos FY2026 (TTM)</div><div class="v">$331.8B</div></div>
+      <div class="statcell"><div class="k">Var. ingresos (últ. trim.)</div><div class="v pos">+18%</div></div>
+      <div class="statcell"><div class="k">Margen operativo TTM</div><div class="v">46.8%</div></div>
+      <div class="statcell"><div class="k">Posición de caja neta</div><div class="v pos">+$36.5B</div></div>
+    </div>
+  </div>
+  <p class="footnote">Cifras fundamentales: SEC EDGAR (Form 8-K, Exhibit 99.1 — comunicado de resultados oficial), año fiscal cerrado el 30 de junio de 2026 (Q4/FY2026), publicado el 29 de julio de 2026. Este documento es 100% analítico — no constituye una recomendación de compra, venta ni mantenimiento. Ver disclosure completo al pie.</p>
+
+  <div class="toc">
+    <div class="toc-title">Contenido</div>
+    <ol>
+      <li><a href="#s01">Resumen Ejecutivo</a></li>
+      <li><a href="#s02">Historia y Evolución</a></li>
+      <li><a href="#s03">Modelo de Negocio y Segmentos</a></li>
+      <li><a href="#s04">Desarrollos Recientes y Perspectiva</a></li>
+      <li><a href="#s05">Estados Financieros</a></li>
+      <li><a href="#s06">Deuda y Balance</a></li>
+      <li><a href="#s07">Flujo de Caja y Capital Allocation</a></li>
+      <li><a href="#s08">Comparables de Industria</a></li>
+      <li><a href="#s09">Gobierno Corporativo y Estructura Accionaria</a></li>
+      <li><a href="#s10">Registro de Riesgos</a></li>
+      <li><a href="#s11">Catalizadores</a></li>
+      <li><a href="#s12">Modelo Financiero Proyectado y Momentum de Estimados</a></li>
+      <li class="toc-final"><a href="#s13">Valuación: Cuatro Métodos y el Fair Value</a></li>
+      <li><a href="#s14">Limitaciones del Modelo</a></li>
+    </ol>
+  </div>
+
+  <!-- 01 -->
+  <p class="secnum" id="s01">01 — Resumen Ejecutivo</p>
+  <h2>Azure acelera a +43%, pero la guía de capex FY2027 duplica la apuesta</h2>
+  <p>
+    El 29 de julio de 2026, Microsoft reportó los resultados del cuarto trimestre y el cierre del año fiscal 2026
+    (terminado el 30 de junio de 2026): ingresos trimestrales de $90.0 mil millones (+18% interanual), Microsoft Cloud
+    de $59.3 mil millones (+27%) y Azure acelerando a +43% interanual — la primera vez que el negocio de Azure supera
+    los $100 mil millones de ingresos en un año fiscal completo. El RPO comercial (contratos firmados aún no
+    reconocidos como ingreso) saltó 84% interanual a $678 mil millones, la señal más concreta de que la demanda de
+    infraestructura de IA se está firmando en compromisos plurianuales reales, no solo en expectativas de mercado.
+  </p>
+  <p>
+    El resultado superó ampliamente el consenso: EPS diluido de $4.81 (+32% GAAP, +23% ajustado por el impacto no
+    operativo de las inversiones en OpenAI y Anthropic) contra una expectativa de $4.24. Pero el mismo comunicado
+    incluyó la guía de capex para el año fiscal 2027: $255-260 mil millones, más del doble de los $115.9 mil millones
+    invertidos en FY2026. La acción cerró la sesión regular previa al reporte en $390.54 y subía cerca de 9% en
+    operaciones de after-hours al momento de este informe — una reacción que todavía no está confirmada en una sesión
+    regular y que tratamos como catalizador, no como precio de mercado válido para la valuación (ver Sección 13).
+  </p>
+  <p>
+    Este informe recorre el negocio completo —de dónde viene, cómo está armado, qué cambió con el reporte del 29-jul-2026,
+    cómo se compara con sus pares de mega-cap tech— antes de llegar, en la Sección 13, a la pregunta de cuánto vale la
+    acción. A diferencia de lo que suele ser el caso en este desk, acá el propio DCF arroja flujo de caja libre
+    <strong>negativo en el primer año de proyección bajo los tres escenarios</strong> — consecuencia directa y honesta
+    de la guía de capex recién anunciada — mientras que las otras tres metodologías (comparables, reversión histórica,
+    consenso Wall Street) ubican el fair value por encima del precio de mercado. Esa tensión, no una conclusión
+    unívoca, es el resultado central de este informe.
+  </p>
+
+  <!-- 02 -->
+  <p class="secnum" id="s02">02 — Historia y Evolución</p>
+  <h2>De Windows/Office a "cloud-first, AI-first": la segunda reinvención de Microsoft bajo Nadella</h2>
+  <p>
+    Microsoft fue fundada por Bill Gates y Paul Allen en 1975, y construyó su primera era de dominancia sobre MS-DOS y
+    Windows, consolidada con Office en los 90 y el caso antitrust de EE.UU. de 1998-2001 —que la obligó a moderar
+    prácticas de bundling pero no a dividirse— como el episodio regulatorio que definió a la compañía durante más de
+    una década, y que funciona como el precedente histórico más relevante para leer cualquier riesgo antitrust
+    sobre el bundling de Teams/Office (Sección 10). La década 2000-2010, bajo Steve Ballmer, quedó marcada por el
+    fracaso en anticipar la transición a mobile (Windows Phone nunca superó una fracción marginal de mercado frente a
+    iOS y Android) y por una acción que cotizó prácticamente plana durante casi 15 años pese al crecimiento del
+    negocio subyacente.
+  </p>
+  <p>
+    La segunda reinvención arrancó en febrero de 2014, cuando Satya Nadella asumió como CEO y declaró la estrategia
+    "mobile-first, cloud-first" — un giro que redirigió la inversión de la compañía hacia Azure (lanzado en 2010 pero
+    marginal hasta entonces) y hacia el modelo de suscripción (Office 365) en desmedro de las licencias perpetuas.
+    Esa estrategia se reforzó con una seguidilla de adquisiciones que son pilares del negocio: LinkedIn en 2016
+    ($26.2 mil millones), GitHub en 2018 ($7.5 mil millones), y Activision Blizzard en 2023 ($68.7 mil millones, la
+    mayor adquisición en la historia de la industria de videojuegos). La inversión en OpenAI —iniciada con $1.000
+    millones en 2019 y escalada a un compromiso de $13.000 millones hacia 2023— es, en retrospectiva, la apuesta de
+    capital más rentable de la era Nadella: la participación resultante (26.79% de OpenAI) vale aproximadamente
+    $228.300 millones a la valuación de $852.000 millones de la ronda de marzo 2026 — casi 18 veces el capital
+    invertido, y una cifra que por sí sola equivale a cerca del 7-8% de la capitalización bursátil actual de Microsoft.
+  </p>
+  <p class="pull">
+    El dato que mejor resume la tensión central de este informe no es el crecimiento de ingresos — es el capex. En el
+    año fiscal 2016, Microsoft invirtió $8.3 mil millones en bienes de capital, apenas 9.2% de sus ingresos de ese
+    año. Para el año fiscal 2026 recién cerrado, ese capex escaló a $115.9 mil millones — 34.9% de los ingresos — y la
+    guía para el año fiscal 2027 ($255-260 mil millones) lo llevaría a más del 65% de los ingresos esperados para
+    ese año. Es la mayor aceleración de intensidad de capital en la historia reciente de la compañía, y el dato que
+    más pesa en la valuación de la Sección 13.
+  </p>
+  <div class="chartbox">
+    <canvas id="historyChart" height="320"></canvas>
+    <p class="chartcap">Ingresos anuales reportados, FY2016–FY2026 (año fiscal cerrado el 30 de junio de cada año). Fuente: SEC EDGAR XBRL, RevenueFromContractWithCustomerExcludingAssessedTax.</p>
+  </div>
+  <p>
+    Los hitos de capitalización acompañan esta historia: Microsoft cruzó el $1 billón de valor de mercado en abril de
+    2019, los $2 billones en junio de 2021, y los $3 billones en enero de 2024 — validando la tesis Nadella de cloud +
+    productividad antes incluso del supercycle de IA generativa que arrancó con el lanzamiento público de ChatGPT en
+    noviembre de 2022 y que es el motor central del negocio de Intelligent Cloud (Sección 03).
+  </p>
+  <p>
+    En paralelo, el retorno de capital a accionistas se sostuvo de forma mucho más moderada que en Apple: Microsoft
+    recompró $22.3 mil millones y pagó $26.4 mil millones en dividendos durante el año fiscal 2026 — una fracción del
+    capex del mismo período ($115.9 mil millones). A diferencia de Apple, que prioriza explícitamente recompras sobre
+    capex de IA (ver el informe de AAPL de este mismo desk), Microsoft invierte simultáneamente en ambos frentes,
+    financiado por un flujo de caja operativo de $182.9 mil millones — la clave para entender por qué el capex
+    guiado para FY2027 no compromete la solvencia de la compañía, aunque sí comprime el free cash flow en el corto
+    plazo (Sección 07).
+  </p>
+
+  <!-- 03 -->
+  <p class="secnum" id="s03">03 — Modelo de Negocio y Segmentos</p>
+  <h2>Qué vende Microsoft, y dónde: la lectura detrás de los $90.0B del cuarto trimestre</h2>
+  <p>
+    Microsoft reporta sus ingresos en tres segmentos operativos, cada uno con una dinámica de crecimiento y margen
+    muy distinta. En el trimestre recién cerrado (Q4 FY2026, terminado el 30 de junio de 2026), Intelligent Cloud —el
+    segmento que incluye Azure— representó el 43.7% de los ingresos totales y creció 32% interanual, superando por
+    primera vez a Productivity and Business Processes como el segmento más grande de la compañía. More Personal
+    Computing (Windows OEM, Xbox, Surface, búsqueda) es el segmento más chico y el único en contracción.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Segmento</th><th class="right-al">Q4 FY2026 (jun-26)</th><th class="right-al">% del total</th><th class="right-al">Var. YoY</th><th class="right-al">Margen operativo</th><th class="right-al">FY2026 (12M)</th></tr>
+    <tr><td class="label">Intelligent Cloud</td><td class="right-al">$39.31B</td><td class="right-al">43.7%</td><td class="right-al pos">+32%</td><td class="right-al">40.6%</td><td class="right-al">$137.79B</td></tr>
+    <tr><td class="label">Productivity &amp; Business Processes</td><td class="right-al">$37.85B</td><td class="right-al">42.0%</td><td class="right-al pos">+14%</td><td class="right-al">59.9%</td><td class="right-al">$140.00B</td></tr>
+    <tr><td class="label">More Personal Computing</td><td class="right-al">$12.85B</td><td class="right-al">14.3%</td><td class="right-al neg">-4%</td><td class="right-al">26.6%</td><td class="right-al">$54.05B</td></tr>
+    <tr class="total"><td class="label">Total</td><td class="right-al">$90.01B</td><td class="right-al">100%</td><td class="right-al pos">+18%</td><td class="right-al">45.1%</td><td class="right-al">$331.84B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 8-K, Exhibit 99.1 (comunicado de resultados oficial Q4/FY2026), publicado 29-jul-2026. Margen operativo = operating income del segmento / revenue del segmento, trimestre.</p>
+  <div class="chartbox">
+    <canvas id="segmentChart" height="280"></canvas>
+    <p class="chartcap">Mix de ingresos por segmento, Q4 FY2026 (trimestre cerrado 30-jun-2026).</p>
+  </div>
+  <p>
+    Dentro de Intelligent Cloud, el dato central es Azure: +43% interanual en el trimestre, muy por encima del
+    crecimiento del segmento en su conjunto (+32%), lo que implica que el resto del segmento (servidores on-premise,
+    principalmente) sigue en declive estructural mientras la migración a la nube se acelera. Dentro de Productivity
+    and Business Processes, Microsoft 365 Commercial cloud creció 14-16% según se ajuste o no por un efecto de
+    reconocimiento de ingresos del año anterior, LinkedIn +12% y Dynamics 365 +13% — un segmento maduro pero todavía
+    con crecimiento de doble dígito sostenido. More Personal Computing es la única señal débil: Windows OEM y
+    dispositivos cayeron 7%, y Xbox contenido y servicios cayó 10%, parcialmente compensado por publicidad de
+    búsqueda (+10%) — la evidencia más clara de que el negocio de consumo/hardware de Microsoft, a diferencia de
+    Apple, ya no es un motor de crecimiento para la tesis.
+  </p>
+  <div class="chartbox">
+    <canvas id="geoChart" height="260"></canvas>
+    <p class="chartcap">Ingresos por segmento, año fiscal completo FY2026 (miles de millones USD). Fuente: 8-K Q4/FY2026.</p>
+  </div>
+
+  <!-- 04 -->
+  <p class="secnum" id="s04">04 — Desarrollos Recientes y Perspectiva</p>
+  <h2>Tres frentes que van a definir los próximos trimestres</h2>
+  <h3>La apuesta de capex: de $115.9B a $255-260B en un año fiscal</h3>
+  <p>
+    El desarrollo más relevante del reporte del 29-jul-2026 no es una cifra de ingresos sino una decisión de capital: Microsoft
+    guio un capex de $255-260 mil millones para el año fiscal 2027, más del doble de los $115.9 mil millones
+    invertidos en FY2026. La compañía había guiado previamente un capex de calendario 2026 de aproximadamente $190 mil
+    millones (que incluye ~$25 mil millones de impacto por mayores precios de componentes) — la nueva guía de FY2027
+    representa una aceleración adicional significativa sobre esa cifra. El management encuadra esta inversión como
+    respuesta directa a la demanda: el RPO comercial de $678 mil millones (+84% YoY) sugiere que buena parte de esa
+    capacidad ya tiene contratos firmados detrás. El mercado reaccionó positivamente en las horas posteriores al
+    reporte (+9% after-hours), lo que sugiere que, al menos en la reacción inicial, los inversores están leyendo el
+    capex como inversión en crecimiento contratado y no como riesgo de sobre-construcción — una lectura que esta
+    misma mesa de research trata con más cautela en la Sección 13, dado que el propio DCF arroja FCF negativo en el
+    primer año bajo los tres escenarios.
+  </p>
+  <h3>OpenAI y Anthropic: de socio exclusivo a inversor diversificado</h3>
+  <p>
+    El acuerdo renegociado con OpenAI en 2026 eliminó la exclusividad de Azure como proveedor de cómputo — OpenAI
+    puede correr cargas de trabajo también en AWS — a cambio de un compromiso de OpenAI de consumir $250 mil millones
+    adicionales en servicios de Azure hasta 2030. En paralelo, Microsoft invirtió $5 mil millones en Anthropic en
+    noviembre de 2025, en un acuerdo que incluye un compromiso de Anthropic de comprar $30 mil millones en servicios
+    de Azure — un patrón de "inversión circular" (invertir capital en un cliente que luego gasta ese capital en la
+    propia nube del inversor) que genera ganancias no operativas vistosas en el estado de resultados ($3.2 mil
+    millones de ganancia por Anthropic solo en este trimestre) pero que exige lectura cuidadosa: no es lo mismo
+    ingreso de Azure genuino por demanda externa que ingreso de Azure financiado, en parte, por el propio capital de
+    Microsoft. Este informe trata ambos flujos por separado en la Sección 07 y los señala como límite del modelo en
+    la Sección 14.
+  </p>
+  <h3>Microsoft 365 Copilot: 30 millones de asientos pagos, la métrica de adopción de IA más seguida del sector</h3>
+  <p>
+    Microsoft 365 Copilot superó los 30 millones de asientos pagos en el trimestre — la cifra que el mercado usa como
+    proxy más directo de cuánta de la inversión en IA ya se está monetizando en el negocio core de productividad,
+    frente a competidores como Google Workspace con Gemini o herramientas de terceros. Es todavía una fracción del
+    total de usuarios de Microsoft 365 Commercial (cientos de millones de asientos), lo que deja un runway de
+    upsell considerable si la tasa de adopción se sostiene — pero también significa que la mayor parte del ARPU
+    potencial de Copilot todavía no está en el número reportado este trimestre.
+  </p>
+
+  <!-- 05 -->
+  <p class="secnum" id="s05">05 — Estados Financieros</p>
+  <h2>Los últimos dos trimestres reportados, línea por línea</h2>
+  <p>
+    Los dos trimestres más recientes muestran una aceleración sostenida: +18.3% interanual en el trimestre de marzo y
+    +17.7% en el de junio, ambos por encima del crecimiento del año fiscal completo (+17.7%), señal de que el negocio
+    viene ganando velocidad trimestre a trimestre, no perdiéndola. El apalancamiento operativo es real pero moderado
+    —el margen operativo del trimestre de junio (45.1%) fue apenas inferior al de marzo (46.3%)— porque el gasto en
+    I+D y en costo de servicio de la nube (depreciación de los centros de datos, principalmente) crece casi al mismo
+    ritmo que el ingreso.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Q3 FY26 (mar-26)</th><th class="right-al">Q4 FY26 (jun-26)</th><th class="right-al">FY2026 (12M)</th></tr>
+    <tr><td class="label">Ingresos totales</td><td class="right-al">$82.89B</td><td class="right-al">$90.01B</td><td class="right-al">$331.84B</td></tr>
+    <tr><td class="label">Var. interanual</td><td class="right-al pos">+18.3%</td><td class="right-al pos">+17.7%</td><td class="right-al pos">+17.8%</td></tr>
+    <tr><td class="label">Utilidad bruta</td><td class="right-al">$56.06B</td><td class="right-al">$60.48B</td><td class="right-al">$225.47B</td></tr>
+    <tr><td class="label">Margen bruto</td><td class="right-al">67.6%</td><td class="right-al">67.2%</td><td class="right-al">67.9%</td></tr>
+    <tr><td class="label">Utilidad operativa</td><td class="right-al">$38.40B</td><td class="right-al">$40.60B</td><td class="right-al">$155.24B</td></tr>
+    <tr><td class="label">Margen operativo</td><td class="right-al">46.3%</td><td class="right-al">45.1%</td><td class="right-al">46.8%</td></tr>
+    <tr><td class="label">Utilidad neta</td><td class="right-al">$31.78B</td><td class="right-al">$35.77B</td><td class="right-al">$133.75B</td></tr>
+    <tr><td class="label">EPS diluido</td><td class="right-al">$4.27</td><td class="right-al">$4.81</td><td class="right-al">$17.95</td></tr>
+    <tr><td class="label">Var. EPS interanual</td><td class="right-al pos">+23%</td><td class="right-al pos">+32%</td><td class="right-al pos">+32%</td></tr>
+    <tr><td class="label">Gasto en I+D</td><td class="right-al">$8.92B</td><td class="right-al">$10.00B</td><td class="right-al">$35.56B</td></tr>
+    <tr><td class="label">I+D como % de ingresos</td><td class="right-al">10.8%</td><td class="right-al">11.1%</td><td class="right-al">10.7%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 8-K, Exhibit 99.1 — comunicados de resultados oficiales de Q3 FY2026 (trimestre cerrado 31-mar-2026) y Q4/FY2026 (trimestre y año fiscal cerrados 30-jun-2026, publicado 29-jul-2026).</p>
+  <p>
+    El resultado neto y el EPS crecieron muy por encima de la utilidad operativa en ambos trimestres (+23% y +32% de
+    EPS vs. +18% de operating income) — la diferencia son las ganancias no operativas por las inversiones en OpenAI y
+    Anthropic ($480 millones en el trimestre de junio, $3.200 millones por la revaluación de Anthropic) que engrosan
+    la línea de "Other income" pero no reflejan mejora del negocio core. Ajustado por ese impacto, el EPS del
+    trimestre de junio creció 23% (no 32%) — la cifra "non-GAAP" que Microsoft reporta explícitamente junto al GAAP y
+    que este informe recomienda mirar en paralelo, no en lugar de, la cifra GAAP.
+  </p>
+  <div class="chartbox">
+    <canvas id="marginChart" height="260"></canvas>
+    <p class="chartcap">Margen bruto y margen operativo trimestral, últimos 8 trimestres reportados. Fuente: SEC EDGAR XBRL / 8-K.</p>
+  </div>
+
+  <!-- 06 -->
+  <p class="secnum" id="s06">06 — Deuda y Balance</p>
+  <h2>Un balance con margen de sobra para financiar el capex guiado</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica (al 30 jun 2026)</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Efectivo y equivalentes</td><td class="right-al">$20.94B</td></tr>
+    <tr><td class="label">Inversiones de corto plazo</td><td class="right-al">$55.91B</td></tr>
+    <tr class="total"><td class="label">Posición total de caja e inversiones de corto plazo</td><td class="right-al">$76.84B</td></tr>
+    <tr><td class="label">Deuda total (porción corriente + largo plazo)</td><td class="right-al">$40.29B</td></tr>
+    <tr class="total"><td class="label">Caja neta (posición neta de deuda)</td><td class="right-al pos">+$36.55B</td></tr>
+    <tr><td class="label">Activos totales</td><td class="right-al">$758.38B</td></tr>
+    <tr><td class="label">Pasivos totales</td><td class="right-al">$315.99B</td></tr>
+    <tr><td class="label">Patrimonio neto (equity)</td><td class="right-al">$442.39B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 8-K, Exhibit 99.1, Balance Sheets al 30-jun-2026. Deuda total = Current portion of long-term debt ($9.23B) + Long-term debt ($31.07B).</p>
+  <p>
+    Microsoft sostiene una posición de caja neta positiva de $36.5 mil millones — con deuda total de apenas $40.3 mil
+    millones equivalente a 0.2x el EBITDA de los últimos doce meses (~$193.8 mil millones, operating income + D&amp;A).
+    El apalancamiento no es, ni remotamente, un límite para el plan de capex de $255-260 mil millones de FY2027: ese
+    monto se financia con flujo de caja operativo ($182.9 mil millones en FY2026) y con la capacidad de emisión de
+    deuda adicional que el balance permite con holgura, no con la caja disponible al 30-jun-2026 — un matiz importante para la
+    Sección 07.
+  </p>
+  <p>
+    Dos partidas del balance merecen una nota aparte por su magnitud y su vínculo directo con el capex: Property and
+    equipment neto saltó de $204.97 mil millones a $313.08 mil millones en doce meses (+52.7%) — el reflejo contable
+    directo de la construcción acelerada de centros de datos — mientras que "Equity and other investments" (que
+    incluye la participación en OpenAI bajo el método de la participación, no a valor de mercado) más que se
+    duplicó, de $15.41 mil millones a $36.35 mil millones. Ninguna de las dos cifras refleja el valor de mercado
+    completo de la participación en OpenAI (~$228.300 millones, Sección 02) — el balance contable es, en este sentido,
+    conservador frente al valor económico real de esa posición.
+  </p>
+
+  <!-- 07 -->
+  <p class="secnum" id="s07">07 — Flujo de Caja y Capital Allocation</p>
+  <h2>FCF comprimido por el capex — la variable central de la tesis</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">FY2026 (12M)</th></tr>
+    <tr><td class="label">Flujo de caja operativo (OCF)</td><td class="right-al">$182.94B</td></tr>
+    <tr><td class="label">Capex (adiciones a PP&amp;E)</td><td class="right-al">$115.95B</td></tr>
+    <tr class="total"><td class="label">Flujo de caja libre (FCF)</td><td class="right-al">$66.99B</td></tr>
+    <tr><td class="label">Margen de FCF sobre ingresos</td><td class="right-al">20.2%</td></tr>
+    <tr><td class="label">Capex como % de ingresos</td><td class="right-al">34.9%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 8-K, Exhibit 99.1, Cash Flows Statements, año fiscal cerrado 30-jun-2026.</p>
+  <p>
+    Un margen de FCF de 20.2% todavía es sólido para una empresa de este tamaño, pero es la mitad de lo que era hace
+    apenas dos años, y la dirección del cambio es lo que importa: el capex viene escalando mucho más rápido que el
+    OCF, y la guía de FY2027 ($255-260 mil millones) implica, en nuestro propio modelo (Sección 13), FCF negativo en
+    el próximo año fiscal bajo los tres escenarios de valuación.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Año fiscal</th><th class="right-al">Capex</th><th class="right-al">Capex/Ingresos</th><th class="right-al">Buybacks</th><th class="right-al">Dividendos pagados</th></tr>
+    <tr><td class="label">FY2021</td><td class="right-al">$20.62B</td><td class="right-al">12.3%</td><td class="right-al">$27.39B</td><td class="right-al">$16.52B</td></tr>
+    <tr><td class="label">FY2022</td><td class="right-al">$23.89B</td><td class="right-al">12.0%</td><td class="right-al">$32.70B</td><td class="right-al">$18.14B</td></tr>
+    <tr><td class="label">FY2023</td><td class="right-al">$28.11B</td><td class="right-al">13.3%</td><td class="right-al">$22.25B</td><td class="right-al">$19.80B</td></tr>
+    <tr><td class="label">FY2024</td><td class="right-al">$44.48B</td><td class="right-al">18.1%</td><td class="right-al">$17.25B</td><td class="right-al">$21.77B</td></tr>
+    <tr><td class="label">FY2025</td><td class="right-al">$64.55B</td><td class="right-al">22.9%</td><td class="right-al">$18.42B</td><td class="right-al">$24.08B</td></tr>
+    <tr class="total"><td class="label">FY2026</td><td class="right-al">$115.95B</td><td class="right-al">34.9%</td><td class="right-al">$22.27B</td><td class="right-al">$26.45B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL companyconcept API (10-K de cada año fiscal), conceptos PaymentsToAcquirePropertyPlantAndEquipment, PaymentsForRepurchaseOfCommonStock, PaymentsOfDividendsCommonStock.</p>
+  <p>
+    A diferencia de Apple —que financia recompras masivas casi exclusivamente con el exceso de caja generado (ver el
+    informe de AAPL de este desk)— Microsoft mantuvo buybacks y dividendos relativamente estables (entre $17 y $33 mil
+    millones anuales cada uno) mientras el capex se multiplicó por 5.6 veces en cinco años. Es una política de capital
+    allocation consistente: el retorno a accionistas no se sacrificó para financiar la carrera de IA, pero tampoco se
+    aceleró — el capex absorbió prácticamente todo el crecimiento incremental de caja generado en el período.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Compañía</th><th class="right-al">Capex FY2026 / guía FY2027</th></tr>
+    <tr class="total"><td class="label">Microsoft (MSFT)</td><td class="right-al">$115.95B (FY26) → $255-260B guiado (FY27)</td></tr>
+    <tr><td class="label">Alphabet (GOOGL)</td><td class="right-al">hasta $205B (guía 2026 elevada)</td></tr>
+    <tr><td class="label">Amazon (AMZN)</td><td class="right-al">&gt;$200B (consenso 2026)</td></tr>
+    <tr><td class="label">Meta (META)</td><td class="right-al">$125-145B (guía 2026)</td></tr>
+    <tr><td class="label">Apple (AAPL)</td><td class="right-al">~$13-14B (FY26)</td></tr>
+  </table></div>
+  <p class="footnote">Fuentes: comunicados y earnings calls de cada compañía, DataCenterDynamics, GeekWire, CNBC, Futurum Group. Cifras de pares con distinto grado de precisión y ventanas temporales (año fiscal vs. calendario) — ver notas por compañía en Sección 08.</p>
+  <div class="chartbox">
+    <canvas id="capexChart" height="280"></canvas>
+    <p class="chartcap">Capex FY2026 (o guía calendario 2026) por compañía — Microsoft y Alphabet lideran la escalada, Apple es la única que se mantiene en un orden de magnitud distinto. Escala logarítmica.</p>
+  </div>
+  <p>
+    Con la guía de FY2027, Microsoft pasa de ser el "capex mediano" del panel de mega-caps a competir por el primer
+    puesto junto con Alphabet y Amazon. La pregunta que este informe no puede responder con certeza —y que tratamos
+    explícitamente como la fuente central de incertidumbre en la Sección 13— es si el RPO comercial de $678 mil
+    millones (+84% YoY) es evidencia suficiente de que ese capex ya tiene demanda contratada detrás, o si una porción
+    relevante depende de que la demanda de IA generativa siga creciendo al ritmo de los últimos dos años.
+  </p>
+
+  <!-- 08 -->
+  <p class="secnum" id="s08">08 — Comparables de Industria</p>
+  <h2>MSFT frente a las otras cuatro "mega caps" de tecnología</h2>
+  <p>
+    Microsoft comparte inversores, capital y la narrativa de infraestructura de IA con otras cuatro compañías de
+    mega-capitalización. AWS (Amazon) y Google Cloud son sus competidores directos en cloud enterprise; Meta y Apple
+    compiten más por el mismo capital de inversores growth/quality que por el mismo negocio. El comparable más
+    directo en términos de modelo de negocio (software enterprise + cloud + apuesta de IA financiada con flujo de
+    caja propio) es, con matices, Alphabet.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Ticker</th><th class="right-al">P/E TTM</th><th class="right-al">P/E Forward</th></tr>
+    <tr class="total"><td class="label">MSFT</td><td class="right-al">21.8x</td><td class="right-al">23.4x*</td></tr>
+    <tr><td class="label">AAPL</td><td class="right-al">41.3x</td><td class="right-al">34.2x</td></tr>
+    <tr><td class="label">GOOGL</td><td class="right-al">16.0x**</td><td class="right-al">24.1x</td></tr>
+    <tr><td class="label">META</td><td class="right-al">21.6x</td><td class="right-al">18.3x</td></tr>
+    <tr><td class="label">AMZN</td><td class="right-al">29.3x</td><td class="right-al">29.3x</td></tr>
+  </table></div>
+  <p class="footnote">*El P/E forward de MSFT usa el consenso FY2027 de $16.71/acción publicado ANTES del reporte del 29-jul-2026 — es, casi con certeza, una cifra desactualizada que el consenso va a revisar al alza en las próximas semanas tras el beat de este trimestre; por eso aparece más alto que el P/E TTM, algo inusual en una empresa con EPS creciendo. **El P/E TTM de GOOGL está distorsionado al alza por una ganancia no operativa puntual — el forward (24.1x) es más representativo. Fuente: cálculo propio sobre precio de cierre pre-reporte ($390.54) y EPS TTM GAAP ($17.95); consenso FY2027 vía ChartMill/stockanalysis.com.</p>
+  <div class="chartbox">
+    <canvas id="compsChart" height="280"></canvas>
+    <p class="chartcap">P/E TTM comparado — Microsoft cotiza en línea con el múltiplo más bajo del panel (junto a META, y sin contar la distorsión puntual de GOOGL) pese al beat de Q4/FY2026.</p>
+  </div>
+
+  <h3>Apple (AAPL) — el contra-ejemplo directo: no correr la carrera de capex y cotizar más caro por eso</h3>
+  <p>
+    Apple es, en muchos sentidos, el espejo invertido de la estrategia de Microsoft: invierte apenas ~$13-14 mil
+    millones de capex anual (menos del 3% de sus ingresos) frente al 34.9% de Microsoft, prioriza recompras masivas
+    ($90.7 mil millones en el último año fiscal) por sobre infraestructura de IA propia, y sin embargo cotiza al
+    múltiplo TTM más alto del panel (41.3x, casi el doble que MSFT). El informe de AAPL de este mismo desk desarrolla
+    esa tesis en profundidad — la lectura conjunta de ambos informes es, en sí misma, el contraste más informativo de
+    toda la cobertura de este research desk: el mercado le paga una prima a Apple por no gastar, y todavía no penaliza
+    a Microsoft por gastar el doble de lo guiado hace apenas un trimestre.
+  </p>
+  <h3>Alphabet (GOOGL) — Cloud en aceleración, pero el mercado empieza a pedir límites al capex</h3>
+  <p>
+    Alphabet tuvo uno de los trimestres más fuertes de su historia reciente: ingresos de $119.80 mil millones (+24%
+    interanual), con Google Cloud creciendo 82% interanual a $24.77 mil millones y un backlog de contratos de cloud
+    que escaló a $514 mil millones. El punto de inflexión llegó con la guía de capex: Alphabet elevó su estimado 2026
+    a un rango de hasta $205 mil millones (desde $180-190 mil millones previamente), y la acción cayó tras el anuncio
+    — la primera señal clara de que el mercado empieza a exigir límites a la escalada de capex de IA, incluso a una
+    empresa con el crecimiento de Cloud más fuerte del panel. Es la referencia más cercana a lo que el mercado podría
+    hacerle a Microsoft si el capex de FY2027 no se traduce en aceleración de Azure sostenida.
+  </p>
+  <h3>Meta (META) — el apostador más agresivo, con el negocio publicitario financiando la apuesta</h3>
+  <p>
+    Meta usa sus modelos de IA (Llama, el sistema de ranking publicitario Andromeda) para mejorar directamente la
+    segmentación de sus anuncios, financiando una guía de capex de $125-145 mil millones con un crecimiento de
+    ingresos publicitarios de más del 27% interanual — mientras Reality Labs sigue perdiendo cerca de $19 mil millones
+    anuales sin visos de breakeven. Cotiza con el forward P/E más bajo del panel (18.3x), reflejo del riesgo de
+    ejecutar dos apuestas de capital simultáneas.
+  </p>
+  <h3>Amazon (AMZN) — el híbrido de e-commerce maduro y AWS en plena carrera de capex</h3>
+  <p>
+    Amazon combina un e-commerce maduro (crecimiento de un dígito) con AWS, que compite directamente con Azure y
+    Google Cloud en infraestructura de IA. El consenso ubica su capex 2026 por encima de $200 mil millones — en la
+    misma categoría de magnitud que la guía de Microsoft para FY2027. Cotiza a 29.3x, la segunda prima más alta del
+    panel después de Apple.
+  </p>
+  <p class="pull">
+    El patrón que emerge del panel: Microsoft, Alphabet y Amazon están convergiendo hacia el mismo orden de magnitud
+    de capex anual ($200-260 mil millones), apostando a que la demanda de infraestructura de IA se sostiene; Meta
+    apuesta un escalón por debajo; Apple es la única que corre en la dirección contraria. El mercado, hasta el cierre
+    de esta sesión, seguía pagando el múltiplo más bajo del panel por Microsoft pese a tener el crecimiento de ingresos
+    más fuerte de las tres "grandes gastadoras" de capex — la brecha entre ese múltiplo bajo y un negocio que acelera
+    es, en esencia, la tensión que resolvemos con números en la Sección 13.
+  </p>
+
+  <!-- 09 -->
+  <p class="secnum" id="s09">09 — Gobierno Corporativo y Estructura Accionaria</p>
+  <h2>Quién controla la compañía, y cómo se paga a quien la dirige</h2>
+  <p>
+    Microsoft es, igual que Apple, una empresa de propiedad institucional predominante — Bill Gates redujo su
+    participación de forma sostenida durante dos décadas (menos del 1% al momento de este informe, jul-2026) y Satya Nadella, como el resto del
+    management, posee una fracción mínima del capital. Esto es relevante para la tesis porque las decisiones de
+    capital allocation (Sección 07) —la decisión de duplicar el capex sin acelerar buybacks— responden a la
+    disciplina fiduciaria del directorio hacia el accionista institucional, no a la preferencia de un
+    fundador-controlador.
+  </p>
+  <div class="govrow">
+    <div class="govcell"><div class="k">Ownership institucional</div><div class="v">~65-70%</div><div class="sub">Vanguard 9.6% y BlackRock 8.1% son los dos mayores accionistas individuales — juntos superan el 17% del capital.</div></div>
+    <div class="govcell"><div class="k">Ownership insider</div><div class="v">~0.02%</div><div class="sub">Satya Nadella posee ~900.000 acciones (sep-2025), ~0.01% de la compañía — el mayor tenedor individual entre los ejecutivos actuales.</div></div>
+    <div class="govcell"><div class="k">Directorio 2026</div><div class="v">13 miembros</div><div class="sub">Ampliado en mayo de 2026 con la incorporación de Carmine Di Sibio (ex CEO global de EY), que se suma a los comités de Compensación y Auditoría.</div></div>
+    <div class="govcell"><div class="k">Compensación CEO (FY2025)</div><div class="v">$96.5M</div><div class="sub">Satya Nadella: $2.5M salario + $9.5M bono + ~$84.2M en acciones + ~$0.2M otros. +22% vs. FY2024. Más del 95% de la compensación es performance-based según el directorio.</div></div>
+    <div class="govcell"><div class="k">Participación en OpenAI</div><div class="v">26.79% · ~$228.3B</div><div class="sub">A la valuación de $852.000M de la ronda de marzo-2026 — ~18x el capital invertido ($13.000M comprometidos 2019-2023). No está a valor de mercado en el balance (Sección 06).</div></div>
+    <div class="govcell"><div class="k">CEO / Chairman</div><div class="v">Satya Nadella</div><div class="sub">CEO desde feb-2014, también chairman del directorio desde 2021 — a diferencia de Apple, no hay una sucesión de liderazgo en curso.</div></div>
+  </div>
+  <p class="footnote">Fuentes: GuruFocus, revenuememo.com, coincodex.com (ownership), SEC EDGAR (Form 8-K, may-2026, incorporación de Di Sibio), Bloomberg/CNBC ("Microsoft CEO's Compensation..."), ceopaywatch.com.</p>
+  <p>
+    El contraste con Apple (Sección 09 del informe de AAPL de este desk) es instructivo: Nadella cobra 30% más que
+    Cook en compensación total anual, en una empresa de capitalización similar, y el directorio lo justifica citando
+    "retornos excepcionales para el accionista" — un argumento que el reporte del 29-jul-2026, con Azure a +43% y RPO a +84%,
+    refuerza más que cuestiona. La ausencia de una transición de liderazgo en curso (a diferencia de la sucesión
+    Cook→Ternus en Apple) reduce un vector de riesgo de ejecución que sí pesa en la tesis de AAPL, pero también
+    significa que la responsabilidad por la decisión de capex de $255-260 mil millones recae enteramente sobre un
+    management con doce años de historial — sin el beneficio de la duda que a veces se le da a un CEO nuevo.
+  </p>
+
+  <!-- 10 -->
+  <p class="secnum" id="s10">10 — Registro de Riesgos</p>
+  <h2>Qué podría cambiar esta lectura</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Riesgo</th><th>Descripción</th><th class="right-al">Severidad</th></tr>
+    <tr><td class="label">FCF negativo en FY2027</td><td class="label">La guía de capex ($255-260B) supera, en nuestro modelo, al OCF proyectado para el primer año en los tres escenarios — free cash flow negativo no es un evento de cola, es el caso base de este informe hasta que el capex se modere o el OCF acelere más de lo guiado.</td><td class="right-al">Alta</td></tr>
+    <tr><td class="label">Retorno del capex de IA sin confirmar</td><td class="label">El RPO comercial (+84% a $678B) sugiere demanda contratada, pero una porción del crecimiento de Azure está financiada por acuerdos circulares (OpenAI, Anthropic) que reinvierten capital de Microsoft en su propia nube — no toda la demanda es 100% orgánica.</td><td class="right-al">Alta (estructural)</td></tr>
+    <tr><td class="label">Compresión de múltiplo en el sector</td><td class="label">Alphabet ya sufrió una caída tras elevar su guía de capex; si el mercado extiende ese castigo a todo el panel de mega-caps, MSFT no sería inmune pese al beat de Q4/FY2026.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Desaceleración de Microsoft 365 / Copilot</td><td class="label">30M asientos pagos de Copilot es la métrica de adopción de IA más seguida del mercado; una desaceleración de ese ritmo de adopción sería leída como evidencia de que el capex no se está monetizando en el negocio core.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Riesgo antitrust sobre bundling</td><td class="label">El precedente de 1998-2001 (Sección 02) es la referencia histórica; el riesgo más concreto hacia adelante es escrutinio regulatorio sobre el bundling de Teams/Office 365 y sobre el poder de mercado de Azure/OpenAI en el mercado de IA generativa.</td><td class="right-al">Baja-Media</td></tr>
+    <tr><td class="label">Concentración de ganancias no operativas</td><td class="label">Parte relevante del crecimiento de EPS GAAP del trimestre (+32% vs. +23% ajustado) proviene de revaluaciones de inversiones en OpenAI/Anthropic, no de operaciones — un inversor que mire solo el titular de EPS puede sobreestimar la mejora operativa real.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Balance y apalancamiento</td><td class="label">Caja neta de +$36.5B y deuda/EBITDA de 0.2x — el balance no es un riesgo activo, y tiene capacidad de sobra para emitir deuda adicional si el capex lo requiere.</td><td class="right-al">Baja</td></tr>
+  </table></div>
+
+  <!-- 11 -->
+  <p class="secnum" id="s11">11 — Catalizadores</p>
+  <h2>Agenda de eventos relevantes</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Fecha</th><th>Evento</th></tr>
+    <tr><td class="label">29 Jul 2026</td><td class="label">Resultados Q4/FY2026 — Azure +43%, RPO +84% a $678B, guía de capex FY2027 elevada a $255-260B. Punto de partida de este informe.</td></tr>
+    <tr><td class="label">Próxima sesión regular</td><td class="label">Confirmación (o reversión) del movimiento de +9% en after-hours — variable clave para saber si el "precio de mercado" de este informe ($390.54) sigue siendo válido.</td></tr>
+    <tr><td class="label">Oct 2026 (estimado)</td><td class="label">Earnings Q1 FY2027 — primera lectura real de cómo evoluciona el capex trimestral frente a la guía anual de $255-260B.</td></tr>
+    <tr><td class="label">En curso</td><td class="label">Revisión al alza esperada del consenso de EPS FY2027 (consenso pre-reporte: $16.71, publicado antes del beat de este trimestre) — ver Sección 12.</td></tr>
+    <tr><td class="label">En curso, sin fecha fija</td><td class="label">Evolución del RPO comercial trimestre a trimestre — la métrica más directa para juzgar si el capex de FY2027 tiene demanda contratada suficiente detrás.</td></tr>
+  </table></div>
+
+  <!-- 12 -->
+  <p class="secnum" id="s12">12 — Modelo Financiero Proyectado y Momentum de Estimados</p>
+  <h2>Cómo vino el consenso vs. lo reportado el 29-jul-2026, y qué espera para FY2027</h2>
+  <p>
+    Antes de construir nuestra propia proyección en la Sección 13, vale la pena mostrar la magnitud del beat del trimestre
+    frente al consenso pre-reporte — el indicador de "momentum" más directo disponible el mismo día del resultado —
+    y separar explícitamente qué es consenso real para FY2027 de qué pasa a ser supuesto propio de este informe.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica — Q4/FY2026</th><th class="right-al">Consenso pre-reporte</th><th class="right-al">Real (reportado)</th><th class="right-al">Sorpresa</th></tr>
+    <tr><td class="label">Ingresos</td><td class="right-al">$87.67B</td><td class="right-al">$90.01B</td><td class="right-al pos">+2.7%</td></tr>
+    <tr><td class="label">EPS diluido</td><td class="right-al">$4.24</td><td class="right-al">$4.81</td><td class="right-al pos">+13.4%</td></tr>
+  </table></div>
+  <p class="footnote">Consenso pre-reporte: 31 analistas vía TradingKey/AppleInsider-style previews, julio 2026. Real: SEC EDGAR Form 8-K, Exhibit 99.1, publicado 29-jul-2026.</p>
+  <div class="chartbox">
+    <canvas id="revisionChart" height="220"></canvas>
+    <p class="chartcap">EPS diluido: consenso pre-reporte vs. resultado real del trimestre. Fuente: consenso agregado pre-reporte y 8-K oficial del 29-jul-2026.</p>
+  </div>
+  <p>
+    Un beat de EPS de 13.4% sobre el consenso —sumado a Azure acelerando por encima de lo guiado y RPO comercial
+    +84%— es el tipo de sorpresa que típicamente dispara una ola de revisiones al alza en las semanas siguientes. No
+    tenemos, al momento de este informe, el detalle granular de cuántas estimaciones individuales ya fueron revisadas
+    (a diferencia del informe de AAPL de este desk, que sí contaba con ese dato para un trimestre ya asentado) — es
+    una limitación reconocida de este informe (Sección 14), no un dato que estemos omitiendo a propósito.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">FY2026 (recién cerrado, real)</th><th class="right-al">FY2027E (consenso, PRE-reporte)</th></tr>
+    <tr><td class="label">Ingresos</td><td class="right-al">$331.84B</td><td class="right-al">n/d — sin consenso agregado público de ingresos FY2027</td></tr>
+    <tr><td class="label">EPS diluido</td><td class="right-al">$17.95</td><td class="right-al">$16.71 (¹)</td></tr>
+  </table></div>
+  <p class="footnote">(¹) El consenso de EPS FY2027 ($16.71) fue publicado ANTES del reporte del 29-jul-2026 y es, casi con certeza, una cifra desactualizada — un EPS FY2027 consensuado por debajo del EPS FY2026 ya reportado ($17.95) implicaría una contracción de ganancias que ningún analista estaba proyectando al momento de este informe; es, con alta probabilidad, un estimado no actualizado desde hace varios meses que el consenso va a revisar al alza en las próximas semanas. Fuente: Erste Group Bank vía themarketsdaily.com, jul-2026.</p>
+  <p>
+    Este es el caso más claro de todo este informe donde el "dato de consenso disponible" y el "dato de consenso
+    razonable" no son lo mismo — y preferimos señalarlo explícitamente antes que usarlo sin comentario en la
+    Sección 13. El método de comparables (Método 2) usa este EPS forward de todos modos, porque es el único
+    dato de consenso FY2027 públicamente disponible al momento de este informe, pero el lector debe leer los
+    resultados de ese método con ese matiz en mente.
+  </p>
+
+  <!-- 13 — VALUACIÓN, AL FINAL -->
+  <p class="secnum" id="s13">13 — Valuación: Cuatro Métodos y el Fair Value</p>
+  <h2>Cuánto vale la acción, mirado desde cuatro ángulos distintos</h2>
+  <p>
+    Llegamos a la valuación después de recorrer el negocio completo a propósito: el objetivo de este informe es que el
+    lector entienda primero por qué Azure acelera y por qué el capex se duplica, y recién después confronte esa
+    realidad con lo que el mercado ya está pagando por ella. Calculamos el valor razonable de la acción con cuatro
+    enfoques independientes entre sí — flujo de caja descontado, múltiplos de comparables, reversión a la media
+    histórica propia, y el consenso de analistas de Wall Street — y mostramos las cuatro cifras sin forzarlas a
+    converger artificialmente.
+  </p>
+
+  <h3>Método 1 — Flujo de caja descontado (DCF), tres escenarios</h3>
+  <p>
+    Construimos un modelo de flujo de caja descontado a dos etapas (cinco años explícitos de proyección más valor
+    terminal por crecimiento perpetuo), partiendo de los ingresos del año fiscal recién cerrado ($331.84 mil millones)
+    y de la posición de caja neta y el conteo de acciones reportados al cierre del trimestre (Sección 06). A diferencia del resto de las
+    coberturas de este desk, acá proyectamos el flujo de caja libre desagregando explícitamente el flujo de caja
+    operativo (OCF) del capex — en vez de un solo "margen de FCF" — porque la guía de capex de FY2027 ($255-260 mil
+    millones, fijada por management para el año 1 de la proyección en los tres escenarios) es demasiado importante
+    para diluirla en un promedio. El WACC base se construyó con una tasa libre de riesgo ancla en el rendimiento
+    vigente del Treasury a 10 años más un premio de riesgo accionario de 5.0%, con un beta cercano a 0.95 —
+    consistente con el perfil de menor volatilidad relativa de Microsoft dentro del universo de mega-caps.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Supuesto</th><th class="right-al">Bear</th><th class="right-al">Base</th><th class="right-al">Bull</th></tr>
+    <tr><td class="label">Crecimiento de ingresos (año 1 → año 5)</td><td class="right-al">14% → 4%</td><td class="right-al">18% → 9%</td><td class="right-al">20% → 11%</td></tr>
+    <tr><td class="label">Margen de OCF (año 1 → año 5)</td><td class="right-al">53% → 55%</td><td class="right-al">55% → 59%</td><td class="right-al">56% → 62%</td></tr>
+    <tr><td class="label">Capex / Ingresos (año 1 → año 5)</td><td class="right-al">65.7% → 35%</td><td class="right-al">65.7% → 27%</td><td class="right-al">65.7% → 22%</td></tr>
+    <tr><td class="label">WACC</td><td class="right-al">10.0%</td><td class="right-al">9.0%</td><td class="right-al">8.0%</td></tr>
+    <tr><td class="label">Crecimiento terminal</td><td class="right-al">2.5%</td><td class="right-al">3.0%</td><td class="right-al">3.5%</td></tr>
+    <tr><td class="label">FCF año 1 (OCF − Capex)</td><td class="right-al neg">&minus;$48.0B</td><td class="right-al neg">&minus;$41.9B</td><td class="right-al neg">&minus;$38.6B</td></tr>
+    <tr><td class="label">% del EV desde valor terminal</td><td class="right-al">87%</td><td class="right-al">87%</td><td class="right-al">89%</td></tr>
+    <tr class="total"><td class="label">Fair value por acción</td><td class="right-al">$131.95</td><td class="right-al">$351.32</td><td class="right-al">$659.12</td></tr>
+  </table></div>
+  <p>
+    El resultado más importante de esta tabla no está en la última fila — está en la anteúltima: <strong>el flujo de
+    caja libre del año 1 es negativo en los tres escenarios</strong>, incluso en el Bull. El capex guiado de
+    $255-260 mil millones para FY2027 es, en nuestro modelo, mayor al flujo de caja operativo que ese mismo escenario
+    genera ese año — un evento que no tiene precedente reciente en la historia financiera de Microsoft (Sección 07).
+    El escenario Bear asume que el capex se mantiene elevado más tiempo del guiado (35% de ingresos todavía en el año
+    5) y que Azure desacelera hacia tasas de un dígito bajo. El escenario Base asume que el capex converge
+    gradualmente hacia ~27% de ingresos en el año 5 —todavía muy por encima del 9.2% de FY2016— a medida que el RPO
+    contratado se va reconociendo como ingreso. El escenario Bull asume una normalización de capex más rápida (22% en
+    el año 5) combinada con aceleración de márgenes por apalancamiento operativo en Azure. En los tres casos, 87-89%
+    del valor de empresa proviene del valor terminal — sustancialmente más alto que en el informe de AAPL de este
+    desk (67-80%), precisamente porque los primeros años de flujo de caja son débiles o negativos.
+  </p>
+  <h3>Sensibilidad del caso Base: WACC × crecimiento terminal</h3>
+  <p>
+    Dado que 87% del valor de empresa del caso Base proviene del valor terminal, mostramos cómo se mueve el fair
+    value únicamente variando WACC y crecimiento terminal, con el resto de los inputs fijos. La celda marcada es el
+    caso Base reportado arriba ($351.32, WACC 9.0%, g 3.0%).
+  </p>
+  <div class="table-scroll"><table class="sens-table">
+    <tr><th>WACC \ g terminal</th><th class="right-al">2.0%</th><th class="right-al">2.5%</th><th class="right-al">3.0%</th><th class="right-al">3.5%</th><th class="right-al">4.0%</th></tr>
+    <tr><td class="axis">8.0%</td><td class="right-al">$364.26</td><td class="right-al">$394.32</td><td class="right-al">$430.39</td><td class="right-al">$474.48</td><td class="right-al">$529.60</td></tr>
+    <tr><td class="axis">8.5%</td><td class="right-al">$332.74</td><td class="right-al">$357.71</td><td class="right-al">$387.23</td><td class="right-al">$422.64</td><td class="right-al">$465.92</td></tr>
+    <tr><td class="axis">9.0%</td><td class="right-al">$305.79</td><td class="right-al">$326.80</td><td class="right-al base-cell">$351.32</td><td class="right-al">$380.29</td><td class="right-al">$415.06</td></tr>
+    <tr><td class="axis">9.5%</td><td class="right-al">$282.48</td><td class="right-al">$300.37</td><td class="right-al">$321.00</td><td class="right-al">$345.07</td><td class="right-al">$373.52</td></tr>
+    <tr><td class="axis">10.0%</td><td class="right-al">$262.14</td><td class="right-al">$277.50</td><td class="right-al">$295.06</td><td class="right-al">$315.32</td><td class="right-al">$338.96</td></tr>
+  </table></div>
+  <p class="footnote">Grilla propia, recalculando el modelo de dos etapas del caso Base (mismo crecimiento explícito, margen de OCF y capex/ingresos por año declarados arriba) para cada combinación WACC/g. La celda base ($351.32) corresponde a WACC 9.0% y g 3.0%, reproduce 86.9% de EV desde terminal.</p>
+  <p>
+    A diferencia de la grilla de AAPL, acá el precio de mercado ($390.54) sí queda dentro del rango de la grilla —
+    varias combinaciones razonables (WACC 8.0-8.5% con g 3.0-4.0%) lo superan. La brecha entre nuestro caso Base y el
+    mercado es, en este caso, más una diferencia de matiz sobre el ritmo exacto de normalización del capex que una
+    discrepancia estructural — muy distinto al patrón observado en AAPL, donde ninguna combinación razonable cerraba
+    la brecha.
+  </p>
+
+  <h3>Método 2 — Múltiplos de comparables</h3>
+  <p>
+    Usamos el EPS forward de consenso FY2027 ($16.71 — con la salvedad de la Sección 12 sobre su antigüedad) y le
+    aplicamos el P/E forward promedio de los cuatro comparables de la Sección 08 (Apple, Alphabet, Meta, Amazon:
+    26.5x promedio).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Múltiplo P/E forward aplicado</th><th class="right-al">Precio implícito</th></tr>
+    <tr><td class="label">18.3x (piso del panel, META)</td><td class="right-al">$305.79</td></tr>
+    <tr><td class="label">24.1x (GOOGL)</td><td class="right-al">$402.71</td></tr>
+    <tr class="total"><td class="label">26.5x (promedio de los 4 comparables)</td><td class="right-al">$442.82</td></tr>
+    <tr><td class="label">29.3x (AMZN)</td><td class="right-al">$489.60</td></tr>
+    <tr><td class="label">34.2x (techo del panel, AAPL)</td><td class="right-al">$571.48</td></tr>
+  </table></div>
+  <p>
+    Tomamos $442.82 (el promedio del panel de 4 comparables) como el resultado de este método — el más generoso de
+    los tres métodos numéricos, y el más expuesto a la fragilidad del EPS forward de consenso señalada en la
+    Sección 12.
+  </p>
+
+  <h3>Método 3 — Reversión a la media histórica propia</h3>
+  <p>
+    Preguntamos a qué múltiplo cotizó la propia acción en promedio durante la última década, y qué precio resultaría
+    de aplicar ese múltiplo histórico al EPS forward de consenso. El P/E promedio de MSFT de los últimos 5 años es
+    32.05x; el de los últimos 10 años, 31.66x — ambos muy por encima del P/E TTM actual de 21.8x (Sección 08), que
+    está 26% por debajo del promedio de 10 años según GuruFocus al 27-jul-2026, es decir, antes del beat del 29-jul-2026.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Referencia histórica</th><th class="right-al">Múltiplo</th><th class="right-al">Precio implícito (sobre EPS fwd. $16.71)</th></tr>
+    <tr><td class="label">Promedio 10 años</td><td class="right-al">31.66x</td><td class="right-al">$529.02</td></tr>
+    <tr class="total"><td class="label">Promedio 5 años</td><td class="right-al">32.05x</td><td class="right-al">$535.53</td></tr>
+  </table></div>
+  <p class="footnote">P/E históricos: financecharts.com, fullratio.com, GuruFocus. EPS forward: consenso FY2027 (ver Método 2 y salvedad de Sección 12).</p>
+  <p>
+    Tomamos el promedio de los dos (~$532.22) como el resultado de este método. Es, de los tres métodos numéricos, el
+    más alto de todos — una lectura consistente con el hecho de que MSFT viene cotizando "barata" frente a sus
+    propios estándares históricos, lo inverso exacto del patrón que encontramos en AAPL.
+  </p>
+
+  <h3>Método 4 — Consenso de Wall Street</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Analistas cubriendo MSFT</td><td class="right-al">56</td></tr>
+    <tr><td class="label">Calificación consenso</td><td class="right-al">Strong Buy</td></tr>
+    <tr class="total"><td class="label">Precio objetivo promedio (12 meses)</td><td class="right-al">$555.77</td></tr>
+    <tr><td class="label">Rango de precios objetivo</td><td class="right-al">$400.00 – $870.00</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: S&amp;P Global Market Intelligence, consenso pre-reporte (jul-2026) — sujeto a revisión al alza tras el beat del trimestre (Sección 12).</p>
+  <p>
+    A diferencia de AAPL, acá no hay divergencia interna: la calificación "Strong Buy" es consistente con un precio
+    objetivo que ya estaba, antes del reporte del 29-jul-2026, 42.3% por encima del precio de mercado. Es el método más
+    optimista de los cuatro, y el más expuesto al riesgo de que esas proyecciones no incorporen todavía el salto de
+    capex anunciado el 29-jul-2026 — el consenso pre-reporte no tenía forma de saber que la guía de FY2027 iba a duplicarse.
+  </p>
+
+  <h3>Síntesis: los cuatro métodos, uno al lado del otro</h3>
+  <div class="chartbox">
+    <canvas id="footballChart" height="260"></canvas>
+    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado ($390.54); la línea azul marca el blend propio ($442.12). A diferencia de AAPL, tres de las cuatro metodologías propias superan el precio de mercado — solo el escenario Bear del DCF queda muy por debajo.</p>
+  </div>
+  <div class="table-scroll"><table>
+    <tr><th>Método</th><th class="right-al">Fair value</th></tr>
+    <tr><td class="label">DCF — Bear</td><td class="right-al">$131.95</td></tr>
+    <tr><td class="label">DCF — Base</td><td class="right-al">$351.32</td></tr>
+    <tr><td class="label">DCF — Bull</td><td class="right-al">$659.12</td></tr>
+    <tr><td class="label">Comparables (P/E forward promedio del panel)</td><td class="right-al">$442.82</td></tr>
+    <tr><td class="label">Reversión histórica (P/E promedio 5-10 años propio)</td><td class="right-al">$532.22</td></tr>
+    <tr class="total"><td class="label">Promedio simple — DCF Base, Comparables, Reversión histórica</td><td class="right-al">$442.12</td></tr>
+    <tr><td class="label">Consenso Wall Street (referencia externa, no promediada)</td><td class="right-al">$555.77</td></tr>
+  </table></div>
+  <p>
+    El promedio simple de las tres metodologías numéricas propias (DCF caso Base, comparables, reversión histórica)
+    da <strong>$442.12 por acción</strong> — 13.2% por encima del precio de mercado de $390.54. A diferencia del
+    informe de AAPL de este desk, acá el blend queda por encima del mercado, y el consenso Wall Street es todavía más
+    optimista ($555.77). Pero no convertimos esto en una recomendación de compra sin matices: el propio DCF —la
+    metodología más rigurosa de las cuatro, y la única que modela explícitamente el capex guiado para FY2027— es también la
+    más dispersa (de $131.95 a $659.12) y la que arroja flujo de caja libre negativo en el año 1 bajo cualquier
+    escenario. Un blend positivo construido sobre un método con esa dispersión no es, en nuestra lectura, evidencia
+    suficiente de convicción — es evidencia de que la tesis todavía tiene que resolverse con los próximos 2-3
+    trimestres de ejecución de capex real, no con el dato de este trimestre.
+  </p>
+
+  <!-- 14 -->
+  <p class="secnum" id="s14">14 — Limitaciones del Modelo</p>
+  <h2>Qué asume este análisis, y dónde puede fallar</h2>
+  <div class="watermark-block">
+    <p style="margin-bottom:0;">
+      87-89% del valor de empresa en los tres escenarios del DCF proviene del valor terminal — más alto que en
+      cualquier otra cobertura de este desk — precisamente porque el flujo de caja libre del año 1 es negativo en los
+      tres escenarios; el modelo depende, en una proporción inusualmente alta, de que el capex se normalice en los
+      años 2-5 tal como se supone, no como se garantiza. El EPS forward de consenso usado en los métodos de
+      comparables y reversión histórica ($16.71) fue publicado ANTES del reporte del 29-jul-2026 y es, con alta probabilidad,
+      una cifra desactualizada que subestima las ganancias reales de FY2027 (Sección 12) — lo que probablemente
+      empuja el resultado de esos dos métodos a la baja de forma artificial, no al revés. El precio de mercado usado
+      en todo este informe ($390.54) es el cierre de la sesión regular previa al reporte, no el precio post-earnings
+      confirmado — la reacción de +9% en after-hours, si se sostiene en la siguiente sesión regular, cambiaría todos
+      los cálculos de upside/downside de esta sección sin que cambie ninguno de los fair values calculados. El modelo
+      trata las ganancias no operativas por inversiones en OpenAI/Anthropic como ajenas al FCF operativo (correcto
+      para el DCF) pero no cuantifica el valor de esas participaciones como activo separado de la operación —el
+      stake en OpenAI (~$228.300 millones, Sección 02) no está incorporado explícitamente en ninguno de los cuatro
+      métodos de esta sección, lo que probablemente subestima el valor total de la compañía en las cuatro
+      metodologías. Finalmente, no tenemos datos granulares de revisión de estimados de los últimos 90 días para
+      MSFT (a diferencia del informe de AAPL de este desk) — el "momentum" que reportamos en la Sección 12 se basa
+      únicamente en el beat de este trimestre, no en una serie histórica de revisiones.
+    </p>
+  </div>
+
+  <div class="disclosure">
+    Documento elaborado a partir de fuentes públicas: SEC EDGAR (Form 8-K Exhibit 99.1, 10-Q, 10-K, XBRL companyconcept
+    API), comunicados de resultados y newsroom de Microsoft, Apple, Alphabet, Meta y Amazon, S&amp;P Global Market
+    Intelligence, GuruFocus, stockanalysis.com, ChartMill, fullratio.com, financecharts.com, TradingKey, CNBC,
+    TechCrunch, GeekWire, DataCenterDynamics, Bloomberg, revenuememo.com, coincodex.com, ceopaywatch.com, Forbes, The
+    Motley Fool y themarketsdaily.com. Cifras fundamentales con fecha de corte en el Form 8-K de Microsoft
+    correspondiente al trimestre y año fiscal cerrados el 30 de junio de 2026, publicado el 29 de julio de 2026;
+    desarrollos corporativos y de mercado con fecha de corte de la misma fecha.
+    <br><br>
+    <strong>Sobre el autor y la naturaleza de este documento:</strong> este informe es un análisis independiente
+    elaborado por Manfredi Investment Research &amp; Markets con fines exclusivamente informativos y educativos. El
+    autor no es un asesor de inversión registrado, no está matriculado ante la Comisión Nacional de Valores (CNV), la
+    SEC, ni ningún otro organismo regulador equivalente, y no mantiene una relación de asesoramiento financiero
+    personalizado con el lector. Ninguna cifra de este documento —incluido el "fair value" de portada, los escenarios
+    de DCF, ni la síntesis de la Sección 13— constituye una recomendación de compra, venta o mantenimiento para
+    ningún lector en particular, ni considera la situación financiera, los objetivos o el perfil de riesgo individual
+    de quien lo lee. Los escenarios de DCF son estimaciones propias sujetas a los supuestos declarados explícitamente
+    en la Sección 13, y no representan guidance oficial de ninguna de las compañías mencionadas salvo donde se cita
+    de forma directa y atribuida. Verificar cifras contra el 10-Q/10-K/8-K más reciente de cada compañía, y consultar
+    a un asesor financiero matriculado, antes de tomar cualquier decisión de inversión.
+  </div>
+
+</div>
+
+<script>
+/* ---- Motor de gráficos propio, sin dependencias externas (Canvas 2D) ---- */
+(function(){
+  var PALETTE = {ink:'#161a20', muted:'#69707c', line:'#e3e9f0', navy:'#0b1f3a', navy2:'#15335c', blue:'#2f5f9e', blueLight:'#5f8fc7', pale:'#c7d9ec', red:'#a8291f', gold:'#c99a3c'};
+
+  function setupCanvas(canvas, cssHeight){
+    var dpr = window.devicePixelRatio || 1;
+    var cssWidth = canvas.parentElement.clientWidth - 44; // padding del chartbox
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = Math.max(1, Math.round(cssWidth * dpr));
+    canvas.height = Math.max(1, Math.round(cssHeight * dpr));
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return {ctx: ctx, w: cssWidth, h: cssHeight};
+  }
+
+  function fmtCompact(v, prefix, suffix){
+    prefix = prefix || ''; suffix = suffix || '';
+    return prefix + v + suffix;
+  }
+
+  function drawVBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+    ctx.font = '11px "IBM Plex Mono", monospace';
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var log = !!opts.log;
+    var padL = 46, padR = 10, padT = 16, padB = 46;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var maxV = Math.max.apply(null, values);
+    var minV = log ? Math.min.apply(null, values) : 0;
+    function scaleY(v){
+      if(log){
+        var lv = Math.log10(Math.max(v,0.01)), lmax = Math.log10(maxV*1.15), lmin = Math.log10(Math.max(minV*0.5,1));
+        return padT + plotH - ((lv - lmin) / (lmax - lmin)) * plotH;
+      }
+      return padT + plotH - (v / (maxV*1.15)) * plotH;
+    }
+
+    // gridlines
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    var gridSteps = 4;
+    for(var g=0; g<=gridSteps; g++){
+      var yy = padT + (plotH/gridSteps)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    // axis
+    ctx.strokeStyle = PALETTE.navy; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    var n = values.length;
+    var slot = plotW / n;
+    var barW = Math.min(slot * 0.56, 64);
+
+    for(var i=0;i<n;i++){
+      var cx = padL + slot*i + slot/2;
+      var y0 = scaleY(values[i]);
+      var yBase = padT + plotH;
+      ctx.fillStyle = colors[i % colors.length];
+      var bw = barW;
+      ctx.fillRect(cx - bw/2, y0, bw, yBase - y0);
+
+      // value label
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'center';
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, cx, y0 - 6);
+
+      // x label
+      ctx.fillStyle = PALETTE.muted;
+      ctx.font = '10px "Inter", sans-serif';
+      wrapLabel(ctx, labels[i], cx, yBase + 16, slot + 6);
+    }
+  }
+
+  function wrapLabel(ctx, text, cx, y, maxW){
+    var words = String(text).split(' ');
+    var lines = [];
+    var cur = '';
+    for(var i=0;i<words.length;i++){
+      var test = cur ? cur + ' ' + words[i] : words[i];
+      if(ctx.measureText(test).width > maxW && cur){ lines.push(cur); cur = words[i]; }
+      else cur = test;
+    }
+    if(cur) lines.push(cur);
+    lines = lines.slice(0,2);
+    ctx.textAlign = 'center';
+    for(var j=0;j<lines.length;j++){
+      ctx.fillText(lines[j], cx, y + j*11);
+    }
+  }
+
+  function drawHBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var padL = 128, padR = 54, padT = 10, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var maxV = Math.max.apply(null, values) * 1.12;
+
+    var n = values.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.5, 30);
+
+    // gridlines (vertical)
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, padT+plotH); ctx.stroke();
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = padL;
+      var w = (values[i]/maxV) * plotW;
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, w, barH);
+
+      ctx.fillStyle = PALETTE.text || PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(labels[i], padL - 10, cy + 4);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'left';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, x0 + w + 8, cy + 4);
+    }
+  }
+
+  function drawRangeBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, ranges = opts.ranges, colors = opts.colors, refLines = opts.refLines || [];
+    var padL = 168, padR = 16, padT = 26, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    ranges.forEach(function(r){ allVals.push(r[0], r[1]); });
+    refLines.forEach(function(r){ allVals.push(r.value); });
+    var domMin = Math.min.apply(null, allVals) * 0.94;
+    var domMax = Math.max.apply(null, allVals) * 1.04;
+    function scaleX(v){ return padL + ((v - domMin)/(domMax - domMin)) * plotW; }
+
+    var n = ranges.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.42, 22);
+
+    // vertical gridlines
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = scaleX(ranges[i][0]), x1 = scaleX(ranges[i][1]);
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, Math.max(x1-x0,2), barH);
+      ctx.beginPath(); ctx.arc(x0, cy, barH/2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x1, cy, barH/2, 0, Math.PI*2); ctx.fill();
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      wrapLabel(ctx, labels[i], padL - 12, cy - 4, padL - 20);
+
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      var vf = opts.valueFmt || function(v){ return '$'+v.toFixed(0); };
+      ctx.textAlign = 'right';
+      ctx.fillText(vf(ranges[i][0]), x0 - 8, cy + 4);
+      ctx.textAlign = 'left';
+      ctx.fillText(vf(ranges[i][1]), x1 + 8, cy + 4);
+    }
+
+    refLines.forEach(function(r){
+      var x = scaleX(r.value);
+      ctx.strokeStyle = r.color; ctx.lineWidth = 1.6; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x, padT-6); ctx.lineTo(x, padT+plotH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = r.color;
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(r.label, x, padT - 12);
+    });
+  }
+
+  function drawLines(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, series = opts.series; // [{name,color,values}]
+    var padL = 40, padR = 14, padT = 16, padB = 54;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    series.forEach(function(s){ allVals = allVals.concat(s.values); });
+    var maxV = Math.max.apply(null, allVals) * 1.08;
+    var minV = Math.min.apply(null, allVals) * 0.92;
+
+    function scaleX(i){ return padL + (plotW/(labels.length-1)) * i; }
+    function scaleY(v){ return padT + plotH - ((v - minV)/(maxV-minV)) * plotH; }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var yy = padT + (plotH/4)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    series.forEach(function(s){
+      ctx.strokeStyle = s.color; ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        ctx.fillStyle = s.color;
+        ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
+      });
+    });
+
+    // x labels
+    ctx.fillStyle = PALETTE.muted;
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    labels.forEach(function(l,i){ ctx.fillText(l, scaleX(i), padT+plotH+16); });
+
+    // legend
+    var lx = padL, ly = H - 12;
+    ctx.font = '11px "Inter", sans-serif';
+    series.forEach(function(s){
+      ctx.fillStyle = s.color;
+      ctx.fillRect(lx, ly-8, 10, 10);
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'left';
+      ctx.fillText(s.name, lx+14, ly);
+      lx += 14 + ctx.measureText(s.name).width + 22;
+    });
+  }
+
+  function renderAll(){
+    drawVBars(document.getElementById('historyChart'), {
+      labels:['FY2016','FY2017','FY2018','FY2019','FY2020','FY2021','FY2022','FY2023','FY2024','FY2025','FY2026'],
+      values:[91.15,96.57,110.36,125.84,143.01,168.09,198.27,211.91,245.12,281.72,331.84],
+      colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.blue,PALETTE.navy2,PALETTE.navy2,PALETTE.navy],
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawHBars(document.getElementById('segmentChart'), {
+      labels:['Intelligent Cloud','Productivity & Business Proc.','More Personal Computing'],
+      values:[39.31,37.85,12.85],
+      colors:[PALETTE.navy,PALETTE.blue,PALETTE.pale],
+      valueFmt:function(v){ return '$'+v.toFixed(1)+'B'; }
+    });
+
+    drawHBars(document.getElementById('geoChart'), {
+      labels:['Productivity & Business Proc.','Intelligent Cloud','More Personal Computing'],
+      values:[140.00,137.79,54.05],
+      colors:[PALETTE.blue,PALETTE.navy,PALETTE.pale],
+      valueFmt:function(v){ return '$'+v.toFixed(1)+'B'; }
+    });
+
+    drawLines(document.getElementById('marginChart'), {
+      labels:['Q3 FY25','Q4 FY25','Q3 FY26','Q4 FY26'],
+      series:[
+        {name:'Margen bruto', color:PALETTE.navy, values:[68.7,68.6,67.6,67.2]},
+        {name:'Margen operativo', color:PALETTE.blueLight, values:[45.7,44.9,46.3,45.1]}
+      ]
+    });
+
+    drawVBars(document.getElementById('capexChart'), {
+      labels:['AAPL','META (piso)','MSFT (FY26 real)','AMZN (piso)','GOOGL (techo)'],
+      values:[13.5,125,115.95,200,205],
+      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.red,PALETTE.blueLight,PALETTE.blueLight],
+      log:true,
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawHBars(document.getElementById('compsChart'), {
+      labels:['AAPL','AMZN','MSFT','META','GOOGL*'],
+      values:[41.3,29.3,21.8,21.6,16.0],
+      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.red,PALETTE.blueLight,PALETTE.pale],
+      valueFmt:function(v){ return v.toFixed(1)+'x'; }
+    });
+
+    drawRangeBars(document.getElementById('footballChart'), {
+      labels:['DCF (Bear → Bull)','Comparables (piso → techo panel)','Reversión histórica (10y → 5y)','Consenso Wall Street (rango objetivo)'],
+      ranges:[[131.95,659.12],[305.79,571.48],[529.02,535.53],[400.00,870.00]],
+      colors:[PALETTE.blue,PALETTE.navy2,PALETTE.blueLight,PALETTE.gold],
+      refLines:[{value:390.54,color:PALETTE.red,label:'Mercado $391'},{value:442.12,color:PALETTE.navy,label:'Blend $442'}],
+      valueFmt:function(v){ return '$'+v.toFixed(0); }
+    });
+
+    drawHBars(document.getElementById('revisionChart'), {
+      labels:['EPS consenso pre-reporte','EPS real Q4 FY2026'],
+      values:[4.24,4.81],
+      colors:[PALETTE.pale,PALETTE.blue],
+      valueFmt:function(v){ return '$'+v.toFixed(2); }
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', renderAll);
+  } else {
+    renderAll();
+  }
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderAll, 150);
+  });
+})();
+</script>
+</body>
+</html>

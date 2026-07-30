@@ -1,0 +1,1278 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AAPL — Apple Inc. | Manfredi Investment Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-dark:#0b1f3a;
+    --navy:#0e2748;
+    --navy2:#15335c;
+    --blue:#2f5f9e;
+    --blue-light:#5f8fc7;
+    --blue-pale:#eaf1f9;
+    --line:#d7e0ea;
+    --text:#161a20;
+    --muted:#69707c;
+    --green:#1a7a54;
+    --red:#a8291f;
+    --serif:'Newsreader',serif;
+    --sans:'Inter',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#fff; color:var(--text); font-family:var(--sans); font-size:15.5px; line-height:1.7;}
+  .wrap{max-width:900px; margin:0 auto; padding:0 30px 90px;}
+
+  .brandbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:26px 30px 20px; max-width:900px; margin:0 auto; border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:38px; height:38px; border:1.5px solid var(--navy-dark); display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-weight:700; color:var(--navy-dark); font-size:16px;
+  }
+  .brand-name{font-family:var(--serif); font-weight:700; font-size:17px; color:var(--text); line-height:1.15;}
+  .brand-sub{font-family:var(--sans); font-size:10px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase;}
+  .brandbar .doctype{font-family:var(--mono); font-size:11px; color:var(--muted); text-align:right;}
+
+  .frontbox{border:1px solid var(--navy-dark); margin:34px 0 8px; padding:0;}
+  .frontbox-top{display:flex; justify-content:space-between; align-items:baseline; padding:22px 28px 14px; border-bottom:1px solid var(--line);}
+  .ticker-big{font-family:var(--serif); font-size:42px; font-weight:700; color:var(--navy-dark);}
+  .exch{font-family:var(--mono); font-size:12px; color:var(--muted); margin-left:10px;}
+  .rating{font-family:var(--mono); font-size:12px; font-weight:600; color:var(--blue); text-align:right; letter-spacing:.03em;}
+  .rating small{display:block; font-family:var(--mono); font-size:10.5px; color:var(--muted); font-weight:400; margin-top:3px; letter-spacing:normal;}
+  .frontbox-body{padding:20px 28px 26px;}
+  .company-line{color:var(--muted); font-size:13.5px; margin-bottom:16px;}
+  .thesis-block{font-family:var(--serif); font-size:17.5px; line-height:1.65; color:var(--text); font-style:italic;}
+
+  .statsrow{display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line);}
+  .statcell{padding:16px 20px; border-right:1px solid var(--line);}
+  .statcell:last-child{border-right:none;}
+  .statcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:6px;}
+  .statcell .v{font-family:var(--mono); font-size:16px; font-weight:600; color:var(--text);}
+  .pos{color:var(--green);} .neg{color:var(--red);}
+
+  .secnum{font-family:var(--mono); font-size:11px; color:var(--blue-light); letter-spacing:.1em; margin:50px 0 2px;}
+  h2{font-family:var(--serif); font-size:24px; font-weight:600; color:var(--navy2); margin:2px 0 18px; padding-bottom:10px; border-bottom:1.5px solid var(--navy-dark); text-wrap:balance;}
+  h3{font-family:var(--serif); font-size:17px; font-weight:600; color:var(--navy2); margin:30px 0 10px;}
+  p{margin:0 0 15px; max-width:68ch;}
+  strong{color:var(--text);}
+
+  .table-scroll{overflow-x:auto; margin:18px 0 22px;}
+  .table-scroll table{margin:0;}
+  table{width:100%; min-width:520px; border-collapse:collapse; font-size:13.5px;}
+  th{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); text-align:left; padding:8px 10px; border-bottom:1.5px solid var(--navy-dark); white-space:nowrap;}
+  td{padding:8px 10px; border-bottom:1px solid var(--line); font-family:var(--mono); color:var(--text); font-variant-numeric:tabular-nums;}
+  td.label{font-family:var(--sans); color:var(--text);}
+  tr.total td{font-weight:600; border-top:1px solid var(--navy-dark); border-bottom:none;}
+  .right-al{text-align:right;}
+
+  .chartbox{border:1px solid var(--line); padding:20px 22px 16px; margin:22px 0;}
+  .chartbox canvas{width:100% !important; display:block;}
+  .chartcap{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:14px; text-align:center;}
+
+  .pull{border-left:2px solid var(--navy-dark); padding-left:18px; margin:22px 0; color:var(--muted); font-size:13.5px; max-width:68ch;}
+
+  .footnote{font-family:var(--mono); font-size:11px; color:var(--muted); margin:-6px 0 18px; max-width:none;}
+
+  .watermark-block{
+    position:relative; margin:60px 0; padding:26px 30px; border:1px solid var(--line); overflow:hidden;
+  }
+  .watermark-block::before{
+    content:"AAPL"; position:absolute; right:10px; top:-30px; font-family:var(--serif); font-weight:700;
+    font-size:110px; color:var(--blue-pale); z-index:0; line-height:1;
+  }
+  .watermark-block > *{position:relative; z-index:1;}
+
+  .toc{border:1px solid var(--line); padding:22px 26px; margin:30px 0;}
+  .toc-title{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px;}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:30px;}
+  .toc li{font-size:13px; margin-bottom:7px; break-inside:avoid;}
+  .toc a{color:var(--navy2); text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  .toc .toc-final a{font-weight:600;}
+
+  .disclosure{margin-top:70px; padding-top:22px; border-top:1px solid var(--navy-dark); font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.8; max-width:none;}
+
+  .fv-block{text-align:right;}
+  .fv-block .fv-label{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+  .fv-block .fv-value{font-family:var(--mono); font-size:22px; font-weight:600; color:var(--navy-dark); line-height:1.3;}
+  .fv-block .fv-gap{font-family:var(--mono); font-size:12.5px; font-weight:600;}
+  .fv-block .fv-gap.neg{color:var(--red);} .fv-block .fv-gap.pos{color:var(--green);}
+
+  .verdict-bar{display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; background:var(--blue-pale); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:14px 28px;}
+  .verdict-stance{font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--navy-dark);}
+  .verdict-stance strong{color:var(--navy-dark);}
+  .verdict-note{font-family:var(--sans); font-size:11.5px; color:var(--muted); max-width:56ch; line-height:1.5;}
+
+  .sens-table td, .sens-table th{text-align:center;}
+  .sens-table td.axis{font-family:var(--mono); font-weight:600; background:#fff; color:var(--text);}
+  .sens-table td.base-cell{outline:2px solid var(--navy-dark); outline-offset:-2px;}
+
+  .govrow{display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:1px solid var(--line); margin:20px 0;}
+  .govcell{padding:16px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .govcell:nth-child(3n){border-right:none;}
+  .govcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px;}
+  .govcell .v{font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text);}
+  .govcell .sub{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.4;}
+
+  a{color:var(--blue);}
+  :focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
+
+  @media (max-width:720px){
+    .statsrow{grid-template-columns:repeat(2,1fr);}
+    .frontbox-top{flex-direction:column; gap:10px;}
+    .rating{text-align:left;}
+    .toc ol{columns:1;}
+    .verdict-bar{flex-direction:column; align-items:flex-start;}
+    .govrow{grid-template-columns:1fr;}
+    .govcell{border-right:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <div class="brand">
+    <div class="brand-mark">MI</div>
+    <div>
+      <div class="brand-name">Manfredi Investment</div>
+      <div class="brand-sub">Research &amp; Markets</div>
+    </div>
+  </div>
+  <div class="doctype">Equity Research · Informe Institucional<br>Datos a Q2 FY2026 (cierre 28 mar 2026)</div>
+</div>
+
+<div class="wrap">
+
+  <div class="frontbox">
+    <div class="frontbox-top">
+      <div><span class="ticker-big">AAPL</span><span class="exch">NASDAQ · Apple Inc.</span></div>
+      <div class="fv-block">
+        <div class="fv-label">Fair value (blend propio)</div>
+        <div class="fv-value">$236.27</div>
+        <div class="fv-gap neg">vs. $341.04 mercado · &minus;30.7%</div>
+      </div>
+    </div>
+    <div class="verdict-bar">
+      <div class="verdict-stance">POSTURA DEL ANÁLISIS: <strong>VALUACIÓN EXIGENTE</strong> — el blend de metodologías propias queda por debajo del precio de mercado (ver Sección 13)</div>
+      <div class="verdict-note">Este documento es análisis independiente con fines informativos y educativos. El autor no es un asesor financiero registrado (no CFA / no matriculado ante la CNV/SEC) y este contenido no constituye una recomendación de compra, venta o mantenimiento para ningún lector en particular. Ver disclosure completo al pie.</div>
+    </div>
+    <div class="frontbox-body">
+      <div class="company-line">Hardware de consumo · Servicios digitales · Ecosistema iOS · Semiconductores propios (Apple Silicon)</div>
+      <div class="thesis-block">
+        Apple está atravesando el ciclo de producto más fuerte de su historia reciente — el iPhone 17 produjo los dos
+        mejores trimestres de ingresos por iPhone jamás reportados — al mismo tiempo que ejecuta la primera sucesión de
+        CEO en quince años y sostiene una política de asignación de capital que la separa cada vez más del resto de las
+        mega-caps tecnológicas, que están volcando cientos de miles de millones de dólares a infraestructura de
+        inteligencia artificial mientras Apple prioriza recompras y dividendos. Este informe recorre el negocio completo
+        —historia, segmentos, resultados, balance, comparables y riesgos— y cierra, recién en la última sección, con la
+        valuación: cuatro metodologías independientes aplicadas sobre los mismos datos, para que el lector llegue a esa
+        conclusión después de conocer el negocio, no antes.
+      </div>
+    </div>
+    <div class="statsrow">
+      <div class="statcell"><div class="k">Ingresos TTM</div><div class="v">$451.4B</div></div>
+      <div class="statcell"><div class="k">Var. ingresos (últ. trim.)</div><div class="v pos">+17%</div></div>
+      <div class="statcell"><div class="k">Margen bruto TTM</div><div class="v">47.9%</div></div>
+      <div class="statcell"><div class="k">Posición de caja neta</div><div class="v pos">+$63.9B</div></div>
+    </div>
+  </div>
+  <p class="footnote">Cifras fundamentales: SEC EDGAR (10-Q/10-K, XBRL), trimestre fiscal cerrado el 28 de marzo de 2026 (Q2 FY2026) y los cuatro trimestres móviles anteriores. Este documento es 100% analítico — no constituye una recomendación de compra, venta ni mantenimiento. Ver disclosure completo al pie.</p>
+
+  <div class="toc">
+    <div class="toc-title">Contenido</div>
+    <ol>
+      <li><a href="#s01">Resumen Ejecutivo</a></li>
+      <li><a href="#s02">Historia y Evolución</a></li>
+      <li><a href="#s03">Modelo de Negocio y Segmentos</a></li>
+      <li><a href="#s04">Desarrollos Recientes y Perspectiva</a></li>
+      <li><a href="#s05">Estados Financieros</a></li>
+      <li><a href="#s06">Deuda y Balance</a></li>
+      <li><a href="#s07">Flujo de Caja y Capital Allocation</a></li>
+      <li><a href="#s08">Comparables de Industria</a></li>
+      <li><a href="#s09">Gobierno Corporativo y Estructura Accionaria</a></li>
+      <li><a href="#s10">Registro de Riesgos</a></li>
+      <li><a href="#s11">Catalizadores</a></li>
+      <li><a href="#s12">Modelo Financiero Proyectado y Momentum de Estimados</a></li>
+      <li class="toc-final"><a href="#s13">Valuación: Cuatro Métodos y el Fair Value</a></li>
+      <li><a href="#s14">Limitaciones del Modelo</a></li>
+    </ol>
+  </div>
+
+  <!-- 01 -->
+  <p class="secnum" id="s01">01 — Resumen Ejecutivo</p>
+  <h2>El mejor momento operativo de Apple coincide con su mayor cambio de liderazgo en quince años</h2>
+  <p>
+    Apple llega a este informe habiendo reportado los dos mejores trimestres de ingresos por iPhone de su historia: el
+    ciclo del iPhone 17 (y su variante de entrada, el iPhone 17e) generó $85.3 mil millones en el trimestre de diciembre
+    2025 (+23% interanual, récord absoluto) y $57.0 mil millones en el trimestre de marzo 2026 (+21.7%, récord para un
+    trimestre de marzo). Servicios —App Store, iCloud, Apple Music, publicidad, AppleCare— alcanzó $31.0 mil millones
+    trimestrales, también récord histórico, con márgenes estructuralmente más altos que el hardware. Gran China, la
+    región que durante años funcionó como el principal argumento bajista sobre la tesis de Apple, creció 28.1%
+    interanual en el trimestre de marzo, su mejor performance en varios años.
+  </p>
+  <p>
+    Ese desempeño llega en simultáneo con el cambio de liderazgo más importante de la compañía desde 2011: Tim Cook,
+    CEO desde la muerte de Steve Jobs, deja el cargo el 1° de septiembre de 2026 después de quince años al mando, y es
+    sucedido por John Ternus, hasta ese momento responsable de ingeniería de hardware. Cook pasa a presidente ejecutivo
+    del directorio. Es una transición que se da, además, mientras Apple negocia un acuerdo con el Departamento de
+    Justicia de EE.UU. sobre el litigio antitrust de 2024, y mientras finalmente lanza "Siri AI" —la versión rediseñada
+    de su asistente con inteligencia artificial— después de un retraso de más de un año que derivó en una demanda
+    colectiva ya resuelta.
+  </p>
+  <p>
+    Todo esto ocurre con la acción cotizando en niveles de valuación que exigen continuidad de ese crecimiento por años,
+    no trimestres: un múltiplo precio/ganancias muy por encima del promedio histórico de la propia compañía, en un
+    momento en que Apple invierte una fracción del capex de infraestructura de IA que están desplegando Microsoft,
+    Alphabet, Meta y Amazon. Este informe desarrolla el negocio completo —de dónde viene, cómo está armado hoy, qué
+    cambió en los últimos trimestres, cómo se comparan sus resultados con los de sus pares— antes de llegar, en la
+    Sección 13, a la pregunta de cuánto vale la acción. Usamos ahí cuatro metodologías independientes (flujo de caja
+    descontado, múltiplos de comparables, reversión a la media histórica propia, y consenso de Wall Street) en lugar de
+    una sola cifra, porque ninguna metodología aislada captura bien una historia con esta cantidad de variables en
+    movimiento simultáneo.
+  </p>
+
+  <!-- 02 -->
+  <p class="secnum" id="s02">02 — Historia y Evolución</p>
+  <h2>De hardware cíclico a compounder de márgenes: la transformación de la era Cook</h2>
+  <p>
+    Apple nació en 1976 y pasó por al menos tres vidas distintas antes de llegar a la que hoy conocemos. La primera, de
+    garage a gigante de PCs personales en los 80, terminó en una crisis casi existencial a mediados de los 90. La
+    segunda arrancó con el regreso de Steve Jobs en 1997 y se consolidó con el iPod (2001), iTunes, y sobre todo con el
+    lanzamiento del iPhone el 9 de enero de 2007 — el evento que redefinió no solo a Apple sino a la industria de
+    tecnología de consumo entera. La apertura del App Store en 2008 sentó las bases de lo que hoy es el segmento de
+    Servicios. Jobs murió en octubre de 2011, y Tim Cook —hasta entonces COO, arquitecto de la cadena de suministro más
+    eficiente del mundo— asumió como CEO. Ese traspaso, hecho con enorme escepticismo del mercado en su momento, es hoy
+    el precedente más relevante para entender la sucesión de 2026: otro cambio de CEO, en otro momento de máxima
+    capitalización, con otro ejecutivo de perfil operativo (Ternus viene de hardware engineering, no de finanzas ni de
+    marketing) tomando la posta.
+  </p>
+  <p>
+    La tercera vida de Apple —la que interesa a este informe— es la que se construyó bajo Cook entre 2011 y 2026: la
+    transición de una empresa de hardware cíclico, dependiente casi en su totalidad de un único producto de reemplazo
+    (el iPhone), a un ecosistema de alto margen sostenido por servicios recurrentes. Esa transición no fue instantánea
+    ni lineal. El Apple Watch (2015) fue el primer intento serio de diversificar más allá del iPhone. Hacia 2016, con el
+    crecimiento del iPhone desacelerando por primera vez de forma preocupante, el management empezó a comunicar
+    explícitamente a Servicios como el segundo pilar estratégico de la compañía — una apuesta que, una década después,
+    es el motor de margen más importante que tiene Apple. Los splits de acciones de 2014 (7-por-1) y 2020 (4-por-1) son
+    la razón técnica por la que el EPS diluido "cae" abruptamente en esos años en cualquier serie histórica sin ajustar
+    — no reflejan deterioro del negocio, sino la mecánica contable de dividir las acciones en circulación.
+  </p>
+  <p class="pull">
+    El dato que mejor resume la transformación de la era Cook no es el precio de la acción — es el margen bruto. En el
+    año fiscal 2017, Apple operaba con un margen bruto de 38.5%, una cifra propia de un fabricante de hardware de
+    consumo premium pero expuesto a la competencia. Para el año fiscal 2025 ese margen había subido a 46.9%, y en los
+    últimos doce meses reportados alcanza 47.9% — casi 950 puntos básicos de expansión estructural en menos de una
+    década, explicada por la creciente ponderación de Servicios de alto margen dentro del mix de ingresos y por la
+    migración a silicio propio (los chips serie M en Mac desde 2020, y trabajo creciente en módems e IA on-device) que
+    redujo la dependencia de proveedores externos de componentes críticos.
+  </p>
+  <div class="chartbox">
+    <canvas id="historyChart" height="320"></canvas>
+    <p class="chartcap">Ingresos anuales reportados, FY2017–FY2025, y TTM al cierre del trimestre de marzo 2026. Fuente: SEC EDGAR (10-K/10-Q), XBRL RevenueFromContractWithCustomerExcludingAssessedTax.</p>
+  </div>
+  <p>
+    El resto de la última década quedó marcado por hitos de capitalización que funcionan como mojones de esta historia:
+    Apple fue la primera empresa estadounidense en tocar $1 billón de valor de mercado en agosto de 2018, cruzó los $2
+    billones en agosto de 2020 (mismo mes del split 4-por-1), y en 2026 alcanzó por primera vez los $5 billones de
+    capitalización, desplazando a Nvidia como la compañía cotizada más valiosa del mundo — aunque ese primer puesto
+    rota con frecuencia entre Nvidia, Apple, Microsoft y Alphabet según el momento de mercado, por lo que conviene leer
+    el hito como una validación puntual del ciclo iPhone 17 más que como una posición estructural garantizada hacia
+    adelante.
+  </p>
+  <p>
+    En paralelo a la historia operativa corre la historia del retorno de capital, que es casi tan relevante para el
+    accionista de largo plazo como el crecimiento del negocio. Apple no recompraba acciones de forma significativa antes
+    de 2012; en el año fiscal 2013 recompró $22.9 mil millones, cifra que escaló a un rango de $70-95 mil millones
+    anuales sostenido durante la última década, con un pico de $94.95 mil millones en el año fiscal 2024. Esa política de
+    recompras masivas, sostenida año tras año incluso en períodos de crecimiento de ingresos débil, redujo el capital
+    accionario (equity) contable de la compañía a niveles cercanos a cero — e incluso llevó el patrimonio neto reportado
+    a mínimos históricos en 2022-2024, antes de empezar a reconstruirse en los últimos trimestres a medida que la
+    utilidad neta generada volvió a superar el ritmo de recompras y dividendos combinados (ver Sección 06). Esa
+    trayectoria de capital allocation es también la clave para entender la decisión más relevante de cara a los próximos
+    años: cuánto de ese flujo de caja se sigue devolviendo a accionistas y cuánto empieza a redirigirse hacia
+    infraestructura de IA (Sección 07).
+  </p>
+
+  <!-- 03 -->
+  <p class="secnum" id="s03">03 — Modelo de Negocio y Segmentos</p>
+  <h2>Qué vende Apple, y dónde: la lectura detrás de los $111.2B del trimestre de marzo</h2>
+  <p>
+    Apple reporta sus ingresos en cinco categorías de producto y cinco regiones geográficas, y ambos cortes cuentan
+    historias distintas y complementarias sobre el estado del negocio. En el trimestre fiscal más reciente (Q2 FY2026,
+    cerrado el 28 de marzo de 2026), el iPhone representó el 51.3% de los ingresos totales, Servicios el 27.9%, y Mac,
+    iPad y Wearables/Home/Accesorios se repartieron el 21% restante casi en partes iguales. Es una concentración de
+    ingresos en un solo producto (iPhone) que sigue siendo alta para los estándares de una empresa "diversificada", pero
+    notablemente menor que hace una década, cuando el iPhone llegó a representar más del 60% de las ventas en trimestres
+    pico.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Segmento</th><th class="right-al">Q2 FY2026 (mar-26)</th><th class="right-al">% del total</th><th class="right-al">Var. YoY</th><th class="right-al">Q1 FY2026 (dic-25)</th><th class="right-al">Var. YoY</th></tr>
+    <tr><td class="label">iPhone</td><td class="right-al">$57.0B</td><td class="right-al">51.3%</td><td class="right-al pos">+21.7%</td><td class="right-al">$85.3B</td><td class="right-al pos">+23.0%</td></tr>
+    <tr><td class="label">Servicios</td><td class="right-al">$31.0B</td><td class="right-al">27.9%</td><td class="right-al pos">+16.3%</td><td class="right-al">$30.0B</td><td class="right-al pos">+14.0%</td></tr>
+    <tr><td class="label">Mac</td><td class="right-al">$8.4B</td><td class="right-al">7.6%</td><td class="right-al pos">+5.7%</td><td class="right-al">n/d</td><td class="right-al">—</td></tr>
+    <tr><td class="label">iPad</td><td class="right-al">$6.9B</td><td class="right-al">6.2%</td><td class="right-al pos">+8.0%</td><td class="right-al">n/d</td><td class="right-al">—</td></tr>
+    <tr><td class="label">Wearables, Home &amp; Accesorios</td><td class="right-al">$7.9B</td><td class="right-al">7.1%</td><td class="right-al pos">+5.0%</td><td class="right-al">n/d</td><td class="right-al">—</td></tr>
+    <tr class="total"><td class="label">Total</td><td class="right-al">$111.2B</td><td class="right-al">100%</td><td class="right-al pos">+17%</td><td class="right-al">$143.8B</td><td class="right-al pos">+16%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: comunicados de resultados de Apple (Q1 y Q2 FY2026), 8-K SEC. Mac/iPad/Wearables de Q1 FY2026 no desagregados en las notas de prensa disponibles al momento de este informe.</p>
+  <div class="chartbox">
+    <canvas id="segmentChart" height="280"></canvas>
+    <p class="chartcap">Mix de ingresos por segmento de producto, trimestre de marzo 2026 (Q2 FY2026).</p>
+  </div>
+  <p>
+    El corte geográfico es, si acaso, más revelador todavía. En el trimestre de marzo 2026, las cinco regiones de Apple
+    crecieron a doble dígito de forma simultánea — algo que no ocurría hace varios años: Gran China +28.1% (a $20.5 mil
+    millones), Resto de Asia-Pacífico +25%, Europa +14.7% y Américas +11.9%. El crecimiento de Gran China en particular
+    contrasta con la narrativa dominante entre 2022 y 2024, cuando la región era señalada sistemáticamente como el
+    principal riesgo bajista de la tesis de Apple por la competencia local (Huawei, Xiaomi, Vivo) y las tensiones
+    comerciales entre EE.UU. y China. Es importante matizar el número antes de proyectarlo hacia adelante: el propio
+    management reconoció un viento de cola cambiario (FX) de 2.5 puntos porcentuales sobre el crecimiento reportado de
+    Gran China ese trimestre, y la sostenibilidad de esa fortaleza en los próximos trimestres —más allá del efecto
+    puntual del ciclo iPhone 17— es todavía una incógnita abierta.
+  </p>
+  <div class="chartbox">
+    <canvas id="geoChart" height="260"></canvas>
+    <p class="chartcap">Crecimiento interanual de ingresos por región, Q2 FY2026 (trimestre cerrado 28 mar 2026). Fuente: earnings call y 8-K de Apple.</p>
+  </div>
+
+  <!-- 04 -->
+  <p class="secnum" id="s04">04 — Desarrollos Recientes y Perspectiva</p>
+  <h2>Cuatro frentes que van a definir los próximos trimestres</h2>
+  <h3>La sucesión: qué cambia y qué no cambia con Ternus</h3>
+  <p>
+    El 20 de abril de 2026, Apple anunció que Tim Cook deja el cargo de CEO el 1° de septiembre de 2026, sucedido por
+    John Ternus, hasta ese momento vicepresidente senior de ingeniería de hardware — responsable del desarrollo de
+    iPhone, iPad, Mac, Apple Watch y AirPods durante gran parte de la última década. Cook pasa a presidente ejecutivo
+    (executive chairman) del directorio, con foco declarado en relaciones con reguladores y gobiernos a nivel global —
+    un rol que sugiere que la Junta quiere mantener su experiencia política justo cuando la compañía negocia el litigio
+    antitrust más relevante de su historia. Debajo de Ternus, Johny Srouji (silicio) y Tom Marieb asumen
+    responsabilidades ampliadas sobre hardware.
+  </p>
+  <p>
+    El precedente de 2011 —cuando Cook sucedió a Jobs en medio de un escepticismo generalizado sobre si alguien podía
+    sostener el nivel de innovación de producto de la era fundacional— es la referencia obligada, pero no es garantía
+    de resultado. Cook demostró ser, sobre todo, un ejecutor y optimizador operativo excepcional (cadena de suministro,
+    márgenes, capital allocation); la pregunta que se va a ir respondiendo a lo largo de los próximos trimestres es si
+    el perfil de ingeniero de hardware puro de Ternus se traduce en la misma disciplina de márgenes y decisiones de
+    capital que caracterizó a la era Cook, en un momento en que el mercado exige simultáneamente innovación de producto
+    (IA) y disciplina financiera (frente al gasto de capex de los pares, ver Sección 07). Es, junto con la resolución
+    del caso antitrust, el factor cualitativo más importante para seguir de cerca de acá en adelante.
+  </p>
+  <h3>Siri AI: de la demanda colectiva al lanzamiento, en la misma temporada</h3>
+  <p>
+    Pocos episodios resumen mejor los tropiezos de Apple en IA generativa que la saga de Siri. En WWDC 2024, Apple
+    anunció "Apple Intelligence" con una Siri rediseñada y capacidades conversacionales avanzadas — funcionalidad que
+    terminó retrasándose más de un año frente a lo anunciado originalmente, generando cobertura de prensa negativa
+    sostenida y, eventualmente, una demanda colectiva en EE.UU. En mayo de 2026 Apple acordó pagar $250 millones para
+    resolver esa demanda, con aprobación preliminar judicial en julio de 2026. En paralelo, en WWDC 2026 Apple presentó
+    la nueva "Siri AI", que llega a todos los usuarios con iPhone 15 Pro o superior con el lanzamiento de iOS 27 en
+    septiembre de 2026 — el producto llega, finalmente, casi en simultáneo con el cierre legal del capítulo anterior. El
+    lanzamiento de septiembre es la primera oportunidad real que va a tener el mercado de evaluar si el producto está a
+    la altura de dos años de expectativas acumuladas; hasta entonces, sigue siendo una incógnita más que un dato.
+  </p>
+  <h3>DOJ: de juicio a mesa de negociación</h3>
+  <p>
+    En marzo de 2024, el Departamento de Justicia de EE.UU., junto con varios estados, demandó a Apple por presunto
+    abuso de posición dominante — acusándola de usar las reglas de la App Store, restricciones a desarrolladores y
+    control sobre funciones clave del iPhone para sofocar competencia, incluyendo limitaciones a "super apps", juegos en
+    la nube, preferencia de su propia app de Mensajes sobre alternativas de terceros, y restricciones a billeteras
+    digitales y smartwatches de la competencia. El caso venía escalando hacia juicio hasta que, en julio de 2026,
+    trascendió que Apple y el DOJ mantienen conversaciones tempranas de acuerdo, con Apple habiendo presentado múltiples
+    ofertas de negociación en lo que va del año. El mercado reaccionó de forma inmediata y positiva a esa noticia,
+    señal de que los inversores prefieren un acuerdo negociado (con remedios probablemente acotados y conocidos) a un
+    litigio prolongado con resultado incierto. Conviene no sobre-interpretar: "conversaciones tempranas" no es lo mismo
+    que un acuerdo cerrado, y los términos de cualquier eventual settlement —multas, cambios obligatorios a las reglas
+    de la App Store— todavía no están definidos. La resolución de este caso, en cualquiera de sus formas, es uno de los
+    desarrollos con mayor capacidad de mover el múltiplo de la acción en los próximos trimestres.
+  </p>
+  <h3>La apuesta de capital: recompras en vez de la carrera armamentista de IA</h3>
+  <p>
+    El desarrollo más relevante para entender la filosofía de asignación de capital de Apple hacia adelante no es un
+    lanzamiento de producto sino una decisión de lo que <em>no</em> está haciendo: mientras Microsoft, Alphabet, Meta y
+    Amazon comprometen colectivamente varios cientos de miles de millones de dólares en capex de infraestructura de IA
+    para 2026, Apple guio a un gasto de capex total de apenas $12.7 mil millones en el año fiscal 2025, con expectativa
+    de "crecimiento sustancial pero acotado" hacia adelante, concentrado en su red de "Private Cloud Compute"
+    (servidores y centros de datos propios para procesar IA on-device de forma privada) más que en clusters masivos de
+    entrenamiento de modelos fundacionales. En paralelo, Apple sumó una nueva autorización de recompra de acciones por
+    $100 mil millones y elevó el dividendo trimestral 4%. Es una apuesta de capital explícita: devolver efectivo a los
+    accionistas en vez de perseguir la escala de cómputo de IA de sus pares. De cara a los próximos años, esta es
+    probablemente la variable estratégica más importante para monitorear de toda la tesis — desarrollamos esta tensión
+    en profundidad en las Secciones 07 y 08.
+  </p>
+
+  <!-- 05 -->
+  <p class="secnum" id="s05">05 — Estados Financieros</p>
+  <h2>Los últimos dos trimestres reportados, línea por línea</h2>
+  <p>
+    Los resultados de los dos trimestres más recientes muestran una aceleración inusual para una empresa del tamaño de
+    Apple: crecimiento de ingresos de doble dígito alto (+16% y +17% interanual respectivamente) en una compañía que,
+    apenas un par de años atrás, crecía a tasas de un dígito bajo. El crecimiento de utilidad neta y EPS corrió todavía
+    más rápido que el de ingresos en ambos trimestres, reflejando apalancamiento operativo genuino: los costos fijos de
+    estructura, marketing y una parte de la manufactura no escalaron al mismo ritmo que las ventas.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Q1 FY26 (dic-25)</th><th class="right-al">Q2 FY26 (mar-26)</th><th class="right-al">TTM (a mar-26)</th></tr>
+    <tr><td class="label">Ingresos totales</td><td class="right-al">$143.76B</td><td class="right-al">$111.18B</td><td class="right-al">$451.44B</td></tr>
+    <tr><td class="label">Var. interanual</td><td class="right-al pos">+16%</td><td class="right-al pos">+17%</td><td class="right-al">—</td></tr>
+    <tr><td class="label">Utilidad bruta</td><td class="right-al">$69.23B</td><td class="right-al">$54.78B</td><td class="right-al">$216.07B</td></tr>
+    <tr><td class="label">Margen bruto</td><td class="right-al">48.2%</td><td class="right-al">49.3%</td><td class="right-al">47.9%</td></tr>
+    <tr><td class="label">Utilidad operativa</td><td class="right-al">$50.85B</td><td class="right-al">$35.88B</td><td class="right-al">$147.36B</td></tr>
+    <tr><td class="label">Margen operativo</td><td class="right-al">35.4%</td><td class="right-al">32.3%</td><td class="right-al">32.6%</td></tr>
+    <tr><td class="label">Utilidad neta</td><td class="right-al">$42.10B</td><td class="right-al">$29.58B</td><td class="right-al">$122.58B</td></tr>
+    <tr><td class="label">EPS diluido</td><td class="right-al">$2.84</td><td class="right-al">$2.01</td><td class="right-al">$8.26</td></tr>
+    <tr><td class="label">Var. EPS interanual</td><td class="right-al pos">+19%</td><td class="right-al pos">+22%</td><td class="right-al">—</td></tr>
+    <tr><td class="label">Gasto en I+D</td><td class="right-al">$10.89B</td><td class="right-al">$11.42B</td><td class="right-al">n/a</td></tr>
+    <tr><td class="label">I+D como % de ingresos</td><td class="right-al">7.6%</td><td class="right-al">10.3%</td><td class="right-al">—</td></tr>
+    <tr><td class="label">SG&amp;A</td><td class="right-al">$7.49B</td><td class="right-al">$7.48B</td><td class="right-al">n/a</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL (10-Q Q1 y Q2 FY2026), companyconcept API. TTM calculado como suma de los cuatro trimestres fiscales más recientes (Q3+Q4 FY2025 + Q1+Q2 FY2026).</p>
+  <p>
+    El dato que más llama la atención no está en la línea de ingresos sino en I+D: el gasto trimestral saltó de $8.55 mil
+    millones en el trimestre de marzo 2025 a $11.42 mil millones en el mismo trimestre de 2026 — un incremento de 33.6%
+    interanual, muy por encima del crecimiento de ingresos del mismo período (+17%). Como proporción de ingresos, I+D
+    pasó de 7.6% en el trimestre de diciembre (estacionalmente el de mayor ingreso) a 10.3% en el de marzo, el nivel más
+    alto en varios años. Es, en nuestra lectura, la evidencia contable más clara de que Apple sí está incrementando su
+    inversión en inteligencia artificial de cara a los próximos lanzamientos — aunque lo esté haciendo de una forma
+    mucho más silenciosa, y mucho menos intensiva en capex de infraestructura física, que sus pares de Big Tech (ver
+    Sección 07). Vale la pena monitorear si esta aceleración de I+D se sostiene en los próximos trimestres o si fue un
+    pico puntual ligado al desarrollo de Siri AI.
+  </p>
+  <div class="chartbox">
+    <canvas id="marginChart" height="260"></canvas>
+    <p class="chartcap">Margen bruto y margen operativo trimestral, últimos 8 trimestres reportados. Fuente: SEC EDGAR XBRL.</p>
+  </div>
+
+  <!-- 06 -->
+  <p class="secnum" id="s06">06 — Deuda y Balance</p>
+  <h2>Un balance en reconstrucción, no en riesgo</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica (al 28 mar 2026)</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Efectivo y equivalentes</td><td class="right-al">$45.57B</td></tr>
+    <tr><td class="label">Inversiones de corto plazo</td><td class="right-al">$22.93B</td></tr>
+    <tr><td class="label">Inversiones de largo plazo</td><td class="right-al">$78.09B</td></tr>
+    <tr class="total"><td class="label">Posición total de caja e inversiones</td><td class="right-al">$146.59B</td></tr>
+    <tr><td class="label">Deuda total (corto + largo plazo)</td><td class="right-al">$82.70B</td></tr>
+    <tr class="total"><td class="label">Caja neta (posición neta de deuda)</td><td class="right-al pos">+$63.89B</td></tr>
+    <tr><td class="label">Activos totales</td><td class="right-al">$371.08B</td></tr>
+    <tr><td class="label">Pasivos totales</td><td class="right-al">$264.59B</td></tr>
+    <tr><td class="label">Patrimonio neto (equity)</td><td class="right-al">$106.49B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL, 10-Q Q2 FY2026 (trimestre cerrado 28 mar 2026), conceptos CashAndCashEquivalentsAtCarryingValue, MarketableSecuritiesCurrent/Noncurrent, LongTermDebt.</p>
+  <p>
+    Apple sostiene una posición de caja neta positiva de aproximadamente $63.9 mil millones — es decir, tiene
+    significativamente más efectivo e inversiones líquidas que deuda total. Para una empresa de $451 mil millones de
+    ingresos anuales y $147 mil millones de utilidad operativa TTM, esto representa un apalancamiento prácticamente nulo:
+    la deuda total ($82.7 mil millones) equivale a apenas 0.5 veces el EBITDA de los últimos doce meses. El perfil de
+    riesgo crediticio de Apple no es, ni remotamente, una preocupación para esta tesis.
+  </p>
+  <p>
+    Lo que sí merece una nota histórica es la trayectoria del patrimonio neto contable (equity), que sorprende a
+    inversores que no siguen de cerca la mecánica de las recompras masivas: entre 2022 y 2024, el ritmo de recompras de
+    acciones combinado con los dividendos pagados superó, en varios trimestres, a la utilidad neta generada más la
+    emisión de nueva deuda — empujando el patrimonio neto contable de Apple a niveles cercanos a cero, una anomalía
+    para una empresa de esta rentabilidad que generó cierta inquietud entre analistas de balance más conservadores en su
+    momento. Los últimos tres trimestres muestran una reconstrucción rápida de esa base de equity (de $65.8 mil millones
+    a $106.5 mil millones entre mediados de 2025 y marzo 2026), a medida que la aceleración de utilidades del ciclo
+    iPhone 17 volvió a superar el ritmo de retorno de capital a accionistas. No es una señal de alerta — es la
+    aritmética normal de una empresa que prioriza sistemáticamente devolver efectivo por sobre acumular equity contable,
+    y una dinámica que vale la pena seguir observando trimestre a trimestre mientras dure el ciclo actual.
+  </p>
+
+  <!-- 07 -->
+  <p class="secnum" id="s07">07 — Flujo de Caja y Capital Allocation</p>
+  <h2>El contraste más importante del sector: recompras vs. capex de IA</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">TTM (a mar-26)</th></tr>
+    <tr><td class="label">Flujo de caja operativo (OCF)</td><td class="right-al">$140.22B</td></tr>
+    <tr><td class="label">Capex</td><td class="right-al">$11.04B</td></tr>
+    <tr class="total"><td class="label">Flujo de caja libre (FCF)</td><td class="right-al">$129.18B</td></tr>
+    <tr><td class="label">Margen de FCF sobre ingresos</td><td class="right-al">28.6%</td></tr>
+    <tr><td class="label">Capex como % de ingresos</td><td class="right-al">2.4%</td></tr>
+  </table></div>
+  <p class="footnote">FCF TTM calculado por diferencia entre datos anuales FY2025 y acumulados YTD de los 10-Q más recientes (metodología estándar de este research desk). Fuente: SEC EDGAR XBRL.</p>
+  <p>
+    Un margen de flujo de caja libre de 28.6% sobre ingresos es una cifra extraordinaria para una empresa de este
+    tamaño — y es, en gran medida, la contracara directa de un capex históricamente bajo: apenas 2.4% de los ingresos
+    en los últimos doce meses. Compárese esto con el resto de la industria tecnológica de mega-capitalización, donde el
+    capex como proporción de ingresos viene escalando agresivamente por la carrera de infraestructura de IA.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Año fiscal</th><th class="right-al">Capex</th><th class="right-al">Buybacks</th><th class="right-al">Dividendos pagados</th></tr>
+    <tr><td class="label">FY2021</td><td class="right-al">$11.09B</td><td class="right-al">$85.97B</td><td class="right-al">$14.47B</td></tr>
+    <tr><td class="label">FY2022</td><td class="right-al">$10.71B</td><td class="right-al">$89.40B</td><td class="right-al">$14.84B</td></tr>
+    <tr><td class="label">FY2023</td><td class="right-al">$10.96B</td><td class="right-al">$77.55B</td><td class="right-al">$15.03B</td></tr>
+    <tr><td class="label">FY2024</td><td class="right-al">$9.45B</td><td class="right-al">$94.95B</td><td class="right-al">$15.23B</td></tr>
+    <tr><td class="label">FY2025</td><td class="right-al">$12.71B</td><td class="right-al">$90.71B</td><td class="right-al">$15.42B</td></tr>
+  </table></div>
+  <p>
+    Apple sumó recientemente una nueva autorización de recompra por $100 mil millones adicionales y elevó el dividendo
+    trimestral 4% — la continuidad exacta del patrón de la última década: devolver prácticamente todo el exceso de caja
+    generado a los accionistas, en vez de reinvertirlo en activos fijos o adquisiciones de gran escala. La comparación
+    con el resto de la industria en el año en curso es, sencillamente, de otro orden de magnitud, y es la variable a
+    seguir con más atención de cara a los próximos ejercicios fiscales.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Compañía</th><th class="right-al">Capex / AI capex guiado, año fiscal 2026</th></tr>
+    <tr class="total"><td class="label">Apple (AAPL)</td><td class="right-al">~$13–14B</td></tr>
+    <tr><td class="label">Microsoft (MSFT)</td><td class="right-al">~$190B (run-rate anualizado)</td></tr>
+    <tr><td class="label">Alphabet (GOOGL)</td><td class="right-al">hasta $205B (guía elevada)</td></tr>
+    <tr><td class="label">Meta (META)</td><td class="right-al">$125–145B</td></tr>
+    <tr><td class="label">Amazon (AMZN)</td><td class="right-al">&gt;$200B (consenso)</td></tr>
+  </table></div>
+  <p class="footnote">Fuentes: comunicados y earnings calls de cada compañía, DataCenterDynamics, GeekWire, CNBC, Futurum Group. Cifras de pares con distinto grado de precisión — ver notas por compañía en Sección 08.</p>
+  <div class="chartbox">
+    <canvas id="capexChart" height="280"></canvas>
+    <p class="chartcap">Capex / gasto en infraestructura de IA guiado para el año fiscal 2026, Apple vs. el resto de las "Cinco Grandes" de tecnología. Escala logarítmica por la magnitud de la brecha.</p>
+  </div>
+  <p>
+    Esta divergencia es, a nuestro juicio, la decisión estratégica más importante que está tomando Apple en este
+    momento de su historia — más relevante incluso que el lanzamiento de un producto puntual. La lectura optimista es
+    que Apple no necesita construir su propia infraestructura de entrenamiento de modelos fundacionales a la escala de
+    sus pares porque su estrategia de IA está diseñada para correr mayormente on-device (procesamiento en el propio
+    iPhone/Mac, vía Apple Silicon) complementada por una red de "Private Cloud Compute" mucho más acotada y específica
+    — priorizando privacidad y eficiencia de costos por sobre la carrera de cómputo bruto. La lectura escéptica es que
+    Apple podría estar subinvirtiendo en la infraestructura que sostiene los modelos de IA más avanzados, y que varios
+    años de brecha de capex frente a Microsoft, Google, Meta y Amazon podrían traducirse en una desventaja de
+    capacidades de producto difícil de revertir hacia el final de la década. Este informe no toma partido entre ambas
+    lecturas — las dos son consistentes con los datos disponibles, y es una de las preguntas centrales que los próximos
+    2-3 años de resultados van a ir respondiendo.
+  </p>
+
+  <!-- 08 -->
+  <p class="secnum" id="s08">08 — Comparables de Industria</p>
+  <h2>AAPL frente a las otras cuatro "mega caps" de tecnología</h2>
+  <p>
+    Apple comparte inversores, capital y, cada vez más, la narrativa de IA con otras cuatro compañías de
+    mega-capitalización. Ninguna de ellas es un comparable de negocio perfecto —Apple es, ante todo, una empresa de
+    hardware de consumo con una capa de servicios; las otras cuatro son, en distintos grados, empresas de software,
+    publicidad digital y cómputo en la nube— pero todas compiten por el mismo capital de inversores growth/quality y,
+    cada vez más, por los mismos usuarios finales de productos de IA.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Ticker</th><th class="right-al">P/E TTM</th><th class="right-al">P/E Forward</th></tr>
+    <tr class="total"><td class="label">AAPL</td><td class="right-al">41.3x</td><td class="right-al">34.2x</td></tr>
+    <tr><td class="label">MSFT</td><td class="right-al">23.2x</td><td class="right-al">21.0x</td></tr>
+    <tr><td class="label">GOOGL</td><td class="right-al">16.0x*</td><td class="right-al">24.1x</td></tr>
+    <tr><td class="label">META</td><td class="right-al">21.6x</td><td class="right-al">18.3x</td></tr>
+    <tr><td class="label">AMZN</td><td class="right-al">29.3x</td><td class="right-al">29.3x</td></tr>
+  </table></div>
+  <p class="footnote">*El P/E TTM de GOOGL está distorsionado al alza por una ganancia no operativa (mark-to-market de inversiones accionarias minoritarias) en un trimestre reciente, que infló el EPS GAAP puntual — no representa rentabilidad operativa recurrente. El forward P/E (24.1x) es la cifra más representativa para comparar. Fuente: GuruFocus, stockanalysis.com, cálculos propios sobre datos SEC EDGAR.</p>
+  <div class="chartbox">
+    <canvas id="compsChart" height="280"></canvas>
+    <p class="chartcap">P/E forward comparado — Apple cotiza con la prima más alta del panel de mega-caps tecnológicas.</p>
+  </div>
+
+  <h3>Microsoft (MSFT) — el contra-ejemplo directo: gastar fuerte y que el mercado lo premie</h3>
+  <p>
+    Microsoft es, en muchos sentidos, el espejo invertido de la estrategia de Apple. En su trimestre más reciente,
+    Microsoft reportó ingresos de $82.9 mil millones (+18% interanual, superando el consenso de $81.4 mil millones) y
+    EPS de $4.27 (+23%), con Azure acelerando a 40% de crecimiento interanual — por encima de la propia guía de la
+    compañía. El negocio de IA de Microsoft alcanzó un run-rate anualizado de $37 mil millones, +123% interanual, y la
+    IA contribuyó entre 22 y 26 puntos porcentuales del crecimiento total de Azure. Todo esto se financia con un capex
+    que se duplicó a un run-rate anualizado de $190 mil millones, y con un acuerdo renegociado con OpenAI: la compañía
+    comprometió $250 mil millones en consumo de Azure hasta 2030, pero a cambio OpenAI dejó de tener exclusividad sobre
+    Azure y ahora puede correr sus productos también sobre AWS. A diferencia de Apple, el mercado no está castigando a
+    Microsoft por su nivel de capex — al contrario, la aceleración de Azure sugiere que, al menos hasta ahora, el gasto
+    se está traduciendo directamente en crecimiento de ingresos monetizable, algo que habrá que seguir confirmando
+    trimestre a trimestre.
+  </p>
+  <h3>Alphabet (GOOGL) — Cloud en aceleración, pero el mercado empieza a pedir límites al capex</h3>
+  <p>
+    Alphabet tuvo uno de los trimestres más fuertes de su historia reciente en términos de crecimiento: ingresos de
+    $119.80 mil millones (+24% interanual), superando el consenso de $117.02 mil millones, con Google Cloud creciendo
+    82% interanual a $24.77 mil millones y un backlog de contratos de cloud que escaló a $514 mil millones. Gemini, la
+    familia de modelos de IA de Google, alcanzó 950 millones de usuarios activos mensuales y casi el 90% de las empresas
+    del Fortune 100 usan Gemini Enterprise. El punto de inflexión llegó, sin embargo, con la guía de capex: Alphabet
+    elevó su estimado de gasto para 2026 a un rango de hasta $205 mil millones (desde $180-190 mil millones previamente),
+    y la acción cayó tras el anuncio — la primera señal clara de que el mercado empieza a exigirle límites a la
+    escalada de capex de IA, incluso a una empresa con el crecimiento de Cloud más fuerte del panel. Es una validación
+    indirecta, aunque parcial, de la tesis de disciplina de capital de Apple: el mercado no premia el capex de forma
+    incondicional, y esa disciplina de los inversores hacia los pares es algo que vale la pena monitorear de cara a los
+    próximos reportes de todo el sector.
+  </p>
+  <h3>Meta (META) — el apostador más agresivo, con el negocio publicitario financiando la apuesta</h3>
+  <p>
+    Meta es la compañía del panel con la relación más directa entre gasto en IA y resultado del negocio core: sus
+    modelos de IA (Llama, y el sistema de ranking publicitario Andromeda) se usan para mejorar directamente la
+    performance de segmentación de sus anuncios, y el management atribuye a esa mejora buena parte de un crecimiento de
+    ingresos publicitarios de más del 27% interanual. El costo de esa estrategia es una guía de capex de infraestructura
+    de IA de entre $125 y $145 mil millones, y una división de hardware de nueva generación —Reality Labs (metaverso,
+    realidad aumentada)— que sigue perdiendo cerca de $19 mil millones anuales sin visos de breakeven en el corto plazo.
+    La pregunta central para Meta, que se va a ir resolviendo trimestre a trimestre, es si el negocio publicitario puede
+    seguir financiando ambas apuestas (IA + Reality Labs) sin comprimir el margen operativo consolidado. Cotiza con el
+    forward P/E más bajo del panel de mega-caps (18.3x), reflejo de ese riesgo de ejecución dual.
+  </p>
+  <h3>Amazon (AMZN) — el híbrido de e-commerce maduro y AWS en plena carrera de capex</h3>
+  <p>
+    Amazon combina un negocio de e-commerce que ya maduró (crecimiento de un dígito, márgenes de retail en Norteamérica
+    mejorando estructuralmente pero todavía moderados, con competencia creciente de plataformas de bajo costo como Temu
+    y Shein) con AWS, que sigue siendo el motor de rentabilidad del grupo y compite directamente con Azure y Google
+    Cloud en infraestructura de IA. El consenso de mercado ubica el capex de Amazon por encima de $200 mil millones para
+    el año fiscal en curso — la cifra más alta de las cuatro comparables junto con Alphabet — impulsado en gran medida
+    por la expansión de capacidad de AWS. Amazon cotiza a un P/E de 29.3x, el segundo más alto del panel después de
+    Apple, reflejo de que el mercado sigue dispuesto a pagar una prima por la combinación de escala en cloud y
+    optimización de márgenes en retail, incluso en un contexto de capex elevado.
+  </p>
+  <p class="pull">
+    El patrón que emerge de las cuatro comparables es consistente: Microsoft, Alphabet, Meta y Amazon están, cada una a
+    su manera, apostando fuerte a que el capex de IA de hoy se traduce en crecimiento de ingresos monetizable de acá a
+    2-3 años, y el mercado —con la excepción parcial y reciente de la reacción a Alphabet— viene premiando esa apuesta
+    con múltiplos de valuación razonables (18x-29x forward) relativo a su crecimiento. Apple es la única de las cinco
+    que eligió explícitamente no correr esa carrera al mismo ritmo, y sin embargo es la que cotiza al múltiplo más alto
+    del grupo. Esa combinación —menor gasto de crecimiento futuro, mayor múltiplo presente— es, en esencia, la tensión
+    central que resolvemos con números en la Sección 13.
+  </p>
+
+  <!-- 09 -->
+  <p class="secnum" id="s09">09 — Gobierno Corporativo y Estructura Accionaria</p>
+  <h2>Quién controla la compañía, y cómo se paga a quien la dirige</h2>
+  <p>
+    Apple es, en la práctica, una empresa de propiedad institucional casi en su totalidad: los fundadores no tienen
+    participación (Jobs falleció en 2011; Wozniak no mantiene posición relevante), y el management actual posee una
+    fracción mínima del capital. Esto es relevante para la tesis porque significa que las decisiones de asignación de
+    capital (Sección 07) responden casi puramente a la disciplina fiduciaria del directorio hacia el accionista
+    institucional, no a la preferencia de un fundador-controlador como ocurre en otras mega-caps tecnológicas.
+  </p>
+  <div class="govrow">
+    <div class="govcell"><div class="k">Ownership institucional</div><div class="v">63.8% – 73.6%</div><div class="sub">Rango entre fuentes (GuruFocus 73.6% al 17-jun-2026; otras fuentes 63.8%) — la dispersión refleja distinta metodología de cálculo del float, no un cambio real en el trimestre.</div></div>
+    <div class="govcell"><div class="k">Ownership insider</div><div class="v">0.12%</div><div class="sub">Directorio y management ejecutivo combinados — nivel bajo, típico de una mega-cap madura sin fundador-controlador activo.</div></div>
+    <div class="govcell"><div class="k">Directorio 2026</div><div class="v">8 nominados</div><div class="sub">Presidido por Arthur Levinson (chair), quien posee ~0.027% de la compañía (~4.07M acciones a feb-2026) — proxy statement FY2026 presentado a accionistas el 8-ene-2026.</div></div>
+    <div class="govcell"><div class="k">Compensación CEO (FY2025)</div><div class="v">$74.3M</div><div class="sub">Tim Cook: $3.0M salario + $12.0M bono + $57.5M en acciones + $1.76M otros. 96% de la compensación está atada a métricas de performance, no es fija.</div></div>
+    <div class="govcell"><div class="k">Variación vs. FY2024</div><div class="v">≈ estable (-0.4%)</div><div class="sub">FY2024: $74.6M. El paquete de Cook se mantuvo prácticamente sin cambios pese al salto de resultados del ciclo iPhone 17 — el comité de compensación no lo ligó al pico puntual del año.</div></div>
+    <div class="govcell"><div class="k">Transición de CEO</div><div class="v">Cook → Ternus</div><div class="sub">Efectiva 1-sep-2026. Cook pasa a presidente ejecutivo (executive chairman) del directorio; su paquete de compensación como chairman aún no está publicado en un proxy statement.</div></div>
+  </div>
+  <p class="footnote">Fuentes: GuruFocus, WallStreetZen, SEC EDGAR (Apple Inc. Form DEF 14A FY2026, presentado 8-ene-2026), Bloomberg ("Apple CEO's Compensation Holds Steady at About $74 Million"), 9to5Mac.</p>
+  <p>
+    El dato más relevante de esta sección no es el nivel de compensación de Cook en sí —está en línea con lo que pagan
+    el resto de las mega-caps tecnológicas a sus CEOs— sino el hecho de que el comité de compensación decidió no
+    ajustarlo al alza pese a que el año fiscal que evalúa incluye el arranque del mejor ciclo de producto de la
+    historia de la compañía (Sección 01). Es una señal, aunque indirecta, de que el directorio está evaluando el
+    desempeño de Cook con una vara de largo plazo y no reaccionando al pico puntual de un trimestre — la misma
+    lógica de disciplina que se refleja en la política de capital allocation de la Sección 07. La composición
+    institucional mayoritaria del accionariado (63.8%-73.6%) es también el contexto necesario para leer la Sección 12:
+    ese bloque de inversores institucionales es, en gran medida, quien está detrás del consenso de analistas y de la
+    dinámica de revisión de estimados que se describe ahí.
+  </p>
+
+  <!-- 10 -->
+  <p class="secnum" id="s10">10 — Registro de Riesgos</p>
+  <h2>Qué podría cambiar esta lectura</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Riesgo</th><th>Descripción</th><th class="right-al">Severidad</th></tr>
+    <tr><td class="label">Compresión de múltiplo</td><td class="label">Con la acción en múltiplos históricamente altos, cualquier guía futura por debajo de expectativas puede gatillar una corrección de múltiplo mayor a la revisión de estimados en sí.</td><td class="right-al">Alta</td></tr>
+    <tr><td class="label">Ejecución de la transición de CEO</td><td class="label">Primera sucesión de CEO en quince años; Ternus tiene perfil de ingeniería de producto, sin historial público de desempeño en decisiones de asignación de capital o relación con inversores institucionales a esta escala.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Términos del acuerdo con el DOJ</td><td class="label">Las conversaciones tempranas de acuerdo reducen el riesgo de un fallo adverso en juicio, pero los términos de cualquier settlement (multas, cambios obligatorios a reglas de la App Store) siguen sin definirse.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Brecha de capex de IA vs. pares</td><td class="label">Apple invierte una fracción del capex de IA de Microsoft, Alphabet, Meta o Amazon; si la ventaja competitiva en IA generativa termina dependiendo de escala de cómputo bruto más que de eficiencia on-device, la brecha podría ampliarse con los años.</td><td class="right-al">Media (estructural)</td></tr>
+    <tr><td class="label">Sostenibilidad del ciclo iPhone 17</td><td class="label">El crecimiento de +21-23% interanual en iPhone es el más fuerte en años; no está claro cuánto de esa demanda es upgrade genuino sostenido vs. un pico de reemplazo que se normaliza en los próximos años fiscales.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Reversión del viento de cola cambiario</td><td class="label">Parte del fuerte crecimiento reportado en Gran China (+28.1%) incluye un viento de cola de FX de 2.5 puntos porcentuales reconocido por el propio management; una reversión del dólar reduciría el crecimiento reportado sin cambio en el negocio subyacente.</td><td class="right-al">Baja</td></tr>
+    <tr><td class="label">Balance y apalancamiento</td><td class="label">Posición de caja neta de ~$64 mil millones y deuda neta/EBITDA prácticamente nula. No es un riesgo activo.</td><td class="right-al">Baja</td></tr>
+  </table></div>
+
+  <!-- 11 -->
+  <p class="secnum" id="s11">11 — Catalizadores</p>
+  <h2>Agenda de eventos relevantes</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Fecha</th><th>Evento</th></tr>
+    <tr><td class="label">30 Jul 2026</td><td class="label">Reporte de resultados del tercer trimestre fiscal (Q3 FY2026) — último balance de Tim Cook como CEO en ejercicio.</td></tr>
+    <tr><td class="label">01 Sep 2026</td><td class="label">John Ternus asume formalmente como CEO; Tim Cook pasa a presidente ejecutivo del directorio.</td></tr>
+    <tr><td class="label">Sep 2026 (estimado)</td><td class="label">Lanzamiento de iOS 27 con "Siri AI" para iPhone 15 Pro y superiores — primera prueba de mercado del producto de IA generativa más esperado y más retrasado de la compañía.</td></tr>
+    <tr><td class="label">En curso, sin fecha fija</td><td class="label">Resolución de las conversaciones de acuerdo entre Apple y el DOJ sobre el caso antitrust de 2024.</td></tr>
+    <tr><td class="label">En curso</td><td class="label">Actualizaciones de guía de capex — cualquier salto significativo hacia el nivel de gasto de IA de los pares sería un cambio de tesis relevante, en cualquier dirección.</td></tr>
+  </table></div>
+
+  <!-- 12 -->
+  <p class="secnum" id="s12">12 — Modelo Financiero Proyectado y Momentum de Estimados</p>
+  <h2>Qué espera el consenso de acá en adelante, y hacia dónde se viene moviendo</h2>
+  <p>
+    Antes de construir nuestra propia proyección en la Sección 13, vale la pena mostrar qué está proyectando el
+    consenso de Wall Street con datos agregados de mercado — separando explícitamente lo que es dato de consenso real
+    de lo que, más allá de FY2027, pasa a ser supuesto propio de este informe (ver Sección 13 para el detalle completo
+    del glide path de crecimiento usado en el DCF).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">TTM (a mar-26)</th><th class="right-al">FY2026E (cierre sep-26)</th><th class="right-al">FY2027E</th></tr>
+    <tr><td class="label">Ingresos</td><td class="right-al">$451.44B (real)</td><td class="right-al">$465.02B (consenso)</td><td class="right-al">n/d — sin consenso agregado público</td></tr>
+    <tr><td class="label">Var. YoY</td><td class="right-al">—</td><td class="right-al pos">+3.0%</td><td class="right-al">—</td></tr>
+    <tr><td class="label">EPS diluido</td><td class="right-al">$8.26 (real)</td><td class="right-al">$8.51 (consenso)</td><td class="right-al">$9.32 (consenso)</td></tr>
+    <tr><td class="label">Var. YoY EPS</td><td class="right-al">—</td><td class="right-al pos">+3.0%</td><td class="right-al pos">+9.5%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: stockanalysis.com, ChartMill (consenso de mercado, julio 2026). EPS y revenue de FY2027E son cifras de consenso independientes entre sí — no necesariamente consistentes con el mismo supuesto de margen; se muestran tal como las reporta el consenso.</p>
+  <h3>El trimestre inmediato: Q3 FY2026 (reporta 30-jul-2026)</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Consenso</th><th class="right-al">Analistas</th></tr>
+    <tr><td class="label">Ingresos estimados</td><td class="right-al">$108.96B</td><td class="right-al">31</td></tr>
+    <tr><td class="label">EPS estimado</td><td class="right-al">$1.89 – $1.93</td><td class="right-al">31</td></tr>
+  </table></div>
+  <p class="footnote">Rango de EPS refleja la dispersión entre fuentes consultadas (AppleInsider/consenso agregado vs. ChartMill) al cierre de julio 2026, antes de la publicación de resultados.</p>
+  <h3>Momentum de revisión: el consenso viene subiendo, no bajando</h3>
+  <p>
+    Más relevante que el nivel de la estimación es su dirección reciente: en los últimos 90 días, 26 estimaciones de
+    EPS de AAPL fueron revisadas al alza contra apenas 1 a la baja — una relación de revisión fuertemente positiva
+    para una mega-cap de esta cobertura. El precio objetivo promedio del panel de analistas subió 8.68% en el mismo
+    período de 3 meses, y la estimación de ingresos del próximo trimestre fue revisada +6.44% al alza. Es, en esencia,
+    la contracara cuantitativa de la aceleración operativa descripta en la Sección 01: el mercado sell-side viene
+    incorporando la fortaleza del ciclo iPhone 17 en sus modelos en tiempo real, no reaccionando con rezago.
+  </p>
+  <div class="chartbox">
+    <canvas id="revisionChart" height="220"></canvas>
+    <p class="chartcap">Revisiones de estimados de EPS de AAPL, últimos 90 días. Fuente: consenso de analistas agregado (Zacks/S&amp;P Global vía fuentes públicas), julio 2026.</p>
+  </div>
+  <p>
+    Conviene matizar esta lectura con el mismo cuidado que el resto del informe: un momentum de revisión positivo es
+    una confirmación de que el consenso comparte la lectura optimista de los últimos trimestres — no es, por sí
+    mismo, evidencia de que la acción esté barata. De hecho, el precio objetivo promedio de $318.81 (Sección 13,
+    Método 4) sigue por debajo del precio de mercado incluso después de esta ola de revisiones al alza, lo cual
+    refuerza — más que contradice — la tensión central de este informe entre un negocio que mejora y un precio que ya
+    lo refleja y, según varias de nuestras metodologías, lo excede.
+  </p>
+
+  <!-- 13 — VALUACIÓN, AL FINAL -->
+  <p class="secnum" id="s13">13 — Valuación: Cuatro Métodos y el Fair Value</p>
+  <h2>Cuánto vale la acción, mirado desde cuatro ángulos distintos</h2>
+  <p>
+    Llegamos a la valuación después de recorrer el negocio completo a propósito: el objetivo de este informe es que el
+    lector entienda primero por qué el negocio de Apple está en su mejor momento operativo en años, y recién después
+    confronte esa realidad con lo que el mercado ya está pagando por ella. En vez de apoyarnos en una sola metodología,
+    calculamos el valor razonable de la acción con cuatro enfoques independientes entre sí — flujo de caja descontado,
+    múltiplos de comparables, reversión a la media histórica propia, y el consenso de analistas de Wall Street — y
+    mostramos las cuatro cifras sin forzarlas a converger artificialmente. Que no coincidan entre sí no es un defecto
+    del ejercicio: es información real sobre cuánta incertidumbre hay en esta tesis.
+  </p>
+
+  <h3>Método 1 — Flujo de caja descontado (DCF), tres escenarios</h3>
+  <p>
+    Construimos un modelo de flujo de caja descontado a dos etapas (cinco años explícitos de proyección más valor
+    terminal por crecimiento perpetuo), partiendo de la base de ingresos de los últimos doce meses reportados ($451.44
+    mil millones), con la posición de caja neta y el conteo de acciones más recientes reportados por la compañía
+    (Sección 06). El WACC base se construyó con una tasa libre de riesgo ancla en el rendimiento vigente del Treasury a
+    10 años más un premio de riesgo accionario aproximado de 5.0%, ajustado por un beta cercano a 1.1 — consistente con
+    el perfil de riesgo relativamente defensivo de Apple dentro del universo de mega-caps tecnológicas (posición de
+    caja neta, ingresos recurrentes de Servicios en expansión).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Supuesto</th><th class="right-al">Bear</th><th class="right-al">Base</th><th class="right-al">Bull</th></tr>
+    <tr><td class="label">Crecimiento de ingresos (año 1 → año 5)</td><td class="right-al">8% → 1%</td><td class="right-al">14% → 4%</td><td class="right-al">18% → 6%</td></tr>
+    <tr><td class="label">Margen de FCF (año 1 → año 5)</td><td class="right-al">27% → 24%</td><td class="right-al">28% → 30%</td><td class="right-al">29% → 34%</td></tr>
+    <tr><td class="label">WACC</td><td class="right-al">10.5%</td><td class="right-al">10.0%</td><td class="right-al">9.0%</td></tr>
+    <tr><td class="label">Crecimiento terminal</td><td class="right-al">2.5%</td><td class="right-al">3.0%</td><td class="right-al">3.5%</td></tr>
+    <tr><td class="label">% del EV desde valor terminal</td><td class="right-al">67%</td><td class="right-al">74%</td><td class="right-al">80%</td></tr>
+    <tr class="total"><td class="label">Fair value por acción</td><td class="right-al">$106.85</td><td class="right-al">$171.89</td><td class="right-al">$275.36</td></tr>
+  </table></div>
+  <p>
+    El escenario Bear asume que el ciclo del iPhone 17 es, en gran medida, un pico puntual de reemplazo que no se
+    sostiene, que la presión regulatoria comprime los márgenes de alto rendimiento de Servicios, y que la brecha de
+    capex de IA frente a los pares empieza a pesar sobre la competitividad de producto hacia el final del horizonte de
+    proyección. El escenario Base toma el crecimiento reciente como una aceleración real pero no perpetua,
+    desacelerando de forma gradual hacia una tasa terminal cercana al crecimiento nominal de la economía global. El
+    escenario Bull asume que Servicios sigue ganando peso en el mix más rápido de lo esperado, que Siri AI y el
+    "Private Cloud Compute" resultan ser una estrategia de IA más eficiente en capital de lo que hoy reconoce el
+    consenso, y que la resolución del caso DOJ no impone remedios estructurales significativos. En los tres escenarios,
+    entre 67% y 80% del valor de empresa proviene del valor terminal — el modelo es, por diseño, sensible a los
+    supuestos de largo plazo más allá del año 5, algo esperable en una empresa de esta escala pero que exige leer el
+    resultado con cautela.
+  </p>
+  <h3>Sensibilidad del caso Base: WACC × crecimiento terminal</h3>
+  <p>
+    Dado que entre 67% y 80% del valor de empresa del DCF proviene del valor terminal, mostramos cómo se mueve el fair
+    value del escenario Base únicamente variando dos supuestos — el WACC y la tasa de crecimiento terminal — mientras
+    el resto de los inputs (crecimiento explícito, márgenes) se mantiene fijo. La celda marcada es el caso Base
+    reportado arriba ($171.89, WACC 10.0%, g 3.0%).
+  </p>
+  <div class="table-scroll"><table class="sens-table">
+    <tr><th>WACC \ g terminal</th><th class="right-al">2.0%</th><th class="right-al">2.5%</th><th class="right-al">3.0%</th><th class="right-al">3.5%</th><th class="right-al">4.0%</th></tr>
+    <tr><td class="axis">9.0%</td><td class="right-al">$177.64</td><td class="right-al">$188.22</td><td class="right-al">$200.56</td><td class="right-al">$215.15</td><td class="right-al">$232.66</td></tr>
+    <tr><td class="axis">9.5%</td><td class="right-al">$165.73</td><td class="right-al">$174.73</td><td class="right-al">$185.12</td><td class="right-al">$197.24</td><td class="right-al">$211.57</td></tr>
+    <tr><td class="axis">10.0%</td><td class="right-al">$155.31</td><td class="right-al">$163.05</td><td class="right-al base-cell">$171.89</td><td class="right-al">$182.09</td><td class="right-al">$193.99</td></tr>
+    <tr><td class="axis">10.5%</td><td class="right-al">$146.13</td><td class="right-al">$152.83</td><td class="right-al">$160.43</td><td class="right-al">$169.11</td><td class="right-al">$179.13</td></tr>
+    <tr><td class="axis">11.0%</td><td class="right-al">$137.97</td><td class="right-al">$143.82</td><td class="right-al">$150.40</td><td class="right-al">$157.86</td><td class="right-al">$166.39</td></tr>
+  </table></div>
+  <p class="footnote">Grilla propia, recalculando el modelo de dos etapas del caso Base (mismo crecimiento explícito y margen de FCF por año declarados arriba) para cada combinación WACC/g — calibrada para reproducir exactamente la celda base ya reportada (WACC 10.0%, g 3.0% → $171.89, 74.0% del EV desde terminal). Todas las combinaciones de esta grilla quedan por debajo del precio de mercado ($341.04) — incluso en el extremo más generoso (WACC 9.0%, g 4.0% → $232.66).</p>
+  <p>
+    El punto que vale la pena remarcar de esta grilla no es ningún valor individual sino el rango completo: incluso en
+    la combinación menos conservadora que seguimos considerando razonable (WACC 9.0%, crecimiento terminal 4.0% —ya
+    por encima del crecimiento nominal de largo plazo típico usado para economías desarrolladas—), el DCF no logra
+    cerrar ni dos tercios de la brecha con el precio de mercado. Para que el DCF converja con $341, WACC y g tendrían
+    que moverse a una combinación bastante más agresiva que cualquier celda de esta grilla, o habría que revisar al
+    alza los supuestos de crecimiento explícito de los primeros 5 años (tabla de supuestos arriba) — no solo el valor
+    terminal.
+  </p>
+
+  <h3>Método 2 — Múltiplos de comparables</h3>
+  <p>
+    Tomamos el EPS forward implícito de Apple (derivado de su propio múltiplo forward actual de 34.2x, lo que arroja
+    un consenso de EPS forward de aproximadamente $9.98) y le aplicamos el P/E forward promedio de los cuatro
+    comparables de la Sección 08 (Microsoft, Alphabet, Meta, Amazon: 23.2x promedio).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Múltiplo P/E forward aplicado</th><th class="right-al">Precio implícito</th></tr>
+    <tr><td class="label">18.3x (piso del panel, META)</td><td class="right-al">$182.63</td></tr>
+    <tr><td class="label">21.0x (MSFT)</td><td class="right-al">$209.58</td></tr>
+    <tr class="total"><td class="label">23.2x (promedio de los 4 comparables)</td><td class="right-al">$231.54</td></tr>
+    <tr><td class="label">29.3x (techo del panel, AMZN)</td><td class="right-al">$292.41</td></tr>
+    <tr><td class="label">34.16x (múltiplo actual de AAPL)</td><td class="right-al">$340.92</td></tr>
+  </table></div>
+  <p>
+    Tomamos $231.54 (el promedio del panel de 4 comparables) como el resultado de este método. Es, casi por
+    definición, un método más generoso que el DCF: mide qué pagaría el mercado por Apple si cotizara como el resto de
+    sus pares de mega-cap tech, no cuánto vale intrínsecamente el negocio.
+  </p>
+
+  <h3>Método 3 — Reversión a la media histórica propia</h3>
+  <p>
+    A diferencia de los dos métodos anteriores, este no compara a Apple contra otras empresas ni proyecta flujos de
+    caja futuros — pregunta, simplemente, a qué múltiplo cotizó la propia acción en promedio durante la última década,
+    y qué precio resultaría de aplicar ese múltiplo histórico al EPS forward actual. El P/E promedio de AAPL de los
+    últimos 5 años es 32.4x; el de los últimos 10 años, 30.6x; la mediana de 10 años es 26.9x, con un rango que fue de
+    12.1x a 42.0x en la última década.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Referencia histórica</th><th class="right-al">Múltiplo</th><th class="right-al">Precio implícito (sobre EPS fwd. $9.98)</th></tr>
+    <tr><td class="label">Mediana 10 años</td><td class="right-al">26.9x</td><td class="right-al">$268.46</td></tr>
+    <tr class="total"><td class="label">Promedio 10 años</td><td class="right-al">30.6x</td><td class="right-al">$305.39</td></tr>
+    <tr><td class="label">Promedio 5 años</td><td class="right-al">32.4x</td><td class="right-al">$323.35</td></tr>
+  </table></div>
+  <p class="footnote">P/E históricos: fullratio.com, financecharts.com, GuruFocus, MacroTrends. EPS forward: consenso implícito propio (ver Método 2).</p>
+  <p>
+    Tomamos el promedio de 10 años (30.6x → $305.39) como el resultado de este método, por ser la ventana más larga y
+    menos sesgada por picos recientes de múltiplo. Es, de los tres métodos numéricos, el que da el resultado menos
+    bajista frente al precio de mercado — un recordatorio de que Apple viene cotizando "cara" según sus propios
+    estándares históricos desde hace varios años, no solo en este ciclo puntual.
+  </p>
+
+  <h3>Método 4 — Consenso de Wall Street</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Analistas cubriendo AAPL</td><td class="right-al">47</td></tr>
+    <tr><td class="label">Calificación consenso</td><td class="right-al">Buy</td></tr>
+    <tr><td class="label">Desglose (Buy / Hold / Sell)</td><td class="right-al">60% / 34% / 6%</td></tr>
+    <tr class="total"><td class="label">Precio objetivo promedio (12 meses)</td><td class="right-al">$318.81</td></tr>
+    <tr><td class="label">Rango de precios objetivo</td><td class="right-al">$215.00 – $400.00</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: S&amp;P Global Market Intelligence vía The Motley Fool ("47 Analysts Cover Apple. Their Average Price Target Is Now Below the Stock Price, One Week Before Earnings").</p>
+  <p>
+    Hay una divergencia interna en el consenso que merece destacarse: 60% de los analistas mantiene calificación de
+    compra, pero el precio objetivo promedio a 12 meses queda por debajo del precio de mercado — la mayoría de quienes
+    recomiendan comprar están, al mismo tiempo, proyectando colectivamente que el precio no tiene demasiado espacio
+    para subir desde estos niveles en el próximo año. Es, probablemente, más reflejo de inercia de calificación
+    (mantener "Buy" es más fácil institucionalmente que bajarla sobre una acción con este nivel de momentum operativo)
+    que de una convicción genuina de upside adicional.
+  </p>
+
+  <h3>Síntesis: los cuatro métodos, uno al lado del otro</h3>
+  <div class="chartbox">
+    <canvas id="footballChart" height="260"></canvas>
+    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea vertical roja marca el precio de mercado ($341.04); la línea azul marca el blend propio ($236.27). Ningún rango metodológico propio alcanza el precio de mercado; el consenso Wall Street es el único cuyo techo lo supera.</p>
+  </div>
+  <div class="table-scroll"><table>
+    <tr><th>Método</th><th class="right-al">Fair value</th></tr>
+    <tr><td class="label">DCF — Bear</td><td class="right-al">$106.85</td></tr>
+    <tr><td class="label">DCF — Base</td><td class="right-al">$171.89</td></tr>
+    <tr><td class="label">DCF — Bull</td><td class="right-al">$275.36</td></tr>
+    <tr><td class="label">Comparables (P/E forward promedio del panel)</td><td class="right-al">$231.54</td></tr>
+    <tr><td class="label">Reversión histórica (P/E promedio 10 años propio)</td><td class="right-al">$305.39</td></tr>
+    <tr class="total"><td class="label">Promedio simple — DCF Base, Comparables, Reversión histórica</td><td class="right-al">$236.27</td></tr>
+    <tr><td class="label">Consenso Wall Street (referencia externa, no promediada)</td><td class="right-al">$318.81</td></tr>
+  </table></div>
+  <p>
+    El promedio simple, sin ponderación diferencial, de las tres metodologías numéricas que este informe puede calcular
+    de forma independiente (DCF caso Base, comparables, y reversión a la media histórica) da <strong>$236.27 por
+    acción</strong>. No incluimos el consenso de Wall Street en ese promedio porque no es una metodología propia sino
+    la opinión agregada de terceros — lo mostramos como punto de referencia externo, no como un cuarto input a
+    mezclar mecánicamente. Lo relevante no es tanto el número final como el patrón: las tres metodologías propias, y
+    también el consenso sell-side, ubican su estimación por debajo del precio de mercado — con una dispersión amplia
+    (de $106.85 en el escenario más conservador a $318.81 en el consenso de analistas) que refleja genuina
+    incertidumbre sobre cuánto del momentum operativo actual de Apple es sostenible más allá de los próximos años, y no
+    una falla de cálculo que debería resolverse en una única cifra falsamente precisa.
+  </p>
+
+  <!-- 14 -->
+  <p class="secnum" id="s14">14 — Limitaciones del Modelo</p>
+  <h2>Qué asume este análisis, y dónde puede fallar</h2>
+  <div class="watermark-block">
+    <p style="margin-bottom:0;">
+      Entre 67% y 80% del valor de empresa en los tres escenarios del DCF proviene del valor terminal, no de los flujos
+      de caja explícitos de los primeros cinco años — el modelo es, por construcción, sensible a supuestos de larguísimo
+      plazo que son inherentemente más inciertos que las proyecciones de corto plazo. El EPS forward usado tanto en el
+      método de comparables como en el de reversión histórica ($9.98) se deriva del propio múltiplo forward de mercado
+      de Apple, no de una cifra de consenso obtenida de forma completamente independiente — es una aproximación
+      razonable pero parcialmente circular entre ambos métodos, y debe leerse como tal. El modelo no desagrega una
+      proyección por segmento (iPhone vs. Servicios vs. resto) sino que trabaja sobre ingresos y márgenes consolidados,
+      lo que simplifica pero pierde granularidad frente al hecho de que Servicios crece más rápido y con mejor margen
+      que el resto del negocio — un modelo de suma de las partes probablemente arrojaría un resultado distinto al DCF
+      consolidado. El aumento reciente de 33.6% interanual en gasto de I+D todavía no se refleja en una proyección
+      explícita de mejora o deterioro de márgenes atribuible a IA. Finalmente, ningún método cuantifica de forma
+      explícita el riesgo de ejecución de la transición de CEO ni el resultado del proceso con el DOJ: son factores
+      cualitativos que pueden mover el múltiplo de mercado en cualquier dirección independientemente de lo que digan
+      los fundamentos, y que ninguna de las cuatro metodologías de la Sección 13 incorpora de forma directa.
+    </p>
+  </div>
+
+  <div class="disclosure">
+    Documento elaborado a partir de fuentes públicas: SEC EDGAR (10-K, 10-Q, XBRL companyconcept API), comunicados de
+    resultados y newsroom de Apple, Microsoft, Alphabet, Meta y Amazon, Yahoo Finance (precios spot y rendimiento del
+    Treasury a 10 años), S&amp;P Global Market Intelligence, GuruFocus, stockanalysis.com, fullratio.com,
+    financecharts.com, MacroTrends, Bloomberg, 9to5Mac, MacRumors, TechCrunch, CNBC, The Motley Fool, GeekWire, Futurum
+    Group, DataCenterDynamics, Variety, Alphastreet, Deadline, GuruFocus, WallStreetZen, SEC EDGAR (Apple Inc. Form DEF
+    14A FY2026), stockanalysis.com, ChartMill y AppleInsider. Cifras fundamentales con fecha de corte en el 10-Q de
+    Apple correspondiente al trimestre cerrado el 28 de marzo de 2026 (Q2 FY2026); desarrollos corporativos y de
+    mercado con fecha de corte de finales de julio de 2026.
+    <br><br>
+    <strong>Sobre el autor y la naturaleza de este documento:</strong> este informe es un análisis independiente
+    elaborado por Manfredi Investment Research &amp; Markets con fines exclusivamente informativos y educativos. El
+    autor no es un asesor de inversión registrado, no está matriculado ante la Comisión Nacional de Valores (CNV), la
+    SEC, ni ningún otro organismo regulador equivalente, y no mantiene una relación de asesoramiento financiero
+    personalizado con el lector. Ninguna cifra de este documento —incluido el "fair value" de portada, los escenarios
+    de DCF, ni la síntesis de la Sección 13— constituye una recomendación de compra, venta o mantenimiento para
+    ningún lector en particular, ni considera la situación financiera, los objetivos o el perfil de riesgo individual
+    de quien lo lee. Los escenarios de DCF son estimaciones propias sujetas a los supuestos declarados explícitamente
+    en la Sección 13, y no representan guidance oficial de ninguna de las compañías mencionadas salvo donde se cita
+    de forma directa y atribuida. Verificar cifras contra el 10-Q/10-K más reciente de cada compañía, y consultar a
+    un asesor financiero matriculado, antes de tomar cualquier decisión de inversión.
+  </div>
+
+</div>
+
+<script>
+/* ---- Motor de gráficos propio, sin dependencias externas (Canvas 2D) ---- */
+(function(){
+  var PALETTE = {ink:'#161a20', muted:'#69707c', line:'#e3e9f0', navy:'#0b1f3a', navy2:'#15335c', blue:'#2f5f9e', blueLight:'#5f8fc7', pale:'#c7d9ec', red:'#a8291f', gold:'#c99a3c'};
+
+  function setupCanvas(canvas, cssHeight){
+    var dpr = window.devicePixelRatio || 1;
+    var cssWidth = canvas.parentElement.clientWidth - 44; // padding del chartbox
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = Math.max(1, Math.round(cssWidth * dpr));
+    canvas.height = Math.max(1, Math.round(cssHeight * dpr));
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return {ctx: ctx, w: cssWidth, h: cssHeight};
+  }
+
+  function fmtCompact(v, prefix, suffix){
+    prefix = prefix || ''; suffix = suffix || '';
+    return prefix + v + suffix;
+  }
+
+  function drawVBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+    ctx.font = '11px "IBM Plex Mono", monospace';
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var log = !!opts.log;
+    var padL = 46, padR = 10, padT = 16, padB = 46;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var maxV = Math.max.apply(null, values);
+    var minV = log ? Math.min.apply(null, values) : 0;
+    function scaleY(v){
+      if(log){
+        var lv = Math.log10(Math.max(v,0.01)), lmax = Math.log10(maxV*1.15), lmin = Math.log10(Math.max(minV*0.5,1));
+        return padT + plotH - ((lv - lmin) / (lmax - lmin)) * plotH;
+      }
+      return padT + plotH - (v / (maxV*1.15)) * plotH;
+    }
+
+    // gridlines
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    var gridSteps = 4;
+    for(var g=0; g<=gridSteps; g++){
+      var yy = padT + (plotH/gridSteps)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    // axis
+    ctx.strokeStyle = PALETTE.navy; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    var n = values.length;
+    var slot = plotW / n;
+    var barW = Math.min(slot * 0.56, 64);
+
+    for(var i=0;i<n;i++){
+      var cx = padL + slot*i + slot/2;
+      var y0 = scaleY(values[i]);
+      var yBase = padT + plotH;
+      ctx.fillStyle = colors[i % colors.length];
+      var bw = barW;
+      ctx.fillRect(cx - bw/2, y0, bw, yBase - y0);
+
+      // value label
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'center';
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, cx, y0 - 6);
+
+      // x label
+      ctx.fillStyle = PALETTE.muted;
+      ctx.font = '10px "Inter", sans-serif';
+      wrapLabel(ctx, labels[i], cx, yBase + 16, slot + 6);
+    }
+  }
+
+  function wrapLabel(ctx, text, cx, y, maxW){
+    var words = String(text).split(' ');
+    var lines = [];
+    var cur = '';
+    for(var i=0;i<words.length;i++){
+      var test = cur ? cur + ' ' + words[i] : words[i];
+      if(ctx.measureText(test).width > maxW && cur){ lines.push(cur); cur = words[i]; }
+      else cur = test;
+    }
+    if(cur) lines.push(cur);
+    lines = lines.slice(0,2);
+    ctx.textAlign = 'center';
+    for(var j=0;j<lines.length;j++){
+      ctx.fillText(lines[j], cx, y + j*11);
+    }
+  }
+
+  function drawHBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var padL = 128, padR = 54, padT = 10, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var maxV = Math.max.apply(null, values) * 1.12;
+
+    var n = values.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.5, 30);
+
+    // gridlines (vertical)
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, padT+plotH); ctx.stroke();
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = padL;
+      var w = (values[i]/maxV) * plotW;
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, w, barH);
+
+      ctx.fillStyle = PALETTE.text || PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(labels[i], padL - 10, cy + 4);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'left';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, x0 + w + 8, cy + 4);
+    }
+  }
+
+  function drawRangeBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, ranges = opts.ranges, colors = opts.colors, refLines = opts.refLines || [];
+    var padL = 168, padR = 16, padT = 26, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    ranges.forEach(function(r){ allVals.push(r[0], r[1]); });
+    refLines.forEach(function(r){ allVals.push(r.value); });
+    var domMin = Math.min.apply(null, allVals) * 0.94;
+    var domMax = Math.max.apply(null, allVals) * 1.04;
+    function scaleX(v){ return padL + ((v - domMin)/(domMax - domMin)) * plotW; }
+
+    var n = ranges.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.42, 22);
+
+    // vertical gridlines
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = scaleX(ranges[i][0]), x1 = scaleX(ranges[i][1]);
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, Math.max(x1-x0,2), barH);
+      ctx.beginPath(); ctx.arc(x0, cy, barH/2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x1, cy, barH/2, 0, Math.PI*2); ctx.fill();
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      wrapLabel(ctx, labels[i], padL - 12, cy - 4, padL - 20);
+
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      var vf = opts.valueFmt || function(v){ return '$'+v.toFixed(0); };
+      ctx.textAlign = 'right';
+      ctx.fillText(vf(ranges[i][0]), x0 - 8, cy + 4);
+      ctx.textAlign = 'left';
+      ctx.fillText(vf(ranges[i][1]), x1 + 8, cy + 4);
+    }
+
+    refLines.forEach(function(r){
+      var x = scaleX(r.value);
+      ctx.strokeStyle = r.color; ctx.lineWidth = 1.6; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x, padT-6); ctx.lineTo(x, padT+plotH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = r.color;
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(r.label, x, padT - 12);
+    });
+  }
+
+  function drawLines(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, series = opts.series; // [{name,color,values}]
+    var padL = 40, padR = 14, padT = 16, padB = 54;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    series.forEach(function(s){ allVals = allVals.concat(s.values); });
+    var maxV = Math.max.apply(null, allVals) * 1.08;
+    var minV = Math.min.apply(null, allVals) * 0.92;
+
+    function scaleX(i){ return padL + (plotW/(labels.length-1)) * i; }
+    function scaleY(v){ return padT + plotH - ((v - minV)/(maxV-minV)) * plotH; }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var yy = padT + (plotH/4)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    series.forEach(function(s){
+      ctx.strokeStyle = s.color; ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        ctx.fillStyle = s.color;
+        ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
+      });
+    });
+
+    // x labels
+    ctx.fillStyle = PALETTE.muted;
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    labels.forEach(function(l,i){ ctx.fillText(l, scaleX(i), padT+plotH+16); });
+
+    // legend
+    var lx = padL, ly = H - 12;
+    ctx.font = '11px "Inter", sans-serif';
+    series.forEach(function(s){
+      ctx.fillStyle = s.color;
+      ctx.fillRect(lx, ly-8, 10, 10);
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'left';
+      ctx.fillText(s.name, lx+14, ly);
+      lx += 14 + ctx.measureText(s.name).width + 22;
+    });
+  }
+
+  function renderAll(){
+    drawVBars(document.getElementById('historyChart'), {
+      labels:['FY2017','FY2018','FY2019','FY2020','FY2021','FY2022','FY2023','FY2024','FY2025','TTM'],
+      values:[229.23,265.60,260.17,274.51,365.82,394.33,383.29,391.04,416.16,451.44],
+      colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blue,PALETTE.blue,PALETTE.navy2,PALETTE.navy2,PALETTE.navy],
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawHBars(document.getElementById('segmentChart'), {
+      labels:['iPhone','Servicios','Wearables/Home','Mac','iPad'],
+      values:[57.0,31.0,7.9,8.4,6.9],
+      colors:[PALETTE.navy,PALETTE.blue,PALETTE.pale,PALETTE.blueLight,PALETTE.pale],
+      valueFmt:function(v){ return '$'+v.toFixed(1)+'B'; }
+    });
+
+    drawHBars(document.getElementById('geoChart'), {
+      labels:['Gran China','Resto Asia-Pacífico','Europa','Américas'],
+      values:[28.1,25.0,14.7,11.9],
+      colors:[PALETTE.navy,PALETTE.navy2,PALETTE.blue,PALETTE.blueLight],
+      valueFmt:function(v){ return '+'+v.toFixed(1)+'%'; }
+    });
+
+    drawLines(document.getElementById('marginChart'), {
+      labels:['Q3 24','Q4 24','Q1 25','Q2 25','Q3 25','Q4 25','Q1 26','Q2 26'],
+      series:[
+        {name:'Margen bruto', color:PALETTE.navy, values:[46.2,46.9,46.9,46.8,46.5,48.2,48.2,49.3]},
+        {name:'Margen operativo', color:PALETTE.blueLight, values:[30.6,34.5,35.9,29.9,30.0,32.4,35.4,32.3]}
+      ]
+    });
+
+    drawVBars(document.getElementById('capexChart'), {
+      labels:['AAPL','META (piso)','MSFT','AMZN (piso)','GOOGL (techo)'],
+      values:[13.5,125,190,200,205],
+      colors:[PALETTE.red,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight],
+      log:true,
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawHBars(document.getElementById('compsChart'), {
+      labels:['AAPL','AMZN','GOOGL','MSFT','META'],
+      values:[34.2,29.3,24.1,21.0,18.3],
+      colors:[PALETTE.navy,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight],
+      valueFmt:function(v){ return v.toFixed(1)+'x'; }
+    });
+
+    drawRangeBars(document.getElementById('footballChart'), {
+      labels:['DCF (Bear → Bull)','Comparables (piso → techo panel)','Reversión histórica (mediana → 5y)','Consenso Wall Street (rango objetivo)'],
+      ranges:[[106.85,275.36],[182.63,292.41],[268.46,323.35],[215.00,400.00]],
+      colors:[PALETTE.blue,PALETTE.navy2,PALETTE.blueLight,PALETTE.gold],
+      refLines:[{value:341.04,color:PALETTE.red,label:'Mercado $341'},{value:236.27,color:PALETTE.navy,label:'Blend $236'}],
+      valueFmt:function(v){ return '$'+v.toFixed(0); }
+    });
+
+    drawHBars(document.getElementById('revisionChart'), {
+      labels:['Revisadas al alza','Revisadas a la baja'],
+      values:[26,1],
+      colors:[PALETTE.blue,PALETTE.red],
+      valueFmt:function(v){ return v+' estimaciones'; }
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', renderAll);
+  } else {
+    renderAll();
+  }
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderAll, 150);
+  });
+})();
+</script>
+</body>
+</html>

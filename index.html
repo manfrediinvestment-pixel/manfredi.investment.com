@@ -1897,11 +1897,44 @@
     @keyframes flash-red { 0% { background-color: rgba(239,68,68,.28); } 100% { background-color: transparent; } }
     @keyframes flash-green { 0% { background-color: rgba(16,185,129,.28); } 100% { background-color: transparent; } }
     .spot-feature-chart { width: 100%; height: 80px; display: block; overflow: visible; }
+    .hero-bottom-row {
+      max-width: 1320px;
+      margin: 28px auto 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      position: relative;
+    }
+    .hero-cal-card--wide { max-width: none; width: 100%; }
+    .hero-inv-card { max-width: none; width: 100%; }
+    .hero-inv-list { display: flex; flex-direction: column; gap: 0; }
+    .hero-inv-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .hero-inv-item:last-child { border-bottom: none; }
+    .hero-inv-item-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .hero-inv-ticker {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,.92);
+      letter-spacing: .02em;
+      min-width: 50px;
+    }
+    .hero-inv-name { font-size: 12.5px; color: rgba(255,255,255,.5); }
+    .hero-inv-item--soon { opacity: .5; font-style: italic; }
+    .hero-inv-item--soon .hero-inv-ticker { color: rgba(255,255,255,.3); }
     @media(max-width:900px){
       .hero-v2-inner { grid-template-columns: 1fr; }
       .hero-v2-right { justify-content: center; }
       .spotlight-card { max-width: 100%; }
       .hero-cal-card { max-width: 100%; }
+      .hero-bottom-row { grid-template-columns: 1fr; max-width: 100%; }
     }
     @media (prefers-reduced-motion: reduce) {
       .spot-feature-value.flash-up, .spot-feature-value.flash-down { animation: none; }
@@ -2575,21 +2608,56 @@
           </div>
           <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#mercados'">Ver todos los mercados &rarr;</button>
         </div>
-        <div class="hero-cal-card" id="heroCalCard">
-          <div class="spotlight-head">
-            <span>Calendario econ&oacute;mico</span>
-            <span class="s-live" id="heroCalBadge">HOY</span>
-          </div>
-          <div class="hero-cal-date" id="heroCalDate">&mdash;</div>
-          <div class="hero-cal-events" id="heroCalEvents">
-            <div class="cal-ev"><div class="cal-ev-dot ar"></div><div class="cal-ev-text">Cargando&hellip;</div></div>
-          </div>
-          <div class="hero-cal-legend">
-            <span><i class="cal-ev-dot us"></i>Estados Unidos</span>
-            <span><i class="cal-ev-dot ar"></i>Argentina</span>
-          </div>
-          <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#calendario'">Ver calendario completo &rarr;</button>
+      </div>
+    </div>
+
+    <div class="hero-bottom-row">
+      <div class="hero-cal-card hero-cal-card--wide" id="heroCalCard">
+        <div class="spotlight-head">
+          <span>Calendario econ&oacute;mico</span>
+          <span class="s-live" id="heroCalBadge">HOY</span>
         </div>
+        <div class="hero-cal-date" id="heroCalDate">&mdash;</div>
+        <div class="hero-cal-events" id="heroCalEvents">
+          <div class="cal-ev"><div class="cal-ev-dot ar"></div><div class="cal-ev-text">Cargando&hellip;</div></div>
+        </div>
+        <div class="hero-cal-legend">
+          <span><i class="cal-ev-dot us"></i>Estados Unidos</span>
+          <span><i class="cal-ev-dot ar"></i>Argentina</span>
+        </div>
+        <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#calendario'">Ver calendario completo &rarr;</button>
+      </div>
+
+      <div class="hero-cal-card hero-inv-card" id="heroInvCard">
+        <div class="spotlight-head">
+          <span>Informes institucionales</span>
+          <span style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);">3 activos</span>
+        </div>
+        <div class="hero-inv-list">
+          <div class="hero-inv-item">
+            <div class="hero-inv-item-info">
+              <span class="hero-inv-ticker">AAPL</span>
+              <span class="hero-inv-name">Apple Inc.</span>
+              <span class="pick-sentiment bear">Bajista</span>
+            </div>
+            <a href="informes/aapl.html" class="pick-btn" target="_blank" rel="noopener">Ver an&aacute;lisis &rarr;</a>
+          </div>
+          <div class="hero-inv-item">
+            <div class="hero-inv-item-info">
+              <span class="hero-inv-ticker">MSFT</span>
+              <span class="hero-inv-name">Microsoft Corp.</span>
+              <span class="pick-sentiment neutral">Neutral</span>
+            </div>
+            <a href="informes/msft.html" class="pick-btn" target="_blank" rel="noopener">Ver an&aacute;lisis &rarr;</a>
+          </div>
+          <div class="hero-inv-item hero-inv-item--soon">
+            <div class="hero-inv-item-info">
+              <span class="hero-inv-ticker">&mdash;</span>
+              <span class="hero-inv-name">Pr&oacute;ximo an&aacute;lisis en camino</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#inversiones'">Ver secci&oacute;n Inversiones &rarr;</button>
       </div>
     </div>
   </section>
@@ -2892,7 +2960,7 @@
     <div class="pick-name">Apple Inc.</div>
   </div>
   <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,10 15,14 30,18 45,22 60,26 75,30 90,33" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-  <div class="pick-right"><span class="pick-sentiment bear">Bajista</span><a href="#" class="pick-btn" data-ticker="AAPL">Ver análisis &rarr;</a></div>
+  <div class="pick-right"><span class="pick-sentiment bear">Bajista</span><a href="informes/aapl.html" class="pick-btn" target="_blank" rel="noopener">Ver análisis &rarr;</a></div>
 </div>
 <div class="pick-card" data-aos="fade-up" data-aos-delay="80">
   <div class="pick-accent neutral"></div>
@@ -2901,7 +2969,7 @@
     <div class="pick-name">Microsoft Corporation</div>
   </div>
   <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,26 15,24 30,20 45,22 60,16 75,18 90,10" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-  <div class="pick-right"><span class="pick-sentiment neutral">Neutral</span><a href="#" class="pick-btn" data-ticker="MSFT">Ver análisis &rarr;</a></div>
+  <div class="pick-right"><span class="pick-sentiment neutral">Neutral</span><a href="informes/msft.html" class="pick-btn" target="_blank" rel="noopener">Ver análisis &rarr;</a></div>
 </div>
 <div class="pick-coming">+ Próximo análisis en camino</div>
 
@@ -7376,10 +7444,7 @@ AOS.init({
 (function(){
 'use strict';
 
-const MI_ASSETS={
-AAPL:{fullname:'Apple Inc. · NASDAQ',tags:['USA','Tecnología','Mega Cap'],rec:'bajista',recLabel:'● BAJISTA',updatedAt:'Julio 2026',targetPrice:'$236',upside:'-30.7%',pe:'41.3x',evEbitda:'31.2x',revGrowth:'+17%',opMargin:'33%',fcf:'$129B',debtEbitda:'Caja neta $63.9B',conviction:32,convictionLabel:'Bajista — negocio excepcional, valuación exige años de ejecución perfecta',thesis:'Apple atraviesa el mejor ciclo de producto de su historia reciente — el iPhone 17 generó los dos mejores trimestres de ingresos por iPhone jamás reportados y Gran China creció +28.1% YoY — en simultáneo con la primera sucesión de CEO en 15 años (Cook → Ternus, sep-2026) y una política de capital que prioriza recompras por sobre el capex de IA de sus pares (Microsoft, Alphabet, Meta, Amazon). El negocio está en su mejor momento operativo; el problema es el precio: a $341 la acción cotiza a 41.3x earnings TTM, y el blend propio de DCF + comparables + reversión histórica da un fair value de $236 — 31% por debajo del mercado. Informe extendido con las 4 metodologías completas: ver link en el sitio.',bull:['Ingresos TTM de $451.4B con aceleración a +17% YoY — el iPhone 17 generó los dos mejores trimestres de ingresos por iPhone de la historia de la compañía','Gran China creció +28.1% YoY en el trimestre de marzo, revirtiendo años de narrativa bajista sobre la región','Caja neta de $63.9B y FCF TTM de $129.2B financian una nueva autorización de recompra por $100B y un aumento de dividendo del 4%','I+D creció 33.6% YoY en el último trimestre — evidencia contable de inversión creciente en IA (Siri AI, lanzamiento sep-2026) pese al capex bajo relativo a los pares'],bear:['El blend de 3 metodologías propias (DCF Base, comparables, reversión histórica) da $236.27/acción — 31% por debajo del precio de mercado de $341.04','P/E TTM de 41.3x muy por encima del promedio histórico propio de 10 años (30.6x) y del panel de comparables (18.3x-29.3x forward)','Primera sucesión de CEO en 15 años (Cook → Ternus, 1-sep-2026) sin historial público de Ternus en asignación de capital a esta escala','Apple invierte ~$13-14B de capex/IA en FY2026 vs. $125B-$205B de Microsoft/Alphabet/Meta/Amazon — riesgo de brecha de capacidades de IA a mediano plazo'],exitUp:['Corrección hacia el rango $172-275 (banda DCF Base-Bull) sin deterioro del negocio','Resolución del caso DOJ sin remedios estructurales significativos sobre la App Store','Lanzamiento de Siri AI (sep-2026) supera las expectativas acumuladas de 2 años de retraso'],exitDn:['Transición Cook → Ternus muestra fricción visible en disciplina de asignación de capital','Dos trimestres consecutivos de miss en guidance de iPhone o Servicios','Revenue de China cae más del 15% por reversión del viento de cola cambiario y represalias arancelarias'],catalysts:[{date:'30 Jul 2026',text:'Earnings Q3 FY2026 — último balance de Tim Cook como CEO en ejercicio.',done:false},{date:'1 Sep 2026',text:'John Ternus asume como CEO; Cook pasa a presidente ejecutivo del directorio.',done:false},{date:'Sep 2026',text:'Lanzamiento iOS 27 con Siri AI — primera prueba de mercado del producto de IA más esperado y más retrasado de la compañía.',done:false},{date:'Continuo',text:'Conversaciones de acuerdo Apple-DOJ sobre el caso antitrust de 2024 — términos aún sin definir.',risk:true}],peers:[{name:'AAPL',val:'34.2x',active:true},{name:'MSFT',val:'21.0x',active:false},{name:'GOOGL',val:'24.1x',active:false},{name:'META',val:'18.3x',active:false}],peersData:[34.2,21.0,24.1,18.3],projLabels:['Q4 2024','Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026e','Q3 2026e'],projReal:[124.30,95.36,94.04,102.47,143.76,111.18,null,null],projEst:[null,null,null,null,null,null,103.9,115.8],valuation:{asOf:'2026-03-28',dataSource:'SEC EDGAR 10-Q Q2 FY2026 (trimestre cerrado 2026-03-28, presentado 2026-05-01) + Yahoo Finance (precio spot) + consenso Street (stockanalysis.com/ChartMill, jul-2026)',ttm:{revenue:451.44,ebitda:159.98,netIncome:122.58,eps:8.26,sharesOutB:14.84,netDebtB:-63.89},dcf:{wacc:0.10,terminalGrowth:0.03,scenarios:{bear:{priceTarget:106.85,upsidePct:-68.7,evB:1522,pctEVFromTerminal:67},base:{priceTarget:171.89,upsidePct:-49.6,evB:2487,pctEVFromTerminal:74},bull:{priceTarget:275.36,upsidePct:-19.3,evB:4022,pctEVFromTerminal:80}}},comps:{peers:[{ticker:'MSFT',price:393.35,source:'Yahoo (spot real) · múltiplo aprox.'},{ticker:'GOOGL',price:333.71,source:'Yahoo (spot real) · múltiplo aprox.'},{ticker:'META',price:593.41,source:'Yahoo (spot real) · múltiplo aprox.'}],peerAvgEvEbitda:23.2,peerAvgPE:23.2,impliedPriceEvEbitda:231.54,impliedPricePE:231.54,blended:231.54},priceTarget:{value:236.27,upsidePct:-30.7,methodology:'Promedio simple: DCF caso Base ($171.89) + Comparables P/E forward ($231.54) + Reversión histórica P/E 10 años propio ($305.39) — ver informe extendido para las 4 metodologías completas incluyendo consenso Wall Street y grilla de sensibilidad WACC×g',ratingRationale:'El blend de 3 metodologías propias da $236.27, un 31% por debajo del precio de mercado de $341.04. El consenso de Wall Street ($318.81, 47 analistas) también queda por debajo del spot, pese a que 60% mantiene calificación de compra. La brecha es la señal central: Apple ejecutó una aceleración real de negocio (ingresos +17% YoY, márgenes en expansión, caja neta de $63.9B) pero el precio actual ya descuenta varios años de continuidad del ciclo. Con 74% del valor del caso Base del DCF viniendo del valor terminal, el modelo es sensible a supuestos de largo plazo.'},limitations:['Entre 67% y 80% del valor de empresa en los tres escenarios del DCF proviene del valor terminal — el modelo es sensible a supuestos de largo plazo más allá del año 5.','El EPS forward usado en comparables y reversión histórica ($9.98) se deriva del propio múltiplo forward de mercado de Apple — es una aproximación parcialmente circular entre ambos métodos.','El modelo no desagrega una proyección por segmento (iPhone vs. Servicios) — un sum-of-the-parts probablemente daría un resultado distinto al DCF consolidado.','El salto de 33.6% YoY en gasto de I+D todavía no se refleja en una proyección explícita de mejora de márgenes atribuible a IA.','Ningún método cuantifica de forma explícita el riesgo de ejecución de la transición de CEO (Cook → Ternus) ni el resultado de las negociaciones con el DOJ.']}},
-MSFT:{fullname:'Microsoft Corporation · NASDAQ',tags:['USA','Tecnología','Mega Cap'],rec:'neutral',recLabel:'◆ NEUTRAL',updatedAt:'Julio 2026',targetPrice:'$442',upside:'+13.2%',pe:'21.8x',evEbitda:'14.8x',revGrowth:'+18%',opMargin:'47%',fcf:'$67.0B',debtEbitda:'Caja neta $36.5B',conviction:55,convictionLabel:'Neutral — Azure acelera, pero el capex FY2027 implica FCF negativo el año 1',thesis:'Microsoft cerró hoy (29-jul-2026) el año fiscal 2026 con Azure acelerando a +43% interanual y RPO comercial saltando 84% a $678B — la validación más clara de que la demanda de infraestructura de IA se está firmando en compromisos reales. El mismo reporte duplicó la guía de capex FY2027 a $255-260B, lo que en nuestro propio DCF implica flujo de caja libre negativo el primer año bajo los tres escenarios. El blend de valuación propio ($442, +13.2% vs. mercado) queda por encima del precio, pero la dispersión del DCF (de $132 a $659) y el riesgo de ejecución del capex nos llevan a una postura neutral, no de convicción plena. Informe extendido con las 4 metodologías completas: ver link en el sitio.',bull:['Azure aceleró a +43% interanual en el trimestre, superando la propia guía — primera vez que supera $100B de ingresos en un año fiscal completo','RPO comercial de $678B (+84% YoY) sugiere que buena parte del capex guiado ya tiene demanda contratada detrás','Balance con caja neta de $36.5B y deuda/EBITDA de apenas 0.2x — margen de sobra para financiar el capex sin comprometer solvencia','Participación de 26.79% en OpenAI vale ~$228B a la valuación de marzo-2026 — casi 18x el capital invertido, no reflejada a valor de mercado en el balance'],bear:['La guía de capex FY2027 ($255-260B) supera, en nuestro modelo, al flujo de caja operativo proyectado — FCF negativo en el año 1 bajo los tres escenarios del DCF','87-89% del valor del DCF depende del valor terminal — el modelo es muy sensible a que el capex se normalice como se supone','Parte del crecimiento de Azure está financiado por acuerdos circulares (OpenAI, Anthropic) que reinvierten capital propio de Microsoft en su nube','El consenso de EPS FY2027 ($16.71) está desactualizado (publicado antes del beat de hoy) — genera ruido en los métodos de comparables y reversión histórica'],exitUp:['RPO comercial sigue creciendo +80% YoY sosteniendo la tesis de demanda contratada real','Capex converge hacia niveles pre-guía más rápido de lo proyectado, liberando FCF antes de lo esperado','Azure sostiene crecimiento superior a 40% YoY por 2 o más trimestres consecutivos'],exitDn:['FCF negativo se sostiene más de 2 trimestres sin señales de normalización de capex','Desaceleración de Microsoft 365 Copilot (hoy 30M asientos pagos) evidencia que el capex no se monetiza en el negocio core','El mercado castiga el capex como hizo con Alphabet, comprimiendo el múltiplo pese al crecimiento'],catalysts:[{date:'29 Jul 2026',text:'Resultados Q4/FY2026 — Azure +43%, RPO +84%, guía de capex FY2027 elevada a $255-260B.',done:true},{date:'Próxima sesión regular',text:'Confirmación del movimiento de +9% en after-hours tras el reporte de hoy.',done:false},{date:'Oct 2026 (estimado)',text:'Earnings Q1 FY2027 — primera lectura real del ritmo de capex trimestral.',done:false},{date:'Continuo',text:'Evolución del RPO comercial trimestre a trimestre — clave para validar demanda contratada.',risk:true}],peers:[{name:'MSFT',val:'21.8x',active:true},{name:'AAPL',val:'41.3x',active:false},{name:'AMZN',val:'29.3x',active:false},{name:'META',val:'21.6x',active:false}],peersData:[21.8,41.3,29.3,21.6],projLabels:['Q3 FY25','Q4 FY25','Q3 FY26','Q4 FY26'],projReal:[70.07,76.44,82.89,90.01],projEst:[null,null,null,null],valuation:{asOf:'2026-06-30',dataSource:'SEC EDGAR Form 8-K Exhibit 99.1 (año fiscal cerrado 2026-06-30, publicado 2026-07-29) + consenso Street (jul-2026)',ttm:{revenue:331.84,ebitda:193.77,netIncome:133.75,eps:17.95,sharesOutB:7.427,netDebtB:-36.549},dcf:{wacc:0.09,terminalGrowth:0.03,scenarios:{bear:{priceTarget:131.95,upsidePct:-66.2,evB:943,pctEVFromTerminal:87},base:{priceTarget:351.32,upsidePct:-10.0,evB:2573,pctEVFromTerminal:87},bull:{priceTarget:659.12,upsidePct:68.8,evB:4859,pctEVFromTerminal:89}}},comps:{peers:[{ticker:'AAPL',price:341.04,source:'Yahoo (spot real) · múltiplo aprox.'},{ticker:'GOOGL',price:333.71,source:'Yahoo (spot real) · múltiplo aprox.'},{ticker:'AMZN',price:238.15,source:'Yahoo (spot real) · múltiplo aprox.'}],peerAvgEvEbitda:26.5,peerAvgPE:26.5,impliedPriceEvEbitda:442.82,impliedPricePE:442.82,blended:442.82},priceTarget:{value:442.12,upsidePct:13.2,methodology:'Promedio simple: DCF caso Base ($351.32) + Comparables P/E forward ($442.82) + Reversión histórica P/E 5-10 años propio ($532.22) — ver informe extendido para las 4 metodologías completas incluyendo consenso Wall Street y grilla de sensibilidad WACC×g',ratingRationale:'El blend de 3 metodologías propias da $442.12, un 13.2% por encima del precio de mercado de $390.54 (cierre previo al reporte de hoy). El consenso de Wall Street ($555.77, 56 analistas, Strong Buy) es todavía más optimista. Pero el propio DCF —la metodología más rigurosa— es también la más dispersa (de $131.95 a $659.12) y arroja FCF negativo en el año 1 bajo los tres escenarios por la guía de capex FY2027. Un blend positivo construido sobre un método con esa dispersión no es evidencia suficiente de convicción plena.'},limitations:['87-89% del valor de empresa del DCF proviene del valor terminal — más alto que en cualquier otra cobertura de este desk, porque el FCF del año 1 es negativo en los tres escenarios.','El EPS forward de consenso usado en comparables y reversión histórica ($16.71) fue publicado antes del reporte de hoy y probablemente subestima las ganancias reales de FY2027.','El precio de mercado usado ($390.54) es el cierre previo al reporte — la reacción de +9% en after-hours todavía no está confirmada en una sesión regular.','La participación en OpenAI (~$228B) no está incorporada explícitamente en ninguno de los cuatro métodos de valuación, lo que probablemente subestima el valor total de la compañía.','No hay datos granulares de revisión de estimados de 90 días para MSFT — el "momentum" se basa únicamente en el beat de este trimestre.']}}
-};
+const MI_ASSETS={};
 
 let miCurrentTicker=null,miFundamentals=null;
 const miCharts={};
@@ -7667,7 +7732,7 @@ document.addEventListener('DOMContentLoaded',function(){
   document.getElementById('mi-close-btn').addEventListener('click',miClose);
   document.querySelectorAll('.mi-nav-item').forEach(function(el){el.addEventListener('click',function(){miSwitchTab(this.dataset.mitab);});});
   document.querySelectorAll('.pick-btn[data-ticker]').forEach(function(btn){btn.addEventListener('click',function(e){e.preventDefault();miOpen(this.dataset.ticker);});});
-  document.querySelectorAll('.pick-btn:not([data-ticker])').forEach(function(btn){btn.addEventListener('click',function(e){e.preventDefault();var card=this.closest('.pick-card');if(!card)return;var el=card.querySelector('.pick-ticker');if(el)miOpen(el.textContent.trim());});});
+  document.querySelectorAll('.pick-btn:not([data-ticker])').forEach(function(btn){var href=btn.getAttribute('href');if(href&&href!=='#')return;btn.addEventListener('click',function(e){e.preventDefault();var card=this.closest('.pick-card');if(!card)return;var el=card.querySelector('.pick-ticker');if(el)miOpen(el.textContent.trim());});});
 });
 document.addEventListener('keydown',function(e){if(e.key==='Escape')miClose();});
 window.miOpenOverlay=miOpen;

@@ -1,8 +1,8 @@
 ---
 name: equity-research
-description: "Use when writing or updating institutional-grade equity research for the 'Inversiones' section of manfredi.investment.com (the MI_ASSETS object in index.html) — individual stock/ADR deep-dive analysis with full investment thesis, financial statement analysis, industry positioning, and valuation (DCF + comparable companies) culminating in an explicit price target and rating. Trigger on: 'informe de [ticker]', 'análisis de [empresa]', 'tesis de inversión', 'price target', 'valuación de [activo]', 'actualizar MI_ASSETS', 'reporte institucional', 'nuevo pick', earnings/10-Q/10-K release for a tracked ticker."
+description: "Use when writing or updating institutional-grade equity research for the 'Inversiones' section of manfredi.investment.com — individual stock/ADR deep-dive analysis with full investment thesis, financial statement analysis, industry positioning, and valuation (DCF + comparable companies) culminating in an explicit fair value. Each ticker ships as a standalone HTML report in `informes/<ticker>.html`, linked from the picks-list and the hero widget. Trigger on: 'informe de [ticker]', 'análisis de [empresa]', 'tesis de inversión', 'price target', 'valuación de [activo]', 'reporte institucional', 'nuevo pick', earnings/10-Q/10-K release for a tracked ticker."
 metadata:
-  version: 1.0.0
+  version: 2.0.0
 ---
 
 # Equity Research Institucional — Manfredi Investment
@@ -20,14 +20,26 @@ debajo del precio de mercado con supuestos razonables, ESO es el hallazgo — re
 reconciliá la diferencia con juicio cualitativo (momentum, multiple expansion, moat) en vez de
 maquillar los inputs. Un analista que fuerza el número no es un analista.
 
+## Regla no-negociable: cero lenguaje relativo a fechas
+
+El informe no se actualiza hasta el próximo reporte trimestral (~3 meses), así que **nunca uses
+"hoy", "ayer", "mañana", "hace X horas" ni ningún marcador de tiempo relativo al momento de
+redacción** — un lector que abra el informe en septiembre no puede encontrarse con "Microsoft
+reportó hoy" sobre un resultado de julio. Escribí siempre en términos de fechas y períodos fijos:
+"el 29-jul-2026", "el trimestre cerrado 30-jun-2026", "el reporte de Q4/FY2026". Antes de dar un
+informe por terminado, corré `grep -in "hoy\|ayer\|mañana\|hace [0-9]* hora"` sobre el archivo final
+y no dejes ninguna coincidencia real (fuera de nombres propios como "Cash and cash equivalents").
+Este bug ya se coló una vez en el informe piloto de MSFT (37 apariciones de "hoy") — no repetirlo.
+
 ## Antes de empezar — reunir datos reales
 
 No inventes cifras. Para cada ticker nuevo:
 
 1. **Fundamentals (SEC EDGAR XBRL)** — `https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json`
    (headers: `User-Agent: manfrediinvestment-pixel contact@manfredi.com`). Buscá el CIK del ticker
-   si no está ya en `TICKERS_CIK` de `update_reports.py`. Extraé, para los últimos 8 trimestres
-   (10-Q/10-K, separando el valor standalone del trimestre cuando el concepto viene YTD):
+   en `TICKERS_CIK` de `update_reports.py` si ya está, o buscalo en EDGAR si es nuevo. Extraé, para
+   los últimos 8 trimestres (10-Q/10-K, separando el valor standalone del trimestre cuando el
+   concepto viene YTD):
    - `Revenues` o `RevenueFromContractWithCustomerExcludingAssessedTax`
    - `OperatingIncomeLoss`, `GrossProfit`, `NetIncomeLoss`
    - `DepreciationDepletionAndAmortization` (viene YTD acumulado en 10-Q — restar el trimestre
@@ -47,98 +59,20 @@ No inventes cifras. Para cada ticker nuevo:
 3. **Peers / comparables** — elegí 3-4 comparables directos del mismo sector/industria. Traé su
    precio con el mismo endpoint. Si no conseguís sus múltiplos (P/E, EV/EBITDA) de una fuente en
    vivo confiable, usá tu conocimiento de mercado como aproximación PERO etiquetalo explícitamente
-   como `"fuente": "aproximado, no verificado en tiempo real"` en el output — nunca lo presentes
-   como dato de mercado en vivo si no lo es. Si en el futuro se contrata una API paga (Financial
-   Modeling Prep, Polygon, etc.) reemplazá esto por datos reales.
+   como "aproximado, no verificado en tiempo real" en el output — nunca lo presentes como dato de
+   mercado en vivo si no lo es.
 
 4. Anotá la fecha/quarter de la última publicación de resultados usada — todo informe debe indicar
    su fecha de corte de datos.
 
-## Estructura obligatoria del informe
+## El entregable: un HTML autocontenido en `informes/<ticker>.html`
 
-Cada ticker se escribe como un objeto en `MI_ASSETS` (`index.html`, buscar `const MI_ASSETS={`).
-Mantené el schema existente y agregá el objeto `valuation` (nuevo, ver más abajo) que hoy no existe
-para ningún ticker.
-
-### 1. Resumen / métricas clave
-`fullname`, `tags[]`, `rec` (`alcista`/`bajista`/`neutral` — ver regla de asignación abajo),
-`recLabel`, `updatedAt` (mes/año real de esta actualización), `pe`, `evEbitda`, `revGrowth` (YoY del
-último trimestre real), `opMargin`, `fcf` (TTM), `debtEbitda`, `targetPrice`, `upside` (calculado
-del target vs precio spot real, no inventado).
-
-### 2. Tesis (`thesis`, string de 1 párrafo)
-3-4 oraciones. Qué es la empresa, por qué importa ahora, cuál es el driver central de la tesis y
-cuál es la tensión principal (crecimiento vs valuación, moat vs competencia, etc.). Nada de relleno.
-
-### 3. Bull / Bear (`bull[]`, `bear[]` — 4 puntos cada uno)
-Cada punto con un dato concreto (%, $, fecha), no una afirmación vaga. "Azure crece 33% YoY" no
-"Azure crece mucho".
-
-### 4. Catalizadores (`catalysts[]`)
-`{date, text, done, risk}`. Próximos earnings, lanzamientos, decisiones regulatorias — con fecha
-real o ventana estimada. `risk:true` para catalizadores negativos/regulatorios.
-
-### 5. Condiciones de salida (`exitUp[]`, `exitDn[]` — 3 puntos cada uno)
-Umbrales concretos y verificables, no genéricos.
-
-### 6. Valuación — `valuation` (objeto nuevo, obligatorio)
-
-```js
-valuation: {
-  asOf: 'YYYY-MM-DD',              // fecha de corte de los datos usados
-  dataSource: 'SEC EDGAR 10-Q Q1 FY2027 (2026-04-26) + Yahoo Finance spot',
-  ttm: { revenue, ebitda, netIncome, eps, sharesOutB, netDebtB },  // USD B salvo eps/shares
-  dcf: {
-    wacc, terminalGrowth,
-    scenarios: {
-      base: { growthPath:[y1..y5], opMarginPath:[y1..y5], priceTarget, upsidePct, evB, pctEVFromTerminal },
-      bull: { ... },
-      bear: { ... }
-    }
-  },
-  comps: {
-    peers: [{ticker, price, source:'aproximado'|'en vivo'}],
-    peerAvgEvEbitda, peerAvgPE,
-    impliedPriceEvEbitda, impliedPricePE, blended
-  },
-  priceTarget: { value, methodology: 'ej. 60% DCF base + 40% comps', ratingRationale: '...' },
-  limitations: ['string explicando qué asume el modelo y dónde puede fallar']
-}
-```
-
-**Reglas del DCF:**
-- Horizonte explícito de 5 años, supuestos de crecimiento y márgenes por año (no un solo número
-  constante) — el crecimiento debe desacelerar hacia el terminal de forma creíble, nunca sostener
-  tasas de hipercrecimiento a perpetuidad.
-- WACC razonado: Rf (~yield del Treasury 10Y actual) + beta × ERP (~5%). Si la empresa tiene caja
-  neta, WACC ≈ costo de equity.
-- Terminal growth entre 2.5%-4%, nunca mayor al crecimiento nominal de largo plazo de la economía
-  salvo justificación explícita.
-- Corré siempre 3 escenarios (bear/base/bull), no solo el base — reportá el rango completo.
-- Si el valor terminal es más del ~65-70% del EV, decilo explícitamente: el modelo es sensible y hay
-  que leerlo con cautela (es normal en growth stocks, pero hay que ser honesto sobre ello).
-- Comps: aplicá el múltiplo promedio de peers al EBITDA/EPS proyectado a 1 año (forward), no al TTM.
-- Precio objetivo final = blend explícito y declarado (ej. 60/40 DCF/comps) — nunca un número "de
-  ojo".
-
-**Regla de asignación de `rec`:** si el precio objetivo blended está por debajo del precio spot,
-`rec` NO puede ser `'alcista'` solo porque el negocio sea bueno — usá `'neutral'` (o `'bajista'` si
-la brecha es grande) y explicá en la tesis la tensión entre calidad del negocio y valuación exigente.
-"Buen negocio" y "buena inversión al precio actual" son preguntas distintas.
-
-## Disclaimer
-
-El informe se muestra bajo el disclaimer ya existente del sitio ("Posiciones con fines
-ilustrativos. No constituyen recomendación...") — no dupliques ese texto dentro del objeto, ya está
-en el `mi-footer` del modal.
-
-## Informe Extendido (companion artifact obligatorio)
-
-Además de la entrada en `MI_ASSETS`, cada ticker cubierto tiene un **informe extendido** — un
-documento HTML autocontenido (publicado como Claude Artifact) con el mismo rigor de una nota de
-mesa de research bulge-bracket (JP Morgan / Morgan Stanley). No es opcional: es el companion piece
-que sostiene con detalle todo lo que `MI_ASSETS` resume en una tarjeta. Usá como plantilla de
-referencia el informe de AAPL (14 secciones). Estructura obligatoria:
+Cada ticker cubierto se entrega como **un único documento HTML autocontenido** guardado directo en
+el repo en `informes/<ticker-en-minúscula>.html` (ej. `informes/googl.html`) — no hay paso
+intermedio de modal-resumen ni de objeto `MI_ASSETS`: este archivo ES el entregable completo, con
+el mismo rigor de una nota de mesa de research bulge-bracket. Usá como plantilla de referencia
+`informes/aapl.html` o `informes/msft.html` (mismo CSS embebido, misma estructura, mismo motor de
+gráficos). Estructura obligatoria (14 secciones):
 
 1. **Portada** — ticker, Fair Value blend propio vs. precio de mercado (`fv-block`), y un banner de
    veredicto (`verdict-bar`) con la postura del análisis en lenguaje descriptivo (nunca "Buy/Sell" —
@@ -167,41 +101,81 @@ referencia el informe de AAPL (14 secciones). Estructura obligatoria:
     histórica + consenso Wall Street, más:
     - **Grilla de sensibilidad WACC × crecimiento terminal** (5×5): recalculá el DCF con la fórmula
       real para cada combinación — nunca tipees números a mano. Calibrá el resultado para que la
-      celda del caso Base reproduzca exactamente el price target y el %EV-desde-terminal ya
-      publicados (ver metodología usada en AAPL: PowerShell/script para computar la grilla, ajustar
-      por un factor de calibración si hace falta, y verificar que %EV-terminal coincida).
+      celda del caso Base reproduzca exactamente el fair value y el %EV-desde-terminal ya
+      publicados.
     - **Football field** (rango bajo/alto por metodología, con líneas de referencia de precio de
       mercado y del blend propio).
 15. Limitaciones del Modelo.
 
+**Reglas del DCF:**
+- Horizonte explícito de 5 años, supuestos de crecimiento y márgenes por año (no un solo número
+  constante) — el crecimiento debe desacelerar hacia el terminal de forma creíble, nunca sostener
+  tasas de hipercrecimiento a perpetuidad.
+- WACC razonado: Rf (~yield del Treasury 10Y vigente) + beta × ERP (~5%). Si la empresa tiene caja
+  neta, WACC ≈ costo de equity.
+- Terminal growth entre 2.5%-4%, nunca mayor al crecimiento nominal de largo plazo de la economía
+  salvo justificación explícita.
+- Corré siempre 3 escenarios (bear/base/bull), no solo el base — reportá el rango completo.
+- Si el valor terminal es más del ~65-70% del EV, decilo explícitamente: el modelo es sensible y hay
+  que leerlo con cautela (es normal en growth stocks, pero hay que ser honesto sobre ello).
+- Comps: aplicá el múltiplo promedio de peers al EBITDA/EPS proyectado a 1 año (forward), no al TTM.
+- Fair value final = blend explícito y declarado (ej. promedio simple DCF Base + comparables +
+  reversión histórica) — nunca un número "de ojo".
+
+**Regla de asignación de la postura (bajista/neutral/alcista):** si el fair value blended está por
+debajo del precio spot, la postura NO puede ser alcista solo porque el negocio sea bueno — usá
+neutral (o bajista si la brecha es grande) y explicá en la tesis la tensión entre calidad del
+negocio y valuación exigente. "Buen negocio" y "buena inversión al precio actual" son preguntas
+distintas.
+
 **Disclaimer no-negociable (portada + pie):** el autor no es un asesor financiero registrado. Nunca
 un rating tipo "Buy/Hold/Sell" — siempre un Fair Value descriptivo derivado del propio modelo,
 etiquetado como análisis, no como recomendación personalizada. Reforzar esto en el `verdict-bar` de
-portada, no solo en el disclosure del pie.
+portada y en el bloque `.disclosure` del pie del documento.
 
 **Motor de gráficos:** los charts son Canvas 2D propio (sin dependencias externas, ver `<script>` al
-final del HTML de AAPL) — reusá `drawVBars`, `drawHBars`, `drawLines`, `drawRangeBars` (para el
-football field) en vez de introducir una librería nueva.
+final de `informes/aapl.html`) — reusá `drawVBars`, `drawHBars`, `drawLines`, `drawRangeBars` (para
+el football field) en vez de introducir una librería nueva.
 
-## Cadencia de rollout (informes extendidos, uno por vez)
+## Cómo conectar el ticker al sitio
 
-Cada informe extendido de este nivel implica varias búsquedas web + un DCF recalculado + ~4000-6000
-palabras — es intensivo en tokens. Ritmo sugerido: **2-3 tickers por día**, no todos de una. Orden
-sugerido para completar la cobertura actual de `MI_ASSETS` (AAPL y NVDA ya están al nivel completo):
-MSFT → GOOGL → AMZN → META (las otras mega-caps del panel de comparables, así se retroalimentan
-entre sí) → JPM → BAC (financieras, requieren ajustar el DCF a un modelo de descuento de dividendos
-o residual income en vez de FCF-to-firm estándar) → MELI → UBER → ADBE → TSLA. Para pedir uno,
-alcanza con: *"hacé el informe institucional de \[TICKER], nivel AAPL"*.
+Una vez que `informes/<ticker>.html` está listo, hay que enlazarlo desde **dos** lugares de
+`index.html` — ya no existe `MI_ASSETS` ni el modal viejo, así que no hay tercer lugar que tocar:
+
+1. **Picks-list de la sección Inversiones** (buscar `class="picks-list"`, dentro de
+   `id="inversiones"`): agregar una `pick-card` nueva (copiar el bloque de AAPL o MSFT como
+   plantilla) con ticker, tag, nombre, sentimiento y sparkline. El botón va con
+   `href="informes/<ticker>.html" class="pick-btn" target="_blank" rel="noopener"` — **sin**
+   `data-ticker` (ese atributo dispara el modal viejo vía JS, que ya no queremos para tickers
+   nuevos).
+2. **Widget del hero** (buscar `id="heroInvCard"`, dentro de `class="hero-bottom-row"`): agregar un
+   `hero-inv-item` (copiar el bloque de AAPL o MSFT) con ticker/nombre/postura + el mismo link
+   `informes/<ticker>.html`. El widget muestra 3 activos visibles: si ya hay 3 informes reales,
+   sacá el placeholder `hero-inv-item--soon` ("Próximo análisis en camino"); si vas a cubrir más de
+   3 en simultáneo, priorizá mostrar los más recientes y dejá el resto solo en el picks-list de
+   `#inversiones` (el hero es una vidriera, no tiene que listar toda la cobertura).
+
+No hace falta tocar `MI_ASSETS`, `reports/fundamentals.json` ni `TICKERS_CIK` — ese pipeline
+alimentaba el modal resumen viejo, que quedó retirado para los tickers que usan este formato nuevo.
+
+## Cadencia de rollout (uno por vez)
+
+Cada informe de este nivel implica varias búsquedas web + un DCF recalculado + ~4000-6000 palabras
+— es intensivo en tokens. Ritmo sugerido: **2-3 tickers por día**, no todos de una. AAPL y MSFT ya
+están completos en el formato nuevo (`informes/aapl.html`, `informes/msft.html`). Orden sugerido
+para seguir sumando cobertura: GOOGL → AMZN → META (mega-caps que se retroalimentan con AAPL/MSFT
+en la sección de comparables) → JPM → BAC (financieras, requieren ajustar el DCF a un modelo de
+descuento de dividendos o residual income en vez de FCF-to-firm estándar) → MELI → UBER → ADBE →
+TSLA → NVDA, y de ahí en más cualquier activo que se pida explícitamente. Para pedir uno, alcanza
+con: *"hacé el informe institucional de [TICKER], nivel AAPL"*.
 
 ## Al terminar un ticker
 
-1. Actualizá la entrada correspondiente en `MI_ASSETS` (`index.html`) — no crees un archivo nuevo,
-   este objeto es la única fuente de verdad que lee el frontend.
-2. Si el ticker no tiene datos reales en `reports/fundamentals.json` (revenue/márgenes/FCF/deuda
-   para los tabs de charts del modal), sumalo a `TICKERS_CIK` en `update_reports.py` y corré el
-   script para generar esos datos — sin eso los tabs de gráficos van a mostrar "Cargando…" para
-   siempre.
-3. Generá/actualizá el informe extendido (ver sección de arriba) como Claude Artifact y guardá el
-   link — si el ticker ya tenía uno, republicá en la misma URL (no crear un link nuevo cada vez).
-4. Probá el resultado en el navegador (abrí `#inversiones`, click en "Ver análisis" del ticker,
-   revisá los 7 tabs incluyendo el nuevo "Valuación") antes de dar el trabajo por terminado.
+1. Generá `informes/<ticker>.html` completo (14 secciones) siguiendo la estructura de arriba.
+2. Corré el grep de lenguaje relativo a fechas (ver regla no-negociable) y limpiá cualquier
+   coincidencia antes de seguir.
+3. Agregá la card en el picks-list de `#inversiones` y el row en `heroInvCard` (ver "Cómo conectar
+   el ticker al sitio"), ambos linkeando a `informes/<ticker>.html`.
+4. Probá en el navegador: abrí `#inversiones`, click en "Ver análisis" del ticker nuevo — debe abrir
+   el informe completo en pestaña nueva con los gráficos Canvas renderizando — y repetí el chequeo
+   desde el botón del widget del hero.
