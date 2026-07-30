@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOOGL — Alphabet Inc. | Manfredi Investment Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-dark:#0b1f3a;
+    --navy:#0e2748;
+    --navy2:#15335c;
+    --blue:#2f5f9e;
+    --blue-light:#5f8fc7;
+    --blue-pale:#eaf1f9;
+    --line:#d7e0ea;
+    --text:#161a20;
+    --muted:#69707c;
+    --green:#1a7a54;
+    --red:#a8291f;
+    --serif:'Newsreader',serif;
+    --sans:'Inter',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#fff; color:var(--text); font-family:var(--sans); font-size:15.5px; line-height:1.7;}
+  .wrap{max-width:900px; margin:0 auto; padding:0 30px 90px;}
+
+  .brandbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:26px 30px 20px; max-width:900px; margin:0 auto; border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:38px; height:38px; border:1.5px solid var(--navy-dark); display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-weight:700; color:var(--navy-dark); font-size:16px;
+  }
+  .brand-name{font-family:var(--serif); font-weight:700; font-size:17px; color:var(--text); line-height:1.15;}
+  .brand-sub{font-family:var(--sans); font-size:10px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase;}
+  .brandbar .doctype{font-family:var(--mono); font-size:11px; color:var(--muted); text-align:right;}
+
+  .frontbox{border:1px solid var(--navy-dark); margin:34px 0 8px; padding:0;}
+  .frontbox-top{display:flex; justify-content:space-between; align-items:baseline; padding:22px 28px 14px; border-bottom:1px solid var(--line);}
+  .ticker-big{font-family:var(--serif); font-size:42px; font-weight:700; color:var(--navy-dark);}
+  .exch{font-family:var(--mono); font-size:12px; color:var(--muted); margin-left:10px;}
+  .rating{font-family:var(--mono); font-size:12px; font-weight:600; color:var(--blue); text-align:right; letter-spacing:.03em;}
+  .rating small{display:block; font-family:var(--mono); font-size:10.5px; color:var(--muted); font-weight:400; margin-top:3px; letter-spacing:normal;}
+  .frontbox-body{padding:20px 28px 26px;}
+  .company-line{color:var(--muted); font-size:13.5px; margin-bottom:16px;}
+  .thesis-block{font-family:var(--serif); font-size:17.5px; line-height:1.65; color:var(--text); font-style:italic;}
+
+  .statsrow{display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line);}
+  .statcell{padding:16px 20px; border-right:1px solid var(--line);}
+  .statcell:last-child{border-right:none;}
+  .statcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:6px;}
+  .statcell .v{font-family:var(--mono); font-size:16px; font-weight:600; color:var(--text);}
+  .pos{color:var(--green);} .neg{color:var(--red);}
+
+  .secnum{font-family:var(--mono); font-size:11px; color:var(--blue-light); letter-spacing:.1em; margin:50px 0 2px;}
+  h2{font-family:var(--serif); font-size:24px; font-weight:600; color:var(--navy2); margin:2px 0 18px; padding-bottom:10px; border-bottom:1.5px solid var(--navy-dark); text-wrap:balance;}
+  h3{font-family:var(--serif); font-size:17px; font-weight:600; color:var(--navy2); margin:30px 0 10px;}
+  p{margin:0 0 15px; max-width:68ch;}
+  strong{color:var(--text);}
+
+  .table-scroll{overflow-x:auto; margin:18px 0 22px;}
+  .table-scroll table{margin:0;}
+  table{width:100%; min-width:520px; border-collapse:collapse; font-size:13.5px;}
+  th{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); text-align:left; padding:8px 10px; border-bottom:1.5px solid var(--navy-dark); white-space:nowrap;}
+  td{padding:8px 10px; border-bottom:1px solid var(--line); font-family:var(--mono); color:var(--text); font-variant-numeric:tabular-nums;}
+  td.label{font-family:var(--sans); color:var(--text);}
+  tr.total td{font-weight:600; border-top:1px solid var(--navy-dark); border-bottom:none;}
+  .right-al{text-align:right;}
+
+  .chartbox{border:1px solid var(--line); padding:20px 22px 16px; margin:22px 0;}
+  .chartbox canvas{width:100% !important; display:block;}
+  .chartcap{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:14px; text-align:center;}
+
+  .pull{border-left:2px solid var(--navy-dark); padding-left:18px; margin:22px 0; color:var(--muted); font-size:13.5px; max-width:68ch;}
+
+  .footnote{font-family:var(--mono); font-size:11px; color:var(--muted); margin:-6px 0 18px; max-width:none;}
+
+  .watermark-block{
+    position:relative; margin:60px 0; padding:26px 30px; border:1px solid var(--line); overflow:hidden;
+  }
+  .watermark-block::before{
+    content:"GOOGL"; position:absolute; right:10px; top:-30px; font-family:var(--serif); font-weight:700;
+    font-size:110px; color:var(--blue-pale); z-index:0; line-height:1;
+  }
+  .watermark-block > *{position:relative; z-index:1;}
+
+  .toc{border:1px solid var(--line); padding:22px 26px; margin:30px 0;}
+  .toc-title{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px;}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:30px;}
+  .toc li{font-size:13px; margin-bottom:7px; break-inside:avoid;}
+  .toc a{color:var(--navy2); text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  .toc .toc-final a{font-weight:600;}
+
+  .disclosure{margin-top:70px; padding-top:22px; border-top:1px solid var(--navy-dark); font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.8; max-width:none;}
+
+  .fv-block{text-align:right;}
+  .fv-block .fv-label{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+  .fv-block .fv-value{font-family:var(--mono); font-size:22px; font-weight:600; color:var(--navy-dark); line-height:1.3;}
+  .fv-block .fv-gap{font-family:var(--mono); font-size:12.5px; font-weight:600;}
+  .fv-block .fv-gap.neg{color:var(--red);} .fv-block .fv-gap.pos{color:var(--green);}
+
+  .verdict-bar{display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; background:var(--blue-pale); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:14px 28px;}
+  .verdict-stance{font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--navy-dark);}
+  .verdict-stance strong{color:var(--navy-dark);}
+  .verdict-note{font-family:var(--sans); font-size:11.5px; color:var(--muted); max-width:56ch; line-height:1.5;}
+
+  .sens-table td, .sens-table th{text-align:center;}
+  .sens-table td.axis{font-family:var(--mono); font-weight:600; background:#fff; color:var(--text);}
+  .sens-table td.base-cell{outline:2px solid var(--navy-dark); outline-offset:-2px;}
+
+  .govrow{display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:1px solid var(--line); margin:20px 0;}
+  .govcell{padding:16px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .govcell:nth-child(3n){border-right:none;}
+  .govcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px;}
+  .govcell .v{font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text);}
+  .govcell .sub{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.4;}
+
+  a{color:var(--blue);}
+  :focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
+
+  @media (max-width:720px){
+    .statsrow{grid-template-columns:repeat(2,1fr);}
+    .frontbox-top{flex-direction:column; gap:10px;}
+    .rating{text-align:left;}
+    .toc ol{columns:1;}
+    .verdict-bar{flex-direction:column; align-items:flex-start;}
+    .govrow{grid-template-columns:1fr;}
+    .govcell{border-right:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <div class="brand">
+    <div class="brand-mark">MI</div>
+    <div>
+      <div class="brand-name">Manfredi Investment</div>
+      <div class="brand-sub">Research &amp; Markets</div>
+    </div>
+  </div>
+  <div class="doctype">Equity Research · Informe Institucional<br>Datos al Q2 2026 (cierre trimestral 30-jun-2026, publicado 22-jul-2026)</div>
+</div>
+
+<div class="wrap">
+
+  <div class="frontbox">
+    <div class="frontbox-top">
+      <div><span class="ticker-big">GOOGL</span><span class="exch">NASDAQ · Alphabet Inc.</span></div>
+      <div class="fv-block">
+        <div class="fv-label">Fair value (blend propio)</div>
+        <div class="fv-value">$251.69</div>
+        <div class="fv-gap neg">vs. $333.66 mercado · &minus;24.6%</div>
+      </div>
+    </div>
+    <div class="verdict-bar">
+      <div class="verdict-stance">POSTURA DEL ANÁLISIS: <strong>VALUACIÓN EXIGENTE — NEGOCIO ACELERANDO, GANANCIA CONTABLE NO OPERATIVA DE POR MEDIO</strong> — el blend propio queda por debajo del precio de mercado, y buena parte de la "utilidad récord" del trimestre no es operativa (ver Sección 13)</div>
+      <div class="verdict-note">Este documento es análisis independiente con fines informativos y educativos. El autor no es un asesor financiero registrado (no CFA / no matriculado ante la CNV/SEC) y este contenido no constituye una recomendación de compra, venta o mantenimiento para ningún lector en particular. Ver disclosure completo al pie.</div>
+    </div>
+    <div class="frontbox-body">
+      <div class="company-line">Búsqueda y publicidad (Google Search, YouTube, Red de Display) · Google Cloud · Suscripciones, plataformas y dispositivos · Other Bets (Waymo)</div>
+      <div class="thesis-block">
+        Alphabet reportó, el 22 de julio de 2026, ingresos de $119.80 mil millones (+24% interanual) y una utilidad neta de
+        $112.11 mil millones —un salto interanual de 298%— que a primera vista luce como el trimestre más fuerte de su
+        historia. Pero $99.0 mil millones de esa "otra utilidad" de $98.0 mil millones son una ganancia contable no operativa
+        por la revaluación de la participación de Alphabet en SpaceX (que salió a bolsa en junio de 2026) y en Anthropic:
+        según la propia compañía, esa ganancia agregó $6.26 al EPS diluido de $9.11 reportado. Sacando ese efecto, el EPS
+        "core" del trimestre fue de apenas $2.85 —esencialmente en línea con el consenso pre-reporte de $2.89—, mientras que
+        Google Cloud aceleró a +82% interanual y la compañía elevó su guía de capex 2026 a $195-205 mil millones (desde
+        $180-190 mil millones), lo que hundió el flujo de caja libre del trimestre a &minus;$5.9 mil millones y provocó una
+        caída de casi 7.4% en la acción al día siguiente. Este informe recorre el negocio completo —historia, segmentos,
+        balance, comparables y riesgos— y cierra, recién en la última sección, con la valuación: cuatro metodologías
+        independientes aplicadas sobre los mismos datos, separando con cuidado la ganancia contable no recurrente del
+        negocio que efectivamente genera caja.
+      </div>
+    </div>
+    <div class="statsrow">
+      <div class="statcell"><div class="k">Ingresos TTM</div><div class="v">$445.9B</div></div>
+      <div class="statcell"><div class="k">Var. ingresos (últ. trim.)</div><div class="v pos">+24%</div></div>
+      <div class="statcell"><div class="k">Margen operativo TTM</div><div class="v">33.1%</div></div>
+      <div class="statcell"><div class="k">Posición de caja neta</div><div class="v pos">+$142.3B</div></div>
+    </div>
+  </div>
+  <p class="footnote">Cifras fundamentales: SEC EDGAR (Form 8-K, Exhibit 99.1 — comunicado de resultados oficial) y Form 10-Q, trimestre cerrado el 30 de junio de 2026, publicado el 22 de julio de 2026. Este documento es 100% analítico — no constituye una recomendación de compra, venta ni mantenimiento. Ver disclosure completo al pie.</p>
+
+  <div class="toc">
+    <div class="toc-title">Contenido</div>
+    <ol>
+      <li><a href="#s01">Resumen Ejecutivo</a></li>
+      <li><a href="#s02">Historia y Evolución</a></li>
+      <li><a href="#s03">Modelo de Negocio y Segmentos</a></li>
+      <li><a href="#s04">Desarrollos Recientes y Perspectiva</a></li>
+      <li><a href="#s05">Estados Financieros</a></li>
+      <li><a href="#s06">Deuda y Balance</a></li>
+      <li><a href="#s07">Flujo de Caja y Capital Allocation</a></li>
+      <li><a href="#s08">Comparables de Industria</a></li>
+      <li><a href="#s09">Gobierno Corporativo y Estructura Accionaria</a></li>
+      <li><a href="#s10">Registro de Riesgos</a></li>
+      <li><a href="#s11">Catalizadores</a></li>
+      <li><a href="#s12">Modelo Financiero Proyectado y Momentum de Estimados</a></li>
+      <li class="toc-final"><a href="#s13">Valuación: Cuatro Métodos y el Fair Value</a></li>
+      <li><a href="#s14">Limitaciones del Modelo</a></li>
+    </ol>
+  </div>
+
+  <!-- 01 -->
+  <p class="secnum" id="s01">01 — Resumen Ejecutivo</p>
+  <h2>Un trimestre récord en el papel, ordinario en el negocio — y un capex que ya no cabe en el flujo de caja</h2>
+  <p>
+    El 22 de julio de 2026, Alphabet reportó ingresos del segundo trimestre de $119.80 mil millones (+24% interanual, 12°
+    trimestre consecutivo de crecimiento de doble dígito), con Google Cloud acelerando a +82% interanual hasta $24.77 mil
+    millones y el backlog de contratos de la nube saltando a $514 mil millones (desde $106 mil millones un año antes). La
+    utilidad neta disponible para accionistas comunes fue de $112.11 mil millones (+298% interanual) y el EPS diluido de
+    $9.11 (+294%) — números que, tomados al pie de la letra, describirían el mejor trimestre de la historia de la compañía.
+  </p>
+  <p>
+    No lo son, en el sentido que más importa para una tesis de inversión. De los $98.0 mil millones de "otros ingresos"
+    reportados, $99.0 mil millones corresponden a una ganancia contable no operativa por la revaluación de la participación
+    de Alphabet en SpaceX —que completó su salida a bolsa a comienzos de junio de 2026 a una valuación de $1.77 billones,
+    revelando una posición de Alphabet de $94.1 mil millones sobre una inversión original de apenas $1.000 millones en
+    2015— y en Anthropic, cuya valuación privada saltó de $350 mil millones a $965 mil millones en el mismo período. La
+    propia compañía informa que esa ganancia agregó $21.9 mil millones a la provisión de impuestos, $77.1 mil millones a la
+    utilidad neta y $6.26 al EPS diluido. Descontando ese efecto, el EPS "core" del trimestre fue de aproximadamente $2.85
+    —prácticamente en línea con el consenso pre-reporte de $2.89— y la utilidad operativa (que no incluye estas ganancias)
+    creció un saludable pero mucho menos espectacular +30%.
+  </p>
+  <p>
+    El segundo dato central del trimestre es el capex: Alphabet elevó su guía de inversión de capital para el año calendario
+    2026 a un rango de $195-205 mil millones (desde $180-190 mil millones guiados apenas tres meses antes), y el flujo de
+    caja libre del trimestre cayó a &minus;$5.9 mil millones —la primera lectura trimestral negativa de FCF de la compañía
+    en la ventana de datos de este informe—. El mercado reaccionó con una caída de 7.4% en la acción al día siguiente del
+    reporte, pese al beat de ingresos y ganancias. Este informe recorre el negocio completo —de dónde viene, cómo está
+    armado, qué cambió con el reporte del 22-jul-2026, cómo se compara con sus pares de mega-cap tech— antes de llegar, en
+    la Sección 13, a la pregunta de cuánto vale la acción separando con cuidado la ganancia contable no recurrente del
+    negocio que efectivamente genera caja.
+  </p>
+
+  <!-- 02 -->
+  <p class="secnum" id="s02">02 — Historia y Evolución</p>
+  <h2>De un buscador de garage de Stanford a la apuesta de infraestructura de IA más grande de su historia</h2>
+  <p>
+    Google fue fundada en 1998 por Larry Page y Sergey Brin, entonces doctorandos en Stanford, sobre el algoritmo PageRank
+    de búsqueda. La compañía salió a bolsa en agosto de 2004 con una estructura accionaria de doble clase diseñada
+    explícitamente para que los fundadores retuvieran control de voto pese a vender participación económica al público —la
+    estructura que, dos décadas después, sigue siendo la base del gobierno corporativo de la compañía (Sección 09). En
+    octubre de 2015, Google se reorganizó bajo una nueva sociedad holding, Alphabet Inc., con Larry Page como CEO de
+    Alphabet y Sundar Pichai al frente de Google; en diciembre de 2019, Page y Brin dejaron sus roles ejecutivos y Pichai
+    asumió también como CEO de Alphabet, consolidando el liderazgo operativo bajo una sola persona por primera vez en la
+    historia de la compañía.
+  </p>
+  <p>
+    La era Pichai como CEO de Alphabet coincidió con la maduración de Google Cloud como negocio relevante y, desde
+    2023, con la carrera de IA generativa desatada por el lanzamiento público de ChatGPT (OpenAI, nov-2022) — un evento que
+    la propia Alphabet reconoció como el mayor desafío competitivo a su negocio central de búsqueda en dos décadas. La
+    respuesta fue Gemini (lanzado como marca unificada en 2023-2024), que hacia julio de 2026 procesa más de 22 mil
+    millones de tokens de API por minuto y alimenta una aplicación de consumo con 950 millones de usuarios activos
+    mensuales. En 2024, Alphabet inició por primera vez en su historia un dividendo en efectivo (Sección 07) y autorizó un
+    programa de recompras de $70 mil millones, una señal de madurez de negocio que convivió, ya en ese momento, con un
+    capex en plena aceleración.
+  </p>
+  <p class="pull">
+    El dato que mejor resume la tensión central de este informe no es el crecimiento de ingresos — es, otra vez, el capex.
+    En 2021, Alphabet invirtió $24.6 mil millones en bienes de capital, apenas 9.6% de sus ingresos de ese año. Para 2025,
+    ese capex había escalado a $91.4 mil millones (22.7% de ingresos), y la guía para el año calendario 2026 completo
+    ($195-205 mil millones) lo llevaría a 39-41% de los ingresos esperados — una intensidad de capital nunca antes vista en
+    la historia de la compañía, financiada en 2026 no solo con flujo de caja operativo sino, por primera vez en más de una
+    década, con emisión de deuda nueva y de una ronda de capital accionario (Sección 07).
+  </p>
+  <div class="chartbox">
+    <canvas id="historyChart" height="320"></canvas>
+    <p class="chartcap">Ingresos anuales reportados, 2016–2025 (año calendario), más TTM al 30-jun-2026. Fuente: SEC EDGAR XBRL, concepto Revenues / RevenueFromContractWithCustomerExcludingAssessedTax.</p>
+  </div>
+  <p>
+    Otros dos hitos recientes son centrales para leer el trimestre de este informe: en marzo de 2026, Alphabet cerró la
+    adquisición de Wiz, la plataforma de ciberseguridad en la nube, por $32 mil millones — la mayor adquisición de
+    ciberseguridad de la historia, sumada a Google Cloud tras superar revisiones antitrust en EE.UU., la Unión Europea y
+    otras jurisdicciones. Y en junio de 2026, SpaceX completó su salida a bolsa a una valuación de $1.77 billones, revelando
+    que la inversión de $1.000 millones que Alphabet había hecho en la compañía de Elon Musk en 2015 —cuando SpaceX estaba
+    valuada en apenas $12 mil millones— vale, al 30-jun-2026, $94.1 mil millones, aunque la posición está mayormente bloqueada para su
+    venta (Sección 06). Ambos eventos, uno operativo y uno puramente financiero, son la base de buena parte de los números
+    inusuales de este trimestre.
+  </p>
+
+  <!-- 03 -->
+  <p class="secnum" id="s03">03 — Modelo de Negocio y Segmentos</p>
+  <h2>Qué vende Alphabet, y dónde: la lectura detrás de los $119.8B del segundo trimestre</h2>
+  <p>
+    Alphabet reporta sus resultados en tres segmentos: Google Services (publicidad de Search, YouTube y la Red de Display,
+    más suscripciones, Play y dispositivos), Google Cloud, y Other Bets (apuestas de largo plazo como Waymo). En el
+    trimestre recién cerrado (Q2 2026, terminado el 30 de junio de 2026), Google Services siguió siendo, por lejos, el
+    negocio dominante en tamaño, pero Google Cloud fue el motor de la aceleración: +82% interanual, más del triple del
+    crecimiento de Google Services (+15%).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Segmento / línea</th><th class="right-al">Q2 2026 (jun-26)</th><th class="right-al">% del total</th><th class="right-al">Var. YoY</th></tr>
+    <tr><td class="label">Google Search &amp; other</td><td class="right-al">$63.27B</td><td class="right-al">52.8%</td><td class="right-al pos">+16.7%</td></tr>
+    <tr><td class="label">YouTube ads</td><td class="right-al">$11.06B</td><td class="right-al">9.2%</td><td class="right-al pos">+12.9%</td></tr>
+    <tr><td class="label">Google Network</td><td class="right-al">$7.30B</td><td class="right-al">6.1%</td><td class="right-al neg">&minus;0.7%</td></tr>
+    <tr><td class="label">Google subscriptions, platforms &amp; devices</td><td class="right-al">$12.91B</td><td class="right-al">10.8%</td><td class="right-al pos">+15.2%</td></tr>
+    <tr class="total"><td class="label">Google Services total</td><td class="right-al">$94.54B</td><td class="right-al">78.9%</td><td class="right-al pos">+14.5%</td></tr>
+    <tr><td class="label">Google Cloud</td><td class="right-al">$24.77B</td><td class="right-al">20.7%</td><td class="right-al pos">+81.8%</td></tr>
+    <tr><td class="label">Other Bets</td><td class="right-al">$0.38B</td><td class="right-al">0.3%</td><td class="right-al pos">+2.4%</td></tr>
+    <tr class="total"><td class="label">Total (incl. hedging)</td><td class="right-al">$119.80B</td><td class="right-al">100%</td><td class="right-al pos">+24.2%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 8-K, Exhibit 99.1 (comunicado de resultados oficial Q2 2026), publicado 22-jul-2026. Google advertising (Search + YouTube ads + Network) sumó $81.63B, +14.4% interanual.</p>
+  <div class="chartbox">
+    <canvas id="segmentChart" height="280"></canvas>
+    <p class="chartcap">Mix de ingresos por línea de negocio, Q2 2026 (trimestre cerrado 30-jun-2026).</p>
+  </div>
+  <p>
+    La rentabilidad cuenta una historia todavía más marcada que el crecimiento: el margen operativo de Google Cloud saltó
+    de 20.7% a 35.6% en un año —la utilidad operativa del segmento casi se triplicó, de $2.83 mil millones a $8.81 mil
+    millones— mientras que Google Services mantuvo un margen alto y estable (41.8%, vs. 40.1% un año antes). Other Bets
+    siguió perdiendo dinero ($1.80 mil millones de pérdida operativa, ampliándose desde $1.25 mil millones), reflejo de la
+    inversión continua en Waymo, y los "Alphabet-level activities" —gasto compartido de investigación de IA no asignado a
+    ningún segmento— casi se duplicaron a $5.79 mil millones, la porción del gasto en IA que no se puede atribuir a un
+    negocio específico todavía.
+  </p>
+  <div class="chartbox">
+    <canvas id="geoChart" height="260"></canvas>
+    <p class="chartcap">Ingresos por región geográfica, Q2 2026 vs. Q2 2025 (variación interanual reportada). Fuente: 8-K Q2 2026, tabla de ingresos por geografía.</p>
+  </div>
+  <p>
+    Por geografía, Estados Unidos fue, sorprendentemente, la región de mayor aceleración (+32% interanual, a $60.85 mil
+    millones) — más rápido que EMEA (+15%), APAC (+17%) y el resto de América (+23%) combinados — un patrón consistente con
+    que la demanda de infraestructura de IA de Google Cloud está concentrada, por ahora, en clientes empresariales
+    estadounidenses.
+  </p>
+
+  <!-- 04 -->
+  <p class="secnum" id="s04">04 — Desarrollos Recientes y Perspectiva</p>
+  <h2>Tres frentes que van a definir los próximos trimestres</h2>
+  <h3>La guía de capex: de $180-190B a $195-205B en un trimestre</h3>
+  <p>
+    El desarrollo más relevante del reporte del 22-jul-2026 no es una cifra de ingresos sino, otra vez, una decisión de
+    capital: Alphabet elevó su guía de capex para el año calendario 2026 completo a $195-205 mil millones, desde los
+    $180-190 mil millones guiados apenas tres meses antes, en el reporte de Q1 2026 (28-abr-2026) — que a su vez ya
+    representaba una escalada sobre el capex real de 2025 ($91.4 mil millones). El propio capex del segundo trimestre
+    ($44.9 mil millones) fue 26% más alto que el del primer trimestre ($35.7 mil millones), y para cumplir con el punto
+    medio de la guía anual ($200 mil millones), el segundo semestre de 2026 requeriría un promedio trimestral de
+    aproximadamente $57-62 mil millones — una nueva aceleración sobre el ritmo ya elevado del segundo trimestre. El
+    mercado reaccionó con una caída de 7.4% en la acción al día siguiente del reporte, la señal más clara hasta ahora de
+    que los inversores están empezando a exigirle límites a la escalada de capex de IA, incluso a la compañía con el
+    backlog de nube de mayor crecimiento del panel de mega-caps.
+  </p>
+  <h3>SpaceX sale a bolsa: de apuesta privada de 2015 a $94.1 mil millones de posición bloqueada</h3>
+  <p>
+    A comienzos de junio de 2026, SpaceX completó su salida a bolsa a una valuación de $1.77 billones. Alphabet reveló, en
+    el 10-Q del trimestre, una posición de $94.1 mil millones en la compañía —originada en una inversión de $1.000 millones
+    en 2015, cuando SpaceX estaba valuada en apenas $12 mil millones—, casi 94 veces el capital invertido. La posición está,
+    sin embargo, mayormente bloqueada: aproximadamente $80 mil millones bajo restricciones de corto plazo asociadas al IPO
+    y $14.1 mil millones restringidos hasta fines de 2027. En paralelo, la valuación privada de Anthropic —donde Alphabet
+    también mantiene una participación relevante— saltó de $350 mil millones a $965 mil millones en el mismo período. La
+    revaluación combinada de ambas posiciones (bajo la norma contable ASU 2016-01, que exige valuar títulos de renta
+    variable a valor de mercado a través del estado de resultados) generó una ganancia de $99.0 mil millones en el
+    trimestre, el motor casi exclusivo de la "utilidad récord" reportada (Sección 01 y 13).
+  </p>
+  <h3>Wiz se integra a Google Cloud: la apuesta de ciberseguridad más grande de la historia del sector</h3>
+  <p>
+    La adquisición de Wiz por $32 mil millones —anunciada en 2025 y cerrada el 11 de marzo de 2026 tras superar revisiones
+    antitrust en EE.UU., la Unión Europea, Australia, Israel, Arabia Saudita, Sudáfrica y Turquía— es la mayor adquisición
+    de ciberseguridad de la historia y ya se refleja en el balance: el goodwill de Alphabet saltó 73% en el semestre, de
+    $33.4 mil millones a $57.8 mil millones (Sección 06). La integración de Wiz a Google Cloud es, junto con el gasto
+    compartido de I+D de IA, uno de los pocos elementos de este trimestre que sí es inversión operativa genuina y no
+    revaluación contable — pero también añade riesgo de ejecución de integración a un negocio de Cloud que ya está
+    escalando capacidad al límite.
+  </p>
+
+  <!-- 05 -->
+  <p class="secnum" id="s05">05 — Estados Financieros</p>
+  <h2>Los últimos dos trimestres reportados, línea por línea — GAAP y "core"</h2>
+  <p>
+    Dado que la utilidad neta y el EPS GAAP de los últimos dos trimestres están dominados por ganancias no operativas sobre
+    títulos de renta variable, esta sección presenta ambas líneas: la cifra GAAP tal como la reporta Alphabet, y una cifra
+    "core" que la propia compañía permite reconstruir gracias a que divulga explícitamente el impacto en impuestos, utilidad
+    neta y EPS de la ganancia por revaluación de equity securities cada trimestre. Para Q1 2026, donde Alphabet no
+    desglosó el impacto exacto en EPS, aplicamos la misma tasa efectiva de impuesto sobre la ganancia que la compañía sí
+    informó para Q2 2026 (22.1%) — supuesto propio, señalado explícitamente.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Q1 2026 (mar-26)</th><th class="right-al">Q2 2026 (jun-26)</th><th class="right-al">TTM (jun-26)</th></tr>
+    <tr><td class="label">Ingresos totales</td><td class="right-al">$109.90B</td><td class="right-al">$119.80B</td><td class="right-al">$445.87B</td></tr>
+    <tr><td class="label">Var. interanual</td><td class="right-al pos">+12.2%</td><td class="right-al pos">+24.2%</td><td class="right-al pos">+20.9%</td></tr>
+    <tr><td class="label">Utilidad bruta</td><td class="right-al">$68.63B</td><td class="right-al">$73.85B</td><td class="right-al">$271.52B</td></tr>
+    <tr><td class="label">Margen bruto</td><td class="right-al">62.5%</td><td class="right-al">61.7%</td><td class="right-al">60.9%</td></tr>
+    <tr><td class="label">Utilidad operativa</td><td class="right-al">$39.70B</td><td class="right-al">$40.77B</td><td class="right-al">$147.63B</td></tr>
+    <tr><td class="label">Margen operativo</td><td class="right-al">36.1%</td><td class="right-al">34.0%</td><td class="right-al">33.1%</td></tr>
+    <tr><td class="label">Utilidad neta (GAAP)</td><td class="right-al">$62.58B</td><td class="right-al">$112.11B</td><td class="right-al">~$244.2B</td></tr>
+    <tr><td class="label">EPS diluido (GAAP)</td><td class="right-al">$5.11</td><td class="right-al">$9.11</td><td class="right-al">$19.91</td></tr>
+    <tr><td class="label">Utilidad neta (core, ex-ganancia equity)</td><td class="right-al">~$33.8B</td><td class="right-al">$35.0B</td><td class="right-al">~$128.0B</td></tr>
+    <tr class="total"><td class="label">EPS diluido (core, ex-ganancia equity)</td><td class="right-al">~$2.76</td><td class="right-al">$2.85</td><td class="right-al">$10.46</td></tr>
+    <tr><td class="label">Gasto en I+D</td><td class="right-al">$17.03B</td><td class="right-al">$18.22B</td><td class="right-al">$68.97B</td></tr>
+    <tr><td class="label">I+D como % de ingresos</td><td class="right-al">15.5%</td><td class="right-al">15.2%</td><td class="right-al">15.5%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 8-K, Exhibit 99.1 y Form 10-Q — comunicados oficiales de Q1 2026 (trimestre cerrado 31-mar-2026) y Q2 2026 (trimestre cerrado 30-jun-2026, publicado 22-jul-2026). EPS core Q2 2026 = EPS GAAP ($9.11) menos el impacto de $6.26 divulgado explícitamente por la compañía por la ganancia en equity securities. EPS core Q1 2026: estimación propia aplicando la tasa efectiva de 22.1% sobre la ganancia pretax de $36.9B de ese trimestre.</p>
+  <p>
+    La comparación GAAP vs. core es la lectura más importante de esta sección: el EPS GAAP creció 294% interanual en Q2
+    2026, pero el EPS core —que excluye la ganancia por SpaceX/Anthropic— fue de $2.85, prácticamente en línea con el
+    consenso pre-reporte de $2.89 (Sección 12). La utilidad operativa, que no incluye ninguna de estas ganancias, es el
+    mejor termómetro del negocio real: creció 30% interanual en Q2 2026, sostenido casi enteramente por la expansión de
+    margen de Google Cloud (Sección 03).
+  </p>
+  <div class="chartbox">
+    <canvas id="marginChart" height="260"></canvas>
+    <p class="chartcap">Margen bruto y margen operativo trimestral, últimos 4 trimestres reportados. Fuente: SEC EDGAR XBRL / 8-K.</p>
+  </div>
+
+  <!-- 06 -->
+  <p class="secnum" id="s06">06 — Deuda y Balance</p>
+  <h2>Un balance que duplicó su tamaño en dos trimestres — financiado con deuda, equity y ganancias de papel</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica (al 30 jun 2026)</th><th class="right-al">Valor</th><th class="right-al">Al 31 dic 2025</th></tr>
+    <tr><td class="label">Efectivo y equivalentes</td><td class="right-al">$55.91B</td><td class="right-al">$30.71B</td></tr>
+    <tr><td class="label">Inversiones de corto plazo (marketable securities)</td><td class="right-al">$186.56B</td><td class="right-al">$96.14B</td></tr>
+    <tr class="total"><td class="label">Posición total de caja e inversiones de corto plazo</td><td class="right-al">$242.47B</td><td class="right-al">$126.84B</td></tr>
+    <tr><td class="label">Inversiones no cotizadas (incl. SpaceX, Anthropic)</td><td class="right-al">$131.46B</td><td class="right-al">$68.69B</td></tr>
+    <tr><td class="label">Deuda total (porción corriente + largo plazo)</td><td class="right-al">$100.16B</td><td class="right-al">$47.55B</td></tr>
+    <tr class="total"><td class="label">Caja neta (posición neta de deuda)</td><td class="right-al pos">+$142.31B</td><td class="right-al pos">+$79.29B</td></tr>
+    <tr><td class="label">Activos totales</td><td class="right-al">$921.98B</td><td class="right-al">$595.28B</td></tr>
+    <tr><td class="label">Pasivos totales</td><td class="right-al">$281.50B</td><td class="right-al">$180.02B</td></tr>
+    <tr><td class="label">Acciones preferentes (convertible obligatorio, 6.25%)</td><td class="right-al">$18.02B</td><td class="right-al">$0.00B</td></tr>
+    <tr><td class="label">Patrimonio neto total (equity)</td><td class="right-al">$640.48B</td><td class="right-al">$415.27B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 8-K, Exhibit 99.1, Balance Sheets al 30-jun-2026 y 31-dic-2025. Deuda total = Long-term debt corriente ($2.0B) + Long-term debt no corriente ($98.2B).</p>
+  <p>
+    El balance de Alphabet casi se duplicó en seis meses ($595.3 mil millones a $922.0 mil millones), pero no por generación
+    orgánica de caja: la deuda de largo plazo saltó de $46.5 mil millones a $98.2 mil millones (Alphabet emitió $31.1 mil
+    millones en notas senior en el primer trimestre y $20.3 mil millones adicionales en el segundo), y en junio de 2026 la
+    compañía completó una ronda de capital accionario de $49.6 mil millones —una combinación de acciones Clase A/C y
+    acciones preferentes convertibles obligatorias al 6.25%— destinada explícitamente, según el propio comunicado, a
+    "financiar gastos de capital para escalar infraestructura de IA y cómputo global". Es la primera vez en más de una
+    década que Alphabet recurre a mercados de capital externos (deuda y equity) para financiar su negocio, en lugar de
+    autofinanciarse enteramente con flujo de caja operativo.
+  </p>
+  <p>
+    Property and equipment neto saltó de $246.6 mil millones a $321.2 mil millones en el semestre (+30.3%) — el reflejo
+    contable directo de la construcción acelerada de centros de datos — mientras que el goodwill se disparó 73.2% (de
+    $33.4 a $57.8 mil millones) por la adquisición de Wiz (Sección 04). Pese al fuerte incremento de deuda, la posición de
+    caja neta sigue siendo ampliamente positiva (+$142.3 mil millones), y la deuda total representa apenas 0.58x el EBITDA
+    de los últimos doce meses (~$172.9 mil millones, operating income + D&amp;A) — el apalancamiento no es, en sí mismo, un
+    riesgo de solvencia, pero el cambio de régimen de capital allocation (Sección 07) sí es una señal a monitorear.
+  </p>
+
+  <!-- 07 -->
+  <p class="secnum" id="s07">07 — Flujo de Caja y Capital Allocation</p>
+  <h2>El fin de la era de recompras — y el primer trimestre de FCF negativo</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Q1 2026</th><th class="right-al">Q2 2026</th><th class="right-al">TTM (jun-26)</th></tr>
+    <tr><td class="label">Flujo de caja operativo (OCF)</td><td class="right-al">$45.79B</td><td class="right-al">$39.07B</td><td class="right-al">$185.68B</td></tr>
+    <tr><td class="label">Capex (adiciones a PP&amp;E)</td><td class="right-al">$35.67B</td><td class="right-al">$44.92B</td><td class="right-al">$132.40B</td></tr>
+    <tr class="total"><td class="label">Flujo de caja libre (FCF)</td><td class="right-al pos">+$10.12B</td><td class="right-al neg">&minus;$5.86B</td><td class="right-al">$53.27B</td></tr>
+    <tr><td class="label">Margen de FCF sobre ingresos (TTM)</td><td class="right-al" colspan="2"></td><td class="right-al">11.9%</td></tr>
+    <tr><td class="label">Capex como % de ingresos (TTM)</td><td class="right-al" colspan="2"></td><td class="right-al">29.7%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 8-K, Exhibit 99.1, Reconciliation from GAAP Net Cash Provided by Operating Activities to Non-GAAP Free Cash Flow, Q2 2026.</p>
+  <p>
+    El flujo de caja libre del segundo trimestre fue negativo por primera vez en la ventana de datos de este informe
+    (&minus;$5.9 mil millones), y la propia guía de capex para el segundo semestre —implícita en el rango anual de
+    $195-205 mil millones— sugiere que el ritmo de inversión trimestral todavía tiene que acelerar más desde los $44.9 mil
+    millones ya invertidos en Q2. El margen de FCF sobre los últimos doce meses (11.9%) todavía es positivo, pero es menos
+    de la mitad de lo que era Alphabet dos años atrás, y la dirección del cambio —capex escalando mucho más rápido que el
+    OCF— es la misma tensión que domina la cobertura de MSFT y META de este desk.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Año</th><th class="right-al">Capex</th><th class="right-al">Capex/Ingresos</th><th class="right-al">Buybacks</th><th class="right-al">Dividendos pagados</th></tr>
+    <tr><td class="label">2021</td><td class="right-al">$24.64B</td><td class="right-al">9.6%</td><td class="right-al">$50.27B</td><td class="right-al">$0.00B</td></tr>
+    <tr><td class="label">2022</td><td class="right-al">$31.49B</td><td class="right-al">11.1%</td><td class="right-al">$59.30B</td><td class="right-al">$0.00B</td></tr>
+    <tr><td class="label">2023</td><td class="right-al">$32.25B</td><td class="right-al">10.5%</td><td class="right-al">$61.50B</td><td class="right-al">$0.00B</td></tr>
+    <tr><td class="label">2024</td><td class="right-al">$52.54B</td><td class="right-al">15.0%</td><td class="right-al">$62.22B</td><td class="right-al">$7.36B</td></tr>
+    <tr><td class="label">2025</td><td class="right-al">$91.45B</td><td class="right-al">22.7%</td><td class="right-al">$45.71B</td><td class="right-al">$10.05B</td></tr>
+    <tr class="total"><td class="label">2026 (H1 real / guía FY)</td><td class="right-al">$80.60B (H1) / $195-205B (guía)</td><td class="right-al">~39-41% (guía)</td><td class="right-al">$0.00B (H1)</td><td class="right-al">$5.23B (H1)</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL companyconcept API (10-K de cada año, 10-Q de 2026), conceptos PaymentsToAcquirePropertyPlantAndEquipment, PaymentsForRepurchaseOfCommonStock, PaymentsOfDividends. Alphabet inició su dividendo en efectivo en 2024.</p>
+  <p>
+    La fila más reveladora de esta tabla es la de recompras: Alphabet recompró $0 en acciones durante todo el primer
+    semestre de 2026, tras cinco años consecutivos de recompras crecientes que llegaron a un pico de $62.2 mil millones en
+    2024 y ya venían en descenso en 2025 ($45.7 mil millones). Es, en la práctica, el fin de una era de retorno de capital
+    vía buybacks que caracterizó a Alphabet desde 2021 — reemplazada, en 2026, por una prioridad de capital allocation
+    completamente distinta: financiar el capex de infraestructura de IA, incluso al costo de recurrir a deuda y emisión de
+    equity nueva por primera vez en más de una década (Sección 06). El dividendo, en cambio, se sostuvo y hasta se elevó
+    5% (a $0.22 por acción trimestral, anunciado en abril de 2026) — una señal de que el directorio distingue entre el
+    compromiso con el dividendo (pequeño en términos absolutos, $10.05 mil millones en 2025) y la flexibilidad de las
+    recompras (mucho más grandes, y la primera palanca que se corta cuando el capex lo exige).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Compañía</th><th class="right-al">Capex FY2026 / guía FY2027</th></tr>
+    <tr class="total"><td class="label">Alphabet (GOOGL)</td><td class="right-al">$195-205B (guía año calendario 2026)</td></tr>
+    <tr><td class="label">Microsoft (MSFT)</td><td class="right-al">$115.95B (FY26) → $255-260B guiado (FY27)</td></tr>
+    <tr><td class="label">Amazon (AMZN)</td><td class="right-al">&gt;$200B (consenso 2026)</td></tr>
+    <tr><td class="label">Meta (META)</td><td class="right-al">$125-145B (guía 2026)</td></tr>
+    <tr><td class="label">Apple (AAPL)</td><td class="right-al">~$13-14B (FY26)</td></tr>
+  </table></div>
+  <p class="footnote">Fuentes: comunicados y earnings calls de cada compañía; cifras de pares tomadas del informe de MSFT de este desk, con distinto grado de precisión y ventanas temporales (año fiscal vs. calendario).</p>
+  <div class="chartbox">
+    <canvas id="capexChart" height="280"></canvas>
+    <p class="chartcap">Capex 2026 (guía o real) por compañía — Alphabet y Microsoft lideran la escalada, Apple es la única que se mantiene en un orden de magnitud distinto. Escala logarítmica.</p>
+  </div>
+
+  <!-- 08 -->
+  <p class="secnum" id="s08">08 — Comparables de Industria</p>
+  <h2>GOOGL frente a las otras cuatro "mega caps" de tecnología</h2>
+  <p>
+    Alphabet comparte con Microsoft y Amazon la carrera de infraestructura de cloud e IA (Google Cloud compite directamente
+    con Azure y AWS), y con Meta la dependencia estructural del negocio publicitario digital. Apple, por su perfil de bajo
+    capex, sigue siendo el contraejemplo del panel. El comparable más directo en términos de modelo de negocio —publicidad
+    + cloud + apuesta de IA financiada crecientemente con capital externo— es, con matices, Microsoft.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Ticker</th><th class="right-al">P/E TTM</th><th class="right-al">P/E Forward</th></tr>
+    <tr><td class="label">AAPL</td><td class="right-al">41.3x</td><td class="right-al">34.2x</td></tr>
+    <tr><td class="label">AMZN</td><td class="right-al">29.3x</td><td class="right-al">29.3x</td></tr>
+    <tr><td class="label">MSFT</td><td class="right-al">21.8x</td><td class="right-al">23.4x</td></tr>
+    <tr><td class="label">META</td><td class="right-al">21.6x</td><td class="right-al">18.3x</td></tr>
+    <tr class="total"><td class="label">GOOGL — GAAP (distorsionado)*</td><td class="right-al">16.8x</td><td class="right-al">16.2x**</td></tr>
+    <tr><td class="label">GOOGL — core (ex-ganancia equity)*</td><td class="right-al">31.9x</td><td class="right-al">n/d</td></tr>
+  </table></div>
+  <p class="footnote">*El P/E TTM "GAAP" de GOOGL ($333.66 / EPS TTM GAAP $19.91) está inflado por las ganancias no operativas de SpaceX/Anthropic de los últimos dos trimestres — no es comparable con el resto del panel, que no tiene un efecto equivalente en su período. El P/E TTM "core" ($333.66 / EPS TTM core $10.46, Sección 05) es la cifra apta para comparar contra los pares de esta tabla, y la que este informe usa en el Método 2 de la Sección 13. Este cálculo corrige la aproximación de "16.0x, no verificado en tiempo real" que el informe de MSFT de este desk había señalado como distorsionada sin poder precisarla. **P/E forward GAAP usando el consenso FY2026 de $20.58 (stockanalysis.com, post-reporte), también inflado por la misma razón — no se calcula un forward "core" por no existir un consenso público que ya excluya la ganancia. Fuente: cálculo propio sobre precio de cierre ($333.66, Yahoo Finance) y EPS TTM (Sección 05); pares tomados del informe de MSFT de este desk.</p>
+  <div class="chartbox">
+    <canvas id="compsChart" height="280"></canvas>
+    <p class="chartcap">P/E TTM comparado — GOOGL mostrado en base "core" (ex-ganancia equity) para hacerlo comparable con el resto del panel; en esa base, cotiza en la mitad superior del panel, no en el piso.</p>
+  </div>
+
+  <h3>Microsoft (MSFT) — el comparable más cercano: cloud + capex financiado con flujo de caja propio, sin ganancias de papel</h3>
+  <p>
+    Microsoft es el par más directo: Azure compite cabeza a cabeza con Google Cloud, y ambas compañías están escalando
+    capex hacia el mismo orden de magnitud ($195-260 mil millones guiados). La diferencia central es de calidad de la
+    utilidad: el EPS de Microsoft del último trimestre creció 32% GAAP / 23% ajustado por sus propias ganancias de OpenAI y
+    Anthropic —una distorsión mucho más moderada que el 294% GAAP / ~5% core de Alphabet este trimestre—, y Microsoft
+    financia su capex enteramente con flujo de caja operativo propio, sin recurrir a deuda o equity nuevos como sí lo hizo
+    Alphabet en el primer semestre de 2026 (Sección 06).
+  </p>
+  <h3>Meta (META) — capex agresivo financiado por un negocio publicitario más chico pero más eficiente</h3>
+  <p>
+    Meta guio un capex de $125-145 mil millones para 2026 —un escalón por debajo de Alphabet y Microsoft— financiado con un
+    negocio publicitario de menor escala pero con un crecimiento interanual similar. Cotiza al forward P/E más bajo del
+    panel (18.3x), reflejo del riesgo de sostener simultáneamente el gasto de IA y las pérdidas de Reality Labs.
+  </p>
+  <h3>Amazon (AMZN) — el otro gran gastador de capex, con AWS como frente de batalla directo</h3>
+  <p>
+    El consenso ubica el capex 2026 de Amazon por encima de $200 mil millones, en la misma categoría de magnitud que la
+    guía de Alphabet. AWS compite directamente con Google Cloud y Azure en infraestructura de IA empresarial. Amazon cotiza
+    a 29.3x, sin la complejidad de ganancias no operativas que domina el trimestre de Alphabet.
+  </p>
+  <h3>Apple (AAPL) — el contraejemplo: capex mínimo, múltiplo más alto del panel</h3>
+  <p>
+    Apple invierte apenas ~$13-14 mil millones de capex anual —una fracción del de Alphabet— y prioriza recompras masivas
+    por sobre infraestructura de IA propia, y sin embargo cotiza al múltiplo más alto del panel (41.3x TTM). El informe de
+    AAPL de este mismo desk desarrolla esa tesis en profundidad.
+  </p>
+  <p class="pull">
+    El patrón que emerge del panel: Alphabet, Microsoft y Amazon convergen hacia el mismo orden de magnitud de capex anual
+    ($195-260 mil millones), apostando a que la demanda de infraestructura de IA se sostiene; Meta apuesta un escalón por
+    debajo; Apple es la única que corre en la dirección contraria. Alphabet es, además, la única de las tres "grandes
+    gastadoras" que en 2026 tuvo que recurrir a deuda y equity nuevos para financiar esa apuesta, y la única cuyo trimestre
+    reciente estuvo dominado por una ganancia contable no operativa de la magnitud suficiente para triplicar su utilidad
+    neta reportada.
+  </p>
+
+  <!-- 09 -->
+  <p class="secnum" id="s09">09 — Gobierno Corporativo y Estructura Accionaria</p>
+  <h2>Control de voto concentrado en los fundadores, veinte años después del IPO</h2>
+  <p>
+    A diferencia de Microsoft o Apple —empresas de propiedad institucional predominante sin un bloque de control—, Alphabet
+    conserva la estructura de doble clase accionaria diseñada en su IPO de 2004: Larry Page y Sergey Brin poseen,
+    combinados, apenas ~9.9% del capital económico total pero 52.7% del poder de voto, gracias a las acciones Clase B (10
+    votos cada una, frente a 1 voto de la Clase A y ningún voto de la Clase C). Esa mayoría de voto les permite, en los
+    hechos, aprobar o bloquear cualquier decisión societaria sin el concurso de ningún otro accionista — la razón
+    estructural por la que decisiones de capital allocation tan drásticas como la suspensión de recompras y la primera
+    emisión de equity en más de una década (Sección 07) pudieron ejecutarse sin fricción de gobierno corporativo visible.
+  </p>
+  <div class="govrow">
+    <div class="govcell"><div class="k">Ownership institucional</div><div class="v">~64.5%</div><div class="sub">Vanguard ~7.0% y BlackRock ~6.2% son los dos mayores accionistas institucionales individuales.</div></div>
+    <div class="govcell"><div class="k">Ownership fundadores</div><div class="v">~9.9% cap. · 52.7% votos</div><div class="sub">Larry Page (~5.0% cap. / 27.4% votos) y Sergey Brin (~4.5% cap. / 25.3% votos), vía acciones Clase B de 10 votos.</div></div>
+    <div class="govcell"><div class="k">Directorio 2026</div><div class="v">10 miembros</div><div class="sub">Electos en la asamblea anual de junio de 2026: Page, Brin, Pichai, Hennessy, Arnold, Chávez, Doerr, Ferguson Jr., Shriram y Washington.</div></div>
+    <div class="govcell"><div class="k">Compensación CEO (2025)</div><div class="v">$10.91M</div><div class="sub">Sundar Pichai: $2.01M salario + $8.90M otros; sin nuevo otorgamiento de acciones ese año. Un paquete nuevo a 3 años, ligado a metas de Waymo y Wing, podría valer hasta $692M.</div></div>
+    <div class="govcell"><div class="k">Participación en SpaceX</div><div class="v">$94.1B</div><div class="sub">Sobre $1.000M invertidos en 2015 (SpaceX valuada en $12.000M). Mayormente bloqueada tras el IPO de SpaceX de jun-2026 (Sección 04).</div></div>
+    <div class="govcell"><div class="k">CEO</div><div class="v">Sundar Pichai</div><div class="sub">CEO de Google desde 2015 y de Alphabet desde dic-2019, cuando Page y Brin dejaron sus roles ejecutivos.</div></div>
+  </div>
+  <p class="footnote">Fuentes: DEF 14A de Alphabet (abr-2026), revenuememo.com, capital.com, rankred.com (ownership); Bullfincher, CEOPayWatch, Entrepreneur (compensación); Business Wire / abc.xyz/investor (directorio 2026).</p>
+  <p>
+    La estructura de doble clase de Alphabet es, en sí misma, un factor de riesgo y de estabilidad simultáneamente: reduce
+    el riesgo de que un activista externo fuerce un cambio de rumbo en capital allocation, pero también significa que
+    decisiones tan consecuentes como pausar recompras por completo y emitir $49.6 mil millones en equity nuevo (Sección 07)
+    se tomaron con el consentimiento de fundadores que ya no ocupan roles ejecutivos, no de un directorio plenamente
+    independiente respondiendo a la totalidad de la base accionaria.
+  </p>
+
+  <!-- 10 -->
+  <p class="secnum" id="s10">10 — Registro de Riesgos</p>
+  <h2>Qué podría cambiar esta lectura</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Riesgo</th><th>Descripción</th><th class="right-al">Severidad</th></tr>
+    <tr><td class="label">FCF negativo y capex acelerando</td><td class="label">El FCF de Q2 2026 ya fue negativo (&minus;$5.9B); la guía de $195-205B para todo 2026 implica un segundo semestre con capex trimestral todavía más alto que el de Q2 — probable que el FCF trimestral siga negativo o muy comprimido en los próximos reportes.</td><td class="right-al">Alta</td></tr>
+    <tr><td class="label">Calidad de la utilidad reportada</td><td class="label">$99.0B de los $112.1B de utilidad neta de Q2 2026 provienen de una ganancia contable no operativa y no recurrente; la propia compañía advierte que estas ganancias "podrían contribuir significativamente a la volatilidad" de resultados futuros, en cualquier dirección.</td><td class="right-al">Alta (estructural)</td></tr>
+    <tr><td class="label">Antitrust — Search</td><td class="label">La sentencia de remedios de sep-2025 evitó la venta forzada de Chrome, pero tanto Google (por el requisito de compartir datos) como el DOJ y 35 estados (buscando remedios estructurales) apelaron en ene/feb-2026. Resolución pendiente.</td><td class="right-al">Media-Alta</td></tr>
+    <tr><td class="label">Antitrust — Ad tech</td><td class="label">La jueza Brinkema ya determinó que Google monopolizó ilegalmente los mercados de ad exchange y servidor de anuncios de publishers; el DOJ pide la venta forzada de AdX y DFP. Alegatos finales concluidos, fallo de remedios todavía pendiente al momento de este informe.</td><td class="right-al">Media-Alta</td></tr>
+    <tr><td class="label">Suspensión de recompras + nuevo apalancamiento</td><td class="label">Alphabet pasó de recomprar ~$46-62B anuales a $0 en H1 2026, y recurrió a $49.6B de equity nuevo y $51.4B de deuda nueva en el semestre — un cambio de régimen de capital allocation que, de sostenerse, diluye el retorno de capital histórico a accionistas.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Ejecución del backlog de Cloud</td><td class="label">El backlog de Google Cloud saltó a $514B (de $106B un año antes); la compañía espera reconocer poco más del 50% como ingreso en los próximos 24 meses — un desfasaje entre contratos firmados y capacidad entregada que exige ejecución impecable.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Integración de Wiz</td><td class="label">La mayor adquisición de ciberseguridad de la historia ($32B, cerrada mar-2026) añade riesgo de integración operativa a un negocio de Cloud que ya escala capacidad al límite.</td><td class="right-al">Baja-Media</td></tr>
+    <tr><td class="label">Balance y apalancamiento</td><td class="label">Caja neta de +$142.3B y deuda/EBITDA de 0.58x — pese al salto de deuda del semestre, el balance no es, al cierre de Q2 2026, un riesgo de solvencia.</td><td class="right-al">Baja</td></tr>
+  </table></div>
+
+  <!-- 11 -->
+  <p class="secnum" id="s11">11 — Catalizadores</p>
+  <h2>Agenda de eventos relevantes</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Fecha</th><th>Evento</th></tr>
+    <tr><td class="label">22 Jul 2026</td><td class="label">Resultados Q2 2026 — Cloud +82%, backlog a $514B, guía de capex 2026 elevada a $195-205B, ganancia de $99.0B por SpaceX/Anthropic. Punto de partida de este informe.</td></tr>
+    <tr><td class="label">Oct 2026 (estimado)</td><td class="label">Earnings Q3 2026 — primera lectura de si el capex trimestral se acelera hacia el ritmo necesario para cumplir la guía anual, y si el FCF trimestral vuelve a terreno positivo.</td></tr>
+    <tr><td class="label">Sin fecha fija</td><td class="label">Resolución de las apelaciones cruzadas del caso antitrust de Search (Google vs. datos compartidos; DOJ/35 estados vs. remedios estructurales/Chrome).</td></tr>
+    <tr><td class="label">Sin fecha fija</td><td class="label">Fallo de remedios de la jueza Brinkema en el caso de monopolio de ad tech (posible venta forzada de AdX/DFP).</td></tr>
+    <tr><td class="label">En curso</td><td class="label">Evolución trimestre a trimestre de la valuación de las posiciones en SpaceX y Anthropic — con potencial de generar tanto ganancias como pérdidas de magnitud comparable en OI&amp;E futuro, según advierte la propia compañía.</td></tr>
+    <tr><td class="label">En curso</td><td class="label">Integración de Wiz dentro de Google Cloud y su contribución a la aceleración del segmento de seguridad empresarial.</td></tr>
+  </table></div>
+
+  <!-- 12 -->
+  <p class="secnum" id="s12">12 — Modelo Financiero Proyectado y Momentum de Estimados</p>
+  <h2>Cómo vino el consenso "core" vs. lo reportado el 22-jul-2026, y qué espera para el resto de 2026</h2>
+  <p>
+    El titular del trimestre —un "beat" de EPS de más de 200% frente al consenso— es engañoso si no se separa la ganancia
+    no operativa. El consenso pre-reporte para Q2 2026 esperaba un EPS de $2.89 y un ingreso de $116.84 mil millones; lo
+    reportado fue un ingreso de $119.80 mil millones (+2.5% sobre consenso, un beat genuino y operativo) y un EPS core de
+    aproximadamente $2.85 (Sección 05) — es decir, un resultado esencialmente en línea, con un leve miss de menos de 2%
+    frente al consenso, una vez que se excluye la ganancia de SpaceX/Anthropic. El EPS GAAP de $9.11 no es comparable
+    contra ese consenso de $2.89, porque el consenso de analistas no intenta anticipar revaluaciones de participaciones
+    privadas.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica — Q2 2026</th><th class="right-al">Consenso pre-reporte</th><th class="right-al">Real (reportado)</th><th class="right-al">Sorpresa</th></tr>
+    <tr><td class="label">Ingresos</td><td class="right-al">$116.84B</td><td class="right-al">$119.80B</td><td class="right-al pos">+2.5%</td></tr>
+    <tr><td class="label">EPS diluido — core (comparable)</td><td class="right-al">$2.89</td><td class="right-al">~$2.85</td><td class="right-al neg">&minus;1.4%</td></tr>
+    <tr><td class="label">EPS diluido — GAAP (no comparable)</td><td class="right-al">n/a</td><td class="right-al">$9.11</td><td class="right-al">n/a — incluye ganancia no operativa</td></tr>
+  </table></div>
+  <p class="footnote">Consenso pre-reporte: Alphastreet, jul-2026. Real: SEC EDGAR Form 8-K, Exhibit 99.1, publicado 22-jul-2026. EPS core real: estimación propia (Sección 05).</p>
+  <div class="chartbox">
+    <canvas id="revisionChart" height="220"></canvas>
+    <p class="chartcap">EPS diluido "core" (comparable): consenso pre-reporte vs. resultado real del trimestre, excluyendo ambos la ganancia por SpaceX/Anthropic. Fuente: consenso pre-reporte y 8-K oficial, con ajuste propio.</p>
+  </div>
+  <p>
+    Con el ingreso operativo en línea o levemente por encima del consenso, pero el EPS core levemente por debajo, no
+    esperamos una ola de revisiones al alza de estimados de EPS GAAP para lo que resta de 2026 — de hecho, el consenso
+    FY2026 de EPS GAAP ya saltó a $20.58 (desde niveles muy inferiores antes del reporte), casi con certeza porque los
+    analistas ya incorporaron la ganancia de $99.0B de Q2 en sus modelos de EPS anual, no porque esperen que el negocio
+    core se acelere en esa magnitud. El consenso de ingresos FY2026 es de $497.70 mil millones (+23.5% sobre 2025), en
+    línea con el ritmo de crecimiento reciente. No existe, al momento de este informe, un consenso agregado público de EPS
+    FY2027 — un límite reconocido de este informe (Sección 14), que remitimos a los supuestos explícitos del DCF (Sección
+    13) en lugar de fabricar una cifra de consenso inexistente.
+  </p>
+
+  <!-- 13 — VALUACIÓN, AL FINAL -->
+  <p class="secnum" id="s13">13 — Valuación: Cuatro Métodos y el Fair Value</p>
+  <h2>Cuánto vale la acción, separando la ganancia de papel del negocio que genera caja</h2>
+  <p>
+    Llegamos a la valuación después de recorrer el negocio completo a propósito: el objetivo de este informe es que el
+    lector entienda primero por qué Google Cloud acelera, por qué el capex se dispara y por qué la utilidad neta reportada
+    no es lo que parece, y recién después confronte esa realidad con lo que el mercado ya está pagando por ella.
+    Calculamos el valor razonable de la acción con cuatro enfoques independientes entre sí — flujo de caja descontado,
+    múltiplos de comparables, reversión a la media histórica propia, y el consenso de analistas de Wall Street — y en los
+    tres métodos numéricos que involucran una cifra de utilidad, usamos consistentemente el EPS "core" (ex-ganancia de
+    SpaceX/Anthropic) de la Sección 05, no el EPS GAAP inflado.
+  </p>
+
+  <h3>Método 1 — Flujo de caja descontado (DCF), tres escenarios</h3>
+  <p>
+    Construimos un modelo de flujo de caja descontado a dos etapas (cinco años explícitos de proyección más valor terminal
+    por crecimiento perpetuo), partiendo de los ingresos de los últimos doce meses ($445.87 mil millones) y de la posición
+    de caja neta y el conteo de acciones diluidas reportados al cierre del trimestre (Sección 06). Igual que en la
+    cobertura de MSFT de este desk, proyectamos el flujo de caja libre desagregando explícitamente el flujo de caja
+    operativo (OCF) del capex —en vez de un solo "margen de FCF"— porque la guía de capex 2026 ($195-205 mil millones,
+    aplicada como base del año 1 de la proyección en los tres escenarios) es demasiado importante para diluirla en un
+    promedio. El WACC base se construyó con una tasa libre de riesgo ancla en el rendimiento vigente del Treasury a 10
+    años más un premio de riesgo accionario de 5.0%, con un beta cercano a 1.0 — consistente con el perfil de Alphabet
+    dentro del universo de mega-caps de IA.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Supuesto</th><th class="right-al">Bear</th><th class="right-al">Base</th><th class="right-al">Bull</th></tr>
+    <tr><td class="label">Crecimiento de ingresos (año 1 → año 5)</td><td class="right-al">16% → 6%</td><td class="right-al">20% → 10%</td><td class="right-al">24% → 13%</td></tr>
+    <tr><td class="label">Margen de OCF (año 1 → año 5)</td><td class="right-al">35% → 39%</td><td class="right-al">37% → 44%</td><td class="right-al">39% → 48%</td></tr>
+    <tr><td class="label">Capex / Ingresos (año 1 → año 5)</td><td class="right-al">41% → 30%</td><td class="right-al">39% → 22%</td><td class="right-al">37% → 16%</td></tr>
+    <tr><td class="label">WACC</td><td class="right-al">10.0%</td><td class="right-al">9.0%</td><td class="right-al">8.0%</td></tr>
+    <tr><td class="label">Crecimiento terminal</td><td class="right-al">2.5%</td><td class="right-al">3.0%</td><td class="right-al">3.5%</td></tr>
+    <tr><td class="label">FCF año 1 (OCF − Capex)</td><td class="right-al neg">&minus;$31.0B</td><td class="right-al neg">&minus;$10.7B</td><td class="right-al pos">+$11.1B</td></tr>
+    <tr><td class="label">% del EV desde valor terminal</td><td class="right-al">93.1%</td><td class="right-al">87.4%</td><td class="right-al">89.2%</td></tr>
+    <tr class="total"><td class="label">Fair value por acción</td><td class="right-al">$60.59</td><td class="right-al">$212.09</td><td class="right-al">$479.46</td></tr>
+  </table></div>
+  <p>
+    El resultado más importante de esta tabla, otra vez, no está en la última fila — está en la anteúltima: el flujo de
+    caja libre del año 1 es negativo tanto en el escenario Bear como en el Base, y apenas positivo en el Bull. El capex
+    guiado de $195-205 mil millones para 2026 es, en nuestro modelo, mayor al flujo de caja operativo que el escenario
+    Base genera en el primer año de proyección — la misma tensión que encontramos en la cobertura de MSFT de este desk,
+    aunque con un punto de partida de márgenes de OCF más bajo. El escenario Bear asume que el capex se mantiene elevado
+    más tiempo del guiado (30% de ingresos todavía en el año 5) y que Google Cloud desacelera hacia tasas de crecimiento
+    más moderadas conforme la base se agranda. El escenario Base asume que el capex converge gradualmente hacia ~22% de
+    ingresos en el año 5 —todavía muy por encima del 9.6% de 2021— a medida que el backlog contratado se va reconociendo
+    como ingreso. El escenario Bull asume una normalización de capex más rápida (16% en el año 5) combinada con la
+    expansión de margen de Cloud ya observada en Q2 2026 (20.7%→35.6% en un año) sosteniéndose en el resto del negocio. En
+    los tres casos, 87-93% del valor de empresa proviene del valor terminal — el modelo depende, en una proporción muy
+    alta, de que el capex se normalice tal como se supone, no como se garantiza.
+  </p>
+  <h3>Sensibilidad del caso Base: WACC × crecimiento terminal</h3>
+  <p>
+    Dado que 87.4% del valor de empresa del caso Base proviene del valor terminal, mostramos cómo se mueve el fair value
+    únicamente variando WACC y crecimiento terminal, con el resto de los inputs fijos. La celda marcada es el caso Base
+    reportado arriba ($212.09, WACC 9.0%, g 3.0%).
+  </p>
+  <div class="table-scroll"><table class="sens-table">
+    <tr><th>WACC \ g terminal</th><th class="right-al">2.0%</th><th class="right-al">2.5%</th><th class="right-al">3.0%</th><th class="right-al">3.5%</th><th class="right-al">4.0%</th></tr>
+    <tr><td class="axis">8.0%</td><td class="right-al">$219.56</td><td class="right-al">$237.06</td><td class="right-al">$258.06</td><td class="right-al">$283.72</td><td class="right-al">$315.81</td></tr>
+    <tr><td class="axis">8.5%</td><td class="right-al">$201.24</td><td class="right-al">$215.78</td><td class="right-al">$232.96</td><td class="right-al">$253.58</td><td class="right-al">$278.78</td></tr>
+    <tr><td class="axis">9.0%</td><td class="right-al">$185.59</td><td class="right-al">$197.82</td><td class="right-al base-cell">$212.09</td><td class="right-al">$228.96</td><td class="right-al">$249.20</td></tr>
+    <tr><td class="axis">9.5%</td><td class="right-al">$172.05</td><td class="right-al">$182.46</td><td class="right-al">$194.48</td><td class="right-al">$208.49</td><td class="right-al">$225.05</td></tr>
+    <tr><td class="axis">10.0%</td><td class="right-al">$160.24</td><td class="right-al">$169.19</td><td class="right-al">$179.41</td><td class="right-al">$191.20</td><td class="right-al">$204.96</td></tr>
+  </table></div>
+  <p class="footnote">Grilla propia, recalculando el modelo de dos etapas del caso Base (mismo crecimiento explícito, margen de OCF y capex/ingresos por año declarados arriba) para cada combinación WACC/g. La celda base ($212.09) corresponde a WACC 9.0% y g 3.0%, y reproduce 87.4% de EV desde terminal.</p>
+  <p>
+    Incluso en la esquina más generosa de esta grilla (WACC 8.0%, g 4.0% → $315.81), el DCF Base queda por debajo del
+    precio de mercado ($333.66) — a diferencia de MSFT, donde varias combinaciones razonables de la grilla ya superaban el
+    precio de mercado. Para que el DCF Base iguale el precio actual, harían falta supuestos de margen o de normalización de
+    capex más optimistas que los del propio escenario Bull, o un WACC por debajo del extremo inferior de esta grilla — la
+    brecha entre nuestro caso Base y el mercado es, en este caso, más estructural que de matiz fino.
+  </p>
+
+  <h3>Método 2 — Múltiplos de comparables</h3>
+  <p>
+    Aplicamos el P/E forward promedio de los cuatro comparables de la Sección 08 (Apple, Microsoft, Meta, Amazon: 26.3x
+    promedio) sobre el EPS TTM "core" de Alphabet ($10.46, Sección 05) — no sobre el consenso GAAP de $20.58, que
+    aplicado directamente a un múltiplo de panel construido sobre utilidades sin ganancias extraordinarias comparables
+    produciría un resultado engañosamente alto (~$541, ver nota metodológica abajo).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Múltiplo P/E forward aplicado (sobre EPS core $10.46)</th><th class="right-al">Precio implícito</th></tr>
+    <tr><td class="label">18.3x (piso del panel, META)</td><td class="right-al">$191.42</td></tr>
+    <tr><td class="label">23.4x (MSFT)</td><td class="right-al">$244.76</td></tr>
+    <tr class="total"><td class="label">26.3x (promedio de los 4 comparables)</td><td class="right-al">$275.10</td></tr>
+    <tr><td class="label">29.3x (AMZN)</td><td class="right-al">$306.48</td></tr>
+    <tr><td class="label">34.2x (techo del panel, AAPL)</td><td class="right-al">$357.73</td></tr>
+  </table></div>
+  <p>
+    Tomamos $275.10 (el promedio del panel de 4 comparables) como el resultado de este método. Nota metodológica: aplicar
+    el mismo múltiplo de 26.3x al consenso GAAP de EPS FY2026 ($20.58, todavía inflado por la ganancia de Q1+Q2 2026) daría
+    un precio implícito de ~$541 — un resultado que ilustra exactamente el tipo de error de comparabilidad que este
+    informe busca evitar, y la razón por la que insistimos en trabajar con la cifra "core" en toda esta sección.
+  </p>
+
+  <h3>Método 3 — Reversión a la media histórica propia</h3>
+  <p>
+    Preguntamos a qué múltiplo cotizó la propia acción en promedio durante la última década, y qué precio resultaría de
+    aplicar ese múltiplo histórico al EPS TTM core. El P/E promedio de GOOGL de los últimos 5 años es de aproximadamente
+    24.9x; el de los últimos 10 años, 26.3x — ambos muy por encima del P/E TTM GAAP actual (16.8x, Sección 08), que en
+    apariencia luce "barato" frente a su propio historial, pero solo porque el denominador (EPS GAAP) está inflado por la
+    ganancia de SpaceX/Anthropic, no porque el mercado esté pagando menos por el negocio.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Referencia histórica</th><th class="right-al">Múltiplo</th><th class="right-al">Precio implícito (sobre EPS core $10.46)</th></tr>
+    <tr><td class="label">Promedio 5 años</td><td class="right-al">24.9x</td><td class="right-al">$260.45</td></tr>
+    <tr class="total"><td class="label">Promedio 10 años</td><td class="right-al">26.32x</td><td class="right-al">$275.31</td></tr>
+  </table></div>
+  <p class="footnote">P/E históricos: fullratio.com, financecharts.com. EPS core: Sección 05 de este informe.</p>
+  <p>
+    Tomamos el promedio de los dos (~$267.88) como el resultado de este método. A diferencia de lo que sugeriría el P/E
+    GAAP de portada, cuando se corrige por la ganancia no recurrente, Alphabet no cotiza "barata" frente a su propio
+    historial — cotiza, en la base core, por encima de su múltiplo promedio de 10 años (31.9x actual vs. 26.3x histórico),
+    la misma dirección de sorpresa que encontramos en el informe de AAPL de este desk, aunque de menor magnitud.
+  </p>
+
+  <h3>Método 4 — Consenso de Wall Street</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Analistas cubriendo GOOGL</td><td class="right-al">64</td></tr>
+    <tr><td class="label">Calificación consenso</td><td class="right-al">Strong Buy</td></tr>
+    <tr class="total"><td class="label">Precio objetivo promedio (12 meses)</td><td class="right-al">$427.59</td></tr>
+    <tr><td class="label">Rango de precios objetivo</td><td class="right-al">$340.00 – $515.00</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: S&amp;P Global Market Intelligence, consenso jul-2026 (post-reporte Q2 2026).</p>
+  <p>
+    El consenso Wall Street es, por lejos, el método más optimista de los cuatro —28% por encima del precio de mercado y
+    más de 60% por encima de nuestro blend propio—. Es también el único de los cuatro métodos que no podemos auditar
+    línea por línea: no sabemos qué proporción de los modelos de los 64 analistas ya descuenta correctamente que la
+    ganancia de SpaceX/Anthropic no es recurrente, ni cuánto de su optimismo responde a la aceleración genuina de Google
+    Cloud frente a la parte contable del trimestre.
+  </p>
+
+  <h3>Síntesis: los cuatro métodos, uno al lado del otro</h3>
+  <div class="chartbox">
+    <canvas id="footballChart" height="260"></canvas>
+    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología (todas calculadas sobre EPS core donde aplica). La línea roja marca el precio de mercado ($333.66); la línea azul marca el blend propio ($251.69).</p>
+  </div>
+  <div class="table-scroll"><table>
+    <tr><th>Método</th><th class="right-al">Fair value</th></tr>
+    <tr><td class="label">DCF — Bear</td><td class="right-al">$60.59</td></tr>
+    <tr><td class="label">DCF — Base</td><td class="right-al">$212.09</td></tr>
+    <tr><td class="label">DCF — Bull</td><td class="right-al">$479.46</td></tr>
+    <tr><td class="label">Comparables (P/E forward promedio del panel sobre EPS core)</td><td class="right-al">$275.10</td></tr>
+    <tr><td class="label">Reversión histórica (P/E promedio 5-10 años propio sobre EPS core)</td><td class="right-al">$267.88</td></tr>
+    <tr class="total"><td class="label">Promedio simple — DCF Base, Comparables, Reversión histórica</td><td class="right-al">$251.69</td></tr>
+    <tr><td class="label">Consenso Wall Street (referencia externa, no promediada)</td><td class="right-al">$427.59</td></tr>
+  </table></div>
+  <p>
+    El promedio simple de las tres metodologías numéricas propias (DCF caso Base, comparables, reversión histórica) da
+    <strong>$251.69 por acción</strong> — 24.6% por debajo del precio de mercado de $333.66. Por la regla de este desk, un
+    blend por debajo del precio de mercado no puede traducirse en una postura alcista solo porque el negocio sea de
+    calidad: Google Cloud acelerando a +82% y expandiendo margen de 20.7% a 35.6% en un año es, sin duda, evidencia de un
+    negocio excepcional, pero "buen negocio" y "buena inversión al precio actual" son preguntas distintas. La brecha se
+    explica, en partes similares, por (a) un capex guiado que el propio DCF no logra justificar al precio de mercado bajo
+    supuestos razonables, y (b) un mercado que probablemente todavía no ha terminado de descontar cuánto del "beat" de
+    este trimestre fue contable y cuánto fue operativo. El consenso de Wall Street ($427.59), más optimista incluso que el
+    propio precio de mercado, sugiere que buena parte de la comunidad de analistas todavía no ha hecho ese ajuste con el
+    rigor que este informe aplica en la Sección 05.
+  </p>
+
+  <!-- 14 -->
+  <p class="secnum" id="s14">14 — Limitaciones del Modelo</p>
+  <h2>Qué asume este análisis, y dónde puede fallar</h2>
+  <div class="watermark-block">
+    <p style="margin-bottom:0;">
+      87-93% del valor de empresa en los tres escenarios del DCF proviene del valor terminal — el modelo depende, en una
+      proporción muy alta, de que el capex se normalice en los años 2-5 tal como se supone, no como se garantiza. El
+      ajuste "core" de EPS que usamos en los métodos de comparables y reversión histórica (Sección 05) es, para Q1 2026,
+      una estimación propia que aplica la tasa efectiva de impuesto divulgada por la compañía para Q2 2026 (22.1%) —no un
+      dato exacto reportado por Alphabet para ese trimestre— y podría diferir de la cifra real si la tasa efectiva sobre
+      la ganancia de Q1 fue distinta. El precio de mercado usado en este informe ($333.66) es un precio de mercado
+      posterior a la caída de 7.4% del día siguiente al reporte, no el precio de cierre inmediatamente previo al 22-jul-2026
+      — a diferencia de otras coberturas de este desk que anclan al precio pre-reporte, aquí sí incorporamos la reacción
+      del mercado porque la ventana de varios días transcurrida permite tratarla como precio de mercado válido, no como
+      reacción de una sola sesión de after-hours. El stake de Alphabet en SpaceX (~$94.1 mil millones) y en Anthropic no
+      están incorporados como un activo separado en ninguno de los cuatro métodos de valuación de esta sección más allá de
+      su efecto en el balance (Sección 06) — un tratamiento simétrico al que el informe de MSFT de este desk aplicó a la
+      participación de Microsoft en OpenAI, pero que en el caso de Alphabet podría subestimar el valor total de la
+      compañía en una magnitud mayor, dado el tamaño relativo de la posición. Finalmente, no existe consenso agregado
+      público de EPS o ingresos para 2027 al momento de este informe (Sección 12) — el "momentum" que reportamos se basa
+      en la comparación de un solo trimestre contra su consenso pre-reporte, no en una serie histórica de revisiones de
+      90 días.
+    </p>
+  </div>
+
+  <div class="disclosure">
+    Documento elaborado a partir de fuentes públicas: SEC EDGAR (Form 8-K Exhibit 99.1, 10-Q, 10-K, XBRL companyconcept
+    API), comunicados de resultados y newsroom de Alphabet, Microsoft, Apple, Meta y Amazon, S&amp;P Global Market
+    Intelligence, stockanalysis.com, fullratio.com, financecharts.com, Alphastreet, MarketBeat, CNBC, 9to5Google,
+    TechCrunch, Bloomberg, revenuememo.com, CEOPayWatch, Cleary Gottlieb, SecurityWeek, y coincentral.com. Cifras
+    fundamentales con fecha de corte en el Form 8-K de Alphabet correspondiente al trimestre cerrado el 30 de junio de
+    2026, publicado el 22 de julio de 2026; desarrollos corporativos y de mercado con fecha de corte de la misma fecha o
+    posterior donde se indica explícitamente.
+    <br><br>
+    <strong>Sobre el autor y la naturaleza de este documento:</strong> este informe es un análisis independiente
+    elaborado por Manfredi Investment Research &amp; Markets con fines exclusivamente informativos y educativos. El autor
+    no es un asesor de inversión registrado, no está matriculado ante la Comisión Nacional de Valores (CNV), la SEC, ni
+    ningún otro organismo regulador equivalente, y no mantiene una relación de asesoramiento financiero personalizado con
+    el lector. Ninguna cifra de este documento —incluido el "fair value" de portada, los escenarios de DCF, ni la síntesis
+    de la Sección 13— constituye una recomendación de compra, venta o mantenimiento para ningún lector en particular, ni
+    considera la situación financiera, los objetivos o el perfil de riesgo individual de quien lo lee. Los escenarios de
+    DCF son estimaciones propias sujetas a los supuestos declarados explícitamente en la Sección 13, y no representan
+    guidance oficial de ninguna de las compañías mencionadas salvo donde se cita de forma directa y atribuida. Verificar
+    cifras contra el 10-Q/10-K/8-K más reciente de cada compañía, y consultar a un asesor financiero matriculado, antes de
+    tomar cualquier decisión de inversión.
+  </div>
+
+</div>
+
+<script>
+/* ---- Motor de gráficos propio, sin dependencias externas (Canvas 2D) ---- */
+(function(){
+  var PALETTE = {ink:'#161a20', muted:'#69707c', line:'#e3e9f0', navy:'#0b1f3a', navy2:'#15335c', blue:'#2f5f9e', blueLight:'#5f8fc7', pale:'#c7d9ec', red:'#a8291f', gold:'#c99a3c'};
+
+  function setupCanvas(canvas, cssHeight){
+    var dpr = window.devicePixelRatio || 1;
+    var cssWidth = canvas.parentElement.clientWidth - 44; // padding del chartbox
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = Math.max(1, Math.round(cssWidth * dpr));
+    canvas.height = Math.max(1, Math.round(cssHeight * dpr));
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return {ctx: ctx, w: cssWidth, h: cssHeight};
+  }
+
+  function drawVBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+    ctx.font = '11px "IBM Plex Mono", monospace';
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var log = !!opts.log;
+    var padL = 46, padR = 10, padT = 16, padB = 46;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var maxV = Math.max.apply(null, values);
+    var minV = log ? Math.min.apply(null, values) : 0;
+    function scaleY(v){
+      if(log){
+        var lv = Math.log10(Math.max(v,0.01)), lmax = Math.log10(maxV*1.15), lmin = Math.log10(Math.max(minV*0.5,1));
+        return padT + plotH - ((lv - lmin) / (lmax - lmin)) * plotH;
+      }
+      return padT + plotH - (v / (maxV*1.15)) * plotH;
+    }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    var gridSteps = 4;
+    for(var g=0; g<=gridSteps; g++){
+      var yy = padT + (plotH/gridSteps)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    var n = values.length;
+    var slot = plotW / n;
+    var barW = Math.min(slot * 0.56, 64);
+
+    for(var i=0;i<n;i++){
+      var cx = padL + slot*i + slot/2;
+      var y0 = scaleY(values[i]);
+      var yBase = padT + plotH;
+      ctx.fillStyle = colors[i % colors.length];
+      var bw = barW;
+      ctx.fillRect(cx - bw/2, y0, bw, yBase - y0);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'center';
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, cx, y0 - 6);
+
+      ctx.fillStyle = PALETTE.muted;
+      ctx.font = '10px "Inter", sans-serif';
+      wrapLabel(ctx, labels[i], cx, yBase + 16, slot + 6);
+    }
+  }
+
+  function wrapLabel(ctx, text, cx, y, maxW){
+    var words = String(text).split(' ');
+    var lines = [];
+    var cur = '';
+    for(var i=0;i<words.length;i++){
+      var test = cur ? cur + ' ' + words[i] : words[i];
+      if(ctx.measureText(test).width > maxW && cur){ lines.push(cur); cur = words[i]; }
+      else cur = test;
+    }
+    if(cur) lines.push(cur);
+    lines = lines.slice(0,2);
+    ctx.textAlign = 'center';
+    for(var j=0;j<lines.length;j++){
+      ctx.fillText(lines[j], cx, y + j*11);
+    }
+  }
+
+  function drawHBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var padL = 128, padR = 54, padT = 10, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var maxV = Math.max.apply(null, values) * 1.12;
+
+    var n = values.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.5, 30);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, padT+plotH); ctx.stroke();
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = padL;
+      var w = (values[i]/maxV) * plotW;
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, w, barH);
+
+      ctx.fillStyle = PALETTE.text || PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(labels[i], padL - 10, cy + 4);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'left';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, x0 + w + 8, cy + 4);
+    }
+  }
+
+  function drawRangeBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, ranges = opts.ranges, colors = opts.colors, refLines = opts.refLines || [];
+    var padL = 168, padR = 16, padT = 26, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    ranges.forEach(function(r){ allVals.push(r[0], r[1]); });
+    refLines.forEach(function(r){ allVals.push(r.value); });
+    var domMin = Math.min.apply(null, allVals) * 0.94;
+    var domMax = Math.max.apply(null, allVals) * 1.04;
+    function scaleX(v){ return padL + ((v - domMin)/(domMax - domMin)) * plotW; }
+
+    var n = ranges.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.42, 22);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = scaleX(ranges[i][0]), x1 = scaleX(ranges[i][1]);
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, Math.max(x1-x0,2), barH);
+      ctx.beginPath(); ctx.arc(x0, cy, barH/2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x1, cy, barH/2, 0, Math.PI*2); ctx.fill();
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      wrapLabel(ctx, labels[i], padL - 12, cy - 4, padL - 20);
+
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      var vf = opts.valueFmt || function(v){ return '$'+v.toFixed(0); };
+      ctx.textAlign = 'right';
+      ctx.fillText(vf(ranges[i][0]), x0 - 8, cy + 4);
+      ctx.textAlign = 'left';
+      ctx.fillText(vf(ranges[i][1]), x1 + 8, cy + 4);
+    }
+
+    refLines.forEach(function(r){
+      var x = scaleX(r.value);
+      ctx.strokeStyle = r.color; ctx.lineWidth = 1.6; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x, padT-6); ctx.lineTo(x, padT+plotH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = r.color;
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(r.label, x, padT - 12);
+    });
+  }
+
+  function drawLines(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, series = opts.series; // [{name,color,values}]
+    var padL = 40, padR = 14, padT = 16, padB = 54;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    series.forEach(function(s){ allVals = allVals.concat(s.values); });
+    var maxV = Math.max.apply(null, allVals) * 1.08;
+    var minV = Math.min.apply(null, allVals) * 0.92;
+
+    function scaleX(i){ return padL + (plotW/(labels.length-1)) * i; }
+    function scaleY(v){ return padT + plotH - ((v - minV)/(maxV-minV)) * plotH; }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var yy = padT + (plotH/4)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    series.forEach(function(s){
+      ctx.strokeStyle = s.color; ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        ctx.fillStyle = s.color;
+        ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
+      });
+    });
+
+    ctx.fillStyle = PALETTE.muted;
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    labels.forEach(function(l,i){ ctx.fillText(l, scaleX(i), padT+plotH+16); });
+
+    var lx = padL, ly = H - 12;
+    ctx.font = '11px "Inter", sans-serif';
+    series.forEach(function(s){
+      ctx.fillStyle = s.color;
+      ctx.fillRect(lx, ly-8, 10, 10);
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'left';
+      ctx.fillText(s.name, lx+14, ly);
+      lx += 14 + ctx.measureText(s.name).width + 22;
+    });
+  }
+
+  function renderAll(){
+    drawVBars(document.getElementById('historyChart'), {
+      labels:['2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','TTM jun-26'],
+      values:[90.27,110.86,136.82,161.86,182.53,257.64,282.84,307.39,350.02,402.84,445.87],
+      colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.blue,PALETTE.navy2,PALETTE.navy2,PALETTE.navy],
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawHBars(document.getElementById('segmentChart'), {
+      labels:['Google Search & other','Google Cloud','Subscriptions/platforms/dev.','YouTube ads','Google Network','Other Bets'],
+      values:[63.27,24.77,12.91,11.06,7.30,0.38],
+      colors:[PALETTE.navy,PALETTE.blue,PALETTE.blueLight,PALETTE.blueLight,PALETTE.pale,PALETTE.pale],
+      valueFmt:function(v){ return '$'+v.toFixed(1)+'B'; }
+    });
+
+    drawHBars(document.getElementById('geoChart'), {
+      labels:['United States','EMEA','APAC','Other Americas'],
+      values:[32,15,17,23],
+      colors:[PALETTE.navy,PALETTE.blue,PALETTE.blueLight,PALETTE.pale],
+      valueFmt:function(v){ return '+'+v.toFixed(0)+'%'; }
+    });
+
+    drawLines(document.getElementById('marginChart'), {
+      labels:['Q3 2025','Q4 2025','Q1 2026','Q2 2026'],
+      series:[
+        {name:'Margen bruto', color:PALETTE.navy, values:[59.6,59.8,62.5,61.7]},
+        {name:'Margen operativo', color:PALETTE.blueLight, values:[30.5,31.6,36.1,34.0]}
+      ]
+    });
+
+    drawVBars(document.getElementById('capexChart'), {
+      labels:['AAPL','META (piso)','GOOGL (piso)','MSFT (piso)','AMZN (piso)'],
+      values:[13.5,125,195,255,200],
+      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.red,PALETTE.blueLight,PALETTE.blueLight],
+      log:true,
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawHBars(document.getElementById('compsChart'), {
+      labels:['AAPL','AMZN','GOOGL (core)*','MSFT','META'],
+      values:[41.3,29.3,31.9,21.8,21.6],
+      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.red,PALETTE.blueLight,PALETTE.blueLight],
+      valueFmt:function(v){ return v.toFixed(1)+'x'; }
+    });
+
+    drawRangeBars(document.getElementById('footballChart'), {
+      labels:['DCF (Bear → Bull)','Comparables (piso → techo panel)','Reversión histórica (5y → 10y)','Consenso Wall Street (rango objetivo)'],
+      ranges:[[60.59,479.46],[191.42,357.73],[260.45,275.31],[340.00,515.00]],
+      colors:[PALETTE.blue,PALETTE.navy2,PALETTE.blueLight,PALETTE.gold],
+      refLines:[{value:333.66,color:PALETTE.red,label:'Mercado $334'},{value:251.69,color:PALETTE.navy,label:'Blend $252'}],
+      valueFmt:function(v){ return '$'+v.toFixed(0); }
+    });
+
+    drawHBars(document.getElementById('revisionChart'), {
+      labels:['EPS core consenso pre-reporte','EPS core real Q2 2026'],
+      values:[2.89,2.85],
+      colors:[PALETTE.pale,PALETTE.blue],
+      valueFmt:function(v){ return '$'+v.toFixed(2); }
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', renderAll);
+  } else {
+    renderAll();
+  }
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderAll, 150);
+  });
+})();
+</script>
+</body>
+</html>
