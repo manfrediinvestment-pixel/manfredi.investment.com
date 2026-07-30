@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>META — Meta Platforms, Inc. | Manfredi Investment Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-dark:#0b1f3a;
+    --navy:#0e2748;
+    --navy2:#15335c;
+    --blue:#2f5f9e;
+    --blue-light:#5f8fc7;
+    --blue-pale:#eaf1f9;
+    --line:#d7e0ea;
+    --text:#161a20;
+    --muted:#69707c;
+    --green:#1a7a54;
+    --red:#a8291f;
+    --serif:'Newsreader',serif;
+    --sans:'Inter',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#fff; color:var(--text); font-family:var(--sans); font-size:15.5px; line-height:1.7;}
+  .wrap{max-width:900px; margin:0 auto; padding:0 30px 90px;}
+
+  .brandbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:26px 30px 20px; max-width:900px; margin:0 auto; border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:38px; height:38px; border:1.5px solid var(--navy-dark); display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-weight:700; color:var(--navy-dark); font-size:16px;
+  }
+  .brand-name{font-family:var(--serif); font-weight:700; font-size:17px; color:var(--text); line-height:1.15;}
+  .brand-sub{font-family:var(--sans); font-size:10px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase;}
+  .brandbar .doctype{font-family:var(--mono); font-size:11px; color:var(--muted); text-align:right;}
+
+  .frontbox{border:1px solid var(--navy-dark); margin:34px 0 8px; padding:0;}
+  .frontbox-top{display:flex; justify-content:space-between; align-items:baseline; padding:22px 28px 14px; border-bottom:1px solid var(--line);}
+  .ticker-big{font-family:var(--serif); font-size:42px; font-weight:700; color:var(--navy-dark);}
+  .exch{font-family:var(--mono); font-size:12px; color:var(--muted); margin-left:10px;}
+  .rating{font-family:var(--mono); font-size:12px; font-weight:600; color:var(--blue); text-align:right; letter-spacing:.03em;}
+  .rating small{display:block; font-family:var(--mono); font-size:10.5px; color:var(--muted); font-weight:400; margin-top:3px; letter-spacing:normal;}
+  .frontbox-body{padding:20px 28px 26px;}
+  .company-line{color:var(--muted); font-size:13.5px; margin-bottom:16px;}
+  .thesis-block{font-family:var(--serif); font-size:17.5px; line-height:1.65; color:var(--text); font-style:italic;}
+
+  .statsrow{display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line);}
+  .statcell{padding:16px 20px; border-right:1px solid var(--line);}
+  .statcell:last-child{border-right:none;}
+  .statcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:6px;}
+  .statcell .v{font-family:var(--mono); font-size:16px; font-weight:600; color:var(--text);}
+  .pos{color:var(--green);} .neg{color:var(--red);}
+
+  .secnum{font-family:var(--mono); font-size:11px; color:var(--blue-light); letter-spacing:.1em; margin:50px 0 2px;}
+  h2{font-family:var(--serif); font-size:24px; font-weight:600; color:var(--navy2); margin:2px 0 18px; padding-bottom:10px; border-bottom:1.5px solid var(--navy-dark); text-wrap:balance;}
+  h3{font-family:var(--serif); font-size:17px; font-weight:600; color:var(--navy2); margin:30px 0 10px;}
+  p{margin:0 0 15px; max-width:68ch;}
+  strong{color:var(--text);}
+
+  .table-scroll{overflow-x:auto; margin:18px 0 22px;}
+  .table-scroll table{margin:0;}
+  table{width:100%; min-width:520px; border-collapse:collapse; font-size:13.5px;}
+  th{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); text-align:left; padding:8px 10px; border-bottom:1.5px solid var(--navy-dark); white-space:nowrap;}
+  td{padding:8px 10px; border-bottom:1px solid var(--line); font-family:var(--mono); color:var(--text); font-variant-numeric:tabular-nums;}
+  td.label{font-family:var(--sans); color:var(--text);}
+  tr.total td{font-weight:600; border-top:1px solid var(--navy-dark); border-bottom:none;}
+  .right-al{text-align:right;}
+
+  .chartbox{border:1px solid var(--line); padding:20px 22px 16px; margin:22px 0;}
+  .chartbox canvas{width:100% !important; display:block;}
+  .chartcap{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:14px; text-align:center;}
+
+  .pull{border-left:2px solid var(--navy-dark); padding-left:18px; margin:22px 0; color:var(--muted); font-size:13.5px; max-width:68ch;}
+
+  .footnote{font-family:var(--mono); font-size:11px; color:var(--muted); margin:-6px 0 18px; max-width:none;}
+
+  .watermark-block{
+    position:relative; margin:60px 0; padding:26px 30px; border:1px solid var(--line); overflow:hidden;
+  }
+  .watermark-block::before{
+    content:"META"; position:absolute; right:10px; top:-30px; font-family:var(--serif); font-weight:700;
+    font-size:110px; color:var(--blue-pale); z-index:0; line-height:1;
+  }
+  .watermark-block > *{position:relative; z-index:1;}
+
+  .toc{border:1px solid var(--line); padding:22px 26px; margin:30px 0;}
+  .toc-title{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px;}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:30px;}
+  .toc li{font-size:13px; margin-bottom:7px; break-inside:avoid;}
+  .toc a{color:var(--navy2); text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  .toc .toc-final a{font-weight:600;}
+
+  .disclosure{margin-top:70px; padding-top:22px; border-top:1px solid var(--navy-dark); font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.8; max-width:none;}
+
+  .fv-block{text-align:right;}
+  .fv-block .fv-label{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+  .fv-block .fv-value{font-family:var(--mono); font-size:22px; font-weight:600; color:var(--navy-dark); line-height:1.3;}
+  .fv-block .fv-gap{font-family:var(--mono); font-size:12.5px; font-weight:600;}
+  .fv-block .fv-gap.neg{color:var(--red);} .fv-block .fv-gap.pos{color:var(--green);}
+
+  .verdict-bar{display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; background:var(--blue-pale); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:14px 28px;}
+  .verdict-stance{font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--navy-dark);}
+  .verdict-stance strong{color:var(--navy-dark);}
+  .verdict-note{font-family:var(--sans); font-size:11.5px; color:var(--muted); max-width:56ch; line-height:1.5;}
+
+  .sens-table td, .sens-table th{text-align:center;}
+  .sens-table td.axis{font-family:var(--mono); font-weight:600; background:#fff; color:var(--text);}
+  .sens-table td.base-cell{outline:2px solid var(--navy-dark); outline-offset:-2px;}
+
+  .govrow{display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:1px solid var(--line); margin:20px 0;}
+  .govcell{padding:16px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .govcell:nth-child(3n){border-right:none;}
+  .govcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px;}
+  .govcell .v{font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text);}
+  .govcell .sub{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.4;}
+
+  a{color:var(--blue);}
+  :focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
+
+  @media (max-width:720px){
+    .statsrow{grid-template-columns:repeat(2,1fr);}
+    .frontbox-top{flex-direction:column; gap:10px;}
+    .rating{text-align:left;}
+    .toc ol{columns:1;}
+    .verdict-bar{flex-direction:column; align-items:flex-start;}
+    .govrow{grid-template-columns:1fr;}
+    .govcell{border-right:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <div class="brand">
+    <div class="brand-mark">MI</div>
+    <div>
+      <div class="brand-name">Manfredi Investment</div>
+      <div class="brand-sub">Research &amp; Markets</div>
+    </div>
+  </div>
+  <div class="doctype">Equity Research · Informe Institucional<br>Datos al Q2 2026 (cierre trimestral 30-jun-2026, publicado 29-jul-2026)</div>
+</div>
+
+<div class="wrap">
+
+  <div class="frontbox">
+    <div class="frontbox-top">
+      <div><span class="ticker-big">META</span><span class="exch">NASDAQ · Meta Platforms, Inc.</span></div>
+      <div class="fv-block">
+        <div class="fv-label">Fair value (blend propio)</div>
+        <div class="fv-value">$785.09</div>
+        <div class="fv-gap pos">vs. $534.72 mercado · +46.8%</div>
+      </div>
+    </div>
+    <div class="verdict-bar">
+      <div class="verdict-stance">POSTURA DEL ANÁLISIS: <strong>NEUTRAL — CRECIMIENTO PUBLICITARIO SÓLIDO, MONETIZACIÓN DE IA Y FCF BAJO PRESIÓN INMEDIATA</strong> — el blend propio queda muy por encima del mercado, pero dos de los tres métodos numéricos dependen de un consenso de EPS que todavía no incorpora el miss de este trimestre (ver Sección 13)</div>
+      <div class="verdict-note">Este documento es análisis independiente con fines informativos y educativos. El autor no es un asesor financiero registrado (no CFA / no matriculado ante la CNV/SEC) y este contenido no constituye una recomendación de compra, venta o mantenimiento para ningún lector en particular. Ver disclosure completo al pie.</div>
+    </div>
+    <div class="frontbox-body">
+      <div class="company-line">Publicidad digital · Familia de Apps (Facebook, Instagram, WhatsApp, Messenger) · Reality Labs (RA/RV) · Infraestructura de IA</div>
+      <div class="thesis-block">
+        Meta cerró el trimestre finalizado el 30-jun-2026 con ingresos de $60.8 mil millones (+28% interanual) y un
+        motor publicitario que sigue acelerando —impresiones +14%, precio por anuncio +12%, 3.600 millones de personas
+        activas diarias en la familia de apps—, pero el resultado por acción cayó 13% frente al año anterior por
+        $2.400 millones en cargos legales y $1.180 millones de indemnizaciones por los despidos de mayo de 2026, en
+        simultáneo con una guía de capex 2026 ampliada a $130.000-145.000 millones. El flujo de caja libre del
+        trimestre fue de apenas $784 millones —una fracción de los $8.500 millones del mismo trimestre del año
+        anterior— y el mercado castigó la acción con una caída de casi 12% al día siguiente del reporte. Este informe
+        recorre el negocio completo —historia, segmentos, resultados del trimestre, balance, comparables y riesgos— y
+        cierra, recién en la última sección, con la valuación: cuatro metodologías independientes aplicadas sobre los
+        mismos datos, para que el lector llegue a esa conclusión después de conocer el negocio, no antes.
+      </div>
+    </div>
+    <div class="statsrow">
+      <div class="statcell"><div class="k">Ingresos TTM</div><div class="v">$228.2B</div></div>
+      <div class="statcell"><div class="k">Var. ingresos (últ. trim.)</div><div class="v pos">+28%</div></div>
+      <div class="statcell"><div class="k">Margen operativo TTM</div><div class="v">38.1%</div></div>
+      <div class="statcell"><div class="k">Posición de caja neta</div><div class="v pos">+$6.6B</div></div>
+    </div>
+  </div>
+  <p class="footnote">Cifras fundamentales: SEC EDGAR (Form 8-K, Exhibit 99.1 — comunicado de resultados oficial), trimestre cerrado el 30 de junio de 2026 (Q2 2026), publicado el 29 de julio de 2026, más los tres trimestres móviles anteriores vía SEC EDGAR XBRL. Este documento es 100% analítico — no constituye una recomendación de compra, venta ni mantenimiento. Ver disclosure completo al pie.</p>
+
+  <div class="toc">
+    <div class="toc-title">Contenido</div>
+    <ol>
+      <li><a href="#s01">Resumen Ejecutivo</a></li>
+      <li><a href="#s02">Historia y Evolución</a></li>
+      <li><a href="#s03">Modelo de Negocio y Segmentos</a></li>
+      <li><a href="#s04">Desarrollos Recientes y Perspectiva</a></li>
+      <li><a href="#s05">Estados Financieros</a></li>
+      <li><a href="#s06">Deuda y Balance</a></li>
+      <li><a href="#s07">Flujo de Caja y Capital Allocation</a></li>
+      <li><a href="#s08">Comparables de Industria</a></li>
+      <li><a href="#s09">Gobierno Corporativo y Estructura Accionaria</a></li>
+      <li><a href="#s10">Registro de Riesgos</a></li>
+      <li><a href="#s11">Catalizadores</a></li>
+      <li><a href="#s12">Modelo Financiero Proyectado y Momentum de Estimados</a></li>
+      <li class="toc-final"><a href="#s13">Valuación: Cuatro Métodos y el Fair Value</a></li>
+      <li><a href="#s14">Limitaciones del Modelo</a></li>
+    </ol>
+  </div>
+
+  <!-- 01 -->
+  <p class="secnum" id="s01">01 — Resumen Ejecutivo</p>
+  <h2>El negocio publicitario acelera, pero el mercado castiga el costo de la apuesta de IA</h2>
+  <p>
+    El 29 de julio de 2026, Meta Platforms reportó ingresos de $60.8 mil millones para el segundo trimestre de 2026
+    (+28% interanual), impulsados por un negocio publicitario que sigue mejorando en las dos palancas que lo componen:
+    impresiones (+14% interanual) y precio por anuncio (+12% interanual). La familia de aplicaciones (Facebook,
+    Instagram, WhatsApp, Messenger) alcanzó 3.600 millones de personas activas diarias en promedio durante junio de
+    2026, +3% interanual. En términos de crecimiento de ingresos y engagement, es uno de los mejores trimestres de la
+    compañía en varios años.
+  </p>
+  <p>
+    Pero la utilidad por acción no acompañó: el EPS diluido de $6.18 quedó 13% por debajo del mismo trimestre del año
+    anterior y entre 13% y 15% por debajo del consenso de analistas ($7.14-$7.23), explicado por $2.400 millones en
+    cargos por procesos legales (cuya naturaleza específica la compañía no detalló en el comunicado) y $1.180 millones
+    en indemnizaciones vinculadas a una reducción de personal de aproximadamente 8.000 puestos anunciada en mayo de
+    2026. El margen operativo cayó de 43% a 31% en la comparación interanual. En simultáneo, Meta amplió su guía de
+    capex 2026 a un rango de $130.000-145.000 millones (desde $125.000-145.000 millones), lo que —sumado al gasto ya
+    ejecutado— dejó el flujo de caja libre del trimestre en apenas $784 millones, muy por debajo de los $8.500
+    millones del mismo trimestre de 2025. El mercado reaccionó cayendo cerca de 12% en la sesión siguiente al reporte,
+    y al menos siete casas de research recortaron su precio objetivo esa misma noche.
+  </p>
+  <p>
+    Este informe recorre el negocio completo —de dónde viene, cómo está armado, qué cambió con el reporte del
+    29-jul-2026, cómo se compara con sus pares de mega-cap tech— antes de llegar, en la Sección 13, a la pregunta de
+    cuánto vale la acción. El resultado de esa sección tiene una tensión que vale la pena adelantar: el blend propio de
+    tres metodologías da un fair value muy por encima del precio de mercado, pero dos de esas tres metodologías se
+    apoyan en un consenso de EPS forward que fue fijado antes del miss de este trimestre y que, con alta probabilidad,
+    todavía no refleja la nueva realidad de costos. Tratamos esa tensión con la cautela que exige, y no la resolvemos
+    a favor de un rating optimista solo porque el número del blend "dé lindo".
+  </p>
+
+  <!-- 02 -->
+  <p class="secnum" id="s02">02 — Historia y Evolución</p>
+  <h2>De "The Facebook" a Meta: veintidós años de un solo fundador al mando</h2>
+  <p>
+    Mark Zuckerberg fundó "The Facebook" en su dormitorio de Harvard en febrero de 2004; la compañía salió a bolsa en
+    mayo de 2012 a $38 por acción, en una de las OPIs más seguidas de la historia de Wall Street, que sin embargo
+    cotizó por debajo de su precio de colocación durante más de un año. Las dos adquisiciones que definieron la década
+    siguiente llegaron poco después: Instagram en 2012 por $1.000 millones (una cifra que en su momento generó
+    escepticismo generalizado sobre si Facebook había pagado de más por una app sin ingresos) y WhatsApp en 2014 por
+    $19.000 millones, todavía la segunda adquisición más grande de la historia de la compañía. Ambas pasaron el
+    escrutinio antitrust más severo de la historia reciente de la empresa treinta años después —ver Sección 10— y son,
+    junto con Facebook y Messenger, la base de una familia de aplicaciones que factura prácticamente la totalidad de
+    los ingresos de la compañía.
+  </p>
+  <p>
+    En octubre de 2021, la compañía cambió su nombre corporativo de Facebook, Inc. a Meta Platforms, Inc., como parte
+    de una apuesta declarada por la realidad aumentada y virtual como la "próxima plataforma informática" —el
+    "metaverso"— que llevó a la creación del segmento Reality Labs. Cinco años después, Reality Labs sigue siendo una
+    fuente de pérdidas operativas de varios miles de millones de dólares por trimestre sin una fecha de equilibrio a la
+    vista (ver Sección 03), aunque el hardware y software desarrollado en ese segmento —los anteojos Ray-Ban Meta con
+    IA, en particular— se convirtió en un vehículo de distribución relevante para los productos de inteligencia
+    artificial de la compañía, algo que no formaba parte de la tesis original del pivot de 2021.
+  </p>
+  <p class="pull">
+    El dato que mejor resume la nueva etapa de Meta no es de historia sino de asignación de capital: en junio de 2025,
+    Meta invirtió $14.300 millones en Scale AI a cambio de una participación del 49% sin poder de voto —la segunda
+    adquisición más grande de la historia de la compañía después de WhatsApp— y contrató a su fundador, Alexandr Wang,
+    para liderar un nuevo laboratorio interno de "superinteligencia". Es la señal más clara de que la compañía está
+    dispuesta a pagar sumas extraordinarias por talento y tecnología de IA, en la misma medida en que multiplicó su
+    capex de infraestructura (ver más abajo).
+  </p>
+  <div class="chartbox">
+    <canvas id="historyChart" height="320"></canvas>
+    <p class="chartcap">Ingresos anuales reportados, FY2016–FY2025, y TTM al cierre del trimestre de junio 2026. Fuente: SEC EDGAR (10-K/10-Q), XBRL RevenueFromContractWithCustomerExcludingAssessedTax.</p>
+  </div>
+  <p>
+    La trayectoria de capex es, en efecto, el hilo conductor de toda la historia reciente de la compañía: de menos de
+    $5.000 millones anuales a mediados de la década de 2010, el gasto de capital escaló a $39.200 millones en el año
+    2024, $70.100 millones en 2025 (estimado sobre la base de la guía cumplida) y ahora a un rango guiado de
+    $130.000-145.000 millones para 2026 — casi duplicando el nivel del año anterior en apenas doce meses. Es, en
+    proporción a los ingresos, una aceleración de magnitud comparable a la que atraviesa Microsoft (ver el informe de
+    MSFT de este mismo desk) y sustancialmente mayor que la de Apple, que corre en la dirección exactamente opuesta.
+  </p>
+
+  <!-- 03 -->
+  <p class="secnum" id="s03">03 — Modelo de Negocio y Segmentos</p>
+  <h2>Un negocio publicitario casi puro que financia una apuesta de hardware que todavía no rinde</h2>
+  <p>
+    Meta reporta sus resultados en dos segmentos: Family of Apps (FoA) —Facebook, Instagram, WhatsApp, Messenger y
+    Threads— y Reality Labs (RL) —hardware y software de realidad aumentada y virtual—. La concentración de ingresos en
+    FoA es prácticamente total: en el trimestre de junio de 2026, FoA generó $60.370 millones (99.3% del total) con una
+    utilidad operativa de $23.394 millones, mientras que Reality Labs facturó apenas $431 millones y perdió $4.619
+    millones a nivel operativo — una pérdida que se amplió frente a los $4.030 millones del trimestre anterior. Dentro
+    de FoA, la publicidad explica $59.363 millones (97.6% del total consolidado); los "otros ingresos" (principalmente
+    WhatsApp Business y cargos por uso de API de IA a terceros) son todavía marginales en términos absolutos ($1.007
+    millones) pero crecieron con fuerza interanual.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Segmento</th><th class="right-al">Q2 2026 (jun-26)</th><th class="right-al">% del total</th><th class="right-al">Var. YoY</th><th class="right-al">Resultado operativo</th></tr>
+    <tr><td class="label">Family of Apps</td><td class="right-al">$60.37B</td><td class="right-al">99.3%</td><td class="right-al pos">+28%</td><td class="right-al pos">+$23.39B</td></tr>
+    <tr><td class="label">&nbsp;&nbsp;de la cual, Publicidad</td><td class="right-al">$59.36B</td><td class="right-al">97.6%</td><td class="right-al pos">+27%</td><td class="right-al">—</td></tr>
+    <tr><td class="label">Reality Labs</td><td class="right-al">$0.43B</td><td class="right-al">0.7%</td><td class="right-al pos">+16%</td><td class="right-al neg">&minus;$4.62B</td></tr>
+    <tr class="total"><td class="label">Total</td><td class="right-al">$60.80B</td><td class="right-al">100%</td><td class="right-al pos">+28%</td><td class="right-al">$18.78B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 8-K, Exhibit 99.1 (comunicado de resultados oficial Q2 2026), publicado 29-jul-2026. Segment Information.</p>
+  <div class="chartbox">
+    <canvas id="segmentChart" height="280"></canvas>
+    <p class="chartcap">Ingresos por segmento, Q2 2026 (trimestre cerrado 30-jun-2026). Escala ilustra la concentración casi total en Family of Apps.</p>
+  </div>
+  <p>
+    El motor publicitario se explica por dos palancas que la compañía reporta de forma separada y que, en este
+    trimestre, se movieron ambas en la misma dirección: el volumen de impresiones de anuncios entregadas creció 14%
+    interanual, y el precio promedio por anuncio subió 12% interanual — la combinación implica que Meta está vendiendo
+    más inventario publicitario y cobrando más por cada unidad al mismo tiempo, sin que una palanca compense una
+    debilidad en la otra, como ocurrió en distintos trimestres de 2022-2023. Family daily active people (DAP) llegó a
+    3.600 millones en promedio para junio de 2026 (+3% interanual) — un ritmo de crecimiento de usuarios mucho más
+    lento que el de ingresos, lo que confirma que el crecimiento de este trimestre es explicado casi en su totalidad
+    por monetización (precio y densidad publicitaria), no por adquisición de nuevos usuarios.
+  </p>
+  <div class="chartbox">
+    <canvas id="geoChart" height="260"></canvas>
+    <p class="chartcap">Impresiones de anuncios vs. precio por anuncio, variación interanual Q2 2026. Fuente: comunicado de resultados oficial.</p>
+  </div>
+
+  <!-- 04 -->
+  <p class="secnum" id="s04">04 — Desarrollos Recientes y Perspectiva</p>
+  <h2>Cuatro frentes que van a definir los próximos trimestres</h2>
+  <h3>La apuesta de capex: de $70.100 millones a $130.000-145.000 millones en un año</h3>
+  <p>
+    El desarrollo más relevante del reporte del 29-jul-2026 no es una cifra de ingresos sino una decisión de capital:
+    Meta amplió el piso de su guía de capex 2026 a $130.000 millones (desde $125.000 millones), manteniendo el techo en
+    $145.000 millones — casi duplicando el capex de 2025. El propio comunicado reconoce que la porción del gasto
+    ejecutado en el trimestre ($31.080 millones, incluyendo pagos de arrendamientos financieros) ya casi duplicó al
+    del mismo trimestre del año anterior, y dejó el flujo de caja operativo apenas por encima del capex — de ahí el
+    colapso del flujo de caja libre a $784 millones. El mercado, a diferencia de lo ocurrido con el reporte de Azure de
+    Microsoft (ver el informe de MSFT de este desk, donde el mercado premió una guía de capex igualmente agresiva),
+    castigó a Meta con una caída de casi 12% — la diferencia central es que Microsoft mostró una aceleración de
+    ingresos de nube (Azure) directamente atribuible al capex, mientras que en Meta el vínculo entre el capex de IA y
+    un ingreso incremental específico todavía no está tan claramente evidenciado más allá de la mejora general del
+    sistema de anuncios.
+  </p>
+  <h3>Zuckerberg insinúa un negocio de cómputo en la nube</h3>
+  <p>
+    En la conference call del 29-jul-2026, Mark Zuckerberg reconoció públicamente que la compañía recibe
+    <em>"muchas ofertas por cómputo a un precio significativamente por encima de lo que pagamos por él"</em> y
+    confirmó la intención de entrar al negocio de cómputo en la nube — aunque lo encuadró como secundario frente al
+    desarrollo de servicios propios de IA, advirtiendo que <em>"sería una tontería simplemente vender todo el cómputo y
+    quedarse con una ganancia de corto plazo"</em> en lugar de capturar el margen más alto de vender "inteligencia" (
+    servicios de IA) en vez de cómputo crudo. Es la primera vez que la compañía reconoce en público la opcionalidad de
+    monetizar el exceso de capacidad de su infraestructura de datacenters — una fuente de ingresos que, de
+    concretarse, no está incorporada en ninguna de las cuatro metodologías de valuación de este informe (Sección 14).
+  </p>
+  <h3>La estrategia de monetización de IA: sistema de anuncios, agentes, y un asistente "misterioso"</h3>
+  <p>
+    Meta describió una estrategia de monetización de IA en capas: un sistema de anuncios mejorado (con una mejora de
+    conversión de 15.7% atribuida a modelos de IA generativa aplicados a segmentación y creatividad publicitaria),
+    agentes de atención al cliente para millones de pequeñas y medianas empresas, una API para acceso a sus modelos
+    Llama, y un cuarto producto —un asistente personal disponible las 24 horas— sobre el que la compañía deliberadamente
+    ofreció poca transparencia en la call. La adquisición de Scale AI y la contratación de Alexandr Wang (Sección 02)
+    para liderar el laboratorio de "superinteligencia" son la apuesta organizacional detrás de esta estrategia.
+  </p>
+  <h3>Reducción de personal y cargos legales: dos golpes puntuales al margen, no necesariamente recurrentes</h3>
+  <p>
+    Los $1.180 millones de indemnizaciones responden a una reducción de aproximadamente 8.000 puestos anunciada en
+    mayo de 2026, en el marco de un giro corporativo hacia la priorización de IA — la mayoría de esas personas todavía
+    figuraban en el headcount reportado al cierre del trimestre (75.472, -1% interanual) pero dejarán de estarlo hacia
+    el cierre del tercer trimestre de 2026. Los $2.400 millones de cargos por procesos legales no fueron detallados por
+    la compañía en el comunicado de resultados — una falta de transparencia que este informe señala explícitamente
+    como límite (Sección 14) — y la compañía advirtió en su propia guía que "continúa monitoreando asuntos legales y
+    regulatorios activos que podrían impactar significativamente" sus resultados, mencionando puntualmente juicios
+    vinculados a seguridad infantil programados para 2026 en EE.UU. que "podrían resultar en una pérdida material".
+  </p>
+
+  <!-- 05 -->
+  <p class="secnum" id="s05">05 — Estados Financieros</p>
+  <h2>Los últimos dos trimestres reportados, línea por línea</h2>
+  <p>
+    La comparación entre el primer y el segundo trimestre de 2026 muestra con claridad dónde golpeó el trimestre: los
+    ingresos crecieron trimestre a trimestre (de $56.311 a $60.801 millones) y el negocio publicitario mantuvo su
+    ritmo, pero el margen operativo cayó de 40.6% a 30.9% por la combinación de cargos legales, indemnizaciones, y un
+    gasto de I+D que saltó a 35.6% de los ingresos (desde 31.4% en el primer trimestre) — el nivel más alto en varios
+    años, reflejo del gasto creciente en Meta Superintelligence Labs y en infraestructura de modelos.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Q1 2026 (mar-26)</th><th class="right-al">Q2 2026 (jun-26)</th><th class="right-al">TTM (a jun-26)</th></tr>
+    <tr><td class="label">Ingresos totales</td><td class="right-al">$56.31B</td><td class="right-al">$60.80B</td><td class="right-al">$228.25B</td></tr>
+    <tr><td class="label">Var. interanual</td><td class="right-al pos">+33%</td><td class="right-al pos">+28%</td><td class="right-al">—</td></tr>
+    <tr><td class="label">Utilidad operativa</td><td class="right-al">$22.87B</td><td class="right-al">$18.78B</td><td class="right-al">$86.93B</td></tr>
+    <tr><td class="label">Margen operativo</td><td class="right-al">40.6%</td><td class="right-al">30.9%</td><td class="right-al">38.1%</td></tr>
+    <tr><td class="label">Utilidad neta</td><td class="right-al">$26.77B</td><td class="right-al">$15.85B</td><td class="right-al">$68.10B</td></tr>
+    <tr><td class="label">EPS diluido</td><td class="right-al">$10.44</td><td class="right-al">$6.18</td><td class="right-al">$26.54</td></tr>
+    <tr><td class="label">Var. EPS interanual</td><td class="right-al pos">+62%</td><td class="right-al neg">-13%</td><td class="right-al">—</td></tr>
+    <tr><td class="label">Gasto en I+D</td><td class="right-al">$17.70B</td><td class="right-al">$21.66B</td><td class="right-al">n/a</td></tr>
+    <tr><td class="label">I+D como % de ingresos</td><td class="right-al">31.4%</td><td class="right-al">35.6%</td><td class="right-al">—</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL (10-Q Q1 2026, Q1 2025) y Form 8-K Exhibit 99.1 (Q2 2026), publicado 29-jul-2026. TTM = suma de los cuatro trimestres móviles más recientes (Q3+Q4 2025 + Q1+Q2 2026).</p>
+  <p>
+    El salto de EPS diluido de $10.44 en el primer trimestre a $6.18 en el segundo —una caída de 41% trimestre a
+    trimestre— es prácticamente en su totalidad atribuible a los $2.400 millones de cargos legales y $1.180 millones de
+    indemnizaciones reconocidos en el segundo trimestre, más un aumento real y sostenido del gasto en I+D. Vale la pena
+    remarcar que el EPS TTM de $26.54 usado como base de valuación en este informe está adicionalmente distorsionado a
+    la baja por un cargo impositivo puntual de gran magnitud en el tercer trimestre de 2025 (net income de solo $2.709
+    millones ese trimestre, muy por debajo del run-rate trimestral normal de la compañía) — dos elementos no
+    recurrentes que, combinados, hacen que el P/E TTM (Sección 08) luzca más comprimido de lo que un run-rate
+    "limpio" probablemente mostraría.
+  </p>
+  <div class="chartbox">
+    <canvas id="marginChart" height="260"></canvas>
+    <p class="chartcap">Margen operativo trimestral, últimos 4 trimestres reportados. Fuente: SEC EDGAR XBRL / Form 8-K.</p>
+  </div>
+
+  <!-- 06 -->
+  <p class="secnum" id="s06">06 — Deuda y Balance</p>
+  <h2>Un balance que sigue en caja neta positiva, pero con apalancamiento en aumento acelerado</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica (al 30 jun 2026)</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Efectivo y equivalentes</td><td class="right-al">$15.46B</td></tr>
+    <tr><td class="label">Inversiones de corto plazo (marketable securities)</td><td class="right-al">$74.80B</td></tr>
+    <tr class="total"><td class="label">Posición total de caja e inversiones</td><td class="right-al">$90.26B</td></tr>
+    <tr><td class="label">Deuda de largo plazo</td><td class="right-al">$83.66B</td></tr>
+    <tr class="total"><td class="label">Caja neta (posición neta de deuda)</td><td class="right-al pos">+$6.60B</td></tr>
+    <tr><td class="label">Activos totales</td><td class="right-al">$449.96B</td></tr>
+    <tr><td class="label">Pasivos totales</td><td class="right-al">$188.74B</td></tr>
+    <tr><td class="label">Patrimonio neto (equity)</td><td class="right-al">$261.22B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 8-K, Exhibit 99.1 (Q2 2026), Condensed Consolidated Balance Sheets al 30-jun-2026.</p>
+  <p>
+    Meta sostiene una posición de caja neta positiva de $6.6 mil millones, pero la tendencia es la que hay que
+    seguir de cerca: la deuda de largo plazo saltó de $58.7 mil millones a fines de 2025 a $83.7 mil millones al cierre
+    de este trimestre — un aumento de $25.0 mil millones en un solo trimestre, explicado por una nueva emisión de deuda
+    de $24.9 mil millones que la compañía tomó explícitamente para financiar el capex. Property and equipment neto
+    saltó de $176.4 mil millones a $225.7 mil millones en apenas seis meses (+27.9%) — el reflejo contable directo de
+    la construcción acelerada de datacenters. Ninguna de estas cifras representa, todavía, un riesgo de solvencia: el
+    patrimonio neto de $261.2 mil millones es más de tres veces la deuda total, y el ritmo de emisión de deuda es una
+    elección deliberada de financiamiento (para no vender activos líquidos ni frenar recompras), no una señal de
+    estrés. Pero es la primera vez en varios años que Meta recurre al mercado de deuda en esta magnitud, y es una
+    variable a monitorear en los próximos trimestres si el capex sigue esa trayectoria.
+  </p>
+
+  <!-- 07 -->
+  <p class="secnum" id="s07">07 — Flujo de Caja y Capital Allocation</p>
+  <h2>El flujo de caja libre casi desaparece — la variable central de la tesis de corto plazo</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Q2 2025</th><th class="right-al">Q2 2026</th><th class="right-al">Var.</th></tr>
+    <tr><td class="label">Flujo de caja operativo (OCF)</td><td class="right-al">$25.56B</td><td class="right-al">$31.86B</td><td class="right-al pos">+24.7%</td></tr>
+    <tr><td class="label">Capex (incl. pagos de leasing financiero)</td><td class="right-al">$17.01B</td><td class="right-al">$31.08B</td><td class="right-al neg">+82.7%</td></tr>
+    <tr class="total"><td class="label">Flujo de caja libre (FCF)</td><td class="right-al">$8.55B</td><td class="right-al">$0.78B</td><td class="right-al neg">-90.8%</td></tr>
+    <tr><td class="label">Margen de FCF sobre ingresos</td><td class="right-al">18.0%</td><td class="right-al">1.3%</td><td class="right-al neg">—</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR Form 8-K, Exhibit 99.1, Reconciliation of GAAP to Non-GAAP Results, trimestres cerrados 30-jun-2025 y 30-jun-2026.</p>
+  <p>
+    Un margen de FCF de apenas 1.3% —contra 18.0% en el mismo trimestre del año anterior— es la cifra que más pesó en
+    la reacción negativa del mercado. A diferencia de Microsoft, donde el propio DCF de este desk proyecta flujo de
+    caja libre negativo recién en el año 1 de la proyección (Sección 13 del informe de MSFT), en Meta el deterioro ya
+    ocurrió en el trimestre reportado, no en un escenario futuro. La compañía no recompró acciones en el trimestre
+    (frente a $10.167 millones de recompras en el mismo trimestre de 2025) — la primera señal concreta de que la
+    propia empresa está privilegiando preservar caja frente a devolver capital, mientras sostiene el pago de
+    dividendos ($1.353 millones en el trimestre).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Compañía</th><th class="right-al">Capex 2026 (guía o consenso)</th></tr>
+    <tr class="total"><td class="label">Meta (META)</td><td class="right-al">$130-145B guiado (ampliado desde $125-145B)</td></tr>
+    <tr><td class="label">Microsoft (MSFT)</td><td class="right-al">$255-260B guiado (FY2027)</td></tr>
+    <tr><td class="label">Alphabet (GOOGL)</td><td class="right-al">hasta $205B (guía 2026 elevada)</td></tr>
+    <tr><td class="label">Amazon (AMZN)</td><td class="right-al">&gt;$200B (consenso 2026)</td></tr>
+    <tr><td class="label">Apple (AAPL)</td><td class="right-al">~$13-14B (FY26)</td></tr>
+  </table></div>
+  <p class="footnote">Fuentes: comunicados oficiales de cada compañía y los informes de AAPL/MSFT de este mismo desk. Cifras de pares con distinto grado de precisión y ventanas temporales (año fiscal vs. calendario).</p>
+  <div class="chartbox">
+    <canvas id="capexChart" height="280"></canvas>
+    <p class="chartcap">Capex 2026 guiado por compañía (piso del rango cuando aplica) — Meta ya no es la mega-cap con menor capex relativo, ese lugar lo ocupa únicamente Apple. Escala logarítmica.</p>
+  </div>
+  <p>
+    Meta se ubica en un punto intermedio del panel de mega-caps: su capex guiado ($130-145 mil millones) es menor
+    en términos absolutos al de Microsoft, Alphabet o Amazon, pero representa una proporción de ingresos comparable o
+    mayor, porque la base de ingresos de Meta ($228 mil millones TTM) es sustancialmente menor a la de esos tres pares.
+    Es, junto con Microsoft, la compañía del panel donde el mercado más rápido empezó a exigir evidencia concreta de
+    monetización a cambio de sostener el múltiplo — la caída de casi 12% del día siguiente al reporte es la prueba más
+    directa de ese cambio de humor.
+  </p>
+
+  <!-- 08 -->
+  <p class="secnum" id="s08">08 — Comparables de Industria</p>
+  <h2>META frente a las otras cuatro "mega caps" de tecnología</h2>
+  <p>
+    Meta comparte con Alphabet el modelo de negocio más parecido dentro del panel de mega-caps: publicidad digital
+    financiando una apuesta de infraestructura de IA. Con Microsoft y Amazon comparte la escala del capex y la
+    narrativa de monetización vía nube/IA, aunque Meta no vende cómputo a terceros (todavía — ver Sección 04). Con
+    Apple comparte poco del modelo de negocio, pero es el contraste más citado en este desk sobre filosofías opuestas
+    de asignación de capital frente a la misma ola tecnológica.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Ticker</th><th class="right-al">P/E TTM</th><th class="right-al">P/E Forward</th></tr>
+    <tr class="total"><td class="label">META</td><td class="right-al">20.1x*</td><td class="right-al">17.8x**</td></tr>
+    <tr><td class="label">AAPL</td><td class="right-al">40.1x</td><td class="right-al">33.2x</td></tr>
+    <tr><td class="label">MSFT</td><td class="right-al">25.2x</td><td class="right-al">27.0x</td></tr>
+    <tr><td class="label">GOOGL</td><td class="right-al">16.0x***</td><td class="right-al">24.1x</td></tr>
+    <tr><td class="label">AMZN</td><td class="right-al">29.3x</td><td class="right-al">29.3x</td></tr>
+  </table></div>
+  <p class="footnote">*El P/E TTM de META está distorsionado a la baja por el cargo impositivo puntual de Q3 2025 (Sección 05) — sobre una base normalizada, sería más alto. **El P/E forward usa el consenso de EPS FY2026 pre-reporte (~$30.00), que casi con certeza será revisado a la baja tras el miss de este trimestre — ver Sección 12. ***El P/E TTM de GOOGL está distorsionado al alza por una ganancia no operativa puntual. El P/E forward de MSFT (27.0x) depende a su vez de un consenso de EPS FY2027 ($16.71) que el informe de MSFT de este desk ya señaló como desactualizado — ver Sección 12 de ese informe. El P/E de AMZN (29.3x TTM y forward) es una aproximación heredada del panel de comparables del informe de MSFT, no verificada en tiempo real. Fuente: cálculo propio sobre precios de cierre del 30-jul-2026 (META $534.72, AAPL $331.50, MSFT $451.58, GOOGL $333.53, AMZN $238.43) y EPS TTM/forward de cada informe de este desk.</p>
+  <div class="chartbox">
+    <canvas id="compsChart" height="280"></canvas>
+    <p class="chartcap">P/E TTM comparado — META cotiza con el múltiplo TTM más bajo del panel, aunque parte de esa compresión responde a distorsiones puntuales (Q3 2025) más que a una revalorización estructural a la baja.</p>
+  </div>
+
+  <h3>Alphabet (GOOGL) — el comparable más directo, y el que ya atravesó este mismo castigo de mercado</h3>
+  <p>
+    Alphabet elevó su guía de capex 2026 a un rango de hasta $205 mil millones (desde $180-190 mil millones) y la
+    acción cayó tras el anuncio — el mismo patrón que Meta acaba de repetir, con meses de diferencia. Es la referencia
+    más cercana disponible sobre cuánto tiempo le toma al mercado empezar a "perdonar" el capex si la monetización
+    (Google Cloud, en ese caso) se sostiene en los trimestres siguientes.
+  </p>
+  <h3>Microsoft (MSFT) — capex todavía mayor, pero con RPO comercial que documenta demanda contratada</h3>
+  <p>
+    Microsoft guio un capex de $255-260 mil millones para FY2027 —más del doble, en términos absolutos, que el techo
+    de la guía de Meta— pero acompañó ese anuncio con un RPO comercial de $678 mil millones (+84% interanual), una
+    métrica que documenta demanda contratada de forma mucho más explícita que cualquier cosa que Meta haya reportado
+    hasta ahora. Es, en nuestra lectura, la principal razón cualitativa por la que el mercado premió a Microsoft (+9%
+    tras su reporte) y castigó a Meta (-12%) por decisiones de capital de una magnitud similar en espíritu.
+  </p>
+  <h3>Amazon (AMZN) — el mismo orden de magnitud de capex, con AWS como ancla de monetización visible</h3>
+  <p>
+    Amazon combina un capex 2026 consensuado por encima de $200 mil millones con AWS, un negocio de nube que ya factura
+    de forma independiente y visible para el mercado — a diferencia de Meta, que no vende cómputo a terceros (aunque
+    Zuckerberg abrió esa puerta en la call de este trimestre, Sección 04).
+  </p>
+  <h3>Apple (AAPL) — el contra-ejemplo que sigue cotizando con la prima más alta del panel</h3>
+  <p>
+    Apple invierte apenas ~$13-14 mil millones de capex anual, una fracción de lo que gasta Meta en un solo trimestre,
+    y sin embargo cotiza al múltiplo TTM más alto del panel (40.1x). El informe de AAPL de este mismo desk desarrolla
+    esa tesis en profundidad — la comparación con Meta es, en esencia, la misma tensión que con Microsoft: el mercado
+    todavía no decidió de forma consistente si prefiere pagar una prima por no gastar en IA (Apple) o exigir pruebas de
+    monetización antes de premiar a quien sí gasta (Meta, por ahora).
+  </p>
+
+  <!-- 09 -->
+  <p class="secnum" id="s09">09 — Gobierno Corporativo y Estructura Accionaria</p>
+  <h2>Una compañía de fundador-controlador, a diferencia del resto del panel</h2>
+  <p>
+    A diferencia de Apple y Microsoft —ambas de propiedad institucional dispersa (Sección 09 de esos informes)— Meta
+    es, todavía, una compañía controlada por su fundador. Mark Zuckerberg posee aproximadamente 13% del capital
+    económico total de la compañía, pero controla cerca del 61% del poder de voto gracias a una estructura accionaria
+    dual: las acciones Clase B (que Zuckerberg posee casi en su totalidad) tienen diez votos cada una, contra un voto
+    por acción Clase A. En la práctica, ninguna decisión que se someta a votación de accionistas puede aprobarse contra
+    la voluntad de Zuckerberg, incluida la composición del propio directorio.
+  </p>
+  <div class="govrow">
+    <div class="govcell"><div class="k">Ownership económico de Zuckerberg</div><div class="v">~13%</div><div class="sub">Vía ~341.8 millones de acciones Clase B (99.7% de esa clase) más ~1.5 millones de acciones Clase A.</div></div>
+    <div class="govcell"><div class="k">Poder de voto de Zuckerberg</div><div class="v">~61%</div><div class="sub">Estructura dual: Clase B con 10 votos por acción vs. 1 voto por acción Clase A — control unilateral de facto sobre cualquier votación.</div></div>
+    <div class="govcell"><div class="k">Directorio 2026</div><div class="v">15 nominados</div><div class="sub">Asamblea anual del 27-may-2026; Dina Powell McCormick, Hock E. Tan y Tracey T. Travis dejan el directorio.</div></div>
+    <div class="govcell"><div class="k">Compensación CEO (FY2025)</div><div class="v">$25.1M</div><div class="sub">Zuckerberg recibe $1 de salario, sin bono ni equity nuevo — el total responde casi en su totalidad a su programa de seguridad personal y uso de aviones privados.</div></div>
+    <div class="govcell"><div class="k">Bono de otros ejecutivos</div><div class="v">75% &rarr; 200%</div><div class="sub">El comité de compensación elevó el bono objetivo de los demás altos ejecutivos de 75% a 200% del salario base a partir del período 2025.</div></div>
+    <div class="govcell"><div class="k">CEO / Chairman</div><div class="v">Mark Zuckerberg</div><div class="sub">CEO desde 2004, chairman del directorio — sin sucesión en curso, a diferencia de Apple.</div></div>
+  </div>
+  <p class="footnote">Fuentes: SEC EDGAR (Form DEF 14A, abr-2026), LegalClarity, RankRed, CEOPayWatch, The Register.</p>
+  <p>
+    El contraste con el resto del panel de comparables es el punto central de esta sección: en Apple y Microsoft, las
+    decisiones de capital allocation (capex, recompras, dividendos) responden a la disciplina fiduciaria de un
+    directorio hacia accionistas institucionales dispersos. En Meta, esas mismas decisiones —incluida la de casi
+    duplicar el capex en doce meses, o la de invertir $14.300 millones en Scale AI— responden en última instancia a un
+    solo individuo con control de voto efectivamente absoluto. No es, en sí mismo, ni una señal positiva ni negativa
+    para la tesis; es un dato estructural que cambia la naturaleza del riesgo de gobernanza: no hay riesgo de disputa
+    de control accionario, pero tampoco hay un mecanismo de accountability externo que pueda frenar una decisión de
+    capital si el mercado la considera equivocada.
+  </p>
+
+  <!-- 10 -->
+  <p class="secnum" id="s10">10 — Registro de Riesgos</p>
+  <h2>Qué podría cambiar esta lectura</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Riesgo</th><th>Descripción</th><th class="right-al">Severidad</th></tr>
+    <tr><td class="label">FCF colapsado</td><td class="label">El margen de FCF cayó a 1.3% este trimestre (desde 18.0% un año atrás); si el capex sigue escalando al ritmo guiado sin que la monetización de IA se documente con la misma claridad que en Microsoft (RPO) o Amazon (AWS), el FCF podría volverse negativo en trimestres futuros.</td><td class="right-al">Alta</td></tr>
+    <tr><td class="label">Cargos legales no detallados</td><td class="label">Los $2.400 millones de cargos por procesos legales de este trimestre no fueron explicados por la compañía — un riesgo de que se repitan cargos de magnitud similar sin previsibilidad para el modelo.</td><td class="right-al">Media-Alta</td></tr>
+    <tr><td class="label">Litigios de seguridad infantil</td><td class="label">La propia compañía advirtió en su guía sobre juicios programados para 2026 en EE.UU. vinculados a seguridad infantil que "podrían resultar en una pérdida material" — lenguaje inusualmente directo para una guía corporativa.</td><td class="right-al">Media-Alta</td></tr>
+    <tr><td class="label">Reality Labs sin punto de equilibrio a la vista</td><td class="label">Pérdida operativa de $4.62 mil millones en el trimestre, ampliándose respecto del trimestre anterior, sin guidance de la compañía sobre una fecha de breakeven.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Apalancamiento en aumento acelerado</td><td class="label">La deuda de largo plazo saltó 42.5% en un solo trimestre ($58.7B a $83.7B) para financiar capex — todavía manejable, pero es una tendencia nueva que no existía hace doce meses.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Monetización de IA no comprobada más allá de publicidad</td><td class="label">Agentes de atención al cliente, API de Llama y el asistente personal "misterioso" no tienen todavía una cifra de ingresos reportada de forma separada — es una promesa, no un resultado, según la propia compañía reconoció en la call.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Apelación de la FTC</td><td class="label">Meta ganó el juicio antitrust sobre Instagram/WhatsApp en noviembre de 2025, pero la FTC declaró que estaba "revisando todas sus opciones" — una apelación reabriría la incertidumbre regulatoria más severa que enfrentó la compañía.</td><td class="right-al">Baja-Media</td></tr>
+    <tr><td class="label">Balance y solvencia</td><td class="label">Caja neta todavía positiva (+$6.6B) y patrimonio neto de $261.2B — el apalancamiento no es, al momento de este informe, un riesgo de solvencia.</td><td class="right-al">Baja</td></tr>
+  </table></div>
+
+  <!-- 11 -->
+  <p class="secnum" id="s11">11 — Catalizadores</p>
+  <h2>Agenda de eventos relevantes</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Fecha</th><th>Evento</th></tr>
+    <tr><td class="label">29 Jul 2026</td><td class="label">Resultados Q2 2026 — revenue +28%, EPS -13% por cargos legales y severance, capex 2026 ampliado a $130-145B. Punto de partida de este informe.</td></tr>
+    <tr><td class="label">Oct 2026 (estimado)</td><td class="label">Resultados Q3 2026 — primera lectura de si el FCF empieza a recuperarse o si la compresión se sostiene; guía ya publicada de ingresos $61-64B.</td></tr>
+    <tr><td class="label">En curso</td><td class="label">Juicios de seguridad infantil programados en EE.UU. durante 2026 — la compañía advirtió explícitamente sobre riesgo de pérdida material.</td></tr>
+    <tr><td class="label">En curso, sin fecha fija</td><td class="label">Definición de la estrategia de cómputo en la nube insinuada por Zuckerberg — cualquier anuncio formal sería el primer dato duro sobre una fuente de ingresos todavía no incorporada en la valuación.</td></tr>
+    <tr><td class="label">En curso, sin fecha fija</td><td class="label">Decisión de la FTC sobre si apela el fallo de noviembre de 2025 que favoreció a Meta en el caso antitrust de Instagram/WhatsApp.</td></tr>
+    <tr><td class="label">Continuo</td><td class="label">Evolución trimestre a trimestre de impresiones (+14%) y precio por anuncio (+12%) — las dos palancas que explican la totalidad del crecimiento reciente.</td></tr>
+  </table></div>
+
+  <!-- 12 -->
+  <p class="secnum" id="s12">12 — Modelo Financiero Proyectado y Momentum de Estimados</p>
+  <h2>Cómo vino el consenso vs. lo reportado, y por qué el forward EPS es la variable más frágil de este informe</h2>
+  <p>
+    Antes de construir nuestra propia proyección en la Sección 13, vale la pena mostrar la magnitud del miss del
+    trimestre frente al consenso pre-reporte — y ser explícitos sobre qué de lo que sigue es consenso real y qué pasa
+    a ser supuesto propio de este informe.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica — Q2 2026</th><th class="right-al">Consenso pre-reporte</th><th class="right-al">Real (reportado)</th><th class="right-al">Sorpresa</th></tr>
+    <tr><td class="label">Ingresos</td><td class="right-al">$60.20B</td><td class="right-al">$60.80B</td><td class="right-al pos">+1.0%</td></tr>
+    <tr><td class="label">EPS diluido</td><td class="right-al">$7.14 - $7.23</td><td class="right-al">$6.18</td><td class="right-al neg">-13.4% a -14.5%</td></tr>
+  </table></div>
+  <p class="footnote">Consenso pre-reporte: agregado de Alphastreet/IG International/S&amp;P Global, jul-2026. Real: SEC EDGAR Form 8-K, Exhibit 99.1, publicado 29-jul-2026.</p>
+  <div class="chartbox">
+    <canvas id="revisionChart" height="220"></canvas>
+    <p class="chartcap">EPS diluido: consenso pre-reporte (punto medio) vs. resultado real del trimestre.</p>
+  </div>
+  <p>
+    Un beat de ingresos modesto (+1.0%) combinado con un miss de EPS de más de 13% es una combinación relativamente
+    inusual — normalmente refleja, como en este caso, que el problema no estuvo en la demanda del negocio sino en
+    partidas de costos que el consenso no pudo anticipar (cargos legales no anunciados previamente, severance de una
+    decisión de headcount ya conocida pero cuyo costo exacto no estaba en los modelos). El consenso de EPS forward
+    para el año completo 2026 (~$30.00 antes de este reporte, con estimaciones individuales entre $29.65 y $32) fue
+    fijado semanas o meses antes de este resultado y, con alta probabilidad, todavía no incorpora ni el miss de este
+    trimestre ni la guía ampliada de gastos totales 2026 ($165-169 mil millones). De hecho, al menos siete casas de
+    research (Wells Fargo, Cantor Fitzgerald, DA Davidson, Barclays, Bank of America, Citi y Morgan Stanley) ya
+    recortaron su precio objetivo la misma noche del reporte — la señal más concreta disponible de que el consenso
+    numérico todavía no se movió, aunque el consenso cualitativo (vía precio objetivo) ya empezó a hacerlo.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Casa de research</th><th class="right-al">Precio objetivo anterior</th><th class="right-al">Precio objetivo nuevo</th></tr>
+    <tr><td class="label">Wells Fargo</td><td class="right-al">$835</td><td class="right-al">$640</td></tr>
+    <tr><td class="label">Cantor Fitzgerald</td><td class="right-al">$770</td><td class="right-al">$680</td></tr>
+    <tr><td class="label">DA Davidson</td><td class="right-al">$850</td><td class="right-al">$700</td></tr>
+    <tr><td class="label">Barclays</td><td class="right-al">$830</td><td class="right-al">$780</td></tr>
+    <tr><td class="label">Bank of America</td><td class="right-al">$835</td><td class="right-al">$810</td></tr>
+    <tr><td class="label">Citi</td><td class="right-al">$850</td><td class="right-al">$800</td></tr>
+    <tr><td class="label">Morgan Stanley</td><td class="right-al">$775 (mantenido)</td><td class="right-al">$775</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: agregación de casas de research vía cobertura de prensa financiera (24/7 Wall St., TradingKey, CNBC), 29/30-jul-2026. Lista no exhaustiva — solo incluye firmas con cambio de precio objetivo confirmado en fuentes públicas al momento de este informe.</p>
+  <p>
+    Es, en nuestra lectura, el dato más honesto disponible sobre hacia dónde se dirige el consenso: el promedio simple
+    de estos siete precios objetivo ya revisados es de aproximadamente $740 — todavía por encima del precio de
+    mercado ($534.72), pero sensiblemente por debajo tanto del consenso pre-reporte ($826-843, Sección 13) como del
+    fair value que arrojan los métodos de comparables y reversión histórica de este informe, que todavía usan el EPS
+    forward pre-miss. Tratamos esto como una advertencia explícita, no como un ajuste que hagamos por nuestra cuenta al
+    consenso: usamos el número pre-reporte porque es el único con base pública verificable, pero el lector debe leer
+    los métodos 2 y 3 de la Sección 13 sabiendo que probablemente sobreestiman el fair value.
+  </p>
+
+  <!-- 13 — VALUACIÓN, AL FINAL -->
+  <p class="secnum" id="s13">13 — Valuación: Cuatro Métodos y el Fair Value</p>
+  <h2>Cuánto vale la acción, mirado desde cuatro ángulos distintos</h2>
+  <p>
+    Llegamos a la valuación después de recorrer el negocio completo a propósito: el objetivo de este informe es que el
+    lector entienda primero por qué el negocio publicitario acelera y por qué el flujo de caja libre colapsó en el
+    mismo trimestre, y recién después confronte esa realidad con lo que el mercado ya está pagando por ella.
+    Calculamos el valor razonable de la acción con cuatro enfoques independientes entre sí — flujo de caja descontado,
+    múltiplos de comparables, reversión a la media histórica propia, y el consenso de analistas de Wall Street — y
+    mostramos las cuatro cifras sin forzarlas a converger artificialmente.
+  </p>
+
+  <h3>Método 1 — Flujo de caja descontado (DCF), tres escenarios</h3>
+  <p>
+    Construimos un modelo de flujo de caja descontado a dos etapas (cinco años explícitos de proyección más valor
+    terminal por crecimiento perpetuo), partiendo de los ingresos TTM ($228.25 mil millones) y de la posición de caja
+    neta reportada al cierre del trimestre (Sección 06). Proyectamos el flujo de caja libre desagregando
+    explícitamente el margen de flujo de caja operativo del ratio de capex sobre ingresos — en vez de un solo "margen
+    de FCF" — porque la guía de capex 2026 ($130-145 mil millones) es demasiado importante para diluirla en un
+    promedio, siguiendo la misma metodología aplicada en el informe de MSFT de este desk. El WACC base se construyó
+    con una tasa libre de riesgo ancla en el rendimiento vigente del Treasury a 10 años más un premio de riesgo
+    accionario de 5.0%, con un beta cercano a 1.25 — más alto que el de Microsoft o Apple, consistente con la mayor
+    volatilidad relativa de Meta dentro del universo de mega-caps (el propio movimiento de -12% en un día es evidencia
+    directa de esa volatilidad).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Supuesto</th><th class="right-al">Bear</th><th class="right-al">Base</th><th class="right-al">Bull</th></tr>
+    <tr><td class="label">Crecimiento de ingresos (año 1 → año 5)</td><td class="right-al">16% → 6%</td><td class="right-al">20% → 10%</td><td class="right-al">24% → 13%</td></tr>
+    <tr><td class="label">Margen de OCF (año 1 → año 5)</td><td class="right-al">50% → 52%</td><td class="right-al">54% → 60%</td><td class="right-al">57% → 64%</td></tr>
+    <tr><td class="label">Capex / Ingresos (año 1 → año 5)</td><td class="right-al">55% → 35%</td><td class="right-al">50% → 25%</td><td class="right-al">45% → 18%</td></tr>
+    <tr><td class="label">WACC</td><td class="right-al">11.0%</td><td class="right-al">10.0%</td><td class="right-al">9.0%</td></tr>
+    <tr><td class="label">Crecimiento terminal</td><td class="right-al">2.5%</td><td class="right-al">3.0%</td><td class="right-al">3.5%</td></tr>
+    <tr><td class="label">FCF año 1</td><td class="right-al neg">&minus;$13.2B</td><td class="right-al pos">$11.0B</td><td class="right-al pos">$34.0B</td></tr>
+    <tr><td class="label">% del EV desde valor terminal</td><td class="right-al">87%</td><td class="right-al">85%</td><td class="right-al">86%</td></tr>
+    <tr class="total"><td class="label">Fair value por acción</td><td class="right-al">$208.93</td><td class="right-al">$688.32</td><td class="right-al">$1,338.60</td></tr>
+  </table></div>
+  <p>
+    El escenario Bear es el más severo de los tres informes de este desk publicados hasta ahora: si la monetización de
+    IA no se documenta más allá de la mejora del sistema de anuncios y el capex se mantiene elevado por más tiempo del
+    guiado, el flujo de caja libre del año 1 ya sería negativo (-$13.2 mil millones) — no por un supuesto extremo, sino
+    por extender linealmente la dinámica que ya se observó este mismo trimestre. El escenario Base asume que el capex
+    converge gradualmente desde el 50% de ingresos hacia 25% en el año 5, a medida que la inversión ya realizada
+    empieza a generar ingresos incrementales (vía el sistema de anuncios mejorado, agentes de IA, y eventualmente el
+    negocio de cómputo insinuado por Zuckerberg). El escenario Bull asume una normalización de capex más rápida (18%
+    en el año 5) combinada con una monetización de IA que se documenta con la misma claridad que el RPO comercial de
+    Microsoft. En los tres casos, 85-87% del valor de empresa proviene del valor terminal — en línea con el patrón ya
+    observado en los informes de AAPL y MSFT de este desk, y una advertencia recurrente de que estos modelos son
+    sensibles a supuestos de largo plazo más allá del horizonte explícito de 5 años.
+  </p>
+  <h3>Sensibilidad del caso Base: WACC × crecimiento terminal</h3>
+  <p>
+    Dado que 85% del valor de empresa del caso Base proviene del valor terminal, mostramos cómo se mueve el fair
+    value únicamente variando WACC y crecimiento terminal, con el resto de los inputs fijos. La celda marcada es el
+    caso Base reportado arriba ($688.32, WACC 10.0%, g 3.0%).
+  </p>
+  <div class="table-scroll"><table class="sens-table">
+    <tr><th>WACC \ g terminal</th><th class="right-al">2.0%</th><th class="right-al">2.5%</th><th class="right-al">3.0%</th><th class="right-al">3.5%</th><th class="right-al">4.0%</th></tr>
+    <tr><td class="axis">8.5%</td><td class="right-al">$776.66</td><td class="right-al">$835.46</td><td class="right-al">$904.96</td><td class="right-al">$988.35</td><td class="right-al">$1,090.27</td></tr>
+    <tr><td class="axis">9.0%</td><td class="right-al">$713.32</td><td class="right-al">$762.81</td><td class="right-al">$820.54</td><td class="right-al">$888.77</td><td class="right-al">$970.64</td></tr>
+    <tr><td class="axis">9.5%</td><td class="right-al">$658.57</td><td class="right-al">$700.68</td><td class="right-al">$749.27</td><td class="right-al">$805.95</td><td class="right-al">$872.94</td></tr>
+    <tr><td class="axis">10.0%</td><td class="right-al">$610.79</td><td class="right-al">$646.97</td><td class="right-al base-cell">$688.32</td><td class="right-al">$736.03</td><td class="right-al">$791.69</td></tr>
+    <tr><td class="axis">10.5%</td><td class="right-al">$568.75</td><td class="right-al">$600.10</td><td class="right-al">$635.63</td><td class="right-al">$676.24</td><td class="right-al">$723.09</td></tr>
+  </table></div>
+  <p class="footnote">Grilla propia, recalculando el modelo de dos etapas del caso Base (mismo crecimiento explícito, margen de OCF y capex/ingresos por año declarados arriba) para cada combinación WACC/g. La celda base ($688.32) corresponde a WACC 10.0% y g 3.0%.</p>
+  <p>
+    Incluso en la esquina más conservadora de la grilla (WACC 10.5%, g 2.0%), el DCF Base arroja $568.75 — todavía
+    por encima del precio de mercado ($534.72). Es una señal relevante: a diferencia de AAPL (donde ninguna
+    combinación razonable de la grilla cerraba la brecha con el mercado), en META la mayoría de las combinaciones
+    razonables de WACC y crecimiento terminal ya superan el precio actual, incluso antes de considerar comparables o
+    consenso. Esto no es evidencia de que el mercado esté equivocado — es evidencia de que el precio actual ya
+    descuenta un escenario más cercano al Bear de lo que este modelo considera el caso central.
+  </p>
+
+  <h3>Método 2 — Múltiplos de comparables</h3>
+  <p>
+    Usamos el EPS forward de consenso FY2026 (~$30.00 — con la salvedad extensa de la Sección 12 sobre su antigüedad
+    y probable revisión a la baja) y le aplicamos el P/E forward promedio de los cuatro comparables de la Sección 08
+    (Apple, Microsoft, Alphabet, Amazon: 28.4x promedio).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Múltiplo P/E forward aplicado</th><th class="right-al">Precio implícito</th></tr>
+    <tr><td class="label">24.1x (piso del panel, GOOGL)</td><td class="right-al">$723.00</td></tr>
+    <tr><td class="label">27.0x (MSFT)</td><td class="right-al">$810.00</td></tr>
+    <tr class="total"><td class="label">28.4x (promedio de los 4 comparables)</td><td class="right-al">$852.00</td></tr>
+    <tr><td class="label">29.3x (AMZN)</td><td class="right-al">$879.00</td></tr>
+    <tr><td class="label">33.2x (techo del panel, AAPL)</td><td class="right-al">$996.00</td></tr>
+  </table></div>
+  <p>
+    Tomamos $852.00 (el promedio del panel de 4 comparables) como el resultado de este método — el más expuesto, de
+    los tres métodos numéricos, a la fragilidad del EPS forward de consenso señalada en la Sección 12. Si el consenso
+    FY2026 se revisa un 10% a la baja tras este reporte (un ajuste moderado dado un miss de 13-14% en el trimestre),
+    este método arrojaría en cambio un fair value cercano a $767 — todavía holgadamente por encima del mercado, pero
+    materialmente menor al número que estamos reportando como resultado formal del método.
+  </p>
+
+  <h3>Método 3 — Reversión a la media histórica propia</h3>
+  <p>
+    Preguntamos a qué múltiplo cotizó la propia acción en promedio durante la última década, y qué precio resultaría
+    de aplicar ese múltiplo histórico al EPS forward de consenso. El P/E promedio de META de los últimos 5 años es
+    26.46x; el de los últimos 10 años, 27.87x — ambos por encima del P/E TTM actual de 20.1x (Sección 08), que está
+    distorsionado a la baja por el cargo impositivo puntual de Q3 2025 (Sección 05).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Referencia histórica</th><th class="right-al">Múltiplo</th><th class="right-al">Precio implícito (sobre EPS fwd. $30.00)</th></tr>
+    <tr><td class="label">Promedio 10 años</td><td class="right-al">27.87x</td><td class="right-al">$836.10</td></tr>
+    <tr class="total"><td class="label">Promedio 5 años</td><td class="right-al">26.46x</td><td class="right-al">$793.80</td></tr>
+  </table></div>
+  <p class="footnote">P/E históricos: fullratio.com, financecharts.com, GuruFocus (jul-2026). EPS forward: consenso FY2026 (ver Método 2 y salvedad extensa de Sección 12).</p>
+  <p>
+    Tomamos el promedio de los dos (~$814.95) como el resultado de este método. Como el Método 2, depende del mismo
+    EPS forward de consenso pre-miss — la misma salvedad aplica en la misma dirección.
+  </p>
+
+  <h3>Método 4 — Consenso de Wall Street</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Analistas cubriendo META (pre-reporte)</td><td class="right-al">63-72</td></tr>
+    <tr><td class="label">Calificación consenso (pre-reporte)</td><td class="right-al">Strong Buy</td></tr>
+    <tr class="total"><td class="label">Precio objetivo promedio (pre-reporte)</td><td class="right-al">$826 - $843</td></tr>
+    <tr><td class="label">Promedio simple de 7 precios objetivo ya revisados post-reporte</td><td class="right-al">~$740</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: S&amp;P Global / stockanalysis.com (consenso pre-reporte, jul-2026); 24/7 Wall St. / TradingKey / CNBC (revisiones post-reporte, 29/30-jul-2026, ver tabla completa en Sección 12).</p>
+  <p>
+    A diferencia de los Métodos 2 y 3, acá sí podemos mostrar directamente la dirección de la revisión: el consenso
+    pre-reporte ($826-843) y el promedio de las siete casas que ya se movieron post-reporte (~$740) difieren en más de
+    $85 por acción — toda esa diferencia ocurrió en menos de 24 horas. Tratamos el número pre-reporte como la
+    referencia formal de este método por ser la única con base estadística amplia y pública, pero el lector debería
+    anclar sus expectativas más cerca de la muestra post-reporte, más pequeña pero más actualizada.
+  </p>
+
+  <h3>Síntesis: los cuatro métodos, uno al lado del otro</h3>
+  <div class="chartbox">
+    <canvas id="footballChart" height="260"></canvas>
+    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado ($534.72); la línea azul marca el blend propio ($785.09).</p>
+  </div>
+  <div class="table-scroll"><table>
+    <tr><th>Método</th><th class="right-al">Fair value</th></tr>
+    <tr><td class="label">DCF — Bear</td><td class="right-al">$208.93</td></tr>
+    <tr><td class="label">DCF — Base</td><td class="right-al">$688.32</td></tr>
+    <tr><td class="label">DCF — Bull</td><td class="right-al">$1,338.60</td></tr>
+    <tr><td class="label">Comparables (P/E forward promedio del panel)</td><td class="right-al">$852.00</td></tr>
+    <tr><td class="label">Reversión histórica (P/E promedio 5-10 años propio)</td><td class="right-al">$814.95</td></tr>
+    <tr class="total"><td class="label">Promedio simple — DCF Base, Comparables, Reversión histórica</td><td class="right-al">$785.09</td></tr>
+    <tr><td class="label">Consenso Wall Street pre-reporte (referencia externa, no promediada)</td><td class="right-al">$826 - $843</td></tr>
+    <tr><td class="label">Muestra de 7 targets ya revisados post-reporte (referencia, no promediada)</td><td class="right-al">~$740</td></tr>
+  </table></div>
+  <p>
+    El promedio simple de las tres metodologías numéricas propias (DCF caso Base, comparables, reversión histórica)
+    da <strong>$785.09 por acción</strong> — 46.8% por encima del precio de mercado de $534.72. Es, de los tres
+    informes publicados hasta ahora por este desk, el que muestra la brecha más amplia entre blend y mercado. Pero,
+    a diferencia de AAPL y MSFT, acá dos de los tres métodos que componen el blend (comparables y reversión histórica)
+    dependen explícitamente de un EPS forward de consenso que fue fijado antes de un miss de 13-14% y que, con alta
+    probabilidad, todavía no se revisó a la baja — la muestra de precios objetivo ya revisados post-reporte (~$740, un
+    5.7% menos que el blend) es la evidencia más concreta de hacia dónde se dirige ese ajuste. Incluso descontando ese
+    sesgo, el propio DCF —la metodología menos dependiente de consenso externo— también da un resultado por encima
+    del mercado en el caso Base ($688.32, +28.7%), aunque con una dispersión severa entre escenarios (de -61% a +150%)
+    que refleja genuinamente cuánto depende el resultado de si la apuesta de capex termina monetizándose. Por esa
+    combinación —un número de blend que probablemente sobreestima, una dispersión de escenarios inusualmente amplia, y
+    un trimestre que acaba de mostrar en los hechos (no en un escenario hipotético) que el FCF puede comprimirse mucho
+    más rápido de lo que el mercado esperaba— la postura de este informe es neutral, no alcista: el negocio
+    publicitario es excepcional, pero la valuación exige resolver, en los próximos 2-3 trimestres, la tensión entre
+    ese negocio y el costo real de la apuesta de IA.
+  </p>
+
+  <!-- 14 -->
+  <p class="secnum" id="s14">14 — Limitaciones del Modelo</p>
+  <h2>Qué asume este análisis, y dónde puede fallar</h2>
+  <div class="watermark-block">
+    <p style="margin-bottom:0;">
+      Dos de los tres métodos numéricos de este informe (comparables y reversión histórica) usan un EPS forward de
+      consenso fijado antes del reporte del 29-jul-2026 — la Sección 12 muestra evidencia directa (siete recortes de
+      precio objetivo la misma noche) de que ese consenso está en proceso de revisión a la baja, lo que probablemente
+      infla el resultado de esos dos métodos de forma artificial. El DCF, con 85-87% de su valor de empresa
+      dependiendo del valor terminal en los tres escenarios, es sensible a supuestos de largo plazo sobre si el capex
+      converge como se supone en el caso Base — un supuesto todavía sin evidencia empírica más allá de la mejora del
+      sistema de anuncios (+15.7% de conversión). Los $2.400 millones de cargos legales del trimestre no fueron
+      explicados por la compañía, lo que impide a este informe evaluar si son recurrentes o verdaderamente puntuales.
+      El precio de mercado usado en todo este informe ($534.72) es el precio de cierre del día siguiente al reporte —
+      ya incorpora la caída de casi 12%, a diferencia de los informes de AAPL y MSFT de este desk, que usaron el
+      cierre previo al reporte respectivo. El modelo no incorpora ningún valor separado para la opcionalidad de un
+      negocio de cómputo en la nube insinuado por Zuckerberg (Sección 04), porque todavía no existe como línea de
+      negocio reportable. Finalmente, no tenemos datos granulares de revisión de estimados de los últimos 90 días para
+      META —el "momentum" que reportamos en la Sección 12 se basa en el beat/miss de este único trimestre y en la
+      muestra parcial de precios objetivo ya revisados, no en una serie histórica completa de revisiones.
+    </p>
+  </div>
+
+  <div class="disclosure">
+    Documento elaborado a partir de fuentes públicas: SEC EDGAR (Form 8-K Exhibit 99.1, 10-Q, 10-K, XBRL companyconcept
+    API), comunicados de resultados y newsroom de Meta Platforms, Apple, Microsoft, Alphabet y Amazon, S&amp;P Global
+    Market Intelligence, GuruFocus, stockanalysis.com, ChartMill, fullratio.com, financecharts.com, Alphastreet, IG
+    International, StockTitan, Variety, 24/7 Wall St., TradingKey, CNBC, Fortune, LegalClarity, RankRed, CEOPayWatch,
+    The Register, Sullivan &amp; Cromwell LLP y CBS News. Cifras fundamentales con fecha de corte en el Form 8-K de
+    Meta Platforms correspondiente al trimestre cerrado el 30 de junio de 2026, publicado el 29 de julio de 2026;
+    desarrollos corporativos y de mercado con fecha de corte del 30 de julio de 2026.
+    <br><br>
+    <strong>Sobre el autor y la naturaleza de este documento:</strong> este informe es un análisis independiente
+    elaborado por Manfredi Investment Research &amp; Markets con fines exclusivamente informativos y educativos. El
+    autor no es un asesor de inversión registrado, no está matriculado ante la Comisión Nacional de Valores (CNV), la
+    SEC, ni ningún otro organismo regulador equivalente, y no mantiene una relación de asesoramiento financiero
+    personalizado con el lector. Ninguna cifra de este documento —incluido el "fair value" de portada, los escenarios
+    de DCF, ni la síntesis de la Sección 13— constituye una recomendación de compra, venta o mantenimiento para
+    ningún lector en particular, ni considera la situación financiera, los objetivos o el perfil de riesgo individual
+    de quien lo lee. Los escenarios de DCF son estimaciones propias sujetas a los supuestos declarados explícitamente
+    en la Sección 13, y no representan guidance oficial de ninguna de las compañías mencionadas salvo donde se cita
+    de forma directa y atribuida. Verificar cifras contra el 10-Q/10-K/8-K más reciente de cada compañía, y consultar
+    a un asesor financiero matriculado, antes de tomar cualquier decisión de inversión.
+  </div>
+
+</div>
+
+<script>
+/* ---- Motor de gráficos propio, sin dependencias externas (Canvas 2D) ---- */
+(function(){
+  var PALETTE = {ink:'#161a20', muted:'#69707c', line:'#e3e9f0', navy:'#0b1f3a', navy2:'#15335c', blue:'#2f5f9e', blueLight:'#5f8fc7', pale:'#c7d9ec', red:'#a8291f', gold:'#c99a3c'};
+
+  function setupCanvas(canvas, cssHeight){
+    var dpr = window.devicePixelRatio || 1;
+    var cssWidth = canvas.parentElement.clientWidth - 44; // padding del chartbox
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = Math.max(1, Math.round(cssWidth * dpr));
+    canvas.height = Math.max(1, Math.round(cssHeight * dpr));
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return {ctx: ctx, w: cssWidth, h: cssHeight};
+  }
+
+  function drawVBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+    ctx.font = '11px "IBM Plex Mono", monospace';
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var log = !!opts.log;
+    var padL = 46, padR = 10, padT = 16, padB = 46;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var maxV = Math.max.apply(null, values);
+    var minV = log ? Math.min.apply(null, values) : 0;
+    function scaleY(v){
+      if(log){
+        var lv = Math.log10(Math.max(v,0.01)), lmax = Math.log10(maxV*1.15), lmin = Math.log10(Math.max(minV*0.5,1));
+        return padT + plotH - ((lv - lmin) / (lmax - lmin)) * plotH;
+      }
+      return padT + plotH - (v / (maxV*1.15)) * plotH;
+    }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    var gridSteps = 4;
+    for(var g=0; g<=gridSteps; g++){
+      var yy = padT + (plotH/gridSteps)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    var n = values.length;
+    var slot = plotW / n;
+    var barW = Math.min(slot * 0.56, 64);
+
+    for(var i=0;i<n;i++){
+      var cx = padL + slot*i + slot/2;
+      var y0 = scaleY(values[i]);
+      var yBase = padT + plotH;
+      ctx.fillStyle = colors[i % colors.length];
+      var bw = barW;
+      ctx.fillRect(cx - bw/2, y0, bw, yBase - y0);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'center';
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, cx, y0 - 6);
+
+      ctx.fillStyle = PALETTE.muted;
+      ctx.font = '10px "Inter", sans-serif';
+      wrapLabel(ctx, labels[i], cx, yBase + 16, slot + 6);
+    }
+  }
+
+  function wrapLabel(ctx, text, cx, y, maxW){
+    var words = String(text).split(' ');
+    var lines = [];
+    var cur = '';
+    for(var i=0;i<words.length;i++){
+      var test = cur ? cur + ' ' + words[i] : words[i];
+      if(ctx.measureText(test).width > maxW && cur){ lines.push(cur); cur = words[i]; }
+      else cur = test;
+    }
+    if(cur) lines.push(cur);
+    lines = lines.slice(0,2);
+    ctx.textAlign = 'center';
+    for(var j=0;j<lines.length;j++){
+      ctx.fillText(lines[j], cx, y + j*11);
+    }
+  }
+
+  function drawHBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var padL = 128, padR = 54, padT = 10, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var maxV = Math.max.apply(null, values) * 1.12;
+
+    var n = values.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.5, 30);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, padT+plotH); ctx.stroke();
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = padL;
+      var w = (values[i]/maxV) * plotW;
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, w, barH);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(labels[i], padL - 10, cy + 4);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'left';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, x0 + w + 8, cy + 4);
+    }
+  }
+
+  function drawRangeBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, ranges = opts.ranges, colors = opts.colors, refLines = opts.refLines || [];
+    var padL = 168, padR = 16, padT = 26, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    ranges.forEach(function(r){ allVals.push(r[0], r[1]); });
+    refLines.forEach(function(r){ allVals.push(r.value); });
+    var domMin = Math.min.apply(null, allVals) * 0.94;
+    var domMax = Math.max.apply(null, allVals) * 1.04;
+    function scaleX(v){ return padL + ((v - domMin)/(domMax - domMin)) * plotW; }
+
+    var n = ranges.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.42, 22);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = scaleX(ranges[i][0]), x1 = scaleX(ranges[i][1]);
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, Math.max(x1-x0,2), barH);
+      ctx.beginPath(); ctx.arc(x0, cy, barH/2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x1, cy, barH/2, 0, Math.PI*2); ctx.fill();
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      wrapLabel(ctx, labels[i], padL - 12, cy - 4, padL - 20);
+
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      var vf = opts.valueFmt || function(v){ return '$'+v.toFixed(0); };
+      ctx.textAlign = 'right';
+      ctx.fillText(vf(ranges[i][0]), x0 - 8, cy + 4);
+      ctx.textAlign = 'left';
+      ctx.fillText(vf(ranges[i][1]), x1 + 8, cy + 4);
+    }
+
+    refLines.forEach(function(r){
+      var x = scaleX(r.value);
+      ctx.strokeStyle = r.color; ctx.lineWidth = 1.6; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x, padT-6); ctx.lineTo(x, padT+plotH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = r.color;
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(r.label, x, padT - 12);
+    });
+  }
+
+  function drawLines(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, series = opts.series;
+    var padL = 40, padR = 14, padT = 16, padB = 54;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    series.forEach(function(s){ allVals = allVals.concat(s.values); });
+    var maxV = Math.max.apply(null, allVals) * 1.08;
+    var minV = Math.min.apply(null, allVals) * 0.92;
+
+    function scaleX(i){ return padL + (plotW/(labels.length-1)) * i; }
+    function scaleY(v){ return padT + plotH - ((v - minV)/(maxV-minV)) * plotH; }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var yy = padT + (plotH/4)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    series.forEach(function(s){
+      ctx.strokeStyle = s.color; ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        ctx.fillStyle = s.color;
+        ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
+      });
+    });
+
+    ctx.fillStyle = PALETTE.muted;
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    labels.forEach(function(l,i){ ctx.fillText(l, scaleX(i), padT+plotH+16); });
+
+    var lx = padL, ly = H - 12;
+    ctx.font = '11px "Inter", sans-serif';
+    series.forEach(function(s){
+      ctx.fillStyle = s.color;
+      ctx.fillRect(lx, ly-8, 10, 10);
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'left';
+      ctx.fillText(s.name, lx+14, ly);
+      lx += 14 + ctx.measureText(s.name).width + 22;
+    });
+  }
+
+  function renderAll(){
+    drawVBars(document.getElementById('historyChart'), {
+      labels:['FY2016','FY2017','FY2018','FY2019','FY2020','FY2021','FY2022','FY2023','FY2024','FY2025','TTM'],
+      values:[27.64,40.65,55.84,70.70,85.97,117.93,116.61,134.90,164.50,200.97,228.25],
+      colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.blue,PALETTE.navy2,PALETTE.navy2,PALETTE.navy],
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawHBars(document.getElementById('segmentChart'), {
+      labels:['Family of Apps','Reality Labs'],
+      values:[60.37,0.43],
+      colors:[PALETTE.navy,PALETTE.red],
+      valueFmt:function(v){ return '$'+v.toFixed(2)+'B'; }
+    });
+
+    drawVBars(document.getElementById('geoChart'), {
+      labels:['Impresiones de anuncios','Precio por anuncio'],
+      values:[14,12],
+      colors:[PALETTE.blue,PALETTE.navy2],
+      valueFmt:function(v){ return '+'+v.toFixed(0)+'%'; }
+    });
+
+    drawLines(document.getElementById('marginChart'), {
+      labels:['Q3 2025','Q4 2025','Q1 2026','Q2 2026'],
+      series:[
+        {name:'Margen operativo', color:PALETTE.navy, values:[40.1,41.3,40.6,30.9]}
+      ]
+    });
+
+    drawVBars(document.getElementById('capexChart'), {
+      labels:['AAPL','META (piso)','MSFT (FY27)','AMZN (piso)','GOOGL (techo)'],
+      values:[13.5,130,255,200,205],
+      colors:[PALETTE.blueLight,PALETTE.red,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight],
+      log:true,
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawHBars(document.getElementById('compsChart'), {
+      labels:['AAPL','AMZN','MSFT','GOOGL*','META'],
+      values:[40.1,29.3,25.2,16.0,20.1],
+      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.pale,PALETTE.red],
+      valueFmt:function(v){ return v.toFixed(1)+'x'; }
+    });
+
+    drawRangeBars(document.getElementById('footballChart'), {
+      labels:['DCF (Bear → Bull)','Comparables (piso → techo panel)','Reversión histórica (5y → 10y)','Consenso Wall Street (rango objetivo)'],
+      ranges:[[208.93,1338.60],[723.00,996.00],[793.80,836.10],[640,1015]],
+      colors:[PALETTE.blue,PALETTE.navy2,PALETTE.blueLight,PALETTE.gold],
+      refLines:[{value:534.72,color:PALETTE.red,label:'Mercado $535'},{value:785.09,color:PALETTE.navy,label:'Blend $785'}],
+      valueFmt:function(v){ return '$'+v.toFixed(0); }
+    });
+
+    drawHBars(document.getElementById('revisionChart'), {
+      labels:['EPS consenso pre-reporte (punto medio)','EPS real Q2 2026'],
+      values:[7.19,6.18],
+      colors:[PALETTE.pale,PALETTE.red],
+      valueFmt:function(v){ return '$'+v.toFixed(2); }
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', renderAll);
+  } else {
+    renderAll();
+  }
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderAll, 150);
+  });
+})();
+</script>
+</body>
+</html>
