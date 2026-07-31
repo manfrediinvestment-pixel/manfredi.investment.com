@@ -97,14 +97,15 @@ gráficos). Estructura obligatoria (14 secciones):
     gráfico de revisiones de EPS de los últimos 90 días (al alza vs. a la baja). Nunca fabricar una
     proyección línea por línea a 5 años que no esté sourceada — para años sin consenso público,
     remitir explícitamente a los supuestos del DCF (sección siguiente) en vez de inventar precisión.
-14. **Valuación: Cuatro Métodos y el Fair Value** — DCF (3 escenarios) + comparables + reversión
-    histórica + consenso Wall Street, más:
+14. **Valuación: Cuatro (o más) Métodos y el Fair Value** — DCF (3 escenarios) + comparables +
+    reversión histórica + consenso Wall Street como piso mínimo, más los métodos adicionales de la
+    regla "Compañías con apuesta de plataforma" de abajo cuando corresponda, más:
     - **Grilla de sensibilidad WACC × crecimiento terminal** (5×5): recalculá el DCF con la fórmula
       real para cada combinación — nunca tipees números a mano. Calibrá el resultado para que la
       celda del caso Base reproduzca exactamente el fair value y el %EV-desde-terminal ya
       publicados.
     - **Football field** (rango bajo/alto por metodología, con líneas de referencia de precio de
-      mercado y del blend propio).
+      mercado y del fair value/blend propio o de la referencia externa más relevante).
 15. Limitaciones del Modelo.
 
 **Reglas del DCF:**
@@ -115,18 +116,50 @@ gráficos). Estructura obligatoria (14 secciones):
   neta, WACC ≈ costo de equity.
 - Terminal growth entre 2.5%-4%, nunca mayor al crecimiento nominal de largo plazo de la economía
   salvo justificación explícita.
-- Corré siempre 3 escenarios (bear/base/bull), no solo el base — reportá el rango completo.
+- Corré siempre 3 escenarios (bear/base/bull), no solo el base — reportá el rango completo. Además
+  del promedio simple, calculá también un valor esperado ponderado por probabilidad explícita (ej.
+  25/45/30) — es más riguroso que promediar sin más, y hay que reportar ambos.
 - Si el valor terminal es más del ~65-70% del EV, decilo explícitamente: el modelo es sensible y hay
   que leerlo con cautela (es normal en growth stocks, pero hay que ser honesto sobre ello).
 - Comps: aplicá el múltiplo promedio de peers al EBITDA/EPS proyectado a 1 año (forward), no al TTM.
 - Fair value final = blend explícito y declarado (ej. promedio simple DCF Base + comparables +
   reversión histórica) — nunca un número "de ojo".
 
-**Regla de asignación de la postura (bajista/neutral/alcista):** si el fair value blended está por
-debajo del precio spot, la postura NO puede ser alcista solo porque el negocio sea bueno — usá
+**Compañías con negocio maduro + apuesta de plataforma/opcionalidad (autonomía, IA, robótica,
+plataformas todavía sin ingresos materiales):** el DCF/comparables/reversión estándar valúan
+*solo* el negocio que ya factura — son retrospectivos y estáticos por diseño, y en compañías de este
+tipo terminan dando un fair value que parece poco creíble frente al precio de mercado, porque no le
+ponen ningún precio a la apuesta de plataforma. Cuando el negocio bajo cobertura tenga una línea de
+crecimiento futuro grande y todavía no monetizada (ej. robotaxi, robótica humanoide, licenciamiento
+de IA), sumá además:
+- **Sum-of-the-parts (SOTP) propio**, deliberadamente conservador: valuá el negocio actual por DCF
+  (como siempre) y sumale el valor de cada apuesta nueva usando la valuación de transacciones reales
+  y recientes de sus comparables directos en el mercado privado (rondas de financiamiento, series de
+  venture capital, adquisiciones) — nunca un TAM inventado sin anclar a una transacción real. Hacé
+  también una sensibilidad simple (ej. 50%-150% del valor del comparable) en vez de un único punto.
+- **SOTP externo de referencia**: si un banco o casa de research reconocida publicó su propio SOTP
+  para la misma compañía, citalo aparte (no lo promedies con tus propios métodos) y comparalo
+  críticamente contra transacciones de mercado privado reales — cuantificar la brecha (ej. "el
+  componente X implica una valuación N veces mayor que la última ronda del comparable directo más
+  cercano") es más útil que aceptar o rechazar el número sin más.
+- **DCF inverso**: en vez de solo proyectar hacia adelante, partí del precio de mercado y resolvé qué
+  trayectoria de crecimiento o de margen sería necesaria para justificarlo, dentro del mismo WACC y
+  crecimiento terminal ya usados. Traducir el precio en supuestos concretos y verificables (ej. "el
+  mercado exige un margen operativo de caja de X% para el año 5") es más honesto y más útil para el
+  lector que una etiqueta de "cara" o "barata".
+- El **fair value final**, en estos casos, se reporta como **rango** (mínimo del DCF del negocio
+  actual a máximo del SOTP más agresivo disponible, propio o externo) en vez de forzar un único punto
+  — el objetivo es que el precio de mercado quede visiblemente ubicado dentro de ese rango, no que el
+  informe declare un solo número "correcto" que nadie encuentra creíble. Ver `informes/tsla.html`
+  como plantilla completa de esta estructura de seis métodos (Sección 13).
+
+**Regla de asignación de la postura (bajista/neutral/alcista):** si el fair value (o el rango) queda
+por debajo del precio spot, la postura NO puede ser alcista solo porque el negocio sea bueno — usá
 neutral (o bajista si la brecha es grande) y explicá en la tesis la tensión entre calidad del
-negocio y valuación exigente. "Buen negocio" y "buena inversión al precio actual" son preguntas
-distintas.
+negocio y valuación exigente. Cuando el fair value se reporta como rango y el precio de mercado cae
+dentro de él, la postura puede ser "neutral, con sesgo cauteloso/optimista" según en qué extremo del
+rango caiga el precio — pero seguí explicitando qué tiene que ser cierto para que el precio actual
+tenga sentido. "Buen negocio" y "buena inversión al precio actual" son preguntas distintas.
 
 **Disclaimer no-negociable (portada + pie):** el autor no es un asesor financiero registrado. Nunca
 un rating tipo "Buy/Hold/Sell" — siempre un Fair Value descriptivo derivado del propio modelo,
