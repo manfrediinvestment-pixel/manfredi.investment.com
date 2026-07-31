@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMZN — Amazon.com, Inc. | Manfredi Investment Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-dark:#0b1f3a;
+    --navy:#0e2748;
+    --navy2:#15335c;
+    --blue:#2f5f9e;
+    --blue-light:#5f8fc7;
+    --blue-pale:#eaf1f9;
+    --line:#d7e0ea;
+    --text:#161a20;
+    --muted:#69707c;
+    --green:#1a7a54;
+    --red:#a8291f;
+    --serif:'Newsreader',serif;
+    --sans:'Inter',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#fff; color:var(--text); font-family:var(--sans); font-size:15.5px; line-height:1.7;}
+  .wrap{max-width:900px; margin:0 auto; padding:0 30px 90px;}
+
+  .brandbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:26px 30px 20px; max-width:900px; margin:0 auto; border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:38px; height:38px; border:1.5px solid var(--navy-dark); display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-weight:700; color:var(--navy-dark); font-size:16px;
+  }
+  .brand-name{font-family:var(--serif); font-weight:700; font-size:17px; color:var(--text); line-height:1.15;}
+  .brand-sub{font-family:var(--sans); font-size:10px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase;}
+  .brandbar .doctype{font-family:var(--mono); font-size:11px; color:var(--muted); text-align:right;}
+
+  .frontbox{border:1px solid var(--navy-dark); margin:34px 0 8px; padding:0;}
+  .frontbox-top{display:flex; justify-content:space-between; align-items:baseline; padding:22px 28px 14px; border-bottom:1px solid var(--line);}
+  .ticker-big{font-family:var(--serif); font-size:42px; font-weight:700; color:var(--navy-dark);}
+  .exch{font-family:var(--mono); font-size:12px; color:var(--muted); margin-left:10px;}
+  .rating{font-family:var(--mono); font-size:12px; font-weight:600; color:var(--blue); text-align:right; letter-spacing:.03em;}
+  .rating small{display:block; font-family:var(--mono); font-size:10.5px; color:var(--muted); font-weight:400; margin-top:3px; letter-spacing:normal;}
+  .frontbox-body{padding:20px 28px 26px;}
+  .company-line{color:var(--muted); font-size:13.5px; margin-bottom:16px;}
+  .thesis-block{font-family:var(--serif); font-size:17.5px; line-height:1.65; color:var(--text); font-style:italic;}
+
+  .statsrow{display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line);}
+  .statcell{padding:16px 20px; border-right:1px solid var(--line);}
+  .statcell:last-child{border-right:none;}
+  .statcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:6px;}
+  .statcell .v{font-family:var(--mono); font-size:16px; font-weight:600; color:var(--text);}
+  .pos{color:var(--green);} .neg{color:var(--red);}
+
+  .secnum{font-family:var(--mono); font-size:11px; color:var(--blue-light); letter-spacing:.1em; margin:50px 0 2px;}
+  h2{font-family:var(--serif); font-size:24px; font-weight:600; color:var(--navy2); margin:2px 0 18px; padding-bottom:10px; border-bottom:1.5px solid var(--navy-dark); text-wrap:balance;}
+  h3{font-family:var(--serif); font-size:17px; font-weight:600; color:var(--navy2); margin:30px 0 10px;}
+  p{margin:0 0 15px; max-width:68ch;}
+  strong{color:var(--text);}
+
+  .table-scroll{overflow-x:auto; margin:18px 0 22px;}
+  .table-scroll table{margin:0;}
+  table{width:100%; min-width:520px; border-collapse:collapse; font-size:13.5px;}
+  th{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); text-align:left; padding:8px 10px; border-bottom:1.5px solid var(--navy-dark); white-space:nowrap;}
+  td{padding:8px 10px; border-bottom:1px solid var(--line); font-family:var(--mono); color:var(--text); font-variant-numeric:tabular-nums;}
+  td.label{font-family:var(--sans); color:var(--text);}
+  tr.total td{font-weight:600; border-top:1px solid var(--navy-dark); border-bottom:none;}
+  .right-al{text-align:right;}
+
+  .chartbox{border:1px solid var(--line); padding:20px 22px 16px; margin:22px 0;}
+  .chartbox canvas{width:100% !important; display:block;}
+  .chartcap{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:14px; text-align:center;}
+
+  .pull{border-left:2px solid var(--navy-dark); padding-left:18px; margin:22px 0; color:var(--muted); font-size:13.5px; max-width:68ch;}
+
+  .footnote{font-family:var(--mono); font-size:11px; color:var(--muted); margin:-6px 0 18px; max-width:none;}
+
+  .watermark-block{
+    position:relative; margin:60px 0; padding:26px 30px; border:1px solid var(--line); overflow:hidden;
+  }
+  .watermark-block::before{
+    content:"AMZN"; position:absolute; right:10px; top:-30px; font-family:var(--serif); font-weight:700;
+    font-size:110px; color:var(--blue-pale); z-index:0; line-height:1;
+  }
+  .watermark-block > *{position:relative; z-index:1;}
+
+  .toc{border:1px solid var(--line); padding:22px 26px; margin:30px 0;}
+  .toc-title{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px;}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:30px;}
+  .toc li{font-size:13px; margin-bottom:7px; break-inside:avoid;}
+  .toc a{color:var(--navy2); text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  .toc .toc-final a{font-weight:600;}
+
+  .disclosure{margin-top:70px; padding-top:22px; border-top:1px solid var(--navy-dark); font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.8; max-width:none;}
+
+  .fv-block{text-align:right;}
+  .fv-block .fv-label{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+  .fv-block .fv-value{font-family:var(--mono); font-size:22px; font-weight:600; color:var(--navy-dark); line-height:1.3;}
+  .fv-block .fv-gap{font-family:var(--mono); font-size:12.5px; font-weight:600;}
+  .fv-block .fv-gap.neg{color:var(--red);} .fv-block .fv-gap.pos{color:var(--green);}
+
+  .verdict-bar{display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; background:var(--blue-pale); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:14px 28px;}
+  .verdict-stance{font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--navy-dark);}
+  .verdict-stance strong{color:var(--navy-dark);}
+  .verdict-note{font-family:var(--sans); font-size:11.5px; color:var(--muted); max-width:56ch; line-height:1.5;}
+
+  .sens-table td, .sens-table th{text-align:center;}
+  .sens-table td.axis{font-family:var(--mono); font-weight:600; background:#fff; color:var(--text);}
+  .sens-table td.base-cell{outline:2px solid var(--navy-dark); outline-offset:-2px;}
+
+  .govrow{display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:1px solid var(--line); margin:20px 0;}
+  .govcell{padding:16px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .govcell:nth-child(3n){border-right:none;}
+  .govcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px;}
+  .govcell .v{font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text);}
+  .govcell .sub{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.4;}
+
+  a{color:var(--blue);}
+  :focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
+
+  @media (max-width:720px){
+    .statsrow{grid-template-columns:repeat(2,1fr);}
+    .frontbox-top{flex-direction:column; gap:10px;}
+    .rating{text-align:left;}
+    .toc ol{columns:1;}
+    .verdict-bar{flex-direction:column; align-items:flex-start;}
+    .govrow{grid-template-columns:1fr;}
+    .govcell{border-right:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <div class="brand">
+    <div class="brand-mark">MI</div>
+    <div>
+      <div class="brand-name">Manfredi Investment</div>
+      <div class="brand-sub">Research &amp; Markets</div>
+    </div>
+  </div>
+  <div class="doctype">Equity Research · Informe Institucional<br>Datos al 2Q 2026 (trimestre cerrado 30 jun 2026, publicado 30 jul 2026)</div>
+</div>
+
+<div class="wrap">
+
+  <div class="frontbox">
+    <div class="frontbox-top">
+      <div><span class="ticker-big">AMZN</span><span class="exch">NASDAQ · Amazon.com, Inc.</span></div>
+      <div class="fv-block">
+        <div class="fv-label">Fair value (blend propio)</div>
+        <div class="fv-value">$241.21</div>
+        <div class="fv-gap neg">vs. $270.20 mercado · -10.7%</div>
+      </div>
+    </div>
+    <div class="verdict-bar">
+      <div class="verdict-stance">POSTURA DEL ANÁLISIS: <strong>NEUTRAL, CON SESGO CONSTRUCTIVO — EL MERCADO YA CONVALIDÓ PARTE DE LA TESIS DE IA, LA BRECHA CON EL DCF PROPIO SE ANGOSTÓ FUERTE TRAS EL SALTO DEL 31-JUL-2026</strong> — dos de los tres métodos del blend (comparables y suma de las partes) ya ubican el fair value por encima del precio de mercado; solo el DCF consolidado, el más conservador, lo ubica por debajo (ver Sección 13)</div>
+      <div class="verdict-note">Este documento es análisis independiente con fines informativos y educativos. El autor no es un asesor financiero registrado (no CFA / no matriculado ante la CNV/SEC) y este contenido no constituye una recomendación de compra, venta o mantenimiento para ningún lector en particular. Ver disclosure completo al pie.</div>
+    </div>
+    <div class="frontbox-body">
+      <div class="company-line">E-commerce y logística (North America, International) · AWS (cloud e infraestructura de IA) · Publicidad · Suscripciones Prime</div>
+      <div class="thesis-block">
+        Amazon reportó, el 30 de julio de 2026, ingresos trimestrales de $200.6 mil millones (+20% interanual, primera
+        vez que supera los $200.000 millones) y AWS acelerando a +37% interanual — su crecimiento más rápido en más de
+        tres años. El mercado lo premió con fuerza: en la sesión regular del 31 de julio de 2026 (el día hábil siguiente),
+        la acción saltó más de 14% hasta $270.20, con analistas de Bank of America, Goldman Sachs, Deutsche Bank,
+        Bernstein y Wells Fargo elevando sus precios objetivo tras el reporte. La utilidad neta de $62.6 mil millones
+        (+243% interanual), sin embargo, está inflada por una ganancia no operativa puntual de $53.4 mil millones antes
+        de impuestos por la revaluación de su participación en Anthropic, y el mismo comunicado elevó la guía de capex
+        2026 a aproximadamente $220 mil millones (desde $200 mil millones), citando mayores costos de memoria. Este
+        informe recorre el negocio completo —historia, segmentos, balance, comparables y riesgos— y cierra, recién en
+        la última sección, con la valuación: cinco metodologías independientes aplicadas sobre los mismos datos —incluyendo
+        una suma de las partes que separa AWS del negocio de e-commerce, la lente que mejor explica por qué el mercado
+        paga una prima sobre lo que arroja un DCF consolidado— con la ganancia no operativa de Anthropic explícitamente
+        aislada para no distorsionar ni el múltiplo ni el DCF.
+      </div>
+    </div>
+    <div class="statsrow">
+      <div class="statcell"><div class="k">Ingresos TTM (2Q26)</div><div class="v">$775.7B</div></div>
+      <div class="statcell"><div class="k">Var. ingresos (últ. trim.)</div><div class="v pos">+20%</div></div>
+      <div class="statcell"><div class="k">Margen operativo TTM</div><div class="v">12.1%</div></div>
+      <div class="statcell"><div class="k">Var. precio post-reporte</div><div class="v pos">+14.7%</div></div>
+    </div>
+  </div>
+  <p class="footnote">Cifras fundamentales: SEC EDGAR (Form 10-Q/10-K y XBRL companyfacts API, CIK 0001018724), trimestre cerrado el 30 de junio de 2026, publicado el 30 de julio de 2026. Precio de mercado: Yahoo Finance, intradía del 31-jul-2026 ($270.20, sesión regular NYSE ~11:05am ET) — el cierre previo, del día del reporte (30-jul-2026), había sido $235.50. Este documento es 100% analítico — no constituye una recomendación de compra, venta ni mantenimiento. Ver disclosure completo al pie.</p>
+
+  <div class="toc">
+    <div class="toc-title">Contenido</div>
+    <ol>
+      <li><a href="#s01">Resumen Ejecutivo</a></li>
+      <li><a href="#s02">Historia y Evolución</a></li>
+      <li><a href="#s03">Modelo de Negocio y Segmentos</a></li>
+      <li><a href="#s04">Desarrollos Recientes y Perspectiva</a></li>
+      <li><a href="#s05">Estados Financieros</a></li>
+      <li><a href="#s06">Deuda y Balance</a></li>
+      <li><a href="#s07">Flujo de Caja y Capital Allocation</a></li>
+      <li><a href="#s08">Comparables de Industria</a></li>
+      <li><a href="#s09">Gobierno Corporativo y Estructura Accionaria</a></li>
+      <li><a href="#s10">Registro de Riesgos</a></li>
+      <li><a href="#s11">Catalizadores</a></li>
+      <li><a href="#s12">Modelo Financiero Proyectado y Momentum de Estimados</a></li>
+      <li class="toc-final"><a href="#s13">Valuación: Cinco Métodos y el Fair Value</a></li>
+      <li><a href="#s14">Limitaciones del Modelo</a></li>
+    </ol>
+  </div>
+
+  <!-- 01 -->
+  <p class="secnum" id="s01">01 — Resumen Ejecutivo</p>
+  <h2>AWS acelera a +37%, pero la utilidad neta del trimestre no es lo que parece</h2>
+  <p>
+    El 30 de julio de 2026, Amazon reportó los resultados del segundo trimestre de 2026: ingresos de $200.61 mil
+    millones (+20% interanual, superando el consenso de $196.47 mil millones), con AWS acelerando a +36.7% interanual
+    a $42.2 mil millones — su ritmo de crecimiento más rápido en más de tres años — y la utilidad operativa consolidada
+    subiendo 43% a $27.5 mil millones. El negocio de publicidad, que no es un segmento reportado por separado pero que
+    este informe sigue de cerca, creció 26% a $19.8 mil millones.
+  </p>
+  <p>
+    El titular más llamativo del trimestre, sin embargo, es engañoso si se lee sin contexto: la utilidad neta GAAP
+    saltó 243% interanual a $62.6 mil millones, y el EPS diluido de $5.75 superó por más de tres veces el consenso de
+    $1.82. La diferencia no es operativa — son $53.4 mil millones de ganancia no operativa, antes de impuestos, por la
+    revaluación al alza de la participación de Amazon en Anthropic (valuada en libros en aproximadamente $74.2 mil
+    millones tras el ajuste). Es la segunda vez en el año que esto ocurre: el primer trimestre de 2026 ya había
+    incluido una ganancia similar de $16.8 mil millones por el mismo concepto. Sumadas, ambas marcas explican
+    prácticamente toda la brecha entre el crecimiento de la utilidad operativa (+43% este trimestre) y el de la
+    utilidad neta (+243%) — una distinción que este informe trata con el mismo rigor con el que los informes de GOOGL
+    y META de este desk trataron sus propias distorsiones puntuales, y que aísla explícitamente en las Secciones 05,
+    08, 12 y 13 para no contaminar ni el múltiplo P/E ni el DCF.
+  </p>
+  <p>
+    El mismo comunicado elevó la guía de capex 2026 a aproximadamente $220 mil millones (desde $200 mil millones),
+    citando mayores costos de memoria para servidores de IA — la mayor guía de capex de todo el panel de mega-caps de
+    este desk, por delante de Microsoft, Alphabet y Meta. En el mismo trimestre, Amazon pasó de una posición histórica
+    de caja neta a una posición de <strong>deuda neta de $54.8 mil millones</strong>, tras emitir cerca de $107 mil
+    millones en bonos en los últimos doce meses — el mayor programa de emisión de deuda de todo Big Tech — para
+    financiar ese mismo capex. El mercado leyó todo esto como buenas noticias: la acción saltó +14.7% a $270.20 en la
+    sesión siguiente al reporte. Este informe recorre el negocio completo antes de llegar, en la Sección 13, a la
+    pregunta de cuánto vale la acción: con la ganancia no operativa aislada, un DCF consolidado tradicional todavía
+    arroja un fair value por debajo del precio de mercado, pero una suma de las partes que separa AWS del resto del
+    negocio —la misma lente que, en nuestra lectura, explica por qué Wall Street paga una prima sobre lo que arroja
+    ese DCF— junto con el método de comparables y el consenso de analistas, ya lo ubican por encima. Esa convergencia
+    de tres de cinco métodos por encima del mercado, con el DCF consolidado como la excepción más conservadora, es el
+    resultado central de este informe.
+  </p>
+
+  <!-- 02 -->
+  <p class="secnum" id="s02">02 — Historia y Evolución</p>
+  <h2>De librería online a "the everything store", con AWS como motor de utilidades</h2>
+  <p>
+    Amazon fue fundada por Jeff Bezos en 1994 en Seattle como una librería online, bajo la premisa de que internet
+    permitía ofrecer un catálogo imposible de igualar para una librería física. Salió a bolsa en 1997 con la célebre
+    carta a accionistas que declaraba la intención de operar con pérdidas contables durante años en favor de
+    crecimiento de largo plazo — la filosofía "Get Big Fast" que definió la cultura de la compañía y que sobrevivió al
+    estallido de la burbuja punto-com de 2000-2001, cuando la acción cayó más de 90% desde su máximo pero el negocio
+    subyacente continuó expandiéndose. Durante la década de 2000, Amazon se expandió de libros a "la tienda de todo":
+    electrónica, juguetes, ropa, y lanzó Amazon Marketplace (2000) para que terceros vendieran en su plataforma —la
+    semilla del negocio de publicidad y logística actual.
+  </p>
+  <p>
+    El giro que define a la compañía actual llegó en 2006 con el lanzamiento de Amazon Web Services (S3 y EC2): la
+    infraestructura que Amazon había construido internamente para escalar su propio e-commerce se convirtió en un
+    producto que vendía a terceros, creando de la nada la categoría de infraestructura de cloud computing. Prime se
+    lanzó en 2005 como programa de envíos, y se convirtió en la base de la relación de suscripción con el cliente que
+    incluye, además de envíos, streaming de video, música y beneficios de Whole Foods. La adquisición de Whole Foods Market en 2017
+    ($13.7 mil millones) fue la entrada de Amazon al retail físico de alimentos frescos, un canal que sigue siendo
+    marginal frente al negocio online pero que le dio presencia de marca en más de 500 tiendas físicas en EE.UU.
+  </p>
+  <p class="pull">
+    El dato que mejor resume la transformación de Amazon en veinte años no es el crecimiento de ingresos —es la
+    composición de la utilidad operativa. AWS, que en 2016 representaba una fracción menor de los ingresos totales de
+    la compañía, generó $16.6 mil millones de utilidad operativa en el segundo trimestre de 2026 —60% de la utilidad
+    operativa consolidada de $27.5 mil millones— sobre apenas 21% de los ingresos totales. El negocio de e-commerce
+    que le da el nombre a la compañía es, en términos de rentabilidad, el segundo negocio de Amazon, no el primero.
+  </p>
+  <div class="chartbox">
+    <canvas id="historyChart" height="320"></canvas>
+    <p class="chartcap">Ingresos anuales reportados, FY2016–FY2025, más consenso FY2026. Fuente: SEC EDGAR XBRL (RevenueFromContractWithCustomerExcludingAssessedTax) y consenso stockanalysis.com para FY2026E.</p>
+  </div>
+  <p>
+    Andy Jassy —quien había construido y dirigido AWS desde sus inicios— sucedió a Jeff Bezos como CEO en julio de
+    2021; Bezos se mantiene como Executive Chairman del directorio (Sección 09). En junio de 2022 Amazon ejecutó un
+    split de acciones 20:1, y entre fines de 2022 y 2023 realizó los mayores recortes de personal corporativo de su
+    historia (~27.000 puestos), en un giro hacia disciplina de costos tras el sobre-dimensionamiento de la pandemia.
+    La era actual —desde 2023 en adelante— está definida por la carrera de infraestructura de IA: Amazon invirtió en
+    Anthropic en múltiples rondas desde 2023 hasta acumular ~$13 mil millones y una participación de 15-20% de la
+    compañía (Sección 04), en paralelo a un capex propio que pasó de $52.7 mil millones en 2023 a una guía de ~$220
+    mil millones para 2026 —una escalada de capital sin precedente reciente en la historia de la compañía, y el dato
+    que más pesa en la valuación de la Sección 13.
+  </p>
+  <p>
+    Amazon cruzó el $1 billón de capitalización de mercado en 2018 —la segunda compañía de EE.UU. en hacerlo, después
+    de Apple—, cayó por debajo de esa marca durante el mercado bajista de 2022, y volvió a superar los $2 billones en
+    2024. Con el reporte del 30-jul-2026 y el salto de precio de la sesión siguiente ($270.20, +14.7%), la
+    capitalización de mercado —sobre aproximadamente 10.786 millones de acciones en circulación— asciende a
+    aproximadamente <strong>$2.91 billones</strong>, acercando a Amazon a la conversación de las primeras compañías en
+    alcanzar los $3 billones de valor de mercado.
+  </p>
+
+  <!-- 03 -->
+  <p class="secnum" id="s03">03 — Modelo de Negocio y Segmentos</p>
+  <h2>Qué vende Amazon, y dónde: la lectura detrás de los $200.6B del segundo trimestre</h2>
+  <p>
+    Amazon reporta tres segmentos geográfico-funcionales: North America e International (el negocio de e-commerce,
+    marketplace y publicidad, separado por geografía) y AWS (cloud, reportado globalmente). En el trimestre cerrado el
+    30 de junio de 2026, AWS representó apenas 21% de los ingresos totales pero 60% de la utilidad operativa
+    consolidada — la asimetría de rentabilidad que define toda la tesis de inversión.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Segmento</th><th class="right-al">2Q 2026</th><th class="right-al">% del total</th><th class="right-al">Var. YoY</th><th class="right-al">Utilidad operativa</th><th class="right-al">Margen operativo</th></tr>
+    <tr><td class="label">North America</td><td class="right-al">$116.2B</td><td class="right-al">57.9%</td><td class="right-al pos">+16%</td><td class="right-al">$9.1B</td><td class="right-al">7.9%</td></tr>
+    <tr><td class="label">International</td><td class="right-al">$42.2B</td><td class="right-al">21.0%</td><td class="right-al pos">+15%</td><td class="right-al">$1.7B</td><td class="right-al">4.1%</td></tr>
+    <tr><td class="label">AWS</td><td class="right-al">$42.2B</td><td class="right-al">21.0%</td><td class="right-al pos">+36.7%</td><td class="right-al">$16.6B</td><td class="right-al">39.3%</td></tr>
+    <tr class="total"><td class="label">Total</td><td class="right-al">$200.6B</td><td class="right-al">100%</td><td class="right-al pos">+20%</td><td class="right-al">$27.5B</td><td class="right-al">13.7%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: Amazon.com Announces Second Quarter Results (comunicado oficial, 30-jul-2026), vía SEC EDGAR 8-K. Margen operativo = utilidad operativa del segmento / ingresos del segmento.</p>
+  <div class="chartbox">
+    <canvas id="segmentChart" height="280"></canvas>
+    <p class="chartcap">Ingresos por segmento, 2Q 2026 (miles de millones USD). International y AWS coinciden en tamaño de ingresos ($42.2B cada uno) pero AWS genera casi 10 veces la utilidad operativa.</p>
+  </div>
+  <p>
+    North America (retail online, marketplace de terceros y publicidad en EE.UU., Canadá y México) creció 16%
+    interanual con un margen operativo de apenas 7.9% — sólido para un negocio de retail, pero un orden de magnitud por
+    debajo del margen de AWS. International, la geografía de menor escala y madurez (Europa, India, Brasil, Japón,
+    Medio Oriente), creció 15% con un margen operativo de solo 4.1%, reflejo de inversión continua en infraestructura
+    logística en mercados donde Amazon todavía no alcanzó la escala de EE.UU. Dentro de ambos segmentos —no como línea
+    separada— el negocio de publicidad (anuncios patrocinados de terceros vendedores, anuncios en Prime Video y
+    deportes en vivo) creció 26% interanual a $19.8 mil millones, con un margen estructuralmente mucho más alto que el
+    retail, y es, junto con AWS, el principal motor de expansión de márgenes consolidados de los últimos años.
+  </p>
+  <div class="chartbox">
+    <canvas id="opIncomeChart" height="260"></canvas>
+    <p class="chartcap">Utilidad operativa por segmento, 2Q 2026 (miles de millones USD) — AWS genera 60% de la utilidad operativa consolidada sobre solo 21% de los ingresos.</p>
+  </div>
+  <p>
+    Dentro de AWS, el crecimiento de 36.7% es el más rápido en al menos tres años, impulsado por la demanda de
+    infraestructura de IA generativa: el backlog de contratos comprometidos (RPO) escaló a $364 mil millones —cifra que
+    ni siquiera incluye el acuerdo de cómputo separado con Anthropic, reportado por encima de $100 mil millones (Sección
+    04)— y AWS ya opera a una tasa anualizada de ingresos de aproximadamente $169 mil millones. La guía de management
+    para el tercer trimestre de 2026 es de $197-202 mil millones de ingresos consolidados y $22.5-26.5 mil millones de
+    utilidad operativa.
+  </p>
+
+  <!-- 04 -->
+  <p class="secnum" id="s04">04 — Desarrollos Recientes y Perspectiva</p>
+  <h2>Tres frentes que van a definir los próximos trimestres</h2>
+  <h3>La apuesta de capex: de $200B a ~$220B guiados para 2026, por el costo de la memoria</h3>
+  <p>
+    El desarrollo más relevante del reporte del 30-jul-2026 es una decisión de capital, no una cifra de ingresos:
+    Amazon elevó su guía de capex 2026 a aproximadamente $220 mil millones, desde una guía previa de ~$200 mil
+    millones, citando explícitamente el encarecimiento de la memoria para servidores de IA como el factor detrás del
+    ajuste. Es, por magnitud absoluta, la mayor guía de capex del panel de mega-caps de este desk —por delante de
+    Microsoft (guía FY2027 de $255-260B, pero sobre un año fiscal distinto), Alphabet (hasta $205B) y Meta ($125-145B).
+    El grueso de esa inversión se dirige a centros de datos, chips propios (Trainium, Graviton) y capacidad de
+    networking para AWS, con management señalando que la demanda —evidenciada por el backlog de $364 mil millones—
+    sigue superando la capacidad disponible.
+  </p>
+  <h3>Anthropic: de socio de cómputo a la mayor fuente de ruido no operativo del estado de resultados</h3>
+  <p>
+    Amazon ha invertido aproximadamente $13 mil millones en Anthropic desde 2023, en una combinación de notas
+    convertibles (~$42.2 mil millones en valor de libros tras la revaluación) y acciones preferentes no votantes
+    (~$32 mil millones), por una participación reportada de entre 15% y 20% del capital de la compañía. Bajo las
+    reglas contables de valuación a mercado para este tipo de instrumentos, cada suba relevante en la valuación
+    implícita de Anthropic —impulsada este año por rondas de financiamiento y especulación sobre una eventual oferta
+    pública que la valuaría en hasta $1.2 billones— se traduce en una ganancia no operativa en el estado de resultados
+    de Amazon. Eso ya ocurrió dos veces en 2026: $16.8 mil millones antes de impuestos en el primer trimestre y $53.4
+    mil millones en el segundo, un total de $70.2 mil millones en seis meses que no tiene relación con el desempeño
+    operativo del e-commerce o de AWS. Si la valuación de Anthropic se sostiene o sigue subiendo (por ejemplo, en un
+    escenario de IPO), la participación de Amazon podría valer entre $180 y $240 mil millones a la valuación de $1.2
+    billones comentada en el mercado —muy por encima de los ~$74.2 mil millones registrados en el balance al 30-jun-2026—, pero
+    también es una posición que puede revertirse si esa valuación privada retrocede (Sección 14).
+  </p>
+  <h3>Trainium: la ventaja de costos que el mercado está empezando a pagar</h3>
+  <p>
+    Una parte central de por qué el mercado reaccionó con tanta fuerza al reporte —y de por qué este informe revisa al
+    alza, en la Sección 13, los supuestos de margen y capex del DCF frente a una primera lectura más conservadora— es
+    la economía de los chips propios de Amazon. El negocio de silicio a medida (Graviton, Trainium, Nitro) ya opera a
+    una tasa anualizada de ingresos de más de $20 mil millones, con crecimiento interanual de triple dígito, y
+    acumula compromisos de ingresos multianuales por más de $225 mil millones, casi enteramente ligados a Trainium.
+    Management fue explícito en la earnings call: Trainium puede ahorrar decenas de miles de millones de dólares de
+    capex por año frente a depender de GPUs de terceros, y genera varios cientos de puntos básicos de ventaja de
+    margen operativo en cargas de trabajo de inferencia. Trainium3, la generación más reciente, mejora el
+    price-performance 30-40% frente a Trainium2 y reduce el consumo energético ~40% — relevante en un contexto donde
+    la disponibilidad de energía, no solo de chips, empieza a ser el cuello de botella de la industria. Es la pieza de
+    evidencia más concreta de que el capex elevado no es gasto puro: una porción se está convirtiendo en ventaja de
+    costo estructural frente a competir solo con GPUs de Nvidia compradas a precio de mercado.
+  </p>
+  <h3>Publicidad y Prime Video: el negocio de mayor margen que menos atención recibe</h3>
+  <p>
+    Los ingresos de publicidad crecieron 26% interanual a $19.8 mil millones en el trimestre, impulsados por mayor
+    engagement en anuncios de Prime Video —incluyendo deportes en vivo— y por herramientas de IA para anunciantes
+    (Ads Agent) que Amazon dice mejoran el desempeño de las campañas. Es, después de AWS, el segundo negocio de mayor
+    margen de la compañía, y su crecimiento de doble dígito alto compensa parcialmente los márgenes más comprimidos
+    del retail core en North America e International.
+  </p>
+  <h3>Guía de tercer trimestre 2026</h3>
+  <p>
+    Management guio ingresos de $197-202 mil millones y utilidad operativa de $22.5-26.5 mil millones para el tercer
+    trimestre de 2026 —un rango que, en el punto medio de utilidad operativa ($24.5 mil millones), implicaría una leve
+    desaceleración secuencial del margen operativo consolidado frente al 13.7% de este trimestre, coherente con el
+    ritmo de inversión en capacidad que la propia guía de capex elevada sugiere.
+  </p>
+
+  <!-- 05 -->
+  <p class="secnum" id="s05">05 — Estados Financieros</p>
+  <h2>Los últimos dos trimestres, y por qué la utilidad neta TTM no es lo que aparenta</h2>
+  <p>
+    La utilidad operativa —que no incluye las ganancias por Anthropic— muestra una aceleración consistente: 13.1% de
+    margen en el primer trimestre de 2026 y 13.7% en el segundo, ambos por encima del rango de 9.7%-11.8% de los
+    cuatro trimestres anteriores. Es la lectura "limpia" del negocio. La utilidad neta, en cambio, se disparó a niveles
+    que no tienen relación con esa mejora operativa: 16.7% de margen neto en el primer trimestre y 31.2% en el
+    segundo, ambos inflados por las ganancias de Anthropic ya descritas en la Sección 04.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">1Q 2026</th><th class="right-al">2Q 2026</th><th class="right-al">TTM (jul-2025 a jun-2026)</th></tr>
+    <tr><td class="label">Ingresos totales</td><td class="right-al">$181.52B</td><td class="right-al">$200.61B</td><td class="right-al">$775.68B</td></tr>
+    <tr><td class="label">Var. interanual</td><td class="right-al pos">+17%</td><td class="right-al pos">+20%</td><td class="right-al pos">+17.9%</td></tr>
+    <tr><td class="label">Utilidad operativa</td><td class="right-al">$23.85B</td><td class="right-al">$27.46B</td><td class="right-al">$93.71B</td></tr>
+    <tr><td class="label">Margen operativo</td><td class="right-al">13.1%</td><td class="right-al">13.7%</td><td class="right-al">12.1%</td></tr>
+    <tr><td class="label">Utilidad neta (GAAP)</td><td class="right-al">$30.26B</td><td class="right-al">$62.65B</td><td class="right-al">$135.28B</td></tr>
+    <tr><td class="label">Margen neto (GAAP)</td><td class="right-al">16.7%</td><td class="right-al">31.2%</td><td class="right-al">17.4%</td></tr>
+    <tr><td class="label">Ganancia no operativa por Anthropic (pretax)</td><td class="right-al">$16.8B</td><td class="right-al">$53.4B</td><td class="right-al">$70.2B (1S26)</td></tr>
+    <tr><td class="label">Utilidad neta normalizada (estimación propia, ex-Anthropic)</td><td class="right-al">~$17.5B</td><td class="right-al">~$22.1B</td><td class="right-al">~$81.9B</td></tr>
+    <tr><td class="label">EPS diluido (GAAP)</td><td class="right-al">$2.78</td><td class="right-al">$5.75</td><td class="right-al">$12.43</td></tr>
+    <tr><td class="label">D&amp;A del trimestre</td><td class="right-al">$18.95B</td><td class="right-al">$19.99B</td><td class="right-al">$75.20B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL companyfacts API (CIK 0001018724) y comunicados 8-K de resultados de 1Q y 2Q 2026. La "utilidad neta normalizada" es una estimación propia que excluye la ganancia pretax por Anthropic de cada trimestre neta de un impuesto aproximado del 24% (tasa efectiva histórica de Amazon) — Amazon no reporta esta cifra como métrica non-GAAP oficial; es un ajuste analítico de este informe, no una cifra publicada por la compañía. EPS TTM GAAP calculado sobre 10.903B de acciones diluidas (2Q 2026).</p>
+  <p>
+    Con la ganancia no operativa aislada, la utilidad neta normalizada TTM es de aproximadamente $81.9 mil millones —un
+    EPS normalizado de ~$7.51, muy por debajo del EPS GAAP TTM de $12.43—. Esto importa para la Sección 13: sobre el
+    precio intradía del 31-jul-2026 ($270.20, ya con el salto post-reporte), el P/E TTM GAAP da 21.7x y el P/E TTM
+    normalizado (EPS ex-Anthropic) da 36.0x — ambos más altos que un día antes, porque el mercado empujó el precio muy
+    por encima del ritmo al que la propia utilidad creció. Proveedores de datos de mercado como GuruFocus reportaban,
+    al 30-jul-2026 (antes del salto), un P/E TTM de 27.74x para AMZN —sobre el cierre pre-reporte, ya desactualizado
+    tras el movimiento del día siguiente—. Este informe usa el EPS normalizado, no el GAAP, en los métodos de
+    comparables e histórico de la Sección 13, precisamente para evitar este tipo de distorsión.
+  </p>
+  <div class="chartbox">
+    <canvas id="marginChart" height="260"></canvas>
+    <p class="chartcap">Margen operativo (línea limpia) vs. margen neto GAAP (distorsionado por Anthropic en 1Q y 2Q 2026), últimos 8 trimestres. Fuente: SEC EDGAR XBRL.</p>
+  </div>
+
+  <!-- 06 -->
+  <p class="secnum" id="s06">06 — Deuda y Balance</p>
+  <h2>De caja neta a deuda neta: el balance que financia el capex de $220B</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica (al 30 jun 2026)</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Efectivo y equivalentes</td><td class="right-al">$78.21B</td></tr>
+    <tr><td class="label">Deuda de largo plazo</td><td class="right-al">$132.99B</td></tr>
+    <tr class="total"><td class="label">Deuda neta (posición neta)</td><td class="right-al neg">-$54.78B</td></tr>
+    <tr><td class="label">Deuda neta hace 12 meses (2Q 2025)</td><td class="right-al pos">+$1.66B (caja neta)</td></tr>
+    <tr><td class="label">Emisión de deuda últimos 12 meses</td><td class="right-al">~$107B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL companyfacts API, conceptos CashAndCashEquivalentsAtCarryingValue y LongTermDebt/LongTermDebtNoncurrent. Emisión de deuda 12 meses: CNBC, MLQ News, Yahoo Finance (jul-2026).</p>
+  <p>
+    Amazon pasó, en apenas doce meses, de una posición de caja neta apenas positiva de ~$1.7 mil millones (2Q 2025) a una
+    posición de <strong>deuda neta de $54.8 mil millones</strong> (2Q 2026) — el cambio de balance más significativo
+    de todo el panel de mega-caps que cubre este desk, y consecuencia directa del financiamiento del capex. En los
+    últimos doce meses, Amazon emitió aproximadamente $107 mil millones en bonos: cerca de $54 mil millones en
+    mercados de EE.UU. y Europa a comienzos de 2026, $10 mil millones adicionales en dólares canadienses en junio, y
+    una colocación final de $25 mil millones en ocho tramos en julio —explícitamente destinada a financiar capacidad
+    de IA comprometida con clientes como OpenAI y Anthropic—, con management señalando que no habría más emisiones de
+    deuda en lo que resta de 2026. Un detalle relevante de esa última colocación: la demanda fue de apenas 1.6 veces
+    el monto ofrecido, muy por debajo del promedio de 4 veces para colocaciones investment-grade en 2026 —una señal,
+    todavía temprana, de que el mercado de bonos empieza a mostrarse más selectivo frente a la oferta creciente de
+    deuda ligada a infraestructura de IA (más de $335 mil millones emitidos por el sector en el año), un riesgo que
+    este informe retoma en la Sección 10.
+  </p>
+  <p>
+    El apalancamiento en sí no es, todavía, un problema de solvencia: $133 mil millones de deuda de largo plazo frente
+    a un EBITDA TTM aproximado de $168.9 mil millones (utilidad operativa + D&amp;A) es un ratio de 0.8x, manejable
+    para una compañía de este tamaño y generación de caja. Pero es el primer año en la historia reciente de Amazon en
+    que el financiamiento externo, y no solo la caja generada internamente, se vuelve una pieza necesaria del
+    financiamiento del capex — un cambio estructural que vale la pena monitorear trimestre a trimestre.
+  </p>
+
+  <!-- 07 -->
+  <p class="secnum" id="s07">07 — Flujo de Caja y Capital Allocation</p>
+  <h2>FCF negativo en los últimos doce meses — la primera vez en años</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">TTM (jul-2025 a jun-2026)</th></tr>
+    <tr><td class="label">Flujo de caja operativo (OCF)</td><td class="right-al">$161.40B</td></tr>
+    <tr><td class="label">Capex (adiciones a activos productivos)</td><td class="right-al">$173.03B</td></tr>
+    <tr class="total"><td class="label">Flujo de caja libre (FCF)</td><td class="right-al neg">-$11.63B</td></tr>
+    <tr><td class="label">Margen de FCF sobre ingresos</td><td class="right-al neg">-1.5%</td></tr>
+    <tr><td class="label">Capex como % de ingresos</td><td class="right-al">22.3%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL companyfacts API, conceptos NetCashProvidedByUsedInOperatingActivities y PaymentsToAcquireProductiveAssets, TTM calculado sobre los últimos cuatro trimestres reportados.</p>
+  <p>
+    El flujo de caja libre de los últimos doce meses es negativo — la primera vez que esto ocurre en la historia
+    reciente de Amazon fuera de los trimestres de pico de inversión en fulfillment de 2020-2021. No es un evento de
+    cola: es la consecuencia matemática directa de un capex ($173 mil millones TTM, camino a ~$220 mil millones para
+    el año calendario completo 2026) que ya supera al flujo de caja operativo generado en el mismo período. A
+    diferencia de Microsoft o Alphabet, que financian su propio capex con FCF todavía positivo (aunque comprimido),
+    Amazon está, en este momento, financiando una porción de su inversión con deuda nueva (Sección 06) — no
+    únicamente con caja operativa.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Año</th><th class="right-al">Capex</th><th class="right-al">Capex/Ingresos</th></tr>
+    <tr><td class="label">FY2021</td><td class="right-al">$61.05B</td><td class="right-al">13.0%</td></tr>
+    <tr><td class="label">FY2022</td><td class="right-al">$63.65B</td><td class="right-al">12.4%</td></tr>
+    <tr><td class="label">FY2023</td><td class="right-al">$52.73B</td><td class="right-al">9.2%</td></tr>
+    <tr><td class="label">FY2024</td><td class="right-al">$83.00B</td><td class="right-al">13.0%</td></tr>
+    <tr><td class="label">FY2025</td><td class="right-al">$131.82B</td><td class="right-al">18.4%</td></tr>
+    <tr class="total"><td class="label">FY2026 (guía)</td><td class="right-al">~$220B</td><td class="right-al">~26.6%*</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL (PaymentsToAcquireProductiveAssets, 10-K de cada año fiscal). *Capex/Ingresos FY2026 estimado sobre el consenso de ingresos FY2026 ($825.58B, Sección 12) — ver salvedad de precisión en Sección 14.</p>
+  <p>
+    Amazon no paga dividendos —nunca lo ha hecho— y su único programa de recompras activo es una autorización de $10
+    mil millones aprobada en marzo de 2022, de la cual quedaban apenas $6.1 mil millones sin utilizar según la última
+    divulgación disponible. A diferencia de Apple o Microsoft, las recompras de Amazon no funcionan como vehículo real
+    de retorno de capital: sirven principalmente para compensar la dilución de la compensación basada en acciones
+    (~$19.5 mil millones otorgados en 2025), y aun así el conteo de acciones en circulación al 2026 es mayor que en 2022.
+    La política de capital allocation de Amazon es, y siempre fue, 100% reinversión — un contraste que vale la pena
+    tener presente frente a AAPL y MSFT (informes de este mismo desk).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Compañía</th><th class="right-al">Capex FY2026 / guía</th></tr>
+    <tr class="total"><td class="label">Amazon (AMZN)</td><td class="right-al">~$220B (guía 2026, elevada desde $200B)</td></tr>
+    <tr><td class="label">Microsoft (MSFT)</td><td class="right-al">$115.95B (FY26 real) → $255-260B guiado (FY27)</td></tr>
+    <tr><td class="label">Alphabet (GOOGL)</td><td class="right-al">hasta $205B (guía 2026 elevada)</td></tr>
+    <tr><td class="label">Meta (META)</td><td class="right-al">$125-145B (guía 2026)</td></tr>
+    <tr><td class="label">Apple (AAPL)</td><td class="right-al">~$13-14B (FY26)</td></tr>
+  </table></div>
+  <p class="footnote">Fuentes: comunicados y earnings calls de cada compañía, Converge Digest, Motley Fool, Investing.com, Value Add VC. Cifras de pares con distinto grado de precisión y ventanas temporales (año fiscal vs. calendario) — ver Sección 08.</p>
+  <div class="chartbox">
+    <canvas id="capexChart" height="280"></canvas>
+    <p class="chartcap">Capex 2026 (calendario o guía de año fiscal más reciente) por compañía — Amazon lidera el panel en magnitud absoluta. Escala logarítmica.</p>
+  </div>
+
+  <!-- 08 -->
+  <p class="secnum" id="s08">08 — Comparables de Industria</p>
+  <h2>AMZN frente a dos comparables de cloud y dos de retail premium</h2>
+  <p>
+    Amazon es, en sí misma, un híbrido de dos modelos de negocio que no tienen un comparable directo único. Elegimos
+    cuatro comparables que capturan cada mitad de la historia: Microsoft y Alphabet compiten directamente con AWS en
+    infraestructura de cloud e IA empresarial; Walmart y Costco son los comparables más directos del negocio de
+    retail, con un perfil de márgenes y crecimiento estructuralmente distinto (más estable, de menor crecimiento, y
+    con múltiplos de "calidad defensiva" que el mercado le paga a ese tipo de negocio).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Ticker</th><th class="right-al">P/E TTM</th><th class="right-al">P/E Forward</th></tr>
+    <tr class="total"><td class="label">AMZN</td><td class="right-al">21.7x*</td><td class="right-al">25.8x**</td></tr>
+    <tr><td class="label">MSFT</td><td class="right-al">21.8x</td><td class="right-al">23.4x</td></tr>
+    <tr><td class="label">GOOGL</td><td class="right-al">16.0x</td><td class="right-al">24.1x</td></tr>
+    <tr><td class="label">WMT</td><td class="right-al">40.2x</td><td class="right-al">39.2x</td></tr>
+    <tr><td class="label">COST</td><td class="right-al">46.1x</td><td class="right-al">42.9x</td></tr>
+  </table></div>
+  <p class="footnote">*El P/E TTM de AMZN ya incorpora el salto de precio del 31-jul-2026 ($270.20) — sigue distorsionado a la baja por las ganancias no operativas de Anthropic (Sección 05); sobre EPS normalizado ($7.51), el múltiplo equivalente sería ~36.0x. **El P/E forward de AMZN usa el consenso FY2026 de $10.48/acción, que también incluye el efecto de ambas ganancias de Anthropic ya realizadas en el año — es, en ese sentido, tan poco representativo como el TTM sin ajustar (ver Sección 12 para el detalle del ajuste). El P/E TTM de GOOGL sigue distorsionado al alza por su propia ganancia no operativa puntual (informes de GOOGL y MSFT de este desk). Fuente: cálculo propio sobre precio de AMZN intradía del 31-jul-2026 ($270.20) y precios de cierre del 30-jul-2026 para los comparables (MSFT $451.10, GOOGL $333.66, WMT $111.10, COST $954.17, sin actualizar a intradía) y EPS TTM/forward de cada compañía (GuruFocus, fullratio.com para pares).</p>
+  <div class="chartbox">
+    <canvas id="compsChart" height="280"></canvas>
+    <p class="chartcap">P/E TTM comparado — Amazon cotiza al múltiplo más bajo del panel, pero el dato está distorsionado por la ganancia de Anthropic; Walmart y Costco cotizan con premium de "retail de calidad" sin relación con el negocio de cloud de AMZN.</p>
+  </div>
+
+  <h3>Microsoft (MSFT) — el comparable de cloud más directo, con Azure como espejo de AWS</h3>
+  <p>
+    Microsoft cerró su año fiscal 2026 con Azure acelerando a +43% interanual, ligeramente por encima del +36.7% de
+    AWS este trimestre, y con una guía de capex FY2027 ($255-260 mil millones) que supera incluso a la de Amazon en
+    términos nominales, aunque sobre un año fiscal distinto. El informe de MSFT de este desk desarrolla en profundidad
+    la tesis de que el mercado paga el múltiplo más bajo del panel de mega-caps tech por Microsoft pese a ese
+    crecimiento — un patrón parecido al que observamos en Amazon una vez que se ajusta el múltiplo por la distorsión
+    de Anthropic.
+  </p>
+  <h3>Alphabet (GOOGL) — Google Cloud crece más rápido que AWS, con su propia distorsión no operativa</h3>
+  <p>
+    Google Cloud creció 82% interanual en su trimestre más reciente —más del doble que AWS— con un backlog de $514 mil
+    millones, aunque partiendo de una base más chica. El P/E TTM de 16.0x que muestra la tabla está, igual que el de
+    AMZN, distorsionado por una ganancia no operativa puntual (documentada en el informe de GOOGL de este desk); el
+    forward (24.1x) es la cifra más representativa del negocio real de Alphabet. Es, junto con Microsoft, el
+    competidor de cloud más directo de AWS.
+  </p>
+  <h3>Walmart (WMT) — la comparación de retail físico, con un múltiplo que Amazon nunca tuvo que justificar por escala</h3>
+  <p>
+    Walmart cotiza a 40.2x TTM, todavía por encima del múltiplo normalizado de Amazon (~36.0x tras el salto del
+    31-jul-2026) pese a un crecimiento de ingresos estructuralmente menor —Walmart no tiene un segmento de cloud que
+    le aporte márgenes de casi 40%—. La
+    prima de Walmart refleja la lectura del mercado sobre la estabilidad y previsibilidad de su negocio de retail
+    físico y digital combinado, más que una comparación directa de calidad de negocio frente a Amazon.
+  </p>
+  <h3>Costco (COST) — el múltiplo más alto del panel, sin ningún negocio de cloud detrás</h3>
+  <p>
+    Costco cotiza al múltiplo más alto de los cuatro comparables (46.1x TTM) apoyado en un modelo de membresías de
+    altísima retención y lealtad de cliente, no en crecimiento de ingresos particularmente acelerado. Es el ejemplo
+    más claro de que, en el universo de comparables de este informe, el múltiplo de "retail de calidad" que el mercado
+    le paga a Costco y Walmart no tiene relación alguna con la escala de infraestructura de IA que definirá los
+    próximos años para AWS, Azure y Google Cloud.
+  </p>
+  <p class="pull">
+    El patrón que emerge del panel: los dos comparables de cloud (MSFT, GOOGL) cotizan a múltiplos forward
+    relativamente contenidos (23-24x) pese a un crecimiento de doble dígito alto en sus respectivos negocios de nube;
+    los dos comparables de retail (WMT, COST) cotizan con una prima sustancial (39-43x forward) por estabilidad y
+    calidad de ejecución, no por crecimiento. Amazon, que combina ambos negocios, termina en un punto intermedio una
+    vez que se normaliza su propio múltiplo por la distorsión de Anthropic — ni tan barata como sus pares de cloud, ni
+    con la prima de "calidad defensiva" que el mercado le reconoce a Walmart o Costco.
+  </p>
+
+  <!-- 09 -->
+  <p class="secnum" id="s09">09 — Gobierno Corporativo y Estructura Accionaria</p>
+  <h2>Bezos como Executive Chairman, Jassy con la compensación en cash más baja del panel de mega-caps</h2>
+  <p>
+    Amazon combina una estructura de propiedad con un fundador todavía muy presente (Jeff Bezos, como Executive
+    Chairman del directorio) con una compensación ejecutiva en efectivo inusualmente baja para el CEO en actividad —
+    Andrew Jassy cobra un salario base de apenas $365.000 anuales, una fracción de lo que cobran sus pares de Apple o
+    Microsoft, porque la enorme mayoría de su patrimonio en la compañía proviene de adjudicaciones de acciones ya
+    otorgadas en años anteriores, no de compensación corriente.
+  </p>
+  <div class="govrow">
+    <div class="govcell"><div class="k">Ownership insider</div><div class="v">~8.9%</div><div class="sub">Jeff Bezos posee ~950 millones de acciones (8.8% del capital) — por lejos el mayor accionista individual. El resto de ejecutivos y directores, excluyendo a Bezos, suma apenas ~3.4 millones de acciones (~0.03%).</div></div>
+    <div class="govcell"><div class="k">Ownership institucional</div><div class="v">~64.1%</div><div class="sub">BlackRock (6.8%) y Vanguard (6.8%) son los mayores accionistas institucionales, seguidos por State Street (3.6%).</div></div>
+    <div class="govcell"><div class="k">Directorio 2026</div><div class="v">11 miembros</div><div class="sub">Incluye a Bezos (Executive Chairman), Jassy (CEO), y los directores independientes Weeks, Stonesifer, Smith, Rubinstein, Nooyi, Ng, Huttenlocher, Gorelick y Cooper.</div></div>
+    <div class="govcell"><div class="k">Compensación CEO (FY2025)</div><div class="v">~$2.1M</div><div class="sub">Andrew Jassy: $365K salario + ~$1.7M en costos de seguridad y viajes de negocio — sin adjudicación nueva de acciones en 2025. Tenía ~$242M en acciones restringidas no adquiridas al cierre de 2025.</div></div>
+    <div class="govcell"><div class="k">Participación en Anthropic</div><div class="v">15-20% · ~$74.2B</div><div class="sub">~$13.000M invertidos desde 2023 (notas convertibles + acciones preferentes no votantes). Valor de libros tras la revaluación de 2Q 2026 — ver Sección 04.</div></div>
+    <div class="govcell"><div class="k">CEO / Chairman</div><div class="v">Jassy / Bezos</div><div class="sub">Jassy es CEO desde jul-2021 (sucedió a Bezos, quien fundó la compañía en 1994 y preside el directorio como Executive Chairman).</div></div>
+  </div>
+  <p class="footnote">Fuentes: TIKR.com, WallStreetZen (ownership), Yahoo Finance/AOL ("Who owns Amazon"), SEC EDGAR Form DEF 14A (compensación, presentado 8-abr-2026), CEOPayWatch.</p>
+  <p>
+    La compensación de Jassy contrasta fuertemente con la de Satya Nadella en Microsoft (~$96.5 millones anuales,
+    informe de MSFT de este desk) — no porque Jassy esté peor pagado en términos económicos reales (mantiene ~$242
+    millones en acciones restringidas pendientes de adquirir, más que suficiente incentivo de largo plazo), sino
+    porque su ciclo de adjudicaciones de acciones ya se otorgó en años anteriores y simplemente no le tocó una nueva
+    concesión en 2025. La estructura de gobierno de Amazon —con Bezos todavía en el directorio como Executive
+    Chairman y como el mayor accionista individual por un margen amplio— es un matiz relevante frente a Microsoft o
+    Alphabet, donde ningún fundador mantiene ese nivel de involucramiento formal.
+  </p>
+
+  <!-- 10 -->
+  <p class="secnum" id="s10">10 — Registro de Riesgos</p>
+  <h2>Qué podría cambiar esta lectura</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Riesgo</th><th>Descripción</th><th class="right-al">Severidad</th></tr>
+    <tr><td class="label">FCF negativo sostenido</td><td class="label">El FCF de los últimos doce meses ya es negativo (-$11.6B); con la guía de capex elevada a ~$220B para el año calendario completo, el FCF podría permanecer negativo o comprimirse más antes de normalizarse — no es un evento de cola, es la trayectoria actual del negocio.</td><td class="right-al">Alta</td></tr>
+    <tr><td class="label">Ganancias no operativas que distorsionan el EPS GAAP</td><td class="label">$70.2 mil millones en ganancias pretax por Anthropic en solo dos trimestres de 2026 infla el EPS GAAP y el consenso de EPS FY2026 ($10.48) muy por encima de la rentabilidad operativa real — un inversor que mire solo el titular puede sobreestimar la mejora del negocio core, o el mercado puede sobre-reaccionar si la valuación privada de Anthropic retrocede.</td><td class="right-al">Alta</td></tr>
+    <tr><td class="label">Apalancamiento creciente y demanda de bonos más débil</td><td class="label">Amazon pasó de caja neta a deuda neta de $54.8B en doce meses, con ~$107B de emisión de deuda; la última colocación de $25B tuvo una demanda de solo 1.6x, muy por debajo del promedio de 4x del mercado investment-grade en 2026 — una señal temprana de fatiga inversora frente a la oferta de deuda ligada a IA.</td><td class="right-al">Media-Alta</td></tr>
+    <tr><td class="label">Retorno del capex de AWS sin confirmar en su totalidad</td><td class="label">El backlog (RPO) de $364B sugiere demanda contratada real, pero no está claro qué porción de ese backlog depende de acuerdos con contrapartes (como Anthropic y OpenAI) en las que Amazon también tiene exposición de capital — un patrón de "inversión circular" similar al señalado en el informe de MSFT de este desk.</td><td class="right-al">Alta (estructural)</td></tr>
+    <tr><td class="label">Márgenes de retail estructuralmente bajos</td><td class="label">North America (7.9%) e International (4.1%) siguen siendo negocios de márgenes delgados frente a AWS (39.3%); cualquier desaceleración de AWS dejaría a la compañía consolidada mucho más expuesta a la rentabilidad más baja del retail.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Concentración de clientes de AWS en pocos hyperscalers de IA</td><td class="label">Una porción relevante del crecimiento reciente de AWS depende de un puñado de clientes de IA generativa (Anthropic, y otros); una moderación del gasto de cualquiera de ellos afectaría el crecimiento de AWS de forma directa.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Ausencia de retorno de capital real a accionistas</td><td class="label">Sin dividendos y con recompras que apenas compensan la dilución por compensación en acciones (~$19.5B en 2025), el accionista de Amazon depende enteramente de la apreciación del capital — no hay un piso de retorno de capital como en AAPL o MSFT.</td><td class="right-al">Baja-Media</td></tr>
+  </table></div>
+
+  <!-- 11 -->
+  <p class="secnum" id="s11">11 — Catalizadores</p>
+  <h2>Agenda de eventos relevantes</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Fecha</th><th>Evento</th></tr>
+    <tr><td class="label">30 Jul 2026</td><td class="label">Resultados 2Q 2026 — AWS +36.7%, capex 2026 elevado a ~$220B, ganancia no operativa de $53.4B por Anthropic. Punto de partida de este informe.</td></tr>
+    <tr><td class="label">Oct 2026 (estimado)</td><td class="label">Resultados 3Q 2026 — guía de management: ingresos $197-202B, utilidad operativa $22.5-26.5B. Primera lectura de si el capex elevado ya se refleja en el margen consolidado.</td></tr>
+    <tr><td class="label">En curso, sin fecha fija</td><td class="label">Evolución de una eventual oferta pública (IPO) de Anthropic — de concretarse a la valuación de $1.2 billones que circula en el mercado, la participación de Amazon podría re-marcarse muy por encima de los ~$74.2B actuales en libros, con un nuevo impacto no operativo en el estado de resultados.</td><td></td></tr>
+    <tr><td class="label">En curso</td><td class="label">Evolución del backlog (RPO) de AWS ($364B) trimestre a trimestre — la métrica más directa para juzgar si el capex de ~$220B tiene demanda contratada suficiente detrás.</td></tr>
+    <tr><td class="label">En curso</td><td class="label">Recepción del mercado de bonos a futuras emisiones de deuda de Big Tech ligada a IA — la oversubscription de solo 1.6x en la última colocación de Amazon (Sección 06) es la señal a monitorear.</td></tr>
+  </table></div>
+
+  <!-- 12 -->
+  <p class="secnum" id="s12">12 — Modelo Financiero Proyectado y Momentum de Estimados</p>
+  <h2>Consenso FY2026: una cifra que hay que leer con la misma salvedad que el EPS del trimestre</h2>
+  <p>
+    El consenso de analistas para el año calendario 2026 (post-reporte del 30-jul-2026) proyecta ingresos de $825.58
+    mil millones (+15.2% interanual sobre los $716.92 mil millones de FY2025) y un EPS de $10.48 (+46.2% interanual
+    sobre los $7.17 de FY2025). Ese salto de EPS es engañoso por la misma razón desarrollada en la Sección 05: incluye
+    los $70.2 mil millones en ganancias pretax por Anthropic ya reconocidas en el primer semestre del año. Descontando
+    ese efecto con nuestra propia estimación de normalización (Sección 05), este informe usa un <strong>EPS FY2026
+    normalizado de ~$8.06</strong> —todavía un crecimiento saludable de doble dígito frente al FY2025 real, pero
+    sustancialmente menor al $10.48 del consenso sin ajustar— como input de los métodos de comparables e histórico de
+    la Sección 13.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">FY2025 (real)</th><th class="right-al">FY2026E (consenso, sin ajustar)</th><th class="right-al">FY2026E (normalizado, estimación propia)</th></tr>
+    <tr><td class="label">Ingresos</td><td class="right-al">$716.92B</td><td class="right-al">$825.58B</td><td class="right-al">$825.58B</td></tr>
+    <tr><td class="label">EPS diluido</td><td class="right-al">$7.17</td><td class="right-al">$10.48</td><td class="right-al">~$8.06</td></tr>
+  </table></div>
+  <p class="footnote">Consenso FY2026 sin ajustar: stockanalysis.com (62 analistas), post-reporte 30-jul-2026. EPS normalizado: estimación propia, ver metodología de ajuste en Sección 05 — no es una cifra publicada por Amazon ni por el consenso de analistas.</p>
+  <div class="chartbox">
+    <canvas id="revisionChart" height="220"></canvas>
+    <p class="chartcap">EPS diluido 2Q 2026: consenso pre-reporte vs. resultado real GAAP — la brecha de $1.82 a $5.75 es, casi en su totalidad, la ganancia no operativa de Anthropic, no un beat operativo de esa magnitud.</p>
+  </div>
+  <p>
+    El consenso, según el corte más reciente disponible tras el reporte (TipRanks, 31-jul-2026), es de 45 analistas
+    con calificación "Strong Buy" (44 Buy, 1 Hold) y un precio objetivo promedio de <strong>$318.93</strong> —todavía
+    calculado sobre una base de precio previa al salto intradía del 31-jul-2026, por lo que el upside implícito real
+    sobre el precio actual ($270.20) es de aproximadamente 18%, no el ~34-37% que muestran los agregadores que no
+    actualizaron el denominador. Varios analistas ya revisaron su precio objetivo al alza específicamente después del
+    reporte: Goldman Sachs a $335 (desde $325), Deutsche Bank a $325 (desde $315), Bank of America y Bernstein a $320
+    cada uno, y Wells Fargo a $313. Es razonable asumir que una porción de ese optimismo post-reporte también
+    incorpora, sin plena discriminación, el efecto de las ganancias de Anthropic sobre las proyecciones de EPS de cada
+    analista — una limitación que reconocemos explícitamente y que no podemos cuantificar con precisión sin acceso al
+    detalle línea por línea de cada modelo individual (Sección 14).
+  </p>
+  <h3>El salto de precio del 31-jul-2026, en contexto</h3>
+  <p>
+    Más allá del consenso de EPS, el dato de "momentum" más directo de este informe es el propio precio: la acción
+    saltó de $235.50 (cierre del día del reporte) a $270.20 (intradía del día siguiente) — un movimiento de +14.7% que
+    coloca a Amazon, según cobertura de CNBC del mismo día, entre los principales "ganadores" de la temporada de
+    resultados de IA, en contraste con Apple, que cayó ese mismo día. El mercado está leyendo tres señales como
+    estructurales, no puntuales: la reaceleración de AWS a +37% (su mejor ritmo en al menos tres años), el backlog de
+    $364 mil millones —que ni siquiera incluye el acuerdo de cómputo de una década por más de $100 mil millones con
+    Anthropic ni el compromiso de $138 mil millones de OpenAI a ocho años, ambos ya contratados—, y la evidencia
+    reciente de que el capex se está traduciendo en ventaja de costo real vía Trainium (Sección 04), no solo en gasto.
+    Es, en conjunto, la explicación más directa de por qué el mercado le asigna a Amazon una valuación por encima de
+    lo que arroja un DCF consolidado tradicional — y la razón por la que este informe suma, en la Sección 13, un
+    quinto método (suma de las partes) que aísla el valor de AWS del resto del negocio.
+  </p>
+
+  <!-- 13 — VALUACIÓN, AL FINAL -->
+  <p class="secnum" id="s13">13 — Valuación: Cinco Métodos y el Fair Value</p>
+  <h2>Cuánto vale la acción, con la ganancia de Anthropic aislada de cada método</h2>
+  <p>
+    Calculamos el valor razonable de la acción con cinco enfoques independientes entre sí — flujo de caja descontado,
+    múltiplos de comparables, suma de las partes, reversión a la media histórica propia, y el consenso de analistas de
+    Wall Street — y mostramos las cinco cifras sin forzarlas a converger artificialmente. En los métodos que usan una
+    cifra de EPS (comparables, histórico y, de forma indirecta, el consenso), usamos el EPS normalizado (ex-Anthropic)
+    de la Sección 12, no el EPS GAAP ni el consenso sin ajustar — precisamente para que la ganancia no operativa
+    puntual no contamine la valuación. El Método 3 (suma de las partes) es una incorporación de esta revisión del
+    informe, motivada por una pregunta concreta: ¿por qué el mercado y el consenso de Wall Street valúan a Amazon muy
+    por encima de lo que arroja un DCF consolidado tradicional? La respuesta, desarrollada en el Método 3, es que un
+    DCF que mezcla AWS (cloud, 39% de margen operativo, backlog de $364B) con e-commerce (7-8% de margen) en un solo
+    flujo de caja diluye la parte más valiosa del negocio — un problema conocido de los DCF consolidados en compañías
+    con segmentos de rentabilidad muy distinta, y la razón por la que la propia cobertura de research de Wall Street
+    sobre AMZN utiliza rutinariamente sum-of-the-parts en lugar de (o además de) un DCF único.
+  </p>
+
+  <h3>Método 1 — Flujo de caja descontado (DCF), tres escenarios</h3>
+  <p>
+    Construimos un modelo de flujo de caja descontado a dos etapas (cinco años explícitos de proyección más valor
+    terminal por crecimiento perpetuo). El año 1 de los tres escenarios usa el mismo ingreso ancla —el consenso real
+    de ingresos FY2026 ($825.58 mil millones, ya con el primer semestre efectivamente reportado)— para que la única
+    variable que difiera entre escenarios en el año 1 sea el margen de OCF y el capex, no el ingreso. A diferencia de
+    la primera versión de este informe, el margen de OCF y el ritmo de normalización del capex de los casos Base y
+    Bull incorporan ahora la economía de Trainium descripta en la Sección 04: management cuantificó explícitamente
+    "varios cientos de puntos básicos" de ventaja de margen operativo y "decenas de miles de millones de dólares" de
+    ahorro de capex anual frente a depender de GPUs de terceros — un dato concreto y ya divulgado, no una expectativa
+    genérica de "eficiencia futura", que justifica un margen de OCF que se expande más rápido y un capex que se
+    normaliza antes de lo que asumía la versión anterior de este modelo. El WACC base se construyó con una tasa libre
+    de riesgo ancla en el rendimiento vigente del Treasury a 10 años más un premio de riesgo accionario de 5.0%, con
+    un beta cercano a 1.15-1.2 —más alto que el de Microsoft o Alphabet, consistente con la mayor ciclicidad del
+    negocio de retail y con el reciente giro a una posición de deuda neta (Sección 06)—. El valor de la deuda neta
+    ($54.78 mil millones al 30-jun-2026) se descuenta del valor de empresa para llegar al valor de equity.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Supuesto</th><th class="right-al">Bear</th><th class="right-al">Base</th><th class="right-al">Bull</th></tr>
+    <tr><td class="label">Ingresos año 1 (FY2026, ancla real)</td><td class="right-al">$825.6B</td><td class="right-al">$825.6B</td><td class="right-al">$825.6B</td></tr>
+    <tr><td class="label">Crecimiento de ingresos (año 2 → año 5)</td><td class="right-al">9.5% → 6%</td><td class="right-al">13% → 8%</td><td class="right-al">15.5% → 10%</td></tr>
+    <tr><td class="label">Margen de OCF (año 1 → año 5)</td><td class="right-al">19.5% → 23.5%</td><td class="right-al">21% → 28%</td><td class="right-al">22.5% → 30.5%</td></tr>
+    <tr><td class="label">Capex año 1 (guía real 2026)</td><td class="right-al">$230B</td><td class="right-al">$220B</td><td class="right-al">$205B</td></tr>
+    <tr><td class="label">Capex/Ingresos (año 1 → año 5)</td><td class="right-al">27.9% → 15.5%</td><td class="right-al">26.6% → 11.5%</td><td class="right-al">24.8% → 8.5%</td></tr>
+    <tr><td class="label">WACC</td><td class="right-al">10.5%</td><td class="right-al">10.0%</td><td class="right-al">9.0%</td></tr>
+    <tr><td class="label">Crecimiento terminal</td><td class="right-al">2.5%</td><td class="right-al">3.0%</td><td class="right-al">3.5%</td></tr>
+    <tr><td class="label">FCF año 1 (OCF − Capex)</td><td class="right-al neg">&minus;$69.0B</td><td class="right-al neg">&minus;$46.6B</td><td class="right-al neg">&minus;$19.2B</td></tr>
+    <tr><td class="label">% del EV desde valor terminal</td><td class="right-al">100%</td><td class="right-al">88%</td><td class="right-al">88%</td></tr>
+    <tr class="total"><td class="label">Fair value por acción</td><td class="right-al">$57.72</td><td class="right-al">$185.24</td><td class="right-al">$365.57</td></tr>
+  </table></div>
+  <p>
+    El flujo de caja libre del año 1 sigue siendo negativo en los tres escenarios —la guía de capex real de 2026
+    (~$220 mil millones en el caso Base) todavía supera al flujo de caja operativo que ese mismo escenario genera—,
+    pero la velocidad de normalización posterior es mayor que en la lectura previa de este informe, reflejando el
+    ahorro de capex de Trainium ya divulgado por management. El caso Base asume que el capex converge desde 26.6% de
+    ingresos hacia 11.5% en el año 5 —todavía por encima del 9.2% de FY2023, pero normalizando más rápido que en
+    escenarios sin ventaja de silicio propio—, a medida que el backlog contratado de AWS se reconoce como ingreso y
+    Trainium reduce el costo por unidad de cómputo. El fair value del caso Base ($185.24) queda 31% por debajo del
+    precio de mercado ($270.20) — todavía la brecha más amplia entre DCF Base y mercado del panel de mega-caps de este
+    desk, pero menos de la mitad de la brecha que mostraba la lectura anterior de este mismo informe (57%). El
+    escenario Bull ($365.57) ya supera al precio de mercado.
+  </p>
+  <h3>Sensibilidad del caso Base: WACC × crecimiento terminal</h3>
+  <p>
+    Dado que 88% del valor de empresa del caso Base proviene del valor terminal, mostramos cómo se mueve el fair value
+    únicamente variando WACC y crecimiento terminal, con el resto de los inputs fijos. La celda marcada es el caso
+    Base reportado arriba ($185.24, WACC 10.0%, g 3.0%).
+  </p>
+  <div class="table-scroll"><table class="sens-table">
+    <tr><th>WACC \ g terminal</th><th class="right-al">2.0%</th><th class="right-al">2.5%</th><th class="right-al">3.0%</th><th class="right-al">3.5%</th><th class="right-al">4.0%</th></tr>
+    <tr><td class="axis">8.5%</td><td class="right-al">$210.56</td><td class="right-al">$227.51</td><td class="right-al">$247.55</td><td class="right-al">$271.59</td><td class="right-al">$300.97</td></tr>
+    <tr><td class="axis">9.0%</td><td class="right-al">$192.35</td><td class="right-al">$206.62</td><td class="right-al">$223.26</td><td class="right-al">$242.93</td><td class="right-al">$266.53</td></tr>
+    <tr><td class="axis">9.5%</td><td class="right-al">$176.61</td><td class="right-al">$188.75</td><td class="right-al">$202.76</td><td class="right-al">$219.10</td><td class="right-al">$238.41</td></tr>
+    <tr><td class="axis">10.0%</td><td class="right-al">$162.89</td><td class="right-al">$173.32</td><td class="right-al base-cell">$185.24</td><td class="right-al">$198.99</td><td class="right-al">$215.03</td></tr>
+    <tr><td class="axis">10.5%</td><td class="right-al">$150.81</td><td class="right-al">$159.85</td><td class="right-al">$170.09</td><td class="right-al">$181.80</td><td class="right-al">$195.30</td></tr>
+  </table></div>
+  <p class="footnote">Grilla propia, recalculando el modelo de dos etapas del caso Base (mismo crecimiento explícito, margen de OCF y capex/ingresos por año declarados arriba) para cada combinación WACC/g. La celda base ($185.24) corresponde a WACC 10.0% y g 3.0%, reproduce 88.0% de EV desde terminal.</p>
+  <p>
+    A diferencia de la lectura anterior de este informe, ahora sí hay combinaciones razonables de la grilla que superan
+    el precio de mercado ($270.20): con WACC de 8.5% y crecimiento terminal de 3.5%-4.0%, el fair value implícito
+    ($271.59-$300.97) ya iguala o supera al mercado. No se necesita forzar el modelo a un extremo poco realista para
+    cerrar la brecha —apenas mover el WACC medio punto porcentual hacia abajo, dentro de un rango de beta razonable,
+    ya lo logra—, lo que sugiere que la brecha remanente entre el DCF Base "central" ($185.24) y el mercado es, en
+    buena medida, una cuestión de qué combinación específica de WACC y crecimiento terminal se elige como "central",
+    no una discrepancia estructural irreconciliable como la que mostraba la versión anterior de este modelo.
+  </p>
+
+  <h3>Método 2 — Múltiplos de comparables</h3>
+  <p>
+    Usamos el EPS FY2026 normalizado (ex-Anthropic) de ~$8.06 (Sección 12) y le aplicamos el P/E forward de cada uno
+    de los cuatro comparables de la Sección 08 (Microsoft, Alphabet, Walmart, Costco: 32.4x promedio).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Múltiplo P/E forward aplicado</th><th class="right-al">Precio implícito</th></tr>
+    <tr><td class="label">23.4x (piso del panel, MSFT)</td><td class="right-al">$188.60</td></tr>
+    <tr><td class="label">24.1x (GOOGL)</td><td class="right-al">$194.25</td></tr>
+    <tr class="total"><td class="label">32.4x (promedio de los 4 comparables)</td><td class="right-al">$261.10</td></tr>
+    <tr><td class="label">39.2x (WMT)</td><td class="right-al">$315.95</td></tr>
+    <tr><td class="label">42.9x (techo del panel, COST)</td><td class="right-al">$345.77</td></tr>
+  </table></div>
+  <p>
+    Tomamos $261.10 (el promedio del panel de 4 comparables) como el resultado de este método. Vale la pena notar la
+    amplitud del rango: los dos comparables de cloud (MSFT, GOOGL) implican un precio cercano a $190, mientras que los
+    dos de retail premium (WMT, COST) implican más de $315 — el panel de comparables de Amazon es, por construcción,
+    el más disperso de todo el desk, precisamente porque no existe un comparable puro para un negocio que combina
+    e-commerce maduro con cloud de alto crecimiento.
+  </p>
+
+  <h3>Método 3 — Suma de las partes (SOTP): AWS y e-commerce, valuados por separado</h3>
+  <p>
+    Un DCF consolidado como el del Método 1 mezcla, en un solo flujo de caja, un negocio de cloud con 39.3% de margen
+    operativo y backlog contratado de $364 mil millones (AWS) con un negocio de e-commerce y publicidad con 7-8% de
+    margen (North America e International). Es, precisamente, el motivo que citan los propios analistas de Wall
+    Street y research independiente para preferir una suma de las partes al valuar Amazon — y la explicación más
+    directa de por qué el mercado le asigna una valuación superior a la de un DCF único. Aplicamos un múltiplo
+    EV/Ingresos de 10x sobre la tasa anualizada de ingresos de AWS ($42.2 mil millones del trimestre × 4 = $168.8 mil
+    millones) — un múltiplo moderado frente al que compañías de infraestructura cloud de alto crecimiento y máximo
+    margen suelen recibir, y sustancialmente por debajo del 21x que una nota pública reciente (24/7 Wall St.) aplicó
+    usando como referencia el múltiplo de ingresos de OpenAI. Al negocio de e-commerce y publicidad (ingresos TTM
+    consolidados menos la tasa anualizada de AWS, $775.7B − $168.8B ≈ $606.9B) le aplicamos un múltiplo de 2.2x
+    ingresos, coherente con el mix de retail de márgenes finos más un negocio de publicidad de alto margen —más
+    conservador que el 4x que la misma nota usó por analogía con eBay, una compañía sin el capex de logística de
+    Amazon—.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Segmento</th><th class="right-al">Base de ingresos</th><th class="right-al">Múltiplo</th><th class="right-al">Valor de empresa</th></tr>
+    <tr><td class="label">AWS</td><td class="right-al">$168.8B (tasa anualizada, 2Q26)</td><td class="right-al">10.0x</td><td class="right-al">$1,688B</td></tr>
+    <tr><td class="label">E-commerce + publicidad</td><td class="right-al">~$606.9B (TTM ex-AWS, aproximado)</td><td class="right-al">2.2x</td><td class="right-al">$1,335B</td></tr>
+    <tr class="total"><td class="label">Valor de empresa total</td><td class="right-al"></td><td class="right-al"></td><td class="right-al">$3,023B</td></tr>
+    <tr><td class="label">Fair value por acción (10.903B acciones diluidas)</td><td class="right-al"></td><td class="right-al"></td><td class="right-al">$277.28</td></tr>
+  </table></div>
+  <p class="footnote">Métodología propia. Base de ingresos e-commerce+publicidad = ingresos TTM consolidados ($775.68B) menos la tasa anualizada de AWS del trimestre — una aproximación, no una cifra TTM segmentada exacta (Amazon no publica el detalle trimestral de AWS de los cuatro trimestres previos con la misma granularidad). Múltiplo AWS de referencia agresivo (21x, sobre ingresos AWS FY2025 de ~$128B): 24/7 Wall St., feb-2026, que estima $2.6 billones para AWS y $2.4 billones para e-commerce ($5 billones combinados, ~$458.59/acción) — no lo adoptamos como caso propio por ser, en nuestra lectura, demasiado optimista, pero lo citamos como evidencia de cuán lejos puede llegar la lectura más alcista del mercado.</p>
+  <p>
+    El resultado de este método, $277.28 por acción, es 2.6 veces más alto que el DCF Base consolidado del Método 1
+    ($185.24) y muy cercano al Método 2 de comparables ($261.10) — dos métodos independientes entre sí que convergen
+    en una zona similar, por encima del precio de mercado. Es, en nuestra lectura, la evidencia más convincente de que
+    la brecha entre el DCF consolidado y el mercado tiene una explicación estructural (un solo flujo de caja diluye a
+    AWS) y no es, sin más, el mercado "pagando de más". Al mismo tiempo, el método depende enteramente de qué múltiplo
+    se elija para AWS — con 21x en lugar de 10x, el resultado casi se duplica — por lo que lo tratamos como un
+    complemento del DCF y los comparables, no como un reemplazo de ninguno de los dos.
+  </p>
+
+  <h3>Método 4 — Reversión a la media histórica propia (referencia, no incluido en el blend)</h3>
+  <p>
+    A diferencia de MSFT o AAPL, donde el P/E promedio histórico es una referencia razonablemente estable, el propio
+    P/E histórico de Amazon no lo es: fuentes de mercado reportan un P/E promedio de 5 años de entre 54.8x y 65.4x, y
+    de 10 años de entre 71.9x y 95.2x —con el P/E trailing a 10 años llegando a oscilar, en algunos trimestres, entre
+    -418x y +508x—. Ese rango extremo no es ruido de fuente: refleja años en los que Amazon reportó utilidades casi
+    nulas o negativas mientras reinvertía agresivamente en fulfillment e infraestructura, lo que vuelve al "P/E
+    promedio" un estadístico prácticamente sin significado para esta compañía en particular.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Referencia histórica</th><th class="right-al">Múltiplo</th><th class="right-al">Precio implícito (sobre EPS normalizado $8.06)</th></tr>
+    <tr><td class="label">Promedio 3 años</td><td class="right-al">~46.5x</td><td class="right-al">$374.79</td></tr>
+    <tr class="total"><td class="label">Promedio 5 años</td><td class="right-al">~60.1x</td><td class="right-al">$484.41</td></tr>
+  </table></div>
+  <p class="footnote">P/E históricos: fullratio.com, financecharts.com, GuruFocus (jul-2026) — promedios de rangos citados por múltiples fuentes, con dispersión amplia entre proveedores.</p>
+  <p>
+    Aplicar estos múltiplos daría un fair value de $375-484 — muy por encima de cualquier otro método de este informe,
+    y de todo el rango del propio DCF (Sección 13, Método 1). En lugar de incluir este resultado en el blend final
+    junto con los otros dos métodos numéricos —como hacemos en el resto de la cobertura de este desk—, optamos por
+    excluirlo explícitamente: el historial de EPS extremadamente volátil de Amazon (incluyendo años de pérdidas)
+    vuelve al múltiplo promedio histórico una medida no representativa de la compañía madura y rentable en que se convirtió, y
+    aplicarlo mecánicamente habría inflado artificialmente el blend. Lo mostramos igual, por transparencia, pero como
+    referencia aislada.
+  </p>
+
+  <h3>Método 5 — Consenso de Wall Street</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Analistas cubriendo AMZN</td><td class="right-al">45 (44 Buy, 1 Hold)</td></tr>
+    <tr><td class="label">Calificación consenso</td><td class="right-al">Strong Buy</td></tr>
+    <tr class="total"><td class="label">Precio objetivo promedio (12 meses)</td><td class="right-al">$318.93</td></tr>
+    <tr><td class="label">Rango representativo (revisiones post-reporte)</td><td class="right-al">$313.00 – $335.00</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: TipRanks, consenso post-reporte (31-jul-2026). El precio objetivo promedio ($318.93) fue calculado por el proveedor antes de que se reflejara el salto de precio intradía — el upside implícito real sobre $270.20 es ~18%, no el ~34-37% que resultaría de compararlo contra el precio pre-reporte. Rango representativo: Wells Fargo ($313), Bank of America y Bernstein ($320 cada uno), Deutsche Bank ($325), Goldman Sachs ($335) — todas revisiones posteriores al reporte del 30-jul-2026.</p>
+  <p>
+    El consenso de Wall Street es, de los cinco métodos, el más optimista después de la reversión histórica excluida
+    del blend — todavía ~18% por encima del precio de mercado actual, incluso después de que el mercado ya convalidó
+    gran parte del optimismo con el salto de +14.7%. Como señalamos en la Sección 12, no podemos descartar que una
+    porción de ese optimismo incorpore, sin plena discriminación, el efecto de las ganancias no operativas de
+    Anthropic sobre los modelos de EPS de cada analista individual.
+  </p>
+
+  <h3>Síntesis: los cinco métodos, uno al lado del otro</h3>
+  <div class="chartbox">
+    <canvas id="footballChart" height="280"></canvas>
+    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado ($270.20); la línea azul marca el blend propio ($241.21). La reversión histórica se muestra como referencia, no como parte del blend.</p>
+  </div>
+  <div class="table-scroll"><table>
+    <tr><th>Método</th><th class="right-al">Fair value</th></tr>
+    <tr><td class="label">DCF — Bear</td><td class="right-al">$57.72</td></tr>
+    <tr><td class="label">DCF — Base</td><td class="right-al">$185.24</td></tr>
+    <tr><td class="label">DCF — Bull</td><td class="right-al">$365.57</td></tr>
+    <tr><td class="label">Comparables (P/E forward promedio del panel)</td><td class="right-al">$261.10</td></tr>
+    <tr><td class="label">Suma de las partes (AWS 10x + e-commerce 2.2x)</td><td class="right-al">$277.28</td></tr>
+    <tr class="total"><td class="label">Blend propio — promedio simple DCF Base + Comparables + SOTP</td><td class="right-al">$241.21</td></tr>
+    <tr><td class="label">Reversión histórica (referencia, no incluida en el blend)</td><td class="right-al">$374.79 – $484.41</td></tr>
+    <tr><td class="label">Consenso Wall Street (referencia externa, no promediada)</td><td class="right-al">$318.93</td></tr>
+  </table></div>
+  <p>
+    El blend propio de este informe —promedio simple de DCF Base ($185.24), Comparables ($261.10) y Suma de las Partes
+    ($277.28), con la reversión histórica excluida por las razones desarrolladas en el Método 4— da <strong>$241.21
+    por acción</strong>, 10.7% por debajo del precio de mercado de $270.20. Es una brecha mucho más angosta que la que
+    mostraba la lectura anterior de este informe (23.1%, sobre un blend de solo dos métodos y sin incorporar la
+    economía de Trainium ni la suma de las partes) — no porque hayamos forzado los supuestos para acercarnos al
+    mercado, sino porque dos mejoras metodológicas concretas (aislar el valor de AWS del negocio consolidado, e
+    incorporar el ahorro de capex y la ventaja de margen de Trainium que management ya divulgó) cambian el resultado
+    de forma genuina. De los tres métodos del blend, dos (Comparables y SOTP) ya ubican el fair value por encima del
+    precio de mercado; solo el DCF Base, el más conservador de los tres, todavía lo ubica por debajo — y el propio
+    escenario Bull del DCF ($365.57) también supera al mercado. Es la razón por la que la postura de portada pasa de
+    "neutral con sesgo bajista" a "neutral con sesgo constructivo": la evidencia ya no apunta mayormente hacia abajo.
+  </p>
+
+  <!-- 14 -->
+  <p class="secnum" id="s14">14 — Limitaciones del Modelo</p>
+  <h2>Qué asume este análisis, y dónde puede fallar</h2>
+  <div class="watermark-block">
+    <p style="margin-bottom:0;">
+      La ganancia no operativa por Anthropic —$70.2 mil millones pretax en el primer semestre de 2026— es, por
+      construcción, una marca a valuación privada: depende de rondas de financiamiento y de expectativas de IPO que
+      pueden revertirse tan rápido como se acumularon. Nuestra "utilidad neta normalizada" (Secciones 05 y 12), que
+      excluye este efecto con una tasa de impuesto aproximada del 24%, es un ajuste analítico propio de este informe,
+      no una cifra que Amazon publique como métrica non-GAAP oficial — el lector debe tratarla como una estimación,
+      no como un dato verificado. El 88.0% del valor de empresa del caso Base del DCF proviene del valor terminal, una
+      dependencia alta —aunque menor que en la versión anterior de este informe (92.8%), porque el capex se normaliza
+      antes en el modelo revisado—; los supuestos de margen y capex del Método 1 fueron ajustados en esta revisión
+      para incorporar la ventaja de costo de Trainium divulgada por management (Sección 04), un dato concreto y ya
+      público, pero la magnitud exacta de esa ventaja en los años 2-5 sigue siendo una proyección nuestra, no una
+      guía oficial de la compañía. El Método 3 (suma de las partes) depende enteramente del múltiplo EV/Ingresos que
+      se le asigne a AWS —usamos 10x-13x como rango razonable, pero una nota pública reciente usó 21x por analogía con
+      múltiplos de compañías de IA pura, y con ese múltiplo el resultado casi se duplica—; es, por lejos, el método
+      más sensible a una sola variable de todo este informe. El Método 4 (reversión histórica) fue excluido del blend
+      por las razones desarrolladas en la Sección 13 — es una decisión de juicio, no una regla mecánica, y un lector
+      que prefiera incluirlo de todos modos puede promediar los cuatro números y llegar a un blend distinto
+      (sustancialmente más alto). El DCF modela flujo de caja consolidado (OCF menos capex total) en el Método 1, y
+      recién separa AWS del resto del negocio en el Método 3 (SOTP) — los dos métodos usan bases de ingresos e
+      hipótesis de crecimiento independientes entre sí, por lo que no deben leerse como una descomposición exacta uno
+      del otro. El conteo de acciones usado en todos los métodos (10.903 mil millones, diluidas) se mantiene fijo a lo
+      largo de la proyección del DCF, sin modelar la dilución adicional por compensación en acciones (~$19.5 mil
+      millones anuales) neta de las recompras —una simplificación que probablemente sobreestima levemente el fair
+      value por acción de los años 4 y 5. Finalmente, el consenso de Wall Street usado en el Método 5 es posterior al
+      reporte del 30-jul-2026 pero su precio objetivo promedio fue calculado por el proveedor sobre una base de precio
+      previa al salto intradía del 31-jul-2026 —el upside implícito que reportamos (~18%) es nuestro propio recálculo
+      contra el precio actual, no la cifra que muestra el proveedor de datos—, y tampoco tenemos forma de aislar cuánto
+      de ese consenso ya descuenta, o no, el efecto normalizado que este informe aplica en los Métodos 2 y 3.
+    </p>
+  </div>
+
+  <div class="disclosure">
+    Documento elaborado a partir de fuentes públicas: SEC EDGAR (Form 10-Q, 10-K, 8-K, XBRL companyfacts API, CIK
+    0001018724), comunicados de resultados y newsroom de Amazon, Microsoft, Alphabet, Walmart y Costco, S&amp;P Global
+    Market Intelligence vía stockanalysis.com, GuruFocus, fullratio.com, financecharts.com, TIKR.com, WallStreetZen,
+    TipRanks, 24/7 Wall St., CEOPayWatch, Yahoo Finance, CNBC, Motley Fool, Investing.com, Converge Digest, Value Add
+    VC, MLQ News, Variety, AdExchanger, Gurufocus.com. Cifras fundamentales con fecha de corte en el 10-Q de Amazon
+    correspondiente al trimestre cerrado el 30 de junio de 2026, publicado el 30 de julio de 2026; el precio de
+    mercado usado en la portada y en la Sección 13 refleja el intradía del 31-jul-2026 (post-reacción del mercado al
+    reporte), no el cierre del día del reporte; desarrollos corporativos y de mercado
+    con fecha de corte de la misma fecha.
+    <br><br>
+    <strong>Sobre el autor y la naturaleza de este documento:</strong> este informe es un análisis independiente
+    elaborado por Manfredi Investment Research &amp; Markets con fines exclusivamente informativos y educativos. El
+    autor no es un asesor de inversión registrado, no está matriculado ante la Comisión Nacional de Valores (CNV), la
+    SEC, ni ningún otro organismo regulador equivalente, y no mantiene una relación de asesoramiento financiero
+    personalizado con el lector. Ninguna cifra de este documento —incluido el "fair value" de portada, los escenarios
+    de DCF, ni la síntesis de la Sección 13— constituye una recomendación de compra, venta o mantenimiento para
+    ningún lector en particular, ni considera la situación financiera, los objetivos o el perfil de riesgo individual
+    de quien lo lee. Los escenarios de DCF son estimaciones propias sujetas a los supuestos declarados explícitamente
+    en la Sección 13, y no representan guidance oficial de ninguna de las compañías mencionadas salvo donde se cita
+    de forma directa y atribuida. Verificar cifras contra el 10-Q/10-K/8-K más reciente de cada compañía, y consultar
+    a un asesor financiero matriculado, antes de tomar cualquier decisión de inversión.
+  </div>
+
+</div>
+
+<script>
+/* ---- Motor de gráficos propio, sin dependencias externas (Canvas 2D) ---- */
+(function(){
+  var PALETTE = {ink:'#161a20', muted:'#69707c', line:'#e3e9f0', navy:'#0b1f3a', navy2:'#15335c', blue:'#2f5f9e', blueLight:'#5f8fc7', pale:'#c7d9ec', red:'#a8291f', gold:'#c99a3c'};
+
+  function setupCanvas(canvas, cssHeight){
+    var dpr = window.devicePixelRatio || 1;
+    var cssWidth = canvas.parentElement.clientWidth - 44; // padding del chartbox
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = Math.max(1, Math.round(cssWidth * dpr));
+    canvas.height = Math.max(1, Math.round(cssHeight * dpr));
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return {ctx: ctx, w: cssWidth, h: cssHeight};
+  }
+
+  function drawVBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+    ctx.font = '11px "IBM Plex Mono", monospace';
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var log = !!opts.log;
+    var padL = 46, padR = 10, padT = 16, padB = 46;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var maxV = Math.max.apply(null, values);
+    var minV = log ? Math.min.apply(null, values) : 0;
+    function scaleY(v){
+      if(log){
+        var lv = Math.log10(Math.max(v,0.01)), lmax = Math.log10(maxV*1.15), lmin = Math.log10(Math.max(minV*0.5,1));
+        return padT + plotH - ((lv - lmin) / (lmax - lmin)) * plotH;
+      }
+      return padT + plotH - (v / (maxV*1.15)) * plotH;
+    }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    var gridSteps = 4;
+    for(var g=0; g<=gridSteps; g++){
+      var yy = padT + (plotH/gridSteps)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    var n = values.length;
+    var slot = plotW / n;
+    var barW = Math.min(slot * 0.56, 64);
+
+    for(var i=0;i<n;i++){
+      var cx = padL + slot*i + slot/2;
+      var y0 = scaleY(values[i]);
+      var yBase = padT + plotH;
+      ctx.fillStyle = colors[i % colors.length];
+      var bw = barW;
+      ctx.fillRect(cx - bw/2, y0, bw, yBase - y0);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'center';
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, cx, y0 - 6);
+
+      ctx.fillStyle = PALETTE.muted;
+      ctx.font = '10px "Inter", sans-serif';
+      wrapLabel(ctx, labels[i], cx, yBase + 16, slot + 6);
+    }
+  }
+
+  function wrapLabel(ctx, text, cx, y, maxW){
+    var words = String(text).split(' ');
+    var lines = [];
+    var cur = '';
+    for(var i=0;i<words.length;i++){
+      var test = cur ? cur + ' ' + words[i] : words[i];
+      if(ctx.measureText(test).width > maxW && cur){ lines.push(cur); cur = words[i]; }
+      else cur = test;
+    }
+    if(cur) lines.push(cur);
+    lines = lines.slice(0,2);
+    ctx.textAlign = 'center';
+    for(var j=0;j<lines.length;j++){
+      ctx.fillText(lines[j], cx, y + j*11);
+    }
+  }
+
+  function drawHBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var padL = 128, padR = 54, padT = 10, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var maxV = Math.max.apply(null, values) * 1.12;
+
+    var n = values.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.5, 30);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, padT+plotH); ctx.stroke();
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = padL;
+      var w = (values[i]/maxV) * plotW;
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, w, barH);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(labels[i], padL - 10, cy + 4);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'left';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, x0 + w + 8, cy + 4);
+    }
+  }
+
+  function drawRangeBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, ranges = opts.ranges, colors = opts.colors, refLines = opts.refLines || [];
+    var padL = 168, padR = 16, padT = 40, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    ranges.forEach(function(r){ allVals.push(r[0], r[1]); });
+    refLines.forEach(function(r){ allVals.push(r.value); });
+    var rawMin = Math.min.apply(null, allVals), rawMax = Math.max.apply(null, allVals);
+    var span = rawMax - rawMin;
+    var domMin = rawMin - span * 0.16;
+    var domMax = rawMax + span * 0.04;
+    function scaleX(v){ return padL + ((v - domMin)/(domMax - domMin)) * plotW; }
+
+    var n = ranges.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.42, 22);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = scaleX(ranges[i][0]), x1 = scaleX(ranges[i][1]);
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, Math.max(x1-x0,2), barH);
+      ctx.beginPath(); ctx.arc(x0, cy, barH/2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x1, cy, barH/2, 0, Math.PI*2); ctx.fill();
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      wrapLabel(ctx, labels[i], padL - 12, cy - 4, padL - 20);
+
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      var vf = opts.valueFmt || function(v){ return '$'+v.toFixed(0); };
+      ctx.textAlign = 'right';
+      ctx.fillText(vf(ranges[i][0]), x0 - 8, cy + 4);
+      ctx.textAlign = 'left';
+      ctx.fillText(vf(ranges[i][1]), x1 + 8, cy + 4);
+    }
+
+    var sortedRefs = refLines.map(function(r,i){ return {r:r, i:i, x:scaleX(r.value)}; }).sort(function(a,b){ return a.x-b.x; });
+    for(var ri=1; ri<sortedRefs.length; ri++){
+      if(sortedRefs[ri].x - sortedRefs[ri-1].x < 90){ sortedRefs[ri].row = (sortedRefs[ri-1].row||0) + 1; }
+    }
+    refLines.forEach(function(r){
+      var x = scaleX(r.value);
+      ctx.strokeStyle = r.color; ctx.lineWidth = 1.6; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x, padT-6); ctx.lineTo(x, padT+plotH); ctx.stroke();
+      ctx.setLineDash([]);
+    });
+    sortedRefs.forEach(function(item){
+      var row = item.row || 0;
+      ctx.fillStyle = item.r.color;
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(item.r.label, item.x, padT - 12 - row*13);
+    });
+  }
+
+  function drawLines(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, series = opts.series;
+    var padL = 40, padR = 14, padT = 16, padB = 54;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    series.forEach(function(s){ allVals = allVals.concat(s.values); });
+    var maxV = Math.max.apply(null, allVals) * 1.08;
+    var minV = Math.min.apply(null, allVals) * 0.92;
+
+    function scaleX(i){ return padL + (plotW/(labels.length-1)) * i; }
+    function scaleY(v){ return padT + plotH - ((v - minV)/(maxV-minV)) * plotH; }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var yy = padT + (plotH/4)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    series.forEach(function(s){
+      ctx.strokeStyle = s.color; ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        ctx.fillStyle = s.color;
+        ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
+      });
+    });
+
+    ctx.fillStyle = PALETTE.muted;
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    labels.forEach(function(l,i){ ctx.fillText(l, scaleX(i), padT+plotH+16); });
+
+    var lx = padL, ly = H - 12;
+    ctx.font = '11px "Inter", sans-serif';
+    series.forEach(function(s){
+      ctx.fillStyle = s.color;
+      ctx.fillRect(lx, ly-8, 10, 10);
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'left';
+      ctx.fillText(s.name, lx+14, ly);
+      lx += 14 + ctx.measureText(s.name).width + 22;
+    });
+  }
+
+  function renderAll(){
+    drawVBars(document.getElementById('historyChart'), {
+      labels:['FY2016','FY2017','FY2018','FY2019','FY2020','FY2021','FY2022','FY2023','FY2024','FY2025','FY2026E'],
+      values:[135.99,177.87,232.89,280.52,386.06,469.82,513.98,574.79,637.96,716.92,825.58],
+      colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.blue,PALETTE.navy2,PALETTE.navy2,PALETTE.navy],
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawHBars(document.getElementById('segmentChart'), {
+      labels:['North America','AWS','International'],
+      values:[116.2,42.2,42.2],
+      colors:[PALETTE.blue,PALETTE.navy,PALETTE.pale],
+      valueFmt:function(v){ return '$'+v.toFixed(1)+'B'; }
+    });
+
+    drawHBars(document.getElementById('opIncomeChart'), {
+      labels:['AWS','North America','International'],
+      values:[16.6,9.1,1.7],
+      colors:[PALETTE.navy,PALETTE.blue,PALETTE.pale],
+      valueFmt:function(v){ return '$'+v.toFixed(1)+'B'; }
+    });
+
+    drawLines(document.getElementById('marginChart'), {
+      labels:['Q3 25','Q4 25','Q1 26','Q2 26'],
+      series:[
+        {name:'Margen operativo', color:PALETTE.navy, values:[9.7,11.7,13.1,13.7]},
+        {name:'Margen neto GAAP', color:PALETTE.red, values:[11.8,9.9,16.7,31.2]}
+      ]
+    });
+
+    drawVBars(document.getElementById('capexChart'), {
+      labels:['AAPL','META (piso)','GOOGL (techo)','MSFT (FY26 real)','AMZN (guía 2026)'],
+      values:[13.5,125,205,115.95,220],
+      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.red],
+      log:true,
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawHBars(document.getElementById('compsChart'), {
+      labels:['COST','WMT','MSFT','AMZN*','GOOGL'],
+      values:[46.1,40.2,21.8,21.7,16.0],
+      colors:[PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.red,PALETTE.blueLight],
+      valueFmt:function(v){ return v.toFixed(1)+'x'; }
+    });
+
+    drawRangeBars(document.getElementById('footballChart'), {
+      labels:['DCF (Bear→Bull)','Comparables (panel)','Suma de las partes (10x-13x AWS)','Reversión histórica*','Consenso Wall St.'],
+      ranges:[[57.72,365.57],[188.60,345.77],[277.28,323.68],[374.79,484.41],[313.00,335.00]],
+      colors:[PALETTE.blue,PALETTE.navy2,PALETTE.blueLight,PALETTE.pale,PALETTE.gold],
+      refLines:[{value:270.20,color:PALETTE.red,label:'Mercado $270'},{value:241.21,color:PALETTE.navy,label:'Blend $241'}],
+      valueFmt:function(v){ return '$'+v.toFixed(0); }
+    });
+
+    drawHBars(document.getElementById('revisionChart'), {
+      labels:['Consenso pre-reporte','Real GAAP 2Q26'],
+      values:[1.82,5.75],
+      colors:[PALETTE.pale,PALETTE.red],
+      valueFmt:function(v){ return '$'+v.toFixed(2); }
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', renderAll);
+  } else {
+    renderAll();
+  }
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderAll, 150);
+  });
+})();
+</script>
+</body>
+</html>
