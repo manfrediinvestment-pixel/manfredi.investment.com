@@ -2,7 +2,7 @@
 name: equity-research
 description: "Use when writing or updating institutional-grade equity research for the 'Inversiones' section of manfredi.investment.com — individual stock/ADR deep-dive analysis with full investment thesis, financial statement analysis, industry positioning, and valuation (DCF + comparable companies) culminating in an explicit fair value. Each ticker ships as a standalone HTML report in `informes/<ticker>.html`, linked from the picks-list and the hero widget. Trigger on: 'informe de [ticker]', 'análisis de [empresa]', 'tesis de inversión', 'price target', 'valuación de [activo]', 'reporte institucional', 'nuevo pick', earnings/10-Q/10-K release for a tracked ticker."
 metadata:
-  version: 2.0.0
+  version: 2.1.0
 ---
 
 # Equity Research Institucional — Manfredi Investment
@@ -152,6 +152,53 @@ de IA), sumá además:
   — el objetivo es que el precio de mercado quede visiblemente ubicado dentro de ese rango, no que el
   informe declare un solo número "correcto" que nadie encuentra creíble. Ver `informes/tsla.html`
   como plantilla completa de esta estructura de seis métodos (Sección 13).
+
+**Compañías con segmentos de rentabilidad muy distinta (cloud/ads de alto margen diluido por un
+negocio core de menor margen):** un DCF consolidado que mezcla, en un solo flujo de caja, un
+segmento de ~35-40%+ de margen operativo (AWS, Azure, Google Cloud, la parte de publicidad de un
+marketplace) con un negocio core de márgenes finos (retail, hardware, dispositivos) diluye
+sistemáticamente la parte más valiosa del negocio — es la razón documentada por la que la cobertura
+de research de Wall Street sobre estas compañías usa rutinariamente **sum-of-the-parts (SOTP)**
+además de un DCF único, y por la que un DCF consolidado sin SOTP tiende a dar fair values muy por
+debajo de precio de mercado y de los price targets de los bancos, no porque el mercado esté "pagando
+de más" sino porque el propio método tiene un sesgo estructural a la baja. Cuando el negocio bajo
+cobertura tenga esta estructura de segmentos, sumá como método adicional del blend (no solo como
+referencia externa):
+- **SOTP propio por múltiplo de ingresos**: aplicá un múltiplo EV/Ingresos moderado y explícito al
+  segmento de alto margen (ej. 8-13x a un cloud de 35-40% de margen operativo y crecimiento de
+  doble dígito alto — nunca copiés sin más un múltiplo agresivo publicado por analogía con
+  compañías puras de IA; si citás uno así, etiquetalo como referencia externa, no como caso propio)
+  y un múltiplo más conservador al resto del negocio (1.5-3x ingresos para retail/hardware maduro,
+  ajustado por margen y crecimiento). Declará la base de ingresos usada (TTM o tasa anualizada del
+  trimestre) y de dónde sale cada múltiplo.
+- Si existe una nota pública reciente de un banco o research shop con su propia SOTP, citala aparte
+  como referencia (no la promedies con la tuya) — mismo tratamiento que el SOTP externo de la regla
+  de "apuesta de plataforma" de abajo.
+- Este SOTP entra al blend final junto con el DCF Base y comparables (reemplazando o sumándose a la
+  reversión histórica si esta última no es representativa — ver regla de exclusión más abajo).
+
+**Usar datos reales de eficiencia de costos ya divulgados por management, no supuestos genéricos
+conservadores, para el margen y el capex del DCF:** si la compañía ya cuantificó públicamente (en el
+comunicado de resultados o la earnings call) una ventaja de costo concreta — chips propios que
+reducen el capex o mejoran el margen en X puntos básicos, automatización que reduce costo por unidad,
+eficiencia de batería/manufactura — ese dato concreto y ya público tiene que informar la velocidad de
+expansión de margen y de normalización de capex de los casos Base y Bull del DCF. Un DCF que ignora
+esa evidencia y usa una curva de normalización genérica y lenta "porque así es como se hacen los DCF
+conservadores" no es más riguroso — es menos preciso, porque descarta información real y disponible.
+Citá la fuente concreta (earnings call, comunicado) de esa ventaja de costo en el texto del Método 1.
+
+**Reversión histórica poco representativa — excluirla del blend con justificación, no forzarla
+adentro:** si el P/E histórico propio de la compañía tiene una dispersión extrema entre proveedores
+o incluye años de utilidades nulas/negativas que vuelven el promedio un estadístico sin significado
+(rango de 5-10 años que varía más de 20-30 puntos según la fuente, o que incluye P/E negativos o de
+cientos de x), no la incluyas en el blend solo para completar el formato de "promedio de tres
+métodos". Mostrala igual por transparencia, explicá por qué no es representativa, y reemplazala en
+el blend por el SOTP (si aplica) o por el promedio de los métodos que sí sean representativos.
+Excluir un método por una razón documentada es más riguroso que promediarlo mecánicamente — no es lo
+mismo que "forzar los supuestos para que cierre", que sigue prohibido por la Regla de oro. Ver
+`informes/amzn.html` (Sección 13, Método 3) como plantilla completa de SOTP por segmento de margen —
+distinto del SOTP de apuesta de plataforma/opcionalidad de `informes/tsla.html`, que es para negocios
+futuros todavía no monetizados, no para segmentos ya facturando con distinto perfil de margen.
 
 **Regla de asignación de la postura (bajista/neutral/alcista):** si el fair value (o el rango) queda
 por debajo del precio spot, la postura NO puede ser alcista solo porque el negocio sea bueno — usá
