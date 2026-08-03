@@ -1,6 +1,6 @@
 ---
-name: equity-research
-description: "Use when writing or updating institutional-grade equity research for the 'Inversiones' section of manfredi.investment.com — individual stock/ADR deep-dive analysis with full investment thesis, financial statement analysis, industry positioning, and valuation (DCF + comparable companies) culminating in an explicit fair value. Each ticker ships as a standalone HTML report in `informes/<ticker>.html`, linked from the picks-list and the hero widget. Trigger on: 'informe de [ticker]', 'análisis de [empresa]', 'tesis de inversión', 'price target', 'valuación de [activo]', 'reporte institucional', 'nuevo pick', earnings/10-Q/10-K release for a tracked ticker."
+name: informe-bigtech
+description: "Use when writing or updating institutional-grade equity research for big tech / semiconductor names in the 'Inversiones' section of manfredi.investment.com — individual stock/ADR deep-dive analysis with full investment thesis, financial statement analysis, industry positioning, and valuation (DCF + comparable companies) culminating in an explicit fair value. Scoped to big tech / semis (AAPL, MSFT, GOOGL, AMZN, META, NVDA, TSLA, NFLX, etc.) — sectors like banks, energy, or defensive/dividend names need a different analysis plan and should get their own skill instead of reusing this one. Each ticker ships as a standalone HTML report in `informes/<ticker>.html`, linked from the picks-list and the hero widget. Trigger on: 'informe de [ticker]', 'análisis de [empresa]', 'tesis de inversión', 'price target', 'valuación de [activo]', 'reporte institucional', 'nuevo pick', earnings/10-Q/10-K release for a tracked big-tech ticker."
 metadata:
   version: 2.1.0
 ---
