@@ -3102,9 +3102,9 @@
           <div class="course-number" style="background:var(--gold);color:var(--primary);font-family:'DM Serif Display',Georgia,serif;font-size:20px;">?</div>
           <div class="course-content">
             <h3 class="course-title">¿Qué tipo de inversor sos?</h3>
-            <p class="course-desc">Descubrí tu perfil de riesgo en 8 preguntas y obtené una estrategia personalizada para el mercado argentino.</p>
+            <p class="course-desc">Descubrí tu perfil de riesgo en 9 preguntas y obtené una estrategia personalizada para el mercado argentino.</p>
             <div class="course-meta">
-              <span>8 preguntas · 3 min</span>
+              <span>9 preguntas · 3 min</span>
               <span class="course-badge free">GRATIS</span>
             </div>
             <button class="course-btn" style="background:var(--gold);color:var(--primary);border-color:var(--gold);">Hacer el quiz →</button>
@@ -8654,20 +8654,29 @@ function miRenderTesis(ticker){
 
 <script>
 var qzCur=0,qzAnswers=[];
+var QZTrackBadge={
+tolerancia:{bg:"rgba(96,165,250,.14)",color:"#60A5FA",border:"rgba(96,165,250,.35)"},
+capacidad:{bg:"rgba(16,185,129,.14)",color:"var(--green)",border:"rgba(16,185,129,.35)"},
+idoneidad:{bg:"rgba(242,201,76,.14)",color:"var(--gold)",border:"rgba(242,201,76,.35)"},
+contexto:{bg:"rgba(139,148,166,.16)",color:"#c3cbd8",border:"rgba(139,148,166,.35)"}
+};
 var QZQs=[
-{q:"¿Cómo reaccionarías si tu inversión cae un 20% en un mes?",opts:["La vendo inmediatamente para no perder más","Me preocupa pero espero a ver qué pasa","Es parte del proceso, no hago nada","Aprovecharía para comprar más barato"],pts:[0,1,2,3]},
-{q:"¿Cuánto tiempo podés dejar invertido tu dinero sin necesitarlo?",opts:["Menos de 1 año","Entre 1 y 3 años","Entre 3 y 7 años","Más de 7 años"],pts:[0,1,2,3]},
-{q:"¿Cuál de estas opciones describe mejor tu situación financiera?",opts:["Tengo deudas que estoy pagando","Cubro mis gastos con poco margen","Tengo ahorros y no dependo de ellos","Tengo ingresos estables y patrimonio sólido"],pts:[0,1,2,3]},
-{q:"¿Cuánta experiencia tenés invirtiendo?",opts:["Ninguna, soy principiante","Tengo cuentas de ahorro o plazo fijo","Compré alguna vez acciones o crypto","Invierto activamente hace años"],pts:[0,1,2,3]},
-{q:"¿Qué tipo de retorno esperás de tus inversiones?",opts:["Que no pierda valor y gane un poco","Ganarle levemente a la inflación","Crecimiento real del 10-20% anual","Maximizar retorno aunque implique riesgo alto"],pts:[0,1,2,3]},
-{q:"Si tuvieras que elegir una inversión, ¿cuál preferirías?",opts:["Plazo fijo o bonos del gobierno","Fondo mixto (acciones + bonos)","Acciones de empresas sólidas","Acciones growth o criptomonedas"],pts:[0,1,2,3]},
-{q:"¿Cómo tomás decisiones financieras importantes?",opts:["Consulto con alguien de confianza antes","Investigo mucho antes de decidir","Confío en mi criterio propio","Me muevo rápido cuando veo una oportunidad"],pts:[0,1,2,3]},
-{q:"¿Qué porcentaje de tus ahorros estarías dispuesto a invertir en activos de riesgo?",opts:["0-10%","10-30%","30-60%","Más del 60%"],pts:[0,1,2,3]}
+{track:"tolerancia",label:"Tolerancia",q:"Te ofrecen dos opciones para invertir un mismo monto: A) Retorno fijo del 6% anual, asegurado. B) 50% de probabilidad de ganar 18%, 50% de probabilidad de perder 8%. ¿Cuál elegís?",opts:["Sin dudas la opción A","Probablemente la opción A, pero lo dudaría","Probablemente la opción B","Sin dudas la opción B"],pts:[0,1,2,3]},
+{track:"tolerancia",label:"Tolerancia",q:"Imaginá que, en una mala racha del mercado, perdés un equivalente a 2 meses de tus ingresos actuales. ¿Qué hacés?",opts:["Vendo todo, no tolero seguir perdiendo","Me preocupa y evito mirar la cuenta, pero no vendo","Lo tomo con calma, es parte del proceso","Lo veo como oportunidad y compro más"],pts:[0,1,2,3]},
+{track:"capacidad",label:"Capacidad financiera",q:"¿Cuánto tiempo podés dejar este dinero invertido sin necesitarlo?",opts:["Menos de 1 año","Entre 1 y 3 años","Entre 3 y 7 años","Más de 7 años"],pts:[0,1,2,3]},
+{track:"capacidad",label:"Capacidad financiera",q:"¿Cuál describe mejor tu situación financiera actual?",opts:["Tengo deudas que estoy pagando","Cubro mis gastos con poco margen","Tengo ahorros y no dependo de este dinero","Ingresos estables y patrimonio sólido"],pts:[0,1,2,3]},
+{track:"capacidad",label:"Capacidad financiera",q:"¿Cuántas personas dependen económicamente de vos, además de vos mismo?",opts:["3 o más","1 a 2","Ninguna, pero tengo gastos fijos altos","Ninguna, con gastos fijos bajos"],pts:[0,1,2,3]},
+{track:"idoneidad",label:"Idoneidad",q:"¿Cuánta experiencia tenés invirtiendo?",opts:["Ninguna, soy principiante","Plazos fijos o cuentas remuneradas","Compré alguna vez acciones o cripto","Invierto activamente hace años"],pts:[0,1,2,3]},
+{track:"contexto",label:"Objetivo",q:"¿Cuál es el objetivo principal de este dinero?",opts:["Preservar capital / fondo de emergencia","Complementar ingresos o pensar en el retiro","Un objetivo grande en los próximos años (propiedad, negocio, etc.)","Crecer el capital a largo plazo, sin un fin puntual"],pts:[0,1,2,3]},
+{track:"contexto",label:"Liquidez",q:"¿Necesitás poder acceder a este dinero en menos de 12 meses para algo puntual?",opts:["Sí, es muy probable","Podría pasar","Es poco probable","No, no lo necesito en el corto plazo"],pts:[3,2,1,0]},
+{track:"contexto",label:"Contexto local",q:"¿Qué parte de tus ahorros totales ya está dolarizada o fuera del sistema bancario argentino?",opts:["Casi todo","Más de la mitad","Menos de la mitad","Casi nada, todo en pesos/sistema local"],pts:[0,1,2,3]}
 ];
 var QZProfiles=[
-{name:"Inversor Conservador",color:"#60A5FA",bg:"rgba(96,165,250,.15)",emoji:"🛡",desc:"Priorizás la seguridad sobre el rendimiento. Tu objetivo es proteger el capital y obtener retornos predecibles. Las inversiones de bajo riesgo como bonos, plazos fijos dolarizados y ONs son las más adecuadas para vos.",riesgo:"Bajo",horizonte:"Corto plazo",activos:"Bonos · Plazos fijos · Letras"},
-{name:"Inversor Moderado",color:"var(--gold)",bg:"rgba(242,201,76,.12)",emoji:"⚖",desc:"Buscás un balance entre seguridad y crecimiento. Podés tolerar cierta volatilidad si el potencial de retorno lo justifica. Un portafolio diversificado con acciones sólidas y activos de renta fija es ideal para vos.",riesgo:"Medio",horizonte:"Mediano plazo",activos:"Acciones · ETFs · Bonos"},
-{name:"Inversor Agresivo",color:"var(--green)",bg:"rgba(16,185,129,.12)",emoji:"🚀",desc:"Buscás maximizar el crecimiento a largo plazo y podés tolerar volatilidad significativa. Tu horizonte temporal largo te permite tomar más riesgo. Acciones de crecimiento, CEDEARs y activos alternativos son tu territorio.",riesgo:"Alto",horizonte:"Largo plazo",activos:"Acciones growth · CEDEARs · Crypto"}
+{name:"Conservador",color:"#60A5FA",bg:"rgba(96,165,250,.15)",emoji:"🛡",desc:"Priorizás preservar el capital por sobre el crecimiento. Buscás previsibilidad y podés tolerar poca volatilidad.",bands:{"Renta fija":[55,75],"Acciones":[15,30],"Cripto / alternativos":[0,3],"Efectivo":[10,25]}},
+{name:"Moderado-Conservador",color:"#7FB3F5",bg:"rgba(127,179,245,.15)",emoji:"🧊",desc:"Preferís la seguridad, pero aceptás algo de crecimiento si el riesgo agregado es acotado.",bands:{"Renta fija":[40,55],"Acciones":[30,45],"Cripto / alternativos":[0,5],"Efectivo":[8,18]}},
+{name:"Moderado",color:"var(--gold)",bg:"rgba(242,201,76,.12)",emoji:"⚖",desc:"Buscás un balance real entre seguridad y crecimiento, tolerando volatilidad moderada a cambio de mejor retorno esperado.",bands:{"Renta fija":[25,40],"Acciones":[45,60],"Cripto / alternativos":[3,8],"Efectivo":[5,15]}},
+{name:"Moderado-Agresivo",color:"#6EE7B7",bg:"rgba(110,231,183,.15)",emoji:"📈",desc:"Priorizás el crecimiento y aceptás volatilidad significativa, con algo de colchón defensivo.",bands:{"Renta fija":[10,25],"Acciones":[55,70],"Cripto / alternativos":[5,15],"Efectivo":[3,10]}},
+{name:"Agresivo",color:"var(--green)",bg:"rgba(16,185,129,.12)",emoji:"🚀",desc:"Maximizás crecimiento de largo plazo y tolerás caídas fuertes en el camino, apoyado en un horizonte largo.",bands:{"Renta fija":[0,12],"Acciones":[60,80],"Cripto / alternativos":[10,25],"Efectivo":[0,8]}}
 ];
 function qzRender(){
   var c=document.getElementById('qzContent');
@@ -8675,7 +8684,9 @@ function qzRender(){
   p.style.width=((qzCur+1)/QZQs.length*100)+'%';
   if(qzCur>=QZQs.length){qzShowResult();return;}
   var q=QZQs[qzCur];
-  c.innerHTML='<div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Pregunta '+(qzCur+1)+' de '+QZQs.length+'</div>'+
+  var b=QZTrackBadge[q.track];
+  c.innerHTML='<div style="display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:20px;margin-bottom:14px;background:'+b.bg+';color:'+b.color+';border:1px solid '+b.border+';">'+q.label+'</div>'+
+  '<div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Pregunta '+(qzCur+1)+' de '+QZQs.length+'</div>'+
   '<div style="font-family:sans-serif;font-size:22px;color:var(--white);line-height:1.35;margin-bottom:24px;">'+q.q+'</div>'+
   '<div style="display:flex;flex-direction:column;gap:10px;">'+
   q.opts.map(function(o,i){return '<button onclick="qzPick('+i+')" style="background:'+(qzAnswers[qzCur]===i?'rgba(242,201,76,.08)':'rgba(255,255,255,.04)')+';border:1px solid '+(qzAnswers[qzCur]===i?'var(--gold)':'rgba(255,255,255,.08)')+';padding:14px 18px;cursor:pointer;font-size:14px;color:'+(qzAnswers[qzCur]===i?'var(--white)':'rgba(255,255,255,.75)')+';text-align:left;line-height:1.45;width:100%;font-family:inherit;">'+o+'</button>';}).join('')+
@@ -8688,26 +8699,64 @@ function qzRender(){
 function qzPick(i){qzAnswers[qzCur]=i;qzRender();}
 function qzPrev(){if(qzCur>0){qzCur--;qzRender();}}
 function qzNext(){if(qzAnswers[qzCur]!==undefined){qzCur++;qzRender();}}
+function qzTier(score,max){return Math.max(0,Math.min(4,Math.round(score/max*4)));}
 function qzShowResult(){
-  var total=qzAnswers.reduce(function(s,a,i){return s+(a!==undefined?QZQs[i].pts[a]:0);},0);
-  var pct=total/(QZQs.length*3);
-  var idx=pct<0.35?0:pct<0.65?1:2;
-  var pr=QZProfiles[idx];
+  var tolScore=0,tolMax=0,capScore=0,capMax=0,expLevel=0,goalAns,liqAns,localAns;
+  QZQs.forEach(function(q,i){
+    var a=qzAnswers[i],pt=q.pts[a];
+    if(q.track==="tolerancia"){tolScore+=pt;tolMax+=3;}
+    if(q.track==="capacidad"){capScore+=pt;capMax+=3;}
+    if(q.track==="idoneidad"){expLevel=a;}
+    if(q.label==="Objetivo")goalAns=a;
+    if(q.label==="Liquidez")liqAns=a;
+    if(q.label==="Contexto local")localAns=a;
+  });
+  var tierT=qzTier(tolScore,tolMax), tierC=qzTier(capScore,capMax);
+  var finalTier=Math.min(tierT,tierC);
+  var cappedByExperience=false;
+  if(expLevel===0&&finalTier>2){finalTier=2;cappedByExperience=true;}
+  var bindingLabel=tierT===tierC?"Tolerancia y capacidad coinciden.":(finalTier===tierT?"Tu tolerancia emocional es la que determina el perfil.":"Tu capacidad financiera es la que determina el perfil (regla CFA: se toma la más conservadora).");
+  var pr=QZProfiles[finalTier];
   document.getElementById('qzProgFill').style.width='100%';
+
+  function subscore(label,score,max,color){
+    var pct=max?(score/max*100):0;
+    return '<div style="flex:1;min-width:150px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px 16px;"><div style="font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px;">'+label+'</div><div style="height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-bottom:6px;"><div style="height:100%;border-radius:3px;width:'+pct+'%;background:'+color+';"></div></div><div style="font-size:12.5px;color:rgba(255,255,255,.6);">'+score+' / '+max+'</div></div>';
+  }
+
+  var bandsHtml='';
+  Object.keys(pr.bands).forEach(function(cat){
+    var band=pr.bands[cat], mid=(band[0]+band[1])/2;
+    bandsHtml+='<div style="margin-bottom:14px;"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px;"><span style="font-weight:600;">'+cat+'</span><span style="color:rgba(255,255,255,.4);">'+band[0]+'&ndash;'+band[1]+'%</span></div><div style="height:10px;background:rgba(255,255,255,.06);border-radius:5px;position:relative;"><div style="position:absolute;top:0;bottom:0;left:0;border-radius:5px;opacity:.55;width:'+mid+'%;background:var(--gold);"></div></div></div>';
+  });
+
+  var caveatsHtml='';
+  if(cappedByExperience){
+    caveatsHtml+='<div style="display:flex;gap:10px;background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.25);border-radius:8px;padding:12px 14px;font-size:12.5px;color:#D6B98C;margin-bottom:10px;line-height:1.55;text-align:left;">⚠ Como marcaste que sos principiante, topeamos tu perfil en <b>Moderado</b> como máximo hasta que ganes experiencia.</div>';
+  }
+  if(liqAns<=1){
+    caveatsHtml+='<div style="display:flex;gap:10px;background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.25);border-radius:8px;padding:12px 14px;font-size:12.5px;color:#D6B98C;margin-bottom:10px;line-height:1.55;text-align:left;">💧 Marcaste que podrías necesitar este dinero en menos de 12 meses. Esa porción puntual conviene mantenerla en instrumentos líquidos y de bajo riesgo, sin importar tu perfil general.</div>';
+  }
+  if(goalAns===2){
+    caveatsHtml+='<div style="display:flex;gap:10px;background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.25);border-radius:8px;padding:12px 14px;font-size:12.5px;color:#D6B98C;margin-bottom:10px;line-height:1.55;text-align:left;">🎯 Tu objetivo es algo concreto en los próximos años. El perfil general no siempre debe aplicarse igual a ese objetivo puntual.</div>';
+  }
+  var localMsgs=["Ya tenés casi todos tus ahorros dolarizados o fuera del sistema — tu exposición cambiaria real ya es baja.","Más de la mitad de tus ahorros ya está dolarizada.","Menos de la mitad de tus ahorros está dolarizada — buena parte sigue expuesta al peso.","Todos tus ahorros están en pesos/sistema local — tu exposición cambiaria es la más alta de las opciones."];
+  caveatsHtml+='<div style="display:flex;gap:10px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:12px 14px;font-size:12.5px;color:#b9d4f5;line-height:1.55;text-align:left;">🌎 Contexto local: '+localMsgs[localAns]+'</div>';
+
   document.getElementById('qzContent').innerHTML=
   '<div style="text-align:center;padding:8px 0;">'+
   '<div style="width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;background:'+pr.bg+';">'+pr.emoji+'</div>'+
   '<div style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:'+pr.color+';margin-bottom:8px;">Tu perfil de inversor</div>'+
   '<div style="font-size:28px;color:var(--white);margin-bottom:16px;">'+pr.name+'</div>'+
-  '<div style="font-size:14px;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto;">'+pr.desc+'</div>'+
-  '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px;">'+
-  '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:16px 14px;"><div style="font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;">Riesgo</div><div style="font-size:18px;font-weight:600;color:'+pr.color+';">'+pr.riesgo+'</div></div>'+
-  '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:16px 14px;"><div style="font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;">Horizonte</div><div style="font-size:18px;font-weight:600;color:'+pr.color+';">'+pr.horizonte+'</div></div>'+
-  '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:16px 14px;"><div style="font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;">Activos ideales</div><div style="font-size:11px;font-weight:600;color:'+pr.color+';">'+pr.activos+'</div></div>'+
+  '<div style="font-size:14px;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:24px;max-width:480px;margin-left:auto;margin-right:auto;">'+pr.desc+'</div>'+
   '</div>'+
-  '<button onclick="closeQuiz()" style="background:var(--gold);border:none;color:var(--primary);padding:14px 32px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.04em;width:100%;margin-bottom:12px;font-family:inherit;">Consultar a Warren sobre mi perfil →</button>'+
-  '<button onclick="qzRestart()" style="background:transparent;border:none;color:rgba(255,255,255,.35);font-size:12px;cursor:pointer;text-decoration:underline;font-family:inherit;">Repetir el quiz</button>'+
-  '</div>';
+  '<div style="display:flex;gap:14px;margin-bottom:18px;flex-wrap:wrap;">'+subscore("Tolerancia (emocional)",tolScore,tolMax,"#60A5FA")+subscore("Capacidad (financiera)",capScore,capMax,"var(--green)")+'</div>'+
+  '<div style="text-align:left;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px 16px;font-size:12.5px;color:rgba(255,255,255,.7);margin-bottom:18px;line-height:1.55;"><b style="color:var(--white);">'+bindingLabel+'</b> Tu perfil final usa la más conservadora de las dos, no el promedio — así lo define el CFA Institute.</div>'+
+  '<div style="text-align:left;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:14px;">Composición orientativa para tu perfil</div>'+
+  bandsHtml+
+  caveatsHtml+
+  '<button onclick="closeQuiz()" style="background:var(--gold);border:none;color:var(--primary);padding:14px 32px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.04em;width:100%;margin-top:10px;margin-bottom:12px;font-family:inherit;">Consultar a Warren sobre mi perfil →</button>'+
+  '<button onclick="qzRestart()" style="background:transparent;border:none;color:rgba(255,255,255,.35);font-size:12px;cursor:pointer;text-decoration:underline;font-family:inherit;width:100%;text-align:center;">Repetir el quiz</button>';
 }
 function qzRestart(){qzCur=0;qzAnswers=[];qzRender();}
 function openQuiz(){qzCur=0;qzAnswers=[];var m=document.getElementById('quizModal');if(m){m.style.display='block';m.scrollTop=0;document.body.style.overflow='hidden';document.documentElement.style.overflow='hidden';qzRender();}}
