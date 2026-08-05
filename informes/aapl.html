@@ -175,8 +175,8 @@
       <div><span class="ticker-big">AAPL</span><span class="exch">NASDAQ · Apple Inc.</span></div>
       <div class="fv-block">
         <div class="fv-label">Fair value (blend propio)</div>
-        <div class="fv-value">$234.76</div>
-        <div class="fv-gap neg">vs. $306.07 mercado · &minus;23.3%</div>
+        <div class="fv-value">$257.08</div>
+        <div class="fv-gap neg">vs. $306.07 mercado · &minus;16.0%</div>
       </div>
     </div>
     <div class="verdict-bar">
@@ -945,7 +945,7 @@
   <h3>Síntesis: los cuatro métodos, uno al lado del otro</h3>
   <div class="chartbox">
     <canvas id="footballChart" height="260"></canvas>
-    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea vertical roja marca el precio de mercado ($306.07); la línea azul marca el blend propio ($234.76). Ningún rango metodológico propio alcanza el precio de mercado; solo el consenso Wall Street lo supera, y por un margen moderado (+5.9%).</p>
+    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea vertical roja marca el precio de mercado ($306.07); la línea azul marca el blend propio ($257.08). Ningún rango metodológico propio alcanza el precio de mercado; solo el consenso Wall Street lo supera, y por un margen moderado (+5.9%).</p>
   </div>
   <div class="table-scroll"><table>
     <tr><th>Método</th><th class="right-al">Fair value</th></tr>
@@ -954,26 +954,25 @@
     <tr><td class="label">DCF — Bull</td><td class="right-al">$293.17</td></tr>
     <tr><td class="label">Comparables (P/E forward promedio del panel)</td><td class="right-al">$224.11</td></tr>
     <tr><td class="label">Reversión histórica (P/E promedio 10 años propio)</td><td class="right-al">$295.60</td></tr>
-    <tr class="total"><td class="label">Promedio simple — DCF Base, Comparables, Reversión histórica</td><td class="right-al">$234.76</td></tr>
-    <tr><td class="label">Consenso Wall Street (referencia externa, no promediada)</td><td class="right-al">$324.01</td></tr>
+    <tr><td class="label">Consenso Wall Street (precio objetivo promedio)</td><td class="right-al">$324.01</td></tr>
+    <tr class="total"><td class="label">Promedio simple — DCF Base, Comparables, Reversión histórica, Consenso Wall Street</td><td class="right-al">$257.08</td></tr>
   </table></div>
   <p>
-    El promedio simple, sin ponderación diferencial, de las tres metodologías numéricas que este informe puede calcular
-    de forma independiente (DCF caso Base, comparables, y reversión a la media histórica) da <strong>$234.76 por
-    acción</strong>. No incluimos el consenso de Wall Street en ese promedio porque no es una metodología propia sino
-    la opinión agregada de terceros — lo mostramos como punto de referencia externo, no como un cuarto input a
-    mezclar mecánicamente. Además del promedio simple, un valor esperado ponderado por probabilidad explícita sobre
-    los tres escenarios del DCF (25% Bear / 45% Base / 30% Bull) da $199.43 por acción — más cercano al caso Base que
-    al promedio de los tres, reflejo de que el escenario Bull recibe menos peso relativo que el Base en esta
-    ponderación. Lo relevante no es tanto el número final como el patrón: las tres metodologías propias siguen
-    ubicando su estimación muy por debajo del precio de mercado (brecha de 23.3%, prácticamente sin cambios respecto
-    al 23.5% del informe anterior pese al trimestre reportado), y el consenso sell-side, aunque por encima del precio
-    de mercado, lo supera por un margen moderado (+5.9%) que está lejos de sugerir que la acción esté barata. La
-    dispersión sigue siendo amplia (de $113.68 en el escenario más conservador a $324.01 en el consenso de
-    analistas), reflejo de genuina incertidumbre sobre cuánto del momentum operativo actual de Apple es sostenible
-    más allá de los próximos años —incertidumbre que la propia guía blanda de Q4 FY2026 y la desaceleración de
-    Servicios de este trimestre no hacen más que reforzar—, y no una falla de cálculo que debería resolverse en una
-    única cifra falsamente precisa.
+    El promedio simple, sin ponderación diferencial, de las cuatro metodologías de este informe (DCF caso Base,
+    comparables, reversión a la media histórica, y consenso de Wall Street) da <strong>$257.08 por
+    acción</strong>. A diferencia de informes anteriores de este desk, el consenso de Wall Street entra al promedio
+    en pie de igualdad con las otras tres — es información de mercado tan legítima como un múltiplo de comparables, y
+    excluirlo del promedio mientras se promedian comparables no tenía una justificación consistente. Además del
+    promedio simple, un valor esperado ponderado por probabilidad explícita sobre los tres escenarios del DCF (25%
+    Bear / 45% Base / 30% Bull) da $199.43 por acción — más cercano al caso Base que al promedio de los cuatro,
+    reflejo de que el escenario Bull recibe menos peso relativo que el Base en esta ponderación. Lo relevante no es
+    tanto el número final como el patrón: incluso incorporando el consenso sell-side —el más optimista de los cuatro
+    métodos, con un upside implícito moderado de apenas 5.9% sobre el precio de mercado— el blend sigue ubicándose
+    16.0% por debajo del precio de mercado. La dispersión sigue siendo amplia (de $113.68 en el escenario más
+    conservador a $324.01 en el consenso de analistas), reflejo de genuina incertidumbre sobre cuánto del momentum
+    operativo actual de Apple es sostenible más allá de los próximos años —incertidumbre que la propia guía blanda de
+    Q4 FY2026 y la desaceleración de Servicios de este trimestre no hacen más que reforzar—, y no una falla de
+    cálculo que debería resolverse en una única cifra falsamente precisa.
   </p>
 
   <!-- 14 -->
@@ -1340,7 +1339,7 @@
       labels:['DCF (Bear → Bull)','Comparables (piso → techo panel)','Reversión histórica (mediana → 5y)','Consenso Wall Street (rango objetivo)'],
       ranges:[[113.68,293.17],[176.78,283.04],[259.85,313.00],[215.00,400.00]],
       colors:[PALETTE.blue,PALETTE.navy2,PALETTE.blueLight,PALETTE.gold],
-      refLines:[{value:306.07,color:PALETTE.red,label:'Mercado $306'},{value:234.76,color:PALETTE.navy,label:'Blend $235'}],
+      refLines:[{value:306.07,color:PALETTE.red,label:'Mercado $306'},{value:257.08,color:PALETTE.navy,label:'Blend $257'}],
       valueFmt:function(v){ return '$'+v.toFixed(0); }
     });
 
