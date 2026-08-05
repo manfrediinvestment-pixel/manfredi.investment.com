@@ -3837,16 +3837,33 @@
     .pf-save-status { font-size: 12.5px; color: rgba(255,255,255,.5); }
     .pf-metrics-empty { color: rgba(255,255,255,.4); font-size: 13.5px; padding: 8px 2px; }
     .pf-metrics-label { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 14px; }
-    .pf-metric-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
-    .pf-metric-card { background: var(--navy-5); border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 14px 16px; }
-    .pf-metric-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .pf-metric-top .name { font-size: 11.5px; color: rgba(255,255,255,.55); }
-    .pf-chip { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: .03em; }
+    .pf-metric-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 16px; }
+    @media (max-width: 680px) { .pf-metric-grid { grid-template-columns: 1fr 1fr; } }
+
+    .pf-metric-card {
+      position: relative; overflow: hidden;
+      background: linear-gradient(160deg, var(--navy-5) 0%, var(--navy-4) 100%);
+      border: 1px solid rgba(255,255,255,.07); border-radius: 14px; padding: 18px 18px 16px;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+      --mc-accent: var(--gold);
+    }
+    .pf-metric-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: var(--mc-accent); opacity:.85; }
+    .pf-metric-card::after { content:''; position:absolute; top:-46px; right:-36px; width:140px; height:140px; background: var(--mc-accent); opacity:.12; filter: blur(28px); border-radius:50%; pointer-events:none; }
+    .pf-metric-card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--mc-accent) 45%, rgba(255,255,255,.07)); box-shadow: 0 12px 26px -14px rgba(0,0,0,.55); }
+    .pf-metric-card.status-ok      { --mc-accent: var(--green); }
+    .pf-metric-card.status-warn    { --mc-accent: var(--yellow); }
+    .pf-metric-card.status-bad     { --mc-accent: var(--red); }
+    .pf-metric-card.status-neutral { --mc-accent: var(--gold); }
+
+    .pf-metric-top { position:relative; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    .pf-metric-top .name { font-size: 11px; font-weight: 600; letter-spacing: .03em; color: rgba(255,255,255,.5); }
+    .pf-chip { display:inline-flex; align-items:center; gap:5px; font-size: 10px; font-weight: 700; padding: 3px 9px 3px 7px; border-radius: 20px; letter-spacing: .03em; white-space:nowrap; }
+    .pf-chip::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0; }
     .pf-chip.ok { background: rgba(16,185,129,.14); color: var(--green); }
     .pf-chip.warn { background: rgba(245,158,11,.14); color: var(--yellow); }
     .pf-chip.bad { background: rgba(239,68,68,.14); color: var(--red); }
-    .pf-metric-val { font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: var(--white); font-variant-numeric: tabular-nums; }
-    .pf-metric-note { font-size: 11.5px; color: rgba(255,255,255,.4); margin-top: 5px; }
+    .pf-metric-val { position:relative; font-family: 'IBM Plex Mono', monospace; font-size: 27px; font-weight: 700; color: var(--white); line-height: 1.1; letter-spacing: -.01em; }
+    .pf-metric-note { position:relative; font-size: 11.5px; color: rgba(255,255,255,.42); margin-top: 8px; line-height: 1.5; }
     .pf-warren-panel { display: flex; gap: 12px; align-items: flex-start; background: rgba(242,201,76,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 16px; }
     .pf-warren-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--navy-1); border: 1px solid var(--gold-dark,#B8943F); color: var(--gold); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 14px; }
     .pf-warren-body .pf-w-name { font-size: 11.5px; font-weight: 700; color: var(--gold); margin-bottom: 6px; letter-spacing: .02em; }
@@ -4195,11 +4212,11 @@
 
     grid.innerHTML = '<div class="pf-metrics-label">Resultados del chequeo</div>'
       + '<div class="pf-metric-grid">'
-      + '<div class="pf-metric-card"><div class="pf-metric-top"><span class="name">Efectivo ocioso</span><span class="pf-chip '+ metrics.cash.status +'">'+ pfChipLabel[metrics.cash.status] +'</span></div>'
+      + '<div class="pf-metric-card status-'+ metrics.cash.status +'"><div class="pf-metric-top"><span class="name">Efectivo ocioso</span><span class="pf-chip '+ metrics.cash.status +'">'+ pfChipLabel[metrics.cash.status] +'</span></div>'
       + '<div class="pf-metric-val">'+ metrics.cash.value.toFixed(1) +'%</div><div class="pf-metric-note">Parte de tu cartera en efectivo.'+ quizNote +'</div></div>'
-      + '<div class="pf-metric-card"><div class="pf-metric-top"><span class="name">Concentración</span><span class="pf-chip '+ metrics.conc.status +'">'+ pfChipLabel[metrics.conc.status] +'</span></div>'
+      + '<div class="pf-metric-card status-'+ metrics.conc.status +'"><div class="pf-metric-top"><span class="name">Concentración</span><span class="pf-chip '+ metrics.conc.status +'">'+ pfChipLabel[metrics.conc.status] +'</span></div>'
       + '<div class="pf-metric-val">'+ metrics.conc.value.toFixed(1) +'%</div><div class="pf-metric-note">'+ (metrics.conc.ticker ? metrics.conc.ticker+' es tu mayor posición.' : 'Sin posiciones no-efectivo.') +'</div></div>'
-      + '<div class="pf-metric-card"><div class="pf-metric-top"><span class="name">Diversificación</span><span class="pf-chip '+ metrics.divers.status +'">'+ pfChipLabel[metrics.divers.status] +'</span></div>'
+      + '<div class="pf-metric-card status-'+ metrics.divers.status +'"><div class="pf-metric-top"><span class="name">Diversificación</span><span class="pf-chip '+ metrics.divers.status +'">'+ pfChipLabel[metrics.divers.status] +'</span></div>'
       + '<div class="pf-metric-val">'+ metrics.divers.value +'</div><div class="pf-metric-note">Posiciones distintas (sin contar efectivo).</div></div>'
       + '</div>'
       + '<div class="pf-warren-panel"><div class="pf-warren-avatar">W</div><div class="pf-warren-body" id="pfWarrenBody">'
@@ -4380,24 +4397,28 @@
       return;
     }
 
-    function card(name, valStr, note, status){
-      return '<div class="pf-metric-card"><div class="pf-metric-top"><span class="name">'+name+'</span>'+(status?'<span class="pf-chip '+status+'">'+pfChipLabel[status]+'</span>':'')+'</div>'
-        + '<div class="pf-metric-val">'+valStr+'</div><div class="pf-metric-note">'+note+'</div></div>';
+    function card(name, valStr, unit, note, status){
+      var st = status || 'neutral';
+      return '<div class="pf-metric-card status-'+st+'"><div class="pf-metric-top"><span class="name">'+name+'</span>'+(status?'<span class="pf-chip '+status+'">'+pfChipLabel[status]+'</span>':'')+'</div>'
+        + '<div class="pf-metric-val">'+valStr+(unit?'<span class="unit">'+unit+'</span>':'')+'</div><div class="pf-metric-note">'+note+'</div></div>';
     }
     var betaStatus = m.beta>1.3 ? 'bad' : (m.beta>=0.8 && m.beta<=1.3 ? 'ok' : 'warn');
+    var volStatus = m.volAnual<0.20 ? 'ok' : (m.volAnual<0.40 ? 'warn' : 'bad');
     var sharpeStatus = m.sharpe>1 ? 'ok' : (m.sharpe>=0 ? 'warn' : 'bad');
+    var alphaStatus = m.alpha>0.02 ? 'ok' : (m.alpha>-0.02 ? 'warn' : 'bad');
     var ddStatus = m.maxDrawdown> -0.15 ? 'ok' : (m.maxDrawdown> -0.30 ? 'warn' : 'bad');
     var corrStatus = m.avgCorrelation==null ? null : (m.avgCorrelation<0.3 ? 'ok' : (m.avgCorrelation<0.7 ? 'warn' : 'bad'));
+    var varStatus = m.var95Daily> -0.02 ? 'ok' : (m.var95Daily> -0.04 ? 'warn' : 'bad');
 
     grid.innerHTML = '<div class="pf-metrics-label">Métricas de cartera <span style="text-transform:none;letter-spacing:0;color:rgba(255,255,255,.3);">&middot; últimos '+ m.daysUsed +' días hábiles</span></div>'
       + '<div class="pf-metric-grid">'
-      + card('Beta vs S&amp;P 500', m.beta.toFixed(2), 'Sensibilidad al mercado. 1 = se mueve igual que el S&amp;P 500.', betaStatus)
-      + card('Volatilidad anual.', (m.volAnual*100).toFixed(1)+'%', 'Desvío estándar anualizado de tus retornos.')
-      + card('Sharpe Ratio', m.sharpe.toFixed(2), 'Retorno ajustado por riesgo (tasa libre de riesgo ~4,5% anual, aproximada).', sharpeStatus)
-      + card('Alpha vs S&amp;P 500', (m.alpha*100).toFixed(1)+'%', 'Retorno de más (o de menos) ajustado por el riesgo que tomaste.')
-      + card('Máximo drawdown', (m.maxDrawdown*100).toFixed(1)+'%', 'La peor caída de pico a valle en el período.', ddStatus)
-      + card('Correlación promedio', m.avgCorrelation==null?'—':m.avgCorrelation.toFixed(2), 'Qué tan parecido se mueven tus posiciones entre sí. Más bajo = más diversificado.', corrStatus)
-      + card('VaR diario (95%)', (m.var95Daily*100).toFixed(1)+'%', 'En 19 de cada 20 días, no deberías perder más que esto en un solo día.')
+      + card('Beta vs S&amp;P 500', m.beta.toFixed(2), '', 'Sensibilidad al mercado. 1 = se mueve igual que el S&amp;P 500.', betaStatus)
+      + card('Volatilidad anual.', (m.volAnual*100).toFixed(1), '%', 'Desvío estándar anualizado de tus retornos.', volStatus)
+      + card('Sharpe Ratio', m.sharpe.toFixed(2), '', 'Retorno ajustado por riesgo (tasa libre de riesgo ~4,5% anual, aproximada).', sharpeStatus)
+      + card('Alpha vs S&amp;P 500', (m.alpha*100).toFixed(1), '%', 'Retorno de más (o de menos) ajustado por el riesgo que tomaste.', alphaStatus)
+      + card('Máximo drawdown', (m.maxDrawdown*100).toFixed(1), '%', 'La peor caída de pico a valle en el período.', ddStatus)
+      + card('Correlación promedio', m.avgCorrelation==null?'—':m.avgCorrelation.toFixed(2), '', 'Qué tan parecido se mueven tus posiciones entre sí. Más bajo = más diversificado.', corrStatus)
+      + card('VaR diario (95%)', (m.var95Daily*100).toFixed(1), '%', 'En 19 de cada 20 días, no deberías perder más que esto en un solo día.', varStatus)
       + '</div>'
       + '<div class="pf-metric-note">Calculado con los últimos '+ m.daysUsed +' cierres diarios disponibles de cada activo. La tasa libre de riesgo es una aproximación fija (4,5% anual), no un dato en vivo.</div>';
 
