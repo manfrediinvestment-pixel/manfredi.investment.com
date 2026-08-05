@@ -9,6 +9,12 @@
 
 const CACHE_KEY = 'mercados_v1';
 const CACHE_TTL_SECONDS = 120;
+// Cierres historicos diarios: cambian a lo sumo una vez por dia, asi que
+// cachear unas horas reduce muchisimo la carga sobre Yahoo/D912/Kraken
+// cuando muchos usuarios calculan metricas de cartera (beta, volatilidad,
+// etc.) al mismo tiempo y varios comparten los mismos tickers populares.
+const HISTORICO_CACHE_TTL_SECONDS = 21600; // 6h
+const HISTORICO_MAX_N = 180;
 
 // Nombres de empresa conocidos - el resto del universo (miles de tickers de
 // data912) se muestra solo con el ticker hasta que se amplie este mapa.
@@ -293,7 +299,10 @@ async function fetchD912Closes(endpoint, symbol, n = 30) {
 }
 
 async function fetchYahooCloses(symbol, n = 30) {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=3mo`;
+  // "range" tiene que cubrir al menos n dias habiles, si no Yahoo devuelve
+  // menos velas de las pedidas y closes.slice(-n) queda corto en silencio.
+  const range = n <= 63 ? '3mo' : (n <= 126 ? '6mo' : '1y');
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=${range}`;
   const resp = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(10000) });
   if (!resp.ok) throw new Error(`Yahoo HTTP ${resp.status}`);
   const json = await resp.json();
@@ -327,18 +336,18 @@ async function fetchDolarCloses(casa, n = 30) {
   return rows.slice(-n).map(r => r.venta);
 }
 
-async function fetchHistoricalCloses(category, symbol) {
-  if (category === 'arg_stocks') return fetchD912Closes('stocks', symbol);
-  if (category === 'arg_cedears') return fetchD912Closes('cedears', symbol);
-  if (category === 'arg_bonds') return fetchD912Closes('bonds', symbol);
-  if (category === 'usa_stocks' || category === 'usa_adrs') return fetchYahooCloses(symbol);
+async function fetchHistoricalCloses(category, symbol, n = 30) {
+  if (category === 'arg_stocks') return fetchD912Closes('stocks', symbol, n);
+  if (category === 'arg_cedears') return fetchD912Closes('cedears', symbol, n);
+  if (category === 'arg_bonds') return fetchD912Closes('bonds', symbol, n);
+  if (category === 'usa_stocks' || category === 'usa_adrs') return fetchYahooCloses(symbol, n);
   if (category === 'commodities') {
     const ySymbol = COMMODITY_YAHOO_MAP[symbol];
     if (!ySymbol) throw new Error('Commodity desconocida');
-    return fetchYahooCloses(ySymbol);
+    return fetchYahooCloses(ySymbol, n);
   }
-  if (category === 'cripto') return fetchKrakenCloses(symbol);
-  if (category === 'dolares') return fetchDolarCloses(symbol.toLowerCase());
+  if (category === 'cripto') return fetchKrakenCloses(symbol, n);
+  if (category === 'dolares') return fetchDolarCloses(symbol.toLowerCase(), n);
   throw new Error('Categoría desconocida');
 }
 
@@ -440,16 +449,25 @@ export default {
     if (url.pathname === '/historico') {
       const category = url.searchParams.get('category') || '';
       const symbol = url.searchParams.get('symbol') || '';
+      const n = Math.min(HISTORICO_MAX_N, Math.max(1, parseInt(url.searchParams.get('n'), 10) || 30));
       if (!category || !symbol) {
         return new Response(JSON.stringify({ error: 'Faltan category y symbol' }), { status: 400, headers });
       }
+      const cacheKey = `historico_v1:${category}:${symbol}:${n}`;
+      const forceRefresh = url.searchParams.get('refresh') === '1';
       try {
-        const closes = await fetchHistoricalCloses(category, symbol);
+        if (!forceRefresh) {
+          const cached = await env.MERCADOS_KV.get(cacheKey);
+          if (cached) return new Response(cached, { headers });
+        }
+        const closes = await fetchHistoricalCloses(category, symbol, n);
         if (!closes.length) throw new Error('Sin datos históricos');
-        return new Response(JSON.stringify({
+        const json = JSON.stringify({
           symbol, category, closes,
           min: Math.min(...closes), max: Math.max(...closes),
-        }), { headers });
+        });
+        await env.MERCADOS_KV.put(cacheKey, json, { expirationTtl: HISTORICO_CACHE_TTL_SECONDS });
+        return new Response(json, { headers });
       } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 404, headers });
       }

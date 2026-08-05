@@ -3911,6 +3911,10 @@
           <div id="pfMetricsGrid"></div>
         </div>
 
+        <div class="pf-card" id="pfAdvWrapper" style="position:relative;">
+          <div id="pfAdvGrid"></div>
+        </div>
+
       </div>
 
       <div class="pf-view-panel" data-pfview-panel="manfredi">
@@ -3938,7 +3942,10 @@
 
   window._pfPositions = window._pfPositions || [];
   var pfIdSeq = 1;
-  var PF_MERCADOS_URL = 'https://manfredi-mercados.nachito2502.workers.dev/mercados';
+  var PF_MERCADOS_BASE = 'https://manfredi-mercados.nachito2502.workers.dev';
+  var PF_MERCADOS_URL = PF_MERCADOS_BASE + '/mercados';
+  var PF_RISK_FREE_ANNUAL = 0.045; // aproximacion fija, no es un dato en vivo
+  var PF_TRADING_DAYS = 252;
   var PF_PALETTE = ['#F2C94C','#60A5FA','#34D399','#F87171','#A78BFA','#FB923C','#22D3EE','#F472B6','#84CC16','#EAB308'];
 
   function pfEsc(s){ return (s||'').replace(/</g,'&lt;'); }
@@ -3985,7 +3992,7 @@
       Object.keys(payload.categorias).forEach(function(cat){
         var items = (payload.categorias[cat] && payload.categorias[cat].items) || [];
         items.forEach(function(it){
-          if(it.symbol && it.price != null) idx[it.symbol.toUpperCase()] = { price: it.price, change: it.change };
+          if(it.symbol && it.price != null) idx[it.symbol.toUpperCase()] = { price: it.price, change: it.change, category: cat };
         });
       });
     }
@@ -4110,6 +4117,7 @@
     var saveBtn = document.getElementById('pfSaveBtn');
     if(saveBtn) saveBtn.style.display = (window._miIsMember && window._miIsMember()) ? '' : 'none';
     pfRenderMetrics();
+    pfRenderAdvancedMetrics();
   }
 
   async function pfSavePortfolio(){
@@ -4248,8 +4256,160 @@
     btn.style.display = 'none';
   }
 
+  // ---- metricas de cartera estilo fondo (beta, volatilidad, Sharpe, alpha, ----
+  // ---- drawdown, correlacion, VaR) a partir de historico de precios ----------
+  var pfHistoricoCache = {};
+  async function pfFetchHistorico(category, symbol, n){
+    var key = category+':'+symbol+':'+n;
+    if(pfHistoricoCache[key]) return pfHistoricoCache[key];
+    try{
+      var res = await fetch(PF_MERCADOS_BASE + '/historico?category='+encodeURIComponent(category)+'&symbol='+encodeURIComponent(symbol)+'&n='+n);
+      var data = await res.json();
+      if(!data || !data.closes || !data.closes.length) return null;
+      pfHistoricoCache[key] = data.closes;
+      return data.closes;
+    }catch(e){ console.warn('pfFetchHistorico failed:', symbol, e); return null; }
+  }
+
+  function pfReturns(closes){ var r=[]; for(var i=1;i<closes.length;i++) r.push(closes[i]/closes[i-1]-1); return r; }
+  function pfMean(arr){ return arr.reduce(function(s,x){return s+x;},0)/arr.length; }
+  function pfStdev(arr){ var m=pfMean(arr); var v=arr.reduce(function(s,x){return s+(x-m)*(x-m);},0)/Math.max(1,arr.length-1); return Math.sqrt(v); }
+  function pfCovariance(a,b){ var ma=pfMean(a), mb=pfMean(b), s=0; for(var i=0;i<a.length;i++) s+=(a[i]-ma)*(b[i]-mb); return s/Math.max(1,a.length-1); }
+  function pfCorrelation(a,b){ var sa=pfStdev(a), sb=pfStdev(b); if(!sa||!sb) return 0; return pfCovariance(a,b)/(sa*sb); }
+  function pfMaxDrawdown(series){
+    var peak=series[0], maxDd=0;
+    for(var i=0;i<series.length;i++){ if(series[i]>peak) peak=series[i]; var dd=(series[i]-peak)/peak; if(dd<maxDd) maxDd=dd; }
+    return maxDd;
+  }
+  function pfPercentile(arr,p){
+    var s=arr.slice().sort(function(a,b){return a-b;});
+    var idx=(s.length-1)*p, lo=Math.floor(idx), hi=Math.ceil(idx);
+    return lo===hi ? s[lo] : s[lo]+(s[hi]-s[lo])*(idx-lo);
+  }
+  function pfAnnualizeReturn(dailyReturns){ return Math.pow(1+pfMean(dailyReturns), PF_TRADING_DAYS)-1; }
+  function pfAnnualizeVol(dailyReturns){ return pfStdev(dailyReturns)*Math.sqrt(PF_TRADING_DAYS); }
+  function pfAvgCorrelation(returnsByTicker){
+    var tickers = Object.keys(returnsByTicker);
+    if(tickers.length<2) return null;
+    var sum=0, count=0;
+    for(var i=0;i<tickers.length;i++){
+      for(var j=i+1;j<tickers.length;j++){
+        var a=returnsByTicker[tickers[i]], b=returnsByTicker[tickers[j]];
+        var n=Math.min(a.length,b.length);
+        sum += pfCorrelation(a.slice(-n), b.slice(-n));
+        count++;
+      }
+    }
+    return count ? sum/count : null;
+  }
+
+  async function pfBuildAdvancedMetrics(){
+    var positions = (window._pfPositions||[]).filter(function(p){ return !p.isCash; });
+    var grouped = {};
+    positions.forEach(function(p){ grouped[p.ticker] = (grouped[p.ticker]||0) + p.cantidad; });
+    var tickers = Object.keys(grouped);
+    if(tickers.length < 2) return { insufficientData:true };
+
+    var N = 90;
+    var closesByTicker = {};
+    await Promise.all(tickers.map(async function(t){
+      var cat = (window._pfMarketData && window._pfMarketData[t] && window._pfMarketData[t].category) || 'usa_stocks';
+      closesByTicker[t] = await pfFetchHistorico(cat, t, N);
+    }));
+    var benchCloses = await pfFetchHistorico('usa_stocks', 'SPY', N);
+
+    var validTickers = tickers.filter(function(t){ return closesByTicker[t] && closesByTicker[t].length > 5; });
+    if(!validTickers.length || !benchCloses) return { dataUnavailable:true };
+
+    var lens = validTickers.map(function(t){ return closesByTicker[t].length; }).concat([benchCloses.length]);
+    var minLen = Math.min.apply(null, lens);
+    if(minLen < 6) return { dataUnavailable:true };
+
+    var series = [];
+    for(var i=0;i<minLen;i++){
+      var val = 0;
+      validTickers.forEach(function(t){ var c=closesByTicker[t]; val += grouped[t]*c[c.length-minLen+i]; });
+      series.push(val);
+    }
+    var portfolioReturns = pfReturns(series);
+    var benchReturns = pfReturns(benchCloses.slice(benchCloses.length-minLen));
+
+    var returnsByTicker = {};
+    validTickers.forEach(function(t){
+      var c = closesByTicker[t].slice(closesByTicker[t].length-minLen);
+      returnsByTicker[t] = pfReturns(c);
+    });
+
+    var beta = pfCovariance(portfolioReturns, benchReturns) / (Math.pow(pfStdev(benchReturns),2) || 1e-9);
+    var volAnual = pfAnnualizeVol(portfolioReturns);
+    var retAnual = pfAnnualizeReturn(portfolioReturns);
+    var retBenchAnual = pfAnnualizeReturn(benchReturns);
+    var sharpe = volAnual>0 ? (retAnual-PF_RISK_FREE_ANNUAL)/volAnual : 0;
+    var alpha = retAnual - (PF_RISK_FREE_ANNUAL + beta*(retBenchAnual-PF_RISK_FREE_ANNUAL));
+
+    return {
+      beta:beta, volAnual:volAnual, sharpe:sharpe, alpha:alpha,
+      maxDrawdown: pfMaxDrawdown(series), var95Daily: pfPercentile(portfolioReturns,0.05),
+      avgCorrelation: pfAvgCorrelation(returnsByTicker), daysUsed: minLen
+    };
+  }
+
+  async function pfRenderAdvancedMetrics(){
+    var wrapper = document.getElementById('pfAdvWrapper');
+    var grid = document.getElementById('pfAdvGrid');
+    if(!wrapper || !grid) return;
+    var existingOverlay = wrapper.querySelector('.mi-paywall-overlay');
+    if(existingOverlay) existingOverlay.remove();
+
+    var distinct = {};
+    (window._pfPositions||[]).forEach(function(p){ if(!p.isCash) distinct[p.ticker]=1; });
+    var count = Object.keys(distinct).length;
+
+    if(count < 2){
+      grid.innerHTML = '<div class="pf-metrics-label">Métricas de cartera</div><div class="pf-metrics-empty">Cargá al menos 2 posiciones (sin contar efectivo) para calcular estas métricas.</div>';
+      return;
+    }
+
+    grid.innerHTML = '<div class="pf-metrics-label">Métricas de cartera</div><div class="pf-metrics-empty">Calculando con datos históricos...</div>';
+    var reqId = ++pfAdvReqSeq;
+    var m = await pfBuildAdvancedMetrics();
+    if(reqId !== pfAdvReqSeq) return; // el usuario cambio posiciones mientras esto cargaba
+
+    if(!m || m.insufficientData || m.dataUnavailable){
+      grid.innerHTML = '<div class="pf-metrics-label">Métricas de cartera</div><div class="pf-metrics-empty">No se pudo traer suficiente historial para estos tickers todavía.</div>';
+      return;
+    }
+
+    function card(name, valStr, note, status){
+      return '<div class="pf-metric-card"><div class="pf-metric-top"><span class="name">'+name+'</span>'+(status?'<span class="pf-chip '+status+'">'+pfChipLabel[status]+'</span>':'')+'</div>'
+        + '<div class="pf-metric-val">'+valStr+'</div><div class="pf-metric-note">'+note+'</div></div>';
+    }
+    var betaStatus = m.beta>1.3 ? 'bad' : (m.beta>=0.8 && m.beta<=1.3 ? 'ok' : 'warn');
+    var sharpeStatus = m.sharpe>1 ? 'ok' : (m.sharpe>=0 ? 'warn' : 'bad');
+    var ddStatus = m.maxDrawdown> -0.15 ? 'ok' : (m.maxDrawdown> -0.30 ? 'warn' : 'bad');
+    var corrStatus = m.avgCorrelation==null ? null : (m.avgCorrelation<0.3 ? 'ok' : (m.avgCorrelation<0.7 ? 'warn' : 'bad'));
+
+    grid.innerHTML = '<div class="pf-metrics-label">Métricas de cartera <span style="text-transform:none;letter-spacing:0;color:rgba(255,255,255,.3);">&middot; últimos '+ m.daysUsed +' días hábiles</span></div>'
+      + '<div class="pf-metric-grid">'
+      + card('Beta vs S&amp;P 500', m.beta.toFixed(2), 'Sensibilidad al mercado. 1 = se mueve igual que el S&amp;P 500.', betaStatus)
+      + card('Volatilidad anual.', (m.volAnual*100).toFixed(1)+'%', 'Desvío estándar anualizado de tus retornos.')
+      + card('Sharpe Ratio', m.sharpe.toFixed(2), 'Retorno ajustado por riesgo (tasa libre de riesgo ~4,5% anual, aproximada).', sharpeStatus)
+      + card('Alpha vs S&amp;P 500', (m.alpha*100).toFixed(1)+'%', 'Retorno de más (o de menos) ajustado por el riesgo que tomaste.')
+      + card('Máximo drawdown', (m.maxDrawdown*100).toFixed(1)+'%', 'La peor caída de pico a valle en el período.', ddStatus)
+      + card('Correlación promedio', m.avgCorrelation==null?'—':m.avgCorrelation.toFixed(2), 'Qué tan parecido se mueven tus posiciones entre sí. Más bajo = más diversificado.', corrStatus)
+      + card('VaR diario (95%)', (m.var95Daily*100).toFixed(1)+'%', 'En 19 de cada 20 días, no deberías perder más que esto en un solo día.')
+      + '</div>'
+      + '<div class="pf-metric-note">Calculado con los últimos '+ m.daysUsed +' cierres diarios disponibles de cada activo. La tasa libre de riesgo es una aproximación fija (4,5% anual), no un dato en vivo.</div>';
+
+    if(!(window._miIsMember && window._miIsMember())){
+      if(window._miApplyPaywall) window._miApplyPaywall('#pfAdvGrid', '#pfAdvWrapper');
+    }
+  }
+  var pfAdvReqSeq = 0;
+
   window._pfRenderPositions = pfRenderPositions;
   window._pfRenderMetrics = pfRenderMetrics;
+  window._pfRenderAdvancedMetrics = pfRenderAdvancedMetrics;
 
   function pfInit(){
     try{
@@ -8380,6 +8540,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
 
                             function checkMembership() {
                             if (typeof window._pfRenderMetrics === 'function') window._pfRenderMetrics();
+                            if (typeof window._pfRenderAdvancedMetrics === 'function') window._pfRenderAdvancedMetrics();
                             if (isMember()) return;
                             applyWarrenPaywall();
               }
