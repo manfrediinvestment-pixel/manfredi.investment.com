@@ -3816,6 +3816,8 @@
     .pf-quiz-badge .pf-qb-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: rgba(255,255,255,.4); display: block; margin-bottom: 3px; }
     .pf-btn-gold { background: var(--gold); color: var(--primary); border: none; border-radius: 6px; padding: 10px 18px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: inherit; }
     .pf-btn-ghost { background: transparent; color: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.18); border-radius: 6px; padding: 9px 16px; font-size: 12.5px; cursor: pointer; font-family: inherit; }
+    .pf-totals-row { display: flex; gap: 22px; flex-wrap: wrap; margin-bottom: 14px; font-size: 12.5px; color: rgba(255,255,255,.55); }
+    .pf-totals-row b { color: var(--white); font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
     .pf-positions-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
     .pf-positions-table th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.35); font-weight: 600; padding: 0 6px 10px; border-bottom: 1px solid rgba(255,255,255,.08); }
     .pf-positions-table td { padding: 11px 6px; border-bottom: 1px solid rgba(255,255,255,.06); color: var(--white); }
@@ -3879,15 +3881,17 @@
 
         <div class="pf-card">
           <h2 class="pf-metrics-label" style="margin-bottom:14px;">Tus posiciones</h2>
+          <div class="pf-totals-row" id="pfTotalsRow"></div>
           <table class="pf-positions-table">
-            <thead><tr><th>Activo</th><th style="text-align:right;">Valor</th><th style="text-align:right;">% cartera</th><th></th></tr></thead>
+            <thead><tr><th>Activo</th><th style="text-align:right;">Cant.</th><th style="text-align:right;">Compra</th><th style="text-align:right;">Actual</th><th style="text-align:right;">Resultado</th><th style="text-align:right;">% cartera</th><th></th></tr></thead>
             <tbody id="pfPositionsBody"></tbody>
           </table>
           <div class="pf-add-row" id="pfAddRowBtn" onclick="pfShowAddForm()">+ Agregar posición</div>
           <div class="pf-add-form" id="pfAddForm" style="display:none;">
-            <input type="text" id="pfInputTicker" placeholder="Ticker o nombre">
-            <input type="number" id="pfInputValor" placeholder="Valor (USD)">
-            <label><input type="checkbox" id="pfInputCash"> Es efectivo</label>
+            <input type="text" id="pfInputTicker" placeholder="Ticker (ej: AAPL)">
+            <input type="number" id="pfInputCantidad" placeholder="Cantidad" step="any">
+            <input type="number" id="pfInputPrecio" placeholder="Precio de compra (USD)" step="any">
+            <label><input type="checkbox" id="pfInputCash" onchange="pfToggleCashFields()"> Es efectivo</label>
             <input type="text" id="pfInputNotas" placeholder="Notas (opcional)">
             <button class="pf-btn-gold" onclick="pfAddPosition()">Agregar</button>
             <button class="pf-btn-ghost" onclick="pfHideAddForm()">Cancelar</button>
@@ -3896,6 +3900,11 @@
             <button class="pf-btn-ghost" id="pfSaveBtn" style="display:none;" onclick="pfSavePortfolio()">Guardar mi portafolio</button>
             <span class="pf-save-status" id="pfSaveStatus"></span>
           </div>
+        </div>
+
+        <div class="pf-card">
+          <h2 class="pf-metrics-label" style="margin-bottom:14px;">Composición del portafolio</h2>
+          <div id="pfPieWrap" style="max-width:340px;margin:0 auto;"><canvas id="pfPieCanvas"></canvas></div>
         </div>
 
         <div class="pf-card" id="pfMetricsWrapper" style="position:relative;">
@@ -3929,23 +3938,38 @@
 
   window._pfPositions = window._pfPositions || [];
   var pfIdSeq = 1;
+  var PF_MERCADOS_URL = 'https://manfredi-mercados.nachito2502.workers.dev/mercados';
+  var PF_PALETTE = ['#F2C94C','#60A5FA','#34D399','#F87171','#A78BFA','#FB923C','#22D3EE','#F472B6','#84CC16','#EAB308'];
+
+  function pfEsc(s){ return (s||'').replace(/</g,'&lt;'); }
+  function pfMoney(n){ return '$'+ (n||0).toLocaleString('es-AR',{maximumFractionDigits: Math.abs(n)<1000?2:0}); }
 
   function pfShowAddForm(){ document.getElementById('pfAddForm').style.display = 'flex'; document.getElementById('pfAddRowBtn').style.display = 'none'; }
+  function pfToggleCashFields(){
+    var isCash = document.getElementById('pfInputCash').checked;
+    var precio = document.getElementById('pfInputPrecio');
+    var cant = document.getElementById('pfInputCantidad');
+    precio.style.display = isCash ? 'none' : '';
+    cant.placeholder = isCash ? 'Monto (USD)' : 'Cantidad';
+  }
   function pfHideAddForm(){
     document.getElementById('pfAddForm').style.display = 'none';
     document.getElementById('pfAddRowBtn').style.display = 'flex';
     document.getElementById('pfInputTicker').value = '';
-    document.getElementById('pfInputValor').value = '';
+    document.getElementById('pfInputCantidad').value = '';
+    document.getElementById('pfInputPrecio').value = '';
     document.getElementById('pfInputNotas').value = '';
     document.getElementById('pfInputCash').checked = false;
+    pfToggleCashFields();
   }
   function pfAddPosition(){
-    var ticker = document.getElementById('pfInputTicker').value.trim();
-    var valor = parseFloat(document.getElementById('pfInputValor').value);
+    var ticker = document.getElementById('pfInputTicker').value.trim().toUpperCase();
     var isCash = document.getElementById('pfInputCash').checked;
+    var cantidad = parseFloat(document.getElementById('pfInputCantidad').value);
+    var precio = isCash ? 1 : parseFloat(document.getElementById('pfInputPrecio').value);
     var notas = document.getElementById('pfInputNotas').value.trim();
-    if(!ticker || !(valor > 0)) return;
-    window._pfPositions.push({ id: pfIdSeq++, ticker: ticker, valor: valor, notas: notas, isCash: isCash });
+    if(!ticker || !(cantidad > 0) || !(precio > 0)) return;
+    window._pfPositions.push({ id: pfIdSeq++, ticker: ticker, cantidad: cantidad, precioCompra: precio, notas: notas, isCash: isCash });
     pfHideAddForm();
     pfRenderPositions();
   }
@@ -3954,22 +3978,135 @@
     pfRenderPositions();
   }
 
-  function pfRenderPositions(){
+  // ---- precios en vivo (reusa el Worker manfredi-mercados que ya sirve la pestaña Mercados) ----
+  function pfIndexMarketPayload(payload){
+    var idx = {};
+    if(payload && payload.categorias){
+      Object.keys(payload.categorias).forEach(function(cat){
+        var items = (payload.categorias[cat] && payload.categorias[cat].items) || [];
+        items.forEach(function(it){
+          if(it.symbol && it.price != null) idx[it.symbol.toUpperCase()] = { price: it.price, change: it.change };
+        });
+      });
+    }
+    return idx;
+  }
+  async function pfFetchMarketData(force){
+    var now = Date.now();
+    if(!force && window._pfMarketData && (now - (window._pfMarketDataTs||0)) < 90000) return window._pfMarketData;
+    try{
+      var res = await fetch(PF_MERCADOS_URL);
+      var data = await res.json();
+      window._pfMarketData = pfIndexMarketPayload(data);
+      window._pfMarketDataTs = now;
+    }catch(e){
+      console.warn('pfFetchMarketData failed:', e);
+      if(!window._pfMarketData) window._pfMarketData = {};
+    }
+    return window._pfMarketData;
+  }
+  function pfGetCurrentPrice(ticker){
+    var idx = window._pfMarketData || {};
+    var hit = idx[(ticker||'').toUpperCase()];
+    return hit ? hit.price : null;
+  }
+
+  // rows: cada posicion + precio actual, valor invertido/actual y resultado ya calculados
+  function pfBuildRows(){
+    return (window._pfPositions||[]).map(function(p){
+      var currentPrice = p.isCash ? 1 : pfGetCurrentPrice(p.ticker);
+      var priceKnown = p.isCash || currentPrice != null;
+      var priceForValue = currentPrice != null ? currentPrice : p.precioCompra;
+      var invertido = p.cantidad * p.precioCompra;
+      var valorActual = p.cantidad * priceForValue;
+      var gain = valorActual - invertido;
+      var gainPct = invertido > 0 ? (gain/invertido*100) : 0;
+      return { id:p.id, ticker:p.ticker, cantidad:p.cantidad, precioCompra:p.precioCompra, isCash:p.isCash,
+        currentPrice:priceForValue, priceKnown:priceKnown, invertido:invertido, valorActual:valorActual, gain:gain, gainPct:gainPct };
+    });
+  }
+  function pfGroupByTicker(rows){
+    var map = {}, order = [];
+    rows.forEach(function(r){
+      var key = r.isCash ? '__CASH__' : r.ticker.toUpperCase();
+      if(!map[key]){ map[key] = { ticker: r.isCash ? 'Efectivo' : r.ticker, isCash:r.isCash, valorActual:0 }; order.push(key); }
+      map[key].valorActual += r.valorActual;
+    });
+    return order.map(function(k){ return map[k]; });
+  }
+  function pfColor(i){ return PF_PALETTE[i % PF_PALETTE.length]; }
+
+  var pfPieChart = null;
+  function pfRenderPieChart(rows, total){
+    var canvas = document.getElementById('pfPieCanvas');
+    var wrap = document.getElementById('pfPieWrap');
+    if(!canvas || typeof Chart === 'undefined') return;
+    if(!rows.length || total <= 0){
+      if(pfPieChart){ pfPieChart.destroy(); pfPieChart = null; }
+      wrap.innerHTML = '<div class="pf-metrics-empty" style="text-align:center;">Cargá posiciones para ver la composición.</div><canvas id="pfPieCanvas"></canvas>';
+      return;
+    }
+    if(wrap.querySelector('.pf-metrics-empty')){
+      wrap.innerHTML = '<canvas id="pfPieCanvas"></canvas>';
+      canvas = document.getElementById('pfPieCanvas');
+    }
+    var grouped = pfGroupByTicker(rows);
+    var labels = grouped.map(function(g){ return g.ticker; });
+    var data = grouped.map(function(g){ return g.valorActual; });
+    var colors = labels.map(function(_,i){ return pfColor(i); });
+    if(pfPieChart) pfPieChart.destroy();
+    pfPieChart = new Chart(canvas, {
+      type: 'doughnut',
+      data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderColor: '#0A0F1E', borderWidth: 2 }] },
+      options: {
+        cutout: '60%',
+        plugins: {
+          legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,.65)', font: { size: 11.5 }, boxWidth: 10, padding: 12 } },
+          tooltip: { callbacks: { label: function(ctx){
+            var val = ctx.parsed; var pct = total > 0 ? (val/total*100).toFixed(1) : 0;
+            return ctx.label + ': ' + pfMoney(val) + ' (' + pct + '%)';
+          } } }
+        }
+      }
+    });
+  }
+
+  async function pfRenderPositions(){
     var body = document.getElementById('pfPositionsBody');
     if(!body) return;
-    var positions = window._pfPositions || [];
-    var total = positions.reduce(function(s,p){ return s + (p.valor||0); }, 0);
-    if(!positions.length){
-      body.innerHTML = '<tr class="pf-empty-row"><td colspan="4">Todavía no cargaste posiciones.</td></tr>';
+    if((window._pfPositions||[]).length) await pfFetchMarketData(false);
+    var rows = pfBuildRows();
+    var total = rows.reduce(function(s,r){ return s + r.valorActual; }, 0);
+    var totalInv = rows.reduce(function(s,r){ return s + r.invertido; }, 0);
+
+    if(!rows.length){
+      body.innerHTML = '<tr class="pf-empty-row"><td colspan="7">Todavía no cargaste posiciones.</td></tr>';
+      document.getElementById('pfTotalsRow').innerHTML = '';
     } else {
-      body.innerHTML = positions.map(function(p){
-        var pct = total > 0 ? (p.valor/total*100) : 0;
-        return '<tr><td>'+ (p.isCash ? '&#128176; ' : '') + p.ticker.replace(/</g,'&lt;') +'</td>'
-          + '<td class="num">$'+ p.valor.toLocaleString('es-AR',{maximumFractionDigits:0}) +'</td>'
+      body.innerHTML = rows.map(function(r){
+        var pct = total > 0 ? (r.valorActual/total*100) : 0;
+        var gainColor = r.gain > 0 ? 'var(--green)' : (r.gain < 0 ? 'var(--red)' : 'rgba(255,255,255,.5)');
+        var sign = r.gain >= 0 ? '+' : '−';
+        var note = (!r.isCash && !r.priceKnown) ? ' <span style="color:var(--yellow);font-size:10px;">sin cotización</span>' : '';
+        return '<tr><td>'+ (r.isCash ? '&#128176; ' : '') + pfEsc(r.ticker) + note +'</td>'
+          + '<td class="num">'+ (r.isCash ? '—' : r.cantidad) +'</td>'
+          + '<td class="num">'+ (r.isCash ? '—' : pfMoney(r.precioCompra)) +'</td>'
+          + '<td class="num">'+ (r.isCash ? '—' : pfMoney(r.currentPrice)) +'</td>'
+          + '<td class="num" style="color:'+ gainColor +';">'+ (r.isCash ? '—' : sign + pfMoney(Math.abs(r.gain)) + ' (' + sign + Math.abs(r.gainPct).toFixed(1) + '%)') +'</td>'
           + '<td class="num">'+ pct.toFixed(1) +'%</td>'
-          + '<td style="text-align:right;"><span class="pf-rm" onclick="pfRemovePosition('+ p.id +')">&times;</span></td></tr>';
+          + '<td style="text-align:right;"><span class="pf-rm" onclick="pfRemovePosition('+ r.id +')">&times;</span></td></tr>';
       }).join('');
+      var totGain = total - totalInv;
+      var totGainPct = totalInv > 0 ? (totGain/totalInv*100) : 0;
+      var totColor = totGain > 0 ? 'var(--green)' : (totGain < 0 ? 'var(--red)' : 'rgba(255,255,255,.7)');
+      document.getElementById('pfTotalsRow').innerHTML =
+        '<span>Invertido: <b>'+ pfMoney(totalInv) +'</b></span>'
+        + '<span>Valor actual: <b>'+ pfMoney(total) +'</b></span>'
+        + '<span>Resultado: <b style="color:'+ totColor +';">'+ (totGain>=0?'+':'−') + pfMoney(Math.abs(totGain)) +' ('+ (totGain>=0?'+':'−') + Math.abs(totGainPct).toFixed(1) +'%)</b></span>';
     }
+
+    pfRenderPieChart(rows, total);
+
     var saveBtn = document.getElementById('pfSaveBtn');
     if(saveBtn) saveBtn.style.display = (window._miIsMember && window._miIsMember()) ? '' : 'none';
     pfRenderMetrics();
@@ -4015,14 +4152,15 @@
   function pfBucketConc(pct){ if(pct < 20) return 'ok'; if(pct <= 40) return 'warn'; return 'bad'; }
   function pfBucketDivers(n){ if(n >= 6) return 'ok'; if(n >= 3) return 'warn'; return 'bad'; }
 
-  function pfComputeMetrics(positions, quizProfile){
-    var total = positions.reduce(function(s,p){ return s + (p.valor||0); }, 0);
+  function pfComputeMetrics(rows, quizProfile){
+    var total = rows.reduce(function(s,r){ return s + r.valorActual; }, 0);
     if(total <= 0) return null;
-    var cash = positions.filter(function(p){ return p.isCash; }).reduce(function(s,p){ return s + p.valor; }, 0);
+    var grouped = pfGroupByTicker(rows);
+    var cash = grouped.filter(function(g){ return g.isCash; }).reduce(function(s,g){ return s + g.valorActual; }, 0);
     var cashPct = cash/total*100;
-    var invested = positions.filter(function(p){ return !p.isCash; });
-    var maxPos = invested.reduce(function(m,p){ return p.valor > m.valor ? p : m; }, {valor:0,ticker:''});
-    var concPct = invested.length ? (maxPos.valor/total*100) : 0;
+    var invested = grouped.filter(function(g){ return !g.isCash; });
+    var maxPos = invested.reduce(function(m,g){ return g.valorActual > m.valorActual ? g : m; }, {valorActual:0,ticker:''});
+    var concPct = invested.length ? (maxPos.valorActual/total*100) : 0;
     return {
       cash: { value: cashPct, status: pfBucketCash(cashPct, quizProfile) },
       conc: { value: concPct, ticker: maxPos.ticker, status: pfBucketConc(concPct) },
@@ -4039,7 +4177,7 @@
     var existingOverlay = wrapper.querySelector('.mi-paywall-overlay');
     if(existingOverlay) existingOverlay.remove();
 
-    var metrics = pfComputeMetrics(window._pfPositions||[], window._qzLastProfile);
+    var metrics = pfComputeMetrics(pfBuildRows(), window._qzLastProfile);
     if(!metrics){
       grid.innerHTML = '<div class="pf-metrics-empty">Cargá al menos una posición para ver el chequeo de alineación.</div>';
       return;
@@ -4086,7 +4224,7 @@
 
   async function pfExplainWithWarren(){
     if(!(window._miIsMember && window._miIsMember())) return;
-    var metrics = pfComputeMetrics(window._pfPositions||[], window._qzLastProfile);
+    var metrics = pfComputeMetrics(pfBuildRows(), window._qzLastProfile);
     if(!metrics) return;
     var btn = document.getElementById('pfExplainBtn');
     var bubble = document.getElementById('pfWarrenBubble');
