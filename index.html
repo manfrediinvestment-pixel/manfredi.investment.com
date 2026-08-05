@@ -2342,6 +2342,10 @@
           await updateDoc(ref, { ultimoAcceso: serverTimestamp() });
         }
         const userData = snap.exists() ? snap.data() : {};
+        if (userData.portfolioManfredi && Array.isArray(userData.portfolioManfredi.positions)) {
+          window._pfPositions = userData.portfolioManfredi.positions;
+          if (typeof window._pfRenderPositions === 'function') window._pfRenderPositions();
+        }
 
                 window._authChecked = true;
                 window._currentUser = user;
@@ -2593,6 +2597,24 @@
 
     window.showNotifyOverlay = showNotifyOverlay;
     window.hideNotifyOverlay = hideNotifyOverlay;
+
+    // Guarda el portafolio cargado manualmente en Tu Portafolio (solo socios)
+    window._miSavePortfolio = async function() {
+      if (!window._currentUser || !(window._miIsMember && window._miIsMember())) return false;
+      try {
+        const ref = doc(db, 'users', window._currentUser.uid);
+        await updateDoc(ref, {
+          portfolioManfredi: {
+            positions: window._pfPositions || [],
+            updatedAt: serverTimestamp()
+          }
+        });
+        return true;
+      } catch (e) {
+        console.warn('portfolioManfredi save failed:', e);
+        return false;
+      }
+    };
   </script>
 <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 <style>
@@ -2730,6 +2752,7 @@
         <li><a href="#calendario" class="nav-link" data-tab-target="calendario">Calendario</a></li>
         <li><a href="#university" class="nav-link" data-tab-target="university">University</a></li>
         <li><a href="#inversiones" class="nav-link" data-member-required="true" data-tab-target="inversiones">Inversiones</a></li>
+        <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
         <li><a href="#asesoria" class="nav-link" data-tab-target="asesoria">Asesoría</a></li>
         <li>
           <span class="nav-link" data-member-required="true" onclick="toggleWarren()" style="cursor:pointer;">
@@ -3773,6 +3796,333 @@
       });
     });
   })();
+  </script>
+
+  <style>
+    .section-portfolio { background: var(--navy-1); position: relative; }
+    .section-portfolio .section-title { color: var(--white); }
+    .section-portfolio .section-sub   { color: rgba(255,255,255,.38); }
+    .pf-stamp {
+      font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 700; letter-spacing: .14em;
+      color: var(--gold); border: 1px solid var(--gold-dark,#B8943F); border-radius: 3px; padding: 3px 8px;
+      margin-left: 10px; vertical-align: middle;
+    }
+    .pf-card { background: var(--navy-4); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 20px 22px; margin-bottom: 20px; }
+    .pf-quiz-cta { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .pf-quiz-cta h3 { font-family: var(--font-display); font-weight: 400; font-size: 18px; margin: 0 0 6px; color: var(--white); }
+    .pf-quiz-cta p { color: rgba(255,255,255,.5); font-size: 13.5px; margin: 0; max-width: 46ch; }
+    .pf-quiz-badge { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .pf-quiz-badge .pf-qb-name { font-family: var(--font-display); font-size: 17px; color: var(--gold); }
+    .pf-quiz-badge .pf-qb-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: rgba(255,255,255,.4); display: block; margin-bottom: 3px; }
+    .pf-btn-gold { background: var(--gold); color: var(--primary); border: none; border-radius: 6px; padding: 10px 18px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: inherit; }
+    .pf-btn-ghost { background: transparent; color: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.18); border-radius: 6px; padding: 9px 16px; font-size: 12.5px; cursor: pointer; font-family: inherit; }
+    .pf-positions-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    .pf-positions-table th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.35); font-weight: 600; padding: 0 6px 10px; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .pf-positions-table td { padding: 11px 6px; border-bottom: 1px solid rgba(255,255,255,.06); color: var(--white); }
+    .pf-positions-table td.num { text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
+    .pf-positions-table .pf-rm { color: rgba(255,255,255,.3); cursor: pointer; font-size: 15px; }
+    .pf-positions-table .pf-rm:hover { color: var(--red); }
+    .pf-empty-row td { color: rgba(255,255,255,.35); font-style: italic; padding: 16px 6px; }
+    .pf-add-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; color: rgba(255,255,255,.4); font-size: 13px; cursor: pointer; padding: 10px 6px; border: 1px dashed rgba(255,255,255,.18); border-radius: 6px; }
+    .pf-add-row:hover { color: var(--gold); border-color: var(--gold-dark,#B8943F); }
+    .pf-add-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; background: var(--navy-5); border-radius: 8px; padding: 12px; }
+    .pf-add-form input[type="text"], .pf-add-form input[type="number"] {
+      background: var(--navy-1); border: 1px solid rgba(255,255,255,.15); border-radius: 5px; color: var(--white);
+      padding: 8px 10px; font-size: 13px; font-family: inherit;
+    }
+    .pf-add-form label { color: rgba(255,255,255,.6); font-size: 12.5px; display: flex; align-items: center; gap: 5px; }
+    .pf-save-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+    .pf-save-status { font-size: 12.5px; color: rgba(255,255,255,.5); }
+    .pf-metrics-empty { color: rgba(255,255,255,.4); font-size: 13.5px; padding: 8px 2px; }
+    .pf-metrics-label { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 14px; }
+    .pf-metric-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
+    .pf-metric-card { background: var(--navy-5); border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 14px 16px; }
+    .pf-metric-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .pf-metric-top .name { font-size: 11.5px; color: rgba(255,255,255,.55); }
+    .pf-chip { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: .03em; }
+    .pf-chip.ok { background: rgba(16,185,129,.14); color: var(--green); }
+    .pf-chip.warn { background: rgba(245,158,11,.14); color: var(--yellow); }
+    .pf-chip.bad { background: rgba(239,68,68,.14); color: var(--red); }
+    .pf-metric-val { font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: var(--white); font-variant-numeric: tabular-nums; }
+    .pf-metric-note { font-size: 11.5px; color: rgba(255,255,255,.4); margin-top: 5px; }
+    .pf-warren-panel { display: flex; gap: 12px; align-items: flex-start; background: rgba(242,201,76,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 16px; }
+    .pf-warren-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--navy-1); border: 1px solid var(--gold-dark,#B8943F); color: var(--gold); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 14px; }
+    .pf-warren-body .pf-w-name { font-size: 11.5px; font-weight: 700; color: var(--gold); margin-bottom: 6px; letter-spacing: .02em; }
+    .pf-warren-body p { margin: 0 0 8px; font-size: 13.5px; color: rgba(255,255,255,.75); }
+    .pf-disclaimer { font-size: 11px; color: rgba(255,255,255,.35); font-style: italic; }
+    .pf-view-panel { display: none; }
+    .pf-view-panel.active { display: block; }
+    .pf-stub-card { text-align: center; padding: 48px 20px; color: rgba(255,255,255,.45); }
+    .pf-stub-card h3 { font-family: var(--font-display); font-weight: 400; color: var(--white); margin: 0 0 10px; }
+  </style>
+  <section class="section section-portfolio" id="portfolio" data-tab="portfolio">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Portfolio Manfredi<span class="pf-stamp">INVESTMENT</span></span>
+        <h2 class="section-title">Portfolio Manfredi</h2>
+        <p class="section-sub">Armá tu portafolio y chequeá si está alineado con tu perfil de riesgo.</p>
+      </div>
+
+      <div class="inv-disclaimer">
+        <span style="color:#D97706;font-size:14px;flex-shrink:0;">&#9888;</span>
+        <span>Herramienta educativa de autogestión. No es asesoramiento financiero ni una recomendación de inversión personalizada.</span>
+      </div>
+
+      <div class="mkt-tabs" id="pfViewTabs" role="tablist">
+        <button type="button" class="mkt-tab active" data-pfview="tuyo">Tu Portafolio</button>
+        <button type="button" class="mkt-tab" data-pfview="manfredi">Portafolio de Manfredi</button>
+      </div>
+
+      <div class="pf-view-panel active" data-pfview-panel="tuyo">
+
+        <div class="pf-card" id="pfQuizCard"></div>
+
+        <div class="pf-card">
+          <h2 class="pf-metrics-label" style="margin-bottom:14px;">Tus posiciones</h2>
+          <table class="pf-positions-table">
+            <thead><tr><th>Activo</th><th style="text-align:right;">Valor</th><th style="text-align:right;">% cartera</th><th></th></tr></thead>
+            <tbody id="pfPositionsBody"></tbody>
+          </table>
+          <div class="pf-add-row" id="pfAddRowBtn" onclick="pfShowAddForm()">+ Agregar posición</div>
+          <div class="pf-add-form" id="pfAddForm" style="display:none;">
+            <input type="text" id="pfInputTicker" placeholder="Ticker o nombre">
+            <input type="number" id="pfInputValor" placeholder="Valor (USD)">
+            <label><input type="checkbox" id="pfInputCash"> Es efectivo</label>
+            <input type="text" id="pfInputNotas" placeholder="Notas (opcional)">
+            <button class="pf-btn-gold" onclick="pfAddPosition()">Agregar</button>
+            <button class="pf-btn-ghost" onclick="pfHideAddForm()">Cancelar</button>
+          </div>
+          <div class="pf-save-row">
+            <button class="pf-btn-ghost" id="pfSaveBtn" style="display:none;" onclick="pfSavePortfolio()">Guardar mi portafolio</button>
+            <span class="pf-save-status" id="pfSaveStatus"></span>
+          </div>
+        </div>
+
+        <div class="pf-card" id="pfMetricsWrapper" style="position:relative;">
+          <div id="pfMetricsGrid"></div>
+        </div>
+
+      </div>
+
+      <div class="pf-view-panel" data-pfview-panel="manfredi">
+        <div class="pf-stub-card">
+          <h3>Próximamente</h3>
+          <p>El desempeño real de mi portafolio frente al S&amp;P 500 todavía no está disponible en esta sección.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <script>
+  (function(){
+    var tabs = document.querySelectorAll('#pfViewTabs .mkt-tab');
+    var panels = document.querySelectorAll('#portfolio .pf-view-panel');
+    tabs.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        tabs.forEach(function(b){ b.classList.toggle('active', b === btn); });
+        var v = btn.getAttribute('data-pfview');
+        panels.forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-pfview-panel') === v); });
+      });
+    });
+  })();
+
+  window._pfPositions = window._pfPositions || [];
+  var pfIdSeq = 1;
+
+  function pfShowAddForm(){ document.getElementById('pfAddForm').style.display = 'flex'; document.getElementById('pfAddRowBtn').style.display = 'none'; }
+  function pfHideAddForm(){
+    document.getElementById('pfAddForm').style.display = 'none';
+    document.getElementById('pfAddRowBtn').style.display = 'flex';
+    document.getElementById('pfInputTicker').value = '';
+    document.getElementById('pfInputValor').value = '';
+    document.getElementById('pfInputNotas').value = '';
+    document.getElementById('pfInputCash').checked = false;
+  }
+  function pfAddPosition(){
+    var ticker = document.getElementById('pfInputTicker').value.trim();
+    var valor = parseFloat(document.getElementById('pfInputValor').value);
+    var isCash = document.getElementById('pfInputCash').checked;
+    var notas = document.getElementById('pfInputNotas').value.trim();
+    if(!ticker || !(valor > 0)) return;
+    window._pfPositions.push({ id: pfIdSeq++, ticker: ticker, valor: valor, notas: notas, isCash: isCash });
+    pfHideAddForm();
+    pfRenderPositions();
+  }
+  function pfRemovePosition(id){
+    window._pfPositions = window._pfPositions.filter(function(p){ return p.id !== id; });
+    pfRenderPositions();
+  }
+
+  function pfRenderPositions(){
+    var body = document.getElementById('pfPositionsBody');
+    if(!body) return;
+    var positions = window._pfPositions || [];
+    var total = positions.reduce(function(s,p){ return s + (p.valor||0); }, 0);
+    if(!positions.length){
+      body.innerHTML = '<tr class="pf-empty-row"><td colspan="4">Todavía no cargaste posiciones.</td></tr>';
+    } else {
+      body.innerHTML = positions.map(function(p){
+        var pct = total > 0 ? (p.valor/total*100) : 0;
+        return '<tr><td>'+ (p.isCash ? '&#128176; ' : '') + p.ticker.replace(/</g,'&lt;') +'</td>'
+          + '<td class="num">$'+ p.valor.toLocaleString('es-AR',{maximumFractionDigits:0}) +'</td>'
+          + '<td class="num">'+ pct.toFixed(1) +'%</td>'
+          + '<td style="text-align:right;"><span class="pf-rm" onclick="pfRemovePosition('+ p.id +')">&times;</span></td></tr>';
+      }).join('');
+    }
+    var saveBtn = document.getElementById('pfSaveBtn');
+    if(saveBtn) saveBtn.style.display = (window._miIsMember && window._miIsMember()) ? '' : 'none';
+    pfRenderMetrics();
+  }
+
+  async function pfSavePortfolio(){
+    if(!window._miSavePortfolio) return;
+    var btn = document.getElementById('pfSaveBtn');
+    var status = document.getElementById('pfSaveStatus');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+    var ok = await window._miSavePortfolio();
+    btn.disabled = false; btn.textContent = 'Guardar mi portafolio';
+    status.textContent = ok ? 'Guardado ✓' : 'No se pudo guardar, probá de nuevo.';
+    setTimeout(function(){ status.textContent=''; }, 4000);
+  }
+
+  function pfRenderQuizStatus(){
+    var card = document.getElementById('pfQuizCard');
+    if(!card) return;
+    var profile = window._qzLastProfile;
+    if(!profile){
+      card.innerHTML = '<div class="pf-quiz-cta">'
+        + '<div><h3>Todavía no hiciste el quiz de perfil</h3><p>2 minutos, 9 preguntas. Separa tu tolerancia emocional de tu capacidad financiera real.</p></div>'
+        + '<button class="pf-btn-gold" onclick="openQuiz()">Empezar quiz &rarr;</button></div>';
+    } else {
+      card.innerHTML = '<div class="pf-quiz-badge">'
+        + '<div><span class="pf-qb-label">Tu perfil</span><span class="pf-qb-name">'+ profile.name +'</span></div>'
+        + '<button class="pf-btn-ghost" onclick="openQuiz()">Rehacer quiz</button></div>';
+    }
+  }
+
+  function pfBucketCash(cashPct, profile){
+    if(profile && profile.bands && profile.bands['Efectivo']){
+      var lo = profile.bands['Efectivo'][0], hi = profile.bands['Efectivo'][1];
+      if(cashPct >= lo-5 && cashPct <= hi+5) return 'ok';
+      if(cashPct >= lo-15 && cashPct <= hi+15) return 'warn';
+      return 'bad';
+    }
+    if(cashPct < 10) return 'ok';
+    if(cashPct <= 25) return 'warn';
+    return 'bad';
+  }
+  function pfBucketConc(pct){ if(pct < 20) return 'ok'; if(pct <= 40) return 'warn'; return 'bad'; }
+  function pfBucketDivers(n){ if(n >= 6) return 'ok'; if(n >= 3) return 'warn'; return 'bad'; }
+
+  function pfComputeMetrics(positions, quizProfile){
+    var total = positions.reduce(function(s,p){ return s + (p.valor||0); }, 0);
+    if(total <= 0) return null;
+    var cash = positions.filter(function(p){ return p.isCash; }).reduce(function(s,p){ return s + p.valor; }, 0);
+    var cashPct = cash/total*100;
+    var invested = positions.filter(function(p){ return !p.isCash; });
+    var maxPos = invested.reduce(function(m,p){ return p.valor > m.valor ? p : m; }, {valor:0,ticker:''});
+    var concPct = invested.length ? (maxPos.valor/total*100) : 0;
+    return {
+      cash: { value: cashPct, status: pfBucketCash(cashPct, quizProfile) },
+      conc: { value: concPct, ticker: maxPos.ticker, status: pfBucketConc(concPct) },
+      divers: { value: invested.length, status: pfBucketDivers(invested.length) }
+    };
+  }
+
+  var pfChipLabel = { ok: 'Alineado', warn: 'Atención', bad: 'Atención' };
+
+  function pfRenderMetrics(){
+    var wrapper = document.getElementById('pfMetricsWrapper');
+    var grid = document.getElementById('pfMetricsGrid');
+    if(!wrapper || !grid) return;
+    var existingOverlay = wrapper.querySelector('.mi-paywall-overlay');
+    if(existingOverlay) existingOverlay.remove();
+
+    var metrics = pfComputeMetrics(window._pfPositions||[], window._qzLastProfile);
+    if(!metrics){
+      grid.innerHTML = '<div class="pf-metrics-empty">Cargá al menos una posición para ver el chequeo de alineación.</div>';
+      return;
+    }
+
+    var quizNote = window._qzLastProfile ? '' : ' Completá el quiz para un chequeo más preciso de tu efectivo.';
+
+    grid.innerHTML = '<div class="pf-metrics-label">Resultados del chequeo</div>'
+      + '<div class="pf-metric-grid">'
+      + '<div class="pf-metric-card"><div class="pf-metric-top"><span class="name">Efectivo ocioso</span><span class="pf-chip '+ metrics.cash.status +'">'+ pfChipLabel[metrics.cash.status] +'</span></div>'
+      + '<div class="pf-metric-val">'+ metrics.cash.value.toFixed(1) +'%</div><div class="pf-metric-note">Parte de tu cartera en efectivo.'+ quizNote +'</div></div>'
+      + '<div class="pf-metric-card"><div class="pf-metric-top"><span class="name">Concentración</span><span class="pf-chip '+ metrics.conc.status +'">'+ pfChipLabel[metrics.conc.status] +'</span></div>'
+      + '<div class="pf-metric-val">'+ metrics.conc.value.toFixed(1) +'%</div><div class="pf-metric-note">'+ (metrics.conc.ticker ? metrics.conc.ticker+' es tu mayor posición.' : 'Sin posiciones no-efectivo.') +'</div></div>'
+      + '<div class="pf-metric-card"><div class="pf-metric-top"><span class="name">Diversificación</span><span class="pf-chip '+ metrics.divers.status +'">'+ pfChipLabel[metrics.divers.status] +'</span></div>'
+      + '<div class="pf-metric-val">'+ metrics.divers.value +'</div><div class="pf-metric-note">Posiciones distintas (sin contar efectivo).</div></div>'
+      + '</div>'
+      + '<div class="pf-warren-panel"><div class="pf-warren-avatar">W</div><div class="pf-warren-body" id="pfWarrenBody">'
+      + '<div class="pf-w-name">WARREN</div>'
+      + '<button class="pf-btn-ghost" id="pfExplainBtn" onclick="pfExplainWithWarren()">Explicame esto</button>'
+      + '<div id="pfWarrenBubble"></div></div></div>';
+
+    if(!(window._miIsMember && window._miIsMember())){
+      if(window._miApplyPaywall) window._miApplyPaywall('#pfMetricsGrid', '#pfMetricsWrapper');
+    }
+  }
+
+  function pfBuildNarrationPrompt(metrics, profile){
+    return "Sos Warren, el asesor educativo de Manfredi Investment. Vas a narrar en prosa breve (maximo 180 palabras) "
+      + "los resultados de un chequeo de alineacion de cartera que YA fueron calculados por el sistema.\n\n"
+      + "REGLAS ESTRICTAS:\n"
+      + "- Usa unicamente los numeros y estados que te paso abajo. Nunca inventes cifras ni asumas datos no provistos.\n"
+      + "- Prohibido usar verbos de ejecucion de operaciones: compra, vende, rota, entra, sali, aumenta, reduci tu posicion. "
+      + "Describi que implica cada metrica y por que se acerca o aleja del perfil declarado, sin instruir una accion.\n"
+      + "- No emitas un veredicto de \"cartera correcta/incorrecta\". Explica, no prescribas.\n"
+      + "- Termina siempre con esta frase exacta, sin modificarla: "
+      + "\"Herramienta educativa de autogestion. No es asesoramiento financiero ni una recomendacion de inversion personalizada.\"\n\n"
+      + "DATOS DEL USUARIO:\n"
+      + "Perfil de riesgo (quiz): " + (profile ? profile.name : 'no completado')
+      + (profile && profile.bands && profile.bands['Efectivo'] ? ' - banda de efectivo objetivo ' + profile.bands['Efectivo'][0] + '-' + profile.bands['Efectivo'][1] + '%' : '') + "\n"
+      + "Efectivo ocioso: " + metrics.cash.value.toFixed(1) + "% - estado: " + metrics.cash.status + "\n"
+      + "Concentracion en una posicion (" + (metrics.conc.ticker || 's/d') + "): " + metrics.conc.value.toFixed(1) + "% - estado: " + metrics.conc.status + "\n"
+      + "Diversificacion: " + metrics.divers.value + " posiciones distintas - estado: " + metrics.divers.status;
+  }
+
+  async function pfExplainWithWarren(){
+    if(!(window._miIsMember && window._miIsMember())) return;
+    var metrics = pfComputeMetrics(window._pfPositions||[], window._qzLastProfile);
+    if(!metrics) return;
+    var btn = document.getElementById('pfExplainBtn');
+    var bubble = document.getElementById('pfWarrenBubble');
+    btn.disabled = true; btn.textContent = 'Warren esta analizando...';
+    try{
+      var res = await fetch('/.netlify/functions/warren', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: 'Explicame en tus palabras que significan estos resultados para mi perfil.' }],
+          systemPrompt: pfBuildNarrationPrompt(metrics, window._qzLastProfile),
+          email: window._currentUser ? window._currentUser.email : null
+        })
+      });
+      var data = await res.json();
+      bubble.innerHTML = '<p>' + (data.response || 'No pude generar la explicación.') + '</p>'
+        + '<p class="pf-disclaimer">Herramienta educativa de autogestión. No es asesoramiento financiero ni una recomendación de inversión personalizada.</p>';
+    } catch(e){
+      bubble.textContent = 'Hubo un error al conectar con Warren. Probá de nuevo.';
+    }
+    btn.style.display = 'none';
+  }
+
+  window._pfRenderPositions = pfRenderPositions;
+  window._pfRenderMetrics = pfRenderMetrics;
+
+  function pfInit(){
+    try{
+      var saved = localStorage.getItem('mi_quiz_profile');
+      if(saved && !window._qzLastProfile) window._qzLastProfile = JSON.parse(saved);
+    }catch(e){}
+    window.addEventListener('mi:quiz-completed', function(){ pfRenderQuizStatus(); pfRenderMetrics(); });
+    pfRenderQuizStatus();
+    pfRenderPositions();
+  }
+  if(document.readyState !== 'loading'){ pfInit(); } else { document.addEventListener('DOMContentLoaded', pfInit); }
   </script>
 
   <!-- ââ ASESORÍA ââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
@@ -7867,6 +8217,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
                             overlay.innerHTML = paywallCardHTML;
                 section.appendChild(overlay);
               }
+              window._miApplyPaywall = applyPaywall;
 
                         function applyWarrenPaywall() {
                 var panel = document.querySelector('#warrenPanel') || document.querySelector('.warren-panel');
@@ -7890,6 +8241,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
               };
 
                             function checkMembership() {
+                            if (typeof window._pfRenderMetrics === 'function') window._pfRenderMetrics();
                             if (isMember()) return;
                             applyWarrenPaywall();
               }
@@ -8717,6 +9069,9 @@ function qzShowResult(){
   if(expLevel===0&&finalTier>2){finalTier=2;cappedByExperience=true;}
   var bindingLabel=tierT===tierC?"Tolerancia y capacidad coinciden.":(finalTier===tierT?"Tu tolerancia emocional es la que determina el perfil.":"Tu capacidad financiera es la que determina el perfil (regla CFA: se toma la más conservadora).");
   var pr=QZProfiles[finalTier];
+  window._qzLastProfile={tier:finalTier,name:pr.name,bands:pr.bands,ts:Date.now()};
+  try{localStorage.setItem('mi_quiz_profile',JSON.stringify(window._qzLastProfile));}catch(e){}
+  window.dispatchEvent(new CustomEvent('mi:quiz-completed',{detail:window._qzLastProfile}));
   document.getElementById('qzProgFill').style.width='100%';
 
   function subscore(label,score,max,color){
@@ -8767,11 +9122,11 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
 <script>
   // ââ Navegacion por pestanas: una sola seccion visible a la vez âââââââââââ
   (function() {
-    var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'asesoria'];
+    var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'portfolio', 'asesoria'];
     var TAB_TITLES = {
       inicio: 'Inicio', mercados: 'Mercados', calendario: 'Calendario Economico',
       informes: 'Informes & Reportes', university: 'University', inversiones: 'Inversiones',
-      asesoria: 'Asesoria'
+      portfolio: 'Portfolio Manfredi', asesoria: 'Asesoria'
     };
 
     function resolveTab(hash) {
