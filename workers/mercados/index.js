@@ -44,6 +44,16 @@ function displayName(symbol) {
   return NAME_MAP[symbol] || symbol;
 }
 
+// Devuelve el primer valor numerico valido de una lista de candidatos --
+// usado para tolerar que Finnhub exponga distintos alias del mismo campo
+// segun el ticker/plan.
+function firstNumber(...candidates) {
+  for (const c of candidates) {
+    if (typeof c === 'number' && !Number.isNaN(c)) return c;
+  }
+  return null;
+}
+
 // ─── data912 ─────────────────────────────────────────────────────────────
 async function fetchD912(endpoint) {
   try {
@@ -467,6 +477,46 @@ export default {
           min: Math.min(...closes), max: Math.max(...closes),
         });
         await env.MERCADOS_KV.put(cacheKey, json, { expirationTtl: HISTORICO_CACHE_TTL_SECONDS });
+        return new Response(json, { headers });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), { status: 404, headers });
+      }
+    }
+
+    // GET /fundamentals?symbol=AAPL -- ROE / P/E / dividend yield ponderados para
+    // "Tu Portafolio". Reusa la FINNHUB_KEY que ya esta configurada (misma que
+    // usa buildPayload() para SPY/QQQ/Merval) -- ninguna cuenta ni key nueva.
+    // Cache largo (24h) porque estos datos fundamentales cambian a lo sumo una
+    // vez por trimestre, no vale la pena pedirlos seguido.
+    if (url.pathname === '/fundamentals') {
+      const symbol = url.searchParams.get('symbol') || '';
+      if (!symbol) {
+        return new Response(JSON.stringify({ error: 'Falta symbol' }), { status: 400, headers });
+      }
+      const cacheKey = `fundamentals_v1:${symbol.toUpperCase()}`;
+      const forceRefresh = url.searchParams.get('refresh') === '1';
+      try {
+        if (!forceRefresh) {
+          const cached = await env.MERCADOS_KV.get(cacheKey);
+          if (cached) return new Response(cached, { headers });
+        }
+        const finnhubKey = env.FINNHUB_KEY;
+        if (!finnhubKey) throw new Error('FINNHUB_KEY no configurada');
+        const resp = await fetch(
+          `https://finnhub.io/api/v1/stock/metric?symbol=${encodeURIComponent(symbol)}&metric=all&token=${finnhubKey}`,
+          { signal: AbortSignal.timeout(10000) }
+        );
+        if (!resp.ok) throw new Error(`Finnhub HTTP ${resp.status}`);
+        const data = await resp.json();
+        const m = data && data.metric;
+        if (!m) throw new Error('Finnhub: sin datos de metric');
+        // Nombres de campo defensivos: Finnhub no siempre expone el mismo alias
+        // para todos los tickers/planes, probamos varias variantes conocidas.
+        const roe = firstNumber(m.roeTTM, m.roeRfy, m.roeAnnual);
+        const pe = firstNumber(m.peBasicExclExtraTTM, m.peTTM, m.peExclExtraTTM, m.peAnnual);
+        const divYield = firstNumber(m.currentDividendYieldTTM, m.dividendYieldIndicatedAnnual, m.dividendYield5Y);
+        const json = JSON.stringify({ symbol: symbol.toUpperCase(), roe, pe, divYield });
+        await env.MERCADOS_KV.put(cacheKey, json, { expirationTtl: 86400 });
         return new Response(json, { headers });
       } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 404, headers });

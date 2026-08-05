@@ -3864,10 +3864,41 @@
     .pf-chip.bad { background: rgba(239,68,68,.14); color: var(--red); }
     .pf-metric-val { position:relative; font-family: 'IBM Plex Mono', monospace; font-size: 27px; font-weight: 700; color: var(--white); line-height: 1.1; letter-spacing: -.01em; }
     .pf-metric-note { position:relative; font-size: 11.5px; color: rgba(255,255,255,.42); margin-top: 8px; line-height: 1.5; }
-    .pf-warren-panel { display: flex; gap: 12px; align-items: flex-start; background: rgba(242,201,76,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 16px; }
-    .pf-warren-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--navy-1); border: 1px solid var(--gold-dark,#B8943F); color: var(--gold); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 14px; }
-    .pf-warren-body .pf-w-name { font-size: 11.5px; font-weight: 700; color: var(--gold); margin-bottom: 6px; letter-spacing: .02em; }
-    .pf-warren-body p { margin: 0 0 8px; font-size: 13.5px; color: rgba(255,255,255,.75); }
+    .pf-warren-panel {
+      position: relative; overflow: hidden; display: flex; gap: 16px; align-items: center;
+      background: linear-gradient(135deg, rgba(242,201,76,.11), rgba(242,201,76,.02) 65%);
+      border: 1px solid rgba(242,201,76,.3); border-radius: 14px; padding: 20px 22px;
+    }
+    .pf-warren-panel::after {
+      content: ''; position: absolute; top: -55%; right: -8%; width: 220px; height: 220px;
+      background: radial-gradient(circle, rgba(242,201,76,.18), transparent 70%); pointer-events: none;
+    }
+    .pf-warren-avatar {
+      position: relative; width: 46px; height: 46px; border-radius: 50%; background: var(--navy-1);
+      border: 1.5px solid var(--gold); color: var(--gold); flex-shrink: 0; display: flex; align-items: center;
+      justify-content: center; font-family: var(--font-display); font-size: 19px; z-index: 1;
+    }
+    .pf-warren-avatar::after {
+      content: ''; position: absolute; inset: -5px; border-radius: 50%; border: 1.5px solid var(--gold);
+      opacity: .55; animation: pfWarrenPulse 2.4s ease-out infinite;
+    }
+    @keyframes pfWarrenPulse { 0%{transform:scale(.9);opacity:.55;} 70%{transform:scale(1.5);opacity:0;} 100%{opacity:0;} }
+    @media (prefers-reduced-motion: reduce) { .pf-warren-avatar::after { animation: none; } }
+    .pf-warren-body { position: relative; flex: 1; z-index: 1; }
+    .pf-warren-body .pf-w-name { font-size: 10.5px; font-weight: 700; color: var(--gold); letter-spacing: .09em; text-transform: uppercase; margin-bottom: 4px; }
+    .pf-warren-body .pf-w-headline { font-family: var(--font-display); font-size: 17px; color: var(--white); margin-bottom: 3px; }
+    .pf-warren-body .pf-w-sub { font-size: 12.5px; color: rgba(255,255,255,.55); margin-bottom: 14px; max-width: 46ch; }
+    .pf-warren-body p { margin: 0 0 8px; font-size: 13.5px; color: rgba(255,255,255,.8); }
+    .pf-warren-cta {
+      display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, var(--gold), var(--gold-dark,#B8943F));
+      color: var(--primary); border: none; border-radius: 8px; padding: 11px 20px; font-weight: 700; font-size: 13.5px;
+      cursor: pointer; font-family: inherit; box-shadow: 0 6px 18px -8px rgba(242,201,76,.55);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .pf-warren-cta:hover { transform: translateY(-1px); box-shadow: 0 9px 22px -8px rgba(242,201,76,.7); }
+    .pf-warren-cta svg { flex-shrink: 0; }
+    .pf-metric-bench { font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,.72); margin-top: 7px; }
+    .pf-metric-bench b { color: var(--white); font-family: 'IBM Plex Mono', monospace; font-weight: 700; }
     .pf-disclaimer { font-size: 11px; color: rgba(255,255,255,.35); font-style: italic; }
     .pf-view-panel { display: none; }
     .pf-view-panel.active { display: block; }
@@ -4220,8 +4251,12 @@
       + '<div class="pf-metric-val">'+ metrics.divers.value +'</div><div class="pf-metric-note">Posiciones distintas (sin contar efectivo).</div></div>'
       + '</div>'
       + '<div class="pf-warren-panel"><div class="pf-warren-avatar">W</div><div class="pf-warren-body" id="pfWarrenBody">'
-      + '<div class="pf-w-name">WARREN</div>'
-      + '<button class="pf-btn-ghost" id="pfExplainBtn" onclick="pfExplainWithWarren()">Explicame esto</button>'
+      + '<div class="pf-w-name">Warren &middot; IA</div>'
+      + '<div class="pf-w-headline">Ya vi tus números.</div>'
+      + '<div class="pf-w-sub">Pedile que te explique, en criollo, qué significan para tu perfil.</div>'
+      + '<button class="pf-warren-cta" id="pfExplainBtn" onclick="pfExplainWithWarren()">'
+      + '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2L12 2z"/></svg>'
+      + 'Preguntale a Warren</button>'
       + '<div id="pfWarrenBubble"></div></div></div>';
 
     if(!(window._miIsMember && window._miIsMember())){
@@ -4362,12 +4397,56 @@
     var retAnual = pfAnnualizeReturn(portfolioReturns);
     var retBenchAnual = pfAnnualizeReturn(benchReturns);
     var sharpe = volAnual>0 ? (retAnual-PF_RISK_FREE_ANNUAL)/volAnual : 0;
-    var alpha = retAnual - (PF_RISK_FREE_ANNUAL + beta*(retBenchAnual-PF_RISK_FREE_ANNUAL));
+
+    var benchVolAnual = pfAnnualizeVol(benchReturns);
+    var benchSharpe = benchVolAnual>0 ? (retBenchAnual-PF_RISK_FREE_ANNUAL)/benchVolAnual : 0;
+    var benchClosesAligned = benchCloses.slice(benchCloses.length-minLen);
 
     return {
-      beta:beta, volAnual:volAnual, sharpe:sharpe, alpha:alpha,
+      beta:beta, volAnual:volAnual, sharpe:sharpe,
       maxDrawdown: pfMaxDrawdown(series), var95Daily: pfPercentile(portfolioReturns,0.05),
-      avgCorrelation: pfAvgCorrelation(returnsByTicker), daysUsed: minLen
+      avgCorrelation: pfAvgCorrelation(returnsByTicker), daysUsed: minLen,
+      benchVolAnual: benchVolAnual, benchSharpe: benchSharpe,
+      benchMaxDrawdown: pfMaxDrawdown(benchClosesAligned), benchVar95Daily: pfPercentile(benchReturns,0.05),
+      grouped: grouped, validTickers: validTickers
+    };
+  }
+
+  // ---- ROE / P/E / dividend yield ponderados (datos fundamentales, Finnhub via Worker) ----
+  var pfFundamentalsCache = {};
+  async function pfFetchFundamentals(symbol){
+    if(pfFundamentalsCache[symbol] !== undefined) return pfFundamentalsCache[symbol];
+    try{
+      var res = await fetch(PF_MERCADOS_BASE + '/fundamentals?symbol=' + encodeURIComponent(symbol));
+      var data = await res.json();
+      pfFundamentalsCache[symbol] = (data && !data.error) ? data : null;
+      return pfFundamentalsCache[symbol];
+    }catch(e){ console.warn('pfFetchFundamentals failed:', symbol, e); pfFundamentalsCache[symbol]=null; return null; }
+  }
+  async function pfBuildFundamentalMetrics(grouped, priceByTicker){
+    var tickers = Object.keys(grouped||{});
+    if(!tickers.length) return null;
+    var fundByTicker = {};
+    await Promise.all(tickers.map(async function(t){ fundByTicker[t] = await pfFetchFundamentals(t); }));
+
+    var totalVal = 0;
+    tickers.forEach(function(t){ totalVal += (grouped[t]||0) * (priceByTicker[t]||0); });
+    if(totalVal <= 0) return null;
+
+    function weightedAvg(field){
+      var sum = 0, weightUsed = 0;
+      tickers.forEach(function(t){
+        var f = fundByTicker[t];
+        if(!f || f[field] == null) return;
+        var w = (grouped[t]||0) * (priceByTicker[t]||0);
+        sum += f[field] * w; weightUsed += w;
+      });
+      return weightUsed > 0 ? sum/weightUsed : null;
+    }
+
+    return {
+      roe: weightedAvg('roe'), pe: weightedAvg('pe'), divYield: weightedAvg('divYield'),
+      coverage: tickers.filter(function(t){ return fundByTicker[t]; }).length + '/' + tickers.length
     };
   }
 
@@ -4397,30 +4476,53 @@
       return;
     }
 
-    function card(name, valStr, unit, note, status){
+    function card(name, valStr, unit, note, status, bench){
       var st = status || 'neutral';
       return '<div class="pf-metric-card status-'+st+'"><div class="pf-metric-top"><span class="name">'+name+'</span>'+(status?'<span class="pf-chip '+status+'">'+pfChipLabel[status]+'</span>':'')+'</div>'
-        + '<div class="pf-metric-val">'+valStr+(unit?'<span class="unit">'+unit+'</span>':'')+'</div><div class="pf-metric-note">'+note+'</div></div>';
+        + '<div class="pf-metric-val">'+valStr+(unit?'<span class="unit">'+unit+'</span>':'')+'</div><div class="pf-metric-note">'+note+'</div>'
+        + (bench?'<div class="pf-metric-bench">'+bench+'</div>':'') + '</div>';
     }
     var betaStatus = m.beta>1.3 ? 'bad' : (m.beta>=0.8 && m.beta<=1.3 ? 'ok' : 'warn');
     var volStatus = m.volAnual<0.20 ? 'ok' : (m.volAnual<0.40 ? 'warn' : 'bad');
     var sharpeStatus = m.sharpe>1 ? 'ok' : (m.sharpe>=0 ? 'warn' : 'bad');
-    var alphaStatus = m.alpha>0.02 ? 'ok' : (m.alpha>-0.02 ? 'warn' : 'bad');
     var ddStatus = m.maxDrawdown> -0.15 ? 'ok' : (m.maxDrawdown> -0.30 ? 'warn' : 'bad');
     var corrStatus = m.avgCorrelation==null ? null : (m.avgCorrelation<0.3 ? 'ok' : (m.avgCorrelation<0.7 ? 'warn' : 'bad'));
     var varStatus = m.var95Daily> -0.02 ? 'ok' : (m.var95Daily> -0.04 ? 'warn' : 'bad');
 
+    var priceByTicker = {};
+    (m.validTickers||[]).forEach(function(t){ priceByTicker[t] = pfGetCurrentPrice(t) || 0; });
+    var fund = await pfBuildFundamentalMetrics(m.grouped, priceByTicker);
+    if(reqId !== pfAdvReqSeq) return;
+
+    var roeStatus = fund && fund.roe!=null ? (fund.roe>15 ? 'ok' : (fund.roe>8 ? 'warn' : 'bad')) : null;
+    var peStatus = fund && fund.pe!=null ? (fund.pe<25 ? 'ok' : (fund.pe<40 ? 'warn' : 'bad')) : null;
+    var divStatus = fund && fund.divYield!=null ? (fund.divYield>1.5 ? 'ok' : 'warn') : null;
+
     grid.innerHTML = '<div class="pf-metrics-label">Métricas de cartera <span style="text-transform:none;letter-spacing:0;color:rgba(255,255,255,.3);">&middot; últimos '+ m.daysUsed +' días hábiles</span></div>'
       + '<div class="pf-metric-grid">'
-      + card('Beta vs S&amp;P 500', m.beta.toFixed(2), '', 'Sensibilidad al mercado. 1 = se mueve igual que el S&amp;P 500.', betaStatus)
-      + card('Volatilidad anual.', (m.volAnual*100).toFixed(1), '%', 'Desvío estándar anualizado de tus retornos.', volStatus)
-      + card('Sharpe Ratio', m.sharpe.toFixed(2), '', 'Retorno ajustado por riesgo (tasa libre de riesgo ~4,5% anual, aproximada).', sharpeStatus)
-      + card('Alpha vs S&amp;P 500', (m.alpha*100).toFixed(1), '%', 'Retorno de más (o de menos) ajustado por el riesgo que tomaste.', alphaStatus)
-      + card('Máximo drawdown', (m.maxDrawdown*100).toFixed(1), '%', 'La peor caída de pico a valle en el período.', ddStatus)
-      + card('Correlación promedio', m.avgCorrelation==null?'—':m.avgCorrelation.toFixed(2), '', 'Qué tan parecido se mueven tus posiciones entre sí. Más bajo = más diversificado.', corrStatus)
-      + card('VaR diario (95%)', (m.var95Daily*100).toFixed(1), '%', 'En 19 de cada 20 días, no deberías perder más que esto en un solo día.', varStatus)
+      + card('Beta vs S&amp;P 500', m.beta.toFixed(2), '', 'Sensibilidad al mercado. 1 = se mueve igual que el S&amp;P 500.', betaStatus,
+             'El S&amp;P 500 tiene beta <b>1.00</b> por definición.')
+      + card('Volatilidad anual.', (m.volAnual*100).toFixed(1), '%', 'Desvío estándar anualizado de tus retornos.', volStatus,
+             'S&amp;P 500 en el mismo período: <b>'+(m.benchVolAnual*100).toFixed(1)+'%</b>')
+      + card('Sharpe Ratio', m.sharpe.toFixed(2), '', 'Retorno ajustado por riesgo (tasa libre de riesgo ~4,5% anual, aproximada).', sharpeStatus,
+             'S&amp;P 500 en el mismo período: <b>'+m.benchSharpe.toFixed(2)+'</b>')
+      + card('Máximo drawdown', (m.maxDrawdown*100).toFixed(1), '%', 'La peor caída de pico a valle en el período.', ddStatus,
+             'S&amp;P 500 en el mismo período: <b>'+(m.benchMaxDrawdown*100).toFixed(1)+'%</b>')
+      + card('Correlación promedio', m.avgCorrelation==null?'—':m.avgCorrelation.toFixed(2), '', 'Qué tan parecido se mueven tus posiciones entre sí. Más bajo = más diversificado.', corrStatus,
+             'Una cartera bien diversificada suele rondar <b>0,20&ndash;0,40</b>.')
+      + card('VaR diario (95%)', (m.var95Daily*100).toFixed(1), '%', 'En 19 de cada 20 días, no deberías perder más que esto en un solo día.', varStatus,
+             'S&amp;P 500 en el mismo período: <b>'+(m.benchVar95Daily*100).toFixed(1)+'%</b>')
+      + card('ROE ponderado', fund && fund.roe!=null ? fund.roe.toFixed(1) : '—', fund && fund.roe!=null ? '%' : '',
+             'Rentabilidad sobre el patrimonio de las empresas que tenés, ponderada por cuánto pesa cada una.' + (fund?' Datos disponibles: '+fund.coverage+'.':''), roeStatus,
+             'Promedio histórico S&amp;P 500: <b>~18%</b> (referencia aproximada, no en vivo).')
+      + card('P/E ponderado', fund && fund.pe!=null ? fund.pe.toFixed(1) : '—', fund && fund.pe!=null ? 'x' : '',
+             'Si tu cartera está cara o barata comparada al mercado.', peStatus,
+             'Promedio histórico S&amp;P 500: <b>~21x</b> (referencia aproximada, no en vivo).')
+      + card('Dividend yield ponderado', fund && fund.divYield!=null ? fund.divYield.toFixed(1) : '—', fund && fund.divYield!=null ? '%' : '',
+             'Cuánto te rinde tu cartera en dividendos por año.', divStatus,
+             'Promedio histórico S&amp;P 500: <b>~1,3%</b> (referencia aproximada, no en vivo).')
       + '</div>'
-      + '<div class="pf-metric-note">Calculado con los últimos '+ m.daysUsed +' cierres diarios disponibles de cada activo. La tasa libre de riesgo es una aproximación fija (4,5% anual), no un dato en vivo.</div>';
+      + '<div class="pf-metric-note">Calculado con los últimos '+ m.daysUsed +' cierres diarios disponibles de cada activo. La tasa libre de riesgo y los promedios de referencia son aproximaciones fijas, no datos en vivo.</div>';
 
     if(!(window._miIsMember && window._miIsMember())){
       if(window._miApplyPaywall) window._miApplyPaywall('#pfAdvGrid', '#pfAdvWrapper');
