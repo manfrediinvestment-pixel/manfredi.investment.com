@@ -175,8 +175,8 @@
       <div><span class="ticker-big">MSFT</span><span class="exch">NASDAQ · Microsoft Corporation</span></div>
       <div class="fv-block">
         <div class="fv-label">Fair value (blend propio)</div>
-        <div class="fv-value">$452.33</div>
-        <div class="fv-gap neg">vs. $464.72 mercado · &minus;2.7%</div>
+        <div class="fv-value">$478.19</div>
+        <div class="fv-gap pos">vs. $464.72 mercado · +2.9%</div>
       </div>
     </div>
     <div class="verdict-bar">
@@ -811,7 +811,7 @@
   <h3>Síntesis: los cuatro métodos, uno al lado del otro</h3>
   <div class="chartbox">
     <canvas id="footballChart" height="260"></canvas>
-    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado ($464.72); la línea azul marca el blend propio ($452.33, incluyendo la participación en OpenAI). A diferencia de AAPL, dos de las tres metodologías propias del blend superan el precio de mercado — el DCF Base (incluso con el ajuste de OpenAI) queda apenas por debajo.</p>
+    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado ($464.72); la línea azul marca el blend propio ($478.19, incluyendo la participación en OpenAI). A diferencia de AAPL, tres de las cuatro metodologías del blend superan el precio de mercado — el DCF Base (incluso con el ajuste de OpenAI) queda apenas por debajo.</p>
   </div>
   <div class="table-scroll"><table>
     <tr><th>Método</th><th class="right-al">Fair value</th></tr>
@@ -822,8 +822,8 @@
     <tr class="total"><td class="label">DCF Base + participación OpenAI</td><td class="right-al">$381.96</td></tr>
     <tr><td class="label">Comparables (P/E forward promedio del panel)</td><td class="right-al">$442.82</td></tr>
     <tr><td class="label">Reversión histórica (P/E promedio 5-10 años propio)</td><td class="right-al">$532.22</td></tr>
-    <tr class="total"><td class="label">Promedio simple — (DCF Base + OpenAI), Comparables, Reversión histórica</td><td class="right-al">$452.33</td></tr>
-    <tr><td class="label">Consenso Wall Street (referencia externa, no promediada)</td><td class="right-al">$555.77</td></tr>
+    <tr><td class="label">Consenso Wall Street (precio objetivo promedio)</td><td class="right-al">$555.77</td></tr>
+    <tr class="total"><td class="label">Promedio simple — (DCF Base + OpenAI), Comparables, Reversión histórica, Consenso Wall Street</td><td class="right-al">$478.19</td></tr>
   </table></div>
   <p>
     Esta actualización del informe suma, por primera vez, la participación de Microsoft en OpenAI (~$228.3 mil
@@ -834,17 +834,18 @@
     ignora — sumarlo explícitamente, en vez de dejarlo como nota al pie en las Limitaciones, es más preciso.
   </p>
   <p>
-    El promedio simple de las tres metodologías numéricas propias (DCF Base + OpenAI, comparables, reversión
-    histórica) da <strong>$452.33 por acción</strong> — todavía 2.7% por debajo del precio de mercado de $464.72,
-    tras la fuerte suba que sostuvo la acción en las sesiones posteriores al reporte. A diferencia de la lectura
-    anterior de este informe (blend 13.2% por encima del mercado, sobre un precio de mercado mucho más bajo), el
-    mercado ya se movió más rápido que nuestra propia revisión al alza del blend — el consenso Wall Street sigue
-    siendo el método más optimista ($555.77). No convertimos esto en una recomendación de compra sin matices: el
-    propio DCF —la metodología más rigurosa de las cinco, y la única que modela explícitamente el capex guiado para
-    FY2027— es también la más dispersa (de $131.95 a $659.12) y la que arroja flujo de caja libre negativo en el año
-    1 bajo cualquier escenario. Un blend que quedó casi en paridad con el mercado no es, en nuestra lectura, evidencia
-    de convicción en ninguna dirección — es evidencia de que la tesis todavía tiene que resolverse con los próximos
-    2-3 trimestres de ejecución de capex real, no con el dato de este trimestre.
+    El promedio simple de las cuatro metodologías de este informe (DCF Base + OpenAI, comparables, reversión
+    histórica, y consenso de Wall Street) da <strong>$478.19 por acción</strong> — 2.9% por encima del precio de
+    mercado de $464.72, tras la fuerte suba que sostuvo la acción en las sesiones posteriores al reporte. A
+    diferencia de informes anteriores de este desk, el consenso entra al promedio en pie de igualdad con las otras
+    tres metodologías en vez de mostrarse solo como referencia externa —es información de mercado tan legítima como
+    un múltiplo de comparables—, y es, de las cuatro, la más optimista ($555.77). No convertimos esto en una
+    recomendación de compra sin matices: el propio DCF —la metodología más rigurosa de las cuatro, y la única que
+    modela explícitamente el capex guiado para FY2027— es también la más dispersa (de $131.95 a $659.12) y la que
+    arroja flujo de caja libre negativo en el año 1 bajo cualquier escenario. Un blend que quedó casi en paridad con
+    el mercado no es, en nuestra lectura, evidencia de convicción en ninguna dirección — es evidencia de que la tesis
+    todavía tiene que resolverse con los próximos 2-3 trimestres de ejecución de capex real, no con el dato de este
+    trimestre.
   </p>
 
   <!-- 14 -->
@@ -1207,7 +1208,7 @@
       labels:['DCF (Bear → Bull)','Comparables (piso → techo panel)','Reversión histórica (10y → 5y)','Consenso Wall Street (rango objetivo)'],
       ranges:[[131.95,659.12],[305.79,571.48],[529.02,535.53],[400.00,870.00]],
       colors:[PALETTE.blue,PALETTE.navy2,PALETTE.blueLight,PALETTE.gold],
-      refLines:[{value:464.72,color:PALETTE.red,label:'Mercado $465'},{value:452.33,color:PALETTE.navy,label:'Blend $452'}],
+      refLines:[{value:464.72,color:PALETTE.red,label:'Mercado $465'},{value:478.19,color:PALETTE.navy,label:'Blend $478'}],
       valueFmt:function(v){ return '$'+v.toFixed(0); }
     });
 
