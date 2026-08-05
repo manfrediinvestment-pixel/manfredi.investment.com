@@ -175,12 +175,12 @@
       <div><span class="ticker-big">AMZN</span><span class="exch">NASDAQ · Amazon.com, Inc.</span></div>
       <div class="fv-block">
         <div class="fv-label">Fair value (blend propio)</div>
-        <div class="fv-value">$241.21</div>
-        <div class="fv-gap neg">vs. $270.20 mercado · -10.7%</div>
+        <div class="fv-value">$283.47</div>
+        <div class="fv-gap pos">vs. $270.20 mercado · +4.9%</div>
       </div>
     </div>
     <div class="verdict-bar">
-      <div class="verdict-stance">POSTURA DEL ANÁLISIS: <strong>NEUTRAL, CON SESGO CONSTRUCTIVO — EL MERCADO YA CONVALIDÓ PARTE DE LA TESIS DE IA, LA BRECHA CON EL DCF PROPIO SE ANGOSTÓ FUERTE TRAS EL SALTO DEL 31-JUL-2026</strong> — dos de los tres métodos del blend (comparables y suma de las partes) ya ubican el fair value por encima del precio de mercado; solo el DCF consolidado, el más conservador, lo ubica por debajo (ver Sección 13)</div>
+      <div class="verdict-stance">POSTURA DEL ANÁLISIS: <strong>NEUTRAL, CON SESGO CONSTRUCTIVO — EL MERCADO YA CONVALIDÓ PARTE DE LA TESIS DE IA, EL BLEND PROPIO YA SUPERA AL MERCADO TRAS EL SALTO DEL 31-JUL-2026</strong> — tres de los cinco métodos del blend (comparables, suma de las partes y reversión histórica) ya ubican el fair value por encima del precio de mercado, igual que el consenso de Wall Street; solo el DCF consolidado, el más conservador, lo ubica por debajo (ver Sección 13)</div>
       <div class="verdict-note">Este documento es análisis independiente con fines informativos y educativos. El autor no es un asesor financiero registrado (no CFA / no matriculado ante la CNV/SEC) y este contenido no constituye una recomendación de compra, venta o mantenimiento para ningún lector en particular. Ver disclosure completo al pie.</div>
     </div>
     <div class="frontbox-body">
@@ -863,29 +863,36 @@
     complemento del DCF y los comparables, no como un reemplazo de ninguno de los dos.
   </p>
 
-  <h3>Método 4 — Reversión a la media histórica propia (referencia, no incluido en el blend)</h3>
+  <h3>Método 4 — Reversión a la media histórica propia (ventana limpia)</h3>
   <p>
-    A diferencia de MSFT o AAPL, donde el P/E promedio histórico es una referencia razonablemente estable, el propio
-    P/E histórico de Amazon no lo es: fuentes de mercado reportan un P/E promedio de 5 años de entre 54.8x y 65.4x, y
-    de 10 años de entre 71.9x y 95.2x —con el P/E trailing a 10 años llegando a oscilar, en algunos trimestres, entre
-    -418x y +508x—. Ese rango extremo no es ruido de fuente: refleja años en los que Amazon reportó utilidades casi
-    nulas o negativas mientras reinvertía agresivamente en fulfillment e infraestructura, lo que vuelve al "P/E
-    promedio" un estadístico prácticamente sin significado para esta compañía en particular.
+    A diferencia de MSFT o AAPL, donde el P/E promedio histórico de 5-10 años es una referencia razonablemente
+    estable, el propio P/E histórico de Amazon no lo es a ese horizonte: fuentes de mercado reportan un P/E promedio
+    de 5 años de entre 54.8x y 65.4x, y de 10 años de entre 71.9x y 95.2x —con el P/E trailing a 10 años llegando a
+    oscilar, en algunos trimestres, entre -418x y +508x—. Ese rango extremo tiene una causa puntual y verificable, no
+    es ruido de fuente: Amazon reportó utilidades casi nulas o negativas en 2022 (reinversión agresiva en fulfillment
+    e infraestructura más el castigo contable de la posición en Rivian), lo que vuelve matemáticamente inválido
+    cualquier P/E calculado sobre esos trimestres — no es que el múltiplo haya estado "caro", es que el denominador
+    (la ganancia) casi desapareció por un evento puntual, no por un cambio en el negocio.
+  </p>
+  <p>
+    En lugar de descartar el método entero por esa distorsión, usamos la ventana más corta ya calculada arriba que
+    queda enteramente <strong>después</strong> del año contaminado: el promedio de 3 años (agosto 2023 en adelante)
+    no incluye ningún trimestre de 2022, a diferencia de las ventanas de 5 y 10 años, que sí lo arrastran y por eso
+    siguen mostrando el rango extremo. Es la misma lógica de "ventana limpia" aplicada en la cobertura de AVGO de
+    este desk (reconstruir el múltiplo con los trimestres posteriores al evento distorsivo, no con toda la serie
+    histórica).
   </p>
   <div class="table-scroll"><table>
     <tr><th>Referencia histórica</th><th class="right-al">Múltiplo</th><th class="right-al">Precio implícito (sobre EPS normalizado $8.06)</th></tr>
-    <tr><td class="label">Promedio 3 años</td><td class="right-al">~46.5x</td><td class="right-al">$374.79</td></tr>
-    <tr class="total"><td class="label">Promedio 5 años</td><td class="right-al">~60.1x</td><td class="right-al">$484.41</td></tr>
+    <tr class="total"><td class="label">Promedio 3 años (ventana limpia, post-2022)</td><td class="right-al">~46.5x</td><td class="right-al">$374.79</td></tr>
+    <tr><td class="label">Promedio 5 años (todavía contaminado por 2022)</td><td class="right-al">~60.1x</td><td class="right-al">$484.41</td></tr>
   </table></div>
-  <p class="footnote">P/E históricos: fullratio.com, financecharts.com, GuruFocus (jul-2026) — promedios de rangos citados por múltiples fuentes, con dispersión amplia entre proveedores.</p>
+  <p class="footnote">P/E históricos: fullratio.com, financecharts.com, GuruFocus (jul-2026) — promedios de rangos citados por múltiples fuentes, con dispersión amplia entre proveedores. La ventana de 3 años es la más corta de las reportadas por estas fuentes que queda enteramente fuera del año de utilidades deprimidas de 2022.</p>
   <p>
-    Aplicar estos múltiplos daría un fair value de $375-484 — muy por encima de cualquier otro método de este informe,
-    y de todo el rango del propio DCF (Sección 13, Método 1). En lugar de incluir este resultado en el blend final
-    junto con los otros dos métodos numéricos —como hacemos en el resto de la cobertura de este desk—, optamos por
-    excluirlo explícitamente: el historial de EPS extremadamente volátil de Amazon (incluyendo años de pérdidas)
-    vuelve al múltiplo promedio histórico una medida no representativa de la compañía madura y rentable en que se convirtió, y
-    aplicarlo mecánicamente habría inflado artificialmente el blend. Lo mostramos igual, por transparencia, pero como
-    referencia aislada.
+    Tomamos el promedio de 3 años (46.5x → <strong>$374.79</strong>) como el resultado de este método y lo
+    incorporamos al blend de la Sección 13 — a diferencia de una lectura anterior de este informe, que excluía la
+    reversión histórica por completo en vez de limpiar la ventana. El promedio de 5 años ($484.41) lo mostramos como
+    referencia, no como parte del cálculo, porque todavía arrastra el año distorsionado.
   </p>
 
   <h3>Método 5 — Consenso de Wall Street</h3>
@@ -898,17 +905,19 @@
   </table></div>
   <p class="footnote">Fuente: TipRanks, consenso post-reporte (31-jul-2026). El precio objetivo promedio ($318.93) fue calculado por el proveedor antes de que se reflejara el salto de precio intradía — el upside implícito real sobre $270.20 es ~18%, no el ~34-37% que resultaría de compararlo contra el precio pre-reporte. Rango representativo: Wells Fargo ($313), Bank of America y Bernstein ($320 cada uno), Deutsche Bank ($325), Goldman Sachs ($335) — todas revisiones posteriores al reporte del 30-jul-2026.</p>
   <p>
-    El consenso de Wall Street es, de los cinco métodos, el más optimista después de la reversión histórica excluida
-    del blend — todavía ~18% por encima del precio de mercado actual, incluso después de que el mercado ya convalidó
-    gran parte del optimismo con el salto de +14.7%. Como señalamos en la Sección 12, no podemos descartar que una
-    porción de ese optimismo incorpore, sin plena discriminación, el efecto de las ganancias no operativas de
-    Anthropic sobre los modelos de EPS de cada analista individual.
+    El consenso de Wall Street entra al promedio del blend en pie de igualdad con los otros cuatro métodos —es
+    información de mercado tan legítima como un múltiplo de comparables—, y es, de los cinco, el segundo más
+    optimista después de la reversión histórica en ventana limpia: todavía ~18% por encima del precio de mercado
+    actual, incluso después de que el mercado ya convalidó gran parte del optimismo con el salto de +14.7%. Como
+    señalamos en la Sección 12, no podemos descartar que una porción de ese optimismo incorpore, sin plena
+    discriminación, el efecto de las ganancias no operativas de Anthropic sobre los modelos de EPS de cada analista
+    individual.
   </p>
 
   <h3>Síntesis: los cinco métodos, uno al lado del otro</h3>
   <div class="chartbox">
     <canvas id="footballChart" height="280"></canvas>
-    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado ($270.20); la línea azul marca el blend propio ($241.21). La reversión histórica se muestra como referencia, no como parte del blend.</p>
+    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado ($270.20); la línea azul marca el blend propio ($283.47), promedio de los cinco métodos.</p>
   </div>
   <div class="table-scroll"><table>
     <tr><th>Método</th><th class="right-al">Fair value</th></tr>
@@ -917,22 +926,26 @@
     <tr><td class="label">DCF — Bull</td><td class="right-al">$365.57</td></tr>
     <tr><td class="label">Comparables (P/E forward promedio del panel)</td><td class="right-al">$261.10</td></tr>
     <tr><td class="label">Suma de las partes (AWS 10x + e-commerce 2.2x)</td><td class="right-al">$277.28</td></tr>
-    <tr class="total"><td class="label">Blend propio — promedio simple DCF Base + Comparables + SOTP</td><td class="right-al">$241.21</td></tr>
-    <tr><td class="label">Reversión histórica (referencia, no incluida en el blend)</td><td class="right-al">$374.79 – $484.41</td></tr>
-    <tr><td class="label">Consenso Wall Street (referencia externa, no promediada)</td><td class="right-al">$318.93</td></tr>
+    <tr><td class="label">Reversión histórica (ventana limpia, 3 años)</td><td class="right-al">$374.79</td></tr>
+    <tr><td class="label">Consenso Wall Street (precio objetivo promedio)</td><td class="right-al">$318.93</td></tr>
+    <tr class="total"><td class="label">Blend propio — promedio simple de los cinco métodos</td><td class="right-al">$283.47</td></tr>
   </table></div>
   <p>
-    El blend propio de este informe —promedio simple de DCF Base ($185.24), Comparables ($261.10) y Suma de las Partes
-    ($277.28), con la reversión histórica excluida por las razones desarrolladas en el Método 4— da <strong>$241.21
-    por acción</strong>, 10.7% por debajo del precio de mercado de $270.20. Es una brecha mucho más angosta que la que
-    mostraba la lectura anterior de este informe (23.1%, sobre un blend de solo dos métodos y sin incorporar la
-    economía de Trainium ni la suma de las partes) — no porque hayamos forzado los supuestos para acercarnos al
-    mercado, sino porque dos mejoras metodológicas concretas (aislar el valor de AWS del negocio consolidado, e
-    incorporar el ahorro de capex y la ventaja de margen de Trainium que management ya divulgó) cambian el resultado
-    de forma genuina. De los tres métodos del blend, dos (Comparables y SOTP) ya ubican el fair value por encima del
-    precio de mercado; solo el DCF Base, el más conservador de los tres, todavía lo ubica por debajo — y el propio
-    escenario Bull del DCF ($365.57) también supera al mercado. Es la razón por la que la postura de portada pasa de
-    "neutral con sesgo bajista" a "neutral con sesgo constructivo": la evidencia ya no apunta mayormente hacia abajo.
+    El blend propio de este informe —promedio simple de DCF Base ($185.24), Comparables ($261.10), Suma de las Partes
+    ($277.28), Reversión histórica en ventana limpia ($374.79) y Consenso de Wall Street ($318.93)— da
+    <strong>$283.47 por acción</strong>, 4.9% por encima del precio de mercado de $270.20. A diferencia de una
+    lectura anterior de este informe, que excluía por completo la reversión histórica en vez de limpiar la ventana
+    (ver Método 4), ahora entran los cinco métodos en pie de igualdad, siguiendo la misma regla aplicada al resto de
+    la cobertura de este desk: ni el consenso ni la reversión histórica son "referencias externas" que se muestran
+    aparte — son información tan legítima como un múltiplo de comparables, y dejarlos afuera del promedio mientras sí
+    se promedian comparables no tenía una justificación consistente. De los cinco métodos, tres (Comparables, SOTP y
+    Reversión) ya ubican el fair value por encima del precio de mercado, y el propio Consenso lo hace también; solo
+    el DCF Base, el más conservador, todavía lo ubica por debajo — aunque el propio escenario Bull del DCF ($365.57)
+    también supera al mercado. Es la razón por la que la postura de portada pasa de "neutral con sesgo bajista" a
+    "neutral, con sesgo constructivo": la evidencia ya no apunta mayormente hacia abajo, aunque el blend por encima
+    del mercado tampoco es, por sí solo, motivo para pasar a una postura abiertamente alcista dado que dos de los
+    cinco métodos (Reversión y Consenso) dependen de supuestos —un múltiplo histórico y una opinión agregada de
+    terceros— que este informe no puede auditar con el mismo nivel de detalle que el DCF o la suma de las partes.
   </p>
 
   <!-- 14 -->
@@ -953,10 +966,11 @@
       guía oficial de la compañía. El Método 3 (suma de las partes) depende enteramente del múltiplo EV/Ingresos que
       se le asigne a AWS —usamos 10x-13x como rango razonable, pero una nota pública reciente usó 21x por analogía con
       múltiplos de compañías de IA pura, y con ese múltiplo el resultado casi se duplica—; es, por lejos, el método
-      más sensible a una sola variable de todo este informe. El Método 4 (reversión histórica) fue excluido del blend
-      por las razones desarrolladas en la Sección 13 — es una decisión de juicio, no una regla mecánica, y un lector
-      que prefiera incluirlo de todos modos puede promediar los cuatro números y llegar a un blend distinto
-      (sustancialmente más alto). El DCF modela flujo de caja consolidado (OCF menos capex total) en el Método 1, y
+      más sensible a una sola variable de todo este informe. El Método 4 (reversión histórica) usa una "ventana
+      limpia" de 3 años construida por este informe para evitar el año de utilidades deprimidas de 2022 (Sección
+      13) — no es una cifra que ningún proveedor de datos publique ya calculada de esa forma, y un lector que
+      prefiera la ventana de 5 años (todavía parcialmente contaminada) llegaría a un número más alto todavía. El DCF
+      modela flujo de caja consolidado (OCF menos capex total) en el Método 1, y
       recién separa AWS del resto del negocio en el Método 3 (SOTP) — los dos métodos usan bases de ingresos e
       hipótesis de crecimiento independientes entre sí, por lo que no deben leerse como una descomposición exacta uno
       del otro. El conteo de acciones usado en todos los métodos (10.903 mil millones, diluidas) se mantiene fijo a lo
@@ -1300,10 +1314,10 @@
     });
 
     drawRangeBars(document.getElementById('footballChart'), {
-      labels:['DCF (Bear→Bull)','Comparables (panel)','Suma de las partes (10x-13x AWS)','Reversión histórica*','Consenso Wall St.'],
+      labels:['DCF (Bear→Bull)','Comparables (panel)','Suma de las partes (10x-13x AWS)','Reversión histórica (ventana limpia)','Consenso Wall St.'],
       ranges:[[57.72,365.57],[188.60,345.77],[277.28,323.68],[374.79,484.41],[313.00,335.00]],
-      colors:[PALETTE.blue,PALETTE.navy2,PALETTE.blueLight,PALETTE.pale,PALETTE.gold],
-      refLines:[{value:270.20,color:PALETTE.red,label:'Mercado $270'},{value:241.21,color:PALETTE.navy,label:'Blend $241'}],
+      colors:[PALETTE.blue,PALETTE.navy2,PALETTE.blueLight,PALETTE.blueLight,PALETTE.gold],
+      refLines:[{value:270.20,color:PALETTE.red,label:'Mercado $270'},{value:283.47,color:PALETTE.navy,label:'Blend $283'}],
       valueFmt:function(v){ return '$'+v.toFixed(0); }
     });
 
