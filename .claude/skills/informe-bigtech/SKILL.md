@@ -98,7 +98,9 @@ gráficos). Estructura obligatoria (14 secciones):
     proyección línea por línea a 5 años que no esté sourceada — para años sin consenso público,
     remitir explícitamente a los supuestos del DCF (sección siguiente) en vez de inventar precisión.
 14. **Valuación: Cuatro (o más) Métodos y el Fair Value** — DCF (3 escenarios) + comparables +
-    reversión histórica + consenso Wall Street como piso mínimo, más los métodos adicionales de la
+    reversión histórica + consenso Wall Street, los cinco promediados en el blend final (ver regla de
+    "Reversión histórica y consenso siempre entran al blend" más abajo — ninguno de los dos se
+    excluye ni se deja como "referencia externa" por default), más los métodos adicionales de la
     regla "Compañías con apuesta de plataforma" de abajo cuando corresponda, más:
     - **Grilla de sensibilidad WACC × crecimiento terminal** (5×5): recalculá el DCF con la fórmula
       real para cada combinación — nunca tipees números a mano. Calibrá el resultado para que la
@@ -122,8 +124,10 @@ gráficos). Estructura obligatoria (14 secciones):
 - Si el valor terminal es más del ~65-70% del EV, decilo explícitamente: el modelo es sensible y hay
   que leerlo con cautela (es normal en growth stocks, pero hay que ser honesto sobre ello).
 - Comps: aplicá el múltiplo promedio de peers al EBITDA/EPS proyectado a 1 año (forward), no al TTM.
-- Fair value final = blend explícito y declarado (ej. promedio simple DCF Base + comparables +
-  reversión histórica) — nunca un número "de ojo".
+- Fair value final = blend explícito y declarado, promedio simple de DCF Base + comparables +
+  reversión histórica + consenso Wall Street (+ SOTP cuando aplique) — nunca un número "de ojo", y
+  nunca dejando reversión o consenso afuera del promedio sin pasar primero por la regla de "ventana
+  limpia" de más abajo.
 
 **Compañías con negocio maduro + apuesta de plataforma/opcionalidad (autonomía, IA, robótica,
 plataformas todavía sin ingresos materiales):** el DCF/comparables/reversión estándar valúan
@@ -174,8 +178,9 @@ referencia externa):
 - Si existe una nota pública reciente de un banco o research shop con su propia SOTP, citala aparte
   como referencia (no la promedies con la tuya) — mismo tratamiento que el SOTP externo de la regla
   de "apuesta de plataforma" de abajo.
-- Este SOTP entra al blend final junto con el DCF Base y comparables (reemplazando o sumándose a la
-  reversión histórica si esta última no es representativa — ver regla de exclusión más abajo).
+- Este SOTP entra al blend final junto con el DCF Base y comparables (sumándose a la reversión
+  histórica y al consenso, no reemplazándolos por default — ver regla de "ventana limpia" más abajo
+  para cuándo sí corresponde reemplazar reversión por SOTP).
 
 **Usar datos reales de eficiencia de costos ya divulgados por management, no supuestos genéricos
 conservadores, para el margen y el capex del DCF:** si la compañía ya cuantificó públicamente (en el
@@ -187,18 +192,41 @@ esa evidencia y usa una curva de normalización genérica y lenta "porque así e
 conservadores" no es más riguroso — es menos preciso, porque descarta información real y disponible.
 Citá la fuente concreta (earnings call, comunicado) de esa ventaja de costo en el texto del Método 1.
 
-**Reversión histórica poco representativa — excluirla del blend con justificación, no forzarla
-adentro:** si el P/E histórico propio de la compañía tiene una dispersión extrema entre proveedores
-o incluye años de utilidades nulas/negativas que vuelven el promedio un estadístico sin significado
-(rango de 5-10 años que varía más de 20-30 puntos según la fuente, o que incluye P/E negativos o de
-cientos de x), no la incluyas en el blend solo para completar el formato de "promedio de tres
-métodos". Mostrala igual por transparencia, explicá por qué no es representativa, y reemplazala en
-el blend por el SOTP (si aplica) o por el promedio de los métodos que sí sean representativos.
-Excluir un método por una razón documentada es más riguroso que promediarlo mecánicamente — no es lo
-mismo que "forzar los supuestos para que cierre", que sigue prohibido por la Regla de oro. Ver
-`informes/amzn.html` (Sección 13, Método 3) como plantilla completa de SOTP por segmento de margen —
-distinto del SOTP de apuesta de plataforma/opcionalidad de `informes/tsla.html`, que es para negocios
-futuros todavía no monetizados, no para segmentos ya facturando con distinto perfil de margen.
+**Reversión histórica y consenso de Wall Street siempre entran al blend — no se excluyen ad hoc
+(regla agregada 05-ago-2026, tras auditar 9 informes y encontrar que la inclusión/exclusión de estos
+dos métodos, no el WACC ni el crecimiento, era la causa real de que el fair value quedara
+sistemáticamente por debajo del mercado en 7 de 9 casos):**
+
+- **Consenso de Wall Street**: siempre se promedia dentro del blend final, nunca se muestra solo como
+  "referencia externa, no promediada" ni como "piso mínimo" aislado. Es información de mercado tan
+  legítima como un múltiplo de comparables — si comparables entra al promedio, consenso también.
+
+- **Reversión histórica**: si el P/E histórico propio de la compañía tiene una dispersión extrema
+  (rango de 5-10 años que varía más de 20-30 puntos según la fuente, o que incluye P/E negativos o de
+  cientos de x), **antes de excluirla del blend, distinguí la causa**:
+  - **Dato contaminado** (ganancia neta casi nula/negativa en algunos trimestres por cargos puntuales
+    de M&A, impuestos, litigios — un problema del denominador, no del negocio): reconstruí una
+    **ventana limpia** en vez de descartar el método entero — el P/E promedio de los últimos 4
+    cierres de trimestre fiscal, cada uno calculado con el precio real de esa fecha sobre el EPS TTM
+    vigente en ese momento, excluyendo específicamente los trimestres contaminados. Aplicá ese
+    múltiplo limpio al EPS TTM actual y usá ese resultado en el blend. Mostrá igual el rango
+    contaminado completo, por transparencia, pero como referencia aparte — no como el número del
+    método.
+  - **El múltiplo actual es alto porque el crecimiento cambió de escalón de forma real** (la empresa
+    entró en un régimen de crecimiento estructuralmente más alto, no una burbuja): esto NO es motivo
+    para excluir la reversión ni para forzarla a la baja hacia un promedio viejo que describe "otra
+    empresa" — se resuelve igual con la ventana limpia/reciente, no con una exclusión total.
+  - Solo excluí el método del todo, como referencia aislada no incluida en el blend, si ni siquiera la
+    ventana limpia da un número utilizable (ej. sigue incluyendo trimestres de ganancia negativa).
+  - Reemplazar reversión por SOTP en el blend (en vez de reconstruir la ventana limpia) sigue siendo
+    válido en compañías donde el SOTP aplica por la regla de "segmentos de rentabilidad muy
+    distinta" de abajo — pero no es un sustituto automático, es una decisión aparte.
+
+Ver `informes/avgo.html` (Sección 13, Método 4) como plantilla completa de la ventana limpia de
+reversión, y `informes/amzn.html` (Sección 13, Método 3) como plantilla completa de SOTP por segmento
+de margen — distinto del SOTP de apuesta de plataforma/opcionalidad de `informes/tsla.html`, que es
+para negocios futuros todavía no monetizados, no para segmentos ya facturando con distinto perfil de
+margen.
 
 **Regla de asignación de la postura (bajista/neutral/alcista):** si el fair value (o el rango) queda
 por debajo del precio spot, la postura NO puede ser alcista solo porque el negocio sea bueno — usá
