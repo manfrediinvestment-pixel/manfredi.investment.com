@@ -1703,26 +1703,35 @@
     @keyframes warrenFabPulse{0%{transform:scale(.9);opacity:.55}70%{transform:scale(1.45);opacity:0}100%{opacity:0}}
     .warren-fab svg{fill:#0A0F1E;width:24px;height:24px;position:relative;z-index:1}
     .warren-badge{position:absolute;top:-3px;right:-3px;width:19px;height:19px;background:#080c18;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--gold);font-family:'IBM Plex Sans',sans-serif;z-index:2}
-    .warren-panel{position:fixed!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;z-index:9999!important;bottom:auto!important;right:auto!important;margin:0!important;width:480px;max-width:calc(100vw - 32px);height:620px;max-height:calc(100vh - 80px);background:var(--primary);border:1px solid rgba(242,201,76,.2);box-shadow:0 16px 64px rgba(0,0,0,.6);display:none;flex-direction:column;overflow:hidden;font-family:'IBM Plex Sans',sans-serif}
+    .warren-panel{position:fixed!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;z-index:9999!important;bottom:auto!important;right:auto!important;margin:0!important;width:500px;max-width:calc(100vw - 32px);height:640px;max-height:calc(100vh - 80px);background:var(--primary);border:1px solid rgba(242,201,76,.2);box-shadow:0 16px 64px rgba(0,0,0,.6);display:none;flex-direction:column;overflow:hidden;font-family:'IBM Plex Sans',sans-serif}
     .warren-panel.open{display:flex}
     .warren-panel.fullscreen{top:0!important;left:0!important;transform:none!important;width:100vw;max-width:100vw;height:100vh;max-height:100vh;border:none}
-    .warren-header{background:#080c18;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;border-bottom:1px solid rgba(242,201,76,.15);position:relative}
+    .warren-header{background:#080c18;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;border-bottom:1px solid rgba(242,201,76,.15);position:relative;z-index:30}
     .warren-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(242,201,76,.3),transparent)}
-    .warren-avatar{width:30px;height:30px;border:1px solid rgba(242,201,76,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold);flex-shrink:0;letter-spacing:.05em}
-    .warren-header-info{flex:1}
-    .warren-header-name{font-size:12px;font-weight:600;color:var(--gold);letter-spacing:.08em}
+    .warren-avatar{width:42px;height:42px;border-radius:50%;background:conic-gradient(from 200deg,#F7CE4E,#F2784B,#E8A23D,#F7CE4E);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#0A0F1E;flex-shrink:0;font-family:'DM Serif Display',Georgia,serif;box-shadow:0 6px 16px -4px rgba(242,148,78,.55)}
+    .warren-avatar.sm{width:24px;height:24px;font-size:10px;box-shadow:0 3px 8px -2px rgba(242,148,78,.5);flex-shrink:0}
+    .warren-header-info{flex:1;min-width:0}
+    .warren-header-name{font-size:13px;font-weight:700;color:var(--gold);letter-spacing:.02em;font-family:'DM Serif Display',Georgia,serif}
     .warren-header-status{font-size:10px;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:4px;margin-top:1px}
-    .warren-status-dot{width:5px;height:5px;background:var(--green);border-radius:50%}
+    .warren-status-dot{width:5px;height:5px;background:var(--green);border-radius:50%;box-shadow:0 0 6px var(--green)}
+    .warren-quota{display:flex;align-items:center;gap:6px;margin-top:5px}
+    .warren-quota-dots{display:flex;gap:2px}
+    .warren-quota-dots i{width:6px;height:4px;border-radius:1px;background:rgba(242,201,76,.15)}
+    .warren-quota-dots i.on{background:linear-gradient(90deg,#F7CE4E,#F2784B)}
+    .warren-quota-n{font-size:9px;color:rgba(242,201,76,.65);font-family:'IBM Plex Mono',monospace;white-space:nowrap}
     .warren-expand-btn { background:none; border:none; color:var(--white); cursor:pointer; font-size:16px; padding:4px 8px; }
     .warren-expand-btn:hover{color:var(--gold)}
     .warren-close-btn { background:none; border:none; color:var(--white); cursor:pointer; font-size:18px; padding:4px 8px; }
     .warren-close-btn:hover { color:var(--gold); }
-    .warren-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth;background:var(--primary)}
+    .warren-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth;background:var(--primary)}
     .warren-messages::-webkit-scrollbar{width:3px}
     .warren-messages::-webkit-scrollbar-thumb{background:rgba(242,201,76,.2);border-radius:2px}
     .warren-msg{max-width:90%;font-size:12px;line-height:1.6}
     .warren-msg.user{align-self:flex-end;background:rgba(242,201,76,.1);border:1px solid rgba(242,201,76,.2);color:#e8d5a0;padding:8px 12px;border-radius:8px 8px 2px 8px}
-    .warren-msg.assistant{align-self:flex-start;color:var(--white);max-width:96%}
+    .warren-msg.assistant{align-self:flex-start;color:var(--white);max-width:96%;display:flex;gap:9px}
+    .warren-msg.assistant .warren-content{flex:1;min-width:0}
+    .warren-verified-tag{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.06em;padding:3px 9px 3px 7px;border-radius:20px;background:rgba(16,185,129,.13);color:var(--green);border:1px solid rgba(16,185,129,.3);margin-bottom:8px}
+    .warren-verified-tag i{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)}
     .warren-content p,.warren-content li,.warren-content h1,.warren-content h2,.warren-content h3,.warren-content h4,.warren-content strong,.warren-content span{color:var(--white)!important}
     .warren-msg.thinking{align-self:flex-start;color:rgba(242,201,76,.5);font-size:11px;letter-spacing:.06em;font-style:normal;padding:4px 0}
     .warren-msg-label{font-size:9px;color:rgba(242,201,76,.6);letter-spacing:.1em;margin-bottom:5px}
@@ -1744,20 +1753,27 @@
     .warren-table td.neg{color:var(--red)}
     .warren-table tr:hover td { background:rgba(255,255,255,.05); color:var(--white) !important; }
     .warren-message.warren-assistant table td, .warren-message.warren-assistant table tr, .warren-message.warren-assistant table { color:var(--white) !important; background: transparent !important; }
-    .warren-chart-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:10px;margin:8px 0}
+    .warren-chart-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px;margin:8px 0;overflow:hidden}
     .warren-chart-box canvas{max-height:150px!important;height:150px!important}
     .warren-disclaimer{font-size:9px;color:rgba(255,255,255,.25);margin-top:8px;border-top:1px solid rgba(255,255,255,.06);padding-top:6px;font-style:italic}
-    .warren-suggestions{padding:0 14px 10px;display:flex;flex-wrap:wrap;gap:5px;background:var(--primary)}
-    .warren-suggestion{font-size:10px;padding:4px 10px;border:1px solid rgba(242,201,76,.2);background:transparent;cursor:pointer;color:rgba(242,201,76,.7);transition:all .15s;font-family:'IBM Plex Sans',sans-serif;border-radius:3px}
-    .warren-suggestion:hover{background:rgba(242,201,76,.08);color:var(--gold);border-color:rgba(242,201,76,.4)}
+    .warren-suggestions{padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--primary)}
+    .warren-suggestion{display:flex;flex-direction:column;align-items:flex-start;gap:8px;font-size:11px;padding:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);cursor:pointer;color:var(--white);transition:all .15s;font-family:'IBM Plex Sans',sans-serif;border-radius:10px;text-align:left}
+    .warren-suggestion:hover{background:rgba(255,255,255,.05);border-color:var(--acc,rgba(242,201,76,.5));transform:translateY(-1px)}
+    .warren-suggestion .wsug-ic{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;background:var(--chip,rgba(242,201,76,.12))}
+    .warren-suggestion .wsug-lbl{font-weight:700;font-size:11px;color:var(--white)}
+    .warren-suggestion .wsug-desc{font-size:9.5px;line-height:1.35;color:rgba(255,255,255,.4)}
+    .warren-suggestion:nth-child(1){--acc:#5EC8E0}.warren-suggestion:nth-child(1) .wsug-ic{--chip:rgba(94,200,224,.14)}
+    .warren-suggestion:nth-child(2){--acc:#F2C94C}.warren-suggestion:nth-child(2) .wsug-ic{--chip:rgba(242,201,76,.15)}
+    .warren-suggestion:nth-child(3){--acc:#10B981}.warren-suggestion:nth-child(3) .wsug-ic{--chip:rgba(16,185,129,.14)}
+    .warren-suggestion:nth-child(4){--acc:#F2784B}.warren-suggestion:nth-child(4) .wsug-ic{--chip:rgba(242,120,75,.16)}
     .warren-input-area{border-top:1px solid rgba(242,201,76,.1);padding:10px 14px;display:flex;gap:8px;align-items:flex-end;flex-shrink:0;background:#080c18}
     .warren-input{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:8px 12px;font-size:12px;font-family:'IBM Plex Sans',sans-serif;resize:none;outline:none;max-height:90px;line-height:1.4;color:#c8d8e8;border-radius:4px;-webkit-appearance:none;appearance:none}
     .warren-input:focus{border-color:rgba(242,201,76,.35)}
     .warren-input::placeholder{color:rgba(255,255,255,.25)}
-    .warren-send-btn{background:rgba(242,201,76,.15);border:1px solid rgba(242,201,76,.3);color:var(--gold);width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;border-radius:4px;transition:all .2s}
-    .warren-send-btn:hover{background:rgba(242,201,76,.25)}
-    .warren-send-btn:disabled{opacity:.3;cursor:not-allowed}
-    .warren-send-btn svg{fill:var(--gold);width:14px;height:14px}
+    .warren-send-btn{background:linear-gradient(155deg,#F7CE4E,#F2784B);border:none;color:#0A0F1E;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;border-radius:8px;transition:all .2s;box-shadow:0 4px 14px -4px rgba(242,148,78,.6)}
+    .warren-send-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px -3px rgba(242,148,78,.75)}
+    .warren-send-btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
+    .warren-send-btn svg{fill:#0A0F1E;width:14px;height:14px}
     @media(max-width:480px){
       .warren-panel{width:calc(100vw - 20px)}
       .warren-fab-wrap{right:16px;bottom:20px}
@@ -2759,7 +2775,6 @@
         <li><a href="#university" class="nav-link" data-tab-target="university">University</a></li>
         <li><a href="#inversiones" class="nav-link" data-member-required="true" data-tab-target="inversiones">Inversiones</a></li>
         <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
-        <li><a href="#asesoria" class="nav-link" data-tab-target="asesoria">Asesoría</a></li>
         <li>
           <span class="nav-link" data-member-required="true" onclick="toggleWarren()" style="cursor:pointer;">
             Asesor IA <span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;margin-left:4px;vertical-align:middle;"></span>
@@ -8485,12 +8500,15 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
     <div class="warren-header">
       <div class="warren-avatar">W</div>
       <div class="warren-header-info">
-        <div class="warren-header-name">Warren &mdash; Asesor Financiero IA</div>
+        <div class="warren-header-name">Warren</div>
         <div class="warren-header-status">
           <div class="warren-status-dot"></div>
-          Manfredi Investment · En línea
+          Asesor IA · en línea
         </div>
-                   <div id="warrenConsultasRestantes" style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px;">100 consultas restantes</div>
+        <div class="warren-quota">
+          <div class="warren-quota-dots" id="warrenQuotaDots"></div>
+          <span class="warren-quota-n" id="warrenQuotaN">100/100</span>
+        </div>
       </div>
       <button class="warren-expand-btn" onclick="toggleWarrenSize()" id="warrenExpandBtn" title="Expandir"> ⤢ </button>
       <button class="warren-close-btn" onclick="closeWarren()" title="Cerrar"> ✕ </button>
@@ -8499,10 +8517,10 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
     <div class="warren-messages" id="warrenMessages"></div>
 
     <div class="warren-suggestions" id="warrenSuggestions">
-      <button class="warren-suggestion" onclick="warrenSuggest('¿Cómo está la macroeconomía argentina hoy? Dólar, inflación, tasas y riesgo país.')">&#127462;&#127479; Macro Argentina</button>
-      <button class="warren-suggestion" onclick="warrenAnalyzePortfolio()">&#128188; Mi portafolio</button>
-      <button class="warren-suggestion" onclick="warrenSuggest('Haceme un análisis completo de Mercado Libre (MELI)')">&#128722; Mercado Libre</button>
-      <button class="warren-suggestion" onclick="warrenSuggest('¿Qué acciones están generando más ruido en el mercado esta semana y por qué? Dame oportunidades para investigar, no recomendaciones.')">&#128293; Oportunidades</button>
+      <button class="warren-suggestion" onclick="warrenSuggest('¿Cómo está la macroeconomía argentina hoy? Dólar, inflación, tasas y riesgo país.')"><span class="wsug-ic">&#127462;&#127479;</span><div class="wsug-lbl">Macro Argentina</div><div class="wsug-desc">Dólar, inflación, tasas y riesgo país</div></button>
+      <button class="warren-suggestion" onclick="warrenAnalyzePortfolio()"><span class="wsug-ic">&#128188;</span><div class="wsug-lbl">Mi portafolio</div><div class="wsug-desc">Análisis de tu cartera real</div></button>
+      <button class="warren-suggestion" onclick="warrenSuggest('Haceme un análisis completo de Mercado Libre (MELI)')"><span class="wsug-ic">&#128722;</span><div class="wsug-lbl">Mercado Libre</div><div class="wsug-desc">Análisis completo de MELI</div></button>
+      <button class="warren-suggestion" onclick="warrenSuggest('¿Qué acciones están generando más ruido en el mercado esta semana y por qué? Dame oportunidades para investigar, no recomendaciones.')"><span class="wsug-ic">&#128293;</span><div class="wsug-lbl">Oportunidades</div><div class="wsug-desc">Lo más comentado del mercado</div></button>
     </div>
 
     <div class="warren-input-area">
@@ -8615,7 +8633,34 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
       warrenInitialized = true;
       warrenShowWelcome();
     }
+    if (warrenOpen) warrenFetchQuota();
   }
+
+  // Cupo de consultas: 20 puntitos representan proporcionalmente
+  // consultas/total (ej. 100/100 = 20 prendidos, 43/100 = 9 prendidos).
+  function warrenRenderQuota(consultas, total) {
+    total = total || 100;
+    const dotsEl = document.getElementById('warrenQuotaDots');
+    const nEl = document.getElementById('warrenQuotaN');
+    if (!dotsEl || !nEl) return;
+    const TOTAL_DOTS = 20;
+    const onDots = Math.max(0, Math.min(TOTAL_DOTS, Math.round((consultas / total) * TOTAL_DOTS)));
+    let html = '';
+    for (let i = 0; i < TOTAL_DOTS; i++) html += '<i' + (i < onDots ? ' class="on"' : '') + '></i>';
+    dotsEl.innerHTML = html;
+    nEl.textContent = consultas + '/' + total;
+  }
+
+  function warrenFetchQuota() {
+    const userEmail = window._currentUser ? window._currentUser.email : null;
+    const ADMIN_EMAILS = ['nachito2502@gmail.com'];
+    if (!userEmail || ADMIN_EMAILS.includes(userEmail.toLowerCase())) { warrenRenderQuota(100, 100); return; }
+    fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(userEmail)}`)
+      .then(r => r.json())
+      .then(d => { if (d.consultas !== undefined) warrenRenderQuota(d.consultas, 100); })
+      .catch(() => {});
+  }
+  warrenRenderQuota(100, 100);
   function closeWarren() {
     warrenOpen = false;
     const panel = document.getElementById('warrenPanel');
@@ -8637,10 +8682,10 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
     warrenAddMessage('assistant', welcome);
   }
 
-  function warrenAddMessage(role, content) {
+  function warrenAddMessage(role, content, usedTool) {
     var msgs = document.getElementById('warrenMessages');
     var div = document.createElement('div');
-    div.className = 'warren-message warren-' + role;
+    div.className = 'warren-message warren-msg warren-' + role + ' ' + role;
     if (role === 'assistant') {
       var codeBlocks = [];
       var btRe = /```(?:json)?\s*([\s\S]*?)```/g;
@@ -8666,11 +8711,13 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
         } catch(e) {}
         return '<pre style="background:#f4f4f4;padding:10px;border-radius:6px;font-size:11px;overflow-x:auto;white-space:pre-wrap;color:#333">' + block.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</pre>';
       });
-      div.innerHTML = '<div class="warren-content">' + html + '</div>';
+      var verifiedTag = usedTool ? '<div class="warren-verified-tag"><i></i>DATOS VERIFICADOS</div>' : '';
+      div.innerHTML = '<div class="warren-avatar sm">W</div><div class="warren-content">' + verifiedTag + html + '</div>';
+      var contentEl = div.querySelector('.warren-content');
       chartPendingData.forEach(function(cd) {
         var chartBox = buildWarrenChart(cd);
         if (chartBox) {
-              div.appendChild(chartBox);
+              contentEl.appendChild(chartBox);
             } else {
               var fallbackDiv = document.createElement('div');
               fallbackDiv.style.cssText = 'background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:8px;';
@@ -8678,7 +8725,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
               fallbackPre.style.cssText = 'font-size:11px;color:var(--text-sec);white-space:pre-wrap;word-break:break-all;margin:0;';
               fallbackPre.textContent = JSON.stringify(cd, null, 2);
               fallbackDiv.appendChild(fallbackPre);
-              div.appendChild(fallbackDiv);
+              contentEl.appendChild(fallbackDiv);
             }
       });
     } else {
@@ -8898,20 +8945,10 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
       let reply = data.response || 'No pude procesar tu consulta. Intentá de nuevo.';
 
       warrenHistory.push({ role: 'assistant', content: reply });
-      warrenAddMessage('assistant', reply);
+      warrenAddMessage('assistant', reply, data.usedTool === true);
 
       // El backend ya restó la consulta -- acá solo refrescamos el contador para mostrarlo.
-      const userEmail = window._currentUser ? window._currentUser.email : null;
-      const ADMIN_EMAILS = ['nachito2502@gmail.com'];
-      if (userEmail && !ADMIN_EMAILS.includes(userEmail.toLowerCase())) {
-        fetch(`https://manfredi-memberships.nachito2502.workers.dev/consultas?email=${encodeURIComponent(userEmail)}`)
-          .then(r => r.json())
-          .then(d => {
-            const el = document.getElementById('warrenConsultasRestantes');
-            if (el && d.consultas !== undefined) el.textContent = `${d.consultas}/100 consultas restantes`;
-          })
-          .catch(() => {});
-      }
+      warrenFetchQuota();
 
     } catch (err) {
       thinkDiv.remove();
