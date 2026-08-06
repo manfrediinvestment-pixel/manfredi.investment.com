@@ -1746,7 +1746,7 @@
     .warren-suggestion{font-size:10px;padding:4px 10px;border:1px solid rgba(242,201,76,.2);background:transparent;cursor:pointer;color:rgba(242,201,76,.7);transition:all .15s;font-family:'IBM Plex Sans',sans-serif;border-radius:3px}
     .warren-suggestion:hover{background:rgba(242,201,76,.08);color:var(--gold);border-color:rgba(242,201,76,.4)}
     .warren-input-area{border-top:1px solid rgba(242,201,76,.1);padding:10px 14px;display:flex;gap:8px;align-items:flex-end;flex-shrink:0;background:#080c18}
-    .warren-input{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:8px 12px;font-size:12px;font-family:'IBM Plex Sans',sans-serif;resize:none;outline:none;max-height:90px;line-height:1.4;color:#c8d8e8;border-radius:4px}
+    .warren-input{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:8px 12px;font-size:12px;font-family:'IBM Plex Sans',sans-serif;resize:none;outline:none;max-height:90px;line-height:1.4;color:#c8d8e8;border-radius:4px;-webkit-appearance:none;appearance:none}
     .warren-input:focus{border-color:rgba(242,201,76,.35)}
     .warren-input::placeholder{color:rgba(255,255,255,.25)}
     .warren-send-btn{background:rgba(242,201,76,.15);border:1px solid rgba(242,201,76,.3);color:var(--gold);width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;border-radius:4px;transition:all .2s}
@@ -8490,10 +8490,10 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
     <div class="warren-messages" id="warrenMessages"></div>
 
     <div class="warren-suggestions" id="warrenSuggestions">
-      <button class="warren-suggestion" onclick="warrenSuggest('¿A cuánto cotiza Mercado Libre ahora?')">&#128200; Mercado Libre ahora</button>
-      <button class="warren-suggestion" onclick="warrenSuggest('¿Qué pasó hoy con el dólar CCL?')">&#128181; Dólar CCL hoy</button>
-      <button class="warren-suggestion" onclick="warrenSuggest('Traeme los últimos titulares del mercado')">&#128240; Titulares del día</button>
-      <button class="warren-suggestion" onclick="warrenSuggest('¿Cómo viene Nvidia esta semana?')">&#128640; Nvidia esta semana</button>
+      <button class="warren-suggestion" onclick="warrenSuggest('¿Cómo está la macroeconomía argentina hoy? Dólar, inflación, tasas y riesgo país.')">&#127462;&#127479; Macro Argentina</button>
+      <button class="warren-suggestion" onclick="warrenAnalyzePortfolio()">&#128188; Mi portafolio</button>
+      <button class="warren-suggestion" onclick="warrenSuggest('Haceme un análisis completo de Mercado Libre (MELI)')">&#128722; Mercado Libre</button>
+      <button class="warren-suggestion" onclick="warrenSuggest('¿Qué acciones están generando más ruido en el mercado esta semana y por qué? Dame oportunidades para investigar, no recomendaciones.')">&#128293; Oportunidades</button>
     </div>
 
     <div class="warren-input-area">
@@ -8619,7 +8619,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
     const panel = document.getElementById('warrenPanel');
     const btn = document.getElementById('warrenExpandBtn');
     panel.classList.toggle('fullscreen', warrenFullscreen);
-    btn.textContent = warrenFullscreen ? 'Á¢Â¡' : 'Á¢ÂÂ¶';
+    btn.textContent = warrenFullscreen ? '⤡' : '⤢';
     btn.title = warrenFullscreen ? 'Reducir' : 'Expandir';
   }
 
@@ -8929,6 +8929,42 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
   function warrenSuggest(text) {
     document.getElementById('warrenInput').value = text;
     warrenSend();
+  }
+
+  // Resumen real del portafolio cargado por el usuario en la pestaña "Tu
+  // Portafolio" (pfBuildRows/pfGroupByTicker ya existen para esa pestaña).
+  // Devuelve null si todavia no cargo ninguna posicion en esta sesion.
+  function pfSummarizeUserPortfolio() {
+    if (typeof pfBuildRows !== 'function' || typeof pfGroupByTicker !== 'function') return null;
+    var rows = pfBuildRows();
+    if (!rows.length) return null;
+    var grouped = pfGroupByTicker(rows);
+    var total = grouped.reduce(function(s, g) { return s + g.valorActual; }, 0);
+    if (total <= 0) return null;
+    var lines = grouped
+      .slice()
+      .sort(function(a, b) { return b.valorActual - a.valorActual; })
+      .map(function(g) {
+        var pct = (g.valorActual / total * 100).toFixed(1);
+        return '- ' + g.ticker + ': ' + pct + '% de la cartera' + (g.isCash ? '' : ' (' + g.moneda + ')');
+      });
+    var profileTxt = (window._qzLastProfile && window._qzLastProfile.name) ? window._qzLastProfile.name : 'no completado';
+    return 'Mi portafolio real cargado en Manfredi Investment (valor total aprox. USD ' + Math.round(total).toLocaleString('es-AR') + '):\n'
+      + lines.join('\n')
+      + '\nMi perfil de riesgo (quiz de la web): ' + profileTxt
+      + '\n\nAnalizá qué le falta o qué deficiencias tiene esta composición para mi perfil, y qué podría fortalecerla -- sin decirme puntualmente qué comprar o vender.';
+  }
+
+  function warrenAnalyzePortfolio() {
+    var summary = pfSummarizeUserPortfolio();
+    if (!summary) {
+      if (!warrenOpen) toggleWarren();
+      if (!warrenInitialized) { warrenInitialized = true; warrenShowWelcome(); }
+      document.getElementById('warrenSuggestions').style.display = 'none';
+      warrenAddMessage('assistant', 'Todavía no tenés posiciones cargadas. Andá a <strong>Portfolio → Tu Portafolio</strong> y cargalas primero -- así puedo analizar tu cartera real en vez de hablarte en general.');
+      return;
+    }
+    warrenSuggest(summary);
   }
   
 
