@@ -1,7 +1,8 @@
-// netlify/functions/warren.js
-// Backend unico de Warren (ver .claude/plans/stateful-roaming-ladybug.md para el
-// contexto completo). Antes habia un Cloudflare Worker duplicado que el frontend
-// probaba primero -- se dejo de usar porque generaba doble descuento de consulta.
+// workers/warren/index.js
+// Backend de Warren IA como Cloudflare Worker (antes vivia en
+// netlify/functions/warren.js, que en realidad nunca corria en produccion --
+// el sitio se sirve por Cloudflare Pages, no Netlify. Ver .claude/plans/
+// stateful-roaming-ladybug.md para el contexto completo del rediseño).
 
 const ADMIN_EMAILS = ['nachito2502@gmail.com'];
 const MEMBERSHIPS_BASE = 'https://manfredi-memberships.nachito2502.workers.dev';
@@ -11,6 +12,13 @@ const NOTICIAS_BASE = 'https://manfredi-noticias.nachito2502.workers.dev';
 const MODEL_HAIKU = 'claude-haiku-4-5';
 const MODEL_SONNET = 'claude-sonnet-5';
 const MAX_TOOL_ITERATIONS = 4;
+
+const CORS_HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+};
+const JSON_HEADERS = { ...CORS_HEADERS, 'Content-Type': 'application/json' };
 
 // ─── Heuristica de ruteo de modelo ─────────────────────────────────────────
 // Sin llamada extra a un LLM clasificador: el ahorro de no rutear bien es
@@ -203,109 +211,97 @@ function extractText(content) {
         .trim();
 }
 
-exports.handler = async function (event, context) {
-    if (event.httpMethod === 'OPTIONS') {
-        return {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS'
-            },
-            body: ''
-        };
-    }
-
-    if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, body: 'Method Not Allowed' };
-    }
-
-    const jsonHeaders = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
-    const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-    if (!ANTHROPIC_API_KEY) {
-        console.error('ERROR: ANTHROPIC_API_KEY no encontrada');
-        return { statusCode: 200, headers: jsonHeaders, body: JSON.stringify({ response: 'Error de configuracion: API key no encontrada.' }) };
-    }
-
-    try {
-        const body = JSON.parse(event.body);
-        const { messages, systemPrompt, email, enableTools } = body;
-        const isAdmin = email && ADMIN_EMAILS.includes(email.toLowerCase());
-
-        // Verificar consultas disponibles (admin no tiene limite)
-        if (email && !isAdmin) {
-            const consultasRes = await fetch(`${MEMBERSHIPS_BASE}/consultas?email=${encodeURIComponent(email)}`);
-            const consultasData = await consultasRes.json();
-            if (consultasData.consultas === 0) {
-                return {
-                    statusCode: 200,
-                    headers: jsonHeaders,
-                    body: JSON.stringify({ response: 'Agotaste tus 100 consultas del mes. Se renuevan el 1 del proximo mes.', limitAlcanzado: true })
-                };
-            }
+export default {
+    async fetch(request, env) {
+        if (request.method === 'OPTIONS') {
+            return new Response(null, { status: 204, headers: CORS_HEADERS });
+        }
+        if (request.method !== 'POST') {
+            return new Response('Method Not Allowed', { status: 405, headers: CORS_HEADERS });
         }
 
-        const tools = enableTools ? buildTools() : null;
-        const claudeMessages = messages.map(m => ({
-            role: m.role === 'assistant' ? 'assistant' : 'user',
-            content: m.content
-        }));
+        const ANTHROPIC_API_KEY = env.ANTHROPIC_API_KEY;
+        if (!ANTHROPIC_API_KEY) {
+            console.error('ERROR: ANTHROPIC_API_KEY no encontrada');
+            return new Response(JSON.stringify({ response: 'Error de configuracion: API key no encontrada.' }), { headers: JSON_HEADERS });
+        }
 
-        const lastUserMsg = [...claudeMessages].reverse().find(m => m.role === 'user');
-        let model = chooseInitialModel(lastUserMsg && typeof lastUserMsg.content === 'string' ? lastUserMsg.content : '');
+        try {
+            const body = await request.json();
+            const { messages, systemPrompt, email, enableTools } = body;
+            const isAdmin = email && ADMIN_EMAILS.includes(email.toLowerCase());
 
-        let finalText = 'No pude procesar tu consulta. Intenta de nuevo.';
-        let iterations = 0;
-        let usedTool = false;
-
-        while (iterations < MAX_TOOL_ITERATIONS) {
-            iterations++;
-            const data = await callClaude(ANTHROPIC_API_KEY, model, systemPrompt || 'Sos Warren, asesor financiero de Manfredi Investment.', claudeMessages, tools);
-
-            if (data.stop_reason !== 'tool_use') {
-                finalText = extractText(data.content) || finalText;
-                break;
-            }
-
-            // Se pidio usar una tool: ejecutarla y, de aca en mas, escalar a Sonnet
-            // para la sintesis final -- es donde mas importa la calidad.
-            usedTool = true;
-            model = MODEL_SONNET;
-
-            claudeMessages.push({ role: 'assistant', content: data.content });
-            const toolUseBlocks = (data.content || []).filter(b => b.type === 'tool_use');
-            const toolResults = [];
-            for (const block of toolUseBlocks) {
-                let result;
-                try {
-                    result = await executeTool(block.name, block.input);
-                } catch (e) {
-                    result = { error: 'Error interno ejecutando la herramienta.' };
+            // Verificar consultas disponibles (admin no tiene limite)
+            if (email && !isAdmin) {
+                const consultasRes = await fetch(`${MEMBERSHIPS_BASE}/consultas?email=${encodeURIComponent(email)}`);
+                const consultasData = await consultasRes.json();
+                if (consultasData.consultas === 0) {
+                    return new Response(JSON.stringify({ response: 'Agotaste tus 100 consultas del mes. Se renuevan el 1 del proximo mes.', limitAlcanzado: true }), { headers: JSON_HEADERS });
                 }
-                toolResults.push({
-                    type: 'tool_result',
-                    tool_use_id: block.id,
-                    content: JSON.stringify(result),
-                    is_error: !!(result && result.error)
-                });
             }
-            claudeMessages.push({ role: 'user', content: toolResults });
+
+            const tools = enableTools ? buildTools() : null;
+            const claudeMessages = messages.map(m => ({
+                role: m.role === 'assistant' ? 'assistant' : 'user',
+                content: m.content
+            }));
+
+            const lastUserMsg = [...claudeMessages].reverse().find(m => m.role === 'user');
+            let model = chooseInitialModel(lastUserMsg && typeof lastUserMsg.content === 'string' ? lastUserMsg.content : '');
+
+            let finalText = 'No pude procesar tu consulta. Intenta de nuevo.';
+            let iterations = 0;
+            let usedTool = false;
+
+            while (iterations < MAX_TOOL_ITERATIONS) {
+                iterations++;
+                const data = await callClaude(ANTHROPIC_API_KEY, model, systemPrompt || 'Sos Warren, asesor financiero de Manfredi Investment.', claudeMessages, tools);
+
+                if (data.stop_reason !== 'tool_use') {
+                    finalText = extractText(data.content) || finalText;
+                    break;
+                }
+
+                // Se pidio usar una tool: ejecutarla y, de aca en mas, escalar a Sonnet
+                // para la sintesis final -- es donde mas importa la calidad.
+                usedTool = true;
+                model = MODEL_SONNET;
+
+                claudeMessages.push({ role: 'assistant', content: data.content });
+                const toolUseBlocks = (data.content || []).filter(b => b.type === 'tool_use');
+                const toolResults = [];
+                for (const block of toolUseBlocks) {
+                    let result;
+                    try {
+                        result = await executeTool(block.name, block.input);
+                    } catch (e) {
+                        result = { error: 'Error interno ejecutando la herramienta.' };
+                    }
+                    toolResults.push({
+                        type: 'tool_result',
+                        tool_use_id: block.id,
+                        content: JSON.stringify(result),
+                        is_error: !!(result && result.error)
+                    });
+                }
+                claudeMessages.push({ role: 'user', content: toolResults });
+            }
+
+            // Restar 1 consulta despues de una respuesta exitosa (unico punto de
+            // descuento -- el frontend no resta por su cuenta).
+            if (email && !isAdmin) {
+                await fetch(`${MEMBERSHIPS_BASE}/restar-consulta`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                }).catch(() => {});
+            }
+
+            return new Response(JSON.stringify({ response: finalText, model, usedTool }), { headers: JSON_HEADERS });
+
+        } catch (err) {
+            console.error('Warren worker error:', err);
+            return new Response(JSON.stringify({ response: 'Hubo un error inesperado. Por favor intenta nuevamente.' }), { headers: JSON_HEADERS });
         }
-
-        // Restar 1 consulta despues de una respuesta exitosa (unico punto de
-        // descuento -- el frontend ya no resta por su cuenta).
-        if (email && !isAdmin) {
-            await fetch(`${MEMBERSHIPS_BASE}/restar-consulta`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            }).catch(() => {});
-        }
-
-        return { statusCode: 200, headers: jsonHeaders, body: JSON.stringify({ response: finalText, model, usedTool }) };
-
-    } catch (err) {
-        console.error('Warren function error:', err);
-        return { statusCode: 200, headers: jsonHeaders, body: JSON.stringify({ response: 'Hubo un error inesperado. Por favor intenta nuevamente.' }) };
     }
 };

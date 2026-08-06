@@ -4471,7 +4471,7 @@
     var bubble = document.getElementById('pfWarrenBubble');
     btn.disabled = true; btn.textContent = 'Warren esta analizando...';
     try{
-      var res = await fetch('/.netlify/functions/warren', {
+      var res = await fetch('https://warren.nachito2502.workers.dev', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -8828,7 +8828,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
 
     try {
       const historyToSend = warrenHistory.slice(-WARREN_HISTORY_SEND_LIMIT);
-      const res = await fetch('/.netlify/functions/warren', {
+      const res = await fetch('https://warren.nachito2502.workers.dev', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
