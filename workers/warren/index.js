@@ -182,11 +182,21 @@ async function executeTool(name, input) {
 async function callClaude(apiKey, model, systemPrompt, messages, tools) {
     const requestBody = {
         model,
-        max_tokens: 1536,
+        // Sonnet 5 piensa (thinking) por defecto y max_tokens es el techo de
+        // pensamiento + texto visible juntos -- con 1536 el thinking se comia
+        // todo el presupuesto en respuestas complejas (analisis con varias
+        // tools) y no dejaba nada para el texto, cortando en seco con
+        // stop_reason "max_tokens" y respuesta vacia. Confirmado en pruebas.
+        max_tokens: 4096,
         system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
         messages
     };
     if (tools && tools.length) requestBody.tools = tools;
+    // effort medio: recorta directamente cuanto piensa antes de responder (en
+    // vez de solo darle mas techo a max_tokens). Solo Sonnet 5 lo soporta --
+    // Haiku 4.5 devuelve 400 "This model does not support the effort parameter"
+    // si se lo mandamos (confirmado en pruebas).
+    if (model === MODEL_SONNET) requestBody.output_config = { effort: 'medium' };
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -262,13 +272,26 @@ export default {
             let finalText = 'No pude procesar tu consulta. Intenta de nuevo.';
             let iterations = 0;
             let usedTool = false;
+            let hitIterationLimit = false;
+            const trace = [];
 
             while (iterations < MAX_TOOL_ITERATIONS) {
                 iterations++;
                 const data = await callClaude(ANTHROPIC_API_KEY, model, systemPrompt || 'Sos Warren, asesor financiero de Manfredi Investment.', claudeMessages, tools);
+                const toolCallsThisTurn = (data.content || []).filter(b => b.type === 'tool_use').map(b => ({ name: b.name, input: b.input }));
+                trace.push({ iteration: iterations, model, stop_reason: data.stop_reason, tools: toolCallsThisTurn, text: extractText(data.content) });
+
+                // Claude a veces manda texto explicativo junto con el tool_use --
+                // lo guardamos como mejor respuesta disponible por si se agota el
+                // limite de iteraciones antes de terminar.
+                const partialText = extractText(data.content);
+                if (partialText) finalText = partialText;
 
                 if (data.stop_reason !== 'tool_use') {
-                    finalText = extractText(data.content) || finalText;
+                    break;
+                }
+                if (iterations >= MAX_TOOL_ITERATIONS) {
+                    hitIterationLimit = true;
                     break;
                 }
 
@@ -297,6 +320,14 @@ export default {
                 claudeMessages.push({ role: 'user', content: toolResults });
             }
 
+            if (hitIterationLimit && finalText === 'No pude procesar tu consulta. Intenta de nuevo.') {
+                // Se agoto el presupuesto de vueltas de tools sin que Claude escribiera
+                // texto explicativo en ninguna -- pasa con pedidos que requieren mas
+                // llamadas de las que cubrimos (ej. datos historicos multi-anio que
+                // nuestras tools no tienen). Mejor avisar esto que devolver el generico.
+                finalText = 'Esta consulta necesita más pasos de investigación de los que puedo hacer en una sola respuesta ahora mismo (probablemente datos históricos que mis fuentes no cubren directo). Probá pedirme algo más acotado -- por ejemplo el precio y las métricas actuales, o un aspecto puntual -- y lo resuelvo sin problema.';
+            }
+
             // Restar 1 consulta despues de una respuesta exitosa (unico punto de
             // descuento -- el frontend no resta por su cuenta).
             if (email && !isAdmin) {
@@ -306,6 +337,10 @@ export default {
                     body: JSON.stringify({ email })
                 }).catch(() => {});
             }
+
+            // El trace queda solo en logs (observabilidad) -- no se lo mandamos
+            // al cliente, es info interna de que tools se llamaron y por que.
+            console.error('[warren] trace:', JSON.stringify(trace));
 
             return new Response(JSON.stringify({ response: finalText, model, usedTool }), { headers: JSON_HEADERS });
 
