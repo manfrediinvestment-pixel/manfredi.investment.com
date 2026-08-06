@@ -279,6 +279,12 @@ export default {
                 iterations++;
                 const data = await callClaude(ANTHROPIC_API_KEY, model, systemPrompt || 'Sos Warren, asesor financiero de Manfredi Investment.', claudeMessages, tools);
                 const toolCallsThisTurn = (data.content || []).filter(b => b.type === 'tool_use').map(b => ({ name: b.name, input: b.input }));
+                // web_search es una tool server-side: Anthropic la ejecuta dentro del
+                // mismo turno (stop_reason nunca es 'tool_use' para esta), así que el
+                // chequeo de mas abajo no la detecta -- se marca aca por separado.
+                if ((data.content || []).some(b => b.type === 'server_tool_use' || b.type === 'web_search_tool_result')) {
+                    usedTool = true;
+                }
                 trace.push({ iteration: iterations, model, stop_reason: data.stop_reason, tools: toolCallsThisTurn, text: extractText(data.content) });
 
                 // Claude a veces manda texto explicativo junto con el tool_use --
