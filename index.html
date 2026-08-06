@@ -3828,7 +3828,7 @@
     .pf-add-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; color: rgba(255,255,255,.4); font-size: 13px; cursor: pointer; padding: 10px 6px; border: 1px dashed rgba(255,255,255,.18); border-radius: 6px; }
     .pf-add-row:hover { color: var(--gold); border-color: var(--gold-dark,#B8943F); }
     .pf-add-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; background: var(--navy-5); border-radius: 8px; padding: 12px; }
-    .pf-add-form input[type="text"], .pf-add-form input[type="number"] {
+    .pf-add-form input[type="text"], .pf-add-form input[type="number"], .pf-add-form select {
       background: var(--navy-1); border: 1px solid rgba(255,255,255,.15); border-radius: 5px; color: var(--white);
       padding: 8px 10px; font-size: 13px; font-family: inherit;
     }
@@ -3839,6 +3839,27 @@
     .pf-metrics-label { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 14px; }
     .pf-metric-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 16px; }
     @media (max-width: 680px) { .pf-metric-grid { grid-template-columns: 1fr 1fr; } }
+
+    .pf-alert-summary {
+      display: flex; gap: 14px; align-items: flex-start;
+      background: linear-gradient(160deg, rgba(239,68,68,.07) 0%, var(--navy-5) 65%);
+      border: 1px solid rgba(239,68,68,.22); border-left: 3px solid var(--red);
+      border-radius: 0 12px 12px 0; padding: 16px 18px; margin-bottom: 16px;
+    }
+    .pf-alert-summary.pf-alert-warn {
+      background: linear-gradient(160deg, rgba(245,158,11,.07) 0%, var(--navy-5) 65%);
+      border-color: rgba(245,158,11,.22); border-left-color: var(--yellow);
+    }
+    .pf-alert-icon {
+      flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 15px;
+      background: rgba(239,68,68,.14); color: var(--red);
+    }
+    .pf-alert-warn .pf-alert-icon { background: rgba(245,158,11,.14); color: var(--yellow); }
+    .pf-alert-title { font-size: 13.5px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+    .pf-alert-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+    .pf-alert-list li { font-size: 12.5px; line-height: 1.55; color: rgba(255,255,255,.6); }
+    .pf-alert-list b { color: var(--white); font-weight: 600; }
 
     .pf-metric-card {
       position: relative; overflow: hidden;
@@ -3904,6 +3925,30 @@
     .pf-view-panel.active { display: block; }
     .pf-stub-card { text-align: center; padding: 48px 20px; color: rgba(255,255,255,.45); }
     .pf-stub-card h3 { font-family: var(--font-display); font-weight: 400; color: var(--white); margin: 0 0 10px; }
+    .mf-summary { display: flex; gap: 22px; flex-wrap: wrap; margin-bottom: 16px; font-size: 13.5px; color: rgba(255,255,255,.55); }
+    .mf-summary b { font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
+    .mf-chart-wrap { position: relative; height: 320px; margin-bottom: 6px; }
+    .mf-comp-table tr:hover td { background: rgba(255,255,255,.025); }
+    .mf-sector-tag {
+      font-size: 10.5px; font-weight: 600; letter-spacing: .02em; color: rgba(255,255,255,.55);
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 20px; padding: 3px 10px; white-space: nowrap;
+    }
+    /* TEMP: bloqueo de toda la seccion Portfolio mientras se rehace Warren IA a fondo.
+       Buscar "TEMP: bloqueo Portfolio" para sacar este bloque + el wrapper de abajo
+       cuando este listo para lanzar. */
+    .pf-lock-wrap { position: relative; }
+    .pf-lock-blur { filter: blur(7px); opacity: .55; pointer-events: none; user-select: none; }
+    .pf-lock-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .pf-lock-card {
+      background: var(--navy-1,#07101E); border: 1px solid var(--gold,#F2C94C); border-radius: 12px;
+      padding: 32px 30px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    }
+    .pf-lock-card h3 { font-family: var(--font-display); font-weight: 400; font-size: 20px; margin: 0 0 8px; color: var(--white); }
+    .pf-lock-card p { margin: 0; font-size: 13px; color: rgba(255,255,255,.6); line-height: 1.55; }
   </style>
   <section class="section section-portfolio" id="portfolio" data-tab="portfolio">
     <div class="container">
@@ -3918,6 +3963,10 @@
         <span>Herramienta educativa de autogestión. No es asesoramiento financiero ni una recomendación de inversión personalizada.</span>
       </div>
 
+      <!-- TEMP: bloqueo Portfolio -- sacar este wrapper (dejando el contenido de adentro
+           tal cual) cuando Warren IA este rehecho y listo para lanzar la seccion. -->
+      <div class="pf-lock-wrap">
+      <div class="pf-lock-blur">
       <div class="mkt-tabs" id="pfViewTabs" role="tablist">
         <button type="button" class="mkt-tab active" data-pfview="tuyo">Tu Portafolio</button>
         <button type="button" class="mkt-tab" data-pfview="manfredi">Portafolio de Manfredi</button>
@@ -3937,12 +3986,17 @@
           <div class="pf-add-row" id="pfAddRowBtn" onclick="pfShowAddForm()">+ Agregar posición</div>
           <div class="pf-add-form" id="pfAddForm" style="display:none;">
             <input type="text" id="pfInputTicker" placeholder="Ticker (ej: AAPL)">
+            <select id="pfInputMoneda" onchange="pfToggleCashFields()">
+              <option value="USD" selected>USD</option>
+              <option value="ARS">ARS (CEDEAR / acción local)</option>
+            </select>
             <input type="number" id="pfInputCantidad" placeholder="Cantidad" step="any">
             <input type="number" id="pfInputPrecio" placeholder="Precio de compra (USD)" step="any">
             <label><input type="checkbox" id="pfInputCash" onchange="pfToggleCashFields()"> Es efectivo</label>
             <input type="text" id="pfInputNotas" placeholder="Notas (opcional)">
             <button class="pf-btn-gold" onclick="pfAddPosition()">Agregar</button>
             <button class="pf-btn-ghost" onclick="pfHideAddForm()">Cancelar</button>
+            <div style="flex-basis:100%;font-size:11px;color:rgba(255,255,255,.35);">Las posiciones en ARS se convierten a USD al dólar CCL actual (no al de la fecha de compra).</div>
           </div>
           <div class="pf-save-row">
             <button class="pf-btn-ghost" id="pfSaveBtn" style="display:none;" onclick="pfSavePortfolio()">Guardar mi portafolio</button>
@@ -3966,11 +4020,27 @@
       </div>
 
       <div class="pf-view-panel" data-pfview-panel="manfredi">
-        <div class="pf-stub-card">
-          <h3>Próximamente</h3>
-          <p>El desempeño real de mi portafolio frente al S&amp;P 500 todavía no está disponible en esta sección.</p>
+        <div class="pf-card">
+          <h2 class="pf-metrics-label" style="margin-bottom:14px;">Rendimiento real vs S&amp;P 500</h2>
+          <div id="mfSummary" class="mf-summary">Calculando con datos históricos...</div>
+          <div class="mf-chart-wrap"><canvas id="mfChartCanvas"></canvas></div>
+          <div class="pf-metric-note">Incluye únicamente las posiciones en acciones y CEDEARs de mi cartera personal &mdash; no incluye el fondo común de inversión ni el efectivo. Rendimiento de los últimos días hábiles disponibles con la composición actual, no desde la fecha de cada compra.</div>
+        </div>
+
+        <div class="pf-card" id="mfCompWrapper" style="position:relative;">
+          <div id="mfCompGrid"></div>
         </div>
       </div>
+
+      </div>
+      <div class="pf-lock-overlay">
+        <div class="pf-lock-card">
+          <h3>Próximamente</h3>
+          <p>Estamos terminando de rediseñar el asesor Warren IA para esta sección. Portfolio Manfredi vuelve pronto.</p>
+        </div>
+      </div>
+      </div>
+      <!-- fin TEMP: bloqueo Portfolio -->
 
     </div>
   </section>
@@ -3984,6 +4054,10 @@
         tabs.forEach(function(b){ b.classList.toggle('active', b === btn); });
         var v = btn.getAttribute('data-pfview');
         panels.forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-pfview-panel') === v); });
+        if(v === 'manfredi' && !window._mfRendered){
+          window._mfRendered = true;
+          if(typeof mfRenderPerformance === 'function') mfRenderPerformance();
+        }
       });
     });
   })();
@@ -3996,21 +4070,45 @@
   var PF_TRADING_DAYS = 252;
   var PF_PALETTE = ['#F2C94C','#60A5FA','#34D399','#F87171','#A78BFA','#FB923C','#22D3EE','#F472B6','#84CC16','#EAB308'];
 
+  // ---- "Portafolio de Manfredi": cartera real del autor (Eco Valores), dato estatico ----
+  // No hay integracion con el broker -- esta lista se actualiza a mano cada vez que cambian
+  // las posiciones reales. Cantidad = tenencia actual (CEDEARs o accion directa, todo en ARS
+  // en Eco Valores). Excluye a proposito el FCI y el efectivo (decision del autor).
+  // precioCompra = PPP (precio promedio ponderado de compra, en ARS) segun "Resultados por
+  // Especie" de Eco Valores -- se usa solo para mostrar la variacion real desde la compra en
+  // la tabla de composicion, no para el grafico de rendimiento. sector asignado a mano.
+  var MF_HOLDINGS = [
+    { ticker:'MSFT', cantidad:36,  moneda:'ARS', precioCompra:20140.000, sector:'Tecnología' },
+    { ticker:'META', cantidad:28,  moneda:'ARS', precioCompra:40060.000, sector:'Comunicación' },
+    { ticker:'MELI', cantidad:62,  moneda:'ARS', precioCompra:22750.000, sector:'Consumo discrecional' },
+    { ticker:'IBIT', cantidad:43,  moneda:'ARS', precioCompra:5691.048,  sector:'Cripto' },
+    { ticker:'NU',   cantidad:116, moneda:'ARS', precioCompra:10500.000, sector:'Financiero' },
+    { ticker:'XOM',  cantidad:18,  moneda:'ARS', precioCompra:21310.000, sector:'Energía' },
+    { ticker:'LLY',  cantidad:9,   moneda:'ARS', precioCompra:33340.000, sector:'Salud' },
+    { ticker:'PEP',  cantidad:39,  moneda:'ARS', precioCompra:12279.947, sector:'Consumo básico' },
+    { ticker:'AMZN', cantidad:289, moneda:'ARS', precioCompra:2642.500,  sector:'Consumo discrecional' },
+    { ticker:'AIG',  cantidad:30,  moneda:'ARS', precioCompra:25195.318, sector:'Financiero' },
+    { ticker:'PAMP', cantidad:106, moneda:'ARS', precioCompra:5040.000,  sector:'Energía' }
+  ];
+
   function pfEsc(s){ return (s||'').replace(/</g,'&lt;'); }
   function pfMoney(n){ return '$'+ (n||0).toLocaleString('es-AR',{maximumFractionDigits: Math.abs(n)<1000?2:0}); }
 
   function pfShowAddForm(){ document.getElementById('pfAddForm').style.display = 'flex'; document.getElementById('pfAddRowBtn').style.display = 'none'; }
   function pfToggleCashFields(){
     var isCash = document.getElementById('pfInputCash').checked;
+    var moneda = document.getElementById('pfInputMoneda').value;
     var precio = document.getElementById('pfInputPrecio');
     var cant = document.getElementById('pfInputCantidad');
     precio.style.display = isCash ? 'none' : '';
-    cant.placeholder = isCash ? 'Monto (USD)' : 'Cantidad';
+    precio.placeholder = 'Precio de compra (' + moneda + ')';
+    cant.placeholder = isCash ? ('Monto (' + moneda + ')') : 'Cantidad';
   }
   function pfHideAddForm(){
     document.getElementById('pfAddForm').style.display = 'none';
     document.getElementById('pfAddRowBtn').style.display = 'flex';
     document.getElementById('pfInputTicker').value = '';
+    document.getElementById('pfInputMoneda').value = 'USD';
     document.getElementById('pfInputCantidad').value = '';
     document.getElementById('pfInputPrecio').value = '';
     document.getElementById('pfInputNotas').value = '';
@@ -4019,12 +4117,13 @@
   }
   function pfAddPosition(){
     var ticker = document.getElementById('pfInputTicker').value.trim().toUpperCase();
+    var moneda = document.getElementById('pfInputMoneda').value === 'ARS' ? 'ARS' : 'USD';
     var isCash = document.getElementById('pfInputCash').checked;
     var cantidad = parseFloat(document.getElementById('pfInputCantidad').value);
     var precio = isCash ? 1 : parseFloat(document.getElementById('pfInputPrecio').value);
     var notas = document.getElementById('pfInputNotas').value.trim();
     if(!ticker || !(cantidad > 0) || !(precio > 0)) return;
-    window._pfPositions.push({ id: pfIdSeq++, ticker: ticker, cantidad: cantidad, precioCompra: precio, notas: notas, isCash: isCash });
+    window._pfPositions.push({ id: pfIdSeq++, ticker: ticker, cantidad: cantidad, precioCompra: precio, moneda: moneda, notas: notas, isCash: isCash });
     pfHideAddForm();
     pfRenderPositions();
   }
@@ -4034,13 +4133,22 @@
   }
 
   // ---- precios en vivo (reusa el Worker manfredi-mercados que ya sirve la pestaña Mercados) ----
+  // Importante: CEDEARs (ARS) y acciones USA (USD) comparten el mismo ticker a proposito
+  // (ej. MSFT existe en arg_cedears Y en usa_stocks). Por eso NUNCA hay que indexar por
+  // simbolo solo -- se guardan ambas monedas por separado y quien pida el precio elige cual.
   function pfIndexMarketPayload(payload){
     var idx = {};
     if(payload && payload.categorias){
       Object.keys(payload.categorias).forEach(function(cat){
-        var items = (payload.categorias[cat] && payload.categorias[cat].items) || [];
+        var catObj = payload.categorias[cat] || {};
+        var currency = catObj.currency === 'USD' ? 'USD' : 'ARS';
+        var items = catObj.items || [];
         items.forEach(function(it){
-          if(it.symbol && it.price != null) idx[it.symbol.toUpperCase()] = { price: it.price, change: it.change, category: cat };
+          if(!it.symbol || it.price == null) return;
+          var sym = it.symbol.toUpperCase();
+          if(!idx[sym]) idx[sym] = {};
+          // si el mismo simbolo aparece en 2 categorias de la misma moneda (raro), gana la de mayor volumen/la primera ya indexada
+          if(!idx[sym][currency]) idx[sym][currency] = { price: it.price, change: it.change, category: cat };
         });
       });
     }
@@ -4060,31 +4168,61 @@
     }
     return window._pfMarketData;
   }
-  function pfGetCurrentPrice(ticker){
+  function pfGetCurrentPrice(ticker, moneda){
     var idx = window._pfMarketData || {};
     var hit = idx[(ticker||'').toUpperCase()];
-    return hit ? hit.price : null;
+    var entry = hit && hit[moneda === 'ARS' ? 'ARS' : 'USD'];
+    return entry ? entry.price : null;
+  }
+  function pfGetCurrentCategory(ticker, moneda){
+    var idx = window._pfMarketData || {};
+    var hit = idx[(ticker||'').toUpperCase()];
+    var entry = hit && hit[moneda === 'ARS' ? 'ARS' : 'USD'];
+    return entry ? entry.category : null;
+  }
+  // Dolar CCL: viaja en el mismo payload (categoria "dolares", simbolo CONTADOCONLIQUI) y ya
+  // queda indexado por el mecanismo de arriba -- cero fetch nuevo.
+  function pfGetCclRate(){ return pfGetCurrentPrice('CONTADOCONLIQUI', 'ARS'); }
+  // Precio de una posicion convertido a USD (moneda base del feature). Si la posicion es ARS
+  // y no hay CCL disponible todavia, devuelve null (no se puede convertir de forma confiable).
+  function pfGetCurrentPriceUSD(p){
+    if(p.isCash) return p.moneda === 'ARS' ? (pfGetCclRate() ? 1/pfGetCclRate() : null) : 1;
+    if(p.moneda === 'ARS'){
+      var priceArs = pfGetCurrentPrice(p.ticker, 'ARS');
+      var ccl = pfGetCclRate();
+      return (priceArs != null && ccl) ? priceArs/ccl : null;
+    }
+    return pfGetCurrentPrice(p.ticker, 'USD');
   }
 
-  // rows: cada posicion + precio actual, valor invertido/actual y resultado ya calculados
+  // rows: cada posicion + precio actual (USD, moneda base), valor invertido/actual y resultado
   function pfBuildRows(){
     return (window._pfPositions||[]).map(function(p){
-      var currentPrice = p.isCash ? 1 : pfGetCurrentPrice(p.ticker);
-      var priceKnown = p.isCash || currentPrice != null;
-      var priceForValue = currentPrice != null ? currentPrice : p.precioCompra;
-      var invertido = p.cantidad * p.precioCompra;
-      var valorActual = p.cantidad * priceForValue;
+      var currentPrice = pfGetCurrentPriceUSD(p);
+      var priceKnown = currentPrice != null;
+      var priceForValue = currentPrice != null ? currentPrice : (p.moneda === 'ARS' ? null : p.precioCompra);
+      var precioCompraUSD = p.moneda === 'ARS' ? (pfGetCclRate() ? p.precioCompra/pfGetCclRate() : null) : p.precioCompra;
+      var invertido = precioCompraUSD != null ? p.cantidad * precioCompraUSD : 0;
+      var valorActual = priceForValue != null ? p.cantidad * priceForValue : 0;
       var gain = valorActual - invertido;
       var gainPct = invertido > 0 ? (gain/invertido*100) : 0;
-      return { id:p.id, ticker:p.ticker, cantidad:p.cantidad, precioCompra:p.precioCompra, isCash:p.isCash,
+      return { id:p.id, ticker:p.ticker, moneda:p.moneda||'USD', cantidad:p.cantidad, precioCompra:precioCompraUSD, isCash:p.isCash,
         currentPrice:priceForValue, priceKnown:priceKnown, invertido:invertido, valorActual:valorActual, gain:gain, gainPct:gainPct };
     });
   }
+  // Clave por ticker+moneda (no solo ticker): una posicion en CEDEAR (ARS) y una en acciones
+  // (USD) del mismo ticker no son la misma unidad (ratio de conversion del CEDEAR), asi que
+  // se tratan como lineas separadas en vez de sumar cantidades no equivalentes.
+  function pfAssetKey(r){ return r.isCash ? '__CASH__' : (r.ticker.toUpperCase() + '|' + (r.moneda==='ARS'?'ARS':'USD')); }
   function pfGroupByTicker(rows){
     var map = {}, order = [];
     rows.forEach(function(r){
-      var key = r.isCash ? '__CASH__' : r.ticker.toUpperCase();
-      if(!map[key]){ map[key] = { ticker: r.isCash ? 'Efectivo' : r.ticker, isCash:r.isCash, valorActual:0 }; order.push(key); }
+      var key = pfAssetKey(r);
+      if(!map[key]){
+        var label = r.isCash ? 'Efectivo' : (r.ticker + (r.moneda==='ARS' ? ' (ARS)' : ''));
+        map[key] = { ticker: label, tickerRaw: r.ticker, moneda: r.moneda||'USD', isCash:r.isCash, valorActual:0 };
+        order.push(key);
+      }
       map[key].valorActual += r.valorActual;
     });
     return order.map(function(k){ return map[k]; });
@@ -4142,12 +4280,13 @@
         var pct = total > 0 ? (r.valorActual/total*100) : 0;
         var gainColor = r.gain > 0 ? 'var(--green)' : (r.gain < 0 ? 'var(--red)' : 'rgba(255,255,255,.5)');
         var sign = r.gain >= 0 ? '+' : '−';
-        var note = (!r.isCash && !r.priceKnown) ? ' <span style="color:var(--yellow);font-size:10px;">sin cotización</span>' : '';
-        return '<tr><td>'+ (r.isCash ? '&#128176; ' : '') + pfEsc(r.ticker) + note +'</td>'
+        var note = !r.priceKnown ? ' <span style="color:var(--yellow);font-size:10px;">sin cotización</span>' : '';
+        var arsTag = (!r.isCash && r.moneda==='ARS') ? ' <span style="color:rgba(255,255,255,.4);font-size:10px;border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:1px 5px;">ARS</span>' : '';
+        return '<tr><td>'+ (r.isCash ? '&#128176; ' : '') + pfEsc(r.ticker) + arsTag + note +'</td>'
           + '<td class="num">'+ (r.isCash ? '—' : r.cantidad) +'</td>'
-          + '<td class="num">'+ (r.isCash ? '—' : pfMoney(r.precioCompra)) +'</td>'
-          + '<td class="num">'+ (r.isCash ? '—' : pfMoney(r.currentPrice)) +'</td>'
-          + '<td class="num" style="color:'+ gainColor +';">'+ (r.isCash ? '—' : sign + pfMoney(Math.abs(r.gain)) + ' (' + sign + Math.abs(r.gainPct).toFixed(1) + '%)') +'</td>'
+          + '<td class="num">'+ (r.isCash || r.precioCompra==null ? '—' : pfMoney(r.precioCompra)) +'</td>'
+          + '<td class="num">'+ (r.isCash || r.currentPrice==null ? '—' : pfMoney(r.currentPrice)) +'</td>'
+          + '<td class="num" style="color:'+ gainColor +';">'+ (r.isCash || !r.priceKnown ? '—' : sign + pfMoney(Math.abs(r.gain)) + ' (' + sign + Math.abs(r.gainPct).toFixed(1) + '%)') +'</td>'
           + '<td class="num">'+ pct.toFixed(1) +'%</td>'
           + '<td style="text-align:right;"><span class="pf-rm" onclick="pfRemovePosition('+ r.id +')">&times;</span></td></tr>';
       }).join('');
@@ -4217,11 +4356,52 @@
     var invested = grouped.filter(function(g){ return !g.isCash; });
     var maxPos = invested.reduce(function(m,g){ return g.valorActual > m.valorActual ? g : m; }, {valorActual:0,ticker:''});
     var concPct = invested.length ? (maxPos.valorActual/total*100) : 0;
+    var cashBand = (quizProfile && quizProfile.bands && quizProfile.bands['Efectivo']) || null;
     return {
-      cash: { value: cashPct, status: pfBucketCash(cashPct, quizProfile) },
+      cash: { value: cashPct, status: pfBucketCash(cashPct, quizProfile), band: cashBand },
       conc: { value: concPct, ticker: maxPos.ticker, status: pfBucketConc(concPct) },
       divers: { value: invested.length, status: pfBucketDivers(invested.length) }
     };
+  }
+
+  // Copy del cartel de "que estas haciendo mal" -- solo describe, nunca instruye una accion
+  // sobre activos concretos (mismo criterio que la narracion de Warren).
+  function pfBuildAlertItems(metrics){
+    var items = [];
+    if(metrics.cash.status !== 'ok'){
+      var band = metrics.cash.band;
+      var cashVal = metrics.cash.value.toFixed(1) + '%';
+      var body;
+      if(band && metrics.cash.value > band[1]){
+        body = 'Tu perfil sugiere un rango de ' + band[0] + '&ndash;' + band[1] + '% en efectivo, y estás bien por encima. Esa porción no está expuesta al mercado: no participa de subas ni cubre la inflación en el mediano plazo.';
+      } else if(band && metrics.cash.value < band[0]){
+        body = 'Tu perfil sugiere un rango de ' + band[0] + '&ndash;' + band[1] + '% en efectivo, y estás bien por debajo. Sin ese colchón, cualquier imprevisto te obliga a desarmar posiciones en un mal momento de mercado.';
+      } else {
+        body = 'Estás por fuera del rango de efectivo típico para una cartera de este tamaño. Ni tanto efectivo ocioso ni tan poco colchón son ideales &mdash; el punto medio depende de tu horizonte y tolerancia.';
+      }
+      items.push({ label: 'Efectivo ocioso (' + cashVal + ')', body: body });
+    }
+    if(metrics.conc.status !== 'ok'){
+      var concVal = metrics.conc.value.toFixed(1) + '%';
+      items.push({ label: 'Concentración (' + concVal + (metrics.conc.ticker ? ' en ' + pfEsc(metrics.conc.ticker) : '') + ')',
+        body: 'Más del ' + (metrics.conc.status==='bad' ? '40' : '20') + '% de tu cartera depende del resultado de un solo activo. Si a esa posición le va mal, el impacto en tu cartera total es mucho mayor que si el mismo peso estuviera repartido entre varias.' });
+    }
+    if(metrics.divers.status !== 'ok'){
+      items.push({ label: 'Diversificación (' + metrics.divers.value + (metrics.divers.value===1?' posición':' posiciones') + ')',
+        body: 'Tenés pocos activos distintos sin contar efectivo. Con tan pocas posiciones, un evento puntual de una sola empresa (una mala noticia, un mal trimestre) pesa mucho más sobre el resultado total que en una cartera más repartida.' });
+    }
+    return items;
+  }
+  function pfRenderAlertSummary(metrics){
+    var items = pfBuildAlertItems(metrics);
+    if(!items.length) return '';
+    var anyBad = metrics.cash.status==='bad' || metrics.conc.status==='bad' || metrics.divers.status==='bad';
+    var n = items.length;
+    var title = n===1 ? '1 métrica necesita atención' : (n + ' métricas necesitan atención');
+    return '<div class="pf-alert-summary'+ (anyBad?'':' pf-alert-warn') +'"><div class="pf-alert-icon">&#9888;</div><div>'
+      + '<div class="pf-alert-title">'+ title +'</div>'
+      + '<ul class="pf-alert-list">'+ items.map(function(it){ return '<li><b>'+ it.label +':</b> '+ it.body +'</li>'; }).join('') +'</ul>'
+      + '</div></div>';
   }
 
   var pfChipLabel = { ok: 'Alineado', warn: 'Atención', bad: 'Atención' };
@@ -4242,6 +4422,7 @@
     var quizNote = window._qzLastProfile ? '' : ' Completá el quiz para un chequeo más preciso de tu efectivo.';
 
     grid.innerHTML = '<div class="pf-metrics-label">Resultados del chequeo</div>'
+      + pfRenderAlertSummary(metrics)
       + '<div class="pf-metric-grid">'
       + '<div class="pf-metric-card status-'+ metrics.cash.status +'"><div class="pf-metric-top"><span class="name">Efectivo ocioso</span><span class="pf-chip '+ metrics.cash.status +'">'+ pfChipLabel[metrics.cash.status] +'</span></div>'
       + '<div class="pf-metric-val">'+ metrics.cash.value.toFixed(1) +'%</div><div class="pf-metric-note">Parte de tu cartera en efectivo.'+ quizNote +'</div></div>'
@@ -4355,19 +4536,67 @@
     return count ? sum/count : null;
   }
 
+  // Cierres de un activo ARS convertidos a USD-equivalente, dia a dia, dividiendo el cierre
+  // en pesos por el cierre del CCL de ese mismo dia (misma cantidad de puntos, alineados
+  // desde el final -- mismo nivel de rigor que la alineacion contra SPY de mas abajo, sin
+  // matching de fechas exacto).
+  function pfCloseArsToUsd(arsCloses, cclCloses){
+    if(!arsCloses || !cclCloses) return null;
+    var n = Math.min(arsCloses.length, cclCloses.length);
+    if(n < 2) return null;
+    var a = arsCloses.slice(arsCloses.length-n), c = cclCloses.slice(cclCloses.length-n);
+    return a.map(function(v,i){ return v/c[i]; });
+  }
+
+  // Historico USD-equivalente de un ticker ARS (CEDEAR o accion local). Primero intenta la
+  // via nativa (cierre en pesos / CCL del mismo dia). Si el feed de cierres ARS no tiene ese
+  // ticker (pasa con algunos CEDEARs chicos en la fuente de datos historicos, aunque el precio
+  // EN VIVO si esta disponible), cae al historico USD de la accion subyacente -- pero un CEDEAR
+  // representa una FRACCION de la accion (ratio de conversion), nunca 1 accion completa. Usar el
+  // precio de la accion sin ajustar sobrepesa brutalmente esos tickers (confirmado: PEP llegaba a
+  // pesar ~19x de mas). Se reescala toda la serie para que el ULTIMO valor coincida con el valor
+  // real de hoy de 1 CEDEAR (precio ARS en vivo / CCL en vivo) -- la curva usa la accion real como
+  // forma/tendencia, pero la magnitud queda calibrada al CEDEAR real.
+  async function pfFetchUsdClosesForArs(ticker, arsCategory, n){
+    var arsCloses = await pfFetchHistorico(arsCategory, ticker, n);
+    var cclCloses = await pfFetchHistorico('dolares', 'contadoconliqui', n);
+    var converted = pfCloseArsToUsd(arsCloses, cclCloses);
+    if(converted) return converted;
+    var usdCloses = (await pfFetchHistorico('usa_stocks', ticker, n)) || (await pfFetchHistorico('usa_adrs', ticker, n));
+    if(!usdCloses || !usdCloses.length) return null;
+    var liveArsPrice = pfGetCurrentPrice(ticker, 'ARS');
+    var liveCcl = pfGetCclRate();
+    if(liveArsPrice == null || !liveCcl) return null; // sin ancla real, mejor excluir que sobrepesar mal
+    var liveCedearUsd = liveArsPrice / liveCcl;
+    var scale = liveCedearUsd / usdCloses[usdCloses.length-1];
+    return usdCloses.map(function(v){ return v*scale; });
+  }
+
   async function pfBuildAdvancedMetrics(){
     var positions = (window._pfPositions||[]).filter(function(p){ return !p.isCash; });
-    var grouped = {};
-    positions.forEach(function(p){ grouped[p.ticker] = (grouped[p.ticker]||0) + p.cantidad; });
+    var grouped = {}; // assetKey -> {ticker, moneda, cantidad}
+    positions.forEach(function(p){
+      var key = pfAssetKey(p);
+      if(!grouped[key]) grouped[key] = { ticker:p.ticker, moneda:p.moneda||'USD', cantidad:0 };
+      grouped[key].cantidad += p.cantidad;
+    });
     var tickers = Object.keys(grouped);
     if(tickers.length < 2) return { insufficientData:true };
 
     var N = 90;
     var closesByTicker = {};
     await Promise.all(tickers.map(async function(t){
-      var cat = (window._pfMarketData && window._pfMarketData[t] && window._pfMarketData[t].category) || 'usa_stocks';
-      closesByTicker[t] = await pfFetchHistorico(cat, t, N);
+      var g = grouped[t];
+      if(g.moneda === 'ARS'){
+        var cat = pfGetCurrentCategory(g.ticker, 'ARS') || 'arg_cedears';
+        closesByTicker[t] = await pfFetchUsdClosesForArs(g.ticker, cat, N);
+      } else {
+        var catUsd = pfGetCurrentCategory(g.ticker, 'USD') || 'usa_stocks';
+        closesByTicker[t] = await pfFetchHistorico(catUsd, g.ticker, N);
+      }
     }));
+    // grouped pasa a exponer solo cantidad (para el promedio ponderado de abajo)
+    var qtyByKey = {}; tickers.forEach(function(t){ qtyByKey[t] = grouped[t].cantidad; });
     var benchCloses = await pfFetchHistorico('usa_stocks', 'SPY', N);
 
     var validTickers = tickers.filter(function(t){ return closesByTicker[t] && closesByTicker[t].length > 5; });
@@ -4380,7 +4609,7 @@
     var series = [];
     for(var i=0;i<minLen;i++){
       var val = 0;
-      validTickers.forEach(function(t){ var c=closesByTicker[t]; val += grouped[t]*c[c.length-minLen+i]; });
+      validTickers.forEach(function(t){ var c=closesByTicker[t]; val += qtyByKey[t]*c[c.length-minLen+i]; });
       series.push(val);
     }
     var portfolioReturns = pfReturns(series);
@@ -4408,7 +4637,7 @@
       avgCorrelation: pfAvgCorrelation(returnsByTicker), daysUsed: minLen,
       benchVolAnual: benchVolAnual, benchSharpe: benchSharpe,
       benchMaxDrawdown: pfMaxDrawdown(benchClosesAligned), benchVar95Daily: pfPercentile(benchReturns,0.05),
-      grouped: grouped, validTickers: validTickers
+      grouped: qtyByKey, assetMeta: grouped, validTickers: validTickers
     };
   }
 
@@ -4423,11 +4652,16 @@
       return pfFundamentalsCache[symbol];
     }catch(e){ console.warn('pfFetchFundamentals failed:', symbol, e); pfFundamentalsCache[symbol]=null; return null; }
   }
-  async function pfBuildFundamentalMetrics(grouped, priceByTicker){
+  async function pfBuildFundamentalMetrics(grouped, priceByTicker, assetMeta){
     var tickers = Object.keys(grouped||{});
     if(!tickers.length) return null;
     var fundByTicker = {};
-    await Promise.all(tickers.map(async function(t){ fundByTicker[t] = await pfFetchFundamentals(t); }));
+    // los fundamentales (ROE/PE/dividend yield) son de la empresa, no dependen de si se
+    // tiene la accion o el CEDEAR -- se piden por el ticker real, no por la assetKey.
+    await Promise.all(tickers.map(async function(t){
+      var realTicker = (assetMeta && assetMeta[t] && assetMeta[t].ticker) || t;
+      fundByTicker[t] = await pfFetchFundamentals(realTicker);
+    }));
 
     var totalVal = 0;
     tickers.forEach(function(t){ totalVal += (grouped[t]||0) * (priceByTicker[t]||0); });
@@ -4490,8 +4724,11 @@
     var varStatus = m.var95Daily> -0.02 ? 'ok' : (m.var95Daily> -0.04 ? 'warn' : 'bad');
 
     var priceByTicker = {};
-    (m.validTickers||[]).forEach(function(t){ priceByTicker[t] = pfGetCurrentPrice(t) || 0; });
-    var fund = await pfBuildFundamentalMetrics(m.grouped, priceByTicker);
+    (m.validTickers||[]).forEach(function(t){
+      var g = (m.assetMeta && m.assetMeta[t]) || { ticker:t, moneda:'USD' };
+      priceByTicker[t] = pfGetCurrentPriceUSD({ ticker:g.ticker, moneda:g.moneda, isCash:false }) || 0;
+    });
+    var fund = await pfBuildFundamentalMetrics(m.grouped, priceByTicker, m.assetMeta);
     if(reqId !== pfAdvReqSeq) return;
 
     var roeStatus = fund && fund.roe!=null ? (fund.roe>15 ? 'ok' : (fund.roe>8 ? 'warn' : 'bad')) : null;
@@ -4529,6 +4766,129 @@
     }
   }
   var pfAdvReqSeq = 0;
+
+  // ---- "Portafolio de Manfredi": rendimiento real vs S&P 500 (gratis, sin composicion) ----
+  // Reusa el mismo pipeline ARS->USD que las metricas de "Tu Portafolio" (pfFetchHistorico,
+  // pfCloseArsToUsd, pfGetCurrentCategory) pero sin nada de beta/Sharpe -- solo una curva de
+  // % de retorno acumulado, cartera vs SPY, sobre la ventana mas larga que soporta el Worker.
+  var MF_WINDOW_DAYS = 30;
+  async function mfBuildPerformanceSeries(){
+    await pfFetchMarketData(false);
+    var closesByTicker = {};
+    await Promise.all(MF_HOLDINGS.map(async function(h){
+      if(h.moneda === 'ARS'){
+        var cat = pfGetCurrentCategory(h.ticker, 'ARS') || 'arg_cedears';
+        closesByTicker[h.ticker] = await pfFetchUsdClosesForArs(h.ticker, cat, MF_WINDOW_DAYS);
+      } else {
+        var catUsd = pfGetCurrentCategory(h.ticker, 'USD') || 'usa_stocks';
+        closesByTicker[h.ticker] = await pfFetchHistorico(catUsd, h.ticker, MF_WINDOW_DAYS);
+      }
+    }));
+    var benchCloses = await pfFetchHistorico('usa_stocks', 'SPY', MF_WINDOW_DAYS);
+
+    var validHoldings = MF_HOLDINGS.filter(function(h){ return closesByTicker[h.ticker] && closesByTicker[h.ticker].length > 5; });
+    if(!validHoldings.length || !benchCloses) return { dataUnavailable:true };
+
+    var lens = validHoldings.map(function(h){ return closesByTicker[h.ticker].length; }).concat([benchCloses.length]);
+    var minLen = Math.min.apply(null, lens);
+    if(minLen < 6) return { dataUnavailable:true };
+
+    var series = [];
+    for(var i=0;i<minLen;i++){
+      var val = 0;
+      validHoldings.forEach(function(h){ var c=closesByTicker[h.ticker]; val += h.cantidad*c[c.length-minLen+i]; });
+      series.push(val);
+    }
+    var benchAligned = benchCloses.slice(benchCloses.length-minLen);
+    var portfolioPct = series.map(function(v){ return (v/series[0]-1)*100; });
+    var benchPct = benchAligned.map(function(v){ return (v/benchAligned[0]-1)*100; });
+
+    return {
+      portfolioPct: portfolioPct, benchPct: benchPct, daysUsed: minLen,
+      totalReturn: portfolioPct[portfolioPct.length-1], benchTotalReturn: benchPct[benchPct.length-1],
+      validHoldings: validHoldings, closesByTicker: closesByTicker
+    };
+  }
+
+  var mfChart = null;
+  function mfRenderChart(m){
+    var canvas = document.getElementById('mfChartCanvas');
+    if(!canvas || typeof Chart === 'undefined') return;
+    var labels = m.portfolioPct.map(function(_,i){ return i; });
+    if(mfChart) mfChart.destroy();
+    mfChart = new Chart(canvas, {
+      type: 'line',
+      data: { labels: labels, datasets: [
+        { label: 'Mi cartera', data: m.portfolioPct, borderColor: '#F2C94C', backgroundColor: 'rgba(242,201,76,.08)', borderWidth: 2, pointRadius: 0, tension: .15, fill: true },
+        { label: 'S&P 500', data: m.benchPct, borderColor: '#60A5FA', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0, tension: .15, borderDash: [4,3] }
+      ] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        scales: {
+          x: { display: false },
+          y: { ticks: { color: 'rgba(255,255,255,.5)', callback: function(v){ return v.toFixed(0)+'%'; } }, grid: { color: 'rgba(255,255,255,.06)' } }
+        },
+        plugins: {
+          legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,.65)', font: { size: 11.5 }, boxWidth: 12, padding: 14 } },
+          tooltip: { callbacks: { label: function(ctx){ return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%'; } } }
+        }
+      }
+    });
+  }
+
+  function mfRenderComposition(m){
+    var wrapper = document.getElementById('mfCompWrapper');
+    var grid = document.getElementById('mfCompGrid');
+    if(!wrapper || !grid) return;
+    var existingOverlay = wrapper.querySelector('.mi-paywall-overlay');
+    if(existingOverlay) existingOverlay.remove();
+
+    var ccl = pfGetCclRate();
+    var priced = m.validHoldings.map(function(h){
+      var c = m.closesByTicker[h.ticker];
+      var liveArsPrice = pfGetCurrentPrice(h.ticker, 'ARS');
+      var priceUsd = (liveArsPrice != null && ccl) ? liveArsPrice/ccl : c[c.length-1];
+      var varPct = (liveArsPrice != null && h.precioCompra) ? (liveArsPrice/h.precioCompra-1)*100 : null;
+      return { ticker:h.ticker, sector:h.sector||'—', priceUsd:priceUsd, varPct:varPct, valorActual: h.cantidad*priceUsd };
+    });
+    var total = priced.reduce(function(s,p){ return s+p.valorActual; }, 0);
+    priced.sort(function(a,b){ return b.valorActual-a.valorActual; });
+
+    grid.innerHTML = '<h2 class="pf-metrics-label" style="margin-bottom:14px;">Composición de la cartera</h2>'
+      + '<table class="pf-positions-table mf-comp-table"><thead><tr><th>Activo</th><th>Sector</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Desde compra</th><th style="text-align:right;">% cartera</th></tr></thead><tbody>'
+      + priced.map(function(p){
+          var pct = total>0 ? (p.valorActual/total*100) : 0;
+          var varStr = p.varPct==null ? '—' : (p.varPct>=0?'+':'−') + Math.abs(p.varPct).toFixed(1) + '%';
+          var varColor = p.varPct==null ? 'rgba(255,255,255,.4)' : (p.varPct>=0 ? 'var(--green)' : 'var(--red)');
+          return '<tr><td><b>'+ pfEsc(p.ticker) +'</b></td>'
+            + '<td><span class="mf-sector-tag">'+ pfEsc(p.sector) +'</span></td>'
+            + '<td class="num">US$'+ p.priceUsd.toFixed(2) +'</td>'
+            + '<td class="num" style="color:'+ varColor +';font-weight:600;">'+ varStr +'</td>'
+            + '<td class="num">'+ pct.toFixed(1) +'%</td></tr>';
+        }).join('')
+      + '</tbody></table>';
+
+    if(!(window._miIsMember && window._miIsMember())){
+      if(window._miApplyPaywall) window._miApplyPaywall('#mfCompGrid', '#mfCompWrapper');
+    }
+  }
+
+  async function mfRenderPerformance(){
+    var summary = document.getElementById('mfSummary');
+    if(!summary) return;
+    var m = await mfBuildPerformanceSeries();
+    if(!m || m.dataUnavailable){
+      summary.textContent = 'No se pudo traer suficiente historial todavía.';
+      return;
+    }
+    var sign1 = m.totalReturn>=0?'+':'−', sign2 = m.benchTotalReturn>=0?'+':'−';
+    summary.innerHTML = '<span>Mi cartera: <b style="color:'+(m.totalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign1 + Math.abs(m.totalReturn).toFixed(1) +'%</b></span>'
+      + '<span>S&amp;P 500: <b style="color:'+(m.benchTotalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign2 + Math.abs(m.benchTotalReturn).toFixed(1) +'%</b></span>'
+      + '<span>Últimos '+ m.daysUsed +' días hábiles</span>';
+    mfRenderChart(m);
+    mfRenderComposition(m);
+  }
 
   window._pfRenderPositions = pfRenderPositions;
   window._pfRenderMetrics = pfRenderMetrics;
