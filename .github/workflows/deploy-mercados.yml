@@ -1,0 +1,19 @@
+name: Deploy Mercados Worker
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['workers/mercados/**']
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy Mercados Worker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --config workers/mercados/wrangler.toml
