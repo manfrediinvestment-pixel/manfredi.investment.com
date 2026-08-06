@@ -178,7 +178,7 @@ async function crearPreferencia(request, env) {
         JSON.stringify({
                 init_point: mpData.init_point,
                 precio_pesos: precioPesos,
-                cotizacion_blue: Math.round(precioPesos / 10),
+                cotizacion_blue: Math.round(precioPesos / 15),
         }),
     { status: 200, headers: CORS_HEADERS }
       );
