@@ -19,7 +19,11 @@ const MAX_TOOL_ITERATIONS = 4;
 // profundo; si en el loop se termina llamando alguna tool, el resto de la
 // conversacion (la sintesis con datos reales) escala a Sonnet porque ahi es
 // donde mas importa la calidad de razonamiento.
-const DEEP_ANALYSIS_RE = /(anali[sz]|dcf|valuaci[oó]n|comparables|m[uú]ltiplos|tesis de inversi[oó]n|sector(es)?|sobrepondera|construime|arm[aá] (una |un )?cartera|portafolio|earnings|balance|resultados trimestrales|riesgos clave|red flags?|mercado argentino|dolar (blue|mep|ccl)|dólar (blue|mep|ccl)|riesgo pa[ií]s|inflaci[oó]n|tasas de inter[eé]s)/i;
+// Nota: preguntas puntuales de un solo dato (precio de un ticker, cotizacion
+// del dolar hoy, titulares del dia) quedan afuera a proposito -- son lookups
+// que get_market_data/get_news resuelven solos, no necesitan la sintesis de
+// Sonnet. Los botones de sugerencia del chat estan diseñados para caer aca.
+const DEEP_ANALYSIS_RE = /(anali[sz]|dcf|valuaci[oó]n|comparables|m[uú]ltiplos|tesis de inversi[oó]n|sector(es)?|sobrepondera|construime|arm[aá] (una |un )?cartera|portafolio|earnings|balance|resultados trimestrales|riesgos clave|red flags?|mercado argentino)/i;
 
 function chooseInitialModel(lastUserText) {
     if (!lastUserText) return MODEL_HAIKU;
