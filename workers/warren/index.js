@@ -94,9 +94,12 @@ async function toolGetMarketData(input) {
     let data;
     try {
         const res = await fetch(MERCADOS_BASE + '/mercados', { signal: AbortSignal.timeout(9000) });
+        console.error('[warren] toolGetMarketData status:', res.status);
         if (!res.ok) return { error: 'No se pudo obtener datos de mercado en este momento.' };
         data = await res.json();
+        console.error('[warren] toolGetMarketData categorias keys:', Object.keys((data && data.categorias) || {}));
     } catch (e) {
+        console.error('[warren] toolGetMarketData fetch error:', e && e.name, e && e.message, e && e.stack);
         return { error: 'No se pudo conectar con la fuente de datos de mercado.' };
     }
     const matches = [];
@@ -231,12 +234,19 @@ export default {
             const { messages, systemPrompt, email, enableTools } = body;
             const isAdmin = email && ADMIN_EMAILS.includes(email.toLowerCase());
 
-            // Verificar consultas disponibles (admin no tiene limite)
+            // Verificar consultas disponibles (admin no tiene limite). Si el
+            // worker de membresias esta caido/no responde, dejamos pasar la
+            // consulta en vez de romper toda la respuesta de Warren por eso --
+            // el peor caso es no descontar una consulta, no un error generico.
             if (email && !isAdmin) {
-                const consultasRes = await fetch(`${MEMBERSHIPS_BASE}/consultas?email=${encodeURIComponent(email)}`);
-                const consultasData = await consultasRes.json();
-                if (consultasData.consultas === 0) {
-                    return new Response(JSON.stringify({ response: 'Agotaste tus 100 consultas del mes. Se renuevan el 1 del proximo mes.', limitAlcanzado: true }), { headers: JSON_HEADERS });
+                try {
+                    const consultasRes = await fetch(`${MEMBERSHIPS_BASE}/consultas?email=${encodeURIComponent(email)}`);
+                    const consultasData = await consultasRes.json();
+                    if (consultasData.consultas === 0) {
+                        return new Response(JSON.stringify({ response: 'Agotaste tus 100 consultas del mes. Se renuevan el 1 del proximo mes.', limitAlcanzado: true }), { headers: JSON_HEADERS });
+                    }
+                } catch (e) {
+                    console.error('[warren] chequeo de consultas fallo, dejamos pasar:', e && e.message);
                 }
             }
 
