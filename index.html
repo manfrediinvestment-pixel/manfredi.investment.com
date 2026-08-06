@@ -8529,10 +8529,13 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
 
 ─── GROUNDING: REGLA MÁS IMPORTANTE DE ESTE PROMPT ───
 Tenés herramientas (tools) para traer datos reales: get_market_data (precio, variación, ROE/P-E/dividend yield de tickers trackeados por Manfredi Investment), get_price_history (histórico de cierres), get_news (titulares de mercado AR/USA) y web_search (respaldo para lo que las anteriores no cubran).
-- Antes de afirmar CUALQUIER cifra concreta (precio, variación %, P/E, ROE, ingresos, fecha de un hecho reciente), llamá primero a la tool correspondiente. Nunca completes un número de memoria ni lo estimes "a ojo".
+- Antes de afirmar CUALQUIER cifra o fecha concreta (precio, variación %, P/E, ROE, ingresos, fecha de earnings, fecha de dividendo, vencimiento de un bono, decisión de un banco central, cualquier hecho con fecha específica), llamá primero a la tool correspondiente. Nunca completes un dato de memoria ni lo estimes "a ojo", ni siquiera si te parece un dato obvio o fácil de recordar (ej. "las empresas suelen reportar el mismo mes todos los años").
+- Tu conocimiento entrenado tiene fecha de corte y puede estar desactualizado, incluso para cosas que te resulten familiares. La falsa confianza es peor que decir "no lo sé". Si en algún momento estás por escribir una fecha o cifra específica sin haber llamado a una tool en este turno, ese es exactamente el momento de parar y llamarla — no hay excepción por "esto ya lo sé".
+- Fechas de eventos futuros o recientes (próximo earnings, próxima reunión de la Fed, vencimiento de un bono, ex-dividend date) SIEMPRE se verifican con get_news o web_search antes de mencionarlas. Nunca las calcules por patrón histórico ("suele ser en tal mes").
 - Si get_market_data no encuentra el ticker, probá web_search antes de responder. Si ni así conseguís el dato, decilo explícitamente ("no tengo una fuente confirmada para esto") en vez de inventar un valor.
 - Cuando cites un dato traído por una tool, es aceptable mencionar de dónde sale (ej. "según datos en vivo de Manfredi Investment" o "según una búsqueda reciente"), no hace falta citar URLs.
 - Esta regla no tiene excepciones por brevedad: preferí una respuesta más corta con menos cifras confirmadas antes que una más completa con cifras sin confirmar.
+- FORMATO DE TABLAS: cada fila va SIEMPRE en una sola línea de texto, sin saltos de línea dentro de una celda (ej. "| 2024 | $45.043B | +32% |", nunca "| 2024 | \n$45.043B\n | \n+32%\n |"). Un salto de línea en medio de una celda rompe el render de la tabla en el chat.
 
 DETECCIÓN AUTOMÁTICA: Detectás qué pide el usuario y respondés con el formato correcto.
 
@@ -8676,7 +8679,44 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
     msgs.scrollTop = msgs.scrollHeight;
 }
 
+  // Claude a veces mete saltos de linea DENTRO de una celda de tabla
+  // (ej. "| \n$45.043B\n |" en vez de "| $45.043B |"), lo que rompe el
+  // parser de abajo (exige cada fila en una sola linea) y la tabla queda
+  // como texto crudo con pipes sueltos. No alcanza con borrar cualquier
+  // salto de linea pegado a un pipe -- eso tambien borraria los saltos que
+  // SI separan una fila real de la siguiente. Se cuenta cuantos pipes tiene
+  // la fila separadora ("|---|---|...|", siempre bien formada) para saber
+  // cuantos pipes debería tener una fila completa, y se van juntando lineas
+  // hasta llegar a esa cantidad -- recien ahi es un salto de linea real.
+  function normalizeTableNewlines(text) {
+    var lines = text.split('\n');
+    var isSepLine = function(l) { return /^\s*\|?[\s\-:|]+\|?\s*$/.test(l) && l.indexOf('-') !== -1 && l.indexOf('|') !== -1; };
+    var countPipes = function(l) { return (l.match(/\|/g) || []).length; };
+    var out = [];
+    for (var i = 0; i < lines.length; i++) {
+      if (!isSepLine(lines[i])) { out.push(lines[i]); continue; }
+      var expectedPipes = countPipes(lines[i]);
+      out.push(lines[i]);
+      i++;
+      var buffer = '', bufferPipes = 0;
+      while (i < lines.length) {
+        var line = lines[i];
+        if (!line.trim()) { if (buffer) { out.push(buffer); buffer = ''; bufferPipes = 0; } out.push(line); i++; continue; }
+        buffer = buffer ? (buffer + ' ' + line.trim()) : line;
+        bufferPipes += countPipes(line);
+        i++;
+        if (bufferPipes >= expectedPipes) { out.push(buffer); buffer = ''; bufferPipes = 0; }
+        if (i < lines.length && countPipes(lines[i]) === 0 && !lines[i].trim()) break;
+      }
+      if (buffer) out.push(buffer);
+      i--;
+    }
+    return out.join('\n');
+  }
+
   function formatWarrenText(text) {
+    text = normalizeTableNewlines(text);
+
     var tableRe = /((?:(?:\|[^\n]*\|)\n?){2,})/gm;
     text = text.replace(tableRe, function(match) {
       var rows = match.trim().split('\n').filter(function(r) { return r.trim(); });
@@ -8689,9 +8729,9 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
         if (isSep(row)) { headerDone = true; return; }
         var cells = row.trim().replace(/^\||\|$/g, '').split('|');
         if (!headerDone) {
-          html += '<thead><tr>' + cells.map(function(c) { return '<th style="background:var(--primary);color:white;padding:8px 12px;text-align:left;font-weight:600;font-size:11px;white-space:nowrap">' + c.trim() + '</th>'; }).join('') + '</tr></thead><tbody>';
+          html += '<thead><tr>' + cells.map(function(c) { return '<th style="background:rgba(242,201,76,.12);color:var(--gold);padding:8px 12px;text-align:left;font-weight:700;font-size:11px;white-space:nowrap;border-bottom:1px solid rgba(242,201,76,.3)">' + c.trim() + '</th>'; }).join('') + '</tr></thead><tbody>';
         } else {
-          html += '<tr>' + cells.map(function(c) { return '<td style="padding:7px 12px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:top">' + c.trim() + '</td>'; }).join('') + '</tr>';
+          html += '<tr>' + cells.map(function(c) { return '<td style="padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.08);font-size:12px;vertical-align:top;color:var(--white)">' + c.trim() + '</td>'; }).join('') + '</tr>';
         }
       });
       html += '</tbody></table></div>';
@@ -8742,7 +8782,11 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
     canvas.style.cssText = 'width:100%;height:400px;display:block';
     wrapper.appendChild(canvas);
 
-    var colors = ['#0A0F1E','#B8943F','#10B981','#EF4444','#6366F1','#F59E0B','#06B6D4','#8B5CF6'];
+    // El primer color NO puede ser el mismo que el fondo del panel
+    // (--primary, #0A0F1E) -- con un solo dataset (el caso mas comun, ej.
+    // ingresos por anio) las barras quedaban invisibles, mismo color que el
+    // fondo. Se arranca con el dorado de la marca en vez de negro.
+    var colors = ['#F2C94C','#B8943F','#10B981','#EF4444','#6366F1','#F59E0B','#06B6D4','#8B5CF6'];
 
     try {
       var chartConfig = {
