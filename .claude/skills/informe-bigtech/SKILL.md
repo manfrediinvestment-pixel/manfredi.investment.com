@@ -129,6 +129,53 @@ gráficos). Estructura obligatoria (14 secciones):
   nunca dejando reversión o consenso afuera del promedio sin pasar primero por la regla de "ventana
   limpia" de más abajo.
 
+**Regla no-negociable: el margen de OCF del DCF tiene que estar anclado en el OCF real reportado, no
+en una analogía al margen operativo (regla agregada 05-ago-2026, tras un caso real en INTC donde el
+DCF Bear daba $0 y el Base $13 porque el margen de OCF Año 1 se había estimado "a ojo" por parecido
+al margen operativo GAAP/no-GAAP, sin cruzarlo contra el estado de flujo de efectivo real — al
+recalcularlo contra el OCF TTM real, el Bear subió a $1.46 y el Base a $23.91, un cambio de +75% en
+el Base):**
+- Antes de fijar el margen de OCF (año 1 → año 5) de cada escenario, calculá el margen de OCF real de
+  los últimos 4-8 trimestres reportados (`NetCashProvidedByUsedInOperatingActivities` en XBRL —
+  ojo, en los 10-Q suele venir acumulado YTD, no trimestral: hay que restar el trimestre anterior
+  para aislar el standalone, igual que con revenue/net income) y usalo como ancla del caso Base del
+  año 1, no una cifra derivada del margen operativo por analogía. El margen de OCF y el margen
+  operativo son cosas distintas — el OCF suma de vuelta partidas no-caja (D&A, compensación en
+  acciones, y en casos atípicos ganancias/pérdidas de revaluación no-caja) que pueden hacer que el
+  OCF real esté muy por encima (o, en compañías con mucho capital de trabajo negativo, por debajo) de
+  lo que el margen operativo sugeriría a simple vista.
+- Si el OCF real de los últimos trimestres es volátil (común en compañías con partidas no-caja
+  grandes, ganancias/pérdidas puntuales, o negocios cíclicos), no promedies sin más: identificá si
+  algún trimestre está inflado o deprimido por una partida específica no recurrente y decilo
+  explícitamente en el texto, en vez de dejar que ese ruido se cuele sin comentario en el supuesto
+  del año 1.
+- **Chequeo de sesgo obligatorio antes de dar el DCF por terminado:** si el escenario Bear da un fair
+  value de $0 o negativo, o si el Base queda a más de ~60-70% del precio de mercado, pará y
+  preguntate explícitamente: ¿este resultado viene de datos reales (deuda, dilución, capex guiado por
+  la propia compañía) o de un supuesto que estimé por parecido/intuición y nunca crucé contra un dato
+  duro? Revisá en este orden: (1) margen de OCF del año 1 vs. OCF real reciente (la causa más común
+  del sesgo, ver arriba), (2) capex del año 1 vs. guía real de la compañía — un capex "congelado" en
+  el nivel más alto guiado incluso en el escenario Bear, cuando en la realidad la propia compañía
+  ajustaría el capex si la demanda decepcionara, es otra fuente común de sesgo a la baja, (3) el
+  ingreso base (año 0) — ¿es un dato real o consenso, o una extrapolación propia sin anclar? Un DCF
+  que da un resultado extremo después de este chequeo (y sigue dando extremo) es un hallazgo legítimo
+  que hay que reportar con confianza, no suavizar — pero solo después de haber descartado que el
+  extremo viene de un supuesto no verificado, no una característica real del negocio. No se trata de
+  ajustar el número para que "se vea mejor": se trata de no dejar pasar un error de calibración
+  disfrazado de rigor.
+- **Cada supuesto del escenario Bear que se desvíe del nivel ya alcanzado necesita una razón
+  documentada en el Registro de Riesgos, no solo "es el caso pesimista" (regla agregada 05-ago-2026,
+  tras un segundo ajuste en el mismo informe de INTC):** un Bear que hace *retroceder* un margen por
+  debajo del nivel que la compañía ya demostró, sin una causa específica citada (competencia
+  concreta, pérdida de un cliente concreto, etc.), es un supuesto sin anclaje — el Bear defendible
+  por defecto es que la mejora *se estanca* en el nivel ya alcanzado, no que retrocede sin motivo. Si
+  el negocio tiene mucha deuda neta relativa al FCF proyectado (equity apalancada), avisá
+  explícitamente en el texto —no solo en una tabla— que la dispersión entre Bear y Bull va a ser
+  mucho más amplia que en una cobertura con balance sano, y por qué (el equity es un residuo chico
+  después de pagar la deuda, así que cualquier diferencia operativa razonable entre escenarios se
+  amplifica en términos porcentuales) — un lector que ve un rango de 15x entre Bear y Bull sin esa
+  explicación asume que el modelo está roto, no que está siendo honesto sobre el apalancamiento.
+
 **Compañías con negocio maduro + apuesta de plataforma/opcionalidad (autonomía, IA, robótica,
 plataformas todavía sin ingresos materiales):** el DCF/comparables/reversión estándar valúan
 *solo* el negocio que ya factura — son retrospectivos y estáticos por diseño, y en compañías de este
@@ -245,6 +292,17 @@ portada y en el bloque `.disclosure` del pie del documento.
 final de `informes/aapl.html`) — reusá `drawVBars`, `drawHBars`, `drawLines`, `drawRangeBars` (para
 el football field) en vez de introducir una librería nueva.
 
+**Bug conocido de `drawHBars` con labels largos (reaparecido en INTC, 05-ago-2026, después de ya
+haberse arreglado en AVGO el 04-ago-2026):** `padL` está hardcodeado en 128px en la definición de la
+función (`var padL = opts.padL || 128, ...` — confirmá que la función tenga ese `|| 128`, no solo
+`var padL = 128`, porque si a alguien se le escapa el `opts.padL ||` al copiar la función de un
+informe viejo, pasar `padL:190` en la llamada no hace nada). Cualquier `drawHBars` con labels de más
+de ~20 caracteres (nombres de segmentos, "EPS no-GAAP consenso pre-reporte", etc.) corta el texto
+contra el borde del canvas si no se pasa `padL` explícito más grande en esa llamada puntual. Antes de
+dar un informe por terminado, abrí cada chart con `drawHBars` en el navegador (no alcanza con mirar
+el código) y confirmá visualmente que ningún label quedó cortado — es un bug que no tira error en
+consola, solo se ve mal.
+
 ## Cómo conectar el ticker al sitio
 
 Una vez que `informes/<ticker>.html` está listo, hay que enlazarlo desde **dos** lugares de
@@ -286,4 +344,12 @@ con: *"hacé el informe institucional de [TICKER], nivel AAPL"*.
    el ticker al sitio"), ambos linkeando a `informes/<ticker>.html`.
 4. Probá en el navegador: abrí `#inversiones`, click en "Ver análisis" del ticker nuevo — debe abrir
    el informe completo en pestaña nueva con los gráficos Canvas renderizando — y repetí el chequeo
-   desde el botón del widget del hero.
+   desde el botón del widget del hero. Recorré **cada** `drawHBars` del informe (no solo el football
+   field) y confirmá visualmente que ningún label quedó cortado contra el borde del canvas (ver "Bug
+   conocido de drawHBars" más arriba) — este bug no tira error de consola, solo se detecta mirando.
+5. Antes de dar la Sección 13 por terminada, corré el chequeo de sesgo del DCF (ver "Regla
+   no-negociable: el margen de OCF..." más arriba) — recalculá cada número derivado (promedios de
+   footnotes, variaciones % interanuales TTM-vs-TTM, el blend final) con un script en vez de a mano,
+   y si el Bear da $0/negativo o el Base queda a más de ~60-70% del mercado, revisá primero si el
+   margen de OCF y el capex del año 1 están anclados en datos reales antes de aceptar el resultado
+   como hallazgo genuino.
