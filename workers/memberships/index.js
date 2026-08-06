@@ -45,14 +45,14 @@ export default {
                 let consultas;
                 if (mesGuardado !== mesActual) {
                     // Reset automático de mes
-                    consultas = 50;
-                    await env.MEMBERS.put(key, '50');
+                    consultas = 100;
+                    await env.MEMBERS.put(key, '100');
                     await env.MEMBERS.put(resetKey, mesActual);
                 } else {
                     const val = await env.MEMBERS.get(key);
-                    consultas = val !== null ? parseInt(val) : 50;
+                    consultas = val !== null ? parseInt(val) : 100;
                     if (val === null) {
-                        await env.MEMBERS.put(key, '50');
+                        await env.MEMBERS.put(key, '100');
                         await env.MEMBERS.put(resetKey, mesActual);
                     }
                 }
@@ -68,7 +68,7 @@ export default {
                 }
                 const key = email + ':consultas';
                 const val = await env.MEMBERS.get(key);
-                const consultas = val !== null ? parseInt(val) : 50;
+                const consultas = val !== null ? parseInt(val) : 100;
                 if (consultas <= 0) {
                     return new Response(JSON.stringify({ error: 'No quedan consultas disponibles', consultas: 0 }), { status: 429, headers: CORS_HEADERS });
                 }
@@ -111,8 +111,8 @@ async function crearPreferencia(request, env) {
           if (!dolarResp.ok) throw new Error('Error al consultar DolarAPI');
           const dolarData = await dolarResp.json();
           const cotizacionVenta = dolarData.venta;
-          // $10 USD al tipo de cambio blue
-      precioPesos = Math.round(10 * cotizacionVenta);
+          // $15 USD al tipo de cambio blue
+      precioPesos = Math.round(15 * cotizacionVenta);
     } catch (err) {
           console.error('DolarAPI error:', err);
           return new Response(
