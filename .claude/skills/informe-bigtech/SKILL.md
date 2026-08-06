@@ -163,6 +163,18 @@ el Base):**
   extremo viene de un supuesto no verificado, no una característica real del negocio. No se trata de
   ajustar el número para que "se vea mejor": se trata de no dejar pasar un error de calibración
   disfrazado de rigor.
+- **Cada supuesto del escenario Bear que se desvíe del nivel ya alcanzado necesita una razón
+  documentada en el Registro de Riesgos, no solo "es el caso pesimista" (regla agregada 05-ago-2026,
+  tras un segundo ajuste en el mismo informe de INTC):** un Bear que hace *retroceder* un margen por
+  debajo del nivel que la compañía ya demostró, sin una causa específica citada (competencia
+  concreta, pérdida de un cliente concreto, etc.), es un supuesto sin anclaje — el Bear defendible
+  por defecto es que la mejora *se estanca* en el nivel ya alcanzado, no que retrocede sin motivo. Si
+  el negocio tiene mucha deuda neta relativa al FCF proyectado (equity apalancada), avisá
+  explícitamente en el texto —no solo en una tabla— que la dispersión entre Bear y Bull va a ser
+  mucho más amplia que en una cobertura con balance sano, y por qué (el equity es un residuo chico
+  después de pagar la deuda, así que cualquier diferencia operativa razonable entre escenarios se
+  amplifica en términos porcentuales) — un lector que ve un rango de 15x entre Bear y Bull sin esa
+  explicación asume que el modelo está roto, no que está siendo honesto sobre el apalancamiento.
 
 **Compañías con negocio maduro + apuesta de plataforma/opcionalidad (autonomía, IA, robótica,
 plataformas todavía sin ingresos materiales):** el DCF/comparables/reversión estándar valúan
