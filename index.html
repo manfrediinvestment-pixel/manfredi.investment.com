@@ -291,23 +291,6 @@
       margin: 0 auto;
       position: relative;
     }
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 28px;
-    }
-    .hero-eyebrow-line {
-      width: 32px;
-      height: 1px;
-      background: var(--gold);
-      opacity: .6;
-    }
     .hero h1 {
       font-family: 'DM Serif Display', Georgia, serif;
       font-size: clamp(38px, 5.5vw, 64px);
@@ -329,37 +312,6 @@
       max-width: 480px;
       margin-bottom: 44px;
       line-height: 1.65;
-    }
-    .hero-sub--lead {
-      font-size: clamp(19px, 2vw, 23px);
-      color: rgba(255,255,255,.78);
-      max-width: 520px;
-      line-height: 1.5;
-      font-weight: 400;
-      margin-bottom: 32px;
-    }
-    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-    .hero-trust-row {
-      display: flex;
-      gap: 32px;
-      flex-wrap: wrap;
-      margin-top: 40px;
-      padding-top: 24px;
-      border-top: 1px solid rgba(255,255,255,.08);
-    }
-    .hero-trust-item { display: flex; flex-direction: column; gap: 3px; }
-    .hero-trust-item strong {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--white);
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -.01em;
-    }
-    .hero-trust-item span {
-      font-size: 11px;
-      color: rgba(255,255,255,.42);
-      letter-spacing: .02em;
     }
     .btn-primary {
       background: var(--white);
@@ -1903,19 +1855,26 @@
       max-width: 1320px;
       margin: 0 auto;
       position: relative;
-      display: grid;
-      grid-template-columns: 1fr 700px;
-      gap: 40px;
-      align-items: center;
-    }
-    .hero-v2-left {}
-    .hero-v2-right {
       display: flex;
+      align-items: stretch;
+      gap: 32px;
       flex-wrap: wrap;
-      align-items: flex-start;
-      justify-content: flex-end;
-      gap: 16px;
     }
+    .hero-v2-left {
+      flex: 0 1 380px;
+      max-width: 400px;
+      display: flex;
+    }
+    .hero-v2-right {
+      flex: 1 1 600px;
+      display: flex;
+    }
+    .hero-v2-left .spotlight-card, .hero-v2-right .spotlight-card {
+      max-width: none;
+      width: 100%;
+    }
+    .hero-mf-summary { font-size: 12px; gap: 16px; margin-bottom: 12px; }
+    .hero-mf-chart-wrap { height: 260px; }
     .spotlight-card {
       background: rgba(255,255,255,.04);
       border: 1px solid rgba(255,255,255,.10);
@@ -2142,12 +2101,10 @@
       .hero-bottom-row > :last-child { grid-column: 1 / -1; }
     }
     @media(max-width:900px){
-      .hero-v2-inner { grid-template-columns: 1fr; }
-      .hero-v2-right { justify-content: center; }
+      .hero-v2-left, .hero-v2-right { max-width: 100%; }
       .spotlight-card { max-width: 100%; }
       .hero-cal-card { max-width: 100%; }
       .hero-bottom-row { grid-template-columns: 1fr; max-width: 100%; }
-      .hero-trust-row { gap: 24px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .spot-feature-value.flash-up, .spot-feature-value.flash-down { animation: none; }
@@ -2909,22 +2866,6 @@
   <section class="hero-v2" data-tab="inicio">
     <div class="hero-v2-inner">
       <div class="hero-v2-left">
-        <div class="hero-eyebrow">
-          <span class="hero-eyebrow-line"></span>
-          Argentina &amp; Estados Unidos &middot; An&aacute;lisis financiero institucional
-        </div>
-        <p class="hero-sub hero-sub--lead">An&aacute;lisis semanales profundos, reportes diarios automatizados y educaci&oacute;n financiera gratuita. Todo en un solo lugar.</p>
-        <div class="hero-actions">
-          <button class="btn-primary" id="heroCta" onclick="location.hash='#informes'">Ver &uacute;ltimo Informe</button>
-          <button class="btn-outline" onclick="location.hash='#university'">Explorar University &rarr;</button>
-        </div>
-        <div class="hero-trust-row">
-          <div class="hero-trust-item"><strong>13</strong><span>informes institucionales</span></div>
-          <div class="hero-trust-item"><strong>60+</strong><span>activos en vivo</span></div>
-          <div class="hero-trust-item"><strong>24/7</strong><span>Warren, asesor IA</span></div>
-        </div>
-      </div>
-      <div class="hero-v2-right">
         <div class="spotlight-card">
           <div class="spotlight-head">
             <span>Mercados ahora</span>
@@ -2981,6 +2922,17 @@
             </div>
           </div>
           <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#mercados'">Ver todos los mercados &rarr;</button>
+        </div>
+      </div>
+      <div class="hero-v2-right">
+        <div class="spotlight-card hero-mf-card">
+          <div class="spotlight-head">
+            <span>Portfolio Manfredi vs. S&amp;P 500</span>
+            <span class="s-live">EN VIVO</span>
+          </div>
+          <div class="mf-summary hero-mf-summary" id="heroMfSummary">Calculando con datos hist&oacute;ricos&hellip;</div>
+          <div class="mf-chart-wrap hero-mf-chart-wrap"><canvas id="heroMfChartCanvas"></canvas></div>
+          <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#portfolio'">Ver mi Portfolio &rarr;</button>
         </div>
       </div>
     </div>
@@ -4986,13 +4938,14 @@
     };
   }
 
-  var mfChart = null;
-  function mfRenderChart(m){
-    var canvas = document.getElementById('mfChartCanvas');
+  var mfCharts = {};
+  function mfRenderChart(m, canvasId){
+    canvasId = canvasId || 'mfChartCanvas';
+    var canvas = document.getElementById(canvasId);
     if(!canvas || typeof Chart === 'undefined') return;
     var labels = m.portfolioPct.map(function(_,i){ return i; });
-    if(mfChart) mfChart.destroy();
-    mfChart = new Chart(canvas, {
+    if(mfCharts[canvasId]) mfCharts[canvasId].destroy();
+    mfCharts[canvasId] = new Chart(canvas, {
       type: 'line',
       data: { labels: labels, datasets: [
         { label: 'Mi cartera', data: m.portfolioPct, borderColor: '#F2C94C', backgroundColor: 'rgba(242,201,76,.08)', borderWidth: 2, pointRadius: 0, tension: .15, fill: true },
@@ -5050,8 +5003,10 @@
     }
   }
 
-  async function mfRenderPerformance(){
-    var summary = document.getElementById('mfSummary');
+  async function mfRenderPerformance(summaryId, canvasId){
+    summaryId = summaryId || 'mfSummary';
+    canvasId = canvasId || 'mfChartCanvas';
+    var summary = document.getElementById(summaryId);
     if(!summary) return;
     var m = await mfBuildPerformanceSeries();
     if(!m || m.dataUnavailable){
@@ -5062,7 +5017,7 @@
     summary.innerHTML = '<span>Mi cartera: <b style="color:'+(m.totalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign1 + Math.abs(m.totalReturn).toFixed(1) +'%</b></span>'
       + '<span>S&amp;P 500: <b style="color:'+(m.benchTotalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign2 + Math.abs(m.benchTotalReturn).toFixed(1) +'%</b></span>'
       + '<span>Últimos '+ m.daysUsed +' días hábiles</span>';
-    mfRenderChart(m);
+    mfRenderChart(m, canvasId);
     mfRenderComposition(m);
   }
 
@@ -5078,6 +5033,10 @@
     window.addEventListener('mi:quiz-completed', function(){ pfRenderQuizStatus(); pfRenderMetrics(); });
     pfRenderQuizStatus();
     pfRenderPositions();
+    if(!window._heroMfRendered && document.getElementById('heroMfChartCanvas')){
+      window._heroMfRendered = true;
+      mfRenderPerformance('heroMfSummary', 'heroMfChartCanvas');
+    }
   }
   if(document.readyState !== 'loading'){ pfInit(); } else { document.addEventListener('DOMContentLoaded', pfInit); }
   </script>
