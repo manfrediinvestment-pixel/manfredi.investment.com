@@ -8,5 +8,25 @@ compatibility_date = "2026-04-19"
 # momento se quiere renombrar, hay que volver a correr `wrangler secret put`
 # para el nuevo nombre.
 
+# Service bindings a los otros Workers de la cuenta: NO usar fetch a sus URLs
+# publicas (*.nachito2502.workers.dev) -- Cloudflare lo bloquea con error 1042
+# (Worker-a-Worker de la misma cuenta via *.workers.dev publico), tanto en
+# produccion como en wrangler dev --remote. Confirmado con wrangler tail: el
+# chequeo/resta de cupo y get_market_data fallaban siempre, en silencio (los
+# try/catch no logueaban nada), asi que Warren nunca tuvo datos de mercado
+# reales en produccion ni restaba consultas a nadie. Los bindings evitan la
+# red publica por completo.
+[[services]]
+binding = "MEMBERSHIPS"
+service = "manfredi-memberships"
+
+[[services]]
+binding = "MERCADOS"
+service = "manfredi-mercados"
+
+[[services]]
+binding = "NOTICIAS"
+service = "manfredi-noticias"
+
 # Secrets (nunca en este archivo, configurar via wrangler):
 #   wrangler secret put ANTHROPIC_API_KEY --config workers/warren/wrangler.toml
