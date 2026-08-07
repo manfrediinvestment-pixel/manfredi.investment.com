@@ -12,7 +12,7 @@ export default {
 
           // Ruta para marcar usuario como miembro
           if (new URL(request.url).pathname === '/marcar-miembro') {
-                      const { email } = await request.json();
+                      const { email, accion, monto } = await request.json();
                       if (!email) return new Response(JSON.stringify({ error: 'Email requerido' }), { status: 400, headers });
 
                     // Reusar lÃ³gica de autenticaciÃ³n Google
@@ -60,6 +60,7 @@ export default {
                                     }
                       }
 
+                    if (accion !== 'cancelacion') {
                     // Buscar fila por email
                     const searchRes = await fetch(
                                   `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Usuarios!A:B`,
@@ -135,6 +136,11 @@ export default {
                                           })
                           }
                                 );
+                    }
+
+                    // Sección aparte con los que se suscriben a la membresía paga
+                    // (independiente de la hoja Usuarios, que es de altas de cuenta).
+                    await upsertMiembroRow(sheetId, access_token, { email, accion: accion || 'alta', monto });
 
                     return new Response(JSON.stringify({ success: true }), { headers });
           }
@@ -243,3 +249,108 @@ export default {
           }
         }
 };
+
+// ─── Hoja "Miembros": socios de la membresía paga, separada de "Usuarios" ──
+// (que es de altas de cuenta, gratis o no). Se crea sola la primera vez que
+// hace falta. Columnas: Fecha alta | Email | Monto ARS | Última renovación |
+// Vence | Estado.
+
+// ─── Hoja "Miembros": socios de la membresía paga, separada de "Usuarios" ──
+// (que es de altas de cuenta, gratis o no). Se crea sola la primera vez que
+// hace falta. Columnas: Fecha alta | Email | Monto ARS | Última renovación |
+// Vence | Estado.
+async function ensureMiembrosSheet(sheetId, accessToken) {
+    const metaRes = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties`,
+        { headers: { 'Authorization': `Bearer ${accessToken}` } }
+    );
+    const meta = await metaRes.json();
+    console.error('[log-user] sheets meta status:', metaRes.status, 'titles:', (meta.sheets || []).map(s => s.properties && s.properties.title));
+    const existing = (meta.sheets || []).find(s => s.properties && s.properties.title === 'Miembros');
+    if (existing) return existing.properties.sheetId;
+
+    const addRes = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`,
+        {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requests: [{ addSheet: { properties: { title: 'Miembros' } } }] })
+        }
+    );
+    const addData = await addRes.json();
+    console.error('[log-user] addSheet status:', addRes.status, 'body:', JSON.stringify(addData));
+    const newSheetId = addData.replies[0].addSheet.properties.sheetId;
+
+    const headerRes = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Miembros!A1:F1?valueInputOption=USER_ENTERED`,
+        {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ values: [['Fecha alta', 'Email', 'Monto ARS', 'Última renovación', 'Vence', 'Estado']] })
+        }
+    );
+    console.error('[log-user] header write status:', headerRes.status);
+
+    return newSheetId;
+}
+
+async function upsertMiembroRow(sheetId, accessToken, { email, accion, monto }) {
+    console.error('[log-user] upsertMiembroRow', email, accion, monto);
+    await ensureMiembrosSheet(sheetId, accessToken);
+    const fechaHoy = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+    const vence = new Date(Date.now() + 2678400000).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+    const montoStr = monto != null ? String(monto) : '';
+
+    const searchRes = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Miembros!A:F`,
+        { headers: { 'Authorization': `Bearer ${accessToken}` } }
+    );
+    const searchData = await searchRes.json();
+    const rows = searchData.values || [];
+    let rowIndex = -1;
+    for (let i = 1; i < rows.length; i++) {
+        if (rows[i][1] && rows[i][1].toLowerCase() === email.toLowerCase()) { rowIndex = i + 1; break; }
+    }
+    console.error('[log-user] Miembros search status:', searchRes.status, 'rowIndex:', rowIndex, 'totalRows:', rows.length);
+
+    if (accion === 'cancelacion') {
+        if (rowIndex === -1) return; // nunca estuvo en la hoja, nada que cancelar
+        const cancelRes = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Miembros!F${rowIndex}?valueInputOption=USER_ENTERED`,
+            {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ values: [['Cancelada']] })
+            }
+        );
+        console.error('[log-user] Miembros cancelacion write status:', cancelRes.status);
+        return;
+    }
+
+    if (rowIndex === -1) {
+        // Alta nueva (o una renovación que por algún motivo no tenía fila -- se
+        // trata igual, con fecha de alta = hoy).
+        const appendRes = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Miembros!A:F:append?valueInputOption=USER_ENTERED`,
+            {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ values: [[fechaHoy, email, montoStr, fechaHoy, vence, 'Activo']] })
+            }
+        );
+        const appendData = await appendRes.json();
+        console.error('[log-user] Miembros append status:', appendRes.status, 'body:', JSON.stringify(appendData));
+        return;
+    }
+
+    // Renovación: se actualiza monto / última renovación / vence / estado,
+    // se deja la fecha de alta original de la columna A sin tocar.
+    await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Miembros!C${rowIndex}:F${rowIndex}?valueInputOption=USER_ENTERED`,
+        {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ values: [[montoStr, fechaHoy, vence, 'Activo']] })
+        }
+    );
+}

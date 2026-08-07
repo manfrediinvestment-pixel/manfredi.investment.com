@@ -9,5 +9,15 @@ SITE_URL = "https://manfredinvestment.com"
 binding = "MEMBERS"
 id = "ba8a1e432a3c4beb9b5f915c5806f24e"
 
+# Service binding a log-user: NO usar fetch a la URL publica
+# (https://log-user.nachito2502.workers.dev) -- Cloudflare lo bloquea con
+# error 1042 (Worker-a-Worker de la misma cuenta via *.workers.dev publico),
+# el mismo bug que ya se encontro y corrigio en workers/warren. Este call
+# probablemente nunca funciono en produccion (fire-and-forget con .catch()
+# que traga el error en silencio, sin log).
+[[services]]
+binding = "LOGUSER"
+service = "log-user"
+
 # Secrets (configurar via: wrangler secret put MP_ACCESS_TOKEN)
 # MP_ACCESS_TOKEN = "..."

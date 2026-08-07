@@ -2429,6 +2429,14 @@
         } catch(e) {
           window._isMiembro = false;
         }
+        try {
+          var subResp = await fetch('https://manfredi-memberships.nachito2502.workers.dev/mi-suscripcion?email=' + encodeURIComponent(user.email));
+          var subData = await subResp.json();
+          window._tieneSuscripcion = subData.tieneSuscripcion === true;
+        } catch(e) {
+          window._tieneSuscripcion = false;
+        }
+        updateNavUser(user);
         applyMemberLock(!window._isMiembro);
         // Si es miembro, remover overlays de paywall que se aplicaron antes del login
         if (window._isMiembro) {
@@ -2605,9 +2613,39 @@
     function updateNavUser(user) {
       const el = document.getElementById('navUserArea');
       if (!el) return;
+      const cancelBtn = window._tieneSuscripcion
+        ? '<button onclick="window.cancelarMiSuscripcion()" style="font-size:11.5px;padding:4px 10px;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:var(--bg-alt);color:var(--text-sec);margin-left:6px">Cancelar membresía</button>'
+        : '';
       el.innerHTML = '<span style="font-size:12.5px;color:var(--text-sec)">' + (user.displayName || user.email) + '</span>'
+        + cancelBtn
         + '<button onclick="window.signOutUser()" style="font-size:11.5px;padding:4px 10px;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:var(--bg-alt);color:var(--text-sec);margin-left:6px">Salir</button>';
     }
+
+    async function cancelarMiSuscripcion() {
+      if (!window._currentUser || !window._currentUser.email) return;
+      if (!confirm('¿Seguro que querés cancelar tu membresía? Vas a perder el acceso a Warren, informes y datos en vivo.')) return;
+      try {
+        var resp = await fetch('https://manfredi-memberships.nachito2502.workers.dev/cancelar-suscripcion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: window._currentUser.email })
+        });
+        var data = await resp.json();
+        if (data.ok) {
+          window._isMiembro = false;
+          window._tieneSuscripcion = false;
+          localStorage.removeItem('mi_member_token');
+          updateNavUser(window._currentUser);
+          applyMemberLock(true);
+          alert('Tu membresía fue cancelada. No se te van a hacer más cobros.');
+        } else {
+          alert('No se pudo cancelar la suscripción: ' + (data.error || 'error desconocido'));
+        }
+      } catch (e) {
+        alert('Error de conexión. Intentá de nuevo.');
+      }
+    }
+    window.cancelarMiSuscripcion = cancelarMiSuscripcion;
 
     // ââ Membership Lock ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
     function applyMemberLock(shouldLock) {
@@ -9224,18 +9262,25 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
 
     async function handlePayment(method) {
   if (method === 'mercadopago') {
+    if (!window._currentUser || !window._currentUser.email) {
+      alert('Necesitás iniciar sesión antes de suscribirte, así podemos asociar la membresía a tu cuenta.');
+      closePaymentModal();
+      window.showLoginOverlay && window.showLoginOverlay();
+      return;
+    }
     var btns = document.querySelectorAll('.pay-btn');
     btns.forEach(function(b){ b.disabled = true; });
     try {
-      var resp = await fetch('https://manfredi-memberships.nachito2502.workers.dev/crear-preferencia', {
+      var resp = await fetch('https://manfredi-memberships.nachito2502.workers.dev/crear-suscripcion', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: window._currentUser.email })
       });
       var data = await resp.json();
       if (data.init_point) {
         window.location.href = data.init_point;
       } else {
-        alert('Error al generar el pago. Intentá de nuevo.');
+        alert('Error al generar la suscripción. Intentá de nuevo.');
         btns.forEach(function(b){ b.disabled = false; });
       }
     } catch (e) {
