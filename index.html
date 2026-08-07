@@ -2051,29 +2051,55 @@
     }
     .hero-cal-card--wide { max-width: none; width: 100%; }
     .hero-inv-card { max-width: none; width: 100%; }
-    .hero-pf-list { display: flex; flex-direction: column; gap: 0; }
+    .hero-pf-card {
+      position: relative;
+      background: linear-gradient(135deg, rgba(242,201,76,.09), rgba(242,201,76,0) 65%), rgba(255,255,255,.04);
+      border: 1px solid rgba(242,201,76,.32);
+      box-shadow: 0 16px 44px -18px rgba(242,201,76,.22);
+      overflow: hidden;
+    }
+    .hero-pf-card::before {
+      content: '';
+      position: absolute;
+      top: -90px; right: -90px;
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, rgba(242,201,76,.16), transparent 70%);
+      pointer-events: none;
+    }
+    .hero-pf-card .spotlight-head span:first-child { color: var(--gold); font-weight: 700; }
+    .hero-pf-list { display: flex; flex-direction: column; gap: 0; position: relative; z-index: 1; }
     .hero-pf-item {
       display: flex;
       align-items: flex-start;
       gap: 12px;
       padding: 13px 0;
-      border-bottom: 1px solid rgba(255,255,255,.05);
+      border-bottom: 1px solid rgba(255,255,255,.06);
     }
     .hero-pf-item:last-child { border-bottom: none; }
-    .hero-pf-ic {
+    .hero-pf-num {
       flex: none;
-      width: 26px; height: 26px;
+      width: 24px; height: 24px;
       margin-top: 1px;
-      border-radius: 7px;
-      background: rgba(242,201,76,.12);
-      border: 1px solid rgba(242,201,76,.3);
-      color: var(--gold);
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--primary);
       display: flex; align-items: center; justify-content: center;
-      font-size: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 700;
     }
     .hero-pf-text { display: flex; flex-direction: column; gap: 2px; }
     .hero-pf-text strong { font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.92); }
     .hero-pf-text span { font-size: 11.5px; color: rgba(255,255,255,.45); line-height: 1.5; }
+    .hero-pf-cta {
+      position: relative; z-index: 1;
+      background: var(--gold) !important;
+      color: var(--primary) !important;
+      border-color: var(--gold) !important;
+      font-weight: 700;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .hero-pf-cta:hover { background: var(--gold-light) !important; transform: translateY(-1px); }
     .hero-inv-list { display: flex; flex-direction: column; gap: 0; }
     .hero-inv-item {
       display: flex;
@@ -2932,7 +2958,7 @@
           </div>
           <div class="mf-summary hero-mf-summary" id="heroMfSummary">Calculando con datos hist&oacute;ricos&hellip;</div>
           <div class="mf-chart-wrap hero-mf-chart-wrap"><canvas id="heroMfChartCanvas"></canvas></div>
-          <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#portfolio'">Ver mi Portfolio &rarr;</button>
+          <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#portfolio'">Ver Portfolio Manfredi Investment &rarr;</button>
         </div>
       </div>
     </div>
@@ -2984,39 +3010,55 @@
             </div>
             <a href="informes/meli.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MELI')">Ver an&aacute;lisis &rarr;</a>
           </div>
+          <div class="hero-inv-item">
+            <div class="hero-inv-item-info">
+              <span class="hero-inv-ticker">NVDA</span>
+              <span class="hero-inv-name">NVIDIA Corporation</span>
+              <span class="pick-sentiment neutral">Neutral</span>
+            </div>
+            <a href="informes/nvda.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'NVDA')">Ver an&aacute;lisis &rarr;</a>
+          </div>
+          <div class="hero-inv-item">
+            <div class="hero-inv-item-info">
+              <span class="hero-inv-ticker">AAPL</span>
+              <span class="hero-inv-name">Apple Inc.</span>
+              <span class="pick-sentiment bear">Bajista</span>
+            </div>
+            <a href="informes/aapl.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AAPL')">Ver an&aacute;lisis &rarr;</a>
+          </div>
         </div>
         <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#inversiones'">Ver secci&oacute;n Inversiones &rarr;</button>
       </div>
 
-      <div class="hero-cal-card hero-inv-card" id="heroPfCard">
+      <div class="hero-cal-card hero-inv-card hero-pf-card" id="heroPfCard">
         <div class="spotlight-head">
-          <span>Portfolio Manfredi</span>
+          <span>Portfolio Manfredi &mdash; arm&aacute; el tuyo en 3 pasos</span>
           <span class="s-live" style="color:var(--gold) !important;">SOCIOS</span>
         </div>
         <div class="hero-pf-list">
           <div class="hero-pf-item">
-            <span class="hero-pf-ic">&#9680;</span>
+            <span class="hero-pf-num">1</span>
             <div class="hero-pf-text">
-              <strong>Arm&aacute; tu cartera</strong>
-              <span>Carg&aacute; tus posiciones y mir&aacute; la composici&oacute;n y m&eacute;tricas en tiempo real</span>
+              <strong>Carg&aacute; tus posiciones</strong>
+              <span>Sum&aacute; tus tickers y cantidades &mdash; toma menos de un minuto</span>
             </div>
           </div>
           <div class="hero-pf-item">
-            <span class="hero-pf-ic">&#8599;</span>
+            <span class="hero-pf-num">2</span>
             <div class="hero-pf-text">
-              <strong>Compar&aacute;la con la nuestra</strong>
-              <span>Rendimiento real de la cartera de Manfredi vs. el S&amp;P 500</span>
+              <strong>Mir&aacute; tus m&eacute;tricas al instante</strong>
+              <span>Composici&oacute;n, beta, volatilidad, drawdown y VaR calculados en vivo</span>
             </div>
           </div>
           <div class="hero-pf-item">
-            <span class="hero-pf-ic">&#9651;</span>
+            <span class="hero-pf-num">3</span>
             <div class="hero-pf-text">
-              <strong>M&eacute;tricas de riesgo</strong>
-              <span>Beta, volatilidad, drawdown y VaR calculados al instante</span>
+              <strong>Compar&aacute; tu resultado</strong>
+              <span>Contra la cartera real de Manfredi y contra el S&amp;P 500</span>
             </div>
           </div>
         </div>
-        <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#portfolio'">Ir a Portfolio &rarr;</button>
+        <button type="button" class="spot-goto-btn hero-pf-cta" onclick="location.hash='#portfolio'">Armar mi Portfolio &rarr;</button>
       </div>
     </div>
   </section>
