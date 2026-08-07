@@ -88,12 +88,12 @@ function buildTools() {
     ];
 }
 
-async function toolGetMarketData(input) {
+async function toolGetMarketData(input, env) {
     const symbol = String((input && input.symbol) || '').toUpperCase().trim();
     if (!symbol) return { error: 'symbol requerido' };
     let data;
     try {
-        const res = await fetch(MERCADOS_BASE + '/mercados', { signal: AbortSignal.timeout(9000) });
+        const res = await env.MERCADOS.fetch(MERCADOS_BASE + '/mercados', { signal: AbortSignal.timeout(9000) });
         console.error('[warren] toolGetMarketData status:', res.status);
         if (!res.ok) return { error: 'No se pudo obtener datos de mercado en este momento.' };
         data = await res.json();
@@ -114,7 +114,7 @@ async function toolGetMarketData(input) {
     }
     let fundamentals = null;
     try {
-        const fRes = await fetch(MERCADOS_BASE + '/fundamentals?symbol=' + encodeURIComponent(symbol), { signal: AbortSignal.timeout(9000) });
+        const fRes = await env.MERCADOS.fetch(MERCADOS_BASE + '/fundamentals?symbol=' + encodeURIComponent(symbol), { signal: AbortSignal.timeout(9000) });
         if (fRes.ok) {
             const fd = await fRes.json();
             if (!fd.error) fundamentals = fd;
@@ -123,13 +123,13 @@ async function toolGetMarketData(input) {
     return { symbol, updated: data.updated, matches, fundamentals };
 }
 
-async function toolGetPriceHistory(input) {
+async function toolGetPriceHistory(input, env) {
     const symbol = String((input && input.symbol) || '').toUpperCase().trim();
     if (!symbol) return { error: 'symbol requerido' };
     const days = Math.min(180, Math.max(5, parseInt((input && input.days), 10) || 30));
     let mdata;
     try {
-        const mres = await fetch(MERCADOS_BASE + '/mercados', { signal: AbortSignal.timeout(9000) });
+        const mres = await env.MERCADOS.fetch(MERCADOS_BASE + '/mercados', { signal: AbortSignal.timeout(9000) });
         if (!mres.ok) return { error: 'No se pudo resolver la categoria del activo.' };
         mdata = await mres.json();
     } catch (e) {
@@ -144,7 +144,7 @@ async function toolGetPriceHistory(input) {
         return { error: `${symbol} no esta trackeado en los datos propios de Manfredi Investment.` };
     }
     try {
-        const hres = await fetch(MERCADOS_BASE + '/historico?category=' + encodeURIComponent(category) + '&symbol=' + encodeURIComponent(symbol) + '&n=' + days, { signal: AbortSignal.timeout(9000) });
+        const hres = await env.MERCADOS.fetch(MERCADOS_BASE + '/historico?category=' + encodeURIComponent(category) + '&symbol=' + encodeURIComponent(symbol) + '&n=' + days, { signal: AbortSignal.timeout(9000) });
         const hdata = await hres.json();
         if (!hres.ok || hdata.error) return { error: hdata.error || 'No se pudo obtener el historico.' };
         return { symbol, category, days, closes: hdata.closes, min: hdata.min, max: hdata.max };
@@ -153,11 +153,11 @@ async function toolGetPriceHistory(input) {
     }
 }
 
-async function toolGetNews(input) {
+async function toolGetNews(input, env) {
     const query = String((input && input.query) || '').toLowerCase().trim();
     let data;
     try {
-        const res = await fetch(NOTICIAS_BASE + '/noticias', { signal: AbortSignal.timeout(9000) });
+        const res = await env.NOTICIAS.fetch(NOTICIAS_BASE + '/noticias', { signal: AbortSignal.timeout(9000) });
         if (!res.ok) return { error: 'No se pudieron obtener noticias en este momento.' };
         data = await res.json();
     } catch (e) {
@@ -171,10 +171,10 @@ async function toolGetNews(input) {
     return { updated: data.updated, items };
 }
 
-async function executeTool(name, input) {
-    if (name === 'get_market_data') return toolGetMarketData(input);
-    if (name === 'get_price_history') return toolGetPriceHistory(input);
-    if (name === 'get_news') return toolGetNews(input);
+async function executeTool(name, input, env) {
+    if (name === 'get_market_data') return toolGetMarketData(input, env);
+    if (name === 'get_price_history') return toolGetPriceHistory(input, env);
+    if (name === 'get_news') return toolGetNews(input, env);
     return { error: 'Tool desconocida: ' + name };
 }
 
@@ -250,7 +250,7 @@ export default {
             // el peor caso es no descontar una consulta, no un error generico.
             if (email && !isAdmin) {
                 try {
-                    const consultasRes = await fetch(`${MEMBERSHIPS_BASE}/consultas?email=${encodeURIComponent(email)}`);
+                    const consultasRes = await env.MEMBERSHIPS.fetch(`${MEMBERSHIPS_BASE}/consultas?email=${encodeURIComponent(email)}`);
                     const consultasData = await consultasRes.json();
                     if (consultasData.consultas === 0) {
                         return new Response(JSON.stringify({ response: 'Agotaste tus 100 consultas del mes. Se renuevan el 1 del proximo mes.', limitAlcanzado: true }), { headers: JSON_HEADERS });
@@ -279,12 +279,6 @@ export default {
                 iterations++;
                 const data = await callClaude(ANTHROPIC_API_KEY, model, systemPrompt || 'Sos Warren, asesor financiero de Manfredi Investment.', claudeMessages, tools);
                 const toolCallsThisTurn = (data.content || []).filter(b => b.type === 'tool_use').map(b => ({ name: b.name, input: b.input }));
-                // web_search es una tool server-side: Anthropic la ejecuta dentro del
-                // mismo turno (stop_reason nunca es 'tool_use' para esta), así que el
-                // chequeo de mas abajo no la detecta -- se marca aca por separado.
-                if ((data.content || []).some(b => b.type === 'server_tool_use' || b.type === 'web_search_tool_result')) {
-                    usedTool = true;
-                }
                 trace.push({ iteration: iterations, model, stop_reason: data.stop_reason, tools: toolCallsThisTurn, text: extractText(data.content) });
 
                 // Claude a veces manda texto explicativo junto con el tool_use --
@@ -312,7 +306,7 @@ export default {
                 for (const block of toolUseBlocks) {
                     let result;
                     try {
-                        result = await executeTool(block.name, block.input);
+                        result = await executeTool(block.name, block.input, env);
                     } catch (e) {
                         result = { error: 'Error interno ejecutando la herramienta.' };
                     }
@@ -337,11 +331,17 @@ export default {
             // Restar 1 consulta despues de una respuesta exitosa (unico punto de
             // descuento -- el frontend no resta por su cuenta).
             if (email && !isAdmin) {
-                await fetch(`${MEMBERSHIPS_BASE}/restar-consulta`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                }).catch(() => {});
+                try {
+                    const restarRes = await env.MEMBERSHIPS.fetch(`${MEMBERSHIPS_BASE}/restar-consulta`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    const restarBody = await restarRes.text();
+                    console.error('[warren] restar-consulta status:', restarRes.status, 'body:', restarBody);
+                } catch (e) {
+                    console.error('[warren] restar-consulta fetch error:', e && e.name, e && e.message);
+                }
             }
 
             // El trace queda solo en logs (observabilidad) -- no se lo mandamos
