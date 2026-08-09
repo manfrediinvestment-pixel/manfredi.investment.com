@@ -1,0 +1,211 @@
+<title>Informes — corredor horizontal</title>
+<style>
+  :root{
+    --primary:#0A0F1E; --gold:#F2C94C; --white:#FFFFFF;
+    --navy-1:#07101E; --navy-3:#0A1525; --navy-4:#0C1828;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--navy-1); color:var(--white);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+  }
+  .wrap{ padding:64px 32px 96px; max-width:1180px; margin:0 auto; }
+  .note{
+    max-width:760px; margin:0 auto 44px; text-align:center;
+    font-size:12.5px; letter-spacing:.04em; color:rgba(255,255,255,.4);
+    border:1px dashed rgba(255,255,255,.15); border-radius:8px; padding:12px 18px;
+  }
+  .note b{color:var(--gold); font-weight:600;}
+
+  .section-label{
+    display:inline-block; font-size:10px; font-weight:600; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--gold); margin-bottom:14px;
+  }
+  .section-title{
+    font-family:'DM Serif Display', Georgia, serif; font-size:clamp(26px,3.5vw,40px);
+    font-weight:400; color:var(--white); letter-spacing:-.01em; margin:0 0 12px; line-height:1.15;
+  }
+  .section-sub{ font-size:15px; color:rgba(255,255,255,.38); max-width:520px; margin:0 0 52px; }
+
+  /* âââ Sub-header con flechas del corredor âââ */
+  .inf-sub-header{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,.07);
+  }
+  .inf-sub-title{ font-size:11px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.35); }
+  .inf-sub-title span{ color:var(--gold); }
+  .carousel-nav{ display:flex; gap:8px; }
+  .carousel-btn{
+    width:32px; height:32px; border-radius:50%; border:1px solid rgba(242,201,76,.3);
+    background:transparent; color:var(--gold); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:background .18s, color .18s, border-color .18s;
+  }
+  .carousel-btn:hover{ background:var(--gold); color:var(--primary); border-color:var(--gold); }
+  .carousel-btn:disabled{ opacity:.25; cursor:default; }
+  .carousel-btn:disabled:hover{ background:transparent; color:var(--gold); }
+  .carousel-btn svg{ width:14px; height:14px; }
+
+  /* âââ Corredor de informes (una fila, scroll horizontal) âââ */
+  .papers-rail-outer{ position:relative; margin-bottom:72px; }
+  .papers-rail{
+    display:flex; gap:16px; overflow-x:auto; scroll-snap-type:x proximity;
+    padding-bottom:6px; scrollbar-width:none;
+  }
+  .papers-rail::-webkit-scrollbar{ display:none; }
+  .papers-rail-outer::after{
+    content:''; position:absolute; top:0; right:0; bottom:6px; width:64px;
+    background:linear-gradient(90deg, rgba(7,16,30,0), var(--navy-1) 88%);
+    pointer-events:none;
+  }
+  .paper-card{
+    flex:0 0 292px; scroll-snap-align:start;
+    background:var(--navy-3); border:1px solid rgba(255,255,255,.08); border-radius:10px;
+    padding:24px 22px; display:flex; flex-direction:column; gap:12px;
+    transition:border-color .18s, background .18s;
+  }
+  .paper-card:hover{ border-color:rgba(242,201,76,.35); background:var(--navy-4); }
+  .paper-card-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+  .paper-tag{
+    font-size:9px; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--gold); border:1px solid rgba(242,201,76,.3); padding:3px 8px; border-radius:3px;
+  }
+  .paper-num{ font-size:10px; font-weight:500; color:rgba(255,255,255,.2); letter-spacing:.06em; font-variant-numeric:tabular-nums; }
+  .paper-title{
+    font-family:'DM Serif Display', Georgia, serif; font-size:16.5px; font-weight:400;
+    color:var(--white); line-height:1.32; letter-spacing:-.01em; min-height:64px;
+  }
+  .paper-abstract{ font-size:11.5px; color:rgba(255,255,255,.38); line-height:1.6; flex:1; }
+  .paper-footer{
+    display:flex; align-items:center; justify-content:space-between; padding-top:12px;
+    border-top:1px solid rgba(255,255,255,.06);
+  }
+  .paper-meta{ font-size:10px; color:rgba(255,255,255,.25); letter-spacing:.04em; }
+  .paper-download{
+    display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:600;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--gold);
+    border:1px solid rgba(242,201,76,.35); padding:5px 12px; border-radius:3px;
+  }
+
+  /* âââ Reportes diarios (segunda fila, sin cambios de fondo) âââ */
+  .reports-grid{ display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  @media (max-width:760px){ .reports-grid{ grid-template-columns:1fr; } }
+  .report-card-daily{
+    background:#050C18; border:1px solid rgba(255,255,255,.07); padding:22px 24px;
+    display:flex; flex-direction:column; gap:14px;
+  }
+  .rpt-header{ display:flex; align-items:center; gap:10px; }
+  .rpt-header-title{ font-size:14px; font-weight:600; display:flex; align-items:center; gap:8px; }
+  .rpt-header-meta{ font-size:10.5px; color:rgba(255,255,255,.3); letter-spacing:.04em; margin-right:auto; }
+  .rpt-live{ display:flex; align-items:center; gap:5px; font-size:9.5px; font-weight:700; letter-spacing:.1em; color:#33D17A; }
+  .rpt-live-dot{ width:6px; height:6px; border-radius:50%; background:#33D17A; box-shadow:0 0 0 3px rgba(51,209,122,.18); }
+  .rpt-body-txt{ font-size:12px; color:rgba(255,255,255,.32); line-height:1.6; }
+
+  @media (max-width:640px){
+    .paper-card{ flex-basis:250px; }
+    .wrap{ padding:44px 18px 64px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <div class="note">Mockup para revisar el reordenamiento &mdash; <b>Biblioteca de Informes</b> ahora arriba, en un corredor de una sola fila con scroll horizontal, y <b>Reportes Diarios</b> despuÃ©s. Prob&aacute; arrastrar la fila de informes o us&aacute; las flechas.</div>
+
+  <div class="section-label">An&aacute;lisis &amp; Reportes</div>
+  <h2 class="section-title">Inteligencia de Mercado</h2>
+  <p class="section-sub">Reportes diarios y papers de investigaci&oacute;n. An&aacute;lisis con foco en impacto real.</p>
+
+  <!-- ââ Biblioteca de Informes (arriba, corredor) ââ -->
+  <div class="inf-sub-header">
+    <span class="inf-sub-title">Biblioteca de Informes <span>&middot; 5</span></span>
+    <div class="carousel-nav">
+      <button class="carousel-btn" id="railPrev" disabled aria-label="Anteriores">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="carousel-btn" id="railNext" aria-label="Siguientes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="papers-rail-outer">
+    <div class="papers-rail" id="papersRail">
+
+      <div class="paper-card">
+        <div class="paper-card-top"><span class="paper-tag">Informe Semanal</span><span class="paper-num">#009</span></div>
+        <div class="paper-title">Argentina bajo presi&oacute;n cambiaria mientras Wall Street celebra un mal dato de empleo</div>
+        <div class="paper-abstract">IPCBA julio 2,9% &middot; D&oacute;lar mayorista rozando $1.500 &middot; Reservas y pago al FMI &middot; Payrolls EE.UU. &middot; S&amp;P 500 y Nasdaq en r&eacute;cords</div>
+        <div class="paper-footer"><span class="paper-meta">8 de agosto de 2026</span><button class="paper-download">&#8595; PDF</button></div>
+      </div>
+
+      <div class="paper-card">
+        <div class="paper-card-top"><span class="paper-tag">Nota Macro</span><span class="paper-num">#008</span></div>
+        <div class="paper-title">La Fed m&aacute;s dividida en una d&eacute;cada: primera disidencia hawkish unificada desde 2016</div>
+        <div class="paper-abstract">Reuni&oacute;n FOMC 28-29 julio 2026 &middot; Kevin Warsh &middot; Voto 9-3 &middot; Tasa 3.50%-3.75%</div>
+        <div class="paper-footer"><span class="paper-meta">30 de julio de 2026</span><button class="paper-download">&#8595; PDF</button></div>
+      </div>
+
+      <div class="paper-card">
+        <div class="paper-card-top"><span class="paper-tag">Informe Semanal</span><span class="paper-num">#007</span></div>
+        <div class="paper-title">Salarios, actividad y mercados: se&ntilde;ales mixtas en una econom&iacute;a en transici&oacute;n</div>
+        <div class="paper-abstract">&Iacute;ndice de Salarios &middot; Balanza Comercial &middot; EMAE &middot; BCRA &middot; Merval &middot; YPF</div>
+        <div class="paper-footer"><span class="paper-meta">25 de mayo de 2026</span><button class="paper-download">&#8595; PDF</button></div>
+      </div>
+
+      <div class="paper-card">
+        <div class="paper-card-top"><span class="paper-tag">Informe Semanal</span><span class="paper-num">#006</span></div>
+        <div class="paper-title">Desinflaci&oacute;n que retoma, actividad que repunta y mercado que sorprende</div>
+        <div class="paper-abstract">IPC Argentina &middot; Capacidad Instalada &middot; BCRA &middot; Merval &middot; CPI USA</div>
+        <div class="paper-footer"><span class="paper-meta">16 de mayo de 2026</span><button class="paper-download">&#8595; PDF</button></div>
+      </div>
+
+      <div class="paper-card">
+        <div class="paper-card-top"><span class="paper-tag">Informe Semanal</span><span class="paper-num">#005</span></div>
+        <div class="paper-title">Entre la desinflaci&oacute;n que se frena y el rally que promete</div>
+        <div class="paper-abstract">Aceleraci&oacute;n inflacionaria de marzo &middot; Reservas del BCRA &middot; Riesgo pa&iacute;s &middot; Rally del S&amp;P 500</div>
+        <div class="paper-footer"><span class="paper-meta">Abril 2026</span><button class="paper-download">&#8595; PDF</button></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ââ Reportes Diarios (abajo) ââ -->
+  <div class="inf-sub-header">
+    <span class="inf-sub-title">Reportes Diarios</span>
+    <span class="inf-sub-title" style="color:rgba(255,255,255,.2)">Actualizado &middot; 11:01 hs</span>
+  </div>
+  <div class="reports-grid">
+    <div class="report-card-daily">
+      <div class="rpt-header">
+        <span class="rpt-header-title">&#127462;&#127479; Argentina</span>
+        <span class="rpt-header-meta">Agente IA</span>
+        <div class="rpt-live"><span class="rpt-live-dot"></span>LIVE</div>
+      </div>
+      <p class="rpt-body-txt">Se&ntilde;al del d&iacute;a, tipo de cambio, tasas y Merval &mdash; se carga en vivo, sin cambios respecto de hoy.</p>
+    </div>
+    <div class="report-card-daily">
+      <div class="rpt-header">
+        <span class="rpt-header-title">&#127482;&#127480; Wall Street</span>
+        <span class="rpt-header-meta">Agente IA</span>
+        <div class="rpt-live"><span class="rpt-live-dot"></span>LIVE</div>
+      </div>
+      <p class="rpt-body-txt">S&amp;P 500, Nasdaq, tasas de la Fed y se&ntilde;al del d&iacute;a &mdash; se carga en vivo, sin cambios respecto de hoy.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const rail = document.getElementById('papersRail');
+  const prev = document.getElementById('railPrev');
+  const next = document.getElementById('railNext');
+  const step = () => Math.min(rail.clientWidth * 0.9, 600);
+  function updateNav(){
+    prev.disabled = rail.scrollLeft <= 4;
+    next.disabled = rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 4;
+  }
+  prev.addEventListener('click', () => rail.scrollBy({ left: -step(), behavior: 'smooth' }));
+  next.addEventListener('click', () => rail.scrollBy({ left: step(), behavior: 'smooth' }));
+  rail.addEventListener('scroll', updateNav);
+  window.addEventListener('resize', updateNav);
+  updateNav();
+</script>
