@@ -6110,6 +6110,16 @@
   .instrument-tag.med { background: var(--amber-light); color: var(--amber); }
   .instrument-tag.high { background: var(--red-light); color: var(--red); }
 
+  /* ===== AUDIO BAR (narración por diapositiva) ===== */
+  .audio-bar { display: flex; align-items: center; gap: 12px; background: var(--blue-light); border: 1px solid rgba(26,86,219,0.18); border-radius: 30px; padding: 8px 10px 8px 8px; margin-bottom: 1.5rem; font-family: sans-serif; }
+  .audio-play { flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; background: var(--blue); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: background .15s, transform .1s; }
+  .audio-play:hover { background: var(--blue-dark); }
+  .audio-play:active { transform: scale(0.94); }
+  .audio-track { flex: 1; height: 5px; background: rgba(26,86,219,0.18); border-radius: 6px; cursor: pointer; position: relative; }
+  .audio-fill { position: absolute; left: 0; top: 0; height: 100%; width: 0%; background: var(--blue); border-radius: 6px; }
+  .audio-label { font-size: 12.5px; color: var(--blue-dark); font-weight: 600; white-space: nowrap; }
+  .audio-time { font-size: 11.5px; color: var(--gray); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
   /* ===== RESET & BASE ===== */
     background: #f5f4f0;
   /* ===== VARIABLES ===== */
@@ -6441,6 +6451,51 @@
 
 </div></div>
 
+
+<!-- COURSE AUDIO (narración por diapositiva, compartida entre cursos) -->
+<script>
+var COURSE_AUDIO = {};
+function courseAudioPath(slug, lesson, slide) { return 'audio/university/' + slug + '/l' + lesson + '-s' + slide + '.mp3'; }
+function fmtCourseTime(s) { if (!isFinite(s)) return '0:00'; var m = Math.floor(s/60), sec = Math.floor(s%60); return m + ':' + (sec<10?'0':'') + sec; }
+function courseAudioBarHTML(pid) {
+  return '<div class="audio-bar"><button class="audio-play" id="audioPlay-'+pid+'" onclick="toggleCourseAudio(\''+pid+'\')" aria-label="Reproducir audio">&#9654;</button>'
+       + '<div class="audio-track" id="audioTrack-'+pid+'" onclick="seekCourseAudio(event,\''+pid+'\')"><div class="audio-fill" id="audioFill-'+pid+'"></div></div>'
+       + '<span class="audio-label">Escuchar</span><span class="audio-time" id="audioTime-'+pid+'">0:00 / 0:00</span></div>';
+}
+function initCourseAudio(pid, slug, lesson, slide) {
+  if (COURSE_AUDIO[pid]) { COURSE_AUDIO[pid].pause(); }
+  var audio = new Audio(courseAudioPath(slug, lesson, slide));
+  COURSE_AUDIO[pid] = audio;
+  var playBtn = document.getElementById('audioPlay-'+pid);
+  var fill = document.getElementById('audioFill-'+pid);
+  var timeEl = document.getElementById('audioTime-'+pid);
+  audio.addEventListener('loadedmetadata', function(){ if (timeEl) timeEl.textContent = fmtCourseTime(0) + ' / ' + fmtCourseTime(audio.duration); });
+  audio.addEventListener('timeupdate', function(){
+    var pct = audio.duration ? (audio.currentTime/audio.duration*100) : 0;
+    if (fill) fill.style.width = pct + '%';
+    if (timeEl) timeEl.textContent = fmtCourseTime(audio.currentTime) + ' / ' + fmtCourseTime(audio.duration);
+  });
+  audio.addEventListener('ended', function(){ if (playBtn) playBtn.innerHTML = '&#9654;'; });
+  audio.addEventListener('error', function(){
+    var bar = playBtn ? playBtn.closest('.audio-bar') : null;
+    if (bar) bar.style.display = 'none';
+  });
+}
+function toggleCourseAudio(pid) {
+  var audio = COURSE_AUDIO[pid]; if (!audio) return;
+  var playBtn = document.getElementById('audioPlay-'+pid);
+  if (audio.paused) { audio.play(); if (playBtn) playBtn.innerHTML = '&#10074;&#10074;'; }
+  else { audio.pause(); if (playBtn) playBtn.innerHTML = '&#9654;'; }
+}
+function seekCourseAudio(e, pid) {
+  var audio = COURSE_AUDIO[pid]; if (!audio || !audio.duration) return;
+  var track = document.getElementById('audioTrack-'+pid);
+  var rect = track.getBoundingClientRect();
+  var pct = (e.clientX - rect.left) / rect.width;
+  audio.currentTime = pct * audio.duration;
+}
+function pauseCourseAudio(pid) { if (COURSE_AUDIO[pid]) COURSE_AUDIO[pid].pause(); }
+</script>
 
 <!-- COURSE SCRIPTS -->
 <script>
@@ -7256,6 +7311,7 @@ function RSIB() {
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
+      ${courseAudioBarHTML('IB')}
       ${slide.html}
       <div class="slide-footer">
         <button class="nav-btn" onclick="PSIB()" ${CSIB===0?'disabled':''}>â Anterior</button>
@@ -7269,6 +7325,7 @@ function RSIB() {
       </div>
     </div>`;
 
+  initCourseAudio('IB', 'introduccion-bolsa', CLIB+1, CSIB+1);
   if (slide.chart) setTimeout(() => DCIB(slide.chart), 80);
 }
 
@@ -8694,7 +8751,7 @@ window.GSlMA=GSlMA;
 
 <script>
 function openCourse(id){document.getElementById('modal-'+id).classList.add('open');document.body.style.overflow='hidden';}
-function closeCourse(id){document.getElementById('modal-'+id).classList.remove('open');document.body.style.overflow='';}
+function closeCourse(id){pauseCourseAudio(id);document.getElementById('modal-'+id).classList.remove('open');document.body.style.overflow='';}
 document.addEventListener('keydown',function(e){if(e.key==='Escape')['FP','IB','AF','MA'].forEach(closeCourse);});
 document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEventListener('click',function(e){if(e.target===el){el.classList.remove('open');document.body.style.overflow='';}});});
 </script>
