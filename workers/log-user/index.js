@@ -381,7 +381,9 @@ async function avisarInforme(request, env, corsHeaders) {
         return new Response(JSON.stringify({ error: 'Body invalido' }), { status: 400, headers });
     }
 
-    const { title, intro, sections = [], ctaUrl = 'https://manfredinvestment.com/#informes',
+    const { title, intro, sections = [], chart = [], chartTitle = '', chartTitleRight = '',
+        quote, quoteAttribution = 'Del cierre del informe',
+        issueNum = '', issueDate = '', ctaUrl = 'https://manfredinvestment.com/#informes',
         ctaLabel = 'Leer el informe completo — gratis', subject, dryRun = false,
         offset = 0, limit = 40, emails: emailsOverride } = body;
 
@@ -415,7 +417,7 @@ async function avisarInforme(request, env, corsHeaders) {
     }
 
     const lote = emailsUnicos.slice(offset, offset + limit);
-    const html = htmlInformeNuevo({ title, intro, sections, ctaUrl, ctaLabel });
+    const html = htmlInformeNuevo({ title, intro, sections, chart, chartTitle, chartTitleRight, quote, quoteAttribution, issueNum, issueDate, ctaUrl, ctaLabel });
 
     // Envio secuencial con una pequena pausa entre cada uno -- mandar los 40
     // en paralelo pego contra el rate-limit de Resend (429s).
@@ -478,44 +480,139 @@ async function getGoogleAccessToken(env) {
     return access_token;
 }
 
-// Mismo template/paleta que scripts/email-informe-nuevo.html, parametrizado
-// para poder reusarlo en cada informe nuevo (no solo el de esta semana).
-function htmlInformeNuevo({ title, intro, sections, ctaUrl, ctaLabel }) {
-    const filas = sections.map((s, i) => {
+// Template editorial "dos velocidades": gráfico divergente por sector (en vez
+// de un índice numerado de secciones) + pull-quote de cierre. Parametrizado
+// para poder reusarlo en cada informe nuevo — ver scripts/email-informe-argentina-dos-velocidades.html
+// para el diseño de referencia (aprobado) del que sale este template.
+function htmlInformeNuevo({ title, intro, sections = [], chart = [], chartTitle, chartTitleRight, quote, quoteAttribution, issueNum, issueDate, ctaUrl, ctaLabel }) {
+    const fmtPct = (v) => {
+        const neg = v < 0;
+        const abs = Math.abs(v).toFixed(1).replace('.', ',');
+        return { neg, text: `${neg ? '−' : '+'}${abs}%` };
+    };
+
+    const axisMax = chart.length ? Math.max(...chart.map(c => Math.abs(c.value))) * 1.08 : 40;
+    const track = 160; // px de cada lado del eje
+
+    const filasChart = chart.map(c => {
+        const { neg, text } = fmtPct(c.value);
+        const w = Math.max(1, Math.round((Math.abs(c.value) / axisMax) * track));
+        const color = neg ? '#EF4444' : '#10B981';
+        const barNeg = neg
+            ? `<div style="height:10px;width:${w}px;background-color:${color};border-radius:2px 0 0 2px;">&nbsp;</div>`
+            : `<div style="height:10px;width:1px;">&nbsp;</div>`;
+        const barPos = !neg
+            ? `<div style="height:10px;width:${w}px;background-color:${color};border-radius:0 2px 2px 0;">&nbsp;</div>`
+            : `<div style="height:10px;width:1px;">&nbsp;</div>`;
+        const valNeg = neg ? `<td width="50" align="right" style="padding-right:8px;color:${color};font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;font-family:'IBM Plex Sans',sans-serif;">${text}</td>` : `<td width="50" align="right">&nbsp;</td>`;
+        const valPos = !neg ? `<td width="60" align="left" style="padding-left:8px;color:${color};font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;font-family:'IBM Plex Sans',sans-serif;">${text}</td>` : `<td width="60" align="left">&nbsp;</td>`;
+        const nota = c.note ? `<tr><td style="padding:0 0 16px 0;"><p style="margin:0;color:rgba(255,255,255,.4);font-size:12px;line-height:1.5;font-family:'IBM Plex Sans',sans-serif;padding-left:2px;">${c.note}</p></td></tr>` : '';
+        return `<tr><td style="padding-bottom:6px;">
+          <table width="100%" cellpadding="0" cellspacing="0" role="presentation"><tr>
+            <td width="96" style="color:rgba(255,255,255,.78);font-size:11.5px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;font-family:'IBM Plex Sans',sans-serif;">${c.label}</td>
+            ${valNeg}
+            <td width="160" align="right">${barNeg}</td>
+            <td width="2" style="background-color:rgba(255,255,255,.18);"><div style="height:10px;width:2px;">&nbsp;</div></td>
+            <td width="160" align="left">${barPos}</td>
+            ${valPos}
+          </tr></table>
+        </td></tr>${nota}`;
+    }).join('');
+
+    const bloqueChart = chart.length ? `
+    <tr><td style="padding:0 40px;">
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);">
+        <tr><td style="padding:20px 0 6px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" role="presentation"><tr>
+            <td style="color:rgba(255,255,255,.38);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;font-family:'IBM Plex Sans',sans-serif;">${chartTitle || ''}</td>
+            <td align="right" style="color:rgba(255,255,255,.38);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;font-family:'IBM Plex Sans',sans-serif;">${chartTitleRight || ''}</td>
+          </tr></table>
+        </td></tr>
+        <tr><td style="padding:2px 0 18px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" role="presentation"><tr>
+            <td width="50%" style="color:#EF4444;font-size:9px;letter-spacing:1.2px;text-transform:uppercase;font-family:'IBM Plex Sans',sans-serif;opacity:.8;">&#9664; Retrocede</td>
+            <td width="50%" align="right" style="color:#10B981;font-size:9px;letter-spacing:1.2px;text-transform:uppercase;font-family:'IBM Plex Sans',sans-serif;opacity:.8;">Avanza &#9654;</td>
+          </tr></table>
+        </td></tr>
+        ${filasChart}
+      </table>
+    </td></tr>` : '';
+
+    const filasSecciones = sections.map((s, i) => {
         const num = String(i + 1).padStart(2, '0');
         const borde = i < sections.length - 1 ? 'border-bottom:1px solid #253052;' : '';
-        return `<tr><td style="padding:8px 0;color:#E7EAF3;font-size:14px;${borde}"><span style="color:#EFC468;font-weight:700;">${num}</span>&nbsp; &middot; &nbsp;${s}</td></tr>`;
+        return `<tr><td style="padding:8px 0;color:#E7EAF3;font-size:14px;${borde}"><span style="color:#F2C94C;font-weight:700;">${num}</span>&nbsp; &middot; &nbsp;${s}</td></tr>`;
     }).join('');
 
     const bloqueSecciones = sections.length ? `
-    <table cellpadding="0" cellspacing="0" style="background-color:#111a30;border:1px solid #2b3757;border-radius:6px;width:100%;margin-bottom:28px;">
-      <tr><td style="padding:24px;">
-        <p style="color:#EFC468;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:0 0 16px 0;">En este informe</p>
-        <table cellpadding="0" cellspacing="0" style="width:100%;">${filas}</table>
-      </td></tr>
-    </table>` : '';
+    <tr><td style="padding:0 40px;">
+      <table cellpadding="0" cellspacing="0" role="presentation" style="background-color:#111a30;border:1px solid #2b3757;border-radius:6px;width:100%;margin-bottom:6px;">
+        <tr><td style="padding:24px;">
+          <p style="color:#F2C94C;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:0 0 16px 0;">En este informe</p>
+          <table cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">${filasSecciones}</table>
+        </td></tr>
+      </table>
+    </td></tr>` : '';
 
-    return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;padding:0;background-color:#0a0e1a;font-family:'Helvetica Neue',Arial,sans-serif;"><table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0e1a;background-image:radial-gradient(120% 140% at 50% -10%, #182a4a 0%, #0a0e1a 55%);padding:40px 20px;"><tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#131b30;background-image:linear-gradient(180deg,#161f38 0%,#0f1526 100%);border:1px solid #D9A73B;border-radius:10px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.45);">
-  <tr><td style="background-color:#0d1424;background-image:linear-gradient(180deg,#111b32 0%,#0c111f 100%);padding:32px 40px;border-bottom:1px solid #D9A73B;">
-    <table cellpadding="0" cellspacing="0"><tr>
-      <td style="background-color:#D9A73B;background-image:linear-gradient(135deg,#F6D488 0%,#D9A73B 55%,#B9822C 100%);width:40px;height:40px;border-radius:6px;text-align:center;vertical-align:middle;box-shadow:0 4px 16px rgba(217,167,59,0.4);"><span style="color:#1a1206;font-weight:800;font-size:16px;line-height:40px;">MI</span></td>
-      <td style="padding-left:12px;vertical-align:middle;"><span style="color:#ffffff;font-size:18px;font-weight:600;letter-spacing:0.5px;">Manfredi Investment</span><br><span style="color:#EFC468;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Research &amp; Markets</span></td>
+    const bloqueQuote = quote ? `
+    <tr><td style="padding:34px 40px 6px 40px;">
+      <table cellpadding="0" cellspacing="0" role="presentation"><tr>
+        <td style="border-left:2px solid #F2C94C;padding:2px 0 2px 20px;">
+          <p style="margin:0 0 10px 0;color:rgba(255,255,255,.88);font-size:20px;line-height:1.48;font-style:italic;font-family:'DM Serif Display',Georgia,serif;">${quote}</p>
+          <p style="margin:0;color:rgba(255,255,255,.4);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;font-family:'IBM Plex Sans',sans-serif;">${quoteAttribution || ''}</p>
+        </td>
+      </tr></table>
+    </td></tr>` : '';
+
+    const bloqueEdicion = (issueNum || issueDate) ? `
+        <td valign="middle" align="right">
+          ${issueNum ? `<span style="color:#F2C94C;font-size:12px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;letter-spacing:.3px;">Nº&nbsp;${issueNum}</span><br>` : ''}
+          ${issueDate ? `<span style="color:rgba(255,255,255,.42);font-size:11px;font-family:'IBM Plex Sans',sans-serif;">${issueDate}</span>` : ''}
+        </td>` : '<td></td>';
+
+    return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;padding:0;background-color:#05080f;font-family:'IBM Plex Sans',system-ui,-apple-system,Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#05080f;padding:36px 16px;"><tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;width:100%;background-color:#0A0F1E;border:1px solid rgba(242,201,76,.18);border-radius:10px;overflow:hidden;">
+
+  <tr><td style="padding:26px 40px 22px 40px;border-bottom:1px solid rgba(242,201,76,.35);">
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation"><tr>
+      <td valign="middle">
+        <table cellpadding="0" cellspacing="0" role="presentation"><tr>
+          <td style="background-color:#F2C94C;width:34px;height:34px;border-radius:6px;text-align:center;vertical-align:middle;"><span style="color:#0A0F1E;font-weight:800;font-size:14px;line-height:34px;font-family:'IBM Plex Sans',sans-serif;">MI</span></td>
+          <td style="padding-left:11px;vertical-align:middle;"><span style="color:#ffffff;font-size:15px;font-weight:600;letter-spacing:.2px;font-family:'IBM Plex Sans',sans-serif;">Manfredi Investment</span><br><span style="color:rgba(255,255,255,.5);font-size:10px;letter-spacing:1.6px;text-transform:uppercase;font-family:'IBM Plex Sans',sans-serif;">Research &amp; Markets</span></td>
+        </tr></table>
+      </td>
+      ${bloqueEdicion}
     </tr></table>
   </td></tr>
-  <tr><td style="padding:40px;">
-    <p style="color:#EFC468;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:0 0 12px 0;">Informe nuevo disponible</p>
-    <h1 style="color:#ffffff;font-size:23px;font-weight:600;line-height:1.35;margin:0 0 14px 0;">${title}</h1>
-    <p style="color:#CBD2E3;font-size:15px;line-height:1.6;margin:0 0 28px 0;">${intro}</p>
-    ${bloqueSecciones}
-    <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:28px;">
-      <tr><td align="center" style="background-color:#D9A73B;background-image:linear-gradient(135deg,#F8DA96 0%,#DDAB40 45%,#B9822C 100%);border-radius:7px;padding:15px 30px;border-top:1px solid rgba(255,255,255,0.55);box-shadow:0 10px 30px rgba(217,167,59,0.45);">
-        <a href="${ctaUrl}" style="color:#1a1206;font-size:15px;font-weight:800;text-decoration:none;letter-spacing:0.6px;">${ctaLabel}</a>
+
+  <tr><td style="padding:36px 40px 0 40px;">
+    <p style="color:#F2C94C;font-size:11px;letter-spacing:2.2px;text-transform:uppercase;margin:0 0 14px 0;font-family:'IBM Plex Sans',sans-serif;font-weight:600;">Informe nuevo disponible</p>
+    <h1 style="color:#ffffff;font-size:29px;font-weight:400;line-height:1.22;letter-spacing:-.01em;margin:0 0 16px 0;font-family:'DM Serif Display',Georgia,serif;">${title}</h1>
+    <p style="color:rgba(255,255,255,.62);font-size:15px;line-height:1.62;margin:0 0 34px 0;font-family:'IBM Plex Sans',sans-serif;">${intro}</p>
+  </td></tr>
+
+  ${bloqueChart}
+  ${bloqueSecciones}
+  ${bloqueQuote}
+
+  <tr><td style="padding:30px 40px 6px 40px;">
+    <table cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+      <tr><td align="center" style="background-color:#F2C94C;border-radius:7px;padding:15px 30px;">
+        <a href="${ctaUrl}" style="color:#0A0F1E;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:.3px;font-family:'IBM Plex Sans',sans-serif;">${ctaLabel}</a>
       </td></tr>
     </table>
-    <p style="color:#8D96B2;font-size:13px;line-height:1.6;margin:0;">Recibís este mail porque tenés una cuenta en Manfredi Investment. Si no querés recibir avisos de informes nuevos, respondé este correo y te sacamos de la lista.</p>
   </td></tr>
-  <tr><td style="background-color:#0d1424;padding:20px 40px;border-top:1px solid #2b3757;text-align:center;">
-    <p style="color:#5B6482;font-size:12px;margin:0;">© 2026 Manfredi Investment · Buenos Aires, Argentina</p>
+
+  <tr><td style="padding:22px 40px 36px 40px;">
+    <p style="color:rgba(255,255,255,.38);font-size:12.5px;line-height:1.6;margin:0;font-family:'IBM Plex Sans',sans-serif;">Recibís este mail porque tenés una cuenta en Manfredi Investment. Si preferís no recibir avisos de informes nuevos, respondé este correo y te sacamos de la lista.</p>
   </td></tr>
-</table></td></tr></table></body></html>`;
+
+  <tr><td style="background-color:#070b14;padding:18px 40px;border-top:1px solid rgba(255,255,255,.08);text-align:center;">
+    <p style="color:rgba(255,255,255,.3);font-size:11.5px;margin:0;font-family:'IBM Plex Sans',sans-serif;">&copy; 2026 Manfredi Investment &middot; Buenos Aires, Argentina</p>
+  </td></tr>
+
+</table>
+</td></tr></table>
+</body></html>`;
 }
