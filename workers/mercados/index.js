@@ -28,6 +28,7 @@ const NAME_MAP = {
   // ADRs
   YPF: 'YPF', PAM: 'Pampa Energía', TEO: 'Telecom Argentina', LOM: 'Loma Negra',
   TX: 'Ternium', IRS: 'IRSA', BIOX: 'Bioceres', DESP: 'Despegar', MELI: 'MercadoLibre',
+  MELIC: 'MercadoLibre (CEDEAR Serie C)', MELID: 'MercadoLibre (CEDEAR Serie D)',
   GLOB: 'Globant', TS: 'Tenaris', CRESY: 'Cresud',
   // CEDEARs / Acciones USA (mismos tickers, mismo nombre en ambas categorías)
   AAPL: 'Apple', TSLA: 'Tesla', AMZN: 'Amazon', GOOGL: 'Alphabet (Google)', MSFT: 'Microsoft',
@@ -78,7 +79,12 @@ function mapD912Rows(rows, { sortByVolume = true, limit = null } = {}) {
       change: r.pct_change ?? null,
       volume: r.v ?? 0,
     }));
-  if (sortByVolume) items.sort((a, b) => (b.volume || 0) - (a.volume || 0));
+  // Ordenamos por volumen EN PLATA (precio * cantidad), no por cantidad de
+  // acciones/nominales: con volumen crudo, activos caros como MELI (~USD 1800
+  // por accion) quedan enterrados detras de acciones baratas que mueven millones
+  // de unidades pero mucha menos plata real. Esto hacia que MELI desapareciera
+  // de "Acciones USA" (top 500) pese a estar entre los mas operados en dolares.
+  if (sortByVolume) items.sort((a, b) => (b.price * b.volume || 0) - (a.price * a.volume || 0));
   if (limit) items = items.slice(0, limit);
   return items;
 }
