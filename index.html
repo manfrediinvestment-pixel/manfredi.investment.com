@@ -2341,22 +2341,33 @@
     }
     .mkt-tab:hover { border-color: rgba(242,201,76,.4); color: var(--gold); }
     .mkt-tab.active { background: var(--gold); border-color: var(--gold); color: var(--primary); }
+    .mkt-tab.mkt-tab-fav { border-color: rgba(242,201,76,.35); color: var(--gold-light); display: inline-flex; align-items: center; gap: 6px; }
+    .mkt-tab.mkt-tab-fav:hover { color: var(--gold); }
+    .mkt-tab.mkt-tab-fav.active { background: var(--gold); color: var(--primary); }
+    .mkt-tab.mkt-tab-fav svg { width: 11px; height: 11px; flex: none; }
+    .mkt-tab.mkt-tab-fav .mkt-tab-fav-count { background: rgba(255,255,255,.14); border-radius: 9px; padding: 0 6px; font-size: 9.5px; line-height: 15px; }
+    .mkt-tab.mkt-tab-fav.active .mkt-tab-fav-count { background: rgba(10,15,30,.18); }
 
     /* Tabla de categoria */
     .mkt-table-wrap { background: var(--navy-4); border: 1px solid rgba(255,255,255,.08); border-radius: 8px; overflow: hidden; }
     .mkt-table-head {
-      display: grid; grid-template-columns: 1.6fr 1fr 1fr; padding: 9px 16px; background: rgba(255,255,255,.03);
+      display: grid; grid-template-columns: 26px 1.6fr 1fr 1fr; padding: 9px 16px; background: rgba(255,255,255,.03);
       border-bottom: 1px solid rgba(255,255,255,.06); font-size: 10px; letter-spacing: .06em; text-transform: uppercase;
       color: rgba(255,255,255,.32); font-family: 'IBM Plex Mono', monospace;
     }
     .mkt-row {
-      display: grid; grid-template-columns: 1.6fr 1fr 1fr; padding: 10px 16px; align-items: center;
+      display: grid; grid-template-columns: 26px 1.6fr 1fr 1fr; padding: 10px 16px; align-items: center;
       border-bottom: 1px solid rgba(255,255,255,.06); font-size: 13px; cursor: pointer;
     }
     .mkt-row:last-child { border-bottom: none; }
     .mkt-row:hover { background: rgba(255,255,255,.03); }
-    .mkt-row .mr-ticker { color: var(--white); font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
-    .mkt-row .mr-name { color: rgba(255,255,255,.4); font-size: 11.5px; margin-left: 7px; }
+    .mkt-row .mr-name-wrap { display: flex; align-items: baseline; gap: 7px; min-width: 0; overflow: hidden; }
+    .mkt-row .mr-ticker { color: var(--white); font-family: 'IBM Plex Mono', monospace; font-weight: 600; white-space: nowrap; }
+    .mkt-row .mr-name { color: rgba(255,255,255,.4); font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mkt-row .mr-fav-badge {
+      font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: .04em; text-transform: uppercase;
+      color: rgba(255,255,255,.35); border: 1px solid rgba(255,255,255,.15); border-radius: 4px; padding: 1px 5px; flex: none;
+    }
     .mkt-row .mr-price { color: var(--white); text-align: right; font-variant-numeric: tabular-nums; }
     .mkt-row .mr-chg { text-align: right; font-variant-numeric: tabular-nums; }
     .mkt-row .mr-chg.pos { color: #10B981; }
@@ -2369,6 +2380,40 @@
       font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; cursor: pointer;
     }
     .mkt-show-all:hover { background: rgba(242,201,76,.12); }
+    .mkt-show-all[hidden] { display: none; }
+
+    /* Estrella de favoritos en cada fila */
+    .mkt-star-btn {
+      background: none; border: none; padding: 0; cursor: pointer; color: rgba(255,255,255,.18);
+      display: flex; align-items: center; justify-content: center; width: 20px; height: 20px;
+    }
+    .mkt-star-btn svg { width: 15px; height: 15px; transition: transform .15s ease; }
+    .mkt-star-btn:hover { color: rgba(242,201,76,.7); }
+    .mkt-star-btn.on { color: var(--gold); }
+    .mkt-star-btn.mkt-star-pop svg { animation: mktStarPop .32s ease; }
+    @keyframes mktStarPop { 0% { transform: scale(1); } 45% { transform: scale(1.35); } 100% { transform: scale(1); } }
+    @media (prefers-reduced-motion: reduce) { .mkt-star-btn.mkt-star-pop svg { animation: none; } }
+
+    /* Favoritos: sin sesión / sin favoritos todavía */
+    .mkt-fav-locked { padding: 40px 24px; text-align: center; }
+    .mkt-fav-locked .mfl-ico {
+      width: 48px; height: 48px; border-radius: 50%; background: rgba(242,201,76,.08); border: 1px solid rgba(242,201,76,.25);
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+    }
+    .mkt-fav-locked .mfl-ico svg { width: 20px; height: 20px; color: var(--gold); }
+    .mkt-fav-locked h4 { color: var(--white); font-size: 16px; margin: 0 0 8px; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; }
+    .mkt-fav-locked p { color: rgba(255,255,255,.5); font-size: 12.5px; max-width: 320px; margin: 0 auto 20px; }
+    .mkt-fav-google-btn {
+      display: inline-flex; align-items: center; gap: 10px; background: var(--white); color: #1A1A2E;
+      border: none; border-radius: 8px; padding: 10px 18px; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: transform .1s ease, box-shadow .15s ease;
+    }
+    .mkt-fav-google-btn:hover { box-shadow: 0 6px 20px rgba(0,0,0,.35); transform: translateY(-1px); }
+    .mkt-fav-google-btn svg { width: 16px; height: 16px; }
+    .mkt-fav-empty { padding: 44px 24px; text-align: center; }
+    .mkt-fav-empty .mfe-ico { width: 32px; height: 32px; margin: 0 auto 14px; color: rgba(255,255,255,.15); }
+    .mkt-fav-empty h4 { color: var(--white); font-size: 14px; margin: 0 0 6px; font-weight: 600; }
+    .mkt-fav-empty p { color: rgba(255,255,255,.35); font-size: 12px; max-width: 260px; margin: 0 auto; }
 
     /* PPP NAVEGACION POR PESTANAS: una seccion visible a la vez PPP */
     [data-tab].tab-hidden { display: none !important; }
@@ -2509,6 +2554,8 @@
           window._pfPositions = userData.portfolioManfredi.positions;
           if (typeof window._pfRenderPositions === 'function') window._pfRenderPositions();
         }
+        window._miFavoritos = Array.isArray(userData.favoritos) ? userData.favoritos : [];
+        if (typeof window._mktOnAuthChange === 'function') window._mktOnAuthChange();
 
                 window._authChecked = true;
                 window._currentUser = user;
@@ -2517,6 +2564,8 @@
       } else {
         window._isMiembro = false;
         window._currentUser = null;
+        window._miFavoritos = [];
+        if (typeof window._mktOnAuthChange === 'function') window._mktOnAuthChange();
         // Sin esto, el token de membresia del usuario anterior quedaba en
         // localStorage y isMember() seguia devolviendo true tras el logout.
         localStorage.removeItem('mi_member_token');
@@ -2790,6 +2839,21 @@
 
     window.showNotifyOverlay = showNotifyOverlay;
     window.hideNotifyOverlay = hideNotifyOverlay;
+
+    // Guarda la lista de activos favoritos (Mercados) del usuario logueado.
+    // A diferencia del portfolio, no requiere ser socio: cualquier cuenta con
+    // Google puede tener favoritos.
+    window._miSaveFavoritos = async function() {
+      if (!window._currentUser) return false;
+      try {
+        const ref = doc(db, 'users', window._currentUser.uid);
+        await updateDoc(ref, { favoritos: window._miFavoritos || [] });
+        return true;
+      } catch (e) {
+        console.warn('favoritos save failed:', e);
+        return false;
+      }
+    };
 
     // Guarda el portafolio cargado manualmente en Tu Portafolio (solo socios)
     window._miSavePortfolio = async function() {
@@ -3213,7 +3277,7 @@
           <div class="mkt-tabs" id="mktTabs" role="tablist"></div>
           <div class="mkt-table-wrap">
             <div class="mkt-table-head" id="mktTableHead">
-              <span>Activo</span><span style="text-align:right;">Precio</span><span style="text-align:right;">Var%</span>
+              <span></span><span>Activo</span><span style="text-align:right;">Precio</span><span style="text-align:right;">Var%</span>
             </div>
             <div id="mktTableBody" class="mkt-table-body">
               <div class="mkt-row-msg">Cargando...</div>
@@ -5712,15 +5776,68 @@
     { key: 'commodities', label: 'Commodities' },
     { key: 'dolares',     label: 'Dólares & Divisas' },
   ];
+  const MKT_FAV_KEY = 'fav';
   let mktActiveCategory = MKT_CATEGORIES[0].key;
   let mktShowingAll = false;
+
+  // ─── Favoritos: guardar/quitar activos y persistirlos en Firestore ───────
+  window._miFavoritos = window._miFavoritos || [];
+
+  function mktStarIcon(filled) {
+    return filled
+      ? '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7L12 17.3 5.7 20.9l1.7-7L2 9.2l7.1-.6z"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7L12 17.3 5.7 20.9l1.7-7L2 9.2l7.1-.6z"/></svg>';
+  }
+
+  function mktIsFavorite(symbol) {
+    return (window._miFavoritos || []).some(f => f.symbol === symbol);
+  }
+
+  function mktToggleFavorite(symbol, category, btnEl) {
+    if (!window._currentUser) {
+      if (typeof window.showLoginOverlay === 'function') window.showLoginOverlay();
+      return;
+    }
+    window._miFavoritos = window._miFavoritos || [];
+    const idx = window._miFavoritos.findIndex(f => f.symbol === symbol);
+    const nowFav = idx === -1;
+    if (nowFav) {
+      window._miFavoritos.push({ symbol, category });
+    } else {
+      window._miFavoritos.splice(idx, 1);
+    }
+    if (btnEl) {
+      btnEl.classList.toggle('on', nowFav);
+      btnEl.innerHTML = mktStarIcon(nowFav);
+      btnEl.classList.remove('mkt-star-pop');
+      void btnEl.offsetWidth;
+      btnEl.classList.add('mkt-star-pop');
+    }
+    renderTabs();
+    if (mktActiveCategory === MKT_FAV_KEY) renderCategoryTable();
+    if (window._miSaveFavoritos) window._miSaveFavoritos();
+  }
+
+  // Reacciona a login/logout: refresca estrellas, contador y la pestaña Favoritos.
+  window._mktOnAuthChange = function() {
+    renderTabs();
+    if (mktActiveCategory === MKT_FAV_KEY) renderCategoryTable();
+    else document.querySelectorAll('#mktTableBody .mkt-star-btn, #mktSearchResults .mkt-star-btn').forEach(btn => {
+      const on = mktIsFavorite(btn.getAttribute('data-symbol'));
+      btn.classList.toggle('on', on);
+      btn.innerHTML = mktStarIcon(on);
+    });
+  };
 
   function renderTabs() {
     const wrap = document.getElementById('mktTabs');
     if (!wrap) return;
-    wrap.innerHTML = MKT_CATEGORIES.map(c =>
+    const favCount = (window._miFavoritos || []).length;
+    let html = `<button type="button" class="mkt-tab mkt-tab-fav${mktActiveCategory === MKT_FAV_KEY ? ' active' : ''}" data-cat="${MKT_FAV_KEY}">${mktStarIcon(true)}Favoritos${favCount ? `<span class="mkt-tab-fav-count">${favCount}</span>` : ''}</button>`;
+    html += MKT_CATEGORIES.map(c =>
       `<button type="button" class="mkt-tab${c.key === mktActiveCategory ? ' active' : ''}" data-cat="${c.key}">${c.label}</button>`
     ).join('');
+    wrap.innerHTML = html;
     wrap.querySelectorAll('.mkt-tab').forEach(btn => {
       btn.addEventListener('click', () => {
         mktActiveCategory = btn.getAttribute('data-cat');
@@ -5731,20 +5848,75 @@
     });
   }
 
-  function mktRowHTML(item, currency, category) {
+  function mktRowHTML(item, currency, category, opts) {
     const { text, cls } = mktFmtChange(item.change);
     const unit = currency === 'USD' ? 'US$ ' : '$ ';
     const name = (item.name && item.name !== item.symbol) ? item.name : '';
+    const isFav = mktIsFavorite(item.symbol);
+    const badge = (opts && opts.showBadge) ? `<span class="mr-fav-badge">${mktCategoryLabel(category)}</span>` : '';
     return `
       <div class="mkt-row" data-symbol="${item.symbol}" data-category="${category}" data-currency="${currency}">
-        <div><span class="mr-ticker">${item.symbol}</span><span class="mr-name">${name}</span></div>
+        <button type="button" class="mkt-star-btn${isFav ? ' on' : ''}" data-symbol="${item.symbol}" data-category="${category}" aria-label="${isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}">${mktStarIcon(isFav)}</button>
+        <div class="mr-name-wrap"><span class="mr-ticker">${item.symbol}</span><span class="mr-name">${name}</span>${badge}</div>
         <div class="mr-price">${mktFmtPrice(item.price, unit)}</div>
         <div class="mr-chg ${cls}">${text}</div>
       </div>
     `;
   }
 
+  function mktFavLockedHTML() {
+    return `
+      <div class="mkt-fav-locked">
+        <div class="mfl-ico">${mktStarIcon(true)}</div>
+        <h4>Guardá tus activos favoritos</h4>
+        <p>Iniciá sesión con tu cuenta de Google para marcar acciones, CEDEARs, cripto o bonos con ★ y encontrarlos todos juntos acá.</p>
+        <button type="button" class="mkt-fav-google-btn" id="mktFavLoginBtn">
+          <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4c-7.4 0-13.8 4.2-17 10.3z"/><path fill="#4CAF50" d="M24 44c5.4 0 10.3-1.9 14-5.1l-6.5-5.4C29.5 35.3 26.9 36 24 36c-5.3 0-9.7-3.1-11.3-7.6l-6.5 5C9.7 40.1 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.5l6.5 5.4C40.9 36.2 44 30.6 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+          Continuar con Google
+        </button>
+      </div>
+    `;
+  }
+
+  function mktFavEmptyHTML() {
+    return `
+      <div class="mkt-fav-empty">
+        <div class="mfe-ico">${mktStarIcon(false)}</div>
+        <h4>Todavía no tenés favoritos</h4>
+        <p>Tocá la ★ junto a cualquier activo, en cualquier pestaña, para agregarlo acá.</p>
+      </div>
+    `;
+  }
+
+  function renderFavoritesTable() {
+    const body = document.getElementById('mktTableBody');
+    const btn  = document.getElementById('mktShowAllBtn');
+    if (!body) return;
+    if (btn) btn.hidden = true;
+    if (!window._currentUser) {
+      body.innerHTML = mktFavLockedHTML();
+      const loginBtn = document.getElementById('mktFavLoginBtn');
+      if (loginBtn) loginBtn.addEventListener('click', () => {
+        if (typeof window.showLoginOverlay === 'function') window.showLoginOverlay();
+      });
+      return;
+    }
+    const favs = window._miFavoritos || [];
+    if (!favs.length || !MERCADOS) {
+      body.innerHTML = mktFavEmptyHTML();
+      return;
+    }
+    const rows = [];
+    favs.forEach(f => {
+      const cat = MERCADOS.categorias[f.category];
+      const item = cat && cat.items.find(i => i.symbol === f.symbol);
+      if (item) rows.push(mktRowHTML(item, cat.currency, f.category, { showBadge: true }));
+    });
+    body.innerHTML = rows.length ? rows.join('') : mktFavEmptyHTML();
+  }
+
   function renderCategoryTable() {
+    if (mktActiveCategory === MKT_FAV_KEY) { renderFavoritesTable(); return; }
     const body = document.getElementById('mktTableBody');
     const btn  = document.getElementById('mktShowAllBtn');
     if (!body || !MERCADOS) return;
@@ -5875,6 +6047,7 @@
   }
 
   function mktRowClickHandler(e) {
+    if (e.target.closest('.mkt-star-btn')) return;
     const row = e.target.closest('.mkt-row');
     if (!row) return;
     const symbol = row.getAttribute('data-symbol');
@@ -5886,11 +6059,18 @@
     if (item) openAssetModal(item, category, currency);
   }
 
+  function mktStarClickHandler(e) {
+    const starBtn = e.target.closest('.mkt-star-btn');
+    if (!starBtn) return;
+    e.stopPropagation();
+    mktToggleFavorite(starBtn.getAttribute('data-symbol'), starBtn.getAttribute('data-category'), starBtn);
+  }
+
   function initAssetModal() {
     const tableBody = document.getElementById('mktTableBody');
     const searchResults = document.getElementById('mktSearchResults');
-    if (tableBody) tableBody.addEventListener('click', mktRowClickHandler);
-    if (searchResults) searchResults.addEventListener('click', mktRowClickHandler);
+    if (tableBody) { tableBody.addEventListener('click', mktRowClickHandler); tableBody.addEventListener('click', mktStarClickHandler); }
+    if (searchResults) { searchResults.addEventListener('click', mktRowClickHandler); searchResults.addEventListener('click', mktStarClickHandler); }
     const closeBtn = document.getElementById('mktModalClose');
     if (closeBtn) closeBtn.addEventListener('click', closeAssetModal);
     const overlay = document.getElementById('mktModalOverlay');
