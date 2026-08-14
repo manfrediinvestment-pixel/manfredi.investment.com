@@ -8291,6 +8291,7 @@ function RSAF() {
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
+      ${courseAudioBarHTML('AF')}
       ${slide.html}
       <div class="slide-footer">
         <button class="nav-btn" onclick="PSAF()" ${currentSlideIdx === 0 ? 'disabled' : ''}>â Anterior</button>
@@ -8304,6 +8305,8 @@ function RSAF() {
       </div>
     </div>
   `;
+
+  initCourseAudio('AF', 'analisis-fundamental', CLAF+1, currentSlideIdx+1);
 
   // Draw chart after DOM ready
   if (slide.chart) {
