@@ -16,9 +16,95 @@ const MAX_TOOL_ITERATIONS = 4;
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
 };
 const JSON_HEADERS = { ...CORS_HEADERS, 'Content-Type': 'application/json' };
+
+// ─── Historial de conversaciones (barra estilo ChatGPT/Gemini, solo Socios) ─
+// Guardado en WARREN_KV, dos claves por usuario:
+//   convos:{email}      -> array liviano [{id,title,updatedAt}], para la lista
+//   convo:{email}:{id}  -> conversacion completa {id,title,createdAt,updatedAt,messages}
+// El titulo se autogenera truncando el primer mensaje del usuario -- sin
+// llamada extra a un LLM, cero costo de API por el simple hecho de guardar.
+const CONVO_LIST_CAP = 100;   // conversaciones guardadas por usuario, las mas viejas se descartan
+const CONVO_MSG_CAP = 60;     // mensajes por conversacion guardada
+const CONVO_TITLE_LEN = 60;
+
+function convoAutoTitle(messages) {
+    const firstUser = (messages || []).find(m => m.role === 'user' && typeof m.content === 'string');
+    if (!firstUser) return 'Conversación';
+    const text = firstUser.content.trim();
+    return text.length > CONVO_TITLE_LEN ? text.slice(0, CONVO_TITLE_LEN) + '…' : text;
+}
+
+async function handleConversationsList(request, env) {
+    const url = new URL(request.url);
+    const email = (url.searchParams.get('email') || '').toLowerCase();
+    if (!email) return new Response(JSON.stringify({ error: 'Email requerido' }), { status: 400, headers: JSON_HEADERS });
+    const listRaw = await env.WARREN_KV.get('convos:' + email);
+    return new Response(JSON.stringify({ conversations: listRaw ? JSON.parse(listRaw) : [] }), { headers: JSON_HEADERS });
+}
+
+async function handleConversationGet(request, env) {
+    const url = new URL(request.url);
+    const email = (url.searchParams.get('email') || '').toLowerCase();
+    const id = url.searchParams.get('id') || '';
+    if (!email || !id) return new Response(JSON.stringify({ error: 'Email e id requeridos' }), { status: 400, headers: JSON_HEADERS });
+    const raw = await env.WARREN_KV.get('convo:' + email + ':' + id);
+    if (!raw) return new Response(JSON.stringify({ error: 'No encontrada' }), { status: 404, headers: JSON_HEADERS });
+    return new Response(raw, { headers: JSON_HEADERS });
+}
+
+async function handleConversationSave(request, env) {
+    const body = await request.json();
+    const email = (body.email || '').toLowerCase();
+    const messages = body.messages;
+    if (!email || !Array.isArray(messages) || !messages.length) {
+        return new Response(JSON.stringify({ error: 'Email y messages requeridos' }), { status: 400, headers: JSON_HEADERS });
+    }
+    const now = Date.now();
+    let id = body.id || null;
+    let createdAt = now, existingTitle = null;
+    if (id) {
+        const existingRaw = await env.WARREN_KV.get('convo:' + email + ':' + id);
+        if (existingRaw) {
+            const existing = JSON.parse(existingRaw);
+            createdAt = existing.createdAt || now;
+            existingTitle = existing.title || null;
+        } else {
+            id = null; // id vencido/de otro usuario -- se trata como conversacion nueva
+        }
+    }
+    if (!id) id = now.toString(36) + Math.random().toString(36).slice(2, 8);
+    const title = body.title || existingTitle || convoAutoTitle(messages);
+    const convo = { id, title, createdAt, updatedAt: now, messages: messages.slice(-CONVO_MSG_CAP) };
+    await env.WARREN_KV.put('convo:' + email + ':' + id, JSON.stringify(convo));
+
+    const listRaw = await env.WARREN_KV.get('convos:' + email);
+    let list = listRaw ? JSON.parse(listRaw) : [];
+    list = list.filter(c => c.id !== id);
+    list.unshift({ id, title, updatedAt: now });
+    if (list.length > CONVO_LIST_CAP) {
+        const dropped = list.slice(CONVO_LIST_CAP);
+        list = list.slice(0, CONVO_LIST_CAP);
+        await Promise.all(dropped.map(c => env.WARREN_KV.delete('convo:' + email + ':' + c.id)));
+    }
+    await env.WARREN_KV.put('convos:' + email, JSON.stringify(list));
+
+    return new Response(JSON.stringify({ id, title }), { headers: JSON_HEADERS });
+}
+
+async function handleConversationDelete(request, env) {
+    const body = await request.json();
+    const email = (body.email || '').toLowerCase();
+    const id = body.id;
+    if (!email || !id) return new Response(JSON.stringify({ error: 'Email e id requeridos' }), { status: 400, headers: JSON_HEADERS });
+    await env.WARREN_KV.delete('convo:' + email + ':' + id);
+    const listRaw = await env.WARREN_KV.get('convos:' + email);
+    const list = (listRaw ? JSON.parse(listRaw) : []).filter(c => c.id !== id);
+    await env.WARREN_KV.put('convos:' + email, JSON.stringify(list));
+    return new Response(JSON.stringify({ ok: true }), { headers: JSON_HEADERS });
+}
 
 // ─── Heuristica de ruteo de modelo ─────────────────────────────────────────
 // Sin llamada extra a un LLM clasificador: el ahorro de no rutear bien es
@@ -229,6 +315,17 @@ export default {
         if (request.method === 'OPTIONS') {
             return new Response(null, { status: 204, headers: CORS_HEADERS });
         }
+
+        const url = new URL(request.url);
+        try {
+            if (request.method === 'GET' && url.pathname === '/conversations') return await handleConversationsList(request, env);
+            if (request.method === 'GET' && url.pathname === '/conversation') return await handleConversationGet(request, env);
+            if (request.method === 'POST' && url.pathname === '/conversation/save') return await handleConversationSave(request, env);
+            if (request.method === 'POST' && url.pathname === '/conversation/delete') return await handleConversationDelete(request, env);
+        } catch (err) {
+            return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: JSON_HEADERS });
+        }
+
         if (request.method !== 'POST') {
             return new Response('Method Not Allowed', { status: 405, headers: CORS_HEADERS });
         }
