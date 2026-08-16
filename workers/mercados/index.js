@@ -502,12 +502,21 @@ export default {
         }
         const finnhubKey = env.FINNHUB_KEY;
         if (!finnhubKey) throw new Error('FINNHUB_KEY no configurada');
-        const resp = await fetch(
-          `https://finnhub.io/api/v1/stock/metric?symbol=${encodeURIComponent(symbol)}&metric=all&token=${finnhubKey}`,
-          { signal: AbortSignal.timeout(10000) }
-        );
-        if (!resp.ok) throw new Error(`Finnhub HTTP ${resp.status}`);
-        const data = await resp.json();
+        const [metricResp, profileResp] = await Promise.all([
+          fetch(
+            `https://finnhub.io/api/v1/stock/metric?symbol=${encodeURIComponent(symbol)}&metric=all&token=${finnhubKey}`,
+            { signal: AbortSignal.timeout(10000) }
+          ),
+          // /stock/profile2 -- sector (finnhubIndustry) y pais de la empresa, para
+          // "Concentracion sectorial"/"Concentracion geografica" en Tu Portafolio.
+          // Free tier de Finnhub la cubre igual que /stock/metric, sin key nueva.
+          fetch(
+            `https://finnhub.io/api/v1/stock/profile2?symbol=${encodeURIComponent(symbol)}&token=${finnhubKey}`,
+            { signal: AbortSignal.timeout(10000) }
+          )
+        ]);
+        if (!metricResp.ok) throw new Error(`Finnhub HTTP ${metricResp.status}`);
+        const data = await metricResp.json();
         const m = data && data.metric;
         if (!m) throw new Error('Finnhub: sin datos de metric');
         // Nombres de campo defensivos: Finnhub no siempre expone el mismo alias
@@ -515,7 +524,13 @@ export default {
         const roe = firstNumber(m.roeTTM, m.roeRfy, m.roeAnnual);
         const pe = firstNumber(m.peBasicExclExtraTTM, m.peTTM, m.peExclExtraTTM, m.peAnnual);
         const divYield = firstNumber(m.currentDividendYieldTTM, m.dividendYieldIndicatedAnnual, m.dividendYield5Y);
-        const json = JSON.stringify({ symbol: symbol.toUpperCase(), roe, pe, divYield });
+        let sector = null, country = null;
+        if (profileResp.ok) {
+          const profile = await profileResp.json();
+          sector = (profile && profile.finnhubIndustry) || null;
+          country = (profile && profile.country) || null;
+        }
+        const json = JSON.stringify({ symbol: symbol.toUpperCase(), roe, pe, divYield, sector, country });
         await env.MERCADOS_KV.put(cacheKey, json, { expirationTtl: 86400 });
         return new Response(json, { headers });
       } catch (err) {
