@@ -7694,8 +7694,30 @@ function DCFP(id) {
   }
 }
 
-RSFP();
-RSFP();
+function renderCourseIntroFP() {
+  var totalSlides = LSFP.slice(0,8).reduce(function(s,l){return s+l.slides.length;},0);
+  var lessonRows = LSFP.slice(0,8).map(function(l,i){
+    return '<div class="step-item"><div class="step-num">'+(i+1)+'</div><div class="step-content"><div class="step-title">'+l.title+'</div><div class="step-desc">'+l.slides.length+' diapositivas + quiz de 3 preguntas</div></div></div>';
+  }).join('');
+  document.getElementById('SWFP').innerHTML = `
+    <div class="slide active">
+      <div class="slide-eyebrow">Programa del curso</div>
+      <div class="slide-title">Finanzas Personales Básicas</div>
+      <p class="slide-intro">El dinero no se administra solo &mdash; aprendé a tomar el control de tu economía personal desde hoy. Presupuesto, ahorro, deudas, fondo de emergencia e inversión inicial.</p>
+      <div class="card-grid cols-3">
+        <div class="card blue"><div class="card-label">Lecciones</div><div class="card-number">8</div><div class="card-body">Cada una con su quiz de 3 preguntas al final.</div></div>
+        <div class="card"><div class="card-label">Diapositivas</div><div class="card-number">${totalSlides}</div><div class="card-body">Contenido en profundidad, a tu ritmo y sin apuro.</div></div>
+        <div class="card green"><div class="card-label">Al terminar</div><div class="card-number">&#127891;</div><div class="card-body">Quiz final de 10 preguntas y tu diploma de finalización.</div></div>
+      </div>
+      <div class="step-list" style="margin-top:2rem;">${lessonRows}</div>
+      <div class="callout blue">Cada lección termina con un quiz rápido de 3 preguntas para reforzar lo aprendido. Al completar las 8 lecciones y aprobar el quiz final (7/10), vas a poder generar tu diploma de finalización con tu nombre.</div>
+      <div class="slide-footer" style="justify-content:center;border-top:none;padding-top:0.5rem;">
+        <button class="nav-btn primary" onclick="GLFP(0)" style="padding:13px 34px;font-size:0.95rem;">Empezar el curso &rarr;</button>
+      </div>
+    </div>`;
+}
+
+renderCourseIntroFP();
 window.GLFP=GLFP;
 window.NSFP=function(){NSFP();};
 window.PSFP=function(){PSFP();};
@@ -8316,8 +8338,30 @@ function DCIB(id) {
   }
 }
 
-RSIB();
-RSIB();
+function renderCourseIntroIB() {
+  var totalSlides = LSIB.slice(0,8).reduce(function(s,l){return s+l.slides.length;},0);
+  var lessonRows = LSIB.slice(0,8).map(function(l,i){
+    return '<div class="step-item"><div class="step-num">'+(i+1)+'</div><div class="step-content"><div class="step-title">'+l.title+'</div><div class="step-desc">'+l.slides.length+' diapositivas + quiz de 3 preguntas</div></div></div>';
+  }).join('');
+  document.getElementById('SWIB').innerHTML = `
+    <div class="slide active">
+      <div class="slide-eyebrow">Programa del curso</div>
+      <div class="slide-title">Introducción a la Bolsa</div>
+      <p class="slide-intro">Todo lo que necesitás saber para empezar a invertir con criterio propio. Acciones, bonos, ETFs, riesgo y retorno &mdash; de cero a un criterio propio para invertir.</p>
+      <div class="card-grid cols-3">
+        <div class="card blue"><div class="card-label">Lecciones</div><div class="card-number">8</div><div class="card-body">Cada una con su quiz de 3 preguntas al final.</div></div>
+        <div class="card"><div class="card-label">Diapositivas</div><div class="card-number">${totalSlides}</div><div class="card-body">Contenido en profundidad, a tu ritmo y sin apuro.</div></div>
+        <div class="card green"><div class="card-label">Al terminar</div><div class="card-number">&#127891;</div><div class="card-body">Quiz final de 10 preguntas y tu diploma de finalización.</div></div>
+      </div>
+      <div class="step-list" style="margin-top:2rem;">${lessonRows}</div>
+      <div class="callout blue">Cada lección termina con un quiz rápido de 3 preguntas para reforzar lo aprendido. Al completar las 8 lecciones y aprobar el quiz final (7/10), vas a poder generar tu diploma de finalización con tu nombre.</div>
+      <div class="slide-footer" style="justify-content:center;border-top:none;padding-top:0.5rem;">
+        <button class="nav-btn primary" onclick="GLIB(0)" style="padding:13px 34px;font-size:0.95rem;">Empezar el curso &rarr;</button>
+      </div>
+    </div>`;
+}
+
+renderCourseIntroIB();
 window.GLIB=GLIB;
 window.NSIB=function(){NSIB();};
 window.PSIB=function(){PSIB();};
@@ -9126,8 +9170,30 @@ function DCAF(id) {
 }
 
 // Init
-RSAF();
-RSAF();
+function renderCourseIntroAF() {
+  var totalSlides = LSAF.slice(0,8).reduce(function(s,l){return s+l.slides.length;},0);
+  var lessonRows = LSAF.slice(0,8).map(function(l,i){
+    return '<div class="step-item"><div class="step-num">'+(i+1)+'</div><div class="step-content"><div class="step-title">'+l.title+'</div><div class="step-desc">'+l.slides.length+' diapositivas + quiz de 3 preguntas</div></div></div>';
+  }).join('');
+  document.getElementById('SWAF').innerHTML = `
+    <div class="slide active">
+      <div class="slide-eyebrow">Programa del curso</div>
+      <div class="slide-title">Análisis Fundamental</div>
+      <p class="slide-intro">Cómo analizar empresas y tomar decisiones de inversión inteligentes. Valor intrínseco, PER, EV/FCF y flujo de caja &mdash; valuá empresas como un profesional.</p>
+      <div class="card-grid cols-3">
+        <div class="card blue"><div class="card-label">Lecciones</div><div class="card-number">8</div><div class="card-body">Cada una con su quiz de 3 preguntas al final.</div></div>
+        <div class="card"><div class="card-label">Diapositivas</div><div class="card-number">${totalSlides}</div><div class="card-body">Contenido en profundidad, a tu ritmo y sin apuro.</div></div>
+        <div class="card green"><div class="card-label">Al terminar</div><div class="card-number">&#127891;</div><div class="card-body">Quiz final de 10 preguntas y tu diploma de finalización.</div></div>
+      </div>
+      <div class="step-list" style="margin-top:2rem;">${lessonRows}</div>
+      <div class="callout blue">Cada lección termina con un quiz rápido de 3 preguntas para reforzar lo aprendido. Al completar las 8 lecciones y aprobar el quiz final (7/10), vas a poder generar tu diploma de finalización con tu nombre.</div>
+      <div class="slide-footer" style="justify-content:center;border-top:none;padding-top:0.5rem;">
+        <button class="nav-btn primary" onclick="GLAF(0)" style="padding:13px 34px;font-size:0.95rem;">Empezar el curso &rarr;</button>
+      </div>
+    </div>`;
+}
+
+renderCourseIntroAF();
 window.GLAF=GLAF;
 window.NSAF=function(){NSAF();};
 window.PSAF=function(){PSAF();};
@@ -9760,8 +9826,30 @@ function DCMA(id) {
   }
 }
 
-RSMA();
-RSMA();
+function renderCourseIntroMA() {
+  var totalSlides = LSMA.slice(0,8).reduce(function(s,l){return s+l.slides.length;},0);
+  var lessonRows = LSMA.slice(0,8).map(function(l,i){
+    return '<div class="step-item"><div class="step-num">'+(i+1)+'</div><div class="step-content"><div class="step-title">'+l.title+'</div><div class="step-desc">'+l.slides.length+' diapositivas + quiz de 3 preguntas</div></div></div>';
+  }).join('');
+  document.getElementById('SWMA').innerHTML = `
+    <div class="slide active">
+      <div class="slide-eyebrow">Programa del curso</div>
+      <div class="slide-title">El Mercado Argentino</div>
+      <p class="slide-intro">CEDEARs, bonos, tipos de cambio y cómo invertir inteligentemente en el contexto local. Estrategias adaptadas a la realidad del inversor argentino.</p>
+      <div class="card-grid cols-3">
+        <div class="card blue"><div class="card-label">Lecciones</div><div class="card-number">8</div><div class="card-body">Cada una con su quiz de 3 preguntas al final.</div></div>
+        <div class="card"><div class="card-label">Diapositivas</div><div class="card-number">${totalSlides}</div><div class="card-body">Contenido en profundidad, a tu ritmo y sin apuro.</div></div>
+        <div class="card green"><div class="card-label">Al terminar</div><div class="card-number">&#127891;</div><div class="card-body">Quiz final de 10 preguntas y tu diploma de finalización.</div></div>
+      </div>
+      <div class="step-list" style="margin-top:2rem;">${lessonRows}</div>
+      <div class="callout blue">Cada lección termina con un quiz rápido de 3 preguntas para reforzar lo aprendido. Al completar las 8 lecciones y aprobar el quiz final (7/10), vas a poder generar tu diploma de finalización con tu nombre.</div>
+      <div class="slide-footer" style="justify-content:center;border-top:none;padding-top:0.5rem;">
+        <button class="nav-btn primary" onclick="GLMA(0)" style="padding:13px 34px;font-size:0.95rem;">Empezar el curso &rarr;</button>
+      </div>
+    </div>`;
+}
+
+renderCourseIntroMA();
 window.GLMA=GLMA;
 window.NSMA=function(){NSMA();};
 window.PSMA=function(){PSMA();};
