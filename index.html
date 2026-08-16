@@ -4500,7 +4500,7 @@
           </div>
           <div id="mfSummary" class="mf-summary">Calculando con datos históricos...</div>
           <div class="mf-chart-wrap"><canvas id="mfChartCanvas"></canvas></div>
-          <div class="pf-metric-note">Incluye únicamente las posiciones en acciones y CEDEARs de mi cartera personal &mdash; no incluye el fondo común de inversión ni el efectivo. Rendimiento con la composición actual, no desde la fecha de cada compra. En YTD y 1 año, "Mi cartera" arranca el 22-may-2026 (fecha real en que armé esta composición) mientras que el S&amp;P 500 muestra el período completo &mdash; por eso la línea de mi cartera empieza más adelante en el gráfico.</div>
+          <div class="pf-metric-note">Incluye únicamente las posiciones en acciones y CEDEARs de mi cartera personal &mdash; no incluye el fondo común de inversión ni el efectivo. El % de "Mi cartera" se calcula con el método Dietz Modificado (estándar GIPS para carteras con aportes de capital), que pondera el aporte por cuánto tiempo estuvo invertido dentro de cada ventana. En 1 semana y 1 mes da igual al retorno simple (no hubo aportes nuevos en esos períodos). En YTD y 1 año, como toda la cartera se armó de una vez el 22-may-2026, ese aporte único se pondera por el tiempo que faltaba de la ventana &mdash; por eso el % puede ser mayor al retorno simple visible en el gráfico, y el S&amp;P 500 (que sí muestra el período de calendario completo) empieza antes en la línea.</div>
         </div>
 
         <div class="pf-card" id="mfCompWrapper" style="position:relative;">
@@ -5411,6 +5411,36 @@
     return count;
   }
 
+  function mfCalendarDaysBetween(from, to){
+    var d = new Date(from); d.setHours(0,0,0,0);
+    var end = new Date(to); end.setHours(0,0,0,0);
+    return Math.round((end - d) / 86400000);
+  }
+
+  // Metodo Dietz Modificado: R = (EMV - BMV - CF) / (BMV + CF x (T-t)/T)
+  // pSeries = serie de valor de la cartera (USD) SOLO durante el tramo en que existio de verdad
+  // (longitud pUseLen); dates = eje de fechas completo de la ventana (longitud totalLen);
+  // padStart = indice donde arranca pSeries dentro de dates (0 si la cartera ya existia al
+  // inicio de la ventana, > 0 si la ventana arranca antes de MF_INCEPTION_DATE).
+  //
+  // Si padStart === 0 no hubo flujo de caja dentro de la ventana (la cartera ya estaba armada)
+  // y la formula colapsa al retorno simple (EMV/BMV - 1). Si padStart > 0, todo el capital
+  // entro como un unico aporte (CF) en la fecha de inicio real -- con BMV=0 -- y el retorno
+  // queda ponderado por cuanto tiempo de la ventana total (T) estuvo ese capital invertido.
+  function mfModifiedDietzReturn(pSeries, dates, padStart){
+    var EMV = pSeries[pSeries.length-1];
+    if(padStart <= 0){
+      var BMV = pSeries[0];
+      return BMV ? (EMV/BMV - 1) * 100 : 0;
+    }
+    var CF = pSeries[0];
+    var T = mfCalendarDaysBetween(dates[0], dates[dates.length-1]) || 1;
+    var t = mfCalendarDaysBetween(dates[0], dates[padStart]);
+    var weight = (T - t) / T;
+    var denom = CF * weight;
+    return denom ? ((EMV - CF) / denom) * 100 : 0;
+  }
+
   // Lista de N dias habiles (Lun-Vie, sin feriados) terminando en endDate, mas viejo primero --
   // misma aproximacion que mfBizDaysBetween, usada para poner fechas reales en el eje X.
   function mfBizDaysList(n, endDate){
@@ -5505,12 +5535,18 @@
     var padBench = totalLen - bUseLen;
     var benchPctPadded = new Array(padBench).fill(null).concat(benchPct);
 
+    // El numero de resumen ("Mi cartera: +-X%") usa Dietz Modificado, no el ultimo punto de la
+    // curva -- en 1 semana/1 mes da lo mismo (no hay flujo de caja dentro de la ventana), pero
+    // en YTD/1 año pondera el aporte unico del 22-may por cuanto tiempo de la ventana total
+    // estuvo invertido, asi que el numero YA NO es igual al del retorno simple de la curva.
+    var dietzReturn = mfModifiedDietzReturn(pSeries, dates, pad);
+
     return {
       dates: dates,
       portfolioPct: portfolioPctPadded, benchPct: benchPctPadded,
       daysUsedPortfolio: pUseLen, daysUsedBench: bUseLen,
       granularity: granularity || 'week',
-      totalReturn: portfolioPct[portfolioPct.length-1], benchTotalReturn: benchPct[benchPct.length-1],
+      totalReturn: dietzReturn, benchTotalReturn: benchPct[benchPct.length-1],
       validHoldings: validHoldings, closesByTicker: closesByTicker
     };
   }
@@ -5611,7 +5647,7 @@
     var sign1 = m.totalReturn>=0?'+':'−', sign2 = m.benchTotalReturn>=0?'+':'−';
     var sameWindow = m.daysUsedPortfolio === m.daysUsedBench;
     summary.innerHTML = '<span>Mi cartera: <b style="color:'+(m.totalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign1 + Math.abs(m.totalReturn).toFixed(1) +'%</b>'
-        + (sameWindow ? '' : ' <small style="color:rgba(255,255,255,.4);">('+ m.daysUsedPortfolio +'d)</small>') + '</span>'
+        + (sameWindow ? '' : ' <small style="color:rgba(255,255,255,.4);">(Dietz Modificado)</small>') + '</span>'
       + '<span>S&amp;P 500: <b style="color:'+(m.benchTotalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign2 + Math.abs(m.benchTotalReturn).toFixed(1) +'%</b>'
         + (sameWindow ? '' : ' <small style="color:rgba(255,255,255,.4);">('+ m.daysUsedBench +'d)</small>') + '</span>'
       + '<span>'+ pfEsc(win.label) + (sameWindow ? '' : ' &middot; cartera desde 22-may') +'</span>';
