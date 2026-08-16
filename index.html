@@ -7281,8 +7281,8 @@ function miRenderDiploma(course) {
   document.getElementById('diplomaOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 
+  var prog = miProgressLoad(course);
   if (typeof window._miSaveCertificado === 'function') {
-    var prog = miProgressLoad(course);
     window._miSaveCertificado(course, {
       id: id,
       curso: meta.name,
@@ -7291,6 +7291,7 @@ function miRenderDiploma(course) {
       finalTotal: prog.FINAL ? prog.FINAL.total : null
     });
   }
+  miMaybeEmailDiploma(course, meta, id, prog);
 }
 
 function miCloseDiploma() {
@@ -7298,20 +7299,62 @@ function miCloseDiploma() {
   document.body.style.overflow = '';
 }
 
-function miDownloadDiplomaPDF() {
-  var btn = document.getElementById('diplomaDownloadBtn');
+// Genera el PDF del diploma a partir del DOM ya renderizado. Devuelve una
+// promesa con el objeto jsPDF (para .save()) y el mismo contenido en base64
+// (para adjuntarlo tal cual en el mail, sin generarlo dos veces).
+function miGenerateDiplomaPdf() {
   var cert = document.getElementById('diplomaCert');
-  if (!cert || !window.html2canvas || !window.jspdf) return;
-  var origText = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = 'Generando…';
-  html2canvas(cert, { scale: 2, backgroundColor: '#F3F4F8' }).then(function (canvas) {
+  if (!cert || !window.html2canvas || !window.jspdf) return Promise.reject(new Error('Faltan dependencias de PDF'));
+  return html2canvas(cert, { scale: 2, backgroundColor: '#F3F4F8' }).then(function (canvas) {
     var imgData = canvas.toDataURL('image/png');
     var jsPDF = window.jspdf.jsPDF;
     var pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
     pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    var base64 = pdf.output('datauristring').split(',')[1];
+    return { pdf: pdf, base64: base64 };
+  });
+}
+
+// Manda el diploma por mail (fire-and-forget) la primera vez que se genera
+// para esta cuenta y este curso. Se marca en localStorage ANTES de que
+// resuelva el pedido para no duplicar el envío si el usuario reabre el
+// diploma varias veces seguidas; si el envío falla, se libera la marca para
+// poder reintentar la próxima vez que entre.
+function miMaybeEmailDiploma(course, meta, certificateId, prog) {
+  var user = window._currentUser;
+  if (!user || !user.email) return;
+  var key = 'mi_diploma_emailed_' + course + '_' + user.uid;
+  if (localStorage.getItem(key)) return;
+  localStorage.setItem(key, '1');
+  miGenerateDiplomaPdf().then(function (result) {
+    return fetch('https://log-user.nachito2502.workers.dev/enviar-diploma', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: user.email,
+        name: user.displayName || 'Estudiante Manfredi',
+        course: meta.name,
+        certificateId: certificateId,
+        score: prog.FINAL ? prog.FINAL.score : null,
+        total: prog.FINAL ? prog.FINAL.total : null,
+        pdfBase64: result.base64
+      })
+    });
+  }).catch(function (e) {
+    console.warn('No se pudo enviar el diploma por mail:', e);
+    localStorage.removeItem(key);
+  });
+}
+
+function miDownloadDiplomaPDF() {
+  var btn = document.getElementById('diplomaDownloadBtn');
+  if (!btn) return;
+  var origText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Generando…';
+  miGenerateDiplomaPdf().then(function (result) {
     var safeName = (document.getElementById('diplomaName').textContent || 'diploma').replace(/[^a-zA-Z0-9]+/g, '-');
-    pdf.save('Diploma-Manfredi-' + safeName + '.pdf');
+    result.pdf.save('Diploma-Manfredi-' + safeName + '.pdf');
     btn.disabled = false;
     btn.textContent = origText;
   }).catch(function (e) {

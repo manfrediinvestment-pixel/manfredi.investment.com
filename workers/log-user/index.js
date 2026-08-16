@@ -15,6 +15,11 @@ export default {
               return await avisarInforme(request, env, headers);
           }
 
+          // Ruta para mandar por mail el diploma de un curso de University recién completado
+          if (pathname === '/enviar-diploma') {
+              return await enviarDiploma(request, env, headers);
+          }
+
           // Ruta para marcar usuario como miembro
           if (new URL(request.url).pathname === '/marcar-miembro') {
                       const { email, accion, monto } = await request.json();
@@ -606,6 +611,99 @@ function htmlInformeNuevo({ title, intro, sections = [], chart = [], chartTitle,
 
   <tr><td style="padding:22px 40px 36px 40px;">
     <p style="color:rgba(255,255,255,.38);font-size:12.5px;line-height:1.6;margin:0;font-family:'IBM Plex Sans',sans-serif;">Recibís este mail porque tenés una cuenta en Manfredi Investment. Si preferís no recibir avisos de informes nuevos, respondé este correo y te sacamos de la lista.</p>
+  </td></tr>
+
+  <tr><td style="background-color:#070b14;padding:18px 40px;border-top:1px solid rgba(255,255,255,.08);text-align:center;">
+    <p style="color:rgba(255,255,255,.3);font-size:11.5px;margin:0;font-family:'IBM Plex Sans',sans-serif;">&copy; 2026 Manfredi Investment &middot; Buenos Aires, Argentina</p>
+  </td></tr>
+
+</table>
+</td></tr></table>
+</body></html>`;
+}
+
+// ─── Ruta "/enviar-diploma": manda por mail (Resend) el diploma en PDF de un ──
+// curso de University recién completado. Se llama desde el cliente (miShowDiploma
+// en index.html) apenas se genera el diploma, con el PDF ya armado en base64
+// (mismo archivo que se ofrece para descargar) para adjuntarlo tal cual.
+async function enviarDiploma(request, env, corsHeaders) {
+    const headers = { ...corsHeaders, 'Content-Type': 'application/json' };
+
+    let body;
+    try {
+        body = await request.json();
+    } catch {
+        return new Response(JSON.stringify({ error: 'Body invalido' }), { status: 400, headers });
+    }
+
+    const { email, name, course, certificateId, score, total, pdfBase64 } = body;
+    if (!email || !name || !course || !pdfBase64) {
+        return new Response(JSON.stringify({ error: 'Faltan campos: email, name, course y pdfBase64 son requeridos' }), { status: 400, headers });
+    }
+
+    try {
+        const res = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                from: 'Manfredi Investment <diplomas@manfredinvestment.com>',
+                to: email,
+                subject: `🎓 Tu diploma de ${course} — Manfredi Investment University`,
+                html: htmlDiplomaCompletado({ name, course, certificateId, score, total }),
+                attachments: [{ filename: `Diploma-Manfredi-${course.replace(/[^a-zA-Z0-9]+/g, '-')}.pdf`, content: pdfBase64 }]
+            })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            return new Response(JSON.stringify({ ok: false, status: res.status, error: data }), { status: 502, headers });
+        }
+        return new Response(JSON.stringify({ ok: true, id: data.id }), { status: 200, headers });
+    } catch (err) {
+        return new Response(JSON.stringify({ ok: false, error: String(err) }), { status: 500, headers });
+    }
+}
+
+function htmlDiplomaCompletado({ name, course, certificateId, score, total }) {
+    const scoreLine = (score != null && total != null)
+        ? `<p style="color:rgba(255,255,255,.5);font-size:12.5px;margin:0 0 4px 0;font-family:'IBM Plex Sans',sans-serif;">Quiz final: ${score} / ${total}</p>`
+        : '';
+    return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;padding:0;background-color:#05080f;font-family:'IBM Plex Sans',system-ui,-apple-system,Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#05080f;padding:36px 16px;"><tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;width:100%;background-color:#0A0F1E;border:1px solid rgba(242,201,76,.18);border-radius:10px;overflow:hidden;">
+
+  <tr><td style="padding:26px 40px 22px 40px;border-bottom:1px solid rgba(242,201,76,.35);">
+    <table cellpadding="0" cellspacing="0" role="presentation"><tr>
+      <td style="background-color:#F2C94C;width:34px;height:34px;border-radius:6px;text-align:center;vertical-align:middle;"><span style="color:#0A0F1E;font-weight:800;font-size:14px;line-height:34px;font-family:'IBM Plex Sans',sans-serif;">MI</span></td>
+      <td style="padding-left:11px;vertical-align:middle;"><span style="color:#ffffff;font-size:15px;font-weight:600;letter-spacing:.2px;font-family:'IBM Plex Sans',sans-serif;">Manfredi Investment</span><br><span style="color:rgba(255,255,255,.5);font-size:10px;letter-spacing:1.6px;text-transform:uppercase;font-family:'IBM Plex Sans',sans-serif;">University</span></td>
+    </tr></table>
+  </td></tr>
+
+  <tr><td style="padding:40px 40px 0 40px;text-align:center;">
+    <p style="color:#F2C94C;font-size:11px;letter-spacing:2.2px;text-transform:uppercase;margin:0 0 14px 0;font-family:'IBM Plex Sans',sans-serif;font-weight:600;">Curso completado</p>
+    <h1 style="color:#ffffff;font-size:27px;font-weight:400;line-height:1.28;letter-spacing:-.01em;margin:0 0 16px 0;font-family:'DM Serif Display',Georgia,serif;">¡Felicitaciones, ${name}!</h1>
+    <p style="color:rgba(255,255,255,.68);font-size:15px;line-height:1.62;margin:0 0 8px 0;font-family:'IBM Plex Sans',sans-serif;">Completaste íntegramente el curso <strong style="color:#fff;">${course}</strong> — las 8 lecciones, sus quizzes y el quiz final.</p>
+    ${scoreLine}
+  </td></tr>
+
+  <tr><td style="padding:28px 40px 6px 40px;">
+    <table cellpadding="0" cellspacing="0" role="presentation" style="background-color:#111a30;border:1px solid #2b3757;border-radius:6px;width:100%;">
+      <tr><td style="padding:22px 24px;text-align:center;">
+        <p style="color:rgba(255,255,255,.85);font-size:14px;line-height:1.6;margin:0;font-family:'IBM Plex Sans',sans-serif;">Tu diploma de finalización va adjunto a este mail en PDF, listo para guardar o compartir.</p>
+        ${certificateId ? `<p style="color:rgba(255,255,255,.35);font-size:11px;margin:12px 0 0 0;font-family:'IBM Plex Sans',sans-serif;letter-spacing:.5px;">ID de certificado: ${certificateId}</p>` : ''}
+      </tr></td>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:30px 40px 6px 40px;">
+    <table cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+      <tr><td align="center" style="background-color:#F2C94C;border-radius:7px;padding:15px 30px;">
+        <a href="https://manfredinvestment.com/#university" style="color:#0A0F1E;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:.3px;font-family:'IBM Plex Sans',sans-serif;">Seguir con el próximo curso</a>
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:22px 40px 36px 40px;">
+    <p style="color:rgba(255,255,255,.38);font-size:12.5px;line-height:1.6;margin:0;font-family:'IBM Plex Sans',sans-serif;">Recibís este mail porque completaste un curso de Manfredi Investment University con tu cuenta.</p>
   </td></tr>
 
   <tr><td style="background-color:#070b14;padding:18px 40px;border-top:1px solid rgba(255,255,255,.08);text-align:center;">
