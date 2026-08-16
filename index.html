@@ -2918,6 +2918,21 @@
         return false;
       }
     };
+
+    // Guarda un registro del diploma/certificado obtenido al terminar un curso de University.
+    // No requiere ser socio: cualquier cuenta con Google puede sacar diplomas de los cursos gratuitos.
+    window._miSaveCertificado = async function(course, data) {
+      if (!window._currentUser) return false;
+      try {
+        const ref = doc(db, 'users', window._currentUser.uid);
+        const field = 'certificados.' + course;
+        await updateDoc(ref, { [field]: { ...data, otorgadoEn: serverTimestamp() } });
+        return true;
+      } catch (e) {
+        console.warn('certificado save failed:', e);
+        return false;
+      }
+    };
   </script>
 <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 <style>
@@ -6396,6 +6411,9 @@
 
 <!-- COURSE STYLES -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- Diploma: generación de imagen/PDF -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 
   .app {
@@ -6429,9 +6447,15 @@
   .course-meta { display: flex; gap: 1.5rem; margin-top: 1.5rem; flex-wrap: wrap; }
   .meta-item { font-size: 13px; font-family: sans-serif; color: rgba(255,255,255,0.92); font-weight: 500; }
 
-  .lesson-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 1.5rem; scrollbar-width: none; }
+  .lesson-nav-wrap { display: flex; align-items: center; gap: 6px; margin-bottom: 1.5rem; }
+  .lesson-nav-arrow { flex-shrink: 0; width: 28px; height: 28px; }
+  .lesson-nav-arrow svg { width: 12px; height: 12px; }
+  .lesson-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none; scroll-behavior: smooth; flex: 1 1 0; min-width: 0; }
   .lesson-nav::-webkit-scrollbar { display: none; }
   .lesson-tab { flex-shrink: 0; padding: 8px 18px; border-radius: 30px; border: 1.5px solid var(--border); background: white; color: var(--gray); font-size: 13px; font-family: sans-serif; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .lesson-tab.quiz-final-tab { border-color: #F2C94C; color: #9a7300; font-weight: 700; }
+  .lesson-tab.quiz-final-tab:hover { background: #fffbeb; }
+  .lesson-tab.quiz-final-tab.active { background: #F2C94C; border-color: #F2C94C; color: #1a1a1a; }
   .lesson-tab:hover { background: var(--blue-light); color: var(--blue-dark); border-color: var(--blue); }
   .lesson-tab.active { background: var(--blue); color: white; border-color: var(--blue); }
 
@@ -6519,6 +6543,38 @@
   .nav-btn.primary { background: var(--blue); color: white; border-color: var(--blue); }
   .nav-btn.primary:hover { background: var(--blue-dark); }
   .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* ===== QUIZ ENGINE (compartido por todos los cursos) ===== */
+  .quiz-wrap { margin-top: 0.25rem; }
+  .quiz-intro { font-family: sans-serif; font-size: 0.92rem; color: var(--gray); margin-bottom: 1.5rem; line-height: 1.6; }
+  .quiz-q { margin-bottom: 1.75rem; padding-bottom: 1.75rem; border-bottom: 1px solid var(--border); }
+  .quiz-q:last-of-type { border-bottom: none; margin-bottom: 0.5rem; padding-bottom: 0; }
+  .quiz-q-head { display: flex; gap: 10px; align-items: baseline; margin-bottom: 0.9rem; }
+  .quiz-q-num { font-family: sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--blue); flex-shrink: 0; padding-top: 3px; white-space: nowrap; }
+  .quiz-q-text { font-family: sans-serif; font-size: 1rem; font-weight: 600; color: #181818; line-height: 1.5; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; font-family: sans-serif; font-size: 0.9rem; padding: 12px 16px; border-radius: 10px; border: 1.5px solid var(--border); background: white; cursor: pointer; transition: all .15s; color: #333; }
+  .quiz-opt:hover:not(.locked) { border-color: var(--blue); background: var(--blue-light); }
+  .quiz-opt-mark { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: transparent; }
+  .quiz-opt.selected .quiz-opt-mark { border-color: var(--blue); background: var(--blue); color: white; }
+  .quiz-opt.selected .quiz-opt-mark::after { content: '✓'; }
+  .quiz-opt.locked { cursor: default; }
+  .quiz-opt.correct { border-color: #16a34a; background: #f0fdf4; }
+  .quiz-opt.correct .quiz-opt-mark { border-color: #16a34a; background: #16a34a; color: white; }
+  .quiz-opt.correct .quiz-opt-mark::after { content: '✓'; }
+  .quiz-opt.incorrect { border-color: #dc2626; background: #fef2f2; }
+  .quiz-opt.incorrect .quiz-opt-mark { border-color: #dc2626; background: #dc2626; color: white; }
+  .quiz-opt.incorrect .quiz-opt-mark::after { content: '✕'; }
+  .quiz-explain { margin-top: 10px; padding: 12px 14px; border-radius: 10px; background: var(--gray-light); font-family: sans-serif; font-size: 0.83rem; color: #444; line-height: 1.6; }
+  .quiz-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 1rem; }
+  .quiz-result { text-align: center; padding: 1.75rem 1.5rem; border-radius: 14px; margin-bottom: 1.75rem; }
+  .quiz-result.pass { background: #f0fdf4; border: 1.5px solid #16a34a; }
+  .quiz-result.fail { background: #fef2f2; border: 1.5px solid #dc2626; }
+  .quiz-result-score { font-family: Georgia, serif; font-size: 2.4rem; font-weight: 700; }
+  .quiz-result.pass .quiz-result-score { color: #16a34a; }
+  .quiz-result.fail .quiz-result-score { color: #dc2626; }
+  .quiz-result-label { font-family: sans-serif; font-size: 0.85rem; color: #555; margin-top: 4px; }
+  .quiz-result .quiz-actions { justify-content: center; margin-top: 1.25rem; }
 
   .meta-item { display: flex; align-items: center; gap: 6px; font-size: 13px; font-family: sans-serif; color: rgba(255,255,255,0.92); font-weight: 500; }
   .slide { display: none; padding: 2.5rem; animation: slideIn 0.25s ease; }
@@ -6773,21 +6829,30 @@
     <div class="course-title">Finanzas Personales Básicas</div>
     <div class="course-subtitle">El dinero no se administra solo &mdash; aprendé a tomar el control de tu economía personal desde hoy</div>
     <div class="course-meta">
-      <div class="meta-item"> 8 lecciones</div>
-      <div class="meta-item"> Gráficos interactivos</div>
+      <div class="meta-item">&#128218; 8 lecciones</div>
+      <div class="meta-item">&#128202; Gráficos interactivos</div>
       <div class="meta-item">&#127462;&#127479; Adaptado al contexto argentino</div>
     </div>
   </div>
 
-  <div class="lesson-nav" id="LNFP">
-    <button class="lesson-tab active" onclick="GLFP(0)">1. Mentalidad financiera</button>
-    <button class="lesson-tab" onclick="GLFP(1)">2. El presupuesto</button>
-    <button class="lesson-tab" onclick="GLFP(2)">3. Fondo de emergencia</button>
-    <button class="lesson-tab" onclick="GLFP(3)">4. Deudas</button>
-    <button class="lesson-tab" onclick="GLFP(4)">5. Ahorro e inflación</button>
-    <button class="lesson-tab" onclick="GLFP(5)">6. Metas financieras</button>
-    <button class="lesson-tab" onclick="GLFP(6)">7. Primer inversión</button>
-    <button class="lesson-tab" onclick="GLFP(7)">8. Plan de acción</button>
+  <div class="lesson-nav-wrap">
+    <button class="carousel-btn lesson-nav-arrow" id="LNFPPrev" aria-label="Lecciones anteriores">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="lesson-nav" id="LNFP">
+      <button class="lesson-tab active" onclick="GLFP(0)">1. Mentalidad financiera</button>
+      <button class="lesson-tab" onclick="GLFP(1)">2. El presupuesto</button>
+      <button class="lesson-tab" onclick="GLFP(2)">3. Fondo de emergencia</button>
+      <button class="lesson-tab" onclick="GLFP(3)">4. Deudas</button>
+      <button class="lesson-tab" onclick="GLFP(4)">5. Ahorro e inflación</button>
+      <button class="lesson-tab" onclick="GLFP(5)">6. Metas financieras</button>
+      <button class="lesson-tab" onclick="GLFP(6)">7. Primer inversión</button>
+      <button class="lesson-tab" onclick="GLFP(7)">8. Plan de acción</button>
+      <button class="lesson-tab quiz-final-tab" onclick="GLFP(8)">🎓 Quiz Final</button>
+    </div>
+    <button class="carousel-btn lesson-nav-arrow" id="LNFPNext" aria-label="Lecciones siguientes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
   </div>
 
   <div class="slide-wrapper" id="SWFP"></div>
@@ -6802,21 +6867,30 @@
     <div class="course-title">Introducción a la Bolsa</div>
     <div class="course-subtitle">Todo lo que necesitás saber para empezar a invertir con criterio propio</div>
     <div class="course-meta">
-      <div class="meta-item"> 8 lecciones</div>
-      <div class="meta-item"> Gráficos interactivos</div>
+      <div class="meta-item">&#128218; 8 lecciones</div>
+      <div class="meta-item">&#128202; Gráficos interactivos</div>
       <div class="meta-item">&#127462;&#127479; Contexto argentino incluido</div>
     </div>
   </div>
 
-  <div class="lesson-nav" id="LNIB">
-    <button class="lesson-tab active" onclick="GLIB(0)">1. ¿Qué es la bolsa?</button>
-    <button class="lesson-tab" onclick="GLIB(1)">2. Instrumentos</button>
-    <button class="lesson-tab" onclick="GLIB(2)">3. Cómo funciona</button>
-    <button class="lesson-tab" onclick="GLIB(3)">4. Riesgo y retorno</button>
-    <button class="lesson-tab" onclick="GLIB(4)">5. ETFs e índices</button>
-    <button class="lesson-tab" onclick="GLIB(5)">6. Bolsa argentina</button>
-    <button class="lesson-tab" onclick="GLIB(6)">7. Cómo empezar</button>
-    <button class="lesson-tab" onclick="GLIB(7)">8. Errores comunes</button>
+  <div class="lesson-nav-wrap">
+    <button class="carousel-btn lesson-nav-arrow" id="LNIBPrev" aria-label="Lecciones anteriores">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="lesson-nav" id="LNIB">
+      <button class="lesson-tab active" onclick="GLIB(0)">1. ¿Qué es la bolsa?</button>
+      <button class="lesson-tab" onclick="GLIB(1)">2. Instrumentos</button>
+      <button class="lesson-tab" onclick="GLIB(2)">3. Cómo funciona</button>
+      <button class="lesson-tab" onclick="GLIB(3)">4. Riesgo y retorno</button>
+      <button class="lesson-tab" onclick="GLIB(4)">5. ETFs e índices</button>
+      <button class="lesson-tab" onclick="GLIB(5)">6. Bolsa argentina</button>
+      <button class="lesson-tab" onclick="GLIB(6)">7. Cómo empezar</button>
+      <button class="lesson-tab" onclick="GLIB(7)">8. Errores comunes</button>
+      <button class="lesson-tab quiz-final-tab" onclick="GLIB(8)">🎓 Quiz Final</button>
+    </div>
+    <button class="carousel-btn lesson-nav-arrow" id="LNIBNext" aria-label="Lecciones siguientes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
   </div>
 
   <div class="slide-wrapper" id="SWIB"></div>
@@ -6833,22 +6907,31 @@
     <div class="course-title">Análisis Fundamental</div>
     <div class="course-subtitle">Cómo analizar empresas y tomar decisiones de inversión inteligentes</div>
     <div class="course-meta">
-      <div class="meta-item"> 8 lecciones</div>
-      <div class="meta-item"> Gráficos interactivos</div>
-      <div class="meta-item"> Nivel principiante a intermedio</div>
+      <div class="meta-item">&#128218; 8 lecciones</div>
+      <div class="meta-item">&#128202; Gráficos interactivos</div>
+      <div class="meta-item">&#127919; Nivel principiante a intermedio</div>
     </div>
   </div>
 
   <!-- LESSON TABS -->
-  <div class="lesson-nav" id="LNAF">
-    <button class="lesson-tab active" onclick="GLAF(0)">1. Introducción</button>
-    <button class="lesson-tab" onclick="GLAF(1)">2. Valor intrínseco</button>
-    <button class="lesson-tab" onclick="GLAF(2)">3. Las 5 condiciones</button>
-    <button class="lesson-tab" onclick="GLAF(3)">4. PER y PEG</button>
-    <button class="lesson-tab" onclick="GLAF(4)">5. EV/FCF y EBIT</button>
-    <button class="lesson-tab" onclick="GLAF(5)">6. Deuda financiera</button>
-    <button class="lesson-tab" onclick="GLAF(6)">7. DCF y WACC</button>
-    <button class="lesson-tab" onclick="GLAF(7)">8. Elegir una empresa</button>
+  <div class="lesson-nav-wrap">
+    <button class="carousel-btn lesson-nav-arrow" id="LNAFPrev" aria-label="Lecciones anteriores">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="lesson-nav" id="LNAF">
+      <button class="lesson-tab active" onclick="GLAF(0)">1. Introducción</button>
+      <button class="lesson-tab" onclick="GLAF(1)">2. Valor intrínseco</button>
+      <button class="lesson-tab" onclick="GLAF(2)">3. Las 5 condiciones</button>
+      <button class="lesson-tab" onclick="GLAF(3)">4. PER y PEG</button>
+      <button class="lesson-tab" onclick="GLAF(4)">5. EV/FCF y EBIT</button>
+      <button class="lesson-tab" onclick="GLAF(5)">6. Deuda financiera</button>
+      <button class="lesson-tab" onclick="GLAF(6)">7. DCF y WACC</button>
+      <button class="lesson-tab" onclick="GLAF(7)">8. Elegir una empresa</button>
+      <button class="lesson-tab quiz-final-tab" onclick="GLAF(8)">🎓 Quiz Final</button>
+    </div>
+    <button class="carousel-btn lesson-nav-arrow" id="LNAFNext" aria-label="Lecciones siguientes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
   </div>
 
   <!-- SLIDE WRAPPER -->
@@ -6865,21 +6948,30 @@
     <div class="course-title">El Mercado Argentino</div>
     <div class="course-subtitle">CEDEARs, bonos, tipos de cambio y cómo invertir inteligentemente en el contexto local</div>
     <div class="course-meta">
-      <div class="meta-item"> 8 lecciones</div>
-      <div class="meta-item"> Diagramas conceptuales</div>
+      <div class="meta-item">&#128218; 8 lecciones</div>
+      <div class="meta-item">&#128202; Diagramas conceptuales</div>
       <div class="meta-item">&#127462;&#127479; 100% contexto argentino</div>
     </div>
   </div>
 
-  <div class="lesson-nav" id="LNMA">
-    <button class="lesson-tab active" onclick="GLMA(0)">1. El sistema financiero AR</button>
-    <button class="lesson-tab" onclick="GLMA(1)">2. Los tipos de cambio</button>
-    <button class="lesson-tab" onclick="GLMA(2)">3. CEDEARs en profundidad</button>
-    <button class="lesson-tab" onclick="GLMA(3)">4. Renta fija local</button>
-    <button class="lesson-tab" onclick="GLMA(4)">5. El Merval y las acciones</button>
-    <button class="lesson-tab" onclick="GLMA(5)">6. Obligaciones Negociables</button>
-    <button class="lesson-tab" onclick="GLMA(6)">7. Brokers y operatoria</button>
-    <button class="lesson-tab" onclick="GLMA(7)">8. Estrategias para el inversor AR</button>
+  <div class="lesson-nav-wrap">
+    <button class="carousel-btn lesson-nav-arrow" id="LNMAPrev" aria-label="Lecciones anteriores">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="lesson-nav" id="LNMA">
+      <button class="lesson-tab active" onclick="GLMA(0)">1. El sistema financiero AR</button>
+      <button class="lesson-tab" onclick="GLMA(1)">2. Los tipos de cambio</button>
+      <button class="lesson-tab" onclick="GLMA(2)">3. CEDEARs en profundidad</button>
+      <button class="lesson-tab" onclick="GLMA(3)">4. Renta fija local</button>
+      <button class="lesson-tab" onclick="GLMA(4)">5. El Merval y las acciones</button>
+      <button class="lesson-tab" onclick="GLMA(5)">6. Obligaciones Negociables</button>
+      <button class="lesson-tab" onclick="GLMA(6)">7. Brokers y operatoria</button>
+      <button class="lesson-tab" onclick="GLMA(7)">8. Estrategias para el inversor AR</button>
+      <button class="lesson-tab quiz-final-tab" onclick="GLMA(8)">🎓 Quiz Final</button>
+    </div>
+    <button class="carousel-btn lesson-nav-arrow" id="LNMANext" aria-label="Lecciones siguientes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
   </div>
 
   <div class="slide-wrapper" id="SWMA"></div>
@@ -6933,10 +7025,364 @@ function seekCourseAudio(e, pid) {
 function pauseCourseAudio(pid) { if (COURSE_AUDIO[pid]) COURSE_AUDIO[pid].pause(); }
 </script>
 
+<!-- ============================================================
+     QUIZ ENGINE + PROGRESO (compartido por todos los cursos)
+     ============================================================ -->
+<script>
+// ---- Progreso (localStorage, no requiere login) ----
+function miProgressKey(course) { return 'mi_quiz_progress_' + course; }
+function miProgressLoad(course) {
+  try { return JSON.parse(localStorage.getItem(miProgressKey(course))) || {}; }
+  catch (e) { return {}; }
+}
+function miProgressSave(course, data) {
+  try { localStorage.setItem(miProgressKey(course), JSON.stringify(data)); } catch (e) {}
+}
+function miQuizRecordResult(course, progressId, score, total, passed) {
+  var p = miProgressLoad(course);
+  p[progressId] = { score: score, total: total, passed: passed, ts: Date.now() };
+  miProgressSave(course, p);
+}
+// lessonIds: array de progressId de las lecciones (ej ['L0','L1',...,'L7'])
+function miCourseEligibleForDiploma(course, lessonIds) {
+  var p = miProgressLoad(course);
+  for (var i = 0; i < lessonIds.length; i++) {
+    if (!(p[lessonIds[i]] && p[lessonIds[i]].passed)) return false;
+  }
+  return !!(p.FINAL && p.FINAL.passed);
+}
+function miCourseProgressSummary(course, lessonIds) {
+  var p = miProgressLoad(course);
+  var done = lessonIds.filter(function (id) { return p[id] && p[id].passed; }).length;
+  return { lessonsDone: done, lessonsTotal: lessonIds.length, finalPassed: !!(p.FINAL && p.FINAL.passed), finalScore: p.FINAL ? p.FINAL.score : null, finalTotal: p.FINAL ? p.FINAL.total : null };
+}
+
+// ---- Motor de quiz ----
+var MI_QUIZ_DATA = {};
+var MI_QUIZ_STATE = {};
+
+function quizMount(quizKey, questions, opts) {
+  MI_QUIZ_DATA[quizKey] = { questions: questions, opts: opts || {} };
+  if (!MI_QUIZ_STATE[quizKey]) MI_QUIZ_STATE[quizKey] = { answers: new Array(questions.length).fill(null), graded: false };
+  quizRender(quizKey);
+}
+
+function quizEsc(s) { return (s || '').replace(/</g, '&lt;'); }
+
+function quizRender(quizKey) {
+  var el = document.getElementById('quizmount-' + quizKey);
+  if (!el) return;
+  var data = MI_QUIZ_DATA[quizKey];
+  var state = MI_QUIZ_STATE[quizKey];
+  var qs = data.questions;
+  var passThreshold = data.opts.passThreshold || Math.ceil(qs.length * 0.6);
+  var allAnswered = state.answers.every(function (a) { return a !== null; });
+
+  var qHtml = qs.map(function (q, i) {
+    var picked = state.answers[i];
+    var optsHtml = q.opts.map(function (optText, oi) {
+      var cls = 'quiz-opt';
+      if (state.graded) {
+        cls += ' locked';
+        if (oi === q.correct) cls += ' correct';
+        else if (oi === picked) cls += ' incorrect';
+      } else if (picked === oi) {
+        cls += ' selected';
+      }
+      var handler = state.graded ? '' : ' onclick="quizSelect(\'' + quizKey + '\',' + i + ',' + oi + ')"';
+      return '<button type="button" class="' + cls + '"' + handler + (state.graded ? ' disabled' : '') + '>' +
+        '<span class="quiz-opt-mark"></span><span>' + quizEsc(optText) + '</span></button>';
+    }).join('');
+    var explainHtml = state.graded
+      ? '<div class="quiz-explain">' + (picked === q.correct ? '✓ Correcto. ' : '✕ La respuesta correcta era "' + quizEsc(q.opts[q.correct]) + '". ') + quizEsc(q.explain) + '</div>'
+      : '';
+    return '<div class="quiz-q">' +
+      '<div class="quiz-q-head"><span class="quiz-q-num">PREGUNTA ' + (i + 1) + '</span><span class="quiz-q-text">' + quizEsc(q.q) + '</span></div>' +
+      '<div class="quiz-opts">' + optsHtml + '</div>' + explainHtml +
+      '</div>';
+  }).join('');
+
+  var resultHtml = '';
+  if (state.graded) {
+    var score = state.answers.reduce(function (acc, a, i) { return acc + (a === qs[i].correct ? 1 : 0); }, 0);
+    var passed = score >= passThreshold;
+    var actionsHtml = '<button class="nav-btn" onclick="quizRetry(\'' + quizKey + '\')">↺ Reintentar</button>';
+    if (passed && data.opts.isFinal) {
+      actionsHtml += '<button class="nav-btn primary" onclick="miShowDiploma(\'' + data.opts.course + '\')">🎓 Ver tu diploma</button>';
+    } else if (data.opts.nextFn) {
+      actionsHtml += '<button class="nav-btn' + (passed ? ' primary' : '') + '" onclick="' + data.opts.nextFn + '">' + (passed ? 'Siguiente lección →' : 'Continuar de todos modos →') + '</button>';
+    }
+    resultHtml = '<div class="quiz-result ' + (passed ? 'pass' : 'fail') + '">' +
+      '<div class="quiz-result-score">' + score + ' / ' + qs.length + '</div>' +
+      '<div class="quiz-result-label">' + (passed ? '¡Aprobado! Ya podés seguir adelante.' : 'Todavía no llegás al mínimo (' + passThreshold + '/' + qs.length + '). Repasá la lección y reintentá cuando quieras.') + '</div>' +
+      '<div class="quiz-actions">' + actionsHtml + '</div>' +
+      '</div>';
+  }
+
+  el.innerHTML = '<div class="quiz-wrap">' +
+    (state.graded ? '' : '<p class="quiz-intro">Respondé las ' + qs.length + ' preguntas y presioná Corregir. Podés reintentar todas las veces que quieras, sin límite.</p>') +
+    resultHtml + qHtml +
+    (!state.graded ? '<div class="quiz-actions"><button class="nav-btn primary" onclick="quizGrade(\'' + quizKey + '\')"' + (allAnswered ? '' : ' disabled') + '>Corregir →</button></div>' : '') +
+    '</div>';
+}
+
+function quizSelect(quizKey, qIdx, optIdx) {
+  var state = MI_QUIZ_STATE[quizKey];
+  if (!state || state.graded) return;
+  state.answers[qIdx] = optIdx;
+  quizRender(quizKey);
+}
+
+function quizGrade(quizKey) {
+  var state = MI_QUIZ_STATE[quizKey];
+  var data = MI_QUIZ_DATA[quizKey];
+  if (!state || state.answers.some(function (a) { return a === null; })) return;
+  state.graded = true;
+  var qs = data.questions;
+  var score = state.answers.reduce(function (acc, a, i) { return acc + (a === qs[i].correct ? 1 : 0); }, 0);
+  var passThreshold = data.opts.passThreshold || Math.ceil(qs.length * 0.6);
+  var passed = score >= passThreshold;
+  if (data.opts.course && data.opts.progressId) {
+    miQuizRecordResult(data.opts.course, data.opts.progressId, score, qs.length, passed);
+  }
+  quizRender(quizKey);
+  var mountEl = document.getElementById('quizmount-' + quizKey);
+  if (mountEl) mountEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function quizRetry(quizKey) {
+  var data = MI_QUIZ_DATA[quizKey];
+  MI_QUIZ_STATE[quizKey] = { answers: new Array(data.questions.length).fill(null), graded: false };
+  quizRender(quizKey);
+}
+</script>
+
+<!-- ============================================================
+     DIPLOMA — certificado de finalización de curso
+     ============================================================ -->
+<style>
+  .diploma-overlay{display:none;position:fixed;inset:0;background:rgba(10,15,30,.78);z-index:10000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:32px 16px;}
+  .diploma-overlay.open{display:flex;}
+  .diploma-modal{background:#fff;border-radius:16px;padding:20px;max-width:1000px;width:100%;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+  .diploma-close{position:absolute;top:14px;right:14px;z-index:2;background:#fff;border:none;width:36px;height:36px;border-radius:50%;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+  .diploma-close:hover{background:#f0f0f0;}
+  .diploma-stage{overflow-x:auto;display:flex;justify-content:center;padding:6px;}
+  .diploma-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px;padding:0 4px;flex-wrap:wrap;}
+  .diploma-id{font-family:'SF Mono','JetBrains Mono',Consolas,monospace;font-size:11.5px;color:#8890a6;letter-spacing:.04em;}
+
+  .cert-editorial{width:960px;height:660px;flex-shrink:0;font-family:Georgia,'Iowan Old Style','Times New Roman',serif;background:#F3F4F8;color:#12172A;border:1px solid rgba(10,15,30,.14);box-shadow:0 10px 30px -10px rgba(0,0,0,.25);}
+  .cert-editorial .frame{height:100%;margin:22px;border:1px solid rgba(10,15,30,.18);padding:44px 70px;display:flex;flex-direction:column;align-items:center;text-align:center;box-sizing:border-box;}
+  .e-mark{width:60px;height:60px;border-radius:50%;margin-top:4px;position:relative;background:radial-gradient(circle at 32% 28%,#16203D,#0A0F1E 70%);box-shadow:0 6px 16px -6px rgba(10,15,30,.45),inset 0 0 0 1px rgba(242,201,76,.5);}
+  .e-mark::before{content:'';position:absolute;inset:5px;border-radius:50%;border:1px solid rgba(242,201,76,.55);}
+  .e-mark span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:17px;letter-spacing:.04em;color:#F2C94C;font-weight:400;}
+  .e-org{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#12172A;margin-top:14px;font-family:-apple-system,sans-serif;font-weight:600;}
+  .e-sub{font-size:11px;color:#767C8C;margin-top:4px;letter-spacing:.04em;font-family:-apple-system,sans-serif;}
+  .e-certifies{font-size:12.5px;color:#5B6478;margin-top:34px;font-style:italic;}
+  .e-name{font-size:40px;margin:10px 0 4px;}
+  .e-rule{width:220px;height:1px;background:#A9770F;margin:8px 0 20px;}
+  .e-body{font-size:14px;color:#3A4152;line-height:1.75;max-width:470px;}
+  .e-course{font-weight:700;}
+  .e-note{font-size:12.5px;color:#5B6478;font-style:italic;margin-top:18px;max-width:440px;line-height:1.6;}
+  .e-foot{margin-top:auto;width:100%;display:flex;justify-content:space-between;align-items:flex-end;padding-top:28px;}
+  .e-sig{font-style:italic;font-size:19px;}
+  .e-sigline{width:150px;height:1px;background:#12172A;margin-bottom:6px;}
+  .e-lbl{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#767C8C;font-family:-apple-system,sans-serif;}
+  .e-date{font-size:11.5px;color:#5B6478;font-family:-apple-system,sans-serif;}
+  @media (max-width:640px){ .cert-editorial{width:720px;height:495px;} .cert-editorial .frame{padding:30px 36px;} .e-name{font-size:30px;} }
+</style>
+
+<div class="diploma-overlay" id="diplomaOverlay">
+  <div class="diploma-modal">
+    <button class="diploma-close" onclick="miCloseDiploma()">&times;</button>
+    <div class="diploma-stage">
+      <div class="cert-editorial" id="diplomaCert">
+        <div class="frame">
+          <div class="e-mark"><span>MI</span></div>
+          <div class="e-org">Manfredi Investment University</div>
+          <div class="e-sub">Educación financiera desde cero hasta nivel avanzado</div>
+          <div class="e-certifies">Por medio del presente se certifica que</div>
+          <div class="e-name" id="diplomaName">—</div>
+          <div class="e-rule"></div>
+          <div class="e-body">completó de forma íntegra el curso <span class="e-course" id="diplomaCourse">—</span>, incluyendo sus 8 lecciones y la totalidad de las evaluaciones correspondientes.</div>
+          <div class="e-note">"Con este certificado reconocemos tu compromiso en aprender a invertir con criterio propio — el primer paso siempre es el que más cuenta."</div>
+          <div class="e-foot">
+            <div><div class="e-date" id="diplomaDate">—</div></div>
+            <div style="text-align:right;">
+              <div class="e-sig">N. Manfredi</div>
+              <div class="e-sigline" style="margin-left:auto;"></div>
+              <div class="e-lbl">Fundador, Manfredi Investment</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="diploma-actions">
+      <div class="diploma-id" id="diplomaId"></div>
+      <button class="nav-btn primary" onclick="miDownloadDiplomaPDF()" id="diplomaDownloadBtn">⭳ Descargar PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var MI_COURSE_META = {
+  IB: { name: 'Introducción a la Bolsa', lessonCount: 8 },
+  FP: { name: 'Finanzas Personales Básicas', lessonCount: 8 },
+  AF: { name: 'Análisis Fundamental', lessonCount: 8 },
+  MA: { name: 'El Mercado Argentino', lessonCount: 8 }
+};
+
+function miDiplomaEligible(course) {
+  var meta = MI_COURSE_META[course];
+  if (!meta) return false;
+  var ids = [];
+  for (var i = 0; i < meta.lessonCount; i++) ids.push('L' + i);
+  return miCourseEligibleForDiploma(course, ids);
+}
+
+var _miDiplomaWaitTimer = null;
+function miShowDiploma(course) {
+  if (!miDiplomaEligible(course)) {
+    alert('Todavía te falta completar algún quiz de lección antes de poder generar el diploma.');
+    return;
+  }
+  if (!window._currentUser) {
+    if (typeof window.signInWithGoogle === 'function') window.signInWithGoogle();
+    var waited = 0;
+    clearInterval(_miDiplomaWaitTimer);
+    _miDiplomaWaitTimer = setInterval(function () {
+      waited += 500;
+      if (window._currentUser) {
+        clearInterval(_miDiplomaWaitTimer);
+        miRenderDiploma(course);
+      } else if (waited > 30000) {
+        clearInterval(_miDiplomaWaitTimer);
+      }
+    }, 500);
+    return;
+  }
+  miRenderDiploma(course);
+}
+
+function miDiplomaId(course) {
+  var uid = (window._currentUser && window._currentUser.uid) || 'guest000000';
+  return 'MI-' + course + '-' + uid.slice(-6).toUpperCase();
+}
+
+function miRenderDiploma(course) {
+  var meta = MI_COURSE_META[course];
+  var user = window._currentUser;
+  var name = (user && user.displayName) || 'Estudiante Manfredi';
+  var today = new Date().toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('diplomaName').textContent = name;
+  document.getElementById('diplomaCourse').textContent = meta.name;
+  document.getElementById('diplomaDate').textContent = today;
+  var id = miDiplomaId(course);
+  document.getElementById('diplomaId').textContent = id;
+  document.getElementById('diplomaOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  if (typeof window._miSaveCertificado === 'function') {
+    var prog = miProgressLoad(course);
+    window._miSaveCertificado(course, {
+      id: id,
+      curso: meta.name,
+      fecha: today,
+      finalScore: prog.FINAL ? prog.FINAL.score : null,
+      finalTotal: prog.FINAL ? prog.FINAL.total : null
+    });
+  }
+}
+
+function miCloseDiploma() {
+  document.getElementById('diplomaOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function miDownloadDiplomaPDF() {
+  var btn = document.getElementById('diplomaDownloadBtn');
+  var cert = document.getElementById('diplomaCert');
+  if (!cert || !window.html2canvas || !window.jspdf) return;
+  var origText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Generando…';
+  html2canvas(cert, { scale: 2, backgroundColor: '#F3F4F8' }).then(function (canvas) {
+    var imgData = canvas.toDataURL('image/png');
+    var jsPDF = window.jspdf.jsPDF;
+    var pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    var safeName = (document.getElementById('diplomaName').textContent || 'diploma').replace(/[^a-zA-Z0-9]+/g, '-');
+    pdf.save('Diploma-Manfredi-' + safeName + '.pdf');
+    btn.disabled = false;
+    btn.textContent = origText;
+  }).catch(function (e) {
+    console.warn('PDF error', e);
+    btn.disabled = false;
+    btn.textContent = origText;
+  });
+}
+</script>
+
 <!-- COURSE SCRIPTS -->
 <script>
 (function() {
 var CLFP=0,CSFP=0,CHFP={};
+
+// ============================================================
+// QUIZZES — Finanzas Personales Básicas
+// ============================================================
+const QZFP_L0 = [
+  { q: "Según Robert Kiyosaki, citado en el curso, ¿qué hacen los ricos con el dinero?", opts: ["Trabajan muy duro para ganarlo", "Hacen que el dinero trabaje para ellos", "Lo gastan rápido antes de que pierda valor", "Lo prestan a tasas altas"], correct: 1, explain: "El curso cita a Robert Kiyosaki: 'Los ricos no trabajan por dinero. Hacen que el dinero trabaje para ellos', de su libro Padre Rico Padre Pobre." },
+  { q: "¿Qué es el 'lifestyle inflation' mencionado en el curso?", opts: ["Cuando la inflación general sube más rápido que el salario", "Cuando aumenta el sueldo pero también aumentan los gastos, y el ahorro se mantiene igual o cero", "Un tipo de inversión inmobiliaria", "Cuando el gobierno emite más dinero"], correct: 1, explain: "El lifestyle inflation ocurre cuando, al aumentar el ingreso, aumentan los gastos en la misma proporción, dejando el ahorro estancado. El curso lo señala como un patrón que destruye más riqueza potencial que cualquier mala inversión." },
+  { q: "¿Cuál es el orden correcto de los tres pilares de la salud financiera según el curso?", opts: ["Invertir, ahorrar, presupuestar", "Presupuesto, fondo de emergencia, eliminación de deudas caras", "Fondo de emergencia, inversión, presupuesto", "Eliminación de deudas, inversión, presupuesto"], correct: 1, explain: "El curso establece el orden: primero presupuesto (saber adónde va tu dinero), luego fondo de emergencia (3-6 meses de gastos), y luego eliminar deudas caras. Recién después tiene sentido invertir." }
+];
+const QZFP_L1 = [
+  { q: "¿Quién popularizó la regla 50/30/20 mencionada en el curso?", opts: ["Robert Kiyosaki", "Elizabeth Warren, en su libro All Your Worth", "Dave Ramsey", "Warren Buffett"], correct: 1, explain: "La regla 50/30/20 fue popularizada por Elizabeth Warren, senadora estadounidense y experta en quiebras personales, en su libro 'All Your Worth'." },
+  { q: "Según el curso, ¿por qué en Argentina conviene calcular el presupuesto en dólares CCL en vez de en pesos nominales?", opts: ["Porque es obligatorio por ley", "Porque da una foto real del poder adquisitivo, dado que un presupuesto en pesos pierde significado rápido con la inflación", "Porque los bancos solo aceptan presupuestos en dólares", "Porque el dólar CCL nunca varía"], correct: 1, explain: "El curso explica que un presupuesto en pesos que no se revisa mensualmente pierde significado rápidamente por la inflación; calcularlo en dólares CCL da una foto real y comparable mes a mes." },
+  { q: "En un contexto donde las necesidades consumen 60-70% del ingreso de la clase media argentina, ¿qué meta realista sugiere el curso en vez del clásico 50/30/20?", opts: ["Es imposible presupuestar en Argentina", "70/20/10 u 80/10/10, con el objetivo de mejorar gradualmente esa proporción", "Hay que emigrar del país", "30/30/40, priorizando los deseos"], correct: 1, explain: "El curso sugiere una meta realista de 70/20/10 o incluso 80/10/10 cuando las necesidades consumen 60-70% del ingreso, buscando mejorar la proporción con el tiempo." }
+];
+const QZFP_L2 = [
+  { q: "¿Cuántos meses de fondo de emergencia recomienda el curso para alguien freelance o en un sector laboral volátil?", opts: ["3 meses", "6 meses", "12 meses", "1 mes"], correct: 1, explain: "El curso recomienda 6 meses para quienes son autónomos, freelance, trabajan en un sector volátil, tienen personas a cargo o hipoteca — el nivel 'recomendado para la mayoría'." },
+  { q: "¿Qué solución práctica propone el curso para el fondo de emergencia en el contexto argentino?", opts: ["Guardar todo en pesos en una caja de ahorro común", "Dividirlo entre un FCI de liquidez inmediata en pesos y una parte en dólares (físicos o en cuenta comitente)", "Invertir todo el fondo de emergencia en CEDEARs", "Guardarlo únicamente en dólares físicos bajo el colchón"], correct: 1, explain: "El curso recomienda dividir el fondo: una parte en pesos en un FCI money market y otra en dólares, para balancear la protección contra la inflación con el riesgo de guardar solo efectivo físico." },
+  { q: "Según el curso, ¿para qué situaciones se recomiendan 12 meses de fondo de emergencia?", opts: ["Para cualquier persona con trabajo estable en relación de dependencia", "Para emprendedores con negocios propios o contextos económicos muy inestables", "Solo para jubilados", "Nunca se recomiendan 12 meses"], correct: 1, explain: "El curso recomienda 12 meses para situaciones de alta incertidumbre: emprendedores con negocio propio, personas con problemas de salud recurrentes, o contextos económicos muy inestables como el argentino." }
+];
+const QZFP_L3 = [
+  { q: "Según el curso, ¿qué caracteriza a una 'deuda buena'?", opts: ["Cualquier deuda con cuotas fijas", "Tasa razonable que financia un activo que se valoriza o genera ingresos, como una hipoteca", "Una deuda de tarjeta de crédito bien administrada", "Una deuda sin intereses de ningún tipo"], correct: 1, explain: "Una deuda 'buena' tiene tasa razonable y financia un activo que se valoriza o genera ingresos, donde el retorno del activo supera el costo de la deuda." },
+  { q: "¿Cuál es la diferencia entre el método Avalanche y el método Snowball para pagar deudas?", opts: ["Son exactamente el mismo método con distinto nombre", "Avalanche paga primero la deuda de mayor tasa (óptimo matemáticamente); Snowball paga primero la de menor monto (mejor psicológicamente)", "Avalanche es solo para deudas en dólares", "Snowball nunca funciona"], correct: 1, explain: "Avalanche prioriza pagar la deuda con la tasa más alta primero (matemáticamente óptimo), mientras que Snowball prioriza la deuda de menor monto para generar victorias rápidas y motivación." },
+  { q: "¿Qué pasa si en Argentina pagás solo el mínimo de la tarjeta de crédito durante un período prolongado, según el curso?", opts: ["La deuda se mantiene igual", "La deuda puede multiplicarse por 3 o 4 veces en 2 años, porque la tasa puede superar el 100% anual", "El banco perdona automáticamente el interés después de un año", "No tiene ningún efecto relevante"], correct: 1, explain: "El curso advierte que la tasa de las tarjetas en Argentina puede superar el 100% anual, y pagar solo el mínimo durante 2 años puede multiplicar la deuda original por 3 o 4 veces." }
+];
+const QZFP_L4 = [
+  { q: "Con una inflación del 100% anual, según el ejemplo del curso, ¿cuánto vale en términos reales $100.000 guardado bajo el colchón después de dos años?", opts: ["$100.000, no cambia", "$50.000", "$25.000", "$75.000"], correct: 2, explain: "Con 100% de inflación anual, $100.000 valen $50.000 en términos reales tras un año, y $25.000 tras dos años — una pérdida del 75% del poder adquisitivo sin gastar nada." },
+  { q: "Según el ejemplo del curso sobre interés compuesto, ¿cuál es la diferencia clave entre empezar a invertir a los 25 años vs. a los 35, invirtiendo lo mismo cada mes?", opts: ["No hay ninguna diferencia relevante", "Empezar 10 años antes puede significar el doble o triple de patrimonio final", "Empezar más tarde siempre da mejor resultado", "Solo importa la tasa de interés, no el tiempo"], correct: 1, explain: "El curso muestra que $500/mes al 8% durante 40 años (empezando a los 25) da $1.8M, mientras que durante 30 años (empezando a los 35) da $745K." },
+  { q: "Según la tabla del curso, ¿qué instrumento ofrece protección 'muy alta' contra la inflación con un rendimiento de 6-9% anual en dólares?", opts: ["Caja de ahorro en pesos", "Plazo fijo en pesos", "Obligaciones Negociables (ON) corporativas en USD", "Dólares físicos guardados sin invertir"], correct: 2, explain: "La tabla del curso ubica a las ON corporativas en USD con protección 'muy alta' contra la inflación y un rendimiento de 6-9% anual en dólares, junto con los CEDEARs/ETFs." }
+];
+const QZFP_L5 = [
+  { q: "¿Qué significa que una meta financiera sea 'SMART' según el curso?", opts: ["Que sea una meta ambiciosa sin límites", "Específica, medible, alcanzable, relevante y con tiempo definido", "Que la defina un asesor financiero profesional", "Que esté expresada solo en dólares"], correct: 1, explain: "SMART es un framework (Specific, Measurable, Achievable, Relevant, Time-bound) que convierte aspiraciones vagas en objetivos accionables." },
+  { q: "Según la 'Regla del 4%' explicada en el curso, ¿cuántas veces tus gastos anuales necesitás tener invertidos para alcanzar la independencia financiera?", opts: ["10 veces", "15 veces", "25 veces", "50 veces"], correct: 2, explain: "La fórmula es Gastos anuales × 25. Si tenés 25 veces tus gastos anuales invertidos, podés retirar el 4% anual indefinidamente sin agotar el capital." },
+  { q: "Para metas de corto plazo (0 a 2 años) como el fondo de emergencia o unas vacaciones, ¿qué instrumento prioriza el curso?", opts: ["ETFs del S&P 500 por su alto crecimiento", "FCI money market, plazo fijo o dólares, priorizando liquidez y seguridad sobre rendimiento", "CEDEARs diversificados", "Propiedades inmobiliarias"], correct: 1, explain: "Para el horizonte de corto plazo el curso prioriza liquidez y seguridad sobre rendimiento, recomendando FCI money market, plazo fijo o dólares." }
+];
+const QZFP_L6 = [
+  { q: "Según el curso, ¿cuáles son las tres condiciones que deben cumplirse antes de empezar a invertir?", opts: ["Tener $10.000 dólares, un asesor y tiempo libre", "Presupuesto armado y ahorro consistente, fondo de emergencia completo, y no tener deudas de alto interés", "Ser mayor de 30 años, tener trabajo fijo y estudios universitarios", "Ninguna condición, hay que invertir apenas se pueda"], correct: 1, explain: "Las tres condiciones son: presupuesto armado y ahorro consistente, fondo de emergencia completo (3-6 meses), y no tener deudas de alto interés (60-100% anual)." },
+  { q: "¿Qué broker menciona el curso como 'el más grande del mundo para inversores individuales', sin comisión para acciones americanas?", opts: ["InvertirOnline (IOL)", "Balanz", "Interactive Brokers", "Cocos Capital"], correct: 2, explain: "Interactive Brokers es descripto en el curso como el broker más grande del mundo para inversores individuales, sin comisión para acciones americanas." },
+  { q: "¿Cuál es, según el curso, el mayor error de un principiante al armar su primera cartera?", opts: ["Elegir mal los primeros instrumentos", "No empezar o abandonar la cartera cuando viene la primera caída del mercado", "Invertir con montos muy chicos como $50", "Diversificar demasiado desde el principio"], correct: 1, explain: "El curso enfatiza que una cartera mediocre que se sostiene durante 10 años supera a una cartera 'perfecta' que se abandona al primer susto del mercado." }
+];
+const QZFP_L7 = [
+  { q: "Según el plan de 90 días del curso, ¿qué se recomienda hacer 'hoy mismo', el primer paso de todos?", opts: ["Abrir una cuenta en un broker internacional", "Calcular el ingreso neto y hacer el listado de gastos del último mes", "Pagar todas las deudas de una vez", "Invertir en un ETF"], correct: 1, explain: "El primer paso del plan de 90 días es calcular tu ingreso neto y listar todos los gastos del último mes, categorizándolos para calcular los porcentajes del 50/30/20." },
+  { q: "¿Cuál es la meta mínima de tasa de ahorro mensual que recomienda monitorear el curso?", opts: ["5%", "10%", "20%", "50%"], correct: 2, explain: "El curso recomienda monitorear la tasa de ahorro mensual con una meta mínima de 20%, como el indicador más importante del progreso financiero." },
+  { q: "Según la primera de las '10 reglas del dinero inteligente' del curso, ¿cuál es la relación correcta entre ahorro y gasto?", opts: ["El ahorro es lo que sobra después de gastar", "El gasto es lo que sobra después de ahorrar — hay que pagarse a uno mismo primero", "Hay que gastar primero y ahorrar cuando se pueda", "No existe una regla clara sobre el orden"], correct: 1, explain: "La primera regla es 'pagarte a vos mismo primero': el gasto es lo que sobra después de ahorrar, no al revés." }
+];
+const QZFP_FINAL = [
+  { q: "¿Qué distingue a un activo de un pasivo, según la definición del curso?", opts: ["Un activo pone dinero en tu bolsillo; un pasivo saca dinero de tu bolsillo", "Un activo es siempre inmueble; un pasivo es siempre efectivo", "No hay diferencia real entre ambos", "Un pasivo genera más riqueza que un activo"], correct: 0, explain: "Un activo pone dinero en tu bolsillo; un pasivo saca dinero de tu bolsillo. La riqueza se construye acumulando activos y minimizando pasivos." },
+  { q: "¿Qué representa el 20% en la regla 50/30/20?", opts: ["Gastos en entretenimiento", "Ahorro e inversión (incluyendo fondo de emergencia y jubilación)", "Impuestos obligatorios", "El monto máximo de deuda permitido"], correct: 1, explain: "En la regla 50/30/20, el 20% corresponde al ahorro e inversión, que incluye el fondo de emergencia, la jubilación y la cartera de inversión." },
+  { q: "¿Cuál es el propósito único de un fondo de emergencia, según el curso?", opts: ["Financiar vacaciones anuales", "Protegerte de tener que endeudarte cuando la vida te sorprende con un gasto urgente e imprevisto", "Generar el máximo retorno posible", "Reemplazar al fondo de jubilación"], correct: 1, explain: "El fondo de emergencia es dinero guardado exclusivamente para gastos imprevistos urgentes, con el único propósito de protegerte de tener que endeudarte." },
+  { q: "¿Qué recomienda el curso hacer con la tarjeta de crédito, como 'regla de oro'?", opts: ["Nunca usarla bajo ninguna circunstancia", "Nunca gastar en la tarjeta lo que no tenés en efectivo, y pagar siempre el total al vencimiento", "Usarla solo para pagar el mínimo cada mes", "Usarla exclusivamente para deudas grandes"], correct: 1, explain: "La regla de oro es nunca gastar en la tarjeta lo que no tenés en efectivo, y pagar siempre el total — si no podés pagar el total, no lo compraste, lo financiaste." },
+  { q: "¿Cuál es, según el curso, la clave real del interés compuesto — la tasa de retorno o el tiempo?", opts: ["La tasa de retorno es lo único que importa", "El tiempo — empezar antes puede duplicar o triplicar el patrimonio final aunque se invierta lo mismo", "Ninguno de los dos importa, solo el monto inicial", "Solo importa en mercados desarrollados, no en Argentina"], correct: 1, explain: "El curso enfatiza que la clave del interés compuesto no es la tasa de retorno sino el tiempo: cada año de demora en empezar tiene un costo enorme." },
+  { q: "¿Qué instrumentos recomienda el curso para metas de largo plazo (8 años o más), como la jubilación?", opts: ["Caja de ahorro y plazo fijo en pesos", "ETFs del S&P 500, CEDEARs diversificados y propiedades, priorizando el máximo crecimiento", "Solo dólares físicos guardados", "FCI money market exclusivamente"], correct: 1, explain: "Para el largo plazo el curso recomienda ETFs del S&P 500, CEDEARs diversificados y propiedades, priorizando el máximo crecimiento." },
+  { q: "¿Qué combinación de instrumentos sugiere el curso para armar una cartera de principiante adaptada a Argentina?", opts: ["Solo plazo fijo en pesos", "CEDEARs de ETFs internacionales más Obligaciones Negociables (ON) corporativas en dólares", "Únicamente criptomonedas", "Acciones individuales argentinas sin diversificar"], correct: 1, explain: "Para Argentina, el curso sugiere CEDEARs de ETFs internacionales combinados con ON corporativas en dólares para renta fija dolarizada." },
+  { q: "Según el dashboard de métricas del curso, ¿qué mide la 'cobertura del fondo de emergencia'?", opts: ["El monto total invertido en acciones", "El saldo del fondo dividido por los gastos mensuales esenciales, es decir cuántos meses podrías sobrevivir sin ingresos", "La tasa de interés que paga el banco", "El porcentaje de deuda sobre el ingreso"], correct: 1, explain: "La cobertura del fondo de emergencia es el saldo del fondo dividido por los gastos mensuales esenciales." },
+  { q: "Un inversor tiene deudas de tarjeta de crédito al 80% anual y considera invertir en acciones que rinden 10% anual. Según los principios del curso, ¿qué debería hacer primero?", opts: ["Invertir en las acciones de inmediato para no perder la oportunidad", "Pagar la deuda de la tarjeta primero, porque no tiene sentido invertir al 10% mientras se paga el 80%", "Dividir el dinero 50/50 entre pagar deuda e invertir", "Pedir un préstamo adicional para invertir más"], correct: 1, explain: "El curso es explícito: si tenés deudas al 60-100% anual, pagarlas es tu mejor inversión garantizada." },
+  { q: "Un joven de 25 años y otro de 45 invierten la misma cantidad mensual a la misma tasa. Según los ejemplos numéricos del curso, ¿qué diferencia de patrimonio final pueden esperar?", opts: ["Prácticamente ninguna diferencia", "Una diferencia enorme: en el ejemplo del curso, $1.8M vs. $294K — el tiempo es el factor más determinante", "El que empieza más tarde siempre termina con más dinero", "Depende únicamente de la tasa de interés, no de la edad de inicio"], correct: 1, explain: "En el ejemplo del curso, $500/mes al 8% da $1.8M empezando a los 25 años, pero solo $294K empezando a los 45 — el tiempo es el factor más determinante." }
+];
+
 const LSFP = [
 
   // LECCIÓN 1 &mdash; MENTALIDAD FINANCIERA
@@ -6977,7 +7423,10 @@ const LSFP = [
         <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">Eliminación de deudas caras &mdash; liberar flujo de caja</div><div class="step-desc">Las deudas de alto interés (tarjetas de crédito, préstamos personales) destruyen tu capacidad de ahorro e inversión. Pagarlas es la inversión con el mayor retorno garantizado que existe.</div></div></div>
       </div>
       <div class="callout">Solo después de tener estos tres pilares sólidos tiene sentido hablar de inversiones. Un inversor con deudas al 60% anual que invierte en acciones que rinden 10% está perdiendo dinero neto. El orden importa tanto como la estrategia.</div>`
-    }
+    },
+    { eyebrow: "Lección 1 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'FP-L0', quizQuestions: QZFP_L0, quizOpts: { course: 'FP', progressId: 'L0', nextFn: "GLFP(1)" },
+      html: '<div id="quizmount-FP-L0"></div>' }
   ]},
 
   // LECCIÓN 2 &mdash; EL PRESUPUESTO
@@ -7014,7 +7463,10 @@ const LSFP = [
         <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">Comparar ingreso vs. gasto por categoría</div><div class="step-desc">¿Cuánto va a cada categoría como porcentaje del ingreso? ¿Estás dentro del 50/30/20? ¿Hay categorías sorprendentemente altas? Este paso suele generar revelaciones &mdash; muchas personas descubren que gastan fortunas en gastos "invisibles".</div></div></div>
         <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">Asigná cada peso del mes siguiente</div><div class="step-desc">Antes de que empiece el próximo mes, decidí adónde va cada peso. Asigná primero el ahorro y la inversión, luego las necesidades fijas, y finalmente los deseos con lo que sobra. Este orden invierte el paradigma de "ahorro lo que sobra".</div></div></div>
       </div>`
-    }
+    },
+    { eyebrow: "Lección 2 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'FP-L1', quizQuestions: QZFP_L1, quizOpts: { course: 'FP', progressId: 'L1', nextFn: "GLFP(2)" },
+      html: '<div id="quizmount-FP-L1"></div>' }
   ]},
 
   // LECCIÓN 3 &mdash; FONDO DE EMERGENCIA
@@ -7045,7 +7497,10 @@ const LSFP = [
         <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">Automatizá un aporte mensual fijo</div><div class="step-desc">Definí cuánto podés aportar por mes (aunque sea el 5% de tu sueldo) y automatizá esa transferencia el día que cobrás. No lo toques hasta alcanzar el objetivo.</div></div></div>
         <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">Nunca lo uses para gastos no urgentes</div><div class="step-desc">La disciplina de uso es tan importante como la disciplina de ahorro. Una salida cara o unas vacaciones no son emergencias. Si lo usás para algo que no es urgente e imprevisto, lo reconstruís antes de hacer cualquier otra cosa.</div></div></div>
       </div>`
-    }
+    },
+    { eyebrow: "Lección 3 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'FP-L2', quizQuestions: QZFP_L2, quizOpts: { course: 'FP', progressId: 'L2', nextFn: "GLFP(3)" },
+      html: '<div id="quizmount-FP-L2"></div>' }
   ]},
 
   // LECCIÓN 4 &mdash; DEUDAS
@@ -7075,7 +7530,10 @@ const LSFP = [
       <div class="chart-box"><div class="chart-title">Efecto del pago mínimo vs. pago total &mdash; deuda inicial $100.000</div><canvas id="chartCard" height="200"></canvas></div>
       <div class="callout red">El pago mínimo de la tarjeta está diseñado para que la deuda dure lo máximo posible y el banco cobre la mayor cantidad de intereses. En Argentina, pagar solo el mínimo durante 2 años puede multiplicar tu deuda original por 3 o 4 veces.</div>
       <div class="callout green">La regla de oro de la tarjeta de crédito es una sola: nunca gastes en la tarjeta lo que no tenés en efectivo. Usala como método de pago para aprovechar el plazo financiero y los beneficios (millas, cashback, cuotas sin interés) pero siempre pagá el total al vencimiento. Si no podés pagar el total, no lo compraste &mdash; lo financiaste.</div>`
-    }
+    },
+    { eyebrow: "Lección 4 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'FP-L3', quizQuestions: QZFP_L3, quizOpts: { course: 'FP', progressId: 'L3', nextFn: "GLFP(4)" },
+      html: '<div id="quizmount-FP-L3"></div>' }
   ]},
 
   // LECCIÓN 5 &mdash; AHORRO E INFLACIÓN
@@ -7108,7 +7566,10 @@ const LSFP = [
         <tr><td><strong>ON corporativas USD</strong></td><td>6-9% anual en USD</td><td>Media</td><td><span class="tag good">Muy alta</span></td></tr>
       </table></div>
       <div class="callout">Para un argentino que quiere preservar el poder adquisitivo de sus ahorros, la estrategia más efectiva suele ser una combinación: fondo de emergencia en pesos líquidos (FCI money market) + ahorros de mediano plazo en CEDEARs o ETFs + reserva en dólares físicos o ON para estabilidad. No hay una sola respuesta correcta &mdash; depende del horizonte y la tolerancia al riesgo.</div>`
-    }
+    },
+    { eyebrow: "Lección 5 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'FP-L4', quizQuestions: QZFP_L4, quizOpts: { course: 'FP', progressId: 'L4', nextFn: "GLFP(5)" },
+      html: '<div id="quizmount-FP-L4"></div>' }
   ]},
 
   // LECCIÓN 6 &mdash; METAS FINANCIERAS
@@ -7140,7 +7601,10 @@ const LSFP = [
         <div class="card indigo"><div class="card-label">Gastos mensuales: $5.000 USD</div><div class="card-number">$1.5M</div><div class="card-body">Estilo de vida más alto implica $1.5 millones USD necesarios.</div></div>
       </div>
       <div class="callout amber">En Argentina, la independencia financiera en dólares tiene la ventaja adicional de que generás ingresos pasivos en moneda dura mientras tus gastos de vida cotidiana son relativamente baratos en términos de dólares comparado con países desarrollados. Es un contexto que puede ser aprovechado estratégicamente.</div>`
-    }
+    },
+    { eyebrow: "Lección 6 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'FP-L5', quizQuestions: QZFP_L5, quizOpts: { course: 'FP', progressId: 'L5', nextFn: "GLFP(6)" },
+      html: '<div id="quizmount-FP-L5"></div>' }
   ]},
 
   // LECCIÓN 7 &mdash; PRIMERA INVERSIÓN
@@ -7148,9 +7612,9 @@ const LSFP = [
     { eyebrow: "Lección 7 · Slide 1", title: "Cuándo es el momento de empezar a invertir",
       html: `<p class="slide-intro">Una de las preguntas más frecuentes en finanzas personales es: "¿cuándo estoy listo para invertir?" La respuesta correcta no es "cuando tenga suficiente dinero" ni "cuando el mercado esté bien" &mdash; esas condiciones nunca se cumplen perfectamente. Hay tres condiciones concretas que deben cumplirse primero.</p>
       <div class="step-list">
-        <div class="step-item"><div class="step-num green">â</div><div class="step-content"><div class="step-title">Condición 1: Tenés presupuesto armado y ahorro consistente</div><div class="step-desc">Sabés exactamente cuánto entra y cuánto sale. Tenés un excedente mensual que podés destinar a inversiones sin comprometer los gastos esenciales.</div></div></div>
-        <div class="step-item"><div class="step-num green">â</div><div class="step-content"><div class="step-title">Condición 2: Tenés fondo de emergencia completo</div><div class="step-desc">Entre 3 y 6 meses de gastos en un instrumento líquido. Sin esto, cualquier imprevisto te forzaría a vender inversiones en el peor momento.</div></div></div>
-        <div class="step-item"><div class="step-num green">â</div><div class="step-content"><div class="step-title">Condición 3: No tenés deudas de alto interés</div><div class="step-desc">Si tenés tarjeta de crédito o préstamos al 60-100% anual, pagarlos es tu mejor inversión garantizada. No tiene sentido invertir al 10% mientras pagás el 80%.</div></div></div>
+        <div class="step-item"><div class="step-num green">✓</div><div class="step-content"><div class="step-title">Condición 1: Tenés presupuesto armado y ahorro consistente</div><div class="step-desc">Sabés exactamente cuánto entra y cuánto sale. Tenés un excedente mensual que podés destinar a inversiones sin comprometer los gastos esenciales.</div></div></div>
+        <div class="step-item"><div class="step-num green">✓</div><div class="step-content"><div class="step-title">Condición 2: Tenés fondo de emergencia completo</div><div class="step-desc">Entre 3 y 6 meses de gastos en un instrumento líquido. Sin esto, cualquier imprevisto te forzaría a vender inversiones en el peor momento.</div></div></div>
+        <div class="step-item"><div class="step-num green">✓</div><div class="step-content"><div class="step-title">Condición 3: No tenés deudas de alto interés</div><div class="step-desc">Si tenés tarjeta de crédito o préstamos al 60-100% anual, pagarlos es tu mejor inversión garantizada. No tiene sentido invertir al 10% mientras pagás el 80%.</div></div></div>
       </div>
       <div class="callout">Si las tres condiciones están cumplidas, el momento de empezar a invertir es hoy. No la semana que viene, no cuando baje el mercado, no cuando hayas leído más. Hoy. Cada mes de retraso tiene un costo real en interés compuesto perdido.</div>`
     },
@@ -7171,7 +7635,10 @@ const LSFP = [
         <div class="step-item"><div class="step-num">C</div><div class="step-content"><div class="step-title">Proceso de apertura &mdash; siempre online y gratuito</div><div class="step-desc">En todos los casos necesitás: DNI o pasaporte escaneado, foto selfie con el documento, CUIL, datos bancarios. El proceso tarda entre 20 minutos y 2 horas de formularios, y la aprobación entre 1 y 5 días hábiles según el broker.</div></div></div>
       </div>
       <div class="callout">No importa cuál broker elijas &mdash; lo importante es elegir uno y empezar. Siempre podés abrir cuentas en múltiples brokers más adelante cuando tengas más experiencia y volumen. Para empezar, uno solo es suficiente.</div>`
-    }
+    },
+    { eyebrow: "Lección 7 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'FP-L6', quizQuestions: QZFP_L6, quizOpts: { course: 'FP', progressId: 'L6', nextFn: "GLFP(7)" },
+      html: '<div id="quizmount-FP-L6"></div>' }
   ]},
 
   // LECCIÓN 8 &mdash; PLAN DE ACCIÓN
@@ -7210,7 +7677,20 @@ const LSFP = [
         <div class="step-item"><div class="step-num">10</div><div class="step-content"><div class="step-title">Seguí aprendiendo &mdash; el conocimiento financiero es el mejor retorno</div><div class="step-desc">Seguí con los otros cursos de esta plataforma: Introducción a la Bolsa, Análisis Fundamental y Mercado Argentino te dan las herramientas para llevar todo esto al siguiente nivel.</div></div></div>
       </div>
       <div class="callout blue">¿Tenés preguntas específicas sobre cómo aplicar estos conceptos a tu situación personal? El asesor IA de esta plataforma está disponible para consultas personalizadas en cualquier momento.</div>`
-    }
+    },
+    { eyebrow: "Lección 8 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'FP-L7', quizQuestions: QZFP_L7, quizOpts: { course: 'FP', progressId: 'L7', nextFn: "GLFP(8)" },
+      html: '<div id="quizmount-FP-L7"></div>' }
+  ]},
+
+  // QUIZ FINAL — 10 preguntas que abarcan las 8 lecciones del curso
+  { title: "Quiz Final", slides: [
+    { eyebrow: "Quiz Final", title: "Demostrá todo lo que aprendiste",
+      isQuiz: true, isFinal: true,
+      quizKey: 'FP-FINAL', quizQuestions: QZFP_FINAL,
+      quizOpts: { course: 'FP', progressId: 'FINAL', isFinal: true, passThreshold: 7 },
+      html: `<p class="slide-intro">10 preguntas que recorren las 8 lecciones del curso. Necesitás al menos 7 correctas para aprobar y desbloquear tu diploma. Podés reintentar las veces que quieras.</p>
+      <div id="quizmount-FP-FINAL"></div>` }
   ]}
 ];
 
@@ -7223,7 +7703,10 @@ const LSFP = [
 function GLFP(idx) {
   CLFP = idx;
   CSFP = 0;
-  document.querySelectorAll('.lesson-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  document.querySelectorAll('#LNFP .lesson-tab').forEach((t,i) => {
+    t.classList.toggle('active', i===idx);
+    if (i===idx) t.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+  });
   RSFP();
 }
 
@@ -7237,12 +7720,12 @@ function RSFP() {
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
-      ${courseAudioBarHTML('FP')}
+      ${slide.isQuiz ? '' : courseAudioBarHTML('FP')}
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSFP()" ${CSFP===0?'disabled':''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSFP()" ${CSFP===0?'disabled':''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
-        ${CSFP < total-1
+        ${slide.isQuiz ? '' : CSFP < total-1
           ? `<button class="nav-btn primary" onclick="NSFP()">Siguiente →</button>`
           : CLFP < LSFP.length-1
             ? `<button class="nav-btn primary" onclick="GLFP(${CLFP+1})">Próxima lección →</button>`
@@ -7251,7 +7734,11 @@ function RSFP() {
       </div>
     </div>`;
 
-  initCourseAudio('FP', 'finanzas-personales', CLFP+1, CSFP+1);
+  if (slide.isQuiz) {
+    quizMount(slide.quizKey, slide.quizQuestions, slide.quizOpts);
+  } else {
+    initCourseAudio('FP', 'finanzas-personales', CLFP+1, CSFP+1);
+  }
   if (slide.chart) setTimeout(() => DCFP(slide.chart), 80);
 }
 
@@ -7406,8 +7893,30 @@ function DCFP(id) {
   }
 }
 
-RSFP();
-RSFP();
+function renderCourseIntroFP() {
+  var totalSlides = LSFP.slice(0,8).reduce(function(s,l){return s+l.slides.length;},0);
+  var lessonRows = LSFP.slice(0,8).map(function(l,i){
+    return '<div class="step-item"><div class="step-num">'+(i+1)+'</div><div class="step-content"><div class="step-title">'+l.title+'</div><div class="step-desc">'+l.slides.length+' diapositivas + quiz de 3 preguntas</div></div></div>';
+  }).join('');
+  document.getElementById('SWFP').innerHTML = `
+    <div class="slide active">
+      <div class="slide-eyebrow">Programa del curso</div>
+      <div class="slide-title">Finanzas Personales Básicas</div>
+      <p class="slide-intro">El dinero no se administra solo &mdash; aprendé a tomar el control de tu economía personal desde hoy. Presupuesto, ahorro, deudas, fondo de emergencia e inversión inicial.</p>
+      <div class="card-grid cols-3">
+        <div class="card blue"><div class="card-label">Lecciones</div><div class="card-number">8</div><div class="card-body">Cada una con su quiz de 3 preguntas al final.</div></div>
+        <div class="card"><div class="card-label">Diapositivas</div><div class="card-number">${totalSlides}</div><div class="card-body">Contenido en profundidad, a tu ritmo y sin apuro.</div></div>
+        <div class="card green"><div class="card-label">Al terminar</div><div class="card-number">&#127891;</div><div class="card-body">Quiz final de 10 preguntas y tu diploma de finalización.</div></div>
+      </div>
+      <div class="step-list" style="margin-top:2rem;">${lessonRows}</div>
+      <div class="callout blue">Cada lección termina con un quiz rápido de 3 preguntas para reforzar lo aprendido. Al completar las 8 lecciones y aprobar el quiz final (7/10), vas a poder generar tu diploma de finalización con tu nombre.</div>
+      <div class="slide-footer" style="justify-content:center;border-top:none;padding-top:0.5rem;">
+        <button class="nav-btn primary" onclick="GLFP(0)" style="padding:13px 34px;font-size:0.95rem;">Empezar el curso &rarr;</button>
+      </div>
+    </div>`;
+}
+
+renderCourseIntroFP();
 window.GLFP=GLFP;
 window.NSFP=function(){NSFP();};
 window.PSFP=function(){PSFP();};
@@ -7418,6 +7927,64 @@ window.GSlFP=GSlFP;
 <script>
 (function() {
 var CLIB=0,CSIB=0,CHIB={};
+// ============================================================
+// QUIZZES — Introducción a la Bolsa
+// ============================================================
+const QZIB_L0 = [
+  { q: "¿Cuál fue la primera bolsa de valores del mundo?", opts: ["Bolsa de Ámsterdam (1602)", "New York Stock Exchange (1792)", "Bolsa de Comercio de Buenos Aires (1854)", "Bolsa de Londres"], correct: 0, explain: "La Compañía Holandesa de las Indias Orientales emitió las primeras acciones de la historia en 1602 para financiar sus expediciones a Asia, dando origen a la Bolsa de Ámsterdam." },
+  { q: "Según el curso, ¿por qué la bolsa es especialmente relevante para un inversor argentino?", opts: ["Porque es la única forma legal de invertir en el país", "Porque, a diferencia del banco, históricamente le ganó a la inflación en el largo plazo", "Porque el gobierno obliga a invertir una parte del sueldo", "Porque no tiene ningún riesgo"], correct: 1, explain: "Con una inflación histórica muy alta, el dinero guardado en el banco pierde poder adquisitivo. La bolsa es una de las pocas herramientas que históricamente le ganó a la inflación en el largo plazo." },
+  { q: "¿Qué se compra y vende realmente en la bolsa?", opts: ["Solo dinero de un banco a otro", "Partes de empresas y promesas de dinero futuro", "Únicamente materias primas físicas", "Créditos que otorga el Estado"], correct: 1, explain: "La bolsa conecta a quienes tienen algo para vender con quienes quieren comprarlo — pero en vez de frutas o autos, lo que se intercambia son partes de empresas y promesas de dinero futuro." }
+];
+const QZIB_L1 = [
+  { q: "¿Cuáles son las dos formas en que un accionista puede ganar dinero?", opts: ["Apreciación del precio y dividendos", "Solo cobrando intereses fijos", "Solo si la empresa hace un IPO", "Recibiendo acciones gratis cada año"], correct: 0, explain: "Ser accionista da derecho a recibir dividendos (parte de las ganancias distribuidas) y a que el valor de la acción suba si el negocio crece." },
+  { q: "¿Qué hace que un ETF como el SPY sea particularmente atractivo para empezar a invertir?", opts: ["Garantiza un retorno fijo del 10% anual", "Da exposición a cientos de empresas a la vez con comisiones muy bajas", "Solo se puede comprar con montos superiores a $10.000", "Es exclusivo para inversores institucionales"], correct: 1, explain: "Con un solo ETF como el SPY podés tener exposición a las 500 empresas del S&P 500 con una comisión desde 0.03% anual — diversificación instantánea y barata." },
+  { q: "¿Qué es un bono, en esencia?", opts: ["Una acción que no paga dividendos", "Un pagaré: le prestás dinero al emisor a cambio de cupones periódicos y la devolución del capital", "Un derivado que solo usan los hedge funds", "Lo mismo que un CEDEAR"], correct: 1, explain: "Al comprar un bono le estás prestando dinero al emisor (gobierno o empresa), que te paga cupones periódicos y te devuelve el capital al vencimiento." }
+];
+const QZIB_L2 = [
+  { q: "¿Qué determina el precio de una acción en tiempo real?", opts: ["Un comité del gobierno que fija precios diarios", "El encuentro entre oferta y demanda de compradores y vendedores", "El promedio de precios del último año", "Solo las noticias que publican los medios"], correct: 1, explain: "No hay una autoridad central fijando precios: el precio surge del encuentro en tiempo real entre quienes quieren comprar y quienes quieren vender." },
+  { q: "¿Cuál es la diferencia clave entre mercado primario y mercado secundario?", opts: ["En el primario la empresa recibe el dinero (IPO); en el secundario los inversores operan entre sí y la empresa no recibe nada", "Son exactamente lo mismo con distinto nombre", "El primario es solo para bonos y el secundario solo para acciones", "El secundario es ilegal en Argentina"], correct: 0, explain: "En el mercado primario la empresa emite acciones por primera vez (IPO) y recibe el dinero. En el secundario, los inversores compran y venden entre sí — la empresa ya no recibe nada de esas operaciones." },
+  { q: "¿Qué es el S&P 500?", opts: ["Un banco de inversión estadounidense", "Un índice bursátil que agrupa a las 500 empresas más grandes de EE.UU.", "Una ley que regula la bolsa de Nueva York", "Un tipo de bono del Tesoro"], correct: 1, explain: "El S&P 500 es un índice bursátil compuesto por 500 de las empresas más grandes de Estados Unidos, usado como termómetro general del mercado." }
+];
+const QZIB_L3 = [
+  { q: "Según la ley fundamental de las finanzas que plantea el curso, ¿qué pasa si alguien te promete alto retorno con bajo riesgo?", opts: ["Es una oportunidad única que hay que aprovechar ya", "Es casi con certeza una estafa, porque esa combinación no existe realmente", "Es normal en bonos del gobierno argentino", "Solo pasa con las criptomonedas"], correct: 1, explain: "No existe una inversión real que ofrezca alto retorno con bajo riesgo. Si alguien te lo promete, es una señal de alerta de estafa." },
+  { q: "¿Qué tipo de riesgo SÍ se elimina diversificando la cartera?", opts: ["El riesgo de mercado (sistemático)", "El riesgo específico (idiosincrático) de una empresa o sector", "El riesgo cambiario en Argentina", "Ninguno, la diversificación no reduce ningún riesgo"], correct: 1, explain: "El riesgo específico de una empresa (un escándalo, perder un cliente clave) se elimina diversificando entre muchas empresas y sectores. El riesgo de mercado, en cambio, afecta a todos por igual." },
+  { q: "Para dinero que vas a necesitar en menos de 2 años, ¿qué recomienda el curso?", opts: ["Ponerlo todo en acciones de alto crecimiento", "Evitar la bolsa y usar instrumentos de corto plazo como plazo fijo o money market", "Invertirlo en un solo CEDEAR concentrado", "Esperar el mejor momento para entrar de golpe"], correct: 1, explain: "El horizonte corto (0-2 años) es de alto riesgo para la bolsa: el mercado puede estar 30-40% abajo justo cuando necesitás el dinero. Para ese plazo conviene priorizar liquidez y estabilidad." }
+];
+const QZIB_L4 = [
+  { q: "Según el estudio SPIVA mencionado en el curso, ¿qué porcentaje de los fondos de gestión activa NO logra superar a su índice de referencia en 15-20 años?", opts: ["Alrededor del 10%", "Alrededor del 50%", "Más del 90%", "Ninguno, todos los fondos activos ganan"], correct: 2, explain: "El estudio SPIVA muestra consistentemente que más del 90% de los fondos de gestión activa no supera a su índice de referencia en períodos de 15-20 años, principalmente por el efecto de las comisiones." },
+  { q: "¿Cuál fue el peor año histórico del S&P 500 mencionado en el curso, y por qué?", opts: ["2020, por la pandemia", "2008, por la crisis financiera global", "1954, por la posguerra", "2022, por la suba de tasas"], correct: 1, explain: "El peor año fue 2008 con -38%, durante la crisis financiera global. El índice se recuperó completamente en unos 4 años." },
+  { q: "¿Qué diferencia principal hay entre gestión activa y gestión pasiva?", opts: ["La activa replica un índice; la pasiva elige acciones a mano", "La pasiva simplemente replica un índice con comisiones muy bajas; la activa usa analistas que intentan superarlo, con comisiones más altas", "No hay ninguna diferencia real entre ambas", "La pasiva solo existe en Argentina"], correct: 1, explain: "La gestión pasiva (como un ETF) replica un índice con comisiones de 0.03-0.20% anual. La gestión activa paga analistas que intentan elegir mejor que el mercado, cobrando 1-2% o más — y en la mayoría de los casos, sin lograrlo." }
+];
+const QZIB_L5 = [
+  { q: "¿Por qué los inversores sofisticados prefieren mirar el Merval en dólares (CCL) en vez de en pesos?", opts: ["Porque en pesos el índice no existe", "Porque en pesos se puede descontar el efecto de la inflación y la devaluación, dando una imagen más real", "Porque el Merval en pesos siempre baja", "Porque la ley obliga a reportarlo en dólares"], correct: 1, explain: "El Merval en pesos puede subir 200% en un año, pero si la devaluación fue mayor, en dólares en realidad bajó. Mirarlo en CCL descuenta ese efecto y muestra la ganancia o pérdida real." },
+  { q: "¿Cómo funciona un CEDEAR, en esencia?", opts: ["Es una acción argentina que cotiza en Nueva York", "Es un certificado que representa una acción extranjera real (depositada en un custodio) y se compra y vende en pesos en Argentina", "Es un bono emitido por el Banco Central", "Es lo mismo que una Obligación Negociable"], correct: 1, explain: "Un banco o broker compra la acción real en el exterior, la deposita en un custodio internacional, y emite certificados (CEDEARs) que representan esa acción y se operan en pesos en el mercado local." },
+  { q: "¿Qué instrumento de renta fija argentina está denominado en dólares y es preferido por inversores conservadores que buscan dolarizarse con menor riesgo que un bono soberano?", opts: ["Lecap", "Bonos CER", "Obligaciones Negociables (ONs) corporativas", "Plazo fijo en pesos"], correct: 2, explain: "Las ONs corporativas en dólares, emitidas por empresas como YPF, Pampa o bancos privados, son preferidas por inversores conservadores que buscan dolarizarse con menor riesgo que los bonos soberanos, con tasas del 6-9% anual en USD." }
+];
+const QZIB_L6 = [
+  { q: "Antes de invertir el primer peso en la bolsa, ¿qué es imprescindible tener según el curso?", opts: ["Un curso universitario de finanzas", "Un fondo de emergencia de 3 a 6 meses de gastos en un instrumento líquido", "Al menos USD 50.000 ahorrados", "Una cuenta en 5 brokers distintos"], correct: 1, explain: "Antes de invertir un solo peso hay que tener entre 3 y 6 meses de gastos en un instrumento de alta liquidez. Invertir dinero que podrías necesitar pronto es el error más común y costoso." },
+  { q: "¿Qué es el Dollar Cost Averaging (DCA)?", opts: ["Comprar todo de una vez cuando el mercado está en mínimos", "Invertir una cantidad fija a intervalos regulares, sin importar si el precio está caro o barato", "Vender apenas el precio sube un poco", "Una estrategia exclusiva para bonos"], correct: 1, explain: "El DCA consiste en invertir una cantidad fija todos los meses sin importar el precio. Esto promedia el costo de compra y elimina el riesgo de intentar 'adivinar' el mejor momento para entrar." },
+  { q: "Según la cartera modelo 'agresiva' del curso (90% acciones / 10% otros), ¿para qué tipo de horizonte temporal es apropiada?", opts: ["Para cualquier plazo, incluso menos de un año", "Solo para horizontes de 10 años o más, porque hay que poder tolerar caídas de 40-50%", "Para jubilados que ya no generan ingresos", "Es la única cartera recomendada para principiantes"], correct: 1, explain: "La cartera agresiva (90% acciones) puede caer 40-50% en momentos de crisis. Solo tiene sentido para quien tiene un horizonte de 10 años o más y puede tolerar esa volatilidad sin vender en pánico." }
+];
+const QZIB_L7 = [
+  { q: "¿Cuál es, según el curso, el error número uno que cometen los inversores?", opts: ["No leer suficientes noticias financieras", "El panic selling: vender en la caída y cristalizar una pérdida que era temporal", "Invertir en ETFs de bajo costo", "Diversificar demasiado la cartera"], correct: 1, explain: "El panic selling es el error número uno: el mercado cae, el miedo domina y se vende, cristalizando una pérdida que probablemente se hubiera recuperado con el tiempo." },
+  { q: "El 'efecto de anclaje' lleva a muchos inversores a pensar que...", opts: ["El precio al que compraron una acción es un dato relevante para decidir si venderla hoy", "Hay que diversificar siempre", "El mercado nunca se recupera de una crisis", "Los ETFs son más riesgosos que las acciones individuales"], correct: 0, explain: "El anclaje es la trampa de pensar 'no vendo porque estoy en pérdida'. Lo que pagaste es un dato histórico irrelevante — la pregunta correcta es si comprarías esa acción hoy, a ese precio." },
+  { q: "¿Qué tienen en común el FOMO y la aversión a las pérdidas, según el curso?", opts: ["Ambos son estrategias recomendadas de inversión", "Son sesgos cognitivos que llevan a decisiones emocionales que perjudican el resultado de largo plazo", "Solo aplican a quienes invierten en criptomonedas", "No tienen relación entre sí"], correct: 1, explain: "Ambos son sesgos cognitivos: el FOMO empuja a comprar en la euforia (cerca de los techos) y la aversión a las pérdidas lleva a aguantar posiciones perdedoras demasiado tiempo. Los dos perjudican el retorno de largo plazo." }
+];
+const QZIB_FINAL = [
+  { q: "¿En qué año y ciudad nació la primera bolsa del mundo?", opts: ["1602, Ámsterdam", "1792, Nueva York", "1854, Buenos Aires", "1929, Londres"], correct: 0, explain: "La Compañía Holandesa de las Indias Orientales emitió las primeras acciones en 1602, dando origen a la Bolsa de Ámsterdam." },
+  { q: "¿Qué instrumento te permite tener exposición a cientos de empresas con una sola compra y comisiones muy bajas?", opts: ["Un bono soberano individual", "Un ETF", "Una opción (call/put)", "Un plazo fijo"], correct: 1, explain: "Los ETFs agrupan muchas empresas en un solo instrumento con comisiones desde 0.03% anual — diversificación instantánea y barata." },
+  { q: "¿Qué es una Obligación Negociable (ON)?", opts: ["Un bono soberano de EE.UU.", "Un bono corporativo emitido por una empresa argentina, muchas veces en dólares", "Un tipo de acción preferida", "Un fondo común de inversión"], correct: 1, explain: "Las ONs son bonos corporativos emitidos por empresas argentinas, muchas denominadas en dólares, atractivas para dolarizar ahorros dentro del sistema local." },
+  { q: "¿Qué es una IPO?", opts: ["La venta de acciones entre dos inversores particulares", "La primera vez que una empresa ofrece sus acciones al público general", "Un tipo de bono del Tesoro", "Un índice bursátil"], correct: 1, explain: "IPO (Initial Public Offering) es la salida a bolsa de una empresa: la primera vez que ofrece acciones al público en el mercado primario." },
+  { q: "¿Qué NO se logra diversificando dentro de la bolsa?", opts: ["El riesgo específico de una empresa", "El riesgo de mercado (sistemático), que afecta a todo el mercado por igual", "El riesgo de tener todo en un solo sector", "El riesgo de tener todo en una sola acción"], correct: 1, explain: "El riesgo sistemático (una crisis financiera, una pandemia) afecta a todo el mercado y no se elimina diversificando dentro de la bolsa — sí se puede mitigar con activos no correlacionados como oro o bonos." },
+  { q: "¿Aproximadamente qué porcentaje de los fondos de gestión activa NO le gana a su índice de referencia en 15-20 años, según el estudio SPIVA?", opts: ["10%", "50%", "Más del 90%", "0%, todos ganan"], correct: 2, explain: "Más del 90% de los fondos de gestión activa no supera a su índice de referencia en el largo plazo, principalmente por el efecto acumulado de comisiones más altas." },
+  { q: "¿Qué hace que el precio en pesos de un CEDEAR suba automáticamente cuando se devalúa el peso?", opts: ["Una decisión manual del broker", "Que su precio sigue al dólar CCL, además del movimiento de la acción subyacente", "Un impuesto especial del Estado", "No sube automáticamente, hay que venderlo y recomprarlo"], correct: 1, explain: "El precio del CEDEAR en pesos refleja el precio de la acción original en dólares convertido al tipo de cambio CCL — si el CCL sube, el CEDEAR sube en pesos aunque la acción no se haya movido." },
+  { q: "¿Qué logra el Dollar Cost Averaging (DCA) frente a invertir todo de una vez?", opts: ["Garantiza siempre un retorno mayor", "Promedia el precio de compra y elimina la presión de 'elegir el momento perfecto' para entrar", "Elimina completamente el riesgo de la inversión", "Solo funciona con bonos"], correct: 1, explain: "El DCA no garantiza mayor retorno, pero promedia el costo de compra a lo largo del tiempo y elimina la presión psicológica de intentar acertar el momento perfecto para entrar al mercado." },
+  { q: "¿Cuál es el antídoto que propone el curso contra el sesgo de confirmación?", opts: ["Comprar más de la misma acción para reafirmar la convicción", "Buscar activamente argumentos en contra de tu propia tesis de inversión", "Ignorar todas las noticias sobre la empresa", "Vender inmediatamente ante cualquier duda"], correct: 1, explain: "El sesgo de confirmación lleva a buscar solo noticias que confirman lo que ya creemos. El antídoto es buscar activamente argumentos en contra de la propia tesis de inversión." },
+  { q: "Un inversor argentino con un horizonte de 15 años quiere empezar a invertir de forma simple y bien diversificada. Según los principios del curso, ¿cuál es el camino más razonable?", opts: ["Poner todo en una sola acción muy prometedora que le recomendó un amigo", "Empezar con 1-2 ETFs de bajo costo como VOO, invirtiendo montos fijos de forma regular (DCA)", "Esperar a que el mercado esté en su punto más bajo para invertir todo de golpe", "Evitar la bolsa por completo y usar solo plazo fijo en pesos"], correct: 1, explain: "El curso recomienda empezar simple (1-2 ETFs de bajo costo), diversificar, invertir de forma regular con DCA y pensar en el largo plazo — evitando tanto la concentración en una sola apuesta como el intento de timear el mercado." }
+];
+const QZIB_LESSON_IDS = ['L0','L1','L2','L3','L4','L5','L6','L7'];
+const QZIB_ALL = [QZIB_L0, QZIB_L1, QZIB_L2, QZIB_L3, QZIB_L4, QZIB_L5, QZIB_L6, QZIB_L7];
+
 const LSIB = [
 
   // LECCIÓN 1 &mdash; ¿QUÉ ES LA BOLSA?
@@ -7450,7 +8017,10 @@ const LSIB = [
       html: `<p class="slide-intro">Para un argentino, esta pregunta tiene una respuesta particularmente urgente: con una inflación histórica de las más altas del mundo, el dinero guardado "debajo del colchón" o en una caja de ahorro pierde poder adquisitivo a un ritmo devastador. La bolsa es una de las pocas herramientas que históricamente le ganó a la inflación en el largo plazo.</p>
       <div class="chart-box"><div class="chart-title">USD 10.000 invertidos en 1990 &mdash; comparación de alternativas (EE.UU.)</div><canvas id="chartInflation" height="200"></canvas></div>
       <div class="callout amber">El poder del interés compuesto es la razón principal. Albert Einstein lo llamó "la octava maravilla del mundo". Cuando tus ganancias generan más ganancias, el crecimiento se acelera exponencialmente con el tiempo &mdash; y la bolsa es el vehículo que mejor aprovecha este efecto.</div>`
-    }
+    },
+    { eyebrow: "Lección 1 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L0', quizQuestions: QZIB_L0, quizOpts: { course: 'IB', progressId: 'L0', nextFn: "GLIB(1)" },
+      html: '<div id="quizmount-IB-L0"></div>' }
   ]},
 
   // LECCIÓN 2 &mdash; INSTRUMENTOS
@@ -7496,7 +8066,10 @@ const LSIB = [
         <div class="instrument-icon"></div>
         <div><div class="instrument-name">REITs (Real Estate Investment Trusts)</div><div class="instrument-desc">Fondos que invierten en bienes raíces y distribuyen el 90% de sus ganancias como dividendos. Permiten participar del mercado inmobiliario con montos pequeños y alta liquidez, algo imposible con propiedades físicas.</div><span class="instrument-tag low">Riesgo bajo-medio &mdash; dividendos altos</span></div>
       </div>`
-    }
+    },
+    { eyebrow: "Lección 2 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L1', quizQuestions: QZIB_L1, quizOpts: { course: 'IB', progressId: 'L1', nextFn: "GLIB(2)" },
+      html: '<div id="quizmount-IB-L1"></div>' }
   ]},
 
   // LECCIÓN 3 &mdash; CÓMO FUNCIONA
@@ -7544,7 +8117,10 @@ const LSIB = [
         <tr><td><strong>Merval</strong></td><td>Empresas líderes de Argentina</td><td>&#127462;&#127479;</td><td><span class="tag neutral">Local</span></td></tr>
         <tr><td><strong>MSCI World</strong></td><td>+1600 empresas de 23 países</td><td></td><td><span class="tag good">Global</span></td></tr>
       </table></div>`
-    }
+    },
+    { eyebrow: "Lección 3 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L2', quizQuestions: QZIB_L2, quizOpts: { course: 'IB', progressId: 'L2', nextFn: "GLIB(3)" },
+      html: '<div id="quizmount-IB-L2"></div>' }
   ]},
 
   // LECCIÓN 4 &mdash; RIESGO Y RETORNO
@@ -7577,7 +8153,10 @@ const LSIB = [
         <div class="card green"><div class="card-label">Largo plazo (8+ años)</div><div class="card-title">Riesgo manejable</div><div class="card-body">Históricamente el S&P 500 nunca tuvo un período de 20 años con retorno negativo. El tiempo convierte la volatilidad de corto plazo en ruido irrelevante.</div></div>
       </div>
       <div class="callout">La pregunta más importante antes de invertir no es "¿qué acción compro?" sino "¿cuándo voy a necesitar este dinero?" Tu horizonte temporal determina casi completamente qué instrumentos son apropiados para vos.</div>`
-    }
+    },
+    { eyebrow: "Lección 4 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L3', quizQuestions: QZIB_L3, quizOpts: { course: 'IB', progressId: 'L3', nextFn: "GLIB(4)" },
+      html: '<div id="quizmount-IB-L3"></div>' }
   ]},
 
   // LECCIÓN 5 &mdash; ETFs E ÍNDICES
@@ -7622,7 +8201,10 @@ const LSIB = [
       </div>
       <div class="callout">El estudio SPIVA de S&P Global analiza anualmente el desempeño de fondos activos vs. sus índices de referencia. El resultado consistente: más del 90% de los fondos de gestión activa no supera a su índice de referencia en períodos de 15-20 años, principalmente por el efecto de las comisiones altas.</div>
       <div class="callout green">Para el inversor común, la estrategia más sencilla y probadamente efectiva es invertir regularmente en 1-3 ETFs de bajo costo y mantenerlos indefinidamente. Esta estrategia llamada "Buy and Hold" supera a la gran mayoría de estrategias más complejas.</div>`
-    }
+    },
+    { eyebrow: "Lección 5 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L4', quizQuestions: QZIB_L4, quizOpts: { course: 'IB', progressId: 'L4', nextFn: "GLIB(5)" },
+      html: '<div id="quizmount-IB-L4"></div>' }
   ]},
 
   // LECCIÓN 6 &mdash; BOLSA ARGENTINA
@@ -7657,7 +8239,10 @@ const LSIB = [
         <tr><td><strong>ONs (Obligaciones Neg.)</strong></td><td>USD</td><td>Total en USD</td><td><span class="tag neutral">Medio-bajo</span></td></tr>
       </table></div>
       <div class="callout">Las Obligaciones Negociables (ONs) corporativas en dólares son las preferidas por inversores conservadores que quieren dolarizarse con menor riesgo que los bonos soberanos. Empresas como YPF, Pampa, Telecom y bancos privados emiten ONs regularmente con tasas del 6-9% anual en USD.</div>`
-    }
+    },
+    { eyebrow: "Lección 6 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L5', quizQuestions: QZIB_L5, quizOpts: { course: 'IB', progressId: 'L5', nextFn: "GLIB(6)" },
+      html: '<div id="quizmount-IB-L5"></div>' }
   ]},
 
   // LECCIÓN 7 &mdash; CÓMO EMPEZAR
@@ -7686,7 +8271,10 @@ const LSIB = [
         <div class="card indigo"><div class="card-label">Agresivo</div><div class="card-title">90% acciones / 10% otros</div><div class="card-body">Para quien puede tolerar caídas del 40-50% a cambio de máximo crecimiento en el largo plazo. Ejemplo: 70% VOO + 20% QQQ + 10% VT. Solo para horizontes de 10+ años.</div></div>
       </div>
       <div class="callout amber">La regla del "100 menos tu edad" es un punto de partida clásico: si tenés 30 años, el 70% en acciones es razonable. A los 60, el 40% en acciones. Es una simplificación útil pero debe ajustarse a tu situación personal &mdash; especialmente en Argentina donde el contexto local cambia la ecuación significativamente.</div>`
-    }
+    },
+    { eyebrow: "Lección 7 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L6', quizQuestions: QZIB_L6, quizOpts: { course: 'IB', progressId: 'L6', nextFn: "GLIB(7)" },
+      html: '<div id="quizmount-IB-L6"></div>' }
   ]},
 
   // LECCIÓN 8 &mdash; ERRORES COMUNES
@@ -7719,7 +8307,20 @@ const LSIB = [
         <div class="step-item"><div class="step-num">5</div><div class="step-content"><div class="step-title">Formación continua &mdash; nunca dejes de aprender</div><div class="step-desc">El mercado evoluciona constantemente. Los inversores que se mantienen formados tienen una ventaja estructural sobre los que se guían por tips y rumores.</div></div></div>
       </div>
       <div class="callout blue">¿Querés seguir formándote? Los cursos de Análisis Fundamental, Mercado Argentino y Finanzas Personales de esta plataforma complementan perfectamente lo que aprendiste acá. Y si tenés dudas puntuales, el asesor IA está disponible para consultarlo en cualquier momento.</div>`
-    }
+    },
+    { eyebrow: "Lección 8 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L7', quizQuestions: QZIB_L7, quizOpts: { course: 'IB', progressId: 'L7', nextFn: "GLIB(8)" },
+      html: '<div id="quizmount-IB-L7"></div>' }
+  ]},
+
+  // QUIZ FINAL — 10 preguntas que abarcan las 8 lecciones del curso
+  { title: "Quiz Final", slides: [
+    { eyebrow: "Quiz Final", title: "Demostrá todo lo que aprendiste",
+      isQuiz: true, isFinal: true,
+      quizKey: 'IB-FINAL', quizQuestions: QZIB_FINAL,
+      quizOpts: { course: 'IB', progressId: 'FINAL', isFinal: true, passThreshold: 7 },
+      html: `<p class="slide-intro">10 preguntas que recorren las 8 lecciones del curso. Necesitás al menos 7 correctas para aprobar y desbloquear tu diploma. Podés reintentar las veces que quieras.</p>
+      <div id="quizmount-IB-FINAL"></div>` }
   ]}
 ];
 
@@ -7732,7 +8333,10 @@ const LSIB = [
 function GLIB(idx) {
   CLIB = idx;
   CSIB = 0;
-  document.querySelectorAll('.lesson-tab').forEach((t,i) => t.classList.toggle('active', i === idx));
+  document.querySelectorAll('#LNIB .lesson-tab').forEach((t,i) => {
+    t.classList.toggle('active', i === idx);
+    if (i === idx) t.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+  });
   RSIB();
 }
 
@@ -7749,12 +8353,12 @@ function RSIB() {
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
-      ${courseAudioBarHTML('IB')}
+      ${slide.isQuiz ? '' : courseAudioBarHTML('IB')}
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSIB()" ${CSIB===0?'disabled':''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSIB()" ${CSIB===0?'disabled':''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
-        ${CSIB < total-1
+        ${slide.isQuiz ? '' : CSIB < total-1
           ? `<button class="nav-btn primary" onclick="NSIB()">Siguiente →</button>`
           : CLIB < LSIB.length-1
             ? `<button class="nav-btn primary" onclick="GLIB(${CLIB+1})">Próxima lección →</button>`
@@ -7763,7 +8367,11 @@ function RSIB() {
       </div>
     </div>`;
 
-  initCourseAudio('IB', 'introduccion-bolsa', CLIB+1, CSIB+1);
+  if (slide.isQuiz) {
+    quizMount(slide.quizKey, slide.quizQuestions, slide.quizOpts);
+  } else {
+    initCourseAudio('IB', 'introduccion-bolsa', CLIB+1, CSIB+1);
+  }
   if (slide.chart) setTimeout(() => DCIB(slide.chart), 80);
 }
 
@@ -7929,8 +8537,30 @@ function DCIB(id) {
   }
 }
 
-RSIB();
-RSIB();
+function renderCourseIntroIB() {
+  var totalSlides = LSIB.slice(0,8).reduce(function(s,l){return s+l.slides.length;},0);
+  var lessonRows = LSIB.slice(0,8).map(function(l,i){
+    return '<div class="step-item"><div class="step-num">'+(i+1)+'</div><div class="step-content"><div class="step-title">'+l.title+'</div><div class="step-desc">'+l.slides.length+' diapositivas + quiz de 3 preguntas</div></div></div>';
+  }).join('');
+  document.getElementById('SWIB').innerHTML = `
+    <div class="slide active">
+      <div class="slide-eyebrow">Programa del curso</div>
+      <div class="slide-title">Introducción a la Bolsa</div>
+      <p class="slide-intro">Todo lo que necesitás saber para empezar a invertir con criterio propio. Acciones, bonos, ETFs, riesgo y retorno &mdash; de cero a un criterio propio para invertir.</p>
+      <div class="card-grid cols-3">
+        <div class="card blue"><div class="card-label">Lecciones</div><div class="card-number">8</div><div class="card-body">Cada una con su quiz de 3 preguntas al final.</div></div>
+        <div class="card"><div class="card-label">Diapositivas</div><div class="card-number">${totalSlides}</div><div class="card-body">Contenido en profundidad, a tu ritmo y sin apuro.</div></div>
+        <div class="card green"><div class="card-label">Al terminar</div><div class="card-number">&#127891;</div><div class="card-body">Quiz final de 10 preguntas y tu diploma de finalización.</div></div>
+      </div>
+      <div class="step-list" style="margin-top:2rem;">${lessonRows}</div>
+      <div class="callout blue">Cada lección termina con un quiz rápido de 3 preguntas para reforzar lo aprendido. Al completar las 8 lecciones y aprobar el quiz final (7/10), vas a poder generar tu diploma de finalización con tu nombre.</div>
+      <div class="slide-footer" style="justify-content:center;border-top:none;padding-top:0.5rem;">
+        <button class="nav-btn primary" onclick="GLIB(0)" style="padding:13px 34px;font-size:0.95rem;">Empezar el curso &rarr;</button>
+      </div>
+    </div>`;
+}
+
+renderCourseIntroIB();
 window.GLIB=GLIB;
 window.NSIB=function(){NSIB();};
 window.PSIB=function(){PSIB();};
@@ -7941,6 +8571,62 @@ window.GSlIB=GSlIB;
 <script>
 (function() {
 var CLAF=0,CSAF=0,CHAF={};
+// ============================================================
+// QUIZZES — Análisis Fundamental
+// ============================================================
+const QZAF_L0 = [
+  { q: "Según el curso, ¿cuál es la diferencia clave entre análisis fundamental y análisis técnico?", opts: ["El fundamental determina CUÁNDO comprar y el técnico QUÉ comprar", "El fundamental estudia la salud del negocio (QUÉ comprar) y el técnico estudia el gráfico de precios (CUÁNDO comprar)", "Son exactamente lo mismo con distinto nombre", "El técnico solo sirve para bonos"], correct: 1, explain: "El análisis fundamental responde QUÉ comprar estudiando la salud del negocio; el técnico responde CUÁNDO comprar estudiando el gráfico de precios. Los mejores inversores combinan ambos." },
+  { q: "Según el estudio de Morgan Stanley mencionado en el curso, ¿qué mueve principalmente el precio de una acción en el largo plazo?", opts: ["El sentimiento del mercado y las valuaciones", "Las ventas y ganancias reales de la empresa", "Las noticias diarias", "Los indicadores técnicos como el RSI"], correct: 1, explain: "En el corto plazo el sentimiento y las valuaciones dominan, pero en el largo plazo lo único que importa son las ventas y ganancias reales del negocio." },
+  { q: "¿Cuál es el tercer paso del proceso de análisis fundamental descripto en el curso (de lo general a lo específico)?", opts: ["Valuación", "Análisis macro", "Análisis de la empresa — las 5 condiciones", "Análisis de ratios"], correct: 2, explain: "El proceso va: 1) análisis macro, 2) análisis sectorial, 3) análisis de la empresa (las 5 condiciones), 4) análisis de ratios, 5) valuación." }
+];
+const QZAF_L1 = [
+  { q: "Según Benjamin Graham, citado en el curso, ¿qué es el mercado en el corto plazo y en el largo plazo?", opts: ["Una máquina de votación en el corto plazo y una máquina de pesar en el largo plazo", "Una máquina de pesar en el corto plazo y de votación en el largo plazo", "Siempre una máquina de pesar", "Siempre impredecible, no hay diferencia entre plazos"], correct: 0, explain: "Graham describió al mercado como una máquina de votación (emociones) en el corto plazo y una máquina de pesar (valor real) en el largo plazo." },
+  { q: "Si calculás que una empresa vale $100 y la comprás a $70, ¿qué margen de seguridad estás tomando?", opts: ["10%", "30%", "70%", "100%"], correct: 1, explain: "Margen de seguridad = (Valor intrínseco − Precio de compra) / Valor intrínseco × 100 = (100-70)/100 = 30%." },
+  { q: "Para empresas riesgosas o de mercados emergentes como el argentino, ¿qué margen de seguridad recomienda el curso?", opts: ["0-10%", "20-30%", "40-50%", "No hace falta margen de seguridad"], correct: 2, explain: "El curso recomienda un mínimo de 20-30% en general, pero para empresas más riesgosas o mercados emergentes como Argentina, conviene buscar márgenes del 40-50%." }
+];
+const QZAF_L2 = [
+  { q: "¿Qué tipo de ventaja competitiva tiene Microsoft, según el ejemplo del curso, cuando las empresas evitan migrar sus sistemas a otro proveedor?", opts: ["Efecto de red", "Costos de cambio elevados", "Diferenciación del producto", "Barreras de entrada"], correct: 1, explain: "Microsoft se beneficia de costos de cambio elevados: migrar todos los sistemas corporativos a otro proveedor es extremadamente costoso para sus clientes." },
+  { q: "¿Cuál es la regla del curso sobre el crecimiento mínimo del EPS para que una empresa pase el filtro de calidad?", opts: ["Al menos 5% anual en 2 años", "Al menos 10% anual compuesto en los últimos 5 años", "Al menos 50% anual", "No hay un mínimo definido"], correct: 1, explain: "La regla es que el EPS debe crecer al menos un 10% anual compuesto en los últimos 5 años; por debajo de eso, la empresa no está creando valor suficiente." },
+  { q: "Según el curso, ¿cuándo es el momento correcto para comprar una empresa cíclica (como una acerera)?", opts: ["Cuando el PER parece muy bajo, señal de que las ganancias están en el pico", "Cuando el PER parece alto o negativo, lo que suele coincidir con el piso del ciclo", "Nunca, las empresas cíclicas no se deben comprar", "Es indistinto, el ciclo no afecta a estas empresas"], correct: 1, explain: "Un PER muy bajo en una cíclica suele indicar que las ganancias están en el techo del ciclo y a punto de caer. Lo correcto es comprarlas cuando el PER parece alto o negativo, que coincide con el piso del ciclo." }
+];
+const QZAF_L3 = [
+  { q: "Un PER de 15 significa que...", opts: ["La empresa perdió 15% de su valor este año", "Estás pagando 15 veces las ganancias anuales actuales de la empresa", "La empresa reparte 15% de dividendos", "El precio de la acción es $15"], correct: 1, explain: "El PER indica cuántos años de ganancias actuales estás pagando por la empresa. Un PER de 15 significa pagar 15 veces las ganancias anuales de hoy." },
+  { q: "Según el curso, ¿qué límite general nunca debería superar el PER, ya que implica una expectativa de crecimiento muy difícil de cumplir?", opts: ["10 años", "20 años", "40 años", "100 años"], correct: 2, explain: "El curso marca que el PER nunca debería superar los 40 años como norma general; por encima de eso, cualquier decepción puede causar caídas de 50% o más." },
+  { q: "Una empresa tiene PER 30 y crece al 30% anual. ¿Qué PEG tiene y qué significa?", opts: ["PEG = 3, está muy sobrevaluada", "PEG = 1, es una valuación razonable dado su crecimiento", "PEG = 0.1, está regalada", "El PEG no se puede calcular con esos datos"], correct: 1, explain: "PEG = PER / tasa de crecimiento = 30/30 = 1. Un PEG de 1 es perfectamente razonable: la empresa crece al mismo ritmo que lo que se paga por ella." }
+];
+const QZAF_L4 = [
+  { q: "Una empresa tiene market cap de $100M, deuda de $50M y efectivo de $10M. ¿Cuál es su Enterprise Value?", opts: ["$100M", "$140M", "$150M", "$40M"], correct: 1, explain: "EV = Capitalización bursátil + Deuda neta = 100 + (50-10) = $140M. Ese es el costo real de comprar la empresa entera." },
+  { q: "¿Por qué el FCF es considerado más difícil de manipular contablemente que el beneficio neto, según el curso?", opts: ["Porque mide dinero real que entra y sale de la empresa, no solo ganancias contables", "Porque lo audita directamente el gobierno", "Porque no depende del CAPEX", "Porque siempre es igual al EBIT"], correct: 0, explain: "El FCF mide dinero real (flujo de caja operativo menos inversiones en CAPEX), a diferencia del beneficio neto que puede ajustarse con amortizaciones y provisiones." },
+  { q: "¿Por qué el EBIT es útil para comparar una empresa argentina con una americana, según el curso?", opts: ["Porque incluye los impuestos de cada país para hacerlos comparables", "Porque elimina el efecto de los intereses de deuda y los impuestos locales, que varían por país", "Porque solo se usa para empresas argentinas", "Porque es lo mismo que el EPS"], correct: 1, explain: "El EBIT elimina intereses e impuestos, que dependen del país y de la estructura de financiamiento, permitiendo comparar la rentabilidad operativa 'pura' entre empresas de distintos países." }
+];
+const QZAF_L5 = [
+  { q: "Una empresa tiene $500M de deuda financiera y $600M en efectivo. ¿Cuál es su situación?", opts: ["Deuda neta de $1100M, muy endeudada", "Deuda neta negativa de -$100M, o sea 'caja neta', una posición financiera excelente", "Deuda neta de $500M", "No se puede determinar con esos datos"], correct: 1, explain: "Deuda neta = deuda financiera total − efectivo = 500 − 600 = -$100M. Una deuda neta negativa se llama 'caja neta', señal de fortaleza financiera." },
+  { q: "¿Qué significa un ratio Deuda neta/EBITDA de 2x?", opts: ["La empresa necesitaría 2 años de ganancias operativas para pagar toda su deuda", "La deuda es el doble del EBITDA de hace 2 años", "La empresa está en quiebra", "Es un nivel de deuda extremadamente peligroso"], correct: 0, explain: "El ratio Deuda/EBITDA indica cuántos años de ganancias operativas necesitaría la empresa para pagar toda su deuda. Un ratio de 2x (razonable) significa 2 años; un ratio de 7x es muy comprometido." },
+  { q: "Según la regla fundamental del curso sobre endeudamiento, ¿cuándo puede una empresa endeudarse de forma saludable?", opts: ["Nunca, toda deuda es peligrosa", "Siempre que esté en constante crecimiento y genere flujo de caja para pagarla", "Solo si es una empresa estatal", "Solo si no tiene ningún competidor"], correct: 1, explain: "La regla fundamental es que una empresa puede endeudarse siempre y cuando esté en constante crecimiento; una empresa estancada que se endeuda camina hacia problemas serios." }
+];
+const QZAF_L6 = [
+  { q: "¿Cuál es la idea central del método DCF?", opts: ["Comparar el PER de la empresa con el de sus competidores", "El valor de una empresa hoy equivale a la suma de todo el dinero que generará en el futuro, ajustado por el costo del dinero en el tiempo", "El valor de la empresa es lo que costaría reemplazar sus activos físicos", "El valor de la empresa es siempre igual a su capitalización bursátil"], correct: 1, explain: "El DCF calcula el valor de una empresa como la suma de sus flujos de caja futuros, descontados a valor presente para reflejar que un peso hoy vale más que un peso en el futuro." },
+  { q: "¿Qué representa la WACC en el modelo DCF?", opts: ["El precio actual de la acción", "La tasa mínima de retorno que debe generar la empresa para que valga la pena invertir, usada para descontar los flujos futuros", "El crecimiento histórico del EPS", "La cantidad de acciones en circulación"], correct: 1, explain: "La WACC es la tasa que se usa para descontar los flujos de caja futuros al valor de hoy — el costo de oportunidad mínimo que debe superar la empresa." },
+  { q: "¿Cuál es la principal limitación del DCF mencionada en el curso?", opts: ["No se puede usar para empresas argentinas", "Es extremadamente sensible a los supuestos: un pequeño cambio en la tasa de crecimiento o en la WACC puede cambiar el resultado en un 50%", "Solo funciona para empresas que pagan dividendos", "Requiere que la empresa cotice en el Merval"], correct: 1, explain: "El DCF es muy sensible a los supuestos usados — pequeños cambios en la tasa de crecimiento proyectada o en la WACC pueden alterar el resultado en un 50%, por eso conviene hacer análisis de sensibilidad." }
+];
+const QZAF_L7 = [
+  { q: "En el checklist final del curso, ¿cuál es el primer filtro cuantitativo antes de seguir analizando una empresa?", opts: ["Calcular el DCF completo", "Que el EPS haya crecido más del 10% anual compuesto en los últimos 5 años", "Que pague dividendos", "Que cotice en el S&P 500"], correct: 1, explain: "El primer filtro cuantitativo es el EPS: si no creció más del 10% anual compuesto en 5 años, la empresa ni siquiera entra al análisis." },
+  { q: "En el análisis PESTEL, ¿qué evalúa la 'E' de Económico?", opts: ["Las patentes y leyes antimonopolio", "Tasas de interés de la Fed, tipo de cambio, inflación y ciclo económico", "Los hábitos de consumo por generación", "La adaptación tecnológica de la empresa"], correct: 1, explain: "El factor Económico del PESTEL evalúa tasas de interés (especialmente de la Fed), tipo de cambio, inflación y el ciclo económico general." },
+  { q: "Según el curso, ¿cuál es la fuente más confiable para los balances oficiales de empresas que cotizan en Argentina?", opts: ["Yahoo Finance", "Investing.com", "La CNV (Comisión Nacional de Valores) — cnv.gob.ar", "Los rumores de redes sociales"], correct: 2, explain: "La CNV (cnv.gob.ar) es la fuente más confiable para balances oficiales, memorias anuales y hechos relevantes de empresas que cotizan en Argentina." }
+];
+const QZAF_FINAL = [
+  { q: "¿Qué mide el análisis fundamental que el análisis técnico no mira?", opts: ["El gráfico de precios", "La salud real del negocio: ganancias, deudas, crecimiento y flujo de caja", "El volumen de operaciones diario", "Los indicadores de momentum"], correct: 1, explain: "El análisis fundamental estudia los números reales del negocio, mientras el técnico se enfoca en gráficos y precios." },
+  { q: "¿Qué frase resume la diferencia entre precio y valor según Warren Buffett, citada en el curso?", opts: ["'El precio siempre tiene razón'", "'El precio es lo que pagás. El valor es lo que obtenés'", "'El valor no importa, solo el precio'", "'Comprá cuando el precio suba'"], correct: 1, explain: "Buffett resumió esta distinción clave: el precio es lo que pagás, el valor es lo que realmente obtenés." },
+  { q: "¿Cuáles son las cuatro fuentes de ventaja competitiva mencionadas en el curso?", opts: ["Publicidad, ventas, marketing y logística", "Diferenciación del producto, barreras de entrada, efecto de red y costos de cambio elevados", "Deuda baja, caja alta, EPS creciente y PER bajo", "Ninguna de las anteriores"], correct: 1, explain: "Las cuatro fuentes de ventaja competitiva (moat) son: diferenciación del producto, barreras de entrada, efecto de red y costos de cambio elevados." },
+  { q: "Si una empresa tiene PER 30 pero crece solo al 10% anual, ¿qué PEG tiene y qué indica?", opts: ["PEG = 0.3, está barata", "PEG = 3, indica una posible sobrevaluación", "PEG = 1, valuación perfecta", "PEG = 10, está regalada"], correct: 1, explain: "PEG = PER/crecimiento = 30/10 = 3. Un PEG mayor a 2 indica que el mercado está pagando demasiado respecto al crecimiento real de la empresa." },
+  { q: "¿Qué ventaja tiene el EV/FCF sobre el PER según el curso?", opts: ["Es más simple de calcular", "Tiene en cuenta la deuda de la empresa y usa el FCF, más difícil de manipular que el beneficio neto", "No depende de ningún dato financiero", "Solo aplica a empresas argentinas"], correct: 1, explain: "El EV/FCF incorpora la deuda (vía el Enterprise Value) y usa el FCF, que es más honesto que el beneficio neto contable." },
+  { q: "¿Qué le pasa a una empresa endeudada cuando está estancada, según la regla del curso?", opts: ["No hay ningún problema mientras pague los intereses", "Camina hacia problemas serios porque no genera el flujo de caja necesario para servir la deuda", "Automáticamente mejora su PER", "Se vuelve más atractiva para invertir"], correct: 1, explain: "La deuda solo es saludable si la empresa crece. Una empresa estancada que se endeuda no genera el flujo de caja necesario para pagarla, lo que la lleva a problemas serios." },
+  { q: "En el modelo DCF, ¿qué es el 'valor residual' o 'terminal value'?", opts: ["El valor de la empresa el día que cierra sus puertas", "El valor de todos los flujos de caja a partir del año 10 en adelante, asumiendo un crecimiento perpetuo conservador", "El valor contable de sus activos físicos", "El precio actual de la acción"], correct: 1, explain: "El terminal value representa el valor de todos los flujos de caja futuros más allá del período proyectado explícitamente (usualmente 5-10 años), asumiendo un crecimiento perpetuo conservador del 2-3%." },
+  { q: "Según el curso, ¿en qué orden se deben aplicar el análisis fundamental y el técnico?", opts: ["Primero técnico para elegir la empresa, después fundamental para el momento de entrada", "Primero fundamental para filtrar las mejores empresas, después técnico para encontrar el momento de entrada", "Es indistinto el orden", "Nunca se deben combinar"], correct: 1, explain: "La estrategia más efectiva combina ambos: primero filtrás las mejores empresas con análisis fundamental, y luego encontrás el momento exacto de entrada con análisis técnico." },
+  { q: "¿Qué es una 'trampa de valor' (value trap), según el ejemplo de Netflix del curso?", opts: ["Una empresa cara que sigue subiendo", "Una empresa que parece barata por sus ratios pero es un negocio en decadencia irreversible que perdió su ventaja competitiva", "Un tipo de bono soberano", "Una estrategia de inversión recomendada"], correct: 1, explain: "Netflix es citada como ejemplo de trampa de valor: números atractivos pero pérdida de ventaja competitiva frente a Disney+, HBO y otros competidores." },
+  { q: "Al analizar un CEDEAR según el curso, ¿a qué tipo de cambio hay que convertir su precio en pesos para compararlo con el mercado internacional?", opts: ["Dólar oficial", "Dólar CCL", "Dólar MEP siempre a la mitad del CCL", "No hace falta convertir, ya está en dólares"], correct: 1, explain: "Los CEDEARs son activos dolarizados; su precio en pesos debe convertirse a dólares al tipo de cambio CCL para obtener una valuación comparable con el mercado internacional." }
+];
+
 // ============================================================
 // DATA &mdash; All LSAF and slides
 // ============================================================
@@ -8014,7 +8700,10 @@ const LSAF = [
           </div>
           <div class="callout">En este curso vamos a recorrer todos estos pasos. Cuando termines, vas a poder analizar cualquier empresa del mundo con criterio propio.</div>
         `
-      }
+      },
+      { eyebrow: "Lección 1 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+        quizKey: 'AF-L0', quizQuestions: QZAF_L0, quizOpts: { course: 'AF', progressId: 'L0', nextFn: "GLAF(1)" },
+        html: '<div id="quizmount-AF-L0"></div>' }
     ]
   },
 
@@ -8062,8 +8751,8 @@ const LSAF = [
           </div>
           <div class="callout">Un margen de seguridad del 20-30% suele ser el mínimo recomendable. Para empresas más riesgosas o mercados emergentes como el argentino, conviene buscar márgenes del 40-50%. Cuanto mayor el margen, menor el riesgo.</div>
           <div class="step-list">
-            <div class="step-item"><div class="step-num">â</div><div class="step-content"><div class="step-title">Te protege de errores en el análisis</div><div class="step-desc">Nadie calcula el valor intrínseco perfectamente. El margen absorbe esos errores.</div></div></div>
-            <div class="step-item"><div class="step-num">â</div><div class="step-content"><div class="step-title">Te protege de eventos imprevistos</div><div class="step-desc">Una pandemia, una crisis, un cambio regulatorio. El margen de seguridad te da tiempo para reaccionar.</div></div></div>
+            <div class="step-item"><div class="step-num">✓</div><div class="step-content"><div class="step-title">Te protege de errores en el análisis</div><div class="step-desc">Nadie calcula el valor intrínseco perfectamente. El margen absorbe esos errores.</div></div></div>
+            <div class="step-item"><div class="step-num">✓</div><div class="step-content"><div class="step-title">Te protege de eventos imprevistos</div><div class="step-desc">Una pandemia, una crisis, un cambio regulatorio. El margen de seguridad te da tiempo para reaccionar.</div></div></div>
           </div>
         `
       },
@@ -8079,7 +8768,10 @@ const LSAF = [
           </div>
           <div class="callout amber">Ningún método es perfecto por sí solo. Los inversores profesionales suelen usar los tres en paralelo y buscan que todos apunten en la misma dirección antes de tomar una decisión.</div>
         `
-      }
+      },
+      { eyebrow: "Lección 2 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+        quizKey: 'AF-L1', quizQuestions: QZAF_L1, quizOpts: { course: 'AF', progressId: 'L1', nextFn: "GLAF(2)" },
+        html: '<div id="quizmount-AF-L1"></div>' }
     ]
   },
 
@@ -8124,8 +8816,8 @@ const LSAF = [
           <div class="chart-box"><div class="chart-title">Ejemplo: empresa con EPS creciente (+12% anual)</div><canvas id="chartEPS" height="180"></canvas></div>
           <div class="callout">La regla es clara: el EPS debe crecer al menos un 10% anual compuesto en los últimos 5 años. Por debajo de eso, la empresa no está creando valor suficiente para el accionista. Podés calcular este crecimiento en <strong>omnicalculator.com/finance/cagr</strong>.</div>
           <div class="card-grid cols-3">
-            <div class="card green"><div class="card-label">EPS creciendo +10% anual</div><div class="card-title">â Pasa el filtro</div><div class="card-body">El negocio está generando más valor cada año.</div></div>
-            <div class="card amber"><div class="card-label">EPS estancado o errático</div><div class="card-title"> Analizar bien</div><div class="card-body">Puede ser un año puntual malo o el inicio de un declive.</div></div>
+            <div class="card green"><div class="card-label">EPS creciendo +10% anual</div><div class="card-title">✓ Pasa el filtro</div><div class="card-body">El negocio está generando más valor cada año.</div></div>
+            <div class="card amber"><div class="card-label">EPS estancado o errático</div><div class="card-title">! Analizar bien</div><div class="card-body">Puede ser un año puntual malo o el inicio de un declive.</div></div>
             <div class="card red"><div class="card-label">EPS negativo o cayendo</div><div class="card-title">x Descartar</div><div class="card-body">Salvo que sea una empresa cíclica o en una reestructuración justificada.</div></div>
           </div>
         `
@@ -8162,7 +8854,10 @@ const LSAF = [
           </div>
           <div class="callout">Observá un patrón: las empresas con la ventaja más alta son aquellas donde el cliente tiene altísimos costos de cambio (Microsoft), donde el producto es casi adictivo (Coca-Cola) o donde el modelo de negocio tiene efectos de red (Alphabet). Buscá esas características en las empresas que analizás.</div>
         `
-      }
+      },
+      { eyebrow: "Lección 3 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+        quizKey: 'AF-L2', quizQuestions: QZAF_L2, quizOpts: { course: 'AF', progressId: 'L2', nextFn: "GLAF(3)" },
+        html: '<div id="quizmount-AF-L2"></div>' }
     ]
   },
 
@@ -8225,7 +8920,10 @@ const LSAF = [
           </div>
           <div class="callout amber">El PEG tiene también sus limitaciones: depende de proyecciones de crecimiento futuro, que son estimaciones y pueden equivocarse. Usalo siempre en conjunto con el PER histórico y otros ratios, no como único criterio.</div>
         `
-      }
+      },
+      { eyebrow: "Lección 4 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+        quizKey: 'AF-L3', quizQuestions: QZAF_L3, quizOpts: { course: 'AF', progressId: 'L3', nextFn: "GLAF(4)" },
+        html: '<div id="quizmount-AF-L3"></div>' }
     ]
   },
 
@@ -8271,7 +8969,7 @@ const LSAF = [
           </div>
           <div class="callout">Una empresa que invierte fuertemente en nueva infraestructura (por ejemplo, abre 50 tiendas nuevas) puede tener FCF muy bajo o negativo ese año, lo cual elevaría el EV/FCF. Eso no es un problema si las inversiones generarán FCF mucho mayor en años futuros. Siempre hay que contextualizar.</div>
           <div class="step-list">
-            <div class="step-item"><div class="step-num">â</div><div class="step-content"><div class="step-title">EV/FCF menor a 15 &mdash; zona atractiva</div><div class="step-desc">La empresa genera mucho flujo de caja libre respecto a su valor total.</div></div></div>
+            <div class="step-item"><div class="step-num">✓</div><div class="step-content"><div class="step-title">EV/FCF menor a 15 &mdash; zona atractiva</div><div class="step-desc">La empresa genera mucho flujo de caja libre respecto a su valor total.</div></div></div>
             <div class="step-item"><div class="step-num amber">!</div><div class="step-content"><div class="step-title">EV/FCF entre 15 y 30 &mdash; zona neutral</div><div class="step-desc">Razonable para empresas de crecimiento moderado.</div></div></div>
           </div>
         `
@@ -8289,7 +8987,10 @@ const LSAF = [
           </div>
           <div class="callout amber">El ratio EV/EBIT funciona de forma similar al EV/FCF pero usando el EBIT en lugar del FCF. Es especialmente útil para comparar empresas del mismo sector con distintos niveles de deuda o en distintos países.</div>
         `
-      }
+      },
+      { eyebrow: "Lección 5 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+        quizKey: 'AF-L4', quizQuestions: QZAF_L4, quizOpts: { course: 'AF', progressId: 'L4', nextFn: "GLAF(5)" },
+        html: '<div id="quizmount-AF-L4"></div>' }
     ]
   },
 
@@ -8333,7 +9034,10 @@ const LSAF = [
           <div class="callout">La regla fundamental: una empresa puede endeudarse siempre y cuando esté en constante crecimiento. Una empresa estancada que se endeuda está caminando hacia problemas serios, porque no genera el flujo de caja necesario para servir esa deuda.</div>
           <div class="callout amber">Ejemplo local: Argentina en los mercados internacionales es un caso extremo de cómo la percepción de riesgo eleva el costo de la deuda hasta hacerla insostenible. Las empresas funcionan igual: a mayor riesgo percibido, mayor tasa de interés que deben pagar.</div>
         `
-      }
+      },
+      { eyebrow: "Lección 6 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+        quizKey: 'AF-L5', quizQuestions: QZAF_L5, quizOpts: { course: 'AF', progressId: 'L5', nextFn: "GLAF(6)" },
+        html: '<div id="quizmount-AF-L5"></div>' }
     ]
   },
 
@@ -8383,7 +9087,10 @@ const LSAF = [
             <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">Sumá todo y dividí por el número de acciones</div><div class="step-desc">Obtenés el valor intrínseco por acción, que comparás con el precio de mercado actual.</div></div></div>
           </div>
         `
-      }
+      },
+      { eyebrow: "Lección 7 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+        quizKey: 'AF-L6', quizQuestions: QZAF_L6, quizOpts: { course: 'AF', progressId: 'L6', nextFn: "GLAF(7)" },
+        html: '<div id="quizmount-AF-L6"></div>' }
     ]
   },
 
@@ -8456,9 +9163,22 @@ const LSAF = [
           <div class="callout">Si la empresa pasa todos estos filtros, es una candidata seria. Pero recordá: el análisis fundamental te dice QUÉ comprar. El cuándo lo determina el análisis técnico. Nunca operes sin confirmar ambos.</div>
           <div class="callout blue">¿Querés practicar lo aprendido? El asesor financiero de esta plataforma está disponible para ayudarte a analizar empresas reales usando todos estos conceptos en tiempo real.</div>
         `
-      }
+      },
+      { eyebrow: "Lección 8 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+        quizKey: 'AF-L7', quizQuestions: QZAF_L7, quizOpts: { course: 'AF', progressId: 'L7', nextFn: "GLAF(8)" },
+        html: '<div id="quizmount-AF-L7"></div>' }
     ]
-  }
+  },
+
+  // QUIZ FINAL — 10 preguntas que abarcan las 8 lecciones del curso
+  { title: "Quiz Final", slides: [
+    { eyebrow: "Quiz Final", title: "Demostrá todo lo que aprendiste",
+      isQuiz: true, isFinal: true,
+      quizKey: 'AF-FINAL', quizQuestions: QZAF_FINAL,
+      quizOpts: { course: 'AF', progressId: 'FINAL', isFinal: true, passThreshold: 7 },
+      html: `<p class="slide-intro">10 preguntas que recorren las 8 lecciones del curso. Necesitás al menos 7 correctas para aprobar y desbloquear tu diploma. Podés reintentar las veces que quieras.</p>
+      <div id="quizmount-AF-FINAL"></div>` }
+  ]}
 
 ];
 
@@ -8471,7 +9191,10 @@ let currentSlideIdx = 0;
 function GLAF(lessonIdx) {
   CLAF = lessonIdx;
   currentSlideIdx = 0;
-  document.querySelectorAll('.lesson-tab').forEach((t,i) => t.classList.toggle('active', i === lessonIdx));
+  document.querySelectorAll('#LNAF .lesson-tab').forEach((t,i) => {
+    t.classList.toggle('active', i === lessonIdx);
+    if (i === lessonIdx) t.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+  });
   RSAF();
 }
 
@@ -8490,12 +9213,12 @@ function RSAF() {
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
-      ${courseAudioBarHTML('AF')}
+      ${slide.isQuiz ? '' : courseAudioBarHTML('AF')}
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSAF()" ${currentSlideIdx === 0 ? 'disabled' : ''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSAF()" ${currentSlideIdx === 0 ? 'disabled' : ''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
-        ${currentSlideIdx < total - 1
+        ${slide.isQuiz ? '' : currentSlideIdx < total - 1
           ? `<button class="nav-btn primary" onclick="NSAF()">Siguiente →</button>`
           : CLAF < LSAF.length - 1
             ? `<button class="nav-btn primary" onclick="GLAF(${CLAF + 1})">Próxima lección →</button>`
@@ -8505,7 +9228,11 @@ function RSAF() {
     </div>
   `;
 
-  initCourseAudio('AF', 'analisis-fundamental', CLAF+1, currentSlideIdx+1);
+  if (slide.isQuiz) {
+    quizMount(slide.quizKey, slide.quizQuestions, slide.quizOpts);
+  } else {
+    initCourseAudio('AF', 'analisis-fundamental', CLAF+1, currentSlideIdx+1);
+  }
 
   // Draw chart after DOM ready
   if (slide.chart) {
@@ -8642,8 +9369,30 @@ function DCAF(id) {
 }
 
 // Init
-RSAF();
-RSAF();
+function renderCourseIntroAF() {
+  var totalSlides = LSAF.slice(0,8).reduce(function(s,l){return s+l.slides.length;},0);
+  var lessonRows = LSAF.slice(0,8).map(function(l,i){
+    return '<div class="step-item"><div class="step-num">'+(i+1)+'</div><div class="step-content"><div class="step-title">'+l.title+'</div><div class="step-desc">'+l.slides.length+' diapositivas + quiz de 3 preguntas</div></div></div>';
+  }).join('');
+  document.getElementById('SWAF').innerHTML = `
+    <div class="slide active">
+      <div class="slide-eyebrow">Programa del curso</div>
+      <div class="slide-title">Análisis Fundamental</div>
+      <p class="slide-intro">Cómo analizar empresas y tomar decisiones de inversión inteligentes. Valor intrínseco, PER, EV/FCF y flujo de caja &mdash; valuá empresas como un profesional.</p>
+      <div class="card-grid cols-3">
+        <div class="card blue"><div class="card-label">Lecciones</div><div class="card-number">8</div><div class="card-body">Cada una con su quiz de 3 preguntas al final.</div></div>
+        <div class="card"><div class="card-label">Diapositivas</div><div class="card-number">${totalSlides}</div><div class="card-body">Contenido en profundidad, a tu ritmo y sin apuro.</div></div>
+        <div class="card green"><div class="card-label">Al terminar</div><div class="card-number">&#127891;</div><div class="card-body">Quiz final de 10 preguntas y tu diploma de finalización.</div></div>
+      </div>
+      <div class="step-list" style="margin-top:2rem;">${lessonRows}</div>
+      <div class="callout blue">Cada lección termina con un quiz rápido de 3 preguntas para reforzar lo aprendido. Al completar las 8 lecciones y aprobar el quiz final (7/10), vas a poder generar tu diploma de finalización con tu nombre.</div>
+      <div class="slide-footer" style="justify-content:center;border-top:none;padding-top:0.5rem;">
+        <button class="nav-btn primary" onclick="GLAF(0)" style="padding:13px 34px;font-size:0.95rem;">Empezar el curso &rarr;</button>
+      </div>
+    </div>`;
+}
+
+renderCourseIntroAF();
 window.GLAF=GLAF;
 window.NSAF=function(){NSAF();};
 window.PSAF=function(){PSAF();};
@@ -8654,6 +9403,63 @@ window.GSlAF=GSlAF;
 <script>
 (function() {
 var CLMA=0,CSMA=0,CHMA={};
+
+// ============================================================
+// QUIZZES — El Mercado Argentino
+// ============================================================
+const QZMA_L0 = [
+  { q: "Según el curso, ¿qué autoridad fija la política de tasas de interés, regula el mercado cambiario oficial y supervisa el sistema bancario en Argentina?", opts: ["La CNV", "El BCRA", "BYMA", "El INDEC"], correct: 1, explain: "El BCRA (Banco Central de la República Argentina) es la autoridad monetaria: fija la política de tasas, regula el mercado cambiario oficial, administra las reservas y supervisa el sistema bancario." },
+  { q: "¿Cuál es la fuente oficial más subestimada por los inversores principiantes, según el curso, para acceder a balances auditados de empresas que cotizan en bolsa?", opts: ["Infobae", "La CNV (Comisión Nacional de Valores)", "El Ministerio de Economía", "TradingView"], correct: 1, explain: "La CNV es la fuente más subestimada: toda empresa que cotiza está obligada a subir ahí sus balances auditados, información oficial, auditada y gratuita." },
+  { q: "¿Qué instituto publica los datos oficiales de inflación (IPC) que sirven de base para el ajuste de los bonos CER?", opts: ["BYMA", "El BCRA", "El INDEC", "La CNV"], correct: 2, explain: "El INDEC publica el IPC oficial, que es la base técnica para el ajuste de los bonos CER y otras variables indexadas." }
+];
+const QZMA_L1 = [
+  { q: "Según el curso, ¿por qué existen múltiples tipos de cambio en Argentina?", opts: ["Es una decisión al azar sin ninguna lógica", "Porque hay regulaciones que limitan el acceso al oficial, lo que incentiva mercados alternativos con precio distinto", "Porque cada banco fija su propio dólar", "Porque el dólar blue es el único tipo de cambio legal"], correct: 1, explain: "Cada tipo de cambio existe porque hay un mecanismo diferente para acceder a los dólares; a mayor control estatal sobre uno, mayor la tendencia a que surjan alternativas menos controladas con precio distinto." },
+  { q: "En el mecanismo del dólar MEP descripto en el curso, ¿qué pasos seguís?", opts: ["Comprás dólares directamente en el banco al tipo oficial", "Comprás un bono en pesos (ej. AL30), esperás el parking y lo vendés en su versión en dólares (AL30D)", "Vendés CEDEARs en el exterior", "Depositás pesos en una cuenta en Uruguay"], correct: 1, explain: "El MEP consiste en comprar un bono en pesos (como el AL30), respetar el plazo de parking obligatorio, y venderlo en su versión en dólares (AL30D); el cociente de precios es el MEP implícito." },
+  { q: "¿Cuál es la diferencia clave entre el dólar MEP y el dólar CCL según el curso?", opts: ["No hay ninguna diferencia real entre ambos", "En el MEP los dólares quedan en el broker local; en el CCL los dólares van a una cuenta en el exterior", "El MEP es ilegal y el CCL es legal", "El CCL solo se usa para importaciones"], correct: 1, explain: "En el MEP los dólares quedan en la cuenta comitente del broker local argentino; en el CCL los dólares se acreditan en una cuenta en el exterior." }
+];
+const QZMA_L2 = [
+  { q: "¿Qué representa el 'ratio de conversión' de un CEDEAR?", opts: ["La comisión que cobra el broker", "Cuántas acciones originales representa cada CEDEAR", "El tipo de cambio oficial del día", "El plazo de parking obligatorio"], correct: 1, explain: "El ratio de conversión define cuántas acciones originales representa cada CEDEAR — por ejemplo, si el ratio de AAPL es 10, cada CEDEAR equivale a 1/10 de una acción de Apple." },
+  { q: "Si Apple cotiza a USD 200, el dólar CCL está en $1.400 y el ratio de conversión del CEDEAR es 10, ¿cuál es el precio teórico del CEDEAR en pesos?", opts: ["$14.000", "$20.000", "$28.000", "$200.000"], correct: 2, explain: "Precio teórico = Precio acción (USD) × CCL / Ratio = 200 × 1.400 / 10 = $28.000 pesos por CEDEAR." },
+  { q: "Según el curso, ¿cuáles son ejemplos de CEDEARs muy líquidos y populares para exposición global diversificada desde Argentina?", opts: ["SPY y QQQ", "Solo bonos soberanos argentinos", "Únicamente acciones de empresas argentinas", "Plazos fijos en dólares"], correct: 0, explain: "SPY (S&P 500) y QQQ (Nasdaq 100) son ejemplos de CEDEARs de ETFs muy líquidos, ideales como punto de partida para quien busca exposición global diversificada con mínima decisión." }
+];
+const QZMA_L3 = [
+  { q: "Según el principio que plantea el curso, si esperás que la inflación sea el principal riesgo para tus pesos, ¿a qué instrumento deberías ir?", opts: ["Dólar linked", "Bonos CER", "Acciones extranjeras", "Plazo fijo tradicional sin ajuste"], correct: 1, explain: "El curso plantea: si esperás que la inflación sea el riesgo principal, vas a bonos CER, que ajustan el capital diariamente por el CER (ligado al IPC del INDEC)." },
+  { q: "¿Cuál es el riesgo principal de un bono CER según el curso?", opts: ["Que suba demasiado el dólar oficial", "Que la inflación real supere a la inflación oficial medida por el INDEC, haciendo insuficiente el ajuste", "Que el BCRA suba las tasas de interés", "Que la empresa emisora quiebre"], correct: 1, explain: "El CER ajusta por la inflación OFICIAL del INDEC; si la inflación real de mercado supera a la medición oficial, el ajuste puede ser insuficiente para preservar el poder adquisitivo real." },
+  { q: "¿Qué diferencia hay entre un bono soberano argentino bajo legislación local (AL) y uno bajo legislación extranjera (GD)?", opts: ["No hay ninguna diferencia de precio ni de riesgo", "En caso de default, los AL litigan en tribunales argentinos y los GD en tribunales de Nueva York; los GD suelen cotizar con prima", "Los AL pagan en pesos y los GD en dólares", "Los GD son bonos corporativos y los AL son soberanos"], correct: 1, explain: "Los bonos bajo ley local (AL) litigan en tribunales argentinos en caso de default y suelen ser más baratos por mayor riesgo percibido de restructuración; los de ley extranjera (GD) litigan en Nueva York y suelen cotizar con prima." }
+];
+const QZMA_L4 = [
+  { q: "¿Por qué es engañoso mirar solo el Merval en pesos según el curso?", opts: ["Porque el Merval en pesos no existe", "Porque puede estar subiendo fuerte en pesos por inflación o devaluación mientras baja en dólares al mismo tiempo", "Porque el Merval en pesos siempre coincide con el Merval en dólares", "Porque solo las empresas extranjeras cotizan en el Merval"], correct: 1, explain: "Un Merval que sube fuerte en pesos durante alta inflación o devaluación puede estar bajando en dólares al mismo tiempo; el indicador relevante es siempre el Merval medido en dólares CCL." },
+  { q: "¿Qué yacimiento menciona el curso como un factor estructural de largo plazo para empresas como YPF, Pampa y Vista?", opts: ["Vaca Muerta", "Cerro Vanguardia", "Bajo de la Alumbrera", "Salar del Hombre Muerto"], correct: 0, explain: "Vaca Muerta, en Neuquén, es uno de los yacimientos de shale oil y gas más grandes del mundo, y es un driver estructural de largo plazo para empresas con exposición al sector energético." },
+  { q: "Según el curso, ¿bajo qué norma están obligadas a presentar sus balances las empresas argentinas que cotizan en bolsa, para reflejar el efecto de la inflación?", opts: ["Norma IFRS internacional únicamente", "RT 6 de la FACPCE (ajuste por inflación)", "No existe ninguna norma de ajuste", "Solo deben presentar balances en dólares"], correct: 1, explain: "Las empresas argentinas que cotizan están obligadas a presentar sus estados financieros ajustados por inflación bajo la norma RT 6 de la FACPCE — hay que leer los balances en moneda homogénea, no los históricos." }
+];
+const QZMA_L5 = [
+  { q: "¿Qué son las Obligaciones Negociables (ONs) y por qué suelen tener menor riesgo que los bonos soberanos según el curso?", opts: ["Son acciones de empresas estatales", "Son bonos corporativos de empresas privadas, cuyo riesgo suele ser más predecible que el riesgo del Estado argentino", "Son un tipo de CEDEAR", "Son depósitos a plazo fijo en dólares"], correct: 1, explain: "Las ONs son bonos corporativos de empresas privadas argentinas; muchas se siguen pagando incluso cuando el país está en default soberano, por eso ofrecen menor riesgo crediticio relativo." },
+  { q: "¿Cuál es la diferencia entre una ON 'hard dollar' y una 'dólar linked'?", opts: ["Son exactamente lo mismo", "La hard dollar paga capital y cupones en USD; la dólar linked se paga en pesos al tipo de cambio oficial", "La dólar linked paga solo en pesos sin ajuste", "La hard dollar es exclusiva de bancos"], correct: 1, explain: "Las ONs hard dollar pagan capital y cupones directamente en dólares; las dólar linked se pagan en pesos pero ajustadas al tipo de cambio oficial." },
+  { q: "¿Qué estrategia conservadora describe el curso para diversificar riesgo emisor y de liquidez entre distintas ONs?", opts: ["Comprar una sola ON con el mayor rendimiento posible", "Armar una 'escalera de vencimientos' con ONs de distintos emisores y plazos", "Invertir todo en ONs de un solo sector", "Evitar completamente las ONs"], correct: 1, explain: "La escalera de vencimientos combina ONs de distintos emisores y vencimientos, dando diversificación de riesgo emisor y liquidez, ya que siempre hay alguna venciendo para reinvertir." }
+];
+const QZMA_L6 = [
+  { q: "¿Dónde están custodiados los activos de tu cuenta comitente, y qué pasa si el broker quiebra según el curso?", opts: ["Quedan en el broker y se pierden si quiebra", "Están custodiados en Caja de Valores S.A. a tu nombre, y están protegidos aunque el broker quiebre", "Quedan en una cuenta del BCRA", "No hay ninguna custodia, es informal"], correct: 1, explain: "Los activos están custodiados en Caja de Valores S.A. y son tuyos, no del broker; incluso si el broker quiebra, tus activos están protegidos." },
+  { q: "¿Qué significa que una operación liquide en 'T+2', mencionado en el curso sobre operatoria local?", opts: ["Se liquida instantáneamente", "Se liquida dos días hábiles después de la operación", "Se liquida dos meses después", "Es una modalidad exclusiva para CEDEARs"], correct: 1, explain: "T+2 significa que la operación liquida dos días hábiles después de la compra; también existe la modalidad 'contado inmediato' (T+0) para algunas operaciones." },
+  { q: "Según el esquema impositivo general que describe el curso, ¿qué pasa con las ganancias por compraventa de acciones y CEDEARs que cotizan en BYMA para personas humanas residentes?", opts: ["Pagan la tasa máxima del impuesto a las ganancias", "Están exentas del impuesto a las ganancias", "Están gravadas al 50%", "Solo tributan si se venden en el mismo día de compra"], correct: 1, explain: "Las ganancias por compraventa de acciones y CEDEARs que cotizan en BYMA están exentas del impuesto a las ganancias para personas humanas residentes, según el esquema general descripto en el curso." }
+];
+const QZMA_L7 = [
+  { q: "Según la 'hoja de ruta' del curso, ¿cuál es el primer paso práctico para empezar a invertir en Argentina?", opts: ["Comprar bonos soberanos en dólares", "Abrir una cuenta comitente en un broker regulado por la CNV", "Especular con dólar blue", "Invertir todo en una sola ON"], correct: 1, explain: "El primer paso de la hoja de ruta es abrir una cuenta comitente en un broker regulado por la CNV (IOL, Balanz, PPI o Cocos Capital), sin la cual no se puede operar en el mercado de capitales." },
+  { q: "¿Qué cuatro indicadores recomienda monitorear mensualmente el curso para tener el pulso del mercado argentino?", opts: ["Solo el precio del dólar blue", "IPC del INDEC, reservas del BCRA, brecha cambiaria y riesgo país", "Solo el Merval en pesos", "El precio del oro y el petróleo"], correct: 1, explain: "El curso recomienda monitorear IPC del INDEC, reservas del BCRA, brecha cambiaria y riesgo país como los cuatro indicadores que dan el pulso del mercado local." },
+  { q: "Según el calendario del inversor argentino que describe el curso, ¿qué evento estacional fortalece típicamente al peso por el ingreso de divisas?", opts: ["La cosecha gruesa (marzo-junio), por la liquidación de exportaciones de soja y maíz", "Las fiestas de fin de año", "El invierno en el hemisferio norte", "El comienzo de clases en marzo"], correct: 0, explain: "La cosecha gruesa (marzo-junio) es el principal ingreso de divisas de Argentina por la liquidación de exportaciones de soja y maíz, lo que suele fortalecer el peso y comprimir la brecha." }
+];
+const QZMA_FINAL = [
+  { q: "¿Qué organismo regula y supervisa el mercado de capitales argentino, autorizando la emisión de acciones y bonos?", opts: ["El BCRA", "La CNV", "El INDEC", "Caja de Valores"], correct: 1, explain: "La CNV (Comisión Nacional de Valores) regula y supervisa el mercado de capitales, autoriza emisiones y supervisa a los brokers." },
+  { q: "En el mecanismo del dólar MEP, ¿en qué instrumento se apoya típicamente la operación descripta en el curso?", opts: ["Un plazo fijo UVA", "Un bono como el AL30, comprado en pesos y vendido en su versión en dólares", "Un CEDEAR de Apple", "Una ON de YPF"], correct: 1, explain: "El MEP se arma comprando un bono en pesos (como el AL30) y vendiéndolo en su versión en dólares (AL30D) tras el parking obligatorio." },
+  { q: "¿Cómo se calcula la brecha cambiaria según la fórmula del curso?", opts: ["Dólar oficial menos dólar paralelo", "(Dólar paralelo − Dólar oficial) / Dólar oficial × 100", "Dólar paralelo dividido dos", "CCL menos MEP"], correct: 1, explain: "La brecha cambiaria = (Dólar paralelo − Dólar oficial) / Dólar oficial × 100, y una brecha alta (históricamente 40-50%+) señala tensión cambiaria." },
+  { q: "En la fórmula del precio teórico de un CEDEAR, ¿qué variable divide al producto de precio de la acción por el tipo de cambio CCL?", opts: ["La tasa de interés", "El ratio de conversión", "La inflación mensual", "El riesgo país"], correct: 1, explain: "Precio teórico CEDEAR = Precio acción (USD) × Dólar CCL / Ratio de conversión." },
+  { q: "¿Qué tipo de bono ajusta su capital diariamente según la inflación oficial medida por el INDEC?", opts: ["Lecap", "Bono CER", "Bono dólar linked", "ON hard dollar"], correct: 1, explain: "Los bonos CER ajustan su capital diariamente por el Coeficiente de Estabilización de Referencia, ligado a la inflación oficial del INDEC." },
+  { q: "¿Qué diferencia principal existe entre un bono bajo legislación local (AL) y uno bajo legislación de Nueva York (GD)?", opts: ["Ninguna, cotizan siempre al mismo precio", "El lugar donde litigan los acreedores en caso de default, lo que suele generar diferencias de precio", "El AL paga en pesos y el GD en dólares", "El GD no puede ser comprado por argentinos"], correct: 1, explain: "En caso de default, los bonos AL litigan en tribunales argentinos y los GD en Nueva York; los GD suelen cotizar con prima por percibirse menor riesgo de restructuración." },
+  { q: "¿Por qué es más representativo medir el Merval en dólares CCL en vez de en pesos, según el curso?", opts: ["Porque el Merval en pesos no existe legalmente", "Porque descuenta el efecto de la inflación y la devaluación, mostrando la ganancia o pérdida real", "Porque los pesos no se pueden usar para comprar acciones", "Porque el Merval en dólares siempre sube"], correct: 1, explain: "El Merval en pesos puede subir por inflación/devaluación mientras cae en dólares; medirlo en CCL da el 'Merval real'." },
+  { q: "¿Qué ventaja tienen las Obligaciones Negociables (ONs) de empresas sólidas frente a los bonos soberanos argentinos, según el curso?", opts: ["Pagan siempre una tasa menor", "Suelen tener menor riesgo crediticio y muchas se siguen pagando incluso en default soberano", "No tienen ningún riesgo", "Solo pueden comprarse en dólares oficiales"], correct: 1, explain: "Las ONs de empresas como YPF, Pampa o bancos privados suelen tener mejor historial de pago que el Estado argentino, y muchas se pagan incluso durante un default soberano." },
+  { q: "¿Qué protege a los activos de un inversor si el broker (ALYC) donde tiene su cuenta comitente quiebra?", opts: ["Nada, se pierden los activos", "Que están custodiados a su nombre en Caja de Valores S.A., no en el broker", "Un seguro privado opcional", "El BCRA los devuelve en pesos"], correct: 1, explain: "Los activos de la cuenta comitente están registrados y custodiados en Caja de Valores S.A. a nombre del inversor, no del broker, por lo que están protegidos aunque este quiebre." },
+  { q: "Según la hoja de ruta final del curso, ¿cuál es el orden lógico sugerido para un inversor argentino que recién empieza?", opts: ["Comprar bonos soberanos de alto riesgo antes que nada", "Abrir cuenta comitente, armar liquidez en pesos con FCI money market, dolarizar excedentes con CEDEARs/MEP y sumar ONs para renta fija en dólares", "Invertir directamente en acciones extranjeras sin pasar por un broker local", "Esperar a que baje la inflación para empezar"], correct: 1, explain: "La hoja de ruta sugiere: abrir cuenta comitente en un broker regulado por la CNV, construir liquidez en pesos con FCI money market, dolarizar excedentes vía CEDEARs o MEP, y luego sumar ONs corporativas para la pata de renta fija en dólares." }
+];
+
 const LSMA = [
 
   // LECCIÓN 1 &mdash; EL SISTEMA FINANCIERO ARGENTINO
@@ -8694,7 +9500,10 @@ const LSMA = [
         <tr><td>Riesgo país y bonos en USD</td><td>JP Morgan (EMBI)</td><td>Ambito, Cronista, TradingView</td></tr>
       </table></div>
       <div class="callout green">La CNV es la fuente más subestimada por inversores principiantes. Toda empresa que cotiza en bolsa está obligada a subir sus balances auditados ahí. Es información oficial, auditada y gratuita &mdash; y es mucho más confiable que los resúmenes que encontrás en plataformas financieras.</div>`
-    }
+    },
+    { eyebrow: "Lección 1 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'MA-L0', quizQuestions: QZMA_L0, quizOpts: { course: 'MA', progressId: 'L0', nextFn: "GLMA(1)" },
+      html: '<div id="quizmount-MA-L0"></div>' }
   ]},
 
   // LECCIÓN 2 &mdash; LOS TIPOS DE CAMBIO
@@ -8739,7 +9548,10 @@ const LSMA = [
         <div class="step-item"><div class="step-num green">→</div><div class="step-content"><div class="step-title">Brecha baja o convergente: señal de estabilidad</div><div class="step-desc">Una brecha comprimida indica que el mercado percibe que el tipo de cambio oficial es sostenible. Generalmente favorece los activos en pesos y reduce la presión dolarizadora.</div></div></div>
         <div class="step-item"><div class="step-num blue">→</div><div class="step-content"><div class="step-title">Impacto en CEDEARs</div><div class="step-desc">Los CEDEARs ajustan su precio en pesos según el CCL. Cuando la brecha sube, los CEDEARs en pesos tienden a subir aunque la acción subyacente no se mueva, simplemente por el efecto cambiario. Y viceversa.</div></div></div>
       </div>`
-    }
+    },
+    { eyebrow: "Lección 2 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'MA-L1', quizQuestions: QZMA_L1, quizOpts: { course: 'MA', progressId: 'L1', nextFn: "GLMA(2)" },
+      html: '<div id="quizmount-MA-L1"></div>' }
   ]},
 
   // LECCIÓN 3 &mdash; CEDEARS EN PROFUNDIDAD
@@ -8788,7 +9600,10 @@ const LSMA = [
         <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">¿Dónde quedan los dólares?</div><div class="step-desc">Los dólares quedan en tu cuenta comitente en dólares en el broker argentino. Podés usarlos para comprar ONs en dólares, bonos hard dollar, o retirarlos a una caja de ahorro en dólares en un banco argentino.</div></div></div>
       </div>
       <div class="callout amber">Este mecanismo de dolarización vía CEDEARs es sensible a cambios regulatorios. Las normas del BCRA y la CNV sobre operaciones de cambio indirecto cambian con frecuencia. Siempre consultá el estado regulatorio vigente con tu broker antes de ejecutar la operación.</div>`
-    }
+    },
+    { eyebrow: "Lección 3 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'MA-L2', quizQuestions: QZMA_L2, quizOpts: { course: 'MA', progressId: 'L2', nextFn: "GLMA(3)" },
+      html: '<div id="quizmount-MA-L2"></div>' }
   ]},
 
   // LECCIÓN 4 &mdash; RENTA FIJA LOCAL
@@ -8824,7 +9639,10 @@ const LSMA = [
         <div class="card amber"><div class="card-label">Desventaja principal</div><div class="card-title">Riesgo de tasa real negativa</div><div class="card-body">Si la inflación supera a la tasa nominal que paga la letra, perdés en términos reales. En Argentina, este escenario es frecuente.</div></div>
         <div class="card"><div class="card-label">¿Cuándo convienen?</div><div class="card-title">Contexto favorable</div><div class="card-body">Cuando las tasas nominales son altas en relación a la inflación esperada, o cuando necesitás estacionamiento de corto plazo con buena liquidez.</div></div>
       </div>`
-    }
+    },
+    { eyebrow: "Lección 4 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'MA-L3', quizQuestions: QZMA_L3, quizOpts: { course: 'MA', progressId: 'L3', nextFn: "GLMA(4)" },
+      html: '<div id="quizmount-MA-L3"></div>' }
   ]},
 
   // LECCIÓN 5 &mdash; EL MERVAL Y LAS ACCIONES
@@ -8856,7 +9674,10 @@ const LSMA = [
         <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">El riesgo regulatorio es el factor diferencial</div><div class="step-desc">En Argentina, los cambios de gobierno pueden implicar cambios drásticos en tarifas, retenciones, regulaciones sectoriales y acceso al mercado de cambios. Una empresa con excelentes fundamentos puede perder 50% de su valor si el gobierno decide intervenir en su sector.</div></div></div>
         <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">El potencial de Vaca Muerta como factor estructural</div><div class="step-desc">El yacimiento de Vaca Muerta en Neuquén es uno de los yacimientos de shale oil y gas más grandes del mundo. Las empresas con exposición a este activo (YPF, Pampa, Vista) tienen un driver de largo plazo que puede ser transformador para la economía argentina si se desarrolla correctamente.</div></div></div>
       </div>`
-    }
+    },
+    { eyebrow: "Lección 5 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'MA-L4', quizQuestions: QZMA_L4, quizOpts: { course: 'MA', progressId: 'L4', nextFn: "GLMA(5)" },
+      html: '<div id="quizmount-MA-L4"></div>' }
   ]},
 
   // LECCIÓN 6 &mdash; OBLIGACIONES NEGOCIABLES
@@ -8891,7 +9712,10 @@ const LSMA = [
         <tr><td><strong>Loma Negra</strong></td><td>Construcción</td><td><span class="tag good">Medio-bajo</span></td><td>Líder en cemento. Flujos ligados al ciclo de construcción.</td></tr>
       </table></div>
       <div class="callout green">Una estrategia conservadora muy utilizada en Argentina es combinar ONs de distintos emisores y distintos vencimientos (una "escalera de vencimientos"). Esto da diversificación de riesgo emisor y de liquidez: siempre hay alguna ON venciendo que devuelve capital para reinvertir según el contexto del momento.</div>`
-    }
+    },
+    { eyebrow: "Lección 6 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'MA-L5', quizQuestions: QZMA_L5, quizOpts: { course: 'MA', progressId: 'L5', nextFn: "GLMA(6)" },
+      html: '<div id="quizmount-MA-L5"></div>' }
   ]},
 
   // LECCIÓN 7 &mdash; BROKERS Y OPERATORIA
@@ -8925,7 +9749,10 @@ const LSMA = [
         <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">Bonos y títulos públicos</div><div class="step-desc">Los rendimientos de bonos públicos (nacionales y provinciales) generalmente están exentos del impuesto a las ganancias para personas humanas. Las ONs corporativas pueden tener tratamiento distinto.</div></div></div>
         <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">Bienes Personales</div><div class="step-desc">Los activos financieros (acciones, bonos, fondos) forman parte del patrimonio declarado en Bienes Personales si superan el mínimo no imponible. La valuación de activos a fines impositivos tiene reglas específicas que varían por tipo de activo.</div></div></div>
       </div>`
-    }
+    },
+    { eyebrow: "Lección 7 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'MA-L6', quizQuestions: QZMA_L6, quizOpts: { course: 'MA', progressId: 'L6', nextFn: "GLMA(7)" },
+      html: '<div id="quizmount-MA-L6"></div>' }
   ]},
 
   // LECCIÓN 8 &mdash; ESTRATEGIAS
@@ -8947,10 +9774,10 @@ const LSMA = [
     { eyebrow: "Lección 8 · Slide 3", title: "El calendario del inversor argentino: los eventos que mueven el mercado",
       html: `<p class="slide-intro">En Argentina, además de los factores globales que mueven cualquier mercado, existen eventos locales recurrentes que tienen impacto directo y predecible sobre ciertos activos. Conocerlos de antemano te permite anticiparte en lugar de reaccionar.</p>
       <div class="step-list">
-        <div class="step-item"><div class="step-num"></div><div class="step-content"><div class="step-title">Dato mensual del IPC (INDEC)</div><div class="step-desc">Se publica generalmente entre el 10 y el 15 de cada mes. Impacta directamente sobre los bonos CER (que ajustan por inflación) y da señales sobre la política monetaria del BCRA.</div></div></div>
-        <div class="step-item"><div class="step-num"></div><div class="step-content"><div class="step-title">Licitaciones de deuda del Tesoro</div><div class="step-desc">El Tesoro licita deuda regularmente para renovar vencimientos. La tasa de cut-off que sale de cada licitación marca la referencia de tasa para todo el mercado de pesos.</div></div></div>
-        <div class="step-item"><div class="step-num"></div><div class="step-content"><div class="step-title">Cosecha gruesa (marzo-junio)</div><div class="step-desc">La liquidación de las exportaciones de soja y maíz por parte del campo es el principal ingreso de divisas de Argentina. En esos meses, el BCRA tiende a acumular reservas, lo cual fortalece el peso y comprime la brecha.</div></div></div>
-        <div class="step-item"><div class="step-num">ï¸</div><div class="step-content"><div class="step-title">Ciclo electoral</div><div class="step-desc">Argentina tiene elecciones cada dos años. Los períodos preelectorales suelen generar volatilidad en activos locales por la incertidumbre sobre el cambio de política económica. Los bonos soberanos y el Merval son especialmente sensibles.</div></div></div>
+        <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-title">Dato mensual del IPC (INDEC)</div><div class="step-desc">Se publica generalmente entre el 10 y el 15 de cada mes. Impacta directamente sobre los bonos CER (que ajustan por inflación) y da señales sobre la política monetaria del BCRA.</div></div></div>
+        <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">Licitaciones de deuda del Tesoro</div><div class="step-desc">El Tesoro licita deuda regularmente para renovar vencimientos. La tasa de cut-off que sale de cada licitación marca la referencia de tasa para todo el mercado de pesos.</div></div></div>
+        <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">Cosecha gruesa (marzo-junio)</div><div class="step-desc">La liquidación de las exportaciones de soja y maíz por parte del campo es el principal ingreso de divisas de Argentina. En esos meses, el BCRA tiende a acumular reservas, lo cual fortalece el peso y comprime la brecha.</div></div></div>
+        <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">Ciclo electoral</div><div class="step-desc">Argentina tiene elecciones cada dos años. Los períodos preelectorales suelen generar volatilidad en activos locales por la incertidumbre sobre el cambio de política económica. Los bonos soberanos y el Merval son especialmente sensibles.</div></div></div>
         <div class="step-item"><div class="step-num">&#127482;&#127480;</div><div class="step-content"><div class="step-title">Decisiones de la Fed (FOMC)</div><div class="step-desc">Las decisiones de la Reserva Federal americana impactan sobre todos los mercados emergentes, incluyendo Argentina. Subas de tasas en EE.UU. generalmente presionan sobre los activos emergentes y el financiamiento externo.</div></div></div>
       </div>`
     },
@@ -8964,7 +9791,20 @@ const LSMA = [
         <div class="step-item"><div class="step-num">5</div><div class="step-content"><div class="step-title">Monitoreá el contexto macro mensualmente</div><div class="step-desc">IPC del INDEC, reservas del BCRA, brecha cambiaria y riesgo país son los cuatro indicadores que te dan el pulso del mercado local. Con esos cuatro datos sabés en qué dirección va el mercado.</div></div></div>
       </div>
       <div class="callout blue">El asesor financiero IA de esta plataforma puede ayudarte a analizar el contexto actual del mercado argentino en tiempo real y responder consultas específicas sobre instrumentos, precios y estrategias adaptadas al momento del mercado.</div>`
-    }
+    },
+    { eyebrow: "Lección 8 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'MA-L7', quizQuestions: QZMA_L7, quizOpts: { course: 'MA', progressId: 'L7', nextFn: "GLMA(8)" },
+      html: '<div id="quizmount-MA-L7"></div>' }
+  ]},
+
+  // QUIZ FINAL — 10 preguntas que abarcan las 8 lecciones del curso
+  { title: "Quiz Final", slides: [
+    { eyebrow: "Quiz Final", title: "Demostrá todo lo que aprendiste",
+      isQuiz: true, isFinal: true,
+      quizKey: 'MA-FINAL', quizQuestions: QZMA_FINAL,
+      quizOpts: { course: 'MA', progressId: 'FINAL', isFinal: true, passThreshold: 7 },
+      html: `<p class="slide-intro">10 preguntas que recorren las 8 lecciones del curso. Necesitás al menos 7 correctas para aprobar y desbloquear tu diploma. Podés reintentar las veces que quieras.</p>
+      <div id="quizmount-MA-FINAL"></div>` }
   ]}
 ];
 
@@ -8977,7 +9817,10 @@ const LSMA = [
 function GLMA(idx) {
   CLMA = idx;
   CSMA = 0;
-  document.querySelectorAll('.lesson-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  document.querySelectorAll('#LNMA .lesson-tab').forEach((t,i) => {
+    t.classList.toggle('active', i===idx);
+    if (i===idx) t.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+  });
   RSMA();
 }
 
@@ -8993,9 +9836,9 @@ function RSMA() {
       <div class="slide-title">${slide.title}</div>
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSMA()" ${CSMA===0?'disabled':''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSMA()" ${CSMA===0?'disabled':''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
-        ${CSMA < total-1
+        ${slide.isQuiz ? '' : CSMA < total-1
           ? `<button class="nav-btn primary" onclick="NSMA()">Siguiente →</button>`
           : CLMA < LSMA.length-1
             ? `<button class="nav-btn primary" onclick="GLMA(${CLMA+1})">Próxima lección →</button>`
@@ -9004,6 +9847,7 @@ function RSMA() {
       </div>
     </div>`;
 
+  if (slide.isQuiz) quizMount(slide.quizKey, slide.quizQuestions, slide.quizOpts);
   if (slide.chart) setTimeout(() => DCMA(slide.chart), 80);
 }
 
@@ -9181,8 +10025,30 @@ function DCMA(id) {
   }
 }
 
-RSMA();
-RSMA();
+function renderCourseIntroMA() {
+  var totalSlides = LSMA.slice(0,8).reduce(function(s,l){return s+l.slides.length;},0);
+  var lessonRows = LSMA.slice(0,8).map(function(l,i){
+    return '<div class="step-item"><div class="step-num">'+(i+1)+'</div><div class="step-content"><div class="step-title">'+l.title+'</div><div class="step-desc">'+l.slides.length+' diapositivas + quiz de 3 preguntas</div></div></div>';
+  }).join('');
+  document.getElementById('SWMA').innerHTML = `
+    <div class="slide active">
+      <div class="slide-eyebrow">Programa del curso</div>
+      <div class="slide-title">El Mercado Argentino</div>
+      <p class="slide-intro">CEDEARs, bonos, tipos de cambio y cómo invertir inteligentemente en el contexto local. Estrategias adaptadas a la realidad del inversor argentino.</p>
+      <div class="card-grid cols-3">
+        <div class="card blue"><div class="card-label">Lecciones</div><div class="card-number">8</div><div class="card-body">Cada una con su quiz de 3 preguntas al final.</div></div>
+        <div class="card"><div class="card-label">Diapositivas</div><div class="card-number">${totalSlides}</div><div class="card-body">Contenido en profundidad, a tu ritmo y sin apuro.</div></div>
+        <div class="card green"><div class="card-label">Al terminar</div><div class="card-number">&#127891;</div><div class="card-body">Quiz final de 10 preguntas y tu diploma de finalización.</div></div>
+      </div>
+      <div class="step-list" style="margin-top:2rem;">${lessonRows}</div>
+      <div class="callout blue">Cada lección termina con un quiz rápido de 3 preguntas para reforzar lo aprendido. Al completar las 8 lecciones y aprobar el quiz final (7/10), vas a poder generar tu diploma de finalización con tu nombre.</div>
+      <div class="slide-footer" style="justify-content:center;border-top:none;padding-top:0.5rem;">
+        <button class="nav-btn primary" onclick="GLMA(0)" style="padding:13px 34px;font-size:0.95rem;">Empezar el curso &rarr;</button>
+      </div>
+    </div>`;
+}
+
+renderCourseIntroMA();
 window.GLMA=GLMA;
 window.NSMA=function(){NSMA();};
 window.PSMA=function(){PSMA();};
@@ -9191,10 +10057,29 @@ window.GSlMA=GSlMA;
 </script>
 
 <script>
-function openCourse(id){document.getElementById('modal-'+id).classList.add('open');document.body.style.overflow='hidden';}
+var _lessonNavUpdaters = {};
+function openCourse(id){document.getElementById('modal-'+id).classList.add('open');document.body.style.overflow='hidden';if(_lessonNavUpdaters[id])_lessonNavUpdaters[id]();}
 function closeCourse(id){pauseCourseAudio(id);document.getElementById('modal-'+id).classList.remove('open');document.body.style.overflow='';}
 document.addEventListener('keydown',function(e){if(e.key==='Escape')['FP','IB','AF','MA'].forEach(closeCourse);});
 document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEventListener('click',function(e){if(e.target===el){el.classList.remove('open');document.body.style.overflow='';}});});
+
+['FP','IB','AF','MA'].forEach(function(id){
+  var rail = document.getElementById('LN'+id);
+  var prev = document.getElementById('LN'+id+'Prev');
+  var next = document.getElementById('LN'+id+'Next');
+  if(!rail||!prev||!next) return;
+  var step = function(){ return Math.min(rail.clientWidth*0.9, 400); };
+  var updateNav = function(){
+    prev.disabled = rail.scrollLeft <= 4;
+    next.disabled = rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 4;
+  };
+  prev.addEventListener('click', function(){ rail.scrollBy({left:-step(), behavior:'smooth'}); });
+  next.addEventListener('click', function(){ rail.scrollBy({left:step(), behavior:'smooth'}); });
+  rail.addEventListener('scroll', updateNav);
+  window.addEventListener('resize', updateNav);
+  _lessonNavUpdaters[id] = updateNav;
+  updateNav();
+});
 </script>
 
 <!-- Warren FAB Button -->
