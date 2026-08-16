@@ -6230,7 +6230,10 @@
   .course-meta { display: flex; gap: 1.5rem; margin-top: 1.5rem; flex-wrap: wrap; }
   .meta-item { font-size: 13px; font-family: sans-serif; color: rgba(255,255,255,0.92); font-weight: 500; }
 
-  .lesson-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 1.5rem; scrollbar-width: none; }
+  .lesson-nav-wrap { display: flex; align-items: center; gap: 6px; margin-bottom: 1.5rem; }
+  .lesson-nav-arrow { flex-shrink: 0; width: 28px; height: 28px; }
+  .lesson-nav-arrow svg { width: 12px; height: 12px; }
+  .lesson-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none; scroll-behavior: smooth; flex: 1 1 0; min-width: 0; }
   .lesson-nav::-webkit-scrollbar { display: none; }
   .lesson-tab { flex-shrink: 0; padding: 8px 18px; border-radius: 30px; border: 1.5px solid var(--border); background: white; color: var(--gray); font-size: 13px; font-family: sans-serif; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
   .lesson-tab:hover { background: var(--blue-light); color: var(--blue-dark); border-color: var(--blue); }
@@ -6574,21 +6577,29 @@
     <div class="course-title">Finanzas Personales Básicas</div>
     <div class="course-subtitle">El dinero no se administra solo &mdash; aprendé a tomar el control de tu economía personal desde hoy</div>
     <div class="course-meta">
-      <div class="meta-item"> 8 lecciones</div>
-      <div class="meta-item"> Gráficos interactivos</div>
+      <div class="meta-item">&#128218; 8 lecciones</div>
+      <div class="meta-item">&#128202; Gráficos interactivos</div>
       <div class="meta-item">&#127462;&#127479; Adaptado al contexto argentino</div>
     </div>
   </div>
 
-  <div class="lesson-nav" id="LNFP">
-    <button class="lesson-tab active" onclick="GLFP(0)">1. Mentalidad financiera</button>
-    <button class="lesson-tab" onclick="GLFP(1)">2. El presupuesto</button>
-    <button class="lesson-tab" onclick="GLFP(2)">3. Fondo de emergencia</button>
-    <button class="lesson-tab" onclick="GLFP(3)">4. Deudas</button>
-    <button class="lesson-tab" onclick="GLFP(4)">5. Ahorro e inflación</button>
-    <button class="lesson-tab" onclick="GLFP(5)">6. Metas financieras</button>
-    <button class="lesson-tab" onclick="GLFP(6)">7. Primer inversión</button>
-    <button class="lesson-tab" onclick="GLFP(7)">8. Plan de acción</button>
+  <div class="lesson-nav-wrap">
+    <button class="carousel-btn lesson-nav-arrow" id="LNFPPrev" aria-label="Lecciones anteriores">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="lesson-nav" id="LNFP">
+      <button class="lesson-tab active" onclick="GLFP(0)">1. Mentalidad financiera</button>
+      <button class="lesson-tab" onclick="GLFP(1)">2. El presupuesto</button>
+      <button class="lesson-tab" onclick="GLFP(2)">3. Fondo de emergencia</button>
+      <button class="lesson-tab" onclick="GLFP(3)">4. Deudas</button>
+      <button class="lesson-tab" onclick="GLFP(4)">5. Ahorro e inflación</button>
+      <button class="lesson-tab" onclick="GLFP(5)">6. Metas financieras</button>
+      <button class="lesson-tab" onclick="GLFP(6)">7. Primer inversión</button>
+      <button class="lesson-tab" onclick="GLFP(7)">8. Plan de acción</button>
+    </div>
+    <button class="carousel-btn lesson-nav-arrow" id="LNFPNext" aria-label="Lecciones siguientes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
   </div>
 
   <div class="slide-wrapper" id="SWFP"></div>
@@ -6603,21 +6614,29 @@
     <div class="course-title">Introducción a la Bolsa</div>
     <div class="course-subtitle">Todo lo que necesitás saber para empezar a invertir con criterio propio</div>
     <div class="course-meta">
-      <div class="meta-item"> 8 lecciones</div>
-      <div class="meta-item"> Gráficos interactivos</div>
+      <div class="meta-item">&#128218; 8 lecciones</div>
+      <div class="meta-item">&#128202; Gráficos interactivos</div>
       <div class="meta-item">&#127462;&#127479; Contexto argentino incluido</div>
     </div>
   </div>
 
-  <div class="lesson-nav" id="LNIB">
-    <button class="lesson-tab active" onclick="GLIB(0)">1. ¿Qué es la bolsa?</button>
-    <button class="lesson-tab" onclick="GLIB(1)">2. Instrumentos</button>
-    <button class="lesson-tab" onclick="GLIB(2)">3. Cómo funciona</button>
-    <button class="lesson-tab" onclick="GLIB(3)">4. Riesgo y retorno</button>
-    <button class="lesson-tab" onclick="GLIB(4)">5. ETFs e índices</button>
-    <button class="lesson-tab" onclick="GLIB(5)">6. Bolsa argentina</button>
-    <button class="lesson-tab" onclick="GLIB(6)">7. Cómo empezar</button>
-    <button class="lesson-tab" onclick="GLIB(7)">8. Errores comunes</button>
+  <div class="lesson-nav-wrap">
+    <button class="carousel-btn lesson-nav-arrow" id="LNIBPrev" aria-label="Lecciones anteriores">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="lesson-nav" id="LNIB">
+      <button class="lesson-tab active" onclick="GLIB(0)">1. ¿Qué es la bolsa?</button>
+      <button class="lesson-tab" onclick="GLIB(1)">2. Instrumentos</button>
+      <button class="lesson-tab" onclick="GLIB(2)">3. Cómo funciona</button>
+      <button class="lesson-tab" onclick="GLIB(3)">4. Riesgo y retorno</button>
+      <button class="lesson-tab" onclick="GLIB(4)">5. ETFs e índices</button>
+      <button class="lesson-tab" onclick="GLIB(5)">6. Bolsa argentina</button>
+      <button class="lesson-tab" onclick="GLIB(6)">7. Cómo empezar</button>
+      <button class="lesson-tab" onclick="GLIB(7)">8. Errores comunes</button>
+    </div>
+    <button class="carousel-btn lesson-nav-arrow" id="LNIBNext" aria-label="Lecciones siguientes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
   </div>
 
   <div class="slide-wrapper" id="SWIB"></div>
@@ -6634,22 +6653,30 @@
     <div class="course-title">Análisis Fundamental</div>
     <div class="course-subtitle">Cómo analizar empresas y tomar decisiones de inversión inteligentes</div>
     <div class="course-meta">
-      <div class="meta-item"> 8 lecciones</div>
-      <div class="meta-item"> Gráficos interactivos</div>
-      <div class="meta-item"> Nivel principiante a intermedio</div>
+      <div class="meta-item">&#128218; 8 lecciones</div>
+      <div class="meta-item">&#128202; Gráficos interactivos</div>
+      <div class="meta-item">&#127919; Nivel principiante a intermedio</div>
     </div>
   </div>
 
   <!-- LESSON TABS -->
-  <div class="lesson-nav" id="LNAF">
-    <button class="lesson-tab active" onclick="GLAF(0)">1. Introducción</button>
-    <button class="lesson-tab" onclick="GLAF(1)">2. Valor intrínseco</button>
-    <button class="lesson-tab" onclick="GLAF(2)">3. Las 5 condiciones</button>
-    <button class="lesson-tab" onclick="GLAF(3)">4. PER y PEG</button>
-    <button class="lesson-tab" onclick="GLAF(4)">5. EV/FCF y EBIT</button>
-    <button class="lesson-tab" onclick="GLAF(5)">6. Deuda financiera</button>
-    <button class="lesson-tab" onclick="GLAF(6)">7. DCF y WACC</button>
-    <button class="lesson-tab" onclick="GLAF(7)">8. Elegir una empresa</button>
+  <div class="lesson-nav-wrap">
+    <button class="carousel-btn lesson-nav-arrow" id="LNAFPrev" aria-label="Lecciones anteriores">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="lesson-nav" id="LNAF">
+      <button class="lesson-tab active" onclick="GLAF(0)">1. Introducción</button>
+      <button class="lesson-tab" onclick="GLAF(1)">2. Valor intrínseco</button>
+      <button class="lesson-tab" onclick="GLAF(2)">3. Las 5 condiciones</button>
+      <button class="lesson-tab" onclick="GLAF(3)">4. PER y PEG</button>
+      <button class="lesson-tab" onclick="GLAF(4)">5. EV/FCF y EBIT</button>
+      <button class="lesson-tab" onclick="GLAF(5)">6. Deuda financiera</button>
+      <button class="lesson-tab" onclick="GLAF(6)">7. DCF y WACC</button>
+      <button class="lesson-tab" onclick="GLAF(7)">8. Elegir una empresa</button>
+    </div>
+    <button class="carousel-btn lesson-nav-arrow" id="LNAFNext" aria-label="Lecciones siguientes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
   </div>
 
   <!-- SLIDE WRAPPER -->
@@ -6666,21 +6693,29 @@
     <div class="course-title">El Mercado Argentino</div>
     <div class="course-subtitle">CEDEARs, bonos, tipos de cambio y cómo invertir inteligentemente en el contexto local</div>
     <div class="course-meta">
-      <div class="meta-item"> 8 lecciones</div>
-      <div class="meta-item"> Diagramas conceptuales</div>
+      <div class="meta-item">&#128218; 8 lecciones</div>
+      <div class="meta-item">&#128202; Diagramas conceptuales</div>
       <div class="meta-item">&#127462;&#127479; 100% contexto argentino</div>
     </div>
   </div>
 
-  <div class="lesson-nav" id="LNMA">
-    <button class="lesson-tab active" onclick="GLMA(0)">1. El sistema financiero AR</button>
-    <button class="lesson-tab" onclick="GLMA(1)">2. Los tipos de cambio</button>
-    <button class="lesson-tab" onclick="GLMA(2)">3. CEDEARs en profundidad</button>
-    <button class="lesson-tab" onclick="GLMA(3)">4. Renta fija local</button>
-    <button class="lesson-tab" onclick="GLMA(4)">5. El Merval y las acciones</button>
-    <button class="lesson-tab" onclick="GLMA(5)">6. Obligaciones Negociables</button>
-    <button class="lesson-tab" onclick="GLMA(6)">7. Brokers y operatoria</button>
-    <button class="lesson-tab" onclick="GLMA(7)">8. Estrategias para el inversor AR</button>
+  <div class="lesson-nav-wrap">
+    <button class="carousel-btn lesson-nav-arrow" id="LNMAPrev" aria-label="Lecciones anteriores">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="lesson-nav" id="LNMA">
+      <button class="lesson-tab active" onclick="GLMA(0)">1. El sistema financiero AR</button>
+      <button class="lesson-tab" onclick="GLMA(1)">2. Los tipos de cambio</button>
+      <button class="lesson-tab" onclick="GLMA(2)">3. CEDEARs en profundidad</button>
+      <button class="lesson-tab" onclick="GLMA(3)">4. Renta fija local</button>
+      <button class="lesson-tab" onclick="GLMA(4)">5. El Merval y las acciones</button>
+      <button class="lesson-tab" onclick="GLMA(5)">6. Obligaciones Negociables</button>
+      <button class="lesson-tab" onclick="GLMA(6)">7. Brokers y operatoria</button>
+      <button class="lesson-tab" onclick="GLMA(7)">8. Estrategias para el inversor AR</button>
+    </div>
+    <button class="carousel-btn lesson-nav-arrow" id="LNMANext" aria-label="Lecciones siguientes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
   </div>
 
   <div class="slide-wrapper" id="SWMA"></div>
@@ -6949,9 +6984,9 @@ const LSFP = [
     { eyebrow: "Lección 7 · Slide 1", title: "Cuándo es el momento de empezar a invertir",
       html: `<p class="slide-intro">Una de las preguntas más frecuentes en finanzas personales es: "¿cuándo estoy listo para invertir?" La respuesta correcta no es "cuando tenga suficiente dinero" ni "cuando el mercado esté bien" &mdash; esas condiciones nunca se cumplen perfectamente. Hay tres condiciones concretas que deben cumplirse primero.</p>
       <div class="step-list">
-        <div class="step-item"><div class="step-num green">â</div><div class="step-content"><div class="step-title">Condición 1: Tenés presupuesto armado y ahorro consistente</div><div class="step-desc">Sabés exactamente cuánto entra y cuánto sale. Tenés un excedente mensual que podés destinar a inversiones sin comprometer los gastos esenciales.</div></div></div>
-        <div class="step-item"><div class="step-num green">â</div><div class="step-content"><div class="step-title">Condición 2: Tenés fondo de emergencia completo</div><div class="step-desc">Entre 3 y 6 meses de gastos en un instrumento líquido. Sin esto, cualquier imprevisto te forzaría a vender inversiones en el peor momento.</div></div></div>
-        <div class="step-item"><div class="step-num green">â</div><div class="step-content"><div class="step-title">Condición 3: No tenés deudas de alto interés</div><div class="step-desc">Si tenés tarjeta de crédito o préstamos al 60-100% anual, pagarlos es tu mejor inversión garantizada. No tiene sentido invertir al 10% mientras pagás el 80%.</div></div></div>
+        <div class="step-item"><div class="step-num green">✓</div><div class="step-content"><div class="step-title">Condición 1: Tenés presupuesto armado y ahorro consistente</div><div class="step-desc">Sabés exactamente cuánto entra y cuánto sale. Tenés un excedente mensual que podés destinar a inversiones sin comprometer los gastos esenciales.</div></div></div>
+        <div class="step-item"><div class="step-num green">✓</div><div class="step-content"><div class="step-title">Condición 2: Tenés fondo de emergencia completo</div><div class="step-desc">Entre 3 y 6 meses de gastos en un instrumento líquido. Sin esto, cualquier imprevisto te forzaría a vender inversiones en el peor momento.</div></div></div>
+        <div class="step-item"><div class="step-num green">✓</div><div class="step-content"><div class="step-title">Condición 3: No tenés deudas de alto interés</div><div class="step-desc">Si tenés tarjeta de crédito o préstamos al 60-100% anual, pagarlos es tu mejor inversión garantizada. No tiene sentido invertir al 10% mientras pagás el 80%.</div></div></div>
       </div>
       <div class="callout">Si las tres condiciones están cumplidas, el momento de empezar a invertir es hoy. No la semana que viene, no cuando baje el mercado, no cuando hayas leído más. Hoy. Cada mes de retraso tiene un costo real en interés compuesto perdido.</div>`
     },
@@ -7024,7 +7059,10 @@ const LSFP = [
 function GLFP(idx) {
   CLFP = idx;
   CSFP = 0;
-  document.querySelectorAll('.lesson-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  document.querySelectorAll('#LNFP .lesson-tab').forEach((t,i) => {
+    t.classList.toggle('active', i===idx);
+    if (i===idx) t.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+  });
   RSFP();
 }
 
@@ -7041,7 +7079,7 @@ function RSFP() {
       ${courseAudioBarHTML('FP')}
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSFP()" ${CSFP===0?'disabled':''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSFP()" ${CSFP===0?'disabled':''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
         ${CSFP < total-1
           ? `<button class="nav-btn primary" onclick="NSFP()">Siguiente →</button>`
@@ -7533,7 +7571,10 @@ const LSIB = [
 function GLIB(idx) {
   CLIB = idx;
   CSIB = 0;
-  document.querySelectorAll('.lesson-tab').forEach((t,i) => t.classList.toggle('active', i === idx));
+  document.querySelectorAll('#LNIB .lesson-tab').forEach((t,i) => {
+    t.classList.toggle('active', i === idx);
+    if (i === idx) t.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+  });
   RSIB();
 }
 
@@ -7553,7 +7594,7 @@ function RSIB() {
       ${courseAudioBarHTML('IB')}
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSIB()" ${CSIB===0?'disabled':''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSIB()" ${CSIB===0?'disabled':''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
         ${CSIB < total-1
           ? `<button class="nav-btn primary" onclick="NSIB()">Siguiente →</button>`
@@ -7863,8 +7904,8 @@ const LSAF = [
           </div>
           <div class="callout">Un margen de seguridad del 20-30% suele ser el mínimo recomendable. Para empresas más riesgosas o mercados emergentes como el argentino, conviene buscar márgenes del 40-50%. Cuanto mayor el margen, menor el riesgo.</div>
           <div class="step-list">
-            <div class="step-item"><div class="step-num">â</div><div class="step-content"><div class="step-title">Te protege de errores en el análisis</div><div class="step-desc">Nadie calcula el valor intrínseco perfectamente. El margen absorbe esos errores.</div></div></div>
-            <div class="step-item"><div class="step-num">â</div><div class="step-content"><div class="step-title">Te protege de eventos imprevistos</div><div class="step-desc">Una pandemia, una crisis, un cambio regulatorio. El margen de seguridad te da tiempo para reaccionar.</div></div></div>
+            <div class="step-item"><div class="step-num">✓</div><div class="step-content"><div class="step-title">Te protege de errores en el análisis</div><div class="step-desc">Nadie calcula el valor intrínseco perfectamente. El margen absorbe esos errores.</div></div></div>
+            <div class="step-item"><div class="step-num">✓</div><div class="step-content"><div class="step-title">Te protege de eventos imprevistos</div><div class="step-desc">Una pandemia, una crisis, un cambio regulatorio. El margen de seguridad te da tiempo para reaccionar.</div></div></div>
           </div>
         `
       },
@@ -7925,8 +7966,8 @@ const LSAF = [
           <div class="chart-box"><div class="chart-title">Ejemplo: empresa con EPS creciente (+12% anual)</div><canvas id="chartEPS" height="180"></canvas></div>
           <div class="callout">La regla es clara: el EPS debe crecer al menos un 10% anual compuesto en los últimos 5 años. Por debajo de eso, la empresa no está creando valor suficiente para el accionista. Podés calcular este crecimiento en <strong>omnicalculator.com/finance/cagr</strong>.</div>
           <div class="card-grid cols-3">
-            <div class="card green"><div class="card-label">EPS creciendo +10% anual</div><div class="card-title">â Pasa el filtro</div><div class="card-body">El negocio está generando más valor cada año.</div></div>
-            <div class="card amber"><div class="card-label">EPS estancado o errático</div><div class="card-title"> Analizar bien</div><div class="card-body">Puede ser un año puntual malo o el inicio de un declive.</div></div>
+            <div class="card green"><div class="card-label">EPS creciendo +10% anual</div><div class="card-title">✓ Pasa el filtro</div><div class="card-body">El negocio está generando más valor cada año.</div></div>
+            <div class="card amber"><div class="card-label">EPS estancado o errático</div><div class="card-title">! Analizar bien</div><div class="card-body">Puede ser un año puntual malo o el inicio de un declive.</div></div>
             <div class="card red"><div class="card-label">EPS negativo o cayendo</div><div class="card-title">x Descartar</div><div class="card-body">Salvo que sea una empresa cíclica o en una reestructuración justificada.</div></div>
           </div>
         `
@@ -8072,7 +8113,7 @@ const LSAF = [
           </div>
           <div class="callout">Una empresa que invierte fuertemente en nueva infraestructura (por ejemplo, abre 50 tiendas nuevas) puede tener FCF muy bajo o negativo ese año, lo cual elevaría el EV/FCF. Eso no es un problema si las inversiones generarán FCF mucho mayor en años futuros. Siempre hay que contextualizar.</div>
           <div class="step-list">
-            <div class="step-item"><div class="step-num">â</div><div class="step-content"><div class="step-title">EV/FCF menor a 15 &mdash; zona atractiva</div><div class="step-desc">La empresa genera mucho flujo de caja libre respecto a su valor total.</div></div></div>
+            <div class="step-item"><div class="step-num">✓</div><div class="step-content"><div class="step-title">EV/FCF menor a 15 &mdash; zona atractiva</div><div class="step-desc">La empresa genera mucho flujo de caja libre respecto a su valor total.</div></div></div>
             <div class="step-item"><div class="step-num amber">!</div><div class="step-content"><div class="step-title">EV/FCF entre 15 y 30 &mdash; zona neutral</div><div class="step-desc">Razonable para empresas de crecimiento moderado.</div></div></div>
           </div>
         `
@@ -8272,7 +8313,10 @@ let currentSlideIdx = 0;
 function GLAF(lessonIdx) {
   CLAF = lessonIdx;
   currentSlideIdx = 0;
-  document.querySelectorAll('.lesson-tab').forEach((t,i) => t.classList.toggle('active', i === lessonIdx));
+  document.querySelectorAll('#LNAF .lesson-tab').forEach((t,i) => {
+    t.classList.toggle('active', i === lessonIdx);
+    if (i === lessonIdx) t.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+  });
   RSAF();
 }
 
@@ -8294,7 +8338,7 @@ function RSAF() {
       ${courseAudioBarHTML('AF')}
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSAF()" ${currentSlideIdx === 0 ? 'disabled' : ''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSAF()" ${currentSlideIdx === 0 ? 'disabled' : ''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
         ${currentSlideIdx < total - 1
           ? `<button class="nav-btn primary" onclick="NSAF()">Siguiente →</button>`
@@ -8778,7 +8822,10 @@ const LSMA = [
 function GLMA(idx) {
   CLMA = idx;
   CSMA = 0;
-  document.querySelectorAll('.lesson-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  document.querySelectorAll('#LNMA .lesson-tab').forEach((t,i) => {
+    t.classList.toggle('active', i===idx);
+    if (i===idx) t.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+  });
   RSMA();
 }
 
@@ -8794,7 +8841,7 @@ function RSMA() {
       <div class="slide-title">${slide.title}</div>
       ${slide.html}
       <div class="slide-footer">
-        <button class="nav-btn" onclick="PSMA()" ${CSMA===0?'disabled':''}>â Anterior</button>
+        <button class="nav-btn" onclick="PSMA()" ${CSMA===0?'disabled':''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
         ${CSMA < total-1
           ? `<button class="nav-btn primary" onclick="NSMA()">Siguiente →</button>`
@@ -8992,10 +9039,29 @@ window.GSlMA=GSlMA;
 </script>
 
 <script>
-function openCourse(id){document.getElementById('modal-'+id).classList.add('open');document.body.style.overflow='hidden';}
+var _lessonNavUpdaters = {};
+function openCourse(id){document.getElementById('modal-'+id).classList.add('open');document.body.style.overflow='hidden';if(_lessonNavUpdaters[id])_lessonNavUpdaters[id]();}
 function closeCourse(id){pauseCourseAudio(id);document.getElementById('modal-'+id).classList.remove('open');document.body.style.overflow='';}
 document.addEventListener('keydown',function(e){if(e.key==='Escape')['FP','IB','AF','MA'].forEach(closeCourse);});
 document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEventListener('click',function(e){if(e.target===el){el.classList.remove('open');document.body.style.overflow='';}});});
+
+['FP','IB','AF','MA'].forEach(function(id){
+  var rail = document.getElementById('LN'+id);
+  var prev = document.getElementById('LN'+id+'Prev');
+  var next = document.getElementById('LN'+id+'Next');
+  if(!rail||!prev||!next) return;
+  var step = function(){ return Math.min(rail.clientWidth*0.9, 400); };
+  var updateNav = function(){
+    prev.disabled = rail.scrollLeft <= 4;
+    next.disabled = rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 4;
+  };
+  prev.addEventListener('click', function(){ rail.scrollBy({left:-step(), behavior:'smooth'}); });
+  next.addEventListener('click', function(){ rail.scrollBy({left:step(), behavior:'smooth'}); });
+  rail.addEventListener('scroll', updateNav);
+  window.addEventListener('resize', updateNav);
+  _lessonNavUpdaters[id] = updateNav;
+  updateNav();
+});
 </script>
 
 <!-- Warren FAB Button -->
