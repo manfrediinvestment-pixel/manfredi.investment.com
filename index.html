@@ -4500,7 +4500,7 @@
           </div>
           <div id="mfSummary" class="mf-summary">Calculando con datos históricos...</div>
           <div class="mf-chart-wrap"><canvas id="mfChartCanvas"></canvas></div>
-          <div class="pf-metric-note">Incluye únicamente las posiciones en acciones y CEDEARs de mi cartera personal &mdash; no incluye el fondo común de inversión ni el efectivo. El % de "Mi cartera" se calcula con el método Dietz Modificado (estándar GIPS para carteras con aportes de capital), que pondera el aporte por cuánto tiempo estuvo invertido dentro de cada ventana. En 1 semana y 1 mes da igual al retorno simple (no hubo aportes nuevos en esos períodos). En YTD y 1 año, como toda la cartera se armó de una vez el 22-may-2026, ese aporte único se pondera por el tiempo que faltaba de la ventana &mdash; por eso el % puede ser mayor al retorno simple visible en el gráfico, y el S&amp;P 500 (que sí muestra el período de calendario completo) empieza antes en la línea.</div>
+          <div class="pf-metric-note">Incluye únicamente las posiciones en acciones y CEDEARs de mi cartera personal &mdash; no incluye el fondo común de inversión ni el efectivo. En YTD y 1 año, el % de "Mi cartera" es proyectado: no es lo que la cartera rindió en ese período completo (todavía no existía desde el inicio), sino el ritmo de rendimiento actual llevado a esa ventana.</div>
         </div>
 
         <div class="pf-card" id="mfCompWrapper" style="position:relative;">
@@ -5647,10 +5647,9 @@
     var sign1 = m.totalReturn>=0?'+':'−', sign2 = m.benchTotalReturn>=0?'+':'−';
     var sameWindow = m.daysUsedPortfolio === m.daysUsedBench;
     summary.innerHTML = '<span>Mi cartera: <b style="color:'+(m.totalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign1 + Math.abs(m.totalReturn).toFixed(1) +'%</b>'
-        + (sameWindow ? '' : ' <small style="color:rgba(255,255,255,.4);">(Dietz Modificado)</small>') + '</span>'
-      + '<span>S&amp;P 500: <b style="color:'+(m.benchTotalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign2 + Math.abs(m.benchTotalReturn).toFixed(1) +'%</b>'
-        + (sameWindow ? '' : ' <small style="color:rgba(255,255,255,.4);">('+ m.daysUsedBench +'d)</small>') + '</span>'
-      + '<span>'+ pfEsc(win.label) + (sameWindow ? '' : ' &middot; cartera desde 22-may') +'</span>';
+        + (sameWindow ? '' : ' <small style="color:rgba(255,255,255,.4);">(proyectado)</small>') + '</span>'
+      + '<span>S&amp;P 500: <b style="color:'+(m.benchTotalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign2 + Math.abs(m.benchTotalReturn).toFixed(1) +'%</b></span>'
+      + '<span>'+ pfEsc(win.label) +'</span>';
     mfRenderChart(m, canvasId);
     mfRenderComposition(m);
   }
