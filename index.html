@@ -4492,6 +4492,12 @@
       <div class="pf-view-panel" data-pfview-panel="manfredi">
         <div class="pf-card">
           <h2 class="pf-metrics-label" style="margin-bottom:14px;">Rendimiento real vs S&amp;P 500</h2>
+          <div class="mkt-tabs mf-window-tabs" id="mfWindowTabs">
+            <button type="button" class="mkt-tab" data-mfwin="1w">1 semana</button>
+            <button type="button" class="mkt-tab active" data-mfwin="1m">1 mes</button>
+            <button type="button" class="mkt-tab" data-mfwin="ytd">YTD</button>
+            <button type="button" class="mkt-tab" data-mfwin="1y">1 año</button>
+          </div>
           <div id="mfSummary" class="mf-summary">Calculando con datos históricos...</div>
           <div class="mf-chart-wrap"><canvas id="mfChartCanvas"></canvas></div>
           <div class="pf-metric-note">Incluye únicamente las posiciones en acciones y CEDEARs de mi cartera personal &mdash; no incluye el fondo común de inversión ni el efectivo. Rendimiento de los últimos días hábiles disponibles con la composición actual, no desde la fecha de cada compra.</div>
@@ -4526,7 +4532,19 @@
         panels.forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-pfview-panel') === v); });
         if(v === 'manfredi' && !window._mfRendered){
           window._mfRendered = true;
-          if(typeof mfRenderPerformance === 'function') mfRenderPerformance();
+          if(typeof mfRenderPerformance === 'function') mfRenderPerformance('mfSummary', 'mfChartCanvas', '1m');
+        }
+      });
+    });
+  })();
+
+  (function(){
+    var winTabs = document.querySelectorAll('#mfWindowTabs .mkt-tab');
+    winTabs.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        winTabs.forEach(function(b){ b.classList.toggle('active', b === btn); });
+        if(typeof mfRenderPerformance === 'function'){
+          mfRenderPerformance('mfSummary', 'mfChartCanvas', btn.getAttribute('data-mfwin'));
         }
       });
     });
@@ -5376,20 +5394,55 @@
   // Reusa el mismo pipeline ARS->USD que las metricas de "Tu Portafolio" (pfFetchHistorico,
   // pfCloseArsToUsd, pfGetCurrentCategory) pero sin nada de beta/Sharpe -- solo una curva de
   // % de retorno acumulado, cartera vs SPY, sobre la ventana mas larga que soporta el Worker.
-  var MF_WINDOW_DAYS = 30;
-  async function mfBuildPerformanceSeries(){
+  // Fecha real en la que se armo esta composicion de cartera. YTD y 1 año quedan topeados
+  // a esta fecha (no tiene sentido "rendimiento" de una cartera que todavia no existia) --
+  // por eso hoy dan el mismo numero, y van a divergir solos una vez pasado un 22-may / 1-ene.
+  var MF_INCEPTION_DATE = new Date('2026-05-22T00:00:00');
+
+  function mfBizDaysBetween(from, to){
+    var d = new Date(from); d.setHours(0,0,0,0);
+    var end = new Date(to); end.setHours(0,0,0,0);
+    var count = 0;
+    while(d <= end){
+      var day = d.getDay();
+      if(day !== 0 && day !== 6) count++;
+      d.setDate(d.getDate()+1);
+    }
+    return count;
+  }
+
+  function mfGetWindows(){
+    var today = new Date();
+    var jan1 = new Date(today.getFullYear(), 0, 1);
+    var sinceInception = Math.max(2, mfBizDaysBetween(MF_INCEPTION_DATE, today));
+    var ytdDays = Math.min(Math.max(2, mfBizDaysBetween(jan1, today)), sinceInception);
+    var oneYearDays = Math.min(252, sinceInception);
+    return [
+      { key:'1w',  label:'1 semana', days: Math.min(5, sinceInception) },
+      { key:'1m',  label:'1 mes',    days: Math.min(21, sinceInception) },
+      { key:'ytd', label:'YTD',      days: ytdDays },
+      { key:'1y',  label:'1 año',    days: oneYearDays }
+    ];
+  }
+
+  var mfSeriesCache = {};
+  async function mfBuildPerformanceSeries(days){
+    days = days || 21;
+    // Se pide un colchon minimo de dias al Worker (ventanas cortas como "1 semana" quedan por
+    // debajo del umbral de datos validos de abajo) -- despues se recorta a la ventana real pedida.
+    var fetchDays = Math.max(days, 10);
     await pfFetchMarketData(false);
     var closesByTicker = {};
     await Promise.all(MF_HOLDINGS.map(async function(h){
       if(h.moneda === 'ARS'){
         var cat = pfGetCurrentCategory(h.ticker, 'ARS') || 'arg_cedears';
-        closesByTicker[h.ticker] = await pfFetchUsdClosesForArs(h.ticker, cat, MF_WINDOW_DAYS);
+        closesByTicker[h.ticker] = await pfFetchUsdClosesForArs(h.ticker, cat, fetchDays);
       } else {
         var catUsd = pfGetCurrentCategory(h.ticker, 'USD') || 'usa_stocks';
-        closesByTicker[h.ticker] = await pfFetchHistorico(catUsd, h.ticker, MF_WINDOW_DAYS);
+        closesByTicker[h.ticker] = await pfFetchHistorico(catUsd, h.ticker, fetchDays);
       }
     }));
-    var benchCloses = await pfFetchHistorico('usa_stocks', 'SPY', MF_WINDOW_DAYS);
+    var benchCloses = await pfFetchHistorico('usa_stocks', 'SPY', fetchDays);
 
     var validHoldings = MF_HOLDINGS.filter(function(h){ return closesByTicker[h.ticker] && closesByTicker[h.ticker].length > 5; });
     if(!validHoldings.length || !benchCloses) return { dataUnavailable:true };
@@ -5405,11 +5458,18 @@
       series.push(val);
     }
     var benchAligned = benchCloses.slice(benchCloses.length-minLen);
-    var portfolioPct = series.map(function(v){ return (v/series[0]-1)*100; });
-    var benchPct = benchAligned.map(function(v){ return (v/benchAligned[0]-1)*100; });
+
+    // Recorte final a la ventana realmente pedida (el colchon de arriba solo sirvio para pasar
+    // el chequeo de datos validos); el 0% del grafico arranca en el primer dia de esta ventana.
+    var useLen = Math.min(minLen, days);
+    var sliceStart = minLen - useLen;
+    var seriesWin = series.slice(sliceStart);
+    var benchWin = benchAligned.slice(sliceStart);
+    var portfolioPct = seriesWin.map(function(v){ return (v/seriesWin[0]-1)*100; });
+    var benchPct = benchWin.map(function(v){ return (v/benchWin[0]-1)*100; });
 
     return {
-      portfolioPct: portfolioPct, benchPct: benchPct, daysUsed: minLen,
+      portfolioPct: portfolioPct, benchPct: benchPct, daysUsed: useLen,
       totalReturn: portfolioPct[portfolioPct.length-1], benchTotalReturn: benchPct[benchPct.length-1],
       validHoldings: validHoldings, closesByTicker: closesByTicker
     };
@@ -5480,12 +5540,20 @@
     }
   }
 
-  async function mfRenderPerformance(summaryId, canvasId){
+  async function mfRenderPerformance(summaryId, canvasId, windowKey){
     summaryId = summaryId || 'mfSummary';
     canvasId = canvasId || 'mfChartCanvas';
     var summary = document.getElementById(summaryId);
     if(!summary) return;
-    var m = await mfBuildPerformanceSeries();
+    var windows = mfGetWindows();
+    var win = windows.filter(function(w){ return w.key === (windowKey || '1m'); })[0] || windows[1];
+    summary.textContent = 'Calculando con datos históricos...';
+    var cacheKey = win.key + '_' + win.days;
+    var m = mfSeriesCache[cacheKey];
+    if(!m){
+      m = await mfBuildPerformanceSeries(win.days);
+      mfSeriesCache[cacheKey] = m;
+    }
     if(!m || m.dataUnavailable){
       summary.textContent = 'No se pudo traer suficiente historial todavía.';
       return;
@@ -5493,7 +5561,7 @@
     var sign1 = m.totalReturn>=0?'+':'−', sign2 = m.benchTotalReturn>=0?'+':'−';
     summary.innerHTML = '<span>Mi cartera: <b style="color:'+(m.totalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign1 + Math.abs(m.totalReturn).toFixed(1) +'%</b></span>'
       + '<span>S&amp;P 500: <b style="color:'+(m.benchTotalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign2 + Math.abs(m.benchTotalReturn).toFixed(1) +'%</b></span>'
-      + '<span>Últimos '+ m.daysUsed +' días hábiles</span>';
+      + '<span>'+ pfEsc(win.label) +' &middot; '+ m.daysUsed +' días hábiles</span>';
     mfRenderChart(m, canvasId);
     mfRenderComposition(m);
   }
