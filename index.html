@@ -4400,6 +4400,20 @@
       background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
       border-radius: 20px; padding: 3px 10px; white-space: nowrap;
     }
+    .mf-comp-row { cursor: pointer; }
+    .mf-comp-chevron {
+      display: inline-block; margin-left: 8px; font-size: 9px; color: rgba(255,255,255,.3);
+      transition: transform .2s ease, color .2s ease;
+    }
+    .mf-comp-row.open .mf-comp-chevron { transform: rotate(90deg); color: var(--gold); }
+    .mf-comp-detail-row td { padding: 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .mf-comp-detail-row:not(.open) { display: none; }
+    .mf-comp-detail { padding: 2px 6px 18px; }
+    .mf-comp-why-label {
+      display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em;
+      color: var(--gold); font-weight: 600; margin-bottom: 8px;
+    }
+    .mf-comp-why-text { font-size: 13.5px; line-height: 1.65; color: rgba(255,255,255,.7); margin: 0; max-width: 680px; }
     /* TEMP: bloqueo de toda la seccion Portfolio mientras se rehace Warren IA a fondo.
        Buscar "TEMP: bloqueo Portfolio" para sacar este bloque + el wrapper de abajo
        cuando este listo para lanzar. */
@@ -4568,7 +4582,7 @@
   var MF_HOLDINGS = [
     { ticker:'MSFT', cantidad:36,  moneda:'ARS', precioCompra:20140.000, sector:'Tecnología' },
     { ticker:'META', cantidad:28,  moneda:'ARS', precioCompra:40060.000, sector:'Comunicación' },
-    { ticker:'MELI', cantidad:62,  moneda:'ARS', precioCompra:22750.000, sector:'Consumo discrecional' },
+    { ticker:'MELI', cantidad:62,  moneda:'ARS', precioCompra:22750.000, sector:'Consumo discrecional', motivo:'MercadoLibre es la posición de mayor convicción de toda la cartera porque no compite por un mercado — lo controla. Domina el e-commerce y los pagos digitales en América Latina con un moat que combina logística propia y Mercado Pago como riel financiero regional, algo que ningún competidor local replica con la misma escala. Le di el peso más alto del portafolio porque además de la tesis de crecimiento regional hay una asimetría clara entre negocio y precio: la empresa viene entregando resultados cada vez mejores, con crecimiento de ingresos y ganancias muy por encima de lo que el mercado terminó reflejando en la cotización — el fundamento corrió más rápido que el precio, no al revés. Eso es exactamente el tipo de desajuste que busco explotar con convicción alta en lugar de diluir en nombres de menor calidad. Acepto la volatilidad que trae en un escenario adverso porque la pienso como el motor del bloque growth, no como una posición más a diversificar.' },
     { ticker:'IBIT', cantidad:43,  moneda:'ARS', precioCompra:5691.048,  sector:'Cripto' },
     { ticker:'NU',   cantidad:116, moneda:'ARS', precioCompra:10500.000, sector:'Financiero' },
     { ticker:'XOM',  cantidad:18,  moneda:'ARS', precioCompra:21310.000, sector:'Energía' },
@@ -5597,6 +5611,8 @@
     if(existingOverlay) existingOverlay.remove();
 
     var ccl = pfGetCclRate();
+    var holdingByTicker = {};
+    MF_HOLDINGS.forEach(function(h){ holdingByTicker[h.ticker] = h; });
     var priced = m.validHoldings.map(function(h){
       var c = m.closesByTicker[h.ticker];
       var liveArsPrice = pfGetCurrentPrice(h.ticker, 'ARS');
@@ -5613,17 +5629,33 @@
           var pct = total>0 ? (p.valorActual/total*100) : 0;
           var varStr = p.varPct==null ? '—' : (p.varPct>=0?'+':'−') + Math.abs(p.varPct).toFixed(1) + '%';
           var varColor = p.varPct==null ? 'rgba(255,255,255,.4)' : (p.varPct>=0 ? 'var(--green)' : 'var(--red)');
-          return '<tr><td><b>'+ pfEsc(p.ticker) +'</b></td>'
+          var motivo = (holdingByTicker[p.ticker] && holdingByTicker[p.ticker].motivo) || '';
+          var rowId = 'mfWhy_' + p.ticker;
+          var row = '<tr class="mf-comp-row" onclick="mfToggleWhy(\''+ rowId +'\')"><td><b>'+ pfEsc(p.ticker) +'</b><span class="mf-comp-chevron">&#9656;</span></td>'
             + '<td><span class="mf-sector-tag">'+ pfEsc(p.sector) +'</span></td>'
             + '<td class="num">US$'+ p.priceUsd.toFixed(2) +'</td>'
             + '<td class="num" style="color:'+ varColor +';font-weight:600;">'+ varStr +'</td>'
             + '<td class="num">'+ pct.toFixed(1) +'%</td></tr>';
+          var detail = '<tr class="mf-comp-detail-row" id="'+ rowId +'"><td colspan="5"><div class="mf-comp-detail">'
+            + '<span class="mf-comp-why-label">Por qué tengo '+ pfEsc(p.ticker) +'</span>'
+            + '<p class="mf-comp-why-text">'+ (motivo ? pfEsc(motivo) : 'Todavía no cargué el motivo de esta posición.') +'</p>'
+            + '</div></td></tr>';
+          return row + detail;
         }).join('')
       + '</tbody></table>';
 
     if(!(window._miIsMember && window._miIsMember())){
       if(window._miApplyPaywall) window._miApplyPaywall('#mfCompGrid', '#mfCompWrapper');
     }
+  }
+
+  function mfToggleWhy(rowId){
+    var detailRow = document.getElementById(rowId);
+    if(!detailRow) return;
+    var toggleRow = detailRow.previousElementSibling;
+    var wasOpen = detailRow.classList.contains('open');
+    detailRow.classList.toggle('open', !wasOpen);
+    if(toggleRow) toggleRow.classList.toggle('open', !wasOpen);
   }
 
   async function mfRenderPerformance(summaryId, canvasId, windowKey){
@@ -5651,7 +5683,11 @@
       + '<span>S&amp;P 500: <b style="color:'+(m.benchTotalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign2 + Math.abs(m.benchTotalReturn).toFixed(1) +'%</b></span>'
       + '<span>'+ pfEsc(win.label) +'</span>';
     mfRenderChart(m, canvasId);
-    mfRenderComposition(m);
+    // La tabla de composicion (#mfCompGrid) es unica en la pagina, vive solo dentro de la tab
+    // "Portafolio de Manfredi" -- el widget del hero (canvasId distinto) no la tiene y no debe
+    // tocarla, porque su fetch corre en paralelo y si termina despues puede pisar/cerrar una
+    // fila que el usuario ya habia abierto en la tab real.
+    if(canvasId === 'mfChartCanvas') mfRenderComposition(m);
   }
 
   window._pfRenderPositions = pfRenderPositions;
