@@ -4500,7 +4500,7 @@
           </div>
           <div id="mfSummary" class="mf-summary">Calculando con datos históricos...</div>
           <div class="mf-chart-wrap"><canvas id="mfChartCanvas"></canvas></div>
-          <div class="pf-metric-note">Incluye únicamente las posiciones en acciones y CEDEARs de mi cartera personal &mdash; no incluye el fondo común de inversión ni el efectivo. Rendimiento de los últimos días hábiles disponibles con la composición actual, no desde la fecha de cada compra.</div>
+          <div class="pf-metric-note">Incluye únicamente las posiciones en acciones y CEDEARs de mi cartera personal &mdash; no incluye el fondo común de inversión ni el efectivo. Rendimiento con la composición actual, no desde la fecha de cada compra. En YTD y 1 año, "Mi cartera" arranca el 22-may-2026 (fecha real en que armé esta composición) mientras que el S&amp;P 500 muestra el período completo &mdash; por eso la línea de mi cartera empieza más adelante en el gráfico.</div>
         </div>
 
         <div class="pf-card" id="mfCompWrapper" style="position:relative;">
@@ -5411,65 +5411,105 @@
     return count;
   }
 
+  // Lista de N dias habiles (Lun-Vie, sin feriados) terminando en endDate, mas viejo primero --
+  // misma aproximacion que mfBizDaysBetween, usada para poner fechas reales en el eje X.
+  function mfBizDaysList(n, endDate){
+    var dates = [];
+    var d = new Date(endDate); d.setHours(0,0,0,0);
+    while(dates.length < n){
+      var day = d.getDay();
+      if(day !== 0 && day !== 6) dates.unshift(new Date(d));
+      d.setDate(d.getDate()-1);
+    }
+    return dates;
+  }
+
+  var MF_MONTHS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  function mfFormatDate(d, granularity){
+    if(granularity === 'month'){
+      var m = MF_MONTHS[d.getMonth()];
+      return m.charAt(0).toUpperCase() + m.slice(1) + " '" + String(d.getFullYear()).slice(-2);
+    }
+    return d.getDate() + ' ' + MF_MONTHS[d.getMonth()];
+  }
+
+  // El benchmark (S&P 500) existe hace decadas, asi que en YTD/1 año muestra el retorno REAL
+  // del periodo completo (benchDays). Mi cartera recien existe desde MF_INCEPTION_DATE, asi que
+  // se topea a esa fecha (portfolioDays) -- por eso las dos lineas arrancan en puntos distintos
+  // del grafico, y el numero de "Mi cartera" en YTD y 1 año da igual (misma fecha de arranque)
+  // mientras que el de S&P 500 NO (son dos periodos reales distintos).
   function mfGetWindows(){
     var today = new Date();
     var jan1 = new Date(today.getFullYear(), 0, 1);
     var sinceInception = Math.max(2, mfBizDaysBetween(MF_INCEPTION_DATE, today));
-    var ytdDays = Math.min(Math.max(2, mfBizDaysBetween(jan1, today)), sinceInception);
-    var oneYearDays = Math.min(252, sinceInception);
+    var ytdRealDays = Math.max(2, mfBizDaysBetween(jan1, today));
+    var oneYearRealDays = 252;
     return [
-      { key:'1w',  label:'1 semana', days: Math.min(5, sinceInception) },
-      { key:'1m',  label:'1 mes',    days: Math.min(21, sinceInception) },
-      { key:'ytd', label:'YTD',      days: ytdDays },
-      { key:'1y',  label:'1 año',    days: oneYearDays }
+      { key:'1w',  label:'1 semana', portfolioDays: Math.min(5, sinceInception),  benchDays: 5,              granularity:'day',   tickEvery: 1 },
+      { key:'1m',  label:'1 mes',    portfolioDays: Math.min(21, sinceInception), benchDays: 21,             granularity:'week',  tickEvery: 5 },
+      { key:'ytd', label:'YTD',      portfolioDays: Math.min(ytdRealDays, sinceInception), benchDays: ytdRealDays, granularity:'month', tickEvery: 21 },
+      { key:'1y',  label:'1 año',    portfolioDays: Math.min(oneYearRealDays, sinceInception), benchDays: oneYearRealDays, granularity:'month', tickEvery: 21 }
     ];
   }
 
   var mfSeriesCache = {};
-  async function mfBuildPerformanceSeries(days){
-    days = days || 21;
+  async function mfBuildPerformanceSeries(portfolioDays, benchDays, granularity){
+    portfolioDays = portfolioDays || 21;
+    benchDays = Math.max(benchDays || portfolioDays, portfolioDays);
     // Se pide un colchon minimo de dias al Worker (ventanas cortas como "1 semana" quedan por
     // debajo del umbral de datos validos de abajo) -- despues se recorta a la ventana real pedida.
-    var fetchDays = Math.max(days, 10);
+    var fetchPortfolioDays = Math.max(portfolioDays, 10);
+    var fetchBenchDays = Math.max(benchDays, 10);
     await pfFetchMarketData(false);
     var closesByTicker = {};
     await Promise.all(MF_HOLDINGS.map(async function(h){
       if(h.moneda === 'ARS'){
         var cat = pfGetCurrentCategory(h.ticker, 'ARS') || 'arg_cedears';
-        closesByTicker[h.ticker] = await pfFetchUsdClosesForArs(h.ticker, cat, fetchDays);
+        closesByTicker[h.ticker] = await pfFetchUsdClosesForArs(h.ticker, cat, fetchPortfolioDays);
       } else {
         var catUsd = pfGetCurrentCategory(h.ticker, 'USD') || 'usa_stocks';
-        closesByTicker[h.ticker] = await pfFetchHistorico(catUsd, h.ticker, fetchDays);
+        closesByTicker[h.ticker] = await pfFetchHistorico(catUsd, h.ticker, fetchPortfolioDays);
       }
     }));
-    var benchCloses = await pfFetchHistorico('usa_stocks', 'SPY', fetchDays);
+    var benchCloses = await pfFetchHistorico('usa_stocks', 'SPY', fetchBenchDays);
+    if(!benchCloses) return { dataUnavailable:true };
 
     var validHoldings = MF_HOLDINGS.filter(function(h){ return closesByTicker[h.ticker] && closesByTicker[h.ticker].length > 5; });
-    if(!validHoldings.length || !benchCloses) return { dataUnavailable:true };
+    if(!validHoldings.length) return { dataUnavailable:true };
 
-    var lens = validHoldings.map(function(h){ return closesByTicker[h.ticker].length; }).concat([benchCloses.length]);
-    var minLen = Math.min.apply(null, lens);
-    if(minLen < 6) return { dataUnavailable:true };
-
-    var series = [];
-    for(var i=0;i<minLen;i++){
+    // ---- Mi cartera: topeada a portfolioDays (desde MF_INCEPTION_DATE en ytd/1y) ----
+    var pLens = validHoldings.map(function(h){ return closesByTicker[h.ticker].length; });
+    var pMinLen = Math.min.apply(null, pLens);
+    if(pMinLen < 6) return { dataUnavailable:true };
+    var pUseLen = Math.min(pMinLen, portfolioDays);
+    var pSeries = [];
+    for(var i=0;i<pUseLen;i++){
       var val = 0;
-      validHoldings.forEach(function(h){ var c=closesByTicker[h.ticker]; val += h.cantidad*c[c.length-minLen+i]; });
-      series.push(val);
+      validHoldings.forEach(function(h){ var c=closesByTicker[h.ticker]; val += h.cantidad*c[c.length-pUseLen+i]; });
+      pSeries.push(val);
     }
-    var benchAligned = benchCloses.slice(benchCloses.length-minLen);
+    var portfolioPct = pSeries.map(function(v){ return (v/pSeries[0]-1)*100; });
 
-    // Recorte final a la ventana realmente pedida (el colchon de arriba solo sirvio para pasar
-    // el chequeo de datos validos); el 0% del grafico arranca en el primer dia de esta ventana.
-    var useLen = Math.min(minLen, days);
-    var sliceStart = minLen - useLen;
-    var seriesWin = series.slice(sliceStart);
-    var benchWin = benchAligned.slice(sliceStart);
-    var portfolioPct = seriesWin.map(function(v){ return (v/seriesWin[0]-1)*100; });
+    // ---- S&P 500: SIN topear -- periodo real completo (benchDays), no acotado a la cartera ----
+    if(benchCloses.length < 6) return { dataUnavailable:true };
+    var bUseLen = Math.min(benchCloses.length, benchDays);
+    var benchWin = benchCloses.slice(benchCloses.length-bUseLen);
     var benchPct = benchWin.map(function(v){ return (v/benchWin[0]-1)*100; });
 
+    // ---- Eje X compartido: bUseLen fechas habiles terminando hoy; la cartera (mas corta) ----
+    // ---- se alinea contra el final (los puntos mas viejos quedan en null = sin dibujar). ----
+    var totalLen = Math.max(pUseLen, bUseLen);
+    var dates = mfBizDaysList(totalLen, new Date());
+    var pad = totalLen - pUseLen;
+    var portfolioPctPadded = new Array(pad).fill(null).concat(portfolioPct);
+    var padBench = totalLen - bUseLen;
+    var benchPctPadded = new Array(padBench).fill(null).concat(benchPct);
+
     return {
-      portfolioPct: portfolioPct, benchPct: benchPct, daysUsed: useLen,
+      dates: dates,
+      portfolioPct: portfolioPctPadded, benchPct: benchPctPadded,
+      daysUsedPortfolio: pUseLen, daysUsedBench: bUseLen,
+      granularity: granularity || 'week',
       totalReturn: portfolioPct[portfolioPct.length-1], benchTotalReturn: benchPct[benchPct.length-1],
       validHoldings: validHoldings, closesByTicker: closesByTicker
     };
@@ -5480,24 +5520,34 @@
     canvasId = canvasId || 'mfChartCanvas';
     var canvas = document.getElementById(canvasId);
     if(!canvas || typeof Chart === 'undefined') return;
-    var labels = m.portfolioPct.map(function(_,i){ return i; });
+    var granularity = m.granularity || 'week';
+    var tickEvery = granularity === 'day' ? 1 : (granularity === 'week' ? 5 : 21);
+    var labels = m.dates.map(function(d){ return mfFormatDate(d, granularity); });
+    var lastIdx = labels.length - 1;
     if(mfCharts[canvasId]) mfCharts[canvasId].destroy();
     mfCharts[canvasId] = new Chart(canvas, {
       type: 'line',
       data: { labels: labels, datasets: [
-        { label: 'Mi cartera', data: m.portfolioPct, borderColor: '#F2C94C', backgroundColor: 'rgba(242,201,76,.08)', borderWidth: 2, pointRadius: 0, tension: .15, fill: true },
-        { label: 'S&P 500', data: m.benchPct, borderColor: '#60A5FA', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0, tension: .15, borderDash: [4,3] }
+        { label: 'Mi cartera', data: m.portfolioPct, borderColor: '#F2C94C', backgroundColor: 'rgba(242,201,76,.08)', borderWidth: 2, pointRadius: 0, tension: .15, fill: true, spanGaps: false },
+        { label: 'S&P 500', data: m.benchPct, borderColor: '#60A5FA', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0, tension: .15, borderDash: [4,3], spanGaps: false }
       ] },
       options: {
         responsive: true, maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
         scales: {
-          x: { display: false },
+          x: {
+            display: true,
+            grid: { display: false },
+            ticks: {
+              color: 'rgba(255,255,255,.45)', font: { size: 10.5 }, autoSkip: false, maxRotation: 0, minRotation: 0,
+              callback: function(val, idx){ return (lastIdx-idx) % tickEvery === 0 ? labels[idx] : ''; }
+            }
+          },
           y: { ticks: { color: 'rgba(255,255,255,.5)', callback: function(v){ return v.toFixed(0)+'%'; } }, grid: { color: 'rgba(255,255,255,.06)' } }
         },
         plugins: {
           legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,.65)', font: { size: 11.5 }, boxWidth: 12, padding: 14 } },
-          tooltip: { callbacks: { label: function(ctx){ return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%'; } } }
+          tooltip: { callbacks: { label: function(ctx){ if(ctx.parsed.y == null) return null; return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%'; } } }
         }
       }
     });
@@ -5548,10 +5598,10 @@
     var windows = mfGetWindows();
     var win = windows.filter(function(w){ return w.key === (windowKey || '1m'); })[0] || windows[1];
     summary.textContent = 'Calculando con datos históricos...';
-    var cacheKey = win.key + '_' + win.days;
+    var cacheKey = win.key + '_' + win.portfolioDays + '_' + win.benchDays;
     var m = mfSeriesCache[cacheKey];
     if(!m){
-      m = await mfBuildPerformanceSeries(win.days);
+      m = await mfBuildPerformanceSeries(win.portfolioDays, win.benchDays, win.granularity);
       mfSeriesCache[cacheKey] = m;
     }
     if(!m || m.dataUnavailable){
@@ -5559,9 +5609,12 @@
       return;
     }
     var sign1 = m.totalReturn>=0?'+':'−', sign2 = m.benchTotalReturn>=0?'+':'−';
-    summary.innerHTML = '<span>Mi cartera: <b style="color:'+(m.totalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign1 + Math.abs(m.totalReturn).toFixed(1) +'%</b></span>'
-      + '<span>S&amp;P 500: <b style="color:'+(m.benchTotalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign2 + Math.abs(m.benchTotalReturn).toFixed(1) +'%</b></span>'
-      + '<span>'+ pfEsc(win.label) +' &middot; '+ m.daysUsed +' días hábiles</span>';
+    var sameWindow = m.daysUsedPortfolio === m.daysUsedBench;
+    summary.innerHTML = '<span>Mi cartera: <b style="color:'+(m.totalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign1 + Math.abs(m.totalReturn).toFixed(1) +'%</b>'
+        + (sameWindow ? '' : ' <small style="color:rgba(255,255,255,.4);">('+ m.daysUsedPortfolio +'d)</small>') + '</span>'
+      + '<span>S&amp;P 500: <b style="color:'+(m.benchTotalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign2 + Math.abs(m.benchTotalReturn).toFixed(1) +'%</b>'
+        + (sameWindow ? '' : ' <small style="color:rgba(255,255,255,.4);">('+ m.daysUsedBench +'d)</small>') + '</span>'
+      + '<span>'+ pfEsc(win.label) + (sameWindow ? '' : ' &middot; cartera desde 22-may') +'</span>';
     mfRenderChart(m, canvasId);
     mfRenderComposition(m);
   }
