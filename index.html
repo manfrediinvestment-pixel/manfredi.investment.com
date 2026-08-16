@@ -10905,7 +10905,16 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
                             function checkMembership() {
                             if (typeof window._pfRenderMetrics === 'function') window._pfRenderMetrics();
                             if (typeof window._pfRenderAdvancedMetrics === 'function') window._pfRenderAdvancedMetrics();
-                            if (isMember()) return;
+                            if (isMember()) {
+                              // La membresia (Google login + verificacion) puede resolverse DESPUES
+                              // de que el usuario ya abrio el panel de Warren -- si eso pasa, toggleWarren()
+                              // ya corrio con has-sidebar todavia sin aplicar. Re-chequear aca (se llama
+                              // cada vez que cambia el estado de auth/membresia) evita que la barra de
+                              // historial quede pegada en "no soy socio" para siempre en esa sesion.
+                              if (typeof warrenApplySidebarVisibility === 'function') warrenApplySidebarVisibility();
+                              if (typeof warrenLoadConversationList === 'function') warrenLoadConversationList();
+                              return;
+                            }
                             applyWarrenPaywall();
               }
               window._miCheckMembership = checkMembership;
