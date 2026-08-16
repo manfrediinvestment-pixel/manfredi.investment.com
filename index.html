@@ -2872,6 +2872,21 @@
         return false;
       }
     };
+
+    // Guarda un registro del diploma/certificado obtenido al terminar un curso de University.
+    // No requiere ser socio: cualquier cuenta con Google puede sacar diplomas de los cursos gratuitos.
+    window._miSaveCertificado = async function(course, data) {
+      if (!window._currentUser) return false;
+      try {
+        const ref = doc(db, 'users', window._currentUser.uid);
+        const field = 'certificados.' + course;
+        await updateDoc(ref, { [field]: { ...data, otorgadoEn: serverTimestamp() } });
+        return true;
+      } catch (e) {
+        console.warn('certificado save failed:', e);
+        return false;
+      }
+    };
   </script>
 <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 <style>
@@ -6197,6 +6212,9 @@
 
 <!-- COURSE STYLES -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- Diploma: generación de imagen/PDF -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 
   .app {
@@ -6236,6 +6254,9 @@
   .lesson-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none; scroll-behavior: smooth; flex: 1 1 0; min-width: 0; }
   .lesson-nav::-webkit-scrollbar { display: none; }
   .lesson-tab { flex-shrink: 0; padding: 8px 18px; border-radius: 30px; border: 1.5px solid var(--border); background: white; color: var(--gray); font-size: 13px; font-family: sans-serif; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .lesson-tab.quiz-final-tab { border-color: #F2C94C; color: #9a7300; font-weight: 700; }
+  .lesson-tab.quiz-final-tab:hover { background: #fffbeb; }
+  .lesson-tab.quiz-final-tab.active { background: #F2C94C; border-color: #F2C94C; color: #1a1a1a; }
   .lesson-tab:hover { background: var(--blue-light); color: var(--blue-dark); border-color: var(--blue); }
   .lesson-tab.active { background: var(--blue); color: white; border-color: var(--blue); }
 
@@ -6323,6 +6344,38 @@
   .nav-btn.primary { background: var(--blue); color: white; border-color: var(--blue); }
   .nav-btn.primary:hover { background: var(--blue-dark); }
   .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* ===== QUIZ ENGINE (compartido por todos los cursos) ===== */
+  .quiz-wrap { margin-top: 0.25rem; }
+  .quiz-intro { font-family: sans-serif; font-size: 0.92rem; color: var(--gray); margin-bottom: 1.5rem; line-height: 1.6; }
+  .quiz-q { margin-bottom: 1.75rem; padding-bottom: 1.75rem; border-bottom: 1px solid var(--border); }
+  .quiz-q:last-of-type { border-bottom: none; margin-bottom: 0.5rem; padding-bottom: 0; }
+  .quiz-q-head { display: flex; gap: 10px; align-items: baseline; margin-bottom: 0.9rem; }
+  .quiz-q-num { font-family: sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--blue); flex-shrink: 0; padding-top: 3px; white-space: nowrap; }
+  .quiz-q-text { font-family: sans-serif; font-size: 1rem; font-weight: 600; color: #181818; line-height: 1.5; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; font-family: sans-serif; font-size: 0.9rem; padding: 12px 16px; border-radius: 10px; border: 1.5px solid var(--border); background: white; cursor: pointer; transition: all .15s; color: #333; }
+  .quiz-opt:hover:not(.locked) { border-color: var(--blue); background: var(--blue-light); }
+  .quiz-opt-mark { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: transparent; }
+  .quiz-opt.selected .quiz-opt-mark { border-color: var(--blue); background: var(--blue); color: white; }
+  .quiz-opt.selected .quiz-opt-mark::after { content: '✓'; }
+  .quiz-opt.locked { cursor: default; }
+  .quiz-opt.correct { border-color: #16a34a; background: #f0fdf4; }
+  .quiz-opt.correct .quiz-opt-mark { border-color: #16a34a; background: #16a34a; color: white; }
+  .quiz-opt.correct .quiz-opt-mark::after { content: '✓'; }
+  .quiz-opt.incorrect { border-color: #dc2626; background: #fef2f2; }
+  .quiz-opt.incorrect .quiz-opt-mark { border-color: #dc2626; background: #dc2626; color: white; }
+  .quiz-opt.incorrect .quiz-opt-mark::after { content: '✕'; }
+  .quiz-explain { margin-top: 10px; padding: 12px 14px; border-radius: 10px; background: var(--gray-light); font-family: sans-serif; font-size: 0.83rem; color: #444; line-height: 1.6; }
+  .quiz-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 1rem; }
+  .quiz-result { text-align: center; padding: 1.75rem 1.5rem; border-radius: 14px; margin-bottom: 1.75rem; }
+  .quiz-result.pass { background: #f0fdf4; border: 1.5px solid #16a34a; }
+  .quiz-result.fail { background: #fef2f2; border: 1.5px solid #dc2626; }
+  .quiz-result-score { font-family: Georgia, serif; font-size: 2.4rem; font-weight: 700; }
+  .quiz-result.pass .quiz-result-score { color: #16a34a; }
+  .quiz-result.fail .quiz-result-score { color: #dc2626; }
+  .quiz-result-label { font-family: sans-serif; font-size: 0.85rem; color: #555; margin-top: 4px; }
+  .quiz-result .quiz-actions { justify-content: center; margin-top: 1.25rem; }
 
   .meta-item { display: flex; align-items: center; gap: 6px; font-size: 13px; font-family: sans-serif; color: rgba(255,255,255,0.92); font-weight: 500; }
   .slide { display: none; padding: 2.5rem; animation: slideIn 0.25s ease; }
@@ -6633,6 +6686,7 @@
       <button class="lesson-tab" onclick="GLIB(5)">6. Bolsa argentina</button>
       <button class="lesson-tab" onclick="GLIB(6)">7. Cómo empezar</button>
       <button class="lesson-tab" onclick="GLIB(7)">8. Errores comunes</button>
+      <button class="lesson-tab quiz-final-tab" onclick="GLIB(8)">🎓 Quiz Final</button>
     </div>
     <button class="carousel-btn lesson-nav-arrow" id="LNIBNext" aria-label="Lecciones siguientes">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
@@ -6767,6 +6821,300 @@ function seekCourseAudio(e, pid) {
   audio.currentTime = pct * audio.duration;
 }
 function pauseCourseAudio(pid) { if (COURSE_AUDIO[pid]) COURSE_AUDIO[pid].pause(); }
+</script>
+
+<!-- ============================================================
+     QUIZ ENGINE + PROGRESO (compartido por todos los cursos)
+     ============================================================ -->
+<script>
+// ---- Progreso (localStorage, no requiere login) ----
+function miProgressKey(course) { return 'mi_quiz_progress_' + course; }
+function miProgressLoad(course) {
+  try { return JSON.parse(localStorage.getItem(miProgressKey(course))) || {}; }
+  catch (e) { return {}; }
+}
+function miProgressSave(course, data) {
+  try { localStorage.setItem(miProgressKey(course), JSON.stringify(data)); } catch (e) {}
+}
+function miQuizRecordResult(course, progressId, score, total, passed) {
+  var p = miProgressLoad(course);
+  p[progressId] = { score: score, total: total, passed: passed, ts: Date.now() };
+  miProgressSave(course, p);
+}
+// lessonIds: array de progressId de las lecciones (ej ['L0','L1',...,'L7'])
+function miCourseEligibleForDiploma(course, lessonIds) {
+  var p = miProgressLoad(course);
+  for (var i = 0; i < lessonIds.length; i++) {
+    if (!(p[lessonIds[i]] && p[lessonIds[i]].passed)) return false;
+  }
+  return !!(p.FINAL && p.FINAL.passed);
+}
+function miCourseProgressSummary(course, lessonIds) {
+  var p = miProgressLoad(course);
+  var done = lessonIds.filter(function (id) { return p[id] && p[id].passed; }).length;
+  return { lessonsDone: done, lessonsTotal: lessonIds.length, finalPassed: !!(p.FINAL && p.FINAL.passed), finalScore: p.FINAL ? p.FINAL.score : null, finalTotal: p.FINAL ? p.FINAL.total : null };
+}
+
+// ---- Motor de quiz ----
+var MI_QUIZ_DATA = {};
+var MI_QUIZ_STATE = {};
+
+function quizMount(quizKey, questions, opts) {
+  MI_QUIZ_DATA[quizKey] = { questions: questions, opts: opts || {} };
+  if (!MI_QUIZ_STATE[quizKey]) MI_QUIZ_STATE[quizKey] = { answers: new Array(questions.length).fill(null), graded: false };
+  quizRender(quizKey);
+}
+
+function quizEsc(s) { return (s || '').replace(/</g, '&lt;'); }
+
+function quizRender(quizKey) {
+  var el = document.getElementById('quizmount-' + quizKey);
+  if (!el) return;
+  var data = MI_QUIZ_DATA[quizKey];
+  var state = MI_QUIZ_STATE[quizKey];
+  var qs = data.questions;
+  var passThreshold = data.opts.passThreshold || Math.ceil(qs.length * 0.6);
+  var allAnswered = state.answers.every(function (a) { return a !== null; });
+
+  var qHtml = qs.map(function (q, i) {
+    var picked = state.answers[i];
+    var optsHtml = q.opts.map(function (optText, oi) {
+      var cls = 'quiz-opt';
+      if (state.graded) {
+        cls += ' locked';
+        if (oi === q.correct) cls += ' correct';
+        else if (oi === picked) cls += ' incorrect';
+      } else if (picked === oi) {
+        cls += ' selected';
+      }
+      var handler = state.graded ? '' : ' onclick="quizSelect(\'' + quizKey + '\',' + i + ',' + oi + ')"';
+      return '<button type="button" class="' + cls + '"' + handler + (state.graded ? ' disabled' : '') + '>' +
+        '<span class="quiz-opt-mark"></span><span>' + quizEsc(optText) + '</span></button>';
+    }).join('');
+    var explainHtml = state.graded
+      ? '<div class="quiz-explain">' + (picked === q.correct ? '✓ Correcto. ' : '✕ La respuesta correcta era "' + quizEsc(q.opts[q.correct]) + '". ') + quizEsc(q.explain) + '</div>'
+      : '';
+    return '<div class="quiz-q">' +
+      '<div class="quiz-q-head"><span class="quiz-q-num">PREGUNTA ' + (i + 1) + '</span><span class="quiz-q-text">' + quizEsc(q.q) + '</span></div>' +
+      '<div class="quiz-opts">' + optsHtml + '</div>' + explainHtml +
+      '</div>';
+  }).join('');
+
+  var resultHtml = '';
+  if (state.graded) {
+    var score = state.answers.reduce(function (acc, a, i) { return acc + (a === qs[i].correct ? 1 : 0); }, 0);
+    var passed = score >= passThreshold;
+    var actionsHtml = '<button class="nav-btn" onclick="quizRetry(\'' + quizKey + '\')">↺ Reintentar</button>';
+    if (passed && data.opts.isFinal) {
+      actionsHtml += '<button class="nav-btn primary" onclick="miShowDiploma(\'' + data.opts.course + '\')">🎓 Ver tu diploma</button>';
+    } else if (data.opts.nextFn) {
+      actionsHtml += '<button class="nav-btn' + (passed ? ' primary' : '') + '" onclick="' + data.opts.nextFn + '">' + (passed ? 'Siguiente lección →' : 'Continuar de todos modos →') + '</button>';
+    }
+    resultHtml = '<div class="quiz-result ' + (passed ? 'pass' : 'fail') + '">' +
+      '<div class="quiz-result-score">' + score + ' / ' + qs.length + '</div>' +
+      '<div class="quiz-result-label">' + (passed ? '¡Aprobado! Ya podés seguir adelante.' : 'Todavía no llegás al mínimo (' + passThreshold + '/' + qs.length + '). Repasá la lección y reintentá cuando quieras.') + '</div>' +
+      '<div class="quiz-actions">' + actionsHtml + '</div>' +
+      '</div>';
+  }
+
+  el.innerHTML = '<div class="quiz-wrap">' +
+    (state.graded ? '' : '<p class="quiz-intro">Respondé las ' + qs.length + ' preguntas y presioná Corregir. Podés reintentar todas las veces que quieras, sin límite.</p>') +
+    resultHtml + qHtml +
+    (!state.graded ? '<div class="quiz-actions"><button class="nav-btn primary" onclick="quizGrade(\'' + quizKey + '\')"' + (allAnswered ? '' : ' disabled') + '>Corregir →</button></div>' : '') +
+    '</div>';
+}
+
+function quizSelect(quizKey, qIdx, optIdx) {
+  var state = MI_QUIZ_STATE[quizKey];
+  if (!state || state.graded) return;
+  state.answers[qIdx] = optIdx;
+  quizRender(quizKey);
+}
+
+function quizGrade(quizKey) {
+  var state = MI_QUIZ_STATE[quizKey];
+  var data = MI_QUIZ_DATA[quizKey];
+  if (!state || state.answers.some(function (a) { return a === null; })) return;
+  state.graded = true;
+  var qs = data.questions;
+  var score = state.answers.reduce(function (acc, a, i) { return acc + (a === qs[i].correct ? 1 : 0); }, 0);
+  var passThreshold = data.opts.passThreshold || Math.ceil(qs.length * 0.6);
+  var passed = score >= passThreshold;
+  if (data.opts.course && data.opts.progressId) {
+    miQuizRecordResult(data.opts.course, data.opts.progressId, score, qs.length, passed);
+  }
+  quizRender(quizKey);
+  var mountEl = document.getElementById('quizmount-' + quizKey);
+  if (mountEl) mountEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function quizRetry(quizKey) {
+  var data = MI_QUIZ_DATA[quizKey];
+  MI_QUIZ_STATE[quizKey] = { answers: new Array(data.questions.length).fill(null), graded: false };
+  quizRender(quizKey);
+}
+</script>
+
+<!-- ============================================================
+     DIPLOMA — certificado de finalización de curso
+     ============================================================ -->
+<style>
+  .diploma-overlay{display:none;position:fixed;inset:0;background:rgba(10,15,30,.78);z-index:10000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:32px 16px;}
+  .diploma-overlay.open{display:flex;}
+  .diploma-modal{background:#fff;border-radius:16px;padding:20px;max-width:1000px;width:100%;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+  .diploma-close{position:absolute;top:14px;right:14px;z-index:2;background:#fff;border:none;width:36px;height:36px;border-radius:50%;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+  .diploma-close:hover{background:#f0f0f0;}
+  .diploma-stage{overflow-x:auto;display:flex;justify-content:center;padding:6px;}
+  .diploma-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px;padding:0 4px;flex-wrap:wrap;}
+  .diploma-id{font-family:'SF Mono','JetBrains Mono',Consolas,monospace;font-size:11.5px;color:#8890a6;letter-spacing:.04em;}
+
+  .cert-editorial{width:960px;height:660px;flex-shrink:0;font-family:Georgia,'Iowan Old Style','Times New Roman',serif;background:#F3F4F8;color:#12172A;border:1px solid rgba(10,15,30,.14);box-shadow:0 10px 30px -10px rgba(0,0,0,.25);}
+  .cert-editorial .frame{height:100%;margin:22px;border:1px solid rgba(10,15,30,.18);padding:44px 70px;display:flex;flex-direction:column;align-items:center;text-align:center;box-sizing:border-box;}
+  .e-mark{width:60px;height:60px;border-radius:50%;margin-top:4px;position:relative;background:radial-gradient(circle at 32% 28%,#16203D,#0A0F1E 70%);box-shadow:0 6px 16px -6px rgba(10,15,30,.45),inset 0 0 0 1px rgba(242,201,76,.5);}
+  .e-mark::before{content:'';position:absolute;inset:5px;border-radius:50%;border:1px solid rgba(242,201,76,.55);}
+  .e-mark span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:17px;letter-spacing:.04em;color:#F2C94C;font-weight:400;}
+  .e-org{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#12172A;margin-top:14px;font-family:-apple-system,sans-serif;font-weight:600;}
+  .e-sub{font-size:11px;color:#767C8C;margin-top:4px;letter-spacing:.04em;font-family:-apple-system,sans-serif;}
+  .e-certifies{font-size:12.5px;color:#5B6478;margin-top:34px;font-style:italic;}
+  .e-name{font-size:40px;margin:10px 0 4px;}
+  .e-rule{width:220px;height:1px;background:#A9770F;margin:8px 0 20px;}
+  .e-body{font-size:14px;color:#3A4152;line-height:1.75;max-width:470px;}
+  .e-course{font-weight:700;}
+  .e-note{font-size:12.5px;color:#5B6478;font-style:italic;margin-top:18px;max-width:440px;line-height:1.6;}
+  .e-foot{margin-top:auto;width:100%;display:flex;justify-content:space-between;align-items:flex-end;padding-top:28px;}
+  .e-sig{font-style:italic;font-size:19px;}
+  .e-sigline{width:150px;height:1px;background:#12172A;margin-bottom:6px;}
+  .e-lbl{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#767C8C;font-family:-apple-system,sans-serif;}
+  .e-date{font-size:11.5px;color:#5B6478;font-family:-apple-system,sans-serif;}
+  @media (max-width:640px){ .cert-editorial{width:720px;height:495px;} .cert-editorial .frame{padding:30px 36px;} .e-name{font-size:30px;} }
+</style>
+
+<div class="diploma-overlay" id="diplomaOverlay">
+  <div class="diploma-modal">
+    <button class="diploma-close" onclick="miCloseDiploma()">&times;</button>
+    <div class="diploma-stage">
+      <div class="cert-editorial" id="diplomaCert">
+        <div class="frame">
+          <div class="e-mark"><span>MI</span></div>
+          <div class="e-org">Manfredi Investment University</div>
+          <div class="e-sub">Educación financiera desde cero hasta nivel avanzado</div>
+          <div class="e-certifies">Por medio del presente se certifica que</div>
+          <div class="e-name" id="diplomaName">—</div>
+          <div class="e-rule"></div>
+          <div class="e-body">completó de forma íntegra el curso <span class="e-course" id="diplomaCourse">—</span>, incluyendo sus 8 lecciones y la totalidad de las evaluaciones correspondientes.</div>
+          <div class="e-note">"Con este certificado reconocemos tu compromiso en aprender a invertir con criterio propio — el primer paso siempre es el que más cuenta."</div>
+          <div class="e-foot">
+            <div><div class="e-date" id="diplomaDate">—</div></div>
+            <div style="text-align:right;">
+              <div class="e-sig">N. Manfredi</div>
+              <div class="e-sigline" style="margin-left:auto;"></div>
+              <div class="e-lbl">Fundador, Manfredi Investment</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="diploma-actions">
+      <div class="diploma-id" id="diplomaId"></div>
+      <button class="nav-btn primary" onclick="miDownloadDiplomaPDF()" id="diplomaDownloadBtn">⭳ Descargar PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var MI_COURSE_META = {
+  IB: { name: 'Introducción a la Bolsa', lessonCount: 8 }
+};
+
+function miDiplomaEligible(course) {
+  var meta = MI_COURSE_META[course];
+  if (!meta) return false;
+  var ids = [];
+  for (var i = 0; i < meta.lessonCount; i++) ids.push('L' + i);
+  return miCourseEligibleForDiploma(course, ids);
+}
+
+var _miDiplomaWaitTimer = null;
+function miShowDiploma(course) {
+  if (!miDiplomaEligible(course)) {
+    alert('Todavía te falta completar algún quiz de lección antes de poder generar el diploma.');
+    return;
+  }
+  if (!window._currentUser) {
+    if (typeof window.signInWithGoogle === 'function') window.signInWithGoogle();
+    var waited = 0;
+    clearInterval(_miDiplomaWaitTimer);
+    _miDiplomaWaitTimer = setInterval(function () {
+      waited += 500;
+      if (window._currentUser) {
+        clearInterval(_miDiplomaWaitTimer);
+        miRenderDiploma(course);
+      } else if (waited > 30000) {
+        clearInterval(_miDiplomaWaitTimer);
+      }
+    }, 500);
+    return;
+  }
+  miRenderDiploma(course);
+}
+
+function miDiplomaId(course) {
+  var uid = (window._currentUser && window._currentUser.uid) || 'guest000000';
+  return 'MI-' + course + '-' + uid.slice(-6).toUpperCase();
+}
+
+function miRenderDiploma(course) {
+  var meta = MI_COURSE_META[course];
+  var user = window._currentUser;
+  var name = (user && user.displayName) || 'Estudiante Manfredi';
+  var today = new Date().toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('diplomaName').textContent = name;
+  document.getElementById('diplomaCourse').textContent = meta.name;
+  document.getElementById('diplomaDate').textContent = today;
+  var id = miDiplomaId(course);
+  document.getElementById('diplomaId').textContent = id;
+  document.getElementById('diplomaOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  if (typeof window._miSaveCertificado === 'function') {
+    var prog = miProgressLoad(course);
+    window._miSaveCertificado(course, {
+      id: id,
+      curso: meta.name,
+      fecha: today,
+      finalScore: prog.FINAL ? prog.FINAL.score : null,
+      finalTotal: prog.FINAL ? prog.FINAL.total : null
+    });
+  }
+}
+
+function miCloseDiploma() {
+  document.getElementById('diplomaOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function miDownloadDiplomaPDF() {
+  var btn = document.getElementById('diplomaDownloadBtn');
+  var cert = document.getElementById('diplomaCert');
+  if (!cert || !window.html2canvas || !window.jspdf) return;
+  var origText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Generando…';
+  html2canvas(cert, { scale: 2, backgroundColor: '#F3F4F8' }).then(function (canvas) {
+    var imgData = canvas.toDataURL('image/png');
+    var jsPDF = window.jspdf.jsPDF;
+    var pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    var safeName = (document.getElementById('diplomaName').textContent || 'diploma').replace(/[^a-zA-Z0-9]+/g, '-');
+    pdf.save('Diploma-Manfredi-' + safeName + '.pdf');
+    btn.disabled = false;
+    btn.textContent = origText;
+  }).catch(function (e) {
+    console.warn('PDF error', e);
+    btn.disabled = false;
+    btn.textContent = origText;
+  });
+}
 </script>
 
 <!-- COURSE SCRIPTS -->
@@ -7257,6 +7605,64 @@ window.GSlFP=GSlFP;
 <script>
 (function() {
 var CLIB=0,CSIB=0,CHIB={};
+// ============================================================
+// QUIZZES — Introducción a la Bolsa
+// ============================================================
+const QZIB_L0 = [
+  { q: "¿Cuál fue la primera bolsa de valores del mundo?", opts: ["Bolsa de Ámsterdam (1602)", "New York Stock Exchange (1792)", "Bolsa de Comercio de Buenos Aires (1854)", "Bolsa de Londres"], correct: 0, explain: "La Compañía Holandesa de las Indias Orientales emitió las primeras acciones de la historia en 1602 para financiar sus expediciones a Asia, dando origen a la Bolsa de Ámsterdam." },
+  { q: "Según el curso, ¿por qué la bolsa es especialmente relevante para un inversor argentino?", opts: ["Porque es la única forma legal de invertir en el país", "Porque, a diferencia del banco, históricamente le ganó a la inflación en el largo plazo", "Porque el gobierno obliga a invertir una parte del sueldo", "Porque no tiene ningún riesgo"], correct: 1, explain: "Con una inflación histórica muy alta, el dinero guardado en el banco pierde poder adquisitivo. La bolsa es una de las pocas herramientas que históricamente le ganó a la inflación en el largo plazo." },
+  { q: "¿Qué se compra y vende realmente en la bolsa?", opts: ["Solo dinero de un banco a otro", "Partes de empresas y promesas de dinero futuro", "Únicamente materias primas físicas", "Créditos que otorga el Estado"], correct: 1, explain: "La bolsa conecta a quienes tienen algo para vender con quienes quieren comprarlo — pero en vez de frutas o autos, lo que se intercambia son partes de empresas y promesas de dinero futuro." }
+];
+const QZIB_L1 = [
+  { q: "¿Cuáles son las dos formas en que un accionista puede ganar dinero?", opts: ["Apreciación del precio y dividendos", "Solo cobrando intereses fijos", "Solo si la empresa hace un IPO", "Recibiendo acciones gratis cada año"], correct: 0, explain: "Ser accionista da derecho a recibir dividendos (parte de las ganancias distribuidas) y a que el valor de la acción suba si el negocio crece." },
+  { q: "¿Qué hace que un ETF como el SPY sea particularmente atractivo para empezar a invertir?", opts: ["Garantiza un retorno fijo del 10% anual", "Da exposición a cientos de empresas a la vez con comisiones muy bajas", "Solo se puede comprar con montos superiores a $10.000", "Es exclusivo para inversores institucionales"], correct: 1, explain: "Con un solo ETF como el SPY podés tener exposición a las 500 empresas del S&P 500 con una comisión desde 0.03% anual — diversificación instantánea y barata." },
+  { q: "¿Qué es un bono, en esencia?", opts: ["Una acción que no paga dividendos", "Un pagaré: le prestás dinero al emisor a cambio de cupones periódicos y la devolución del capital", "Un derivado que solo usan los hedge funds", "Lo mismo que un CEDEAR"], correct: 1, explain: "Al comprar un bono le estás prestando dinero al emisor (gobierno o empresa), que te paga cupones periódicos y te devuelve el capital al vencimiento." }
+];
+const QZIB_L2 = [
+  { q: "¿Qué determina el precio de una acción en tiempo real?", opts: ["Un comité del gobierno que fija precios diarios", "El encuentro entre oferta y demanda de compradores y vendedores", "El promedio de precios del último año", "Solo las noticias que publican los medios"], correct: 1, explain: "No hay una autoridad central fijando precios: el precio surge del encuentro en tiempo real entre quienes quieren comprar y quienes quieren vender." },
+  { q: "¿Cuál es la diferencia clave entre mercado primario y mercado secundario?", opts: ["En el primario la empresa recibe el dinero (IPO); en el secundario los inversores operan entre sí y la empresa no recibe nada", "Son exactamente lo mismo con distinto nombre", "El primario es solo para bonos y el secundario solo para acciones", "El secundario es ilegal en Argentina"], correct: 0, explain: "En el mercado primario la empresa emite acciones por primera vez (IPO) y recibe el dinero. En el secundario, los inversores compran y venden entre sí — la empresa ya no recibe nada de esas operaciones." },
+  { q: "¿Qué es el S&P 500?", opts: ["Un banco de inversión estadounidense", "Un índice bursátil que agrupa a las 500 empresas más grandes de EE.UU.", "Una ley que regula la bolsa de Nueva York", "Un tipo de bono del Tesoro"], correct: 1, explain: "El S&P 500 es un índice bursátil compuesto por 500 de las empresas más grandes de Estados Unidos, usado como termómetro general del mercado." }
+];
+const QZIB_L3 = [
+  { q: "Según la ley fundamental de las finanzas que plantea el curso, ¿qué pasa si alguien te promete alto retorno con bajo riesgo?", opts: ["Es una oportunidad única que hay que aprovechar ya", "Es casi con certeza una estafa, porque esa combinación no existe realmente", "Es normal en bonos del gobierno argentino", "Solo pasa con las criptomonedas"], correct: 1, explain: "No existe una inversión real que ofrezca alto retorno con bajo riesgo. Si alguien te lo promete, es una señal de alerta de estafa." },
+  { q: "¿Qué tipo de riesgo SÍ se elimina diversificando la cartera?", opts: ["El riesgo de mercado (sistemático)", "El riesgo específico (idiosincrático) de una empresa o sector", "El riesgo cambiario en Argentina", "Ninguno, la diversificación no reduce ningún riesgo"], correct: 1, explain: "El riesgo específico de una empresa (un escándalo, perder un cliente clave) se elimina diversificando entre muchas empresas y sectores. El riesgo de mercado, en cambio, afecta a todos por igual." },
+  { q: "Para dinero que vas a necesitar en menos de 2 años, ¿qué recomienda el curso?", opts: ["Ponerlo todo en acciones de alto crecimiento", "Evitar la bolsa y usar instrumentos de corto plazo como plazo fijo o money market", "Invertirlo en un solo CEDEAR concentrado", "Esperar el mejor momento para entrar de golpe"], correct: 1, explain: "El horizonte corto (0-2 años) es de alto riesgo para la bolsa: el mercado puede estar 30-40% abajo justo cuando necesitás el dinero. Para ese plazo conviene priorizar liquidez y estabilidad." }
+];
+const QZIB_L4 = [
+  { q: "Según el estudio SPIVA mencionado en el curso, ¿qué porcentaje de los fondos de gestión activa NO logra superar a su índice de referencia en 15-20 años?", opts: ["Alrededor del 10%", "Alrededor del 50%", "Más del 90%", "Ninguno, todos los fondos activos ganan"], correct: 2, explain: "El estudio SPIVA muestra consistentemente que más del 90% de los fondos de gestión activa no supera a su índice de referencia en períodos de 15-20 años, principalmente por el efecto de las comisiones." },
+  { q: "¿Cuál fue el peor año histórico del S&P 500 mencionado en el curso, y por qué?", opts: ["2020, por la pandemia", "2008, por la crisis financiera global", "1954, por la posguerra", "2022, por la suba de tasas"], correct: 1, explain: "El peor año fue 2008 con -38%, durante la crisis financiera global. El índice se recuperó completamente en unos 4 años." },
+  { q: "¿Qué diferencia principal hay entre gestión activa y gestión pasiva?", opts: ["La activa replica un índice; la pasiva elige acciones a mano", "La pasiva simplemente replica un índice con comisiones muy bajas; la activa usa analistas que intentan superarlo, con comisiones más altas", "No hay ninguna diferencia real entre ambas", "La pasiva solo existe en Argentina"], correct: 1, explain: "La gestión pasiva (como un ETF) replica un índice con comisiones de 0.03-0.20% anual. La gestión activa paga analistas que intentan elegir mejor que el mercado, cobrando 1-2% o más — y en la mayoría de los casos, sin lograrlo." }
+];
+const QZIB_L5 = [
+  { q: "¿Por qué los inversores sofisticados prefieren mirar el Merval en dólares (CCL) en vez de en pesos?", opts: ["Porque en pesos el índice no existe", "Porque en pesos se puede descontar el efecto de la inflación y la devaluación, dando una imagen más real", "Porque el Merval en pesos siempre baja", "Porque la ley obliga a reportarlo en dólares"], correct: 1, explain: "El Merval en pesos puede subir 200% en un año, pero si la devaluación fue mayor, en dólares en realidad bajó. Mirarlo en CCL descuenta ese efecto y muestra la ganancia o pérdida real." },
+  { q: "¿Cómo funciona un CEDEAR, en esencia?", opts: ["Es una acción argentina que cotiza en Nueva York", "Es un certificado que representa una acción extranjera real (depositada en un custodio) y se compra y vende en pesos en Argentina", "Es un bono emitido por el Banco Central", "Es lo mismo que una Obligación Negociable"], correct: 1, explain: "Un banco o broker compra la acción real en el exterior, la deposita en un custodio internacional, y emite certificados (CEDEARs) que representan esa acción y se operan en pesos en el mercado local." },
+  { q: "¿Qué instrumento de renta fija argentina está denominado en dólares y es preferido por inversores conservadores que buscan dolarizarse con menor riesgo que un bono soberano?", opts: ["Lecap", "Bonos CER", "Obligaciones Negociables (ONs) corporativas", "Plazo fijo en pesos"], correct: 2, explain: "Las ONs corporativas en dólares, emitidas por empresas como YPF, Pampa o bancos privados, son preferidas por inversores conservadores que buscan dolarizarse con menor riesgo que los bonos soberanos, con tasas del 6-9% anual en USD." }
+];
+const QZIB_L6 = [
+  { q: "Antes de invertir el primer peso en la bolsa, ¿qué es imprescindible tener según el curso?", opts: ["Un curso universitario de finanzas", "Un fondo de emergencia de 3 a 6 meses de gastos en un instrumento líquido", "Al menos USD 50.000 ahorrados", "Una cuenta en 5 brokers distintos"], correct: 1, explain: "Antes de invertir un solo peso hay que tener entre 3 y 6 meses de gastos en un instrumento de alta liquidez. Invertir dinero que podrías necesitar pronto es el error más común y costoso." },
+  { q: "¿Qué es el Dollar Cost Averaging (DCA)?", opts: ["Comprar todo de una vez cuando el mercado está en mínimos", "Invertir una cantidad fija a intervalos regulares, sin importar si el precio está caro o barato", "Vender apenas el precio sube un poco", "Una estrategia exclusiva para bonos"], correct: 1, explain: "El DCA consiste en invertir una cantidad fija todos los meses sin importar el precio. Esto promedia el costo de compra y elimina el riesgo de intentar 'adivinar' el mejor momento para entrar." },
+  { q: "Según la cartera modelo 'agresiva' del curso (90% acciones / 10% otros), ¿para qué tipo de horizonte temporal es apropiada?", opts: ["Para cualquier plazo, incluso menos de un año", "Solo para horizontes de 10 años o más, porque hay que poder tolerar caídas de 40-50%", "Para jubilados que ya no generan ingresos", "Es la única cartera recomendada para principiantes"], correct: 1, explain: "La cartera agresiva (90% acciones) puede caer 40-50% en momentos de crisis. Solo tiene sentido para quien tiene un horizonte de 10 años o más y puede tolerar esa volatilidad sin vender en pánico." }
+];
+const QZIB_L7 = [
+  { q: "¿Cuál es, según el curso, el error número uno que cometen los inversores?", opts: ["No leer suficientes noticias financieras", "El panic selling: vender en la caída y cristalizar una pérdida que era temporal", "Invertir en ETFs de bajo costo", "Diversificar demasiado la cartera"], correct: 1, explain: "El panic selling es el error número uno: el mercado cae, el miedo domina y se vende, cristalizando una pérdida que probablemente se hubiera recuperado con el tiempo." },
+  { q: "El 'efecto de anclaje' lleva a muchos inversores a pensar que...", opts: ["El precio al que compraron una acción es un dato relevante para decidir si venderla hoy", "Hay que diversificar siempre", "El mercado nunca se recupera de una crisis", "Los ETFs son más riesgosos que las acciones individuales"], correct: 0, explain: "El anclaje es la trampa de pensar 'no vendo porque estoy en pérdida'. Lo que pagaste es un dato histórico irrelevante — la pregunta correcta es si comprarías esa acción hoy, a ese precio." },
+  { q: "¿Qué tienen en común el FOMO y la aversión a las pérdidas, según el curso?", opts: ["Ambos son estrategias recomendadas de inversión", "Son sesgos cognitivos que llevan a decisiones emocionales que perjudican el resultado de largo plazo", "Solo aplican a quienes invierten en criptomonedas", "No tienen relación entre sí"], correct: 1, explain: "Ambos son sesgos cognitivos: el FOMO empuja a comprar en la euforia (cerca de los techos) y la aversión a las pérdidas lleva a aguantar posiciones perdedoras demasiado tiempo. Los dos perjudican el retorno de largo plazo." }
+];
+const QZIB_FINAL = [
+  { q: "¿En qué año y ciudad nació la primera bolsa del mundo?", opts: ["1602, Ámsterdam", "1792, Nueva York", "1854, Buenos Aires", "1929, Londres"], correct: 0, explain: "La Compañía Holandesa de las Indias Orientales emitió las primeras acciones en 1602, dando origen a la Bolsa de Ámsterdam." },
+  { q: "¿Qué instrumento te permite tener exposición a cientos de empresas con una sola compra y comisiones muy bajas?", opts: ["Un bono soberano individual", "Un ETF", "Una opción (call/put)", "Un plazo fijo"], correct: 1, explain: "Los ETFs agrupan muchas empresas en un solo instrumento con comisiones desde 0.03% anual — diversificación instantánea y barata." },
+  { q: "¿Qué es una Obligación Negociable (ON)?", opts: ["Un bono soberano de EE.UU.", "Un bono corporativo emitido por una empresa argentina, muchas veces en dólares", "Un tipo de acción preferida", "Un fondo común de inversión"], correct: 1, explain: "Las ONs son bonos corporativos emitidos por empresas argentinas, muchas denominadas en dólares, atractivas para dolarizar ahorros dentro del sistema local." },
+  { q: "¿Qué es una IPO?", opts: ["La venta de acciones entre dos inversores particulares", "La primera vez que una empresa ofrece sus acciones al público general", "Un tipo de bono del Tesoro", "Un índice bursátil"], correct: 1, explain: "IPO (Initial Public Offering) es la salida a bolsa de una empresa: la primera vez que ofrece acciones al público en el mercado primario." },
+  { q: "¿Qué NO se logra diversificando dentro de la bolsa?", opts: ["El riesgo específico de una empresa", "El riesgo de mercado (sistemático), que afecta a todo el mercado por igual", "El riesgo de tener todo en un solo sector", "El riesgo de tener todo en una sola acción"], correct: 1, explain: "El riesgo sistemático (una crisis financiera, una pandemia) afecta a todo el mercado y no se elimina diversificando dentro de la bolsa — sí se puede mitigar con activos no correlacionados como oro o bonos." },
+  { q: "¿Aproximadamente qué porcentaje de los fondos de gestión activa NO le gana a su índice de referencia en 15-20 años, según el estudio SPIVA?", opts: ["10%", "50%", "Más del 90%", "0%, todos ganan"], correct: 2, explain: "Más del 90% de los fondos de gestión activa no supera a su índice de referencia en el largo plazo, principalmente por el efecto acumulado de comisiones más altas." },
+  { q: "¿Qué hace que el precio en pesos de un CEDEAR suba automáticamente cuando se devalúa el peso?", opts: ["Una decisión manual del broker", "Que su precio sigue al dólar CCL, además del movimiento de la acción subyacente", "Un impuesto especial del Estado", "No sube automáticamente, hay que venderlo y recomprarlo"], correct: 1, explain: "El precio del CEDEAR en pesos refleja el precio de la acción original en dólares convertido al tipo de cambio CCL — si el CCL sube, el CEDEAR sube en pesos aunque la acción no se haya movido." },
+  { q: "¿Qué logra el Dollar Cost Averaging (DCA) frente a invertir todo de una vez?", opts: ["Garantiza siempre un retorno mayor", "Promedia el precio de compra y elimina la presión de 'elegir el momento perfecto' para entrar", "Elimina completamente el riesgo de la inversión", "Solo funciona con bonos"], correct: 1, explain: "El DCA no garantiza mayor retorno, pero promedia el costo de compra a lo largo del tiempo y elimina la presión psicológica de intentar acertar el momento perfecto para entrar al mercado." },
+  { q: "¿Cuál es el antídoto que propone el curso contra el sesgo de confirmación?", opts: ["Comprar más de la misma acción para reafirmar la convicción", "Buscar activamente argumentos en contra de tu propia tesis de inversión", "Ignorar todas las noticias sobre la empresa", "Vender inmediatamente ante cualquier duda"], correct: 1, explain: "El sesgo de confirmación lleva a buscar solo noticias que confirman lo que ya creemos. El antídoto es buscar activamente argumentos en contra de la propia tesis de inversión." },
+  { q: "Un inversor argentino con un horizonte de 15 años quiere empezar a invertir de forma simple y bien diversificada. Según los principios del curso, ¿cuál es el camino más razonable?", opts: ["Poner todo en una sola acción muy prometedora que le recomendó un amigo", "Empezar con 1-2 ETFs de bajo costo como VOO, invirtiendo montos fijos de forma regular (DCA)", "Esperar a que el mercado esté en su punto más bajo para invertir todo de golpe", "Evitar la bolsa por completo y usar solo plazo fijo en pesos"], correct: 1, explain: "El curso recomienda empezar simple (1-2 ETFs de bajo costo), diversificar, invertir de forma regular con DCA y pensar en el largo plazo — evitando tanto la concentración en una sola apuesta como el intento de timear el mercado." }
+];
+const QZIB_LESSON_IDS = ['L0','L1','L2','L3','L4','L5','L6','L7'];
+const QZIB_ALL = [QZIB_L0, QZIB_L1, QZIB_L2, QZIB_L3, QZIB_L4, QZIB_L5, QZIB_L6, QZIB_L7];
+
 const LSIB = [
 
   // LECCIÓN 1 &mdash; ¿QUÉ ES LA BOLSA?
@@ -7289,7 +7695,10 @@ const LSIB = [
       html: `<p class="slide-intro">Para un argentino, esta pregunta tiene una respuesta particularmente urgente: con una inflación histórica de las más altas del mundo, el dinero guardado "debajo del colchón" o en una caja de ahorro pierde poder adquisitivo a un ritmo devastador. La bolsa es una de las pocas herramientas que históricamente le ganó a la inflación en el largo plazo.</p>
       <div class="chart-box"><div class="chart-title">USD 10.000 invertidos en 1990 &mdash; comparación de alternativas (EE.UU.)</div><canvas id="chartInflation" height="200"></canvas></div>
       <div class="callout amber">El poder del interés compuesto es la razón principal. Albert Einstein lo llamó "la octava maravilla del mundo". Cuando tus ganancias generan más ganancias, el crecimiento se acelera exponencialmente con el tiempo &mdash; y la bolsa es el vehículo que mejor aprovecha este efecto.</div>`
-    }
+    },
+    { eyebrow: "Lección 1 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L0', quizQuestions: QZIB_L0, quizOpts: { course: 'IB', progressId: 'L0', nextFn: "GLIB(1)" },
+      html: '<div id="quizmount-IB-L0"></div>' }
   ]},
 
   // LECCIÓN 2 &mdash; INSTRUMENTOS
@@ -7335,7 +7744,10 @@ const LSIB = [
         <div class="instrument-icon"></div>
         <div><div class="instrument-name">REITs (Real Estate Investment Trusts)</div><div class="instrument-desc">Fondos que invierten en bienes raíces y distribuyen el 90% de sus ganancias como dividendos. Permiten participar del mercado inmobiliario con montos pequeños y alta liquidez, algo imposible con propiedades físicas.</div><span class="instrument-tag low">Riesgo bajo-medio &mdash; dividendos altos</span></div>
       </div>`
-    }
+    },
+    { eyebrow: "Lección 2 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L1', quizQuestions: QZIB_L1, quizOpts: { course: 'IB', progressId: 'L1', nextFn: "GLIB(2)" },
+      html: '<div id="quizmount-IB-L1"></div>' }
   ]},
 
   // LECCIÓN 3 &mdash; CÓMO FUNCIONA
@@ -7383,7 +7795,10 @@ const LSIB = [
         <tr><td><strong>Merval</strong></td><td>Empresas líderes de Argentina</td><td>&#127462;&#127479;</td><td><span class="tag neutral">Local</span></td></tr>
         <tr><td><strong>MSCI World</strong></td><td>+1600 empresas de 23 países</td><td></td><td><span class="tag good">Global</span></td></tr>
       </table></div>`
-    }
+    },
+    { eyebrow: "Lección 3 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L2', quizQuestions: QZIB_L2, quizOpts: { course: 'IB', progressId: 'L2', nextFn: "GLIB(3)" },
+      html: '<div id="quizmount-IB-L2"></div>' }
   ]},
 
   // LECCIÓN 4 &mdash; RIESGO Y RETORNO
@@ -7416,7 +7831,10 @@ const LSIB = [
         <div class="card green"><div class="card-label">Largo plazo (8+ años)</div><div class="card-title">Riesgo manejable</div><div class="card-body">Históricamente el S&P 500 nunca tuvo un período de 20 años con retorno negativo. El tiempo convierte la volatilidad de corto plazo en ruido irrelevante.</div></div>
       </div>
       <div class="callout">La pregunta más importante antes de invertir no es "¿qué acción compro?" sino "¿cuándo voy a necesitar este dinero?" Tu horizonte temporal determina casi completamente qué instrumentos son apropiados para vos.</div>`
-    }
+    },
+    { eyebrow: "Lección 4 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L3', quizQuestions: QZIB_L3, quizOpts: { course: 'IB', progressId: 'L3', nextFn: "GLIB(4)" },
+      html: '<div id="quizmount-IB-L3"></div>' }
   ]},
 
   // LECCIÓN 5 &mdash; ETFs E ÍNDICES
@@ -7461,7 +7879,10 @@ const LSIB = [
       </div>
       <div class="callout">El estudio SPIVA de S&P Global analiza anualmente el desempeño de fondos activos vs. sus índices de referencia. El resultado consistente: más del 90% de los fondos de gestión activa no supera a su índice de referencia en períodos de 15-20 años, principalmente por el efecto de las comisiones altas.</div>
       <div class="callout green">Para el inversor común, la estrategia más sencilla y probadamente efectiva es invertir regularmente en 1-3 ETFs de bajo costo y mantenerlos indefinidamente. Esta estrategia llamada "Buy and Hold" supera a la gran mayoría de estrategias más complejas.</div>`
-    }
+    },
+    { eyebrow: "Lección 5 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L4', quizQuestions: QZIB_L4, quizOpts: { course: 'IB', progressId: 'L4', nextFn: "GLIB(5)" },
+      html: '<div id="quizmount-IB-L4"></div>' }
   ]},
 
   // LECCIÓN 6 &mdash; BOLSA ARGENTINA
@@ -7496,7 +7917,10 @@ const LSIB = [
         <tr><td><strong>ONs (Obligaciones Neg.)</strong></td><td>USD</td><td>Total en USD</td><td><span class="tag neutral">Medio-bajo</span></td></tr>
       </table></div>
       <div class="callout">Las Obligaciones Negociables (ONs) corporativas en dólares son las preferidas por inversores conservadores que quieren dolarizarse con menor riesgo que los bonos soberanos. Empresas como YPF, Pampa, Telecom y bancos privados emiten ONs regularmente con tasas del 6-9% anual en USD.</div>`
-    }
+    },
+    { eyebrow: "Lección 6 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L5', quizQuestions: QZIB_L5, quizOpts: { course: 'IB', progressId: 'L5', nextFn: "GLIB(6)" },
+      html: '<div id="quizmount-IB-L5"></div>' }
   ]},
 
   // LECCIÓN 7 &mdash; CÓMO EMPEZAR
@@ -7525,7 +7949,10 @@ const LSIB = [
         <div class="card indigo"><div class="card-label">Agresivo</div><div class="card-title">90% acciones / 10% otros</div><div class="card-body">Para quien puede tolerar caídas del 40-50% a cambio de máximo crecimiento en el largo plazo. Ejemplo: 70% VOO + 20% QQQ + 10% VT. Solo para horizontes de 10+ años.</div></div>
       </div>
       <div class="callout amber">La regla del "100 menos tu edad" es un punto de partida clásico: si tenés 30 años, el 70% en acciones es razonable. A los 60, el 40% en acciones. Es una simplificación útil pero debe ajustarse a tu situación personal &mdash; especialmente en Argentina donde el contexto local cambia la ecuación significativamente.</div>`
-    }
+    },
+    { eyebrow: "Lección 7 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L6', quizQuestions: QZIB_L6, quizOpts: { course: 'IB', progressId: 'L6', nextFn: "GLIB(7)" },
+      html: '<div id="quizmount-IB-L6"></div>' }
   ]},
 
   // LECCIÓN 8 &mdash; ERRORES COMUNES
@@ -7558,7 +7985,20 @@ const LSIB = [
         <div class="step-item"><div class="step-num">5</div><div class="step-content"><div class="step-title">Formación continua &mdash; nunca dejes de aprender</div><div class="step-desc">El mercado evoluciona constantemente. Los inversores que se mantienen formados tienen una ventaja estructural sobre los que se guían por tips y rumores.</div></div></div>
       </div>
       <div class="callout blue">¿Querés seguir formándote? Los cursos de Análisis Fundamental, Mercado Argentino y Finanzas Personales de esta plataforma complementan perfectamente lo que aprendiste acá. Y si tenés dudas puntuales, el asesor IA está disponible para consultarlo en cualquier momento.</div>`
-    }
+    },
+    { eyebrow: "Lección 8 · Quiz", title: "Poné a prueba lo que aprendiste", isQuiz: true,
+      quizKey: 'IB-L7', quizQuestions: QZIB_L7, quizOpts: { course: 'IB', progressId: 'L7', nextFn: "GLIB(8)" },
+      html: '<div id="quizmount-IB-L7"></div>' }
+  ]},
+
+  // QUIZ FINAL — 10 preguntas que abarcan las 8 lecciones del curso
+  { title: "Quiz Final", slides: [
+    { eyebrow: "Quiz Final", title: "Demostrá todo lo que aprendiste",
+      isQuiz: true, isFinal: true,
+      quizKey: 'IB-FINAL', quizQuestions: QZIB_FINAL,
+      quizOpts: { course: 'IB', progressId: 'FINAL', isFinal: true, passThreshold: 7 },
+      html: `<p class="slide-intro">10 preguntas que recorren las 8 lecciones del curso. Necesitás al menos 7 correctas para aprobar y desbloquear tu diploma. Podés reintentar las veces que quieras.</p>
+      <div id="quizmount-IB-FINAL"></div>` }
   ]}
 ];
 
@@ -7591,12 +8031,12 @@ function RSIB() {
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
-      ${courseAudioBarHTML('IB')}
+      ${slide.isQuiz ? '' : courseAudioBarHTML('IB')}
       ${slide.html}
       <div class="slide-footer">
         <button class="nav-btn" onclick="PSIB()" ${CSIB===0?'disabled':''}>← Anterior</button>
         <div class="slide-dots">${dots}</div>
-        ${CSIB < total-1
+        ${slide.isQuiz ? '' : CSIB < total-1
           ? `<button class="nav-btn primary" onclick="NSIB()">Siguiente →</button>`
           : CLIB < LSIB.length-1
             ? `<button class="nav-btn primary" onclick="GLIB(${CLIB+1})">Próxima lección →</button>`
@@ -7605,7 +8045,11 @@ function RSIB() {
       </div>
     </div>`;
 
-  initCourseAudio('IB', 'introduccion-bolsa', CLIB+1, CSIB+1);
+  if (slide.isQuiz) {
+    quizMount(slide.quizKey, slide.quizQuestions, slide.quizOpts);
+  } else {
+    initCourseAudio('IB', 'introduccion-bolsa', CLIB+1, CSIB+1);
+  }
   if (slide.chart) setTimeout(() => DCIB(slide.chart), 80);
 }
 
