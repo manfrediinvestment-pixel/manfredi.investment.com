@@ -4215,6 +4215,21 @@
     .pf-chip.bad { background: rgba(239,68,68,.14); color: var(--red); }
     .pf-metric-val { position:relative; font-family: 'IBM Plex Mono', monospace; font-size: 27px; font-weight: 700; color: var(--white); line-height: 1.1; letter-spacing: -.01em; }
     .pf-metric-note { position:relative; font-size: 11.5px; color: rgba(255,255,255,.42); margin-top: 8px; line-height: 1.5; }
+
+    .pf-metric-top-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .pf-mini-warren {
+      width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0; padding: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(242,201,76,.12); border: 1px solid rgba(242,201,76,.35); color: var(--gold);
+      cursor: pointer; transition: background .15s ease, transform .15s ease;
+    }
+    .pf-mini-warren:hover { background: rgba(242,201,76,.24); transform: scale(1.08); }
+    .pf-mini-warren:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .pf-mini-warren-answer { position: relative; max-height: 0; overflow: hidden; transition: max-height .3s ease, margin-top .3s ease; font-size: 12px; line-height: 1.55; color: rgba(255,255,255,.68); }
+    .pf-mini-warren-answer.expanded { max-height: 280px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); }
+    .pf-mini-warren-loading { font-size: 11.5px; color: rgba(255,255,255,.4); font-style: italic; }
+    .pf-mini-warren-error { font-size: 11.5px; color: var(--red); margin: 0; }
+    @media (prefers-reduced-motion: reduce) { .pf-mini-warren-answer { transition: none; } .pf-mini-warren:hover { transform: none; } }
     .pf-warren-panel {
       position: relative; overflow: hidden; display: flex; gap: 16px; align-items: center;
       background: linear-gradient(135deg, rgba(242,201,76,.11), rgba(242,201,76,.02) 65%);
@@ -4850,7 +4865,6 @@
       + cardHtml('Concentración sectorial', sg.sector, pfSectorNote)
       + cardHtml('Concentración geográfica', sg.country, pfCountryNote)
       + '</div>'
-      + '<p class="pf-metric-note" style="margin-top:14px;">Sector y país salen de la ficha de cada empresa. Bonos, efectivo y cripto no tienen sector/país de empresa y quedan afuera del cálculo.</p>'
       + '<div class="pf-warren-panel"><div class="pf-warren-avatar">W</div><div class="pf-warren-body" id="pfWarrenBody">'
       + '<div class="pf-w-name">Warren &middot; IA</div>'
       + '<div class="pf-w-headline">Ya vi tus números.</div>'
@@ -5128,11 +5142,16 @@
       return;
     }
 
-    function card(name, valStr, unit, note, status, bench){
+    function card(key, name, valStr, unit, note, status, bench){
       var st = status || 'neutral';
-      return '<div class="pf-metric-card status-'+st+'"><div class="pf-metric-top"><span class="name">'+name+'</span>'+(status?'<span class="pf-chip '+status+'">'+pfChipLabel[status]+'</span>':'')+'</div>'
+      pfAdvMetricRegistry[key] = { name:name, valStr:valStr+(unit||''), note:note, bench:bench||'', status:status||null };
+      return '<div class="pf-metric-card status-'+st+'"><div class="pf-metric-top"><span class="name">'+name+'</span>'
+        + '<span class="pf-metric-top-right">'+(status?'<span class="pf-chip '+status+'">'+pfChipLabel[status]+'</span>':'')
+        + '<button type="button" class="pf-mini-warren" onclick="pfExplainMetricWithWarren(event,\''+key+'\')" title="Preguntale a Warren sobre esto" aria-label="Preguntale a Warren sobre esto">'
+        + '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2L12 2z"/></svg></button></span></div>'
         + '<div class="pf-metric-val">'+valStr+(unit?'<span class="unit">'+unit+'</span>':'')+'</div><div class="pf-metric-note">'+note+'</div>'
-        + (bench?'<div class="pf-metric-bench">'+bench+'</div>':'') + '</div>';
+        + (bench?'<div class="pf-metric-bench">'+bench+'</div>':'')
+        + '<div class="pf-mini-warren-answer" id="pfMWA-'+key+'"></div>' + '</div>';
     }
     var betaStatus = m.beta>1.3 ? 'bad' : (m.beta>=0.8 && m.beta<=1.3 ? 'ok' : 'warn');
     var volStatus = m.volAnual<0.20 ? 'ok' : (m.volAnual<0.40 ? 'warn' : 'bad');
@@ -5155,25 +5174,25 @@
 
     grid.innerHTML = '<div class="pf-metrics-label">Métricas de cartera <span style="text-transform:none;letter-spacing:0;color:rgba(255,255,255,.3);">&middot; últimos '+ m.daysUsed +' días hábiles</span></div>'
       + '<div class="pf-metric-grid">'
-      + card('Beta vs S&amp;P 500', m.beta.toFixed(2), '', 'Sensibilidad al mercado. 1 = se mueve igual que el S&amp;P 500.', betaStatus,
+      + card('beta', 'Beta vs S&amp;P 500', m.beta.toFixed(2), '', 'Sensibilidad al mercado. 1 = se mueve igual que el S&amp;P 500.', betaStatus,
              'El S&amp;P 500 tiene beta <b>1.00</b> por definición.')
-      + card('Volatilidad anual.', (m.volAnual*100).toFixed(1), '%', 'Desvío estándar anualizado de tus retornos.', volStatus,
+      + card('vol', 'Volatilidad anual.', (m.volAnual*100).toFixed(1), '%', 'Desvío estándar anualizado de tus retornos.', volStatus,
              'S&amp;P 500 en el mismo período: <b>'+(m.benchVolAnual*100).toFixed(1)+'%</b>')
-      + card('Sharpe Ratio', m.sharpe.toFixed(2), '', 'Retorno ajustado por riesgo (tasa libre de riesgo ~4,5% anual, aproximada).', sharpeStatus,
+      + card('sharpe', 'Sharpe Ratio', m.sharpe.toFixed(2), '', 'Retorno ajustado por riesgo (tasa libre de riesgo ~4,5% anual, aproximada).', sharpeStatus,
              'S&amp;P 500 en el mismo período: <b>'+m.benchSharpe.toFixed(2)+'</b>')
-      + card('Máximo drawdown', (m.maxDrawdown*100).toFixed(1), '%', 'La peor caída de pico a valle en el período.', ddStatus,
+      + card('dd', 'Máximo drawdown', (m.maxDrawdown*100).toFixed(1), '%', 'La peor caída de pico a valle en el período.', ddStatus,
              'S&amp;P 500 en el mismo período: <b>'+(m.benchMaxDrawdown*100).toFixed(1)+'%</b>')
-      + card('Correlación promedio', m.avgCorrelation==null?'—':m.avgCorrelation.toFixed(2), '', 'Qué tan parecido se mueven tus posiciones entre sí. Más bajo = más diversificado.', corrStatus,
+      + card('corr', 'Correlación promedio', m.avgCorrelation==null?'—':m.avgCorrelation.toFixed(2), '', 'Qué tan parecido se mueven tus posiciones entre sí. Más bajo = más diversificado.', corrStatus,
              'Una cartera bien diversificada suele rondar <b>0,20&ndash;0,40</b>.')
-      + card('VaR diario (95%)', (m.var95Daily*100).toFixed(1), '%', 'En 19 de cada 20 días, no deberías perder más que esto en un solo día.', varStatus,
+      + card('var', 'VaR diario (95%)', (m.var95Daily*100).toFixed(1), '%', 'En 19 de cada 20 días, no deberías perder más que esto en un solo día.', varStatus,
              'S&amp;P 500 en el mismo período: <b>'+(m.benchVar95Daily*100).toFixed(1)+'%</b>')
-      + card('ROE ponderado', fund && fund.roe!=null ? fund.roe.toFixed(1) : '—', fund && fund.roe!=null ? '%' : '',
+      + card('roe', 'ROE ponderado', fund && fund.roe!=null ? fund.roe.toFixed(1) : '—', fund && fund.roe!=null ? '%' : '',
              'Rentabilidad sobre el patrimonio de las empresas que tenés, ponderada por cuánto pesa cada una.' + (fund?' Datos disponibles: '+fund.coverage+'.':''), roeStatus,
              'Promedio histórico S&amp;P 500: <b>~18%</b> (referencia aproximada, no en vivo).')
-      + card('P/E ponderado', fund && fund.pe!=null ? fund.pe.toFixed(1) : '—', fund && fund.pe!=null ? 'x' : '',
+      + card('pe', 'P/E ponderado', fund && fund.pe!=null ? fund.pe.toFixed(1) : '—', fund && fund.pe!=null ? 'x' : '',
              'Si tu cartera está cara o barata comparada al mercado.', peStatus,
              'Promedio histórico S&amp;P 500: <b>~21x</b> (referencia aproximada, no en vivo).')
-      + card('Dividend yield ponderado', fund && fund.divYield!=null ? fund.divYield.toFixed(1) : '—', fund && fund.divYield!=null ? '%' : '',
+      + card('div', 'Dividend yield ponderado', fund && fund.divYield!=null ? fund.divYield.toFixed(1) : '—', fund && fund.divYield!=null ? '%' : '',
              'Cuánto te rinde tu cartera en dividendos por año.', divStatus,
              'Promedio histórico S&amp;P 500: <b>~1,3%</b> (referencia aproximada, no en vivo).')
       + '</div>'
@@ -5184,6 +5203,53 @@
     }
   }
   var pfAdvReqSeq = 0;
+  // Datos crudos de cada una de las 9 tarjetas de "Metricas de cartera", para que el
+  // mini-boton de Warren de cada una pueda armar su propio prompt sin recalcular nada.
+  var pfAdvMetricRegistry = {};
+
+  async function pfExplainMetricWithWarren(evt, key){
+    if(evt) evt.stopPropagation();
+    if(!(window._miIsMember && window._miIsMember())) return;
+    var entry = pfAdvMetricRegistry[key];
+    var box = document.getElementById('pfMWA-' + key);
+    if(!entry || !box) return;
+    var isOpen = box.classList.toggle('expanded');
+    if(!isOpen || box.dataset.loaded === '1') return;
+    box.innerHTML = '<div class="pf-mini-warren-loading">Warren está pensando...</div>';
+    try{
+      var profile = window._qzLastProfile;
+      var plain = function(s){ return (s||'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&'); };
+      var systemPrompt = "Sos Warren, el asesor educativo de Manfredi Investment. Vas a explicar en prosa breve (maximo 90 palabras) "
+        + "UNA sola metrica de cartera que YA fue calculada por el sistema.\n\n"
+        + "REGLAS ESTRICTAS:\n"
+        + "- Usa unicamente el numero y estado que te paso abajo. Nunca inventes cifras.\n"
+        + "- Prohibido usar verbos de ejecucion de operaciones: compra, vende, rota, entra, sali, aumenta, reduci tu posicion. "
+        + "Describi que significa, no instruyas una accion.\n"
+        + "- No emitas un veredicto de \"cartera correcta/incorrecta\". Explica, no prescribas.\n"
+        + "- Termina siempre con esta frase exacta, sin modificarla: "
+        + "\"Herramienta educativa de autogestion. No es asesoramiento financiero ni una recomendacion de inversion personalizada.\"\n\n"
+        + "METRICA:\n"
+        + "Nombre: " + plain(entry.name) + "\n"
+        + "Valor: " + plain(entry.valStr) + (entry.status ? " - estado: " + entry.status : "") + "\n"
+        + "Que mide: " + plain(entry.note) + "\n"
+        + (entry.bench ? "Referencia de comparacion: " + plain(entry.bench) + "\n" : "")
+        + "Perfil de riesgo del usuario: " + (profile ? profile.name : 'no completado');
+      var res = await fetch('https://warren.nachito2502.workers.dev', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: 'Explicame en tus palabras que significa esta metrica para mi cartera.' }],
+          systemPrompt: systemPrompt,
+          email: window._currentUser ? window._currentUser.email : null
+        })
+      });
+      var data = await res.json();
+      box.innerHTML = '<p>' + (data.response || 'No pude generar la explicación.') + '</p>';
+      box.dataset.loaded = '1';
+    }catch(e){
+      box.innerHTML = '<p class="pf-mini-warren-error">Hubo un error al conectar con Warren. Probá de nuevo.</p>';
+    }
+  }
 
   // ---- "Portafolio de Manfredi": rendimiento real vs S&P 500 (gratis, sin composicion) ----
   // Reusa el mismo pipeline ARS->USD que las metricas de "Tu Portafolio" (pfFetchHistorico,
