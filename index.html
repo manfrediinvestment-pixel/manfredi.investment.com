@@ -4170,27 +4170,26 @@
     .pf-metrics-label { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 14px; }
     .pf-metric-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 16px; }
     @media (max-width: 680px) { .pf-metric-grid { grid-template-columns: 1fr 1fr; } }
+    .pf-metric-grid.pf-metric-grid-2col { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 560px) { .pf-metric-grid.pf-metric-grid-2col { grid-template-columns: 1fr; } }
 
-    .pf-alert-summary {
-      display: flex; gap: 14px; align-items: flex-start;
-      background: linear-gradient(160deg, rgba(239,68,68,.07) 0%, var(--navy-5) 65%);
-      border: 1px solid rgba(239,68,68,.22); border-left: 3px solid var(--red);
-      border-radius: 0 12px 12px 0; padding: 16px 18px; margin-bottom: 16px;
-    }
-    .pf-alert-summary.pf-alert-warn {
-      background: linear-gradient(160deg, rgba(245,158,11,.07) 0%, var(--navy-5) 65%);
-      border-color: rgba(245,158,11,.22); border-left-color: var(--yellow);
-    }
-    .pf-alert-icon {
-      flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; font-size: 15px;
-      background: rgba(239,68,68,.14); color: var(--red);
-    }
-    .pf-alert-warn .pf-alert-icon { background: rgba(245,158,11,.14); color: var(--yellow); }
-    .pf-alert-title { font-size: 13.5px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
-    .pf-alert-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
-    .pf-alert-list li { font-size: 12.5px; line-height: 1.55; color: rgba(255,255,255,.6); }
-    .pf-alert-list b { color: var(--white); font-weight: 600; }
+    /* ---- Composicion vs. tu perfil (4 categorias del quiz) ---- */
+    .pf-align-profile { font-size: 12px; line-height: 1.6; color: rgba(255,255,255,.55); margin-bottom: 20px; }
+    .pf-align-list { display: flex; flex-direction: column; gap: 20px; }
+    .pf-align-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; gap: 10px; }
+    .pf-align-name { font-size: 13.5px; font-weight: 600; color: var(--white); }
+    .pf-align-right { display: flex; align-items: center; gap: 8px; }
+    .pf-align-val { font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; font-size: 13px; color: rgba(255,255,255,.8); }
+    .pf-align-track { position: relative; height: 10px; border-radius: 6px; background: rgba(255,255,255,.07); margin-bottom: 7px; }
+    .pf-align-band { position: absolute; top: 0; bottom: 0; border-radius: 6px; opacity: .22; }
+    .pf-align-edge { position: absolute; top: -3px; bottom: -3px; width: 2px; opacity: .55; }
+    .pf-align-marker { position: absolute; top: 50%; width: 15px; height: 15px; border-radius: 50%; transform: translate(-50%,-50%); border: 2.5px solid var(--navy-4); box-shadow: 0 0 0 1px rgba(255,255,255,.25); }
+    .pf-align-marker.ok { background: var(--green); }
+    .pf-align-marker.warn { background: var(--yellow); }
+    .pf-align-marker.bad { background: var(--red); }
+    .pf-align-note { font-size: 11.5px; color: rgba(255,255,255,.4); line-height: 1.5; }
+    .pf-align-note b { color: rgba(255,255,255,.65); font-weight: 600; }
+    @media (prefers-reduced-motion: reduce) { .pf-align-marker { transition: none; } }
 
     .pf-metric-card {
       position: relative; overflow: hidden;
@@ -4338,6 +4337,10 @@
         <div class="pf-card">
           <h2 class="pf-metrics-label" style="margin-bottom:14px;">Composición del portafolio</h2>
           <div id="pfPieWrap" style="max-width:340px;margin:0 auto;"><canvas id="pfPieCanvas"></canvas></div>
+        </div>
+
+        <div class="pf-card" id="pfAlignWrapper" style="position:relative;">
+          <div id="pfAlignGrid"></div>
         </div>
 
         <div class="pf-card" id="pfMetricsWrapper" style="position:relative;">
@@ -4634,6 +4637,7 @@
 
     var saveBtn = document.getElementById('pfSaveBtn');
     if(saveBtn) saveBtn.style.display = (window._miIsMember && window._miIsMember()) ? '' : 'none';
+    pfRenderAlignment();
     pfRenderMetrics();
     pfRenderAdvancedMetrics();
   }
@@ -4664,104 +4668,189 @@
     }
   }
 
-  function pfBucketCash(cashPct, profile){
-    if(profile && profile.bands && profile.bands['Efectivo']){
-      var lo = profile.bands['Efectivo'][0], hi = profile.bands['Efectivo'][1];
-      if(cashPct >= lo-5 && cashPct <= hi+5) return 'ok';
-      if(cashPct >= lo-15 && cashPct <= hi+15) return 'warn';
-      return 'bad';
-    }
-    if(cashPct < 10) return 'ok';
-    if(cashPct <= 25) return 'warn';
-    return 'bad';
-  }
-  function pfBucketConc(pct){ if(pct < 20) return 'ok'; if(pct <= 40) return 'warn'; return 'bad'; }
-  function pfBucketDivers(n){ if(n >= 6) return 'ok'; if(n >= 3) return 'warn'; return 'bad'; }
+  var pfChipLabel = { ok: 'Alineado', warn: 'Atención', bad: 'Atención' };
 
-  function pfComputeMetrics(rows, quizProfile){
+  // ---- Composicion vs. tu perfil (4 categorias del quiz) ----
+  // Clasifica cada posicion en una de las 4 categorias del quiz reusando la
+  // categoria ya indexada del worker (cripto->Cripto/alternativos, arg_bonds->
+  // Renta fija, isCash->Efectivo, todo lo demas (cedears/acciones)->Acciones).
+  function pfAllocCategory(r){
+    if(r.isCash) return 'Efectivo';
+    var cat = pfGetCurrentCategory(r.ticker, r.moneda);
+    if(cat === 'cripto') return 'Cripto / alternativos';
+    if(cat === 'arg_bonds') return 'Renta fija';
+    return 'Acciones';
+  }
+  var PF_ALIGN_ORDER = ['Renta fija', 'Acciones', 'Cripto / alternativos', 'Efectivo'];
+  var PF_ALIGN_WARN_MARGIN = 6; // pp fuera de la banda que todavia cuenta como "cerca"
+
+  function pfBuildAllocationByCategory(rows){
     var total = rows.reduce(function(s,r){ return s + r.valorActual; }, 0);
     if(total <= 0) return null;
-    var grouped = pfGroupByTicker(rows);
-    var cash = grouped.filter(function(g){ return g.isCash; }).reduce(function(s,g){ return s + g.valorActual; }, 0);
-    var cashPct = cash/total*100;
-    var invested = grouped.filter(function(g){ return !g.isCash; });
-    var maxPos = invested.reduce(function(m,g){ return g.valorActual > m.valorActual ? g : m; }, {valorActual:0,ticker:''});
-    var concPct = invested.length ? (maxPos.valorActual/total*100) : 0;
-    var cashBand = (quizProfile && quizProfile.bands && quizProfile.bands['Efectivo']) || null;
+    var buckets = { 'Renta fija':0, 'Acciones':0, 'Cripto / alternativos':0, 'Efectivo':0 };
+    rows.forEach(function(r){ buckets[pfAllocCategory(r)] += r.valorActual; });
+    var pct = {};
+    PF_ALIGN_ORDER.forEach(function(k){ pct[k] = buckets[k]/total*100; });
+    return pct;
+  }
+  function pfAlignStatus(value, band){
+    if(!band) return 'ok';
+    if(value >= band[0] && value <= band[1]) return 'ok';
+    var dist = value < band[0] ? band[0]-value : value-band[1];
+    return dist <= PF_ALIGN_WARN_MARGIN ? 'warn' : 'bad';
+  }
+  function pfAlignNote(value, band, status){
+    var rango = band[0] + '–' + band[1] + '%';
+    if(status === 'ok') return '<b>' + value.toFixed(1) + '%</b> — dentro del rango recomendado (' + rango + ').';
+    if(value > band[1]) return 'Tu perfil sugiere ' + rango + ' y tenés <b>' + value.toFixed(1) + '%</b> — por encima del rango.';
+    return 'Tu perfil sugiere ' + rango + ' y tenés <b>' + value.toFixed(1) + '%</b> — por debajo del rango.';
+  }
+
+  function pfRenderAlignment(){
+    var wrapper = document.getElementById('pfAlignWrapper');
+    var grid = document.getElementById('pfAlignGrid');
+    if(!wrapper || !grid) return;
+    var existingOverlay = wrapper.querySelector('.mi-paywall-overlay');
+    if(existingOverlay) existingOverlay.remove();
+
+    var pct = pfBuildAllocationByCategory(pfBuildRows());
+    var profileEntry = window._qzLastProfile;
+    if(!pct){
+      grid.innerHTML = '<div class="pf-metrics-label">Composición vs. tu perfil</div>'
+        + '<div class="pf-metrics-empty">Cargá al menos una posición para ver esta comparación.</div>';
+      return;
+    }
+    if(!profileEntry){
+      grid.innerHTML = '<div class="pf-metrics-label">Composición vs. tu perfil</div>'
+        + '<div class="pf-metrics-empty">Completá el quiz de perfil para ver si tu cartera está alineada.</div>';
+      return;
+    }
+    var profile = QZProfiles[profileEntry.tier] || {};
+    var bands = profileEntry.bands;
+    grid.innerHTML = '<div class="pf-metrics-label">Composición vs. tu perfil</div>'
+      + '<div class="pf-align-profile"><span style="color:'+ (profile.color||'var(--gold)') +';">'+ (profile.emoji||'') +' '+ pfEsc(profileEntry.name) +'.</span> '+ pfEsc(profile.desc||'') +'</div>'
+      + '<div class="pf-align-list">'
+      + PF_ALIGN_ORDER.map(function(cat){
+          var band = bands[cat] || [0,100];
+          var value = pct[cat];
+          var status = pfAlignStatus(value, bands[cat]);
+          return '<div class="pf-align-row"><div class="pf-align-top"><span class="pf-align-name">'+ cat +'</span>'
+            + '<span class="pf-align-right"><span class="pf-align-val">'+ value.toFixed(1) +'%</span><span class="pf-chip '+ status +'">'+ pfChipLabel[status] +'</span></span></div>'
+            + '<div class="pf-align-track"><div class="pf-align-band" style="left:'+ band[0] +'%;width:'+ (band[1]-band[0]) +'%;background:'+ (profile.color||'var(--gold)') +';"></div>'
+            + '<div class="pf-align-edge" style="left:'+ band[0] +'%;background:'+ (profile.color||'var(--gold)') +';"></div>'
+            + '<div class="pf-align-edge" style="left:'+ band[1] +'%;background:'+ (profile.color||'var(--gold)') +';"></div>'
+            + '<div class="pf-align-marker '+ status +'" style="left:'+ Math.min(100,Math.max(0,value)) +'%;"></div></div>'
+            + '<div class="pf-align-note">'+ pfAlignNote(value, band, status) +'</div></div>';
+        }).join('')
+      + '</div>'
+      + '<p class="pf-metric-note" style="margin-top:14px;">Herramienta educativa de autogestión. No es una recomendación de comprar, vender o rotar activos.</p>';
+
+    if(!(window._miIsMember && window._miIsMember())){
+      if(window._miApplyPaywall) window._miApplyPaywall('#pfAlignGrid', '#pfAlignWrapper');
+    }
+  }
+  window._pfRenderAlignment = pfRenderAlignment;
+
+  // ---- Concentracion sectorial / geografica (via Finnhub /fundamentals, ----
+  // ---- mismo proveedor que ROE/P/E -- ver workers/mercados/index.js) --------
+  var pfFundaCache = {};
+  async function pfFetchFundamentals(ticker){
+    var key = (ticker||'').toUpperCase();
+    if(pfFundaCache[key]) return pfFundaCache[key];
+    try{
+      var res = await fetch(PF_MERCADOS_BASE + '/fundamentals?symbol=' + encodeURIComponent(key));
+      var data = await res.json();
+      pfFundaCache[key] = data;
+      return data;
+    }catch(e){ return null; }
+  }
+  var PF_SECTOR_ES = { Technology:'Tecnología', 'Financial Services':'Servicios financieros', Banking:'Bancos',
+    'Consumer Cyclical':'Consumo discrecional', 'Consumer Defensive':'Consumo básico', Healthcare:'Salud',
+    Energy:'Energía', 'Communication Services':'Comunicación', 'Basic Materials':'Materiales',
+    'Real Estate':'Bienes raíces', Utilities:'Servicios públicos', Industrials:'Industrial',
+    Insurance:'Seguros', 'Retail Trade':'Retail', Semiconductors:'Semiconductores', Software:'Software',
+    Media:'Medios', 'Telecommunication Services':'Telecomunicaciones', 'Metals & Mining':'Minería y metales',
+    Airlines:'Aerolíneas', 'Auto Manufacturers':'Automotriz', Pharmaceuticals:'Farmacéutica',
+    Biotechnology:'Biotecnología', 'Oil & Gas':'Petróleo y gas', Construction:'Construcción', Transportation:'Transporte' };
+  var PF_COUNTRY_ES = { US:'Estados Unidos', AR:'Argentina', UY:'Uruguay', BR:'Brasil', CL:'Chile', MX:'México',
+    CN:'China', DE:'Alemania', FR:'Francia', GB:'Reino Unido', JP:'Japón', NL:'Países Bajos', CH:'Suiza',
+    CA:'Canadá', KR:'Corea del Sur', IE:'Irlanda', ES:'España', IL:'Israel', IN:'India', LU:'Luxemburgo',
+    BM:'Bermudas', KY:'Islas Caimán', SG:'Singapur', AU:'Australia', SE:'Suecia', DK:'Dinamarca', IT:'Italia', BE:'Bélgica' };
+
+  function pfConcStatus(pct){ if(pct > 50) return 'bad'; if(pct > 35) return 'warn'; return 'ok'; }
+  function pfSectorNote(status){
+    if(status === 'ok') return 'Tu cartera está razonablemente repartida entre sectores.';
+    if(status === 'bad') return 'Más de la mitad de tu cartera depende del desempeño de un solo sector — un evento que golpee justo a ese sector te afecta mucho más que si estuviera repartido entre varios.';
+    return 'Una parte importante de tu cartera depende del desempeño de un solo sector.';
+  }
+  function pfCountryNote(status){
+    if(status === 'ok') return 'Tu cartera está razonablemente repartida entre países.';
+    if(status === 'bad') return 'Más de la mitad de tu cartera depende de la economía y el tipo de cambio de un solo país, además del riesgo propio de cada activo.';
+    return 'Una parte importante de tu cartera depende de la economía y el tipo de cambio de un solo país.';
+  }
+
+  async function pfComputeSectorGeo(rows){
+    var total = rows.reduce(function(s,r){ return s + r.valorActual; }, 0);
+    if(total <= 0) return null;
+    var byTicker = {};
+    rows.forEach(function(r){ if(!r.isCash) byTicker[r.ticker.toUpperCase()] = (byTicker[r.ticker.toUpperCase()]||0) + r.valorActual; });
+    var tickers = Object.keys(byTicker);
+    var fundas = await Promise.all(tickers.map(pfFetchFundamentals));
+
+    var sectorMap = {}, countryMap = {};
+    tickers.forEach(function(t, i){
+      var f = fundas[i], val = byTicker[t];
+      var sector = f && f.sector && (PF_SECTOR_ES[f.sector] || f.sector);
+      var country = f && f.country && (PF_COUNTRY_ES[f.country] || f.country);
+      if(sector) sectorMap[sector] = (sectorMap[sector]||0) + val;
+      if(country) countryMap[country] = (countryMap[country]||0) + val;
+    });
+    function topOf(map){
+      var best = null;
+      Object.keys(map).forEach(function(k){ if(!best || map[k] > best.value) best = { label:k, value:map[k] }; });
+      return best;
+    }
+    var topSector = topOf(sectorMap), topCountry = topOf(countryMap);
     return {
-      cash: { value: cashPct, status: pfBucketCash(cashPct, quizProfile), band: cashBand },
-      conc: { value: concPct, ticker: maxPos.ticker, status: pfBucketConc(concPct) },
-      divers: { value: invested.length, status: pfBucketDivers(invested.length) }
+      sector: topSector ? { label: topSector.label, value: topSector.value/total*100, status: pfConcStatus(topSector.value/total*100) } : null,
+      country: topCountry ? { label: topCountry.label, value: topCountry.value/total*100, status: pfConcStatus(topCountry.value/total*100) } : null
     };
   }
 
-  // Copy del cartel de "que estas haciendo mal" -- solo describe, nunca instruye una accion
-  // sobre activos concretos (mismo criterio que la narracion de Warren).
-  function pfBuildAlertItems(metrics){
-    var items = [];
-    if(metrics.cash.status !== 'ok'){
-      var band = metrics.cash.band;
-      var cashVal = metrics.cash.value.toFixed(1) + '%';
-      var body;
-      if(band && metrics.cash.value > band[1]){
-        body = 'Tu perfil sugiere un rango de ' + band[0] + '&ndash;' + band[1] + '% en efectivo, y estás bien por encima. Esa porción no está expuesta al mercado: no participa de subas ni cubre la inflación en el mediano plazo.';
-      } else if(band && metrics.cash.value < band[0]){
-        body = 'Tu perfil sugiere un rango de ' + band[0] + '&ndash;' + band[1] + '% en efectivo, y estás bien por debajo. Sin ese colchón, cualquier imprevisto te obliga a desarmar posiciones en un mal momento de mercado.';
-      } else {
-        body = 'Estás por fuera del rango de efectivo típico para una cartera de este tamaño. Ni tanto efectivo ocioso ni tan poco colchón son ideales &mdash; el punto medio depende de tu horizonte y tolerancia.';
-      }
-      items.push({ label: 'Efectivo ocioso (' + cashVal + ')', body: body });
-    }
-    if(metrics.conc.status !== 'ok'){
-      var concVal = metrics.conc.value.toFixed(1) + '%';
-      items.push({ label: 'Concentración (' + concVal + (metrics.conc.ticker ? ' en ' + pfEsc(metrics.conc.ticker) : '') + ')',
-        body: 'Más del ' + (metrics.conc.status==='bad' ? '40' : '20') + '% de tu cartera depende del resultado de un solo activo. Si a esa posición le va mal, el impacto en tu cartera total es mucho mayor que si el mismo peso estuviera repartido entre varias.' });
-    }
-    if(metrics.divers.status !== 'ok'){
-      items.push({ label: 'Diversificación (' + metrics.divers.value + (metrics.divers.value===1?' posición':' posiciones') + ')',
-        body: 'Tenés pocos activos distintos sin contar efectivo. Con tan pocas posiciones, un evento puntual de una sola empresa (una mala noticia, un mal trimestre) pesa mucho más sobre el resultado total que en una cartera más repartida.' });
-    }
-    return items;
-  }
-  function pfRenderAlertSummary(metrics){
-    var items = pfBuildAlertItems(metrics);
-    if(!items.length) return '';
-    var anyBad = metrics.cash.status==='bad' || metrics.conc.status==='bad' || metrics.divers.status==='bad';
-    var n = items.length;
-    var title = n===1 ? '1 métrica necesita atención' : (n + ' métricas necesitan atención');
-    return '<div class="pf-alert-summary'+ (anyBad?'':' pf-alert-warn') +'"><div class="pf-alert-icon">&#9888;</div><div>'
-      + '<div class="pf-alert-title">'+ title +'</div>'
-      + '<ul class="pf-alert-list">'+ items.map(function(it){ return '<li><b>'+ it.label +':</b> '+ it.body +'</li>'; }).join('') +'</ul>'
-      + '</div></div>';
-  }
-
-  var pfChipLabel = { ok: 'Alineado', warn: 'Atención', bad: 'Atención' };
-
-  function pfRenderMetrics(){
+  async function pfRenderMetrics(){
     var wrapper = document.getElementById('pfMetricsWrapper');
     var grid = document.getElementById('pfMetricsGrid');
     if(!wrapper || !grid) return;
     var existingOverlay = wrapper.querySelector('.mi-paywall-overlay');
     if(existingOverlay) existingOverlay.remove();
 
-    var metrics = pfComputeMetrics(pfBuildRows(), window._qzLastProfile);
-    if(!metrics){
-      grid.innerHTML = '<div class="pf-metrics-empty">Cargá al menos una posición para ver el chequeo de alineación.</div>';
+    var rows = pfBuildRows();
+    var total = rows.reduce(function(s,r){ return s + r.valorActual; }, 0);
+    if(total <= 0){
+      grid.innerHTML = '<div class="pf-metrics-empty">Cargá al menos una posición para ver la concentración sectorial y geográfica.</div>';
       return;
     }
+    grid.innerHTML = '<div class="pf-metrics-label">Resultados del chequeo</div><div class="pf-metrics-empty">Calculando sector y país de cada posición…</div>';
 
-    var quizNote = window._qzLastProfile ? '' : ' Completá el quiz para un chequeo más preciso de tu efectivo.';
+    var sg = await pfComputeSectorGeo(rows);
+    window._pfLastSectorGeo = sg;
+    if(!wrapper.isConnected || document.getElementById('pfMetricsGrid') !== grid) return; // el usuario ya navego a otro lado
 
+    if(!sg || (!sg.sector && !sg.country)){
+      grid.innerHTML = '<div class="pf-metrics-label">Resultados del chequeo</div><div class="pf-metrics-empty">No pudimos identificar el sector/país de tus posiciones todavía (bonos, efectivo y cripto no aplican).</div>';
+      return;
+    }
+    function cardHtml(name, m, noteFn){
+      if(!m) return '<div class="pf-metric-card status-neutral"><div class="pf-metric-top"><span class="name">'+ name +'</span></div><div class="pf-metric-val">—</div><div class="pf-metric-note">No pudimos identificar esto en tus posiciones.</div></div>';
+      return '<div class="pf-metric-card status-'+ m.status +'"><div class="pf-metric-top"><span class="name">'+ name +'</span><span class="pf-chip '+ m.status +'">'+ pfChipLabel[m.status] +'</span></div>'
+        + '<div class="pf-metric-val">'+ m.value.toFixed(1) +'%</div><div class="pf-metric-note"><b>'+ pfEsc(m.label) +'</b>. '+ noteFn(m.status) +'</div></div>';
+    }
     grid.innerHTML = '<div class="pf-metrics-label">Resultados del chequeo</div>'
-      + pfRenderAlertSummary(metrics)
-      + '<div class="pf-metric-grid">'
-      + '<div class="pf-metric-card status-'+ metrics.cash.status +'"><div class="pf-metric-top"><span class="name">Efectivo ocioso</span><span class="pf-chip '+ metrics.cash.status +'">'+ pfChipLabel[metrics.cash.status] +'</span></div>'
-      + '<div class="pf-metric-val">'+ metrics.cash.value.toFixed(1) +'%</div><div class="pf-metric-note">Parte de tu cartera en efectivo.'+ quizNote +'</div></div>'
-      + '<div class="pf-metric-card status-'+ metrics.conc.status +'"><div class="pf-metric-top"><span class="name">Concentración</span><span class="pf-chip '+ metrics.conc.status +'">'+ pfChipLabel[metrics.conc.status] +'</span></div>'
-      + '<div class="pf-metric-val">'+ metrics.conc.value.toFixed(1) +'%</div><div class="pf-metric-note">'+ (metrics.conc.ticker ? metrics.conc.ticker+' es tu mayor posición.' : 'Sin posiciones no-efectivo.') +'</div></div>'
-      + '<div class="pf-metric-card status-'+ metrics.divers.status +'"><div class="pf-metric-top"><span class="name">Diversificación</span><span class="pf-chip '+ metrics.divers.status +'">'+ pfChipLabel[metrics.divers.status] +'</span></div>'
-      + '<div class="pf-metric-val">'+ metrics.divers.value +'</div><div class="pf-metric-note">Posiciones distintas (sin contar efectivo).</div></div>'
+      + '<div class="pf-metric-grid pf-metric-grid-2col">'
+      + cardHtml('Concentración sectorial', sg.sector, pfSectorNote)
+      + cardHtml('Concentración geográfica', sg.country, pfCountryNote)
       + '</div>'
+      + '<p class="pf-metric-note" style="margin-top:14px;">Sector y país salen de la ficha de cada empresa. Bonos, efectivo y cripto no tienen sector/país de empresa y quedan afuera del cálculo.</p>'
       + '<div class="pf-warren-panel"><div class="pf-warren-avatar">W</div><div class="pf-warren-body" id="pfWarrenBody">'
       + '<div class="pf-w-name">Warren &middot; IA</div>'
       + '<div class="pf-w-headline">Ya vi tus números.</div>'
@@ -4776,28 +4865,26 @@
     }
   }
 
-  function pfBuildNarrationPrompt(metrics, profile){
+  function pfBuildNarrationPrompt(sg, profileEntry){
     return "Sos Warren, el asesor educativo de Manfredi Investment. Vas a narrar en prosa breve (maximo 180 palabras) "
-      + "los resultados de un chequeo de alineacion de cartera que YA fueron calculados por el sistema.\n\n"
+      + "los resultados de un chequeo de concentracion de cartera que YA fueron calculados por el sistema.\n\n"
       + "REGLAS ESTRICTAS:\n"
       + "- Usa unicamente los numeros y estados que te paso abajo. Nunca inventes cifras ni asumas datos no provistos.\n"
       + "- Prohibido usar verbos de ejecucion de operaciones: compra, vende, rota, entra, sali, aumenta, reduci tu posicion. "
-      + "Describi que implica cada metrica y por que se acerca o aleja del perfil declarado, sin instruir una accion.\n"
+      + "Describi que implica cada metrica y por que puede importar, sin instruir una accion.\n"
       + "- No emitas un veredicto de \"cartera correcta/incorrecta\". Explica, no prescribas.\n"
       + "- Termina siempre con esta frase exacta, sin modificarla: "
       + "\"Herramienta educativa de autogestion. No es asesoramiento financiero ni una recomendacion de inversion personalizada.\"\n\n"
       + "DATOS DEL USUARIO:\n"
-      + "Perfil de riesgo (quiz): " + (profile ? profile.name : 'no completado')
-      + (profile && profile.bands && profile.bands['Efectivo'] ? ' - banda de efectivo objetivo ' + profile.bands['Efectivo'][0] + '-' + profile.bands['Efectivo'][1] + '%' : '') + "\n"
-      + "Efectivo ocioso: " + metrics.cash.value.toFixed(1) + "% - estado: " + metrics.cash.status + "\n"
-      + "Concentracion en una posicion (" + (metrics.conc.ticker || 's/d') + "): " + metrics.conc.value.toFixed(1) + "% - estado: " + metrics.conc.status + "\n"
-      + "Diversificacion: " + metrics.divers.value + " posiciones distintas - estado: " + metrics.divers.status;
+      + "Perfil de riesgo (quiz): " + (profileEntry ? profileEntry.name : 'no completado') + "\n"
+      + "Concentracion sectorial: " + (sg.sector ? sg.sector.value.toFixed(1) + "% en " + sg.sector.label + " - estado: " + sg.sector.status : 'sin datos suficientes') + "\n"
+      + "Concentracion geografica: " + (sg.country ? sg.country.value.toFixed(1) + "% en " + sg.country.label + " - estado: " + sg.country.status : 'sin datos suficientes');
   }
 
   async function pfExplainWithWarren(){
     if(!(window._miIsMember && window._miIsMember())) return;
-    var metrics = pfComputeMetrics(pfBuildRows(), window._qzLastProfile);
-    if(!metrics) return;
+    var sg = window._pfLastSectorGeo;
+    if(!sg) return;
     var btn = document.getElementById('pfExplainBtn');
     var bubble = document.getElementById('pfWarrenBubble');
     btn.disabled = true; btn.textContent = 'Warren esta analizando...';
@@ -4807,7 +4894,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [{ role: 'user', content: 'Explicame en tus palabras que significan estos resultados para mi perfil.' }],
-          systemPrompt: pfBuildNarrationPrompt(metrics, window._qzLastProfile),
+          systemPrompt: pfBuildNarrationPrompt(sg, window._qzLastProfile),
           email: window._currentUser ? window._currentUser.email : null
         })
       });
@@ -5233,7 +5320,7 @@
       var saved = localStorage.getItem('mi_quiz_profile');
       if(saved && !window._qzLastProfile) window._qzLastProfile = JSON.parse(saved);
     }catch(e){}
-    window.addEventListener('mi:quiz-completed', function(){ pfRenderQuizStatus(); pfRenderMetrics(); });
+    window.addEventListener('mi:quiz-completed', function(){ pfRenderQuizStatus(); pfRenderAlignment(); pfRenderMetrics(); });
     pfRenderQuizStatus();
     pfRenderPositions();
     if(!window._heroMfRendered && document.getElementById('heroMfChartCanvas')){
