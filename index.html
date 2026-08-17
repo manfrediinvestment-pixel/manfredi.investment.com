@@ -1739,6 +1739,21 @@
     }
     .pick-tag-us { background: rgba(59,130,246,.12); color: #60A5FA; }
     .pick-tag-ar { background: rgba(16,185,129,.12); color: #34D399; }
+    .gratis-badge {
+      display: inline-block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--primary);
+      background: var(--green);
+      border-radius: 4px;
+      padding: 2px 7px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .mkt-tab.active .gratis-badge { background: rgba(10,15,30,.22); color: var(--primary); }
     .pick-sparkline { flex-shrink: 0; opacity: .85; }
     .pick-card:hover .pick-sparkline { opacity: 1; }
     .pick-right {
@@ -3258,6 +3273,15 @@
         <div class="hero-inv-list">
           <div class="hero-inv-item">
             <div class="hero-inv-item-info">
+              <span class="hero-inv-ticker">MSFT</span>
+              <span class="gratis-badge">Gratis</span>
+              <span class="hero-inv-name">Microsoft Corporation</span>
+              <span class="pick-sentiment neutral">Neutral</span>
+            </div>
+            <a href="informes/msft.html" class="pick-btn" target="_blank" rel="noopener">Ver an&aacute;lisis &rarr;</a>
+          </div>
+          <div class="hero-inv-item">
+            <div class="hero-inv-item-info">
               <span class="hero-inv-ticker">UBER</span>
               <span class="hero-inv-name">Uber Technologies, Inc.</span>
               <span class="pick-sentiment bull">Alcista</span>
@@ -3295,14 +3319,6 @@
               <span class="pick-sentiment neutral">Neutral</span>
             </div>
             <a href="informes/nvda.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'NVDA')">Ver an&aacute;lisis &rarr;</a>
-          </div>
-          <div class="hero-inv-item">
-            <div class="hero-inv-item-info">
-              <span class="hero-inv-ticker">AAPL</span>
-              <span class="hero-inv-name">Apple Inc.</span>
-              <span class="pick-sentiment bear">Bajista</span>
-            </div>
-            <a href="informes/aapl.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AAPL')">Ver an&aacute;lisis &rarr;</a>
           </div>
         </div>
         <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#inversiones'">Ver secci&oacute;n Inversiones &rarr;</button>
@@ -3652,17 +3668,17 @@
       </div>
 
       <div class="mkt-tabs inv-tabs" id="invTabs" role="tablist">
-        <button type="button" class="mkt-tab active" data-sector="semis">Semiconductores</button>
+        <button type="button" class="mkt-tab active" data-sector="software">Software <span class="gratis-badge">Gratis</span></button>
+        <button type="button" class="mkt-tab" data-sector="semis">Semiconductores</button>
         <button type="button" class="mkt-tab" data-sector="argentina">Argentina</button>
         <button type="button" class="mkt-tab" data-sector="bigtech">Big Tech</button>
-        <button type="button" class="mkt-tab" data-sector="software">Software</button>
         <button type="button" class="mkt-tab" data-sector="bancos">Bancos</button>
         <button type="button" class="mkt-tab" data-sector="defensivos">Defensivos</button>
       </div>
 
       <div class="picks-list" style="display:block;">
 
-        <div class="inv-panel active" data-sector-panel="semis">
+        <div class="inv-panel" data-sector-panel="semis">
           <div class="inv-panel-progress">4 de 10 con informe completo</div>
           <div class="sector-cards">
             <div class="pick-card" data-aos="fade-up">
@@ -3950,7 +3966,7 @@
           </div>
         </div>
 
-        <div class="inv-panel" data-sector-panel="software">
+        <div class="inv-panel active" data-sector-panel="software">
           <div class="inv-panel-progress">1 de 10 con informe completo</div>
           <div class="sector-cards">
             <div class="pick-card" data-aos="fade-up">
