@@ -3220,6 +3220,12 @@
             <span>Portfolio Manfredi vs. S&amp;P 500</span>
             <span class="s-live">EN VIVO</span>
           </div>
+          <div class="mkt-tabs mf-window-tabs" id="heroMfWindowTabs">
+            <button type="button" class="mkt-tab" data-mfwin="1w">1 semana</button>
+            <button type="button" class="mkt-tab active" data-mfwin="1m">1 mes</button>
+            <button type="button" class="mkt-tab" data-mfwin="ytd">YTD</button>
+            <button type="button" class="mkt-tab" data-mfwin="1y">1 año</button>
+          </div>
           <div class="mf-summary hero-mf-summary" id="heroMfSummary">Calculando con datos hist&oacute;ricos&hellip;</div>
           <div class="mf-chart-wrap hero-mf-chart-wrap"><canvas id="heroMfChartCanvas"></canvas></div>
           <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#portfolio'">Ver Portfolio Manfredi Investment &rarr;</button>
@@ -5704,10 +5710,22 @@
     pfRenderPositions();
     if(!window._heroMfRendered && document.getElementById('heroMfChartCanvas')){
       window._heroMfRendered = true;
-      mfRenderPerformance('heroMfSummary', 'heroMfChartCanvas');
+      mfRenderPerformance('heroMfSummary', 'heroMfChartCanvas', '1m');
     }
   }
   if(document.readyState !== 'loading'){ pfInit(); } else { document.addEventListener('DOMContentLoaded', pfInit); }
+
+  (function(){
+    var winTabs = document.querySelectorAll('#heroMfWindowTabs .mkt-tab');
+    winTabs.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        winTabs.forEach(function(b){ b.classList.toggle('active', b === btn); });
+        if(typeof mfRenderPerformance === 'function'){
+          mfRenderPerformance('heroMfSummary', 'heroMfChartCanvas', btn.getAttribute('data-mfwin'));
+        }
+      });
+    });
+  })();
   </script>
 
   <!-- ââ ASESORÍA ââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
