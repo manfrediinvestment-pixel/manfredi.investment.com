@@ -2834,7 +2834,7 @@
 
     async function cancelarMiSuscripcion() {
       if (!window._currentUser || !window._currentUser.email) return;
-      if (!confirm('¿Seguro que querés cancelar tu membresía? Vas a perder el acceso a Warren, informes y datos en vivo.')) return;
+      if (!confirm('¿Seguro que querés cancelar la renovación automática de tu membresía? Vas a seguir teniendo acceso hasta que termine el período que ya pagaste, pero no se te va a cobrar el próximo mes.')) return;
       try {
         var resp = await fetch('https://manfredi-memberships.nachito2502.workers.dev/cancelar-suscripcion', {
           method: 'POST',
@@ -2843,12 +2843,12 @@
         });
         var data = await resp.json();
         if (data.ok) {
-          window._isMiembro = false;
+          // El acceso sigue activo -- no tocamos _isMiembro, el token de
+          // localStorage ni el lock. Solo se corta la renovación: se oculta
+          // el botón de cancelar y el próximo mes no se genera el cobro.
           window._tieneSuscripcion = false;
-          localStorage.removeItem('mi_member_token');
           updateNavUser(window._currentUser);
-          applyMemberLock(true);
-          alert('Tu membresía fue cancelada. No se te van a hacer más cobros.');
+          alert('Listo, cancelamos la renovación automática. Vas a seguir teniendo acceso hasta que termine tu período ya pagado, y no se te va a cobrar el próximo mes.');
         } else {
           alert('No se pudo cancelar la suscripción: ' + (data.error || 'error desconocido'));
         }
@@ -3268,7 +3268,7 @@
       <div class="hero-cal-card hero-inv-card" id="heroInvCard">
         <div class="spotlight-head">
           <span>Informes institucionales</span>
-          <span style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);">14 de 60</span>
+          <span style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);">15 de 60</span>
         </div>
         <div class="hero-inv-list">
           <div class="hero-inv-item">
@@ -3309,10 +3309,10 @@
           </div>
           <div class="hero-inv-item">
             <div class="hero-inv-item-info">
-              <span class="hero-inv-ticker">NVDA</span>
-              <span class="hero-inv-name">NVIDIA Corporation</span>
+              <span class="hero-inv-ticker">ADBE</span>
+              <span class="hero-inv-name">Adobe Inc.</span>
             </div>
-            <a href="informes/nvda.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'NVDA')">Ver an&aacute;lisis &rarr;</a>
+            <a href="informes/adbe.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ADBE')">Ver an&aacute;lisis &rarr;</a>
           </div>
         </div>
         <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#inversiones'">Ver secci&oacute;n Inversiones &rarr;</button>
@@ -3961,7 +3961,7 @@
         </div>
 
         <div class="inv-panel active" data-sector-panel="software">
-          <div class="inv-panel-progress">1 de 10 con informe completo</div>
+          <div class="inv-panel-progress">2 de 10 con informe completo</div>
           <div class="sector-cards">
             <div class="pick-card" data-aos="fade-up">
               <div class="pick-accent neutral"></div>
@@ -3972,14 +3972,14 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,26 15,24 30,20 45,22 60,16 75,18 90,10" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/msft.html" class="pick-btn" target="_blank" rel="noopener">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="80">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card" data-aos="fade-up" data-aos-delay="80">
+              <div class="pick-accent neutral"></div>
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">ADBE</span><span class="pick-tag pick-tag-us">USA &middot; Software</span></div>
                 <div class="pick-name">Adobe Inc.</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,6 15,14 30,20 45,26 60,24 75,28 90,26" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/adbe.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ADBE')">Ver análisis &rarr;</a></div>
             </div>
             <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="140">
               <div class="pick-accent soon"></div>
