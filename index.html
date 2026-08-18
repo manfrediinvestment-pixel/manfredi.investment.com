@@ -6010,9 +6010,15 @@
   // -- Cartel de "nuevo informe": reemplaza el mail masivo de Resend.
   // Se muestra una sola vez por informe y solo dentro de la ventana de
   // publishedAt (el día que se sube + el siguiente, para cubrir husos horarios).
-  function maybeShowReportBanner(latest) {
+  // `opts.seenKey` permite tener un cartel independiente por tipo de contenido
+  // (papers semanales vs. informes institucionales de ticker) sin que se pisen
+  // entre sí. `latest.href` (en vez de `latest.file`) dispara un informe de
+  // ticker: abre el HTML directo, pasando primero por el mismo gate de
+  // membresía que usa el picks-list de #inversiones.
+  function maybeShowReportBanner(latest, opts) {
+    opts = opts || {};
     if (!latest || !latest.publishedAt || !latest.num) return;
-    const seenKey = 'mi_report_banner_seen';
+    const seenKey = opts.seenKey || 'mi_report_banner_seen';
     if (localStorage.getItem(seenKey) === latest.num) return;
 
     const published = new Date(latest.publishedAt + 'T00:00:00');
@@ -6031,12 +6037,34 @@
     };
     document.getElementById('reportBannerClose').onclick = dismiss;
     document.getElementById('reportBannerCta').onclick = () => {
-      openPdf('papers/' + encodeURIComponent(latest.file), latest.title);
+      if (latest.href) {
+        const gated = latest.ticker && latest.ticker !== 'MSFT' && !(window._miIsMember && window._miIsMember());
+        if (gated) {
+          const backdrop = document.getElementById('mi-analysis-paywall-backdrop');
+          if (backdrop) { backdrop.classList.add('active'); document.body.style.overflow = 'hidden'; }
+        } else {
+          window.open(latest.href, '_blank', 'noopener');
+        }
+      } else {
+        openPdf('papers/' + encodeURIComponent(latest.file), latest.title);
+      }
       dismiss();
     };
 
     setTimeout(() => banner.classList.add('show'), 1200);
   }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    maybeShowReportBanner({
+      num: 'adbe-2026-08-18',
+      ticker: 'ADBE',
+      title: 'Nuevo informe: Adobe Inc. (ADBE)',
+      abstract: 'DCF de 3 escenarios, comparables, reversión histórica y consenso Wall Street: el blend propio queda 36,9% por encima del mercado, pero el escenario Bear del DCF todavía cotiza por debajo.',
+      date: '18 de agosto de 2026',
+      href: 'informes/adbe.html',
+      publishedAt: '2026-08-18'
+    }, { seenKey: 'mi_report_banner_seen_ticker' });
+  });
 
   function initPapersRailNav() {
     const rail = document.getElementById('papersGrid');
