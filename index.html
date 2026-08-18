@@ -4296,11 +4296,23 @@
     .pf-add-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; color: rgba(255,255,255,.4); font-size: 13px; cursor: pointer; padding: 10px 6px; border: 1px dashed rgba(255,255,255,.18); border-radius: 6px; }
     .pf-add-row:hover { color: var(--gold); border-color: var(--gold-dark,#B8943F); }
     .pf-add-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; background: var(--navy-5); border-radius: 8px; padding: 12px; }
-    .pf-add-form input[type="text"], .pf-add-form input[type="number"], .pf-add-form select {
+    .pf-add-form input[type="text"], .pf-add-form input[type="number"], .pf-add-form select, .pf-ticker-wrap input[type="text"] {
       background: var(--navy-1); border: 1px solid rgba(255,255,255,.15); border-radius: 5px; color: var(--white);
       padding: 8px 10px; font-size: 13px; font-family: inherit;
     }
     .pf-add-form label { color: rgba(255,255,255,.6); font-size: 12.5px; display: flex; align-items: center; gap: 5px; }
+    .pf-ticker-wrap { position: relative; }
+    .pf-ticker-dropdown {
+      display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 270px; max-width: 340px;
+      max-height: 260px; overflow-y: auto; background: var(--navy-1); border: 1px solid rgba(255,255,255,.18);
+      border-radius: 6px; z-index: 30; box-shadow: 0 10px 28px rgba(0,0,0,.45);
+    }
+    .pf-ticker-opt { display: flex; align-items: baseline; gap: 8px; padding: 8px 10px; cursor: pointer; font-size: 13px; }
+    .pf-ticker-opt:hover, .pf-ticker-opt.active { background: rgba(255,255,255,.07); }
+    .pf-ticker-opt-sym { font-family: 'IBM Plex Mono', monospace; color: var(--gold); font-weight: 600; flex-shrink: 0; }
+    .pf-ticker-opt-name { color: rgba(255,255,255,.7); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pf-ticker-opt-tag { font-size: 10.5px; color: rgba(255,255,255,.35); flex-shrink: 0; white-space: nowrap; }
+    .pf-ticker-empty { padding: 10px; font-size: 12.5px; color: rgba(255,255,255,.4); font-style: italic; max-width: 260px; }
     .pf-save-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
     .pf-save-status { font-size: 12.5px; color: rgba(255,255,255,.5); }
     .pf-metrics-empty { color: rgba(255,255,255,.4); font-size: 13.5px; padding: 8px 2px; }
@@ -4462,7 +4474,10 @@
           </table>
           <div class="pf-add-row" id="pfAddRowBtn" onclick="pfShowAddForm()">+ Agregar posición</div>
           <div class="pf-add-form" id="pfAddForm" style="display:none;">
-            <input type="text" id="pfInputTicker" placeholder="Ticker (ej: AAPL)">
+            <div class="pf-ticker-wrap">
+              <input type="text" id="pfInputTicker" placeholder="Ticker o nombre (ej: AAPL, Apple)" autocomplete="off">
+              <div class="pf-ticker-dropdown" id="pfTickerDropdown"></div>
+            </div>
             <select id="pfInputMoneda" onchange="pfToggleCashFields()">
               <option value="USD" selected>USD</option>
               <option value="ARS">ARS (CEDEAR / acción local)</option>
@@ -4583,7 +4598,12 @@
   function pfEsc(s){ return (s||'').replace(/</g,'&lt;'); }
   function pfMoney(n){ return '$'+ (n||0).toLocaleString('es-AR',{maximumFractionDigits: Math.abs(n)<1000?2:0}); }
 
-  function pfShowAddForm(){ document.getElementById('pfAddForm').style.display = 'flex'; document.getElementById('pfAddRowBtn').style.display = 'none'; }
+  function pfShowAddForm(){
+    document.getElementById('pfAddForm').style.display = 'flex';
+    document.getElementById('pfAddRowBtn').style.display = 'none';
+    pfFetchMarketData(false); // precarga la lista de activos para el buscador
+    document.getElementById('pfInputTicker').focus();
+  }
   function pfToggleCashFields(){
     var isCash = document.getElementById('pfInputCash').checked;
     var moneda = document.getElementById('pfInputMoneda').value;
@@ -4596,6 +4616,7 @@
   function pfHideAddForm(){
     document.getElementById('pfAddForm').style.display = 'none';
     document.getElementById('pfAddRowBtn').style.display = 'flex';
+    pfHideTickerDropdown();
     document.getElementById('pfInputTicker').value = '';
     document.getElementById('pfInputMoneda').value = 'USD';
     document.getElementById('pfInputCantidad').value = '';
@@ -4650,6 +4671,7 @@
       var res = await fetch(PF_MERCADOS_URL);
       var data = await res.json();
       window._pfMarketData = pfIndexMarketPayload(data);
+      window._pfTickerList = pfBuildTickerList(data);
       window._pfMarketDataTs = now;
     }catch(e){
       console.warn('pfFetchMarketData failed:', e);
@@ -4657,6 +4679,115 @@
     }
     return window._pfMarketData;
   }
+  // ---- buscador de tickers (autocompletar en "+ Agregar posición") ----
+  // Reusa el mismo payload del Worker de mercados -- no pega un fetch aparte.
+  var PF_CAT_LABELS = { arg_stocks:'Acción AR', arg_cedears:'CEDEAR', usa_stocks:'Acción USA', usa_adrs:'ADR', arg_bonds:'Bono', cripto:'Cripto', commodities:'Commodity' };
+  function pfBuildTickerList(payload){
+    var list = [];
+    if(payload && payload.categorias){
+      Object.keys(payload.categorias).forEach(function(cat){
+        if(cat === 'dolares') return; // no son posiciones que se puedan cargar
+        var catObj = payload.categorias[cat] || {};
+        var currency = catObj.currency === 'USD' ? 'USD' : 'ARS';
+        var items = catObj.items || [];
+        items.forEach(function(it){
+          if(!it.symbol) return;
+          list.push({ symbol: it.symbol.toUpperCase(), name: it.name || '', currency: currency, category: cat });
+        });
+      });
+    }
+    return list;
+  }
+  function pfNormalize(s){ return (s||'').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase(); }
+  function pfFilterTickers(query){
+    var q = pfNormalize(query).trim();
+    if(!q) return [];
+    var starts = [], contains = [];
+    (window._pfTickerList || []).forEach(function(it){
+      var symN = pfNormalize(it.symbol);
+      var nameN = pfNormalize(it.name);
+      if(symN.indexOf(q) === 0) starts.push(it);
+      else if(symN.indexOf(q) !== -1 || nameN.indexOf(q) !== -1) contains.push(it);
+    });
+    return starts.concat(contains).slice(0, 8);
+  }
+  var pfDropdownItems = [];
+  var pfDropdownActiveIdx = -1;
+  function pfHideTickerDropdown(){
+    var dd = document.getElementById('pfTickerDropdown');
+    if(!dd) return;
+    dd.style.display = 'none';
+    dd.innerHTML = '';
+    pfDropdownItems = [];
+    pfDropdownActiveIdx = -1;
+  }
+  function pfHighlightDropdown(){
+    var dd = document.getElementById('pfTickerDropdown');
+    var opts = dd.querySelectorAll('.pf-ticker-opt');
+    opts.forEach(function(el, i){ el.classList.toggle('active', i === pfDropdownActiveIdx); });
+    var activeEl = dd.querySelector('.pf-ticker-opt.active');
+    if(activeEl) activeEl.scrollIntoView({ block: 'nearest' });
+  }
+  function pfSelectTickerOption(idx){
+    var it = pfDropdownItems[idx];
+    if(!it) return;
+    document.getElementById('pfInputTicker').value = it.symbol;
+    document.getElementById('pfInputMoneda').value = it.currency;
+    pfToggleCashFields();
+    pfHideTickerDropdown();
+    document.getElementById('pfInputCantidad').focus();
+  }
+  function pfRenderTickerDropdown(){
+    var input = document.getElementById('pfInputTicker');
+    var dd = document.getElementById('pfTickerDropdown');
+    var q = input.value.trim();
+    if(!q){ pfHideTickerDropdown(); return; }
+    var matches = pfFilterTickers(q);
+    pfDropdownItems = matches;
+    pfDropdownActiveIdx = -1;
+    if(!matches.length){
+      dd.innerHTML = '<div class="pf-ticker-empty">Sin resultados para "'+pfEsc(q)+'". Revisá el ticker o probá con el nombre.</div>';
+      dd.style.display = 'block';
+      return;
+    }
+    dd.innerHTML = matches.map(function(it, i){
+      return '<div class="pf-ticker-opt" data-idx="'+i+'">'
+        + '<span class="pf-ticker-opt-sym">'+pfEsc(it.symbol)+'</span>'
+        + '<span class="pf-ticker-opt-name">'+pfEsc(it.name)+'</span>'
+        + '<span class="pf-ticker-opt-tag">'+pfEsc(PF_CAT_LABELS[it.category] || it.category)+' &middot; '+it.currency+'</span>'
+        + '</div>';
+    }).join('');
+    dd.style.display = 'block';
+    dd.querySelectorAll('.pf-ticker-opt').forEach(function(el){
+      el.addEventListener('mousedown', function(e){
+        e.preventDefault(); // evita que el blur del input cierre el dropdown antes del click
+        pfSelectTickerOption(parseInt(el.getAttribute('data-idx'), 10));
+      });
+    });
+  }
+  (function(){
+    var tickerInput = document.getElementById('pfInputTicker');
+    tickerInput.addEventListener('input', pfRenderTickerDropdown);
+    tickerInput.addEventListener('focus', function(){ if(tickerInput.value.trim()) pfRenderTickerDropdown(); });
+    tickerInput.addEventListener('blur', function(){ setTimeout(pfHideTickerDropdown, 150); });
+    tickerInput.addEventListener('keydown', function(e){
+      if(!pfDropdownItems.length) return;
+      if(e.key === 'ArrowDown'){
+        e.preventDefault();
+        pfDropdownActiveIdx = Math.min(pfDropdownActiveIdx + 1, pfDropdownItems.length - 1);
+        pfHighlightDropdown();
+      } else if(e.key === 'ArrowUp'){
+        e.preventDefault();
+        pfDropdownActiveIdx = Math.max(pfDropdownActiveIdx - 1, 0);
+        pfHighlightDropdown();
+      } else if(e.key === 'Enter'){
+        if(pfDropdownActiveIdx >= 0){ e.preventDefault(); pfSelectTickerOption(pfDropdownActiveIdx); }
+      } else if(e.key === 'Escape'){
+        pfHideTickerDropdown();
+      }
+    });
+  })();
+
   function pfGetCurrentPrice(ticker, moneda){
     var idx = window._pfMarketData || {};
     var hit = idx[(ticker||'').toUpperCase()];
