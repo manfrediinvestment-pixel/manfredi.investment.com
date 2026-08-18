@@ -2834,7 +2834,7 @@
 
     async function cancelarMiSuscripcion() {
       if (!window._currentUser || !window._currentUser.email) return;
-      if (!confirm('¿Seguro que querés cancelar tu membresía? Vas a perder el acceso a Warren, informes y datos en vivo.')) return;
+      if (!confirm('¿Seguro que querés cancelar la renovación automática de tu membresía? Vas a seguir teniendo acceso hasta que termine el período que ya pagaste, pero no se te va a cobrar el próximo mes.')) return;
       try {
         var resp = await fetch('https://manfredi-memberships.nachito2502.workers.dev/cancelar-suscripcion', {
           method: 'POST',
@@ -2843,12 +2843,12 @@
         });
         var data = await resp.json();
         if (data.ok) {
-          window._isMiembro = false;
+          // El acceso sigue activo -- no tocamos _isMiembro, el token de
+          // localStorage ni el lock. Solo se corta la renovación: se oculta
+          // el botón de cancelar y el próximo mes no se genera el cobro.
           window._tieneSuscripcion = false;
-          localStorage.removeItem('mi_member_token');
           updateNavUser(window._currentUser);
-          applyMemberLock(true);
-          alert('Tu membresía fue cancelada. No se te van a hacer más cobros.');
+          alert('Listo, cancelamos la renovación automática. Vas a seguir teniendo acceso hasta que termine tu período ya pagado, y no se te va a cobrar el próximo mes.');
         } else {
           alert('No se pudo cancelar la suscripción: ' + (data.error || 'error desconocido'));
         }

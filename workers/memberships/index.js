@@ -310,8 +310,10 @@ async function cancelarSuscripcion(request, env) {
         return new Response(JSON.stringify({ error: 'Error en la API de Mercado Pago', detalle: errText }), { status: 502, headers: CORS_HEADERS });
     }
 
-    // Revocar el acceso ya mismo, no esperar a que expire el TTL.
-    await env.MEMBERS.delete(email);
+    // No revocamos el acceso ya mismo -- el usuario ya pagó este período, así
+    // que sigue teniendo acceso hasta que expire el TTL de 31 días seteado en
+    // el último cobro aprobado (activarMembresia). Solo cortamos la
+    // recurrencia borrando el preapproval_id, así no se genera el próximo cobro.
     await env.MEMBERS.delete(email + ':preapproval_id');
 
     env.LOGUSER.fetch('https://log-user/marcar-miembro', {
@@ -524,7 +526,22 @@ async function procesarNotifPreapproval(preapprovalId, env) {
             monto: preData.auto_recurring?.transaction_amount,
             preapprovalId
         });
-    } else if (preData.status === 'cancelled' || preData.status === 'paused') {
+    } else if (preData.status === 'cancelled') {
+        // Cancelación voluntaria (o disparada por cancelarSuscripcion): dejamos
+        // que el acceso siga vivo hasta que expire el TTL del último período
+        // pagado -- solo cortamos la recurrencia para que no se genere el
+        // próximo cobro. Ver mismo criterio en cancelarSuscripcion().
+        await env.MEMBERS.delete(email.toLowerCase() + ':preapproval_id');
+        env.LOGUSER.fetch('https://log-user/marcar-miembro', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email.toLowerCase(), accion: 'cancelacion' })
+        }).catch(err => console.error('Error marcando cancelación en Sheets:', err));
+        console.log(`Membresía dada de baja (${preData.status}) para: ${email}`);
+    } else if (preData.status === 'paused') {
+        // Pausa (típicamente por fallas de cobro, no por acción del usuario):
+        // acá sí cortamos el acceso ya mismo porque no hay un período pagado
+        // que respetar.
         await env.MEMBERS.delete(email.toLowerCase());
         await env.MEMBERS.delete(email.toLowerCase() + ':preapproval_id');
         env.LOGUSER.fetch('https://log-user/marcar-miembro', {
