@@ -305,8 +305,7 @@ consola, solo se ve mal.
 
 ## Cómo conectar el ticker al sitio
 
-Una vez que `informes/<ticker>.html` está listo, hay que enlazarlo desde **dos** lugares de
-`index.html` — ya no existe `MI_ASSETS` ni el modal viejo, así que no hay tercer lugar que tocar:
+Una vez que `informes/<ticker>.html` está listo, hay que enlazarlo desde **tres** lugares:
 
 1. **Picks-list de la sección Inversiones** (buscar `class="picks-list"`, dentro de
    `id="inversiones"`): agregar una `pick-card` nueva (copiar el bloque de AAPL o MSFT como
@@ -320,6 +319,27 @@ Una vez que `informes/<ticker>.html` está listo, hay que enlazarlo desde **dos*
    sacá el placeholder `hero-inv-item--soon` ("Próximo análisis en camino"); si vas a cubrir más de
    3 en simultáneo, priorizá mostrar los más recientes y dejá el resto solo en el picks-list de
    `#inversiones` (el hero es una vidriera, no tiene que listar toda la cobertura).
+3. **Cartel de "nuevo informe"** (`informes/manifest.json`, en la raíz de `informes/`): agregar una
+   entrada nueva **al principio** de la lista (el manifest va ordenado del más nuevo al más viejo,
+   `list[0]` es siempre el último publicado) con este formato:
+   ```json
+   {
+     "num": "<ticker-en-minúscula>-YYYY-MM-DD",
+     "ticker": "<TICKER>",
+     "title": "Nuevo informe: <Nombre de la compañía> (<TICKER>)",
+     "abstract": "1-2 frases con el dato más fuerte del informe (fair value vs. mercado, la tensión
+       central de la tesis) — mismo tono que el resumen ejecutivo, no un teaser genérico.",
+     "date": "<fecha en español, ej. 18 de agosto de 2026>",
+     "href": "informes/<ticker>.html",
+     "publishedAt": "<fecha ISO, YYYY-MM-DD, la fecha real de publicación>"
+   }
+   ```
+   No hay que tocar `index.html` para esto — `loadInformesManifest()` ya lee este archivo solo al
+   cargar la página y dispara el cartel (abajo a la izquierda, primera visita del día, vence al día
+   siguiente) para quien esté en la ventana de `publishedAt`. Reusa el mismo gate de membresía que
+   el picks-list: si el lector no es socio, el botón "Ver informe" muestra el paywall en vez de abrir
+   el HTML directo. No hace falta borrar entradas viejas del manifest — solo la más reciente
+   (`list[0]`) dispara el cartel.
 
 No hace falta tocar `MI_ASSETS`, `reports/fundamentals.json` ni `TICKERS_CIK` — ese pipeline
 alimentaba el modal resumen viejo, que quedó retirado para los tickers que usan este formato nuevo.
@@ -340,8 +360,9 @@ con: *"hacé el informe institucional de [TICKER], nivel AAPL"*.
 1. Generá `informes/<ticker>.html` completo (14 secciones) siguiendo la estructura de arriba.
 2. Corré el grep de lenguaje relativo a fechas (ver regla no-negociable) y limpiá cualquier
    coincidencia antes de seguir.
-3. Agregá la card en el picks-list de `#inversiones` y el row en `heroInvCard` (ver "Cómo conectar
-   el ticker al sitio"), ambos linkeando a `informes/<ticker>.html`.
+3. Agregá la card en el picks-list de `#inversiones`, el row en `heroInvCard`, y la entrada al
+   principio de `informes/manifest.json` para el cartel de anuncio (ver "Cómo conectar el ticker al
+   sitio"), todos linkeando a `informes/<ticker>.html`.
 4. Probá en el navegador: abrí `#inversiones`, click en "Ver análisis" del ticker nuevo — debe abrir
    el informe completo en pestaña nueva con los gráficos Canvas renderizando — y repetí el chequeo
    desde el botón del widget del hero. Recorré **cada** `drawHBars` del informe (no solo el football
