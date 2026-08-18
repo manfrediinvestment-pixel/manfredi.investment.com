@@ -10333,6 +10333,7 @@ function RSMA() {
     <div class="slide active">
       <div class="slide-eyebrow">${slide.eyebrow}</div>
       <div class="slide-title">${slide.title}</div>
+      ${courseAudioBarHTML('MA')}
       ${slide.html}
       <div class="slide-footer">
         <button class="nav-btn" onclick="PSMA()" ${CSMA===0?'disabled':''}>← Anterior</button>
@@ -10346,6 +10347,7 @@ function RSMA() {
       </div>
     </div>`;
 
+  initCourseAudio('MA', 'mercado-argentino', CLMA+1, CSMA+1);
   if (slide.isQuiz) quizMount(slide.quizKey, slide.quizQuestions, slide.quizOpts);
   if (slide.chart) setTimeout(() => DCMA(slide.chart), 80);
 }
