@@ -6054,17 +6054,22 @@
     setTimeout(() => banner.classList.add('show'), 1200);
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
-    maybeShowReportBanner({
-      num: 'adbe-2026-08-18',
-      ticker: 'ADBE',
-      title: 'Nuevo informe: Adobe Inc. (ADBE)',
-      abstract: 'DCF de 3 escenarios, comparables, reversión histórica y consenso Wall Street: el blend propio queda 36,9% por encima del mercado, pero el escenario Bear del DCF todavía cotiza por debajo.',
-      date: '18 de agosto de 2026',
-      href: 'informes/adbe.html',
-      publishedAt: '2026-08-18'
-    }, { seenKey: 'mi_report_banner_seen_ticker' });
-  });
+  // -- Cartel de "nuevo informe" para informes de ticker (equity research):
+  // lee informes/manifest.json (mismo patrón que papers/manifest.json) y
+  // anuncia el más reciente. Agregar una entrada nueva ahí es todo lo que
+  // hace falta para que el próximo informe dispare el cartel solo — no
+  // requiere tocar este script. Convención: el manifest está ordenado del
+  // más nuevo al más viejo, así que list[0] siempre es el último publicado.
+  async function loadInformesManifest() {
+    try {
+      const res = await fetch('informes/manifest.json');
+      const list = await res.json();
+      maybeShowReportBanner(list[0], { seenKey: 'mi_report_banner_seen_ticker' });
+    } catch (e) {
+      console.warn('No se pudo cargar informes/manifest.json:', e.message);
+    }
+  }
+  document.addEventListener('DOMContentLoaded', loadInformesManifest);
 
   function initPapersRailNav() {
     const rail = document.getElementById('papersGrid');
