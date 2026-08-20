@@ -34,6 +34,7 @@ const NAME_MAP = {
   NVDA: 'Nvidia', META: 'Meta Platforms', JPM: 'JPMorgan Chase', KO: 'Coca-Cola', DIS: 'Disney',
   NFLX: 'Netflix', 'BRK.B': 'Berkshire Hathaway', V: 'Visa', MA: 'Mastercard', WMT: 'Walmart',
   PG: 'Procter & Gamble', XOM: 'ExxonMobil', BA: 'Boeing', INTC: 'Intel', AMD: 'AMD',
+  AIG: 'American International Group',
   // Bonos AR (soberanos en dólares)
   AL30: 'Bonar 2030', GD30: 'Global 2030', AL35: 'Bonar 2035', GD35: 'Global 2035',
   AE38: 'Bonar 2038', GD38: 'Global 2038', AL41: 'Bonar 2041', GD41: 'Global 2041',
@@ -68,7 +69,11 @@ async function fetchD912(endpoint) {
   }
 }
 
-function mapD912Rows(rows, { sortByVolume = true, limit = null } = {}) {
+// pin: simbolos que siempre tienen que quedar en la lista aunque el limite por
+// volumen los deje afuera -- para activos reales de la cartera con poco volumen
+// de CEDEAR (ej. AIG), sin los cuales el buscador de Mercados y el pricing en
+// vivo del Portafolio de Manfredi los tratan como inexistentes.
+function mapD912Rows(rows, { sortByVolume = true, limit = null, pin = [] } = {}) {
   let items = rows
     .filter(r => r.symbol && r.c != null)
     .map(r => ({
@@ -79,7 +84,14 @@ function mapD912Rows(rows, { sortByVolume = true, limit = null } = {}) {
       volume: r.v ?? 0,
     }));
   if (sortByVolume) items.sort((a, b) => (b.volume || 0) - (a.volume || 0));
-  if (limit) items = items.slice(0, limit);
+  if (limit && items.length > limit) {
+    const kept = items.slice(0, limit);
+    const keptSymbols = new Set(kept.map(it => it.symbol));
+    const missingPins = pin
+      .map(sym => items.find(it => it.symbol === sym))
+      .filter(it => it && !keptSymbols.has(it.symbol));
+    items = kept.concat(missingPins);
+  }
   return items;
 }
 
@@ -418,7 +430,7 @@ async function buildPayload(env) {
 
   const categorias = {
     arg_stocks:  { currency: 'ARS', total: argStocksRaw.length,  items: mapD912Rows(argStocksRaw) },
-    arg_cedears: { currency: 'ARS', total: argCedearsRaw.length, items: mapD912Rows(argCedearsRaw, { limit: 400 }) },
+    arg_cedears: { currency: 'ARS', total: argCedearsRaw.length, items: mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }) },
     usa_stocks:  { currency: 'USD', total: usaStocksRaw.length,  items: mapD912Rows(usaStocksRaw, { limit: 500 }) },
     usa_adrs:    { currency: 'USD', total: usaAdrsRaw.length,    items: mapD912Rows(usaAdrsRaw) },
     arg_bonds:   { currency: 'ARS', total: argBondsRaw.length,   items: mapD912Rows(argBondsRaw) },
