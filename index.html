@@ -2484,7 +2484,12 @@
     }
     .mkt-row:last-child { border-bottom: none; }
     .mkt-row:hover { background: rgba(255,255,255,.03); }
-    .mkt-row .mr-name-wrap { display: flex; align-items: baseline; gap: 7px; min-width: 0; overflow: hidden; }
+    .mkt-row .mr-name-wrap { display: flex; align-items: center; gap: 7px; min-width: 0; overflow: hidden; }
+    .mkt-row .mr-logo { width: 20px; height: 20px; border-radius: 50%; flex: none; object-fit: contain; background: rgba(255,255,255,.06); }
+    .mkt-row .mr-logo-fallback {
+      display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;
+      color: rgba(255,255,255,.55); font-family: 'IBM Plex Mono', monospace;
+    }
     .mkt-row .mr-ticker { color: var(--white); font-family: 'IBM Plex Mono', monospace; font-weight: 600; white-space: nowrap; }
     .mkt-row .mr-name { color: rgba(255,255,255,.4); font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mkt-row .mr-fav-badge {
@@ -6525,6 +6530,12 @@
     });
   }
 
+  function mktLogoHTML(item) {
+    if (item.logo) {
+      return `<img class="mr-logo" src="${pfEsc(item.logo)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'mr-logo mr-logo-fallback',textContent:'${pfEsc((item.symbol||'?').charAt(0))}'}))">`;
+    }
+    return `<div class="mr-logo mr-logo-fallback">${pfEsc((item.symbol||'?').charAt(0))}</div>`;
+  }
   function mktRowHTML(item, currency, category, opts) {
     const { text, cls } = mktFmtChange(item.change);
     const unit = currency === 'USD' ? 'US$ ' : '$ ';
@@ -6534,7 +6545,7 @@
     return `
       <div class="mkt-row" data-symbol="${item.symbol}" data-category="${category}" data-currency="${currency}">
         <button type="button" class="mkt-star-btn${isFav ? ' on' : ''}" data-symbol="${item.symbol}" data-category="${category}" aria-label="${isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}">${mktStarIcon(isFav)}</button>
-        <div class="mr-name-wrap"><span class="mr-ticker">${item.symbol}</span><span class="mr-name">${name}</span>${badge}</div>
+        <div class="mr-name-wrap">${mktLogoHTML(item)}<span class="mr-ticker">${item.symbol}</span><span class="mr-name">${name}</span>${badge}</div>
         <div class="mr-price">${mktFmtPrice(item.price, unit)}</div>
         <div class="mr-chg ${cls}">${text}</div>
       </div>

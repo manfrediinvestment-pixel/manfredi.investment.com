@@ -95,6 +95,43 @@ function mapD912Rows(rows, { sortByVolume = true, limit = null, pin = [] } = {})
   return items;
 }
 
+// ─── Logos de empresa (Finnhub /stock/profile2) ────────────────────────────
+// Cacheados por separado del resto del payload (que refresca cada 2 min) con
+// TTL largo -- un logo no cambia de un dia para el otro, no vale la pena
+// repedirselo a Finnhub en cada refresh. Cache negativo mas corto para los
+// simbolos que hoy no tienen logo en Finnhub (tickers locales AR sin ADR en
+// EE.UU.), por si lo suman mas adelante.
+const LOGO_CACHE_TTL_SECONDS = 2592000; // 30 dias
+const LOGO_NEGATIVE_TTL_SECONDS = 259200; // 3 dias
+
+async function fetchLogo(symbol, finnhubKey) {
+  if (!finnhubKey) return null;
+  try {
+    const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${encodeURIComponent(symbol)}&token=${finnhubKey}`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data && data.logo) || null;
+  } catch (e) {
+    console.error(`[mercados] logo/${symbol}:`, e.message);
+    return null;
+  }
+}
+
+async function enrichWithLogos(items, env, finnhubKey) {
+  if (!finnhubKey || !env.MERCADOS_KV) return items;
+  return Promise.all(items.map(async (item) => {
+    const cacheKey = `logo_v1:${item.symbol}`;
+    const cached = await env.MERCADOS_KV.get(cacheKey);
+    if (cached != null) return { ...item, logo: cached || null };
+    const logo = await fetchLogo(item.symbol, finnhubKey);
+    await env.MERCADOS_KV.put(cacheKey, logo || '', {
+      expirationTtl: logo ? LOGO_CACHE_TTL_SECONDS : LOGO_NEGATIVE_TTL_SECONDS,
+    });
+    return { ...item, logo };
+  }));
+}
+
 // ─── Finnhub (server-side, key nunca viaja al navegador) ──────────────────
 async function fetchFinnhub(symbol, key) {
   if (!key) return null;
@@ -428,8 +465,11 @@ async function buildPayload(env) {
     { id: 'wti', flag: '🛢️', name: 'Petróleo WTI', unit: 'US$', price: wti?.price ?? null, change: wti?.change ?? null, spark: sparks.wti },
   ];
 
+  // Arranca solo por Acciones AR (piloto) -- logos via Finnhub, cache aparte.
+  const argStocksItems = await enrichWithLogos(mapD912Rows(argStocksRaw), env, finnhubKey);
+
   const categorias = {
-    arg_stocks:  { currency: 'ARS', total: argStocksRaw.length,  items: mapD912Rows(argStocksRaw) },
+    arg_stocks:  { currency: 'ARS', total: argStocksRaw.length,  items: argStocksItems },
     arg_cedears: { currency: 'ARS', total: argCedearsRaw.length, items: mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }) },
     usa_stocks:  { currency: 'USD', total: usaStocksRaw.length,  items: mapD912Rows(usaStocksRaw, { limit: 500 }) },
     usa_adrs:    { currency: 'USD', total: usaAdrsRaw.length,    items: mapD912Rows(usaAdrsRaw) },
