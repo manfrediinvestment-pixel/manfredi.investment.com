@@ -2437,6 +2437,7 @@
     }
     .mkt-modal-inner { padding: 22px 24px; }
     .mkt-modal-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+    .mkt-modal-title-row { display: flex; align-items: center; gap: 12px; }
     .mkt-modal-ticker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .06em; color: var(--gold); text-transform: uppercase; }
     .mkt-modal-name { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 21px; color: var(--white); margin: 3px 0 0; }
     .mkt-modal-close {
@@ -2485,11 +2486,15 @@
     .mkt-row:last-child { border-bottom: none; }
     .mkt-row:hover { background: rgba(255,255,255,.03); }
     .mkt-row .mr-name-wrap { display: flex; align-items: center; gap: 7px; min-width: 0; overflow: hidden; }
-    .mkt-row .mr-logo { width: 20px; height: 20px; border-radius: 50%; flex: none; object-fit: contain; background: rgba(255,255,255,.06); }
-    .mkt-row .mr-logo-fallback {
-      display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;
+    .mr-logo { border-radius: 50%; flex: none; object-fit: contain; background: rgba(255,255,255,.06); }
+    .mr-logo-fallback {
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
       color: rgba(255,255,255,.55); font-family: 'IBM Plex Mono', monospace;
     }
+    .mkt-row .mr-logo { width: 20px; height: 20px; }
+    .mkt-row .mr-logo-fallback { font-size: 10px; }
+    .mkt-modal-logo { width: 40px; height: 40px; }
+    .mkt-modal-logo.mr-logo-fallback { font-size: 16px; }
     .mkt-row .mr-ticker { color: var(--white); font-family: 'IBM Plex Mono', monospace; font-weight: 600; white-space: nowrap; }
     .mkt-row .mr-name { color: rgba(255,255,255,.4); font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mkt-row .mr-fav-badge {
@@ -3445,9 +3450,12 @@
     <div class="mkt-modal-box">
       <div class="mkt-modal-inner">
         <div class="mkt-modal-top">
-          <div>
-            <div class="mkt-modal-ticker" id="mktModalTicker">&mdash;</div>
-            <h3 class="mkt-modal-name" id="mktModalName">&mdash;</h3>
+          <div class="mkt-modal-title-row">
+            <div id="mktModalLogoWrap"></div>
+            <div>
+              <div class="mkt-modal-ticker" id="mktModalTicker">&mdash;</div>
+              <h3 class="mkt-modal-name" id="mktModalName">&mdash;</h3>
+            </div>
           </div>
           <button type="button" class="mkt-modal-close" id="mktModalClose" aria-label="Cerrar">&times;</button>
         </div>
@@ -6530,11 +6538,12 @@
     });
   }
 
-  function mktLogoHTML(item) {
+  function mktLogoHTML(item, extraClass) {
+    const cls = 'mr-logo' + (extraClass ? ' ' + extraClass : '');
     if (item.logo) {
-      return `<img class="mr-logo" src="${pfEsc(item.logo)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'mr-logo mr-logo-fallback',textContent:'${pfEsc((item.symbol||'?').charAt(0))}'}))">`;
+      return `<img class="${cls}" src="${pfEsc(item.logo)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'${cls} mr-logo-fallback',textContent:'${pfEsc((item.symbol||'?').charAt(0))}'}))">`;
     }
-    return `<div class="mr-logo mr-logo-fallback">${pfEsc((item.symbol||'?').charAt(0))}</div>`;
+    return `<div class="${cls} mr-logo-fallback">${pfEsc((item.symbol||'?').charAt(0))}</div>`;
   }
   function mktRowHTML(item, currency, category, opts) {
     const { text, cls } = mktFmtChange(item.change);
@@ -6685,6 +6694,7 @@
     if (!overlay || !item) return;
     const { text, cls } = mktFmtChange(item.change);
     const unit = currency === 'USD' ? 'US$ ' : '$ ';
+    document.getElementById('mktModalLogoWrap').innerHTML = mktLogoHTML(item, 'mkt-modal-logo');
     document.getElementById('mktModalTicker').textContent = item.symbol + ' · ' + mktCategoryLabel(category);
     document.getElementById('mktModalName').textContent = (item.name && item.name !== item.symbol) ? item.name : item.symbol;
     document.getElementById('mktModalPrice').innerHTML = mktFmtPrice(item.price, unit);
