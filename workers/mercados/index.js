@@ -136,12 +136,23 @@ async function mapWithConcurrency(items, limit, fn) {
   return results;
 }
 
-async function enrichWithLogos(items, env, finnhubKey) {
+// budget: tope compartido entre TODAS las categorias de simbolos NUEVOS (sin
+// cache) que se le piden a Finnhub en una misma invocacion. Cloudflare Workers
+// tiene un limite duro de subrequests por invocacion (tan bajo como 50 segun
+// el plan) y buildPayload() ya gasta ~25 en precios/indices antes de llegar
+// aca -- sin este tope, la primera vez que se suman ~1.180 simbolos nuevos
+// (Acciones AR + CEDEARs + Acciones USA + ADRs) de golpe se comeria ese
+// limite en un solo build. Los que quedan afuera del cupo no escriben cache
+// (logo: null sin `put`), asi que se reintentan solos en el proximo ciclo de
+// cache (2 min) en vez de quedar de baja 3 dias por un falso negativo.
+async function enrichWithLogos(items, env, finnhubKey, budget) {
   if (!finnhubKey || !env.MERCADOS_KV) return items;
   return mapWithConcurrency(items, 20, async (item) => {
     const cacheKey = `logo_v1:${item.symbol}`;
     const cached = await env.MERCADOS_KV.get(cacheKey);
     if (cached != null) return { ...item, logo: cached || null };
+    if (budget.remaining <= 0) return { ...item, logo: null };
+    budget.remaining--;
     const logo = await fetchLogo(item.symbol, finnhubKey);
     await env.MERCADOS_KV.put(cacheKey, logo || '', {
       expirationTtl: logo ? LOGO_CACHE_TTL_SECONDS : LOGO_NEGATIVE_TTL_SECONDS,
@@ -483,15 +494,22 @@ async function buildPayload(env) {
     { id: 'wti', flag: '🛢️', name: 'Petróleo WTI', unit: 'US$', price: wti?.price ?? null, change: wti?.change ?? null, spark: sparks.wti },
   ];
 
-  // Logos via Finnhub (Acciones AR + CEDEARs por ahora), cache aparte del payload.
-  const argStocksItems = await enrichWithLogos(mapD912Rows(argStocksRaw), env, finnhubKey);
-  const argCedearsItems = await enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), env, finnhubKey);
+  // Logos via Finnhub -- Acciones AR, CEDEARs, Acciones USA y ADRs. Estas dos
+  // ultimas son mayormente empresas ya listadas en EE.UU. (sin las variantes
+  // C/D de liquidacion local), asi que la cobertura de Finnhub deberia ser la
+  // mas alta de todas las categorias. logoBudget se comparte entre las 4 --
+  // ver comentario en enrichWithLogos sobre el limite de subrequests.
+  const logoBudget = { remaining: 20 };
+  const argStocksItems = await enrichWithLogos(mapD912Rows(argStocksRaw), env, finnhubKey, logoBudget);
+  const argCedearsItems = await enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), env, finnhubKey, logoBudget);
+  const usaStocksItems = await enrichWithLogos(mapD912Rows(usaStocksRaw, { limit: 500 }), env, finnhubKey, logoBudget);
+  const usaAdrsItems = await enrichWithLogos(mapD912Rows(usaAdrsRaw), env, finnhubKey, logoBudget);
 
   const categorias = {
     arg_stocks:  { currency: 'ARS', total: argStocksRaw.length,  items: argStocksItems },
     arg_cedears: { currency: 'ARS', total: argCedearsRaw.length, items: argCedearsItems },
-    usa_stocks:  { currency: 'USD', total: usaStocksRaw.length,  items: mapD912Rows(usaStocksRaw, { limit: 500 }) },
-    usa_adrs:    { currency: 'USD', total: usaAdrsRaw.length,    items: mapD912Rows(usaAdrsRaw) },
+    usa_stocks:  { currency: 'USD', total: usaStocksRaw.length,  items: usaStocksItems },
+    usa_adrs:    { currency: 'USD', total: usaAdrsRaw.length,    items: usaAdrsItems },
     arg_bonds:   { currency: 'ARS', total: argBondsRaw.length,   items: mapD912Rows(argBondsRaw) },
     cripto:      { currency: 'USD', total: cripto.length,        items: cripto },
     commodities: { currency: 'USD', total: commodities.length,   items: commodities },
