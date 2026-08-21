@@ -280,7 +280,6 @@ async function fetchCriptoCoinGecko() {
     price: c.current_price,
     change: c.price_change_percentage_24h,
     volume: c.total_volume || 0,
-    logo: c.image || null, // CoinGecko ya trae el logo en la misma respuesta -- sin Finnhub, sin pedido aparte
   }));
 }
 
@@ -320,18 +319,34 @@ async function fetchCriptoKraken() {
     .slice(0, 200);
 }
 
+// Logo de cripto: CDN estatico por simbolo (spothq/cryptocurrency-icons via
+// jsdelivr, gratis, sin key). A diferencia de usar el campo "image" de
+// CoinGecko, esto funciona identico caiga la fuente de precio en CoinGecko
+// o en el fallback de Kraken -- CoinGecko bloquea seguido las IPs de
+// Cloudflare Workers, asi que en la practica el precio viene de Kraken buena
+// parte del tiempo, y Kraken no trae logos. No hace falta chequear si el
+// icono existe: si el simbolo no esta en el repo, el <img onerror> del
+// frontend ya cae solo al circulo con la inicial.
+function cryptoIconUrl(symbol) {
+  return `https://cdn.jsdelivr.net/gh/spothq/cryptocurrency-icons@master/128/color/${symbol.toLowerCase()}.png`;
+}
+
 async function fetchCripto() {
+  let items;
   try {
-    return await fetchCriptoCoinGecko();
+    items = await fetchCriptoCoinGecko();
   } catch (e) {
     console.error('[mercados] coingecko:', e.message);
   }
-  try {
-    return await fetchCriptoKraken();
-  } catch (e) {
-    console.error('[mercados] kraken:', e.message);
-    return [];
+  if (!items) {
+    try {
+      items = await fetchCriptoKraken();
+    } catch (e) {
+      console.error('[mercados] kraken:', e.message);
+      items = [];
+    }
   }
+  return items.map(c => ({ ...c, logo: cryptoIconUrl(c.symbol) }));
 }
 
 // ─── Merval: ArgentinaDatos → Finnhub → Yahoo ─────────────────────────────
