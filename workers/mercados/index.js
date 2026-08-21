@@ -164,27 +164,33 @@ async function mapWithConcurrency(items, limit, fn) {
   return results;
 }
 
-// blob: el mapa completo {simbolo: {logo, marketCap, ts}}, cargado UNA vez
-// por build y compartido entre todas las categorias -- ninguna llamada a KV
-// aca adentro. budget: tope compartido de simbolos NUEVOS pedidos a Finnhub
-// por build (protege el rate limit de Finnhub en si, 60/min en el plan free
-// -- ya no protege subrequests, eso lo resuelve el blob).
-async function enrichWithLogos(items, finnhubKey, blob, budget) {
+// Finnhub devuelve market caps sin sentido para algunos tickers locales de
+// BYMA (encontrado probando con datos reales: GGAL en arg_stocks aparecio
+// con ~USD 10,6 billones, SUPV con ~USD 1,17 billones -- parece confundir
+// unidades/moneda para esas fichas, no un caso aislado). maxMarketCapM
+// (millones de USD) es un techo de sanity por categoria: generoso para
+// empresas globales grandes (CEDEARs/Acciones USA, donde de verdad puede
+// haber compañias de varios billones), mucho mas estricto para Acciones AR
+// (ninguna empresa Argentina esta ni cerca de esa escala). El valor crudo
+// se guarda igual en el blob -- el techo solo filtra lo que se expone en la
+// respuesta, por si el dato de Finnhub mejora mas adelante.
+async function enrichWithLogos(items, finnhubKey, blob, budget, maxMarketCapM) {
   if (!finnhubKey) return items;
   const now = Date.now();
+  const sane = (mc) => (typeof mc === 'number' && mc > 0 && mc <= maxMarketCapM) ? mc : null;
   return mapWithConcurrency(items, 20, async (item) => {
     const entry = blob[item.symbol];
     if (entry && (now - entry.ts) < (entry.logo ? LOGO_POSITIVE_MS : LOGO_NEGATIVE_MS)) {
-      return { ...item, logo: entry.logo, marketCap: entry.marketCap ?? null };
+      return { ...item, logo: entry.logo, marketCap: sane(entry.marketCap) };
     }
     if (budget.remaining <= 0) {
-      return { ...item, logo: entry ? entry.logo : null, marketCap: entry ? (entry.marketCap ?? null) : null };
+      return { ...item, logo: entry ? entry.logo : null, marketCap: entry ? sane(entry.marketCap) : null };
     }
     budget.remaining--;
     const { logo, marketCap } = await fetchProfile(item.symbol, finnhubKey);
     blob[item.symbol] = { logo, marketCap, ts: now };
     budget.dirty = true;
-    return { ...item, logo, marketCap };
+    return { ...item, logo, marketCap: sane(marketCap) };
   });
 }
 
@@ -539,11 +545,13 @@ async function buildPayload(env) {
   // vez, se comparte, y se guarda una vez al final si hubo simbolos nuevos.
   const logoBlob = await loadLogoBlob(env);
   const logoBudget = { remaining: 20, dirty: false };
+  const MAX_MARKETCAP_AR = 500000;      // USD 500 mil millones -- ninguna empresa Argentina se acerca
+  const MAX_MARKETCAP_GLOBAL = 10000000; // USD 10 billones -- headroom generoso arriba de la mas grande del mundo
   const [argStocksItems, argCedearsItems, usaStocksItems, usaAdrsItems] = await Promise.all([
-    enrichWithLogos(mapD912Rows(argStocksRaw), finnhubKey, logoBlob, logoBudget),
-    enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), finnhubKey, logoBlob, logoBudget),
-    enrichWithLogos(mapD912Rows(usaStocksRaw, { limit: 500 }), finnhubKey, logoBlob, logoBudget),
-    enrichWithLogos(mapD912Rows(usaAdrsRaw), finnhubKey, logoBlob, logoBudget),
+    enrichWithLogos(mapD912Rows(argStocksRaw), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_AR),
+    enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_GLOBAL),
+    enrichWithLogos(mapD912Rows(usaStocksRaw, { limit: 500 }), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_GLOBAL),
+    enrichWithLogos(mapD912Rows(usaAdrsRaw), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_GLOBAL),
   ]);
   if (logoBudget.dirty) await saveLogoBlob(env, logoBlob);
 
