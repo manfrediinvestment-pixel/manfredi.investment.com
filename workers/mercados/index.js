@@ -118,9 +118,27 @@ async function fetchLogo(symbol, finnhubKey) {
   }
 }
 
+// Concurrencia acotada -- con categorias grandes (CEDEARs son ~400 simbolos)
+// tirar todo junto con Promise.all satura el limite de Finnhub (60/min en el
+// plan free) en el primer build con cache fria. Un pool chico evita el
+// burst; despues del primer build casi todo pega contra el cache de KV
+// (lectura, no cuenta contra Finnhub) asi que el costo real es unico.
+async function mapWithConcurrency(items, limit, fn) {
+  const results = new Array(items.length);
+  let next = 0;
+  async function worker() {
+    while (next < items.length) {
+      const i = next++;
+      results[i] = await fn(items[i]);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return results;
+}
+
 async function enrichWithLogos(items, env, finnhubKey) {
   if (!finnhubKey || !env.MERCADOS_KV) return items;
-  return Promise.all(items.map(async (item) => {
+  return mapWithConcurrency(items, 20, async (item) => {
     const cacheKey = `logo_v1:${item.symbol}`;
     const cached = await env.MERCADOS_KV.get(cacheKey);
     if (cached != null) return { ...item, logo: cached || null };
@@ -129,7 +147,7 @@ async function enrichWithLogos(items, env, finnhubKey) {
       expirationTtl: logo ? LOGO_CACHE_TTL_SECONDS : LOGO_NEGATIVE_TTL_SECONDS,
     });
     return { ...item, logo };
-  }));
+  });
 }
 
 // ─── Finnhub (server-side, key nunca viaja al navegador) ──────────────────
@@ -465,12 +483,13 @@ async function buildPayload(env) {
     { id: 'wti', flag: '🛢️', name: 'Petróleo WTI', unit: 'US$', price: wti?.price ?? null, change: wti?.change ?? null, spark: sparks.wti },
   ];
 
-  // Arranca solo por Acciones AR (piloto) -- logos via Finnhub, cache aparte.
+  // Logos via Finnhub (Acciones AR + CEDEARs por ahora), cache aparte del payload.
   const argStocksItems = await enrichWithLogos(mapD912Rows(argStocksRaw), env, finnhubKey);
+  const argCedearsItems = await enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), env, finnhubKey);
 
   const categorias = {
     arg_stocks:  { currency: 'ARS', total: argStocksRaw.length,  items: argStocksItems },
-    arg_cedears: { currency: 'ARS', total: argCedearsRaw.length, items: mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }) },
+    arg_cedears: { currency: 'ARS', total: argCedearsRaw.length, items: argCedearsItems },
     usa_stocks:  { currency: 'USD', total: usaStocksRaw.length,  items: mapD912Rows(usaStocksRaw, { limit: 500 }) },
     usa_adrs:    { currency: 'USD', total: usaAdrsRaw.length,    items: mapD912Rows(usaAdrsRaw) },
     arg_bonds:   { currency: 'ARS', total: argBondsRaw.length,   items: mapD912Rows(argBondsRaw) },
