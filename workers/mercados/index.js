@@ -280,6 +280,7 @@ async function fetchCriptoCoinGecko() {
     price: c.current_price,
     change: c.price_change_percentage_24h,
     volume: c.total_volume || 0,
+    logo: c.image || null, // CoinGecko ya trae el logo en la misma respuesta -- sin Finnhub, sin pedido aparte
   }));
 }
 
