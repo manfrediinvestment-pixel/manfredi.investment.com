@@ -95,6 +95,99 @@ function mapD912Rows(rows, { sortByVolume = true, limit = null, pin = [] } = {})
   return items;
 }
 
+// ─── Logos de empresa (Finnhub /stock/profile2) ────────────────────────────
+// Guardados en UN SOLO blob de KV (no una key por simbolo) -- version previa
+// de esto usaba `env.MERCADOS_KV.get()` por cada uno de los ~1.200 simbolos
+// (Acciones AR + CEDEARs + Acciones USA + ADRs) en cada build, y cada
+// lectura de KV cuenta como un subrequest para Cloudflare Workers igual que
+// un fetch(): tumbo el endpoint entero con "Too many API requests by single
+// Worker invocation" (buildPayload ya gasta ~25 subrequests en precios antes
+// de llegar aca). Con el blob, el costo es 1 lectura + a lo sumo 1 escritura
+// por build, sin importar cuantos simbolos haya.
+const LOGO_BLOB_KEY = 'logos_v2';
+const LOGO_POSITIVE_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias -- un logo no cambia
+const LOGO_NEGATIVE_MS = 3 * 24 * 60 * 60 * 1000;  // 3 dias -- reintentar simbolos sin logo
+
+async function loadLogoBlob(env) {
+  if (!env.MERCADOS_KV) return {};
+  try {
+    const raw = await env.MERCADOS_KV.get(LOGO_BLOB_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    console.error('[mercados] logo blob parse:', e.message);
+    return {};
+  }
+}
+
+async function saveLogoBlob(env, blob) {
+  if (!env.MERCADOS_KV) return;
+  try {
+    await env.MERCADOS_KV.put(LOGO_BLOB_KEY, JSON.stringify(blob));
+  } catch (e) {
+    console.error('[mercados] logo blob put:', e.message);
+  }
+}
+
+async function fetchLogo(symbol, finnhubKey) {
+  if (!finnhubKey) return null;
+  try {
+    const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${encodeURIComponent(symbol)}&token=${finnhubKey}`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data && data.logo) || null;
+  } catch (e) {
+    console.error(`[mercados] logo/${symbol}:`, e.message);
+    return null;
+  }
+}
+
+// Concurrencia acotada para las llamadas a Finnhub (no para KV, que ahora es
+// una sola lectura/escritura fuera de este loop).
+async function mapWithConcurrency(items, limit, fn) {
+  const results = new Array(items.length);
+  let next = 0;
+  async function worker() {
+    while (next < items.length) {
+      const i = next++;
+      results[i] = await fn(items[i]);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return results;
+}
+
+// blob: el mapa completo {simbolo: {logo, ts}}, cargado UNA vez por build y
+// compartido entre todas las categorias -- ninguna llamada a KV aca adentro.
+// budget: tope compartido de simbolos NUEVOS pedidos a Finnhub por build
+// (protege el rate limit de Finnhub en si, 60/min en el plan free -- ya no
+// protege subrequests, eso lo resuelve el blob).
+async function enrichWithLogos(items, finnhubKey, blob, budget) {
+  if (!finnhubKey) return items;
+  const now = Date.now();
+  return mapWithConcurrency(items, 20, async (item) => {
+    const entry = blob[item.symbol];
+    if (entry && (now - entry.ts) < (entry.logo ? LOGO_POSITIVE_MS : LOGO_NEGATIVE_MS)) {
+      return { ...item, logo: entry.logo };
+    }
+    if (budget.remaining <= 0) return { ...item, logo: entry ? entry.logo : null };
+    budget.remaining--;
+    const logo = await fetchLogo(item.symbol, finnhubKey);
+    blob[item.symbol] = { logo, ts: now };
+    budget.dirty = true;
+    return { ...item, logo };
+  });
+}
+
+// ─── Cripto: CDN estatico por simbolo (spothq/cryptocurrency-icons via
+// jsdelivr, gratis, sin key, sin KV) -- funciona igual sea que el precio
+// haya salido de CoinGecko o del fallback de Kraken (CoinGecko bloquea
+// seguido las IPs de Cloudflare Workers). Sin verificacion de si el icono
+// existe: el <img onerror> del frontend cae solo al circulo con la inicial.
+function cryptoIconUrl(symbol) {
+  return `https://cdn.jsdelivr.net/gh/spothq/cryptocurrency-icons@master/128/color/${symbol.toLowerCase()}.png`;
+}
+
 // ─── Finnhub (server-side, key nunca viaja al navegador) ──────────────────
 async function fetchFinnhub(symbol, key) {
   if (!key) return null;
@@ -254,17 +347,21 @@ async function fetchCriptoKraken() {
 }
 
 async function fetchCripto() {
+  let items;
   try {
-    return await fetchCriptoCoinGecko();
+    items = await fetchCriptoCoinGecko();
   } catch (e) {
     console.error('[mercados] coingecko:', e.message);
   }
-  try {
-    return await fetchCriptoKraken();
-  } catch (e) {
-    console.error('[mercados] kraken:', e.message);
-    return [];
+  if (!items) {
+    try {
+      items = await fetchCriptoKraken();
+    } catch (e) {
+      console.error('[mercados] kraken:', e.message);
+      items = [];
+    }
   }
+  return items.map(c => ({ ...c, logo: cryptoIconUrl(c.symbol) }));
 }
 
 // ─── Merval: ArgentinaDatos → Finnhub → Yahoo ─────────────────────────────
@@ -428,11 +525,24 @@ async function buildPayload(env) {
     { id: 'wti', flag: '🛢️', name: 'Petróleo WTI', unit: 'US$', price: wti?.price ?? null, change: wti?.change ?? null, spark: sparks.wti },
   ];
 
+  // Logos via Finnhub -- Acciones AR, CEDEARs, Acciones USA y ADRs. Un solo
+  // blob de KV para las 4 (ver comentario en enrichWithLogos): se carga una
+  // vez, se comparte, y se guarda una vez al final si hubo simbolos nuevos.
+  const logoBlob = await loadLogoBlob(env);
+  const logoBudget = { remaining: 20, dirty: false };
+  const [argStocksItems, argCedearsItems, usaStocksItems, usaAdrsItems] = await Promise.all([
+    enrichWithLogos(mapD912Rows(argStocksRaw), finnhubKey, logoBlob, logoBudget),
+    enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), finnhubKey, logoBlob, logoBudget),
+    enrichWithLogos(mapD912Rows(usaStocksRaw, { limit: 500 }), finnhubKey, logoBlob, logoBudget),
+    enrichWithLogos(mapD912Rows(usaAdrsRaw), finnhubKey, logoBlob, logoBudget),
+  ]);
+  if (logoBudget.dirty) await saveLogoBlob(env, logoBlob);
+
   const categorias = {
-    arg_stocks:  { currency: 'ARS', total: argStocksRaw.length,  items: mapD912Rows(argStocksRaw) },
-    arg_cedears: { currency: 'ARS', total: argCedearsRaw.length, items: mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }) },
-    usa_stocks:  { currency: 'USD', total: usaStocksRaw.length,  items: mapD912Rows(usaStocksRaw, { limit: 500 }) },
-    usa_adrs:    { currency: 'USD', total: usaAdrsRaw.length,    items: mapD912Rows(usaAdrsRaw) },
+    arg_stocks:  { currency: 'ARS', total: argStocksRaw.length,  items: argStocksItems },
+    arg_cedears: { currency: 'ARS', total: argCedearsRaw.length, items: argCedearsItems },
+    usa_stocks:  { currency: 'USD', total: usaStocksRaw.length,  items: usaStocksItems },
+    usa_adrs:    { currency: 'USD', total: usaAdrsRaw.length,    items: usaAdrsItems },
     arg_bonds:   { currency: 'ARS', total: argBondsRaw.length,   items: mapD912Rows(argBondsRaw) },
     cripto:      { currency: 'USD', total: cripto.length,        items: cripto },
     commodities: { currency: 'USD', total: commodities.length,   items: commodities },
