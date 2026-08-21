@@ -95,7 +95,7 @@ function mapD912Rows(rows, { sortByVolume = true, limit = null, pin = [] } = {})
   return items;
 }
 
-// ─── Logos de empresa (Finnhub /stock/profile2) ────────────────────────────
+// ─── Logo + market cap (Finnhub /stock/profile2, misma respuesta para las dos) ─
 // Guardados en UN SOLO blob de KV (no una key por simbolo) -- version previa
 // de esto usaba `env.MERCADOS_KV.get()` por cada uno de los ~1.200 simbolos
 // (Acciones AR + CEDEARs + Acciones USA + ADRs) en cada build, y cada
@@ -104,9 +104,13 @@ function mapD912Rows(rows, { sortByVolume = true, limit = null, pin = [] } = {})
 // Worker invocation" (buildPayload ya gasta ~25 subrequests en precios antes
 // de llegar aca). Con el blob, el costo es 1 lectura + a lo sumo 1 escritura
 // por build, sin importar cuantos simbolos haya.
-const LOGO_BLOB_KEY = 'logos_v2';
-const LOGO_POSITIVE_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias -- un logo no cambia
-const LOGO_NEGATIVE_MS = 3 * 24 * 60 * 60 * 1000;  // 3 dias -- reintentar simbolos sin logo
+// v3: el mismo pedido a /stock/profile2 que ya haciamos para el logo tambien
+// trae marketCapitalization (en millones de USD) -- se pide gratis en la
+// misma respuesta, sin sumar ningun fetch nuevo. Bump de version del blob
+// para forzar un refetch limpio que traiga las dos cosas juntas.
+const LOGO_BLOB_KEY = 'logos_v3';
+const LOGO_POSITIVE_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias -- no cambian de un dia para el otro
+const LOGO_NEGATIVE_MS = 3 * 24 * 60 * 60 * 1000;  // 3 dias -- reintentar simbolos sin datos
 
 async function loadLogoBlob(env) {
   if (!env.MERCADOS_KV) return {};
@@ -128,17 +132,20 @@ async function saveLogoBlob(env, blob) {
   }
 }
 
-async function fetchLogo(symbol, finnhubKey) {
-  if (!finnhubKey) return null;
+async function fetchProfile(symbol, finnhubKey) {
+  if (!finnhubKey) return { logo: null, marketCap: null };
   try {
     const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${encodeURIComponent(symbol)}&token=${finnhubKey}`;
     const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    if (!res.ok) return null;
+    if (!res.ok) return { logo: null, marketCap: null };
     const data = await res.json();
-    return (data && data.logo) || null;
+    return {
+      logo: (data && data.logo) || null,
+      marketCap: (data && typeof data.marketCapitalization === 'number') ? data.marketCapitalization : null,
+    };
   } catch (e) {
-    console.error(`[mercados] logo/${symbol}:`, e.message);
-    return null;
+    console.error(`[mercados] profile/${symbol}:`, e.message);
+    return { logo: null, marketCap: null };
   }
 }
 
@@ -157,25 +164,27 @@ async function mapWithConcurrency(items, limit, fn) {
   return results;
 }
 
-// blob: el mapa completo {simbolo: {logo, ts}}, cargado UNA vez por build y
-// compartido entre todas las categorias -- ninguna llamada a KV aca adentro.
-// budget: tope compartido de simbolos NUEVOS pedidos a Finnhub por build
-// (protege el rate limit de Finnhub en si, 60/min en el plan free -- ya no
-// protege subrequests, eso lo resuelve el blob).
+// blob: el mapa completo {simbolo: {logo, marketCap, ts}}, cargado UNA vez
+// por build y compartido entre todas las categorias -- ninguna llamada a KV
+// aca adentro. budget: tope compartido de simbolos NUEVOS pedidos a Finnhub
+// por build (protege el rate limit de Finnhub en si, 60/min en el plan free
+// -- ya no protege subrequests, eso lo resuelve el blob).
 async function enrichWithLogos(items, finnhubKey, blob, budget) {
   if (!finnhubKey) return items;
   const now = Date.now();
   return mapWithConcurrency(items, 20, async (item) => {
     const entry = blob[item.symbol];
     if (entry && (now - entry.ts) < (entry.logo ? LOGO_POSITIVE_MS : LOGO_NEGATIVE_MS)) {
-      return { ...item, logo: entry.logo };
+      return { ...item, logo: entry.logo, marketCap: entry.marketCap ?? null };
     }
-    if (budget.remaining <= 0) return { ...item, logo: entry ? entry.logo : null };
+    if (budget.remaining <= 0) {
+      return { ...item, logo: entry ? entry.logo : null, marketCap: entry ? (entry.marketCap ?? null) : null };
+    }
     budget.remaining--;
-    const logo = await fetchLogo(item.symbol, finnhubKey);
-    blob[item.symbol] = { logo, ts: now };
+    const { logo, marketCap } = await fetchProfile(item.symbol, finnhubKey);
+    blob[item.symbol] = { logo, marketCap, ts: now };
     budget.dirty = true;
-    return { ...item, logo };
+    return { ...item, logo, marketCap };
   });
 }
 
