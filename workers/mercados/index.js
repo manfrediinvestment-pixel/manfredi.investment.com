@@ -25,6 +25,7 @@ const NAME_MAP = {
   TECO2: 'Telecom Argentina', CEPU: 'Central Puerto', CRES: 'Cresud', COME: 'Comercial del Plata',
   TGSU2: 'Transportadora Gas del Sur', TGNO4: 'Transportadora Gas del Norte',
   EDN: 'Edenor', TRAN: 'Transener', VALO: 'Grupo Financiero Valores', SUPV: 'Banco Supervielle',
+  BBAR: 'BBVA Argentina', IRSA: 'IRSA', CVH: 'Cablevisión Holding',
   // ADRs
   YPF: 'YPF', PAM: 'Pampa Energía', TEO: 'Telecom Argentina', LOM: 'Loma Negra',
   TX: 'Ternium', IRS: 'IRSA', BIOX: 'Bioceres', DESP: 'Despegar', MELI: 'MercadoLibre',
@@ -554,11 +555,27 @@ async function buildPayload(env) {
   // Dandole prioridad, se completa sola en ~5 builds (95/20) y despues el
   // cupo entero queda libre para las demas -- mismo total de 20 por build,
   // solo cambia el orden de reparto.
+  //
+  // Ademas, para Acciones AR SOLO se le pide market cap/logo a Finnhub para
+  // los simbolos que ya tenemos identificados con certeza en NAME_MAP (las
+  // ~20 empresas locales grandes y conocidas). Motivo: probando con datos
+  // reales, Finnhub matcheo el ticker local "INTR" (papel chico e iliquido
+  // de BYMA, volumen ~1.700) con el market cap real de otra empresa global
+  // que casualmente usa el mismo ticker (Banco Inter/Inter&Co, ~USD 2.300M)
+  // -- un numero "sano" que un techo maximo no puede detectar, porque el
+  // problema no es que el valor sea absurdo, es que es de la empresa
+  // equivocada. Restringir a la lista curada evita ese choque de simbolo
+  // para el resto de los ~75 tickers chicos/desconocidos (quedan sin market
+  // cap/logo en vez de mostrar un dato de otra compañia).
   const logoBlob = await loadLogoBlob(env);
   const logoBudget = { remaining: 20, dirty: false };
   const MAX_MARKETCAP_AR = 500000;      // USD 500 mil millones -- ninguna empresa Argentina se acerca
   const MAX_MARKETCAP_GLOBAL = 10000000; // USD 10 billones -- headroom generoso arriba de la mas grande del mundo
-  const argStocksItems = await enrichWithLogos(mapD912Rows(argStocksRaw), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_AR);
+  const argStocksSorted = mapD912Rows(argStocksRaw);
+  const argStocksKnown = argStocksSorted.filter(it => NAME_MAP[it.symbol] !== undefined);
+  const argStocksEnriched = await enrichWithLogos(argStocksKnown, finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_AR);
+  const argStocksEnrichedBySymbol = Object.fromEntries(argStocksEnriched.map(it => [it.symbol, it]));
+  const argStocksItems = argStocksSorted.map(it => argStocksEnrichedBySymbol[it.symbol] || { ...it, logo: null, marketCap: null });
   const [argCedearsItems, usaStocksItems, usaAdrsItems] = await Promise.all([
     enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_GLOBAL),
     enrichWithLogos(mapD912Rows(usaStocksRaw, { limit: 500 }), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_GLOBAL),
