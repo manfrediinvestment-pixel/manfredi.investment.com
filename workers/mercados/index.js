@@ -770,6 +770,46 @@ export default {
       }
     }
 
+    // GET /admin/enrich?token=...&symbols=AAPL,MSFT,...&ar=1
+    // Recarga a demanda logos/market cap de un lote chico de simbolos contra
+    // Finnhub y los persiste en el mismo blob de KV que usa buildPayload()
+    // (logos_v5) -- pensado para disparar manualmente en tandas (no expuesto
+    // en el sitio, no llamado por buildPayload) cuando se quiere refrescar
+    // CEDEARs/Acciones USA/ADRs "de una", sin esperar el trickle de 20 por
+    // ciclo de 2 min. Tope duro de 25 simbolos por pedido para no acercarse
+    // al limite de subrequests por invocacion de Cloudflare Workers (mismo
+    // problema que rompio produccion la primera vez, ver comentario de
+    // logos_v2/v3 mas arriba) -- para recargar todo el universo (~1.100
+    // simbolos entre CEDEARs/Acciones USA/ADRs) hay que llamarlo en un loop
+    // externo, ~45-55 pedidos de a 20-25 simbolos.
+    if (url.pathname === '/admin/enrich') {
+      const token = url.searchParams.get('token') || '';
+      if (!env.ADMIN_TOKEN || token !== env.ADMIN_TOKEN) {
+        return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers });
+      }
+      const finnhubKey = env.FINNHUB_KEY;
+      if (!finnhubKey) {
+        return new Response(JSON.stringify({ error: 'FINNHUB_KEY no configurada' }), { status: 500, headers });
+      }
+      const isAR = url.searchParams.get('ar') === '1';
+      const symbols = (url.searchParams.get('symbols') || '')
+        .split(',').map(s => s.trim().toUpperCase()).filter(Boolean).slice(0, 25);
+      if (!symbols.length) {
+        return new Response(JSON.stringify({ error: 'Falta symbols (separados por coma, maximo 25)' }), { status: 400, headers });
+      }
+      const blob = await loadLogoBlob(env);
+      const now = Date.now();
+      const results = await mapWithConcurrency(symbols, 20, async (symbol) => {
+        const querySymbol = AR_LOCAL_TO_ADR_SYMBOL[symbol] || symbol;
+        let { logo, marketCap, country } = await fetchProfile(querySymbol, finnhubKey);
+        if (isAR && country !== 'AR') { logo = null; marketCap = null; }
+        blob[symbol] = { logo, marketCap, ts: now };
+        return { symbol, logo: !!logo, marketCap };
+      });
+      await saveLogoBlob(env, blob);
+      return new Response(JSON.stringify({ processed: results.length, results }), { headers });
+    }
+
     if (url.pathname === '/debug-cripto') {
       const attempts = {};
       const tryOne = async (name, fn) => {
