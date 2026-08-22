@@ -107,9 +107,12 @@ function mapD912Rows(rows, { sortByVolume = true, limit = null, pin = [] } = {})
 // por build, sin importar cuantos simbolos haya.
 // v3: el mismo pedido a /stock/profile2 que ya haciamos para el logo tambien
 // trae marketCapitalization (en millones de USD) -- se pide gratis en la
-// misma respuesta, sin sumar ningun fetch nuevo. Bump de version del blob
-// para forzar un refetch limpio que traiga las dos cosas juntas.
-const LOGO_BLOB_KEY = 'logos_v3';
+// misma respuesta, sin sumar ningun fetch nuevo.
+// v4: Acciones AR ahora solo enriquece simbolos en NAME_MAP (ver comentario
+// en buildPayload) -- bump para descartar entradas viejas de simbolos como
+// GGAL que quedaron con logo cacheado (fresco por 30 dias, no se reintenta)
+// pero marketCap null por el choque de simbolo detectado con INTR/Finnhub.
+const LOGO_BLOB_KEY = 'logos_v4';
 const LOGO_POSITIVE_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias -- no cambian de un dia para el otro
 const LOGO_NEGATIVE_MS = 3 * 24 * 60 * 60 * 1000;  // 3 dias -- reintentar simbolos sin datos
 
