@@ -694,13 +694,14 @@ export default {
         const roe = firstNumber(m.roeTTM, m.roeRfy, m.roeAnnual);
         const pe = firstNumber(m.peBasicExclExtraTTM, m.peTTM, m.peExclExtraTTM, m.peAnnual);
         const divYield = firstNumber(m.currentDividendYieldTTM, m.dividendYieldIndicatedAnnual, m.dividendYield5Y);
-        let sector = null, country = null;
+        let sector = null, country = null, marketCap = null;
         if (profileResp.ok) {
           const profile = await profileResp.json();
           sector = (profile && profile.finnhubIndustry) || null;
           country = (profile && profile.country) || null;
+          marketCap = (profile && typeof profile.marketCapitalization === 'number') ? profile.marketCapitalization : null;
         }
-        const json = JSON.stringify({ symbol: symbol.toUpperCase(), roe, pe, divYield, sector, country });
+        const json = JSON.stringify({ symbol: symbol.toUpperCase(), roe, pe, divYield, sector, country, marketCap });
         await env.MERCADOS_KV.put(cacheKey, json, { expirationTtl: 86400 });
         return new Response(json, { headers });
       } catch (err) {
