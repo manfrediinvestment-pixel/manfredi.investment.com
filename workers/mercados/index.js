@@ -152,19 +152,20 @@ async function saveLogoBlob(env, blob) {
 // Finnhub -- solo devuelve datos si se pide el ticker del ADR equivalente
 // (YPF, PAM, TEO, CRESY, IRS respectivamente, ver AR_LOCAL_TO_ADR_SYMBOL).
 async function fetchProfile(querySymbol, finnhubKey) {
-  if (!finnhubKey) return { logo: null, marketCap: null };
+  if (!finnhubKey) return { logo: null, marketCap: null, country: null };
   try {
     const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${encodeURIComponent(querySymbol)}&token=${finnhubKey}`;
     const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    if (!res.ok) return { logo: null, marketCap: null };
+    if (!res.ok) return { logo: null, marketCap: null, country: null };
     const data = await res.json();
     return {
       logo: (data && data.logo) || null,
       marketCap: (data && typeof data.marketCapitalization === 'number') ? data.marketCapitalization : null,
+      country: (data && data.country) || null,
     };
   } catch (e) {
-    console.error(`[mercados] profile/${symbol}:`, e.message);
-    return { logo: null, marketCap: null };
+    console.error(`[mercados] profile/${querySymbol}:`, e.message);
+    return { logo: null, marketCap: null, country: null };
   }
 }
 
@@ -183,14 +184,17 @@ async function mapWithConcurrency(items, limit, fn) {
   return results;
 }
 
-// Techo de sanity unico para todas las categorias -- generoso, headroom
-// arriba de la compañia mas grande del mundo hoy. Antes habia un techo
-// especial mas estricto para Acciones AR pensado para agarrar el desvio de
-// escala ~1000x que devuelve Finnhub para empresas argentinas (ver
-// comentario de logos_v5 mas arriba) -- se saco porque ese desvio es
-// uniforme para todo el mercado AR, no afecta el tamaño relativo entre
+// Techo de sanity para CEDEARs/Acciones USA/ADRs -- generoso, headroom
+// arriba de la compañia mas grande del mundo hoy. Acciones AR NO usa este
+// techo (ver maxMarketCapM=Infinity en el call site): el desvio de escala
+// ~1000x que devuelve Finnhub para empresas argentinas (ver comentario de
+// logos_v5 mas arriba) hace que justo las dos mas grandes -- GGAL (~USD
+// 10,6 billones inflado) e YPF (~USD 32 billones inflado) -- superen
+// incluso este techo generoso y quedarian nulificadas, cuando son
+// exactamente las que mas se necesitan en el treemap. El desvio es uniforme
+// para todo el mercado AR asi que no afecta el tamaño relativo entre
 // activos de esa misma seccion (que es lo unico que le importa al treemap).
-const MAX_MARKETCAP_M = 10000000; // USD 10 billones
+const MAX_MARKETCAP_M = 10000000; // USD 10 billones -- CEDEARs/USA/ADRs
 
 // Para estos tickers locales de Acciones AR, el ticker de BYMA no resuelve
 // nada en Finnhub -- solo el ticker del ADR equivalente trae datos (ver
@@ -198,10 +202,19 @@ const MAX_MARKETCAP_M = 10000000; // USD 10 billones
 // bajo el ticker LOCAL (ej. "YPFD"), el alias solo se usa para el pedido.
 const AR_LOCAL_TO_ADR_SYMBOL = { YPFD: 'YPF', PAMP: 'PAM', TECO2: 'TEO', CRES: 'CRESY', IRSA: 'IRS' };
 
-async function enrichWithLogos(items, finnhubKey, blob, budget) {
+// expectedCountry (opcional): valida el campo "country" que devuelve
+// Finnhub contra el pais esperado antes de aceptar el logo/marketCap --
+// reemplaza la lista curada fija que se usaba antes para Acciones AR.
+// Encontrado con datos reales: el ticker local "INTR" (papel chico de BYMA)
+// matcheaba por simbolo con Banco Inter (Brasil, country:"BR" en la
+// respuesta) en vez de con la empresa argentina real. Chequear el pais en
+// vivo deja pasar CUALQUIER empresa argentina real sin necesidad de una
+// lista fija, y rechaza automaticamente los choques de simbolo con
+// empresas de otros paises -- mas robusto y no requiere mantenimiento.
+async function enrichWithLogos(items, finnhubKey, blob, budget, maxMarketCapM = MAX_MARKETCAP_M, expectedCountry = null) {
   if (!finnhubKey) return items;
   const now = Date.now();
-  const sane = (mc) => (typeof mc === 'number' && mc > 0 && mc <= MAX_MARKETCAP_M) ? mc : null;
+  const sane = (mc) => (typeof mc === 'number' && mc > 0 && mc <= maxMarketCapM) ? mc : null;
   return mapWithConcurrency(items, 20, async (item) => {
     const entry = blob[item.symbol];
     if (entry && (now - entry.ts) < (entry.logo ? LOGO_POSITIVE_MS : LOGO_NEGATIVE_MS)) {
@@ -212,7 +225,8 @@ async function enrichWithLogos(items, finnhubKey, blob, budget) {
     }
     budget.remaining--;
     const querySymbol = AR_LOCAL_TO_ADR_SYMBOL[item.symbol] || item.symbol;
-    const { logo, marketCap } = await fetchProfile(querySymbol, finnhubKey);
+    let { logo, marketCap, country } = await fetchProfile(querySymbol, finnhubKey);
+    if (expectedCountry && country !== expectedCountry) { logo = null; marketCap = null; }
     blob[item.symbol] = { logo, marketCap, ts: now };
     budget.dirty = true;
     return { ...item, logo, marketCap: sane(marketCap) };
@@ -580,24 +594,15 @@ async function buildPayload(env) {
   // cupo entero queda libre para las demas -- mismo total de 20 por build,
   // solo cambia el orden de reparto.
   //
-  // Ademas, para Acciones AR SOLO se le pide market cap/logo a Finnhub para
-  // los simbolos que ya tenemos identificados con certeza en NAME_MAP (las
-  // ~20 empresas locales grandes y conocidas). Motivo: probando con datos
-  // reales, Finnhub matcheo el ticker local "INTR" (papel chico e iliquido
-  // de BYMA, volumen ~1.700) con el market cap real de otra empresa global
-  // que casualmente usa el mismo ticker (Banco Inter/Inter&Co, ~USD 2.300M)
-  // -- un numero "sano" que un techo maximo no puede detectar, porque el
-  // problema no es que el valor sea absurdo, es que es de la empresa
-  // equivocada. Restringir a la lista curada evita ese choque de simbolo
-  // para el resto de los ~75 tickers chicos/desconocidos (quedan sin market
-  // cap/logo en vez de mostrar un dato de otra compañia).
+  // Ademas, para Acciones AR se valida el "country" que devuelve Finnhub
+  // contra 'AR' antes de aceptar el resultado (ver comentario en
+  // enrichWithLogos) -- reemplaza la lista curada fija que se usaba antes:
+  // ahora TODOS los ~95 simbolos son candidatos, no solo los ~20 conocidos
+  // de antemano, y el choque de simbolo tipo INTR (matcheaba con Banco
+  // Inter de Brasil, country:"BR") se descarta solo por el chequeo de pais.
   const logoBlob = await loadLogoBlob(env);
   const logoBudget = { remaining: 20, dirty: false };
-  const argStocksSorted = mapD912Rows(argStocksRaw);
-  const argStocksKnown = argStocksSorted.filter(it => NAME_MAP[it.symbol] !== undefined);
-  const argStocksEnriched = await enrichWithLogos(argStocksKnown, finnhubKey, logoBlob, logoBudget);
-  const argStocksEnrichedBySymbol = Object.fromEntries(argStocksEnriched.map(it => [it.symbol, it]));
-  const argStocksItems = argStocksSorted.map(it => argStocksEnrichedBySymbol[it.symbol] || { ...it, logo: null, marketCap: null });
+  const argStocksItems = await enrichWithLogos(mapD912Rows(argStocksRaw), finnhubKey, logoBlob, logoBudget, Infinity, 'AR');
   const [argCedearsItems, usaStocksItems, usaAdrsItems] = await Promise.all([
     enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), finnhubKey, logoBlob, logoBudget),
     enrichWithLogos(mapD912Rows(usaStocksRaw, { limit: 500 }), finnhubKey, logoBlob, logoBudget),
