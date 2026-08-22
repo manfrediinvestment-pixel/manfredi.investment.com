@@ -112,7 +112,18 @@ function mapD912Rows(rows, { sortByVolume = true, limit = null, pin = [] } = {})
 // en buildPayload) -- bump para descartar entradas viejas de simbolos como
 // GGAL que quedaron con logo cacheado (fresco por 30 dias, no se reintenta)
 // pero marketCap null por el choque de simbolo detectado con INTR/Finnhub.
-const LOGO_BLOB_KEY = 'logos_v4';
+// v5: se saco el techo especial mas estricto para Acciones AR. Probando con
+// datos reales, Finnhub devuelve el market cap de las empresas argentinas
+// (GGAL, BMA, SUPV, LOMA, CEPU, EDN, YPF, PAM, TEO, CRESY, IRS -- todas con
+// country:"AR" en la respuesta) consistentemente ~1000x mas grande que el
+// valor real (ej. GGAL da $10,6 billones en vez de ~$10 mil millones). Es
+// un desvio de escala uniforme para TODO el mercado argentino -- no importa
+// para este feature porque el treemap de Acciones AR nunca se compara al
+// lado del de CEDEARs/Acciones USA, solo mide tamaño relativo DENTRO de la
+// misma seccion, y ese orden relativo se mantiene igual de correcto este
+// desviado o no. Bump para reintentar los simbolos que el techo anterior
+// habia descartado.
+const LOGO_BLOB_KEY = 'logos_v5';
 const LOGO_POSITIVE_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias -- no cambian de un dia para el otro
 const LOGO_NEGATIVE_MS = 3 * 24 * 60 * 60 * 1000;  // 3 dias -- reintentar simbolos sin datos
 
@@ -136,10 +147,14 @@ async function saveLogoBlob(env, blob) {
   }
 }
 
-async function fetchProfile(symbol, finnhubKey) {
+// querySymbol vs symbol: para algunos tickers locales de Acciones AR
+// (YPFD, PAMP, TECO2, CRES, IRSA), el ticker de BYMA no resuelve nada en
+// Finnhub -- solo devuelve datos si se pide el ticker del ADR equivalente
+// (YPF, PAM, TEO, CRESY, IRS respectivamente, ver AR_LOCAL_TO_ADR_SYMBOL).
+async function fetchProfile(querySymbol, finnhubKey) {
   if (!finnhubKey) return { logo: null, marketCap: null };
   try {
-    const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${encodeURIComponent(symbol)}&token=${finnhubKey}`;
+    const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${encodeURIComponent(querySymbol)}&token=${finnhubKey}`;
     const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) return { logo: null, marketCap: null };
     const data = await res.json();
@@ -168,20 +183,25 @@ async function mapWithConcurrency(items, limit, fn) {
   return results;
 }
 
-// Finnhub devuelve market caps sin sentido para algunos tickers locales de
-// BYMA (encontrado probando con datos reales: GGAL en arg_stocks aparecio
-// con ~USD 10,6 billones, SUPV con ~USD 1,17 billones -- parece confundir
-// unidades/moneda para esas fichas, no un caso aislado). maxMarketCapM
-// (millones de USD) es un techo de sanity por categoria: generoso para
-// empresas globales grandes (CEDEARs/Acciones USA, donde de verdad puede
-// haber compañias de varios billones), mucho mas estricto para Acciones AR
-// (ninguna empresa Argentina esta ni cerca de esa escala). El valor crudo
-// se guarda igual en el blob -- el techo solo filtra lo que se expone en la
-// respuesta, por si el dato de Finnhub mejora mas adelante.
-async function enrichWithLogos(items, finnhubKey, blob, budget, maxMarketCapM) {
+// Techo de sanity unico para todas las categorias -- generoso, headroom
+// arriba de la compañia mas grande del mundo hoy. Antes habia un techo
+// especial mas estricto para Acciones AR pensado para agarrar el desvio de
+// escala ~1000x que devuelve Finnhub para empresas argentinas (ver
+// comentario de logos_v5 mas arriba) -- se saco porque ese desvio es
+// uniforme para todo el mercado AR, no afecta el tamaño relativo entre
+// activos de esa misma seccion (que es lo unico que le importa al treemap).
+const MAX_MARKETCAP_M = 10000000; // USD 10 billones
+
+// Para estos tickers locales de Acciones AR, el ticker de BYMA no resuelve
+// nada en Finnhub -- solo el ticker del ADR equivalente trae datos (ver
+// comentario en fetchProfile). El resultado se sigue guardando/mostrando
+// bajo el ticker LOCAL (ej. "YPFD"), el alias solo se usa para el pedido.
+const AR_LOCAL_TO_ADR_SYMBOL = { YPFD: 'YPF', PAMP: 'PAM', TECO2: 'TEO', CRES: 'CRESY', IRSA: 'IRS' };
+
+async function enrichWithLogos(items, finnhubKey, blob, budget) {
   if (!finnhubKey) return items;
   const now = Date.now();
-  const sane = (mc) => (typeof mc === 'number' && mc > 0 && mc <= maxMarketCapM) ? mc : null;
+  const sane = (mc) => (typeof mc === 'number' && mc > 0 && mc <= MAX_MARKETCAP_M) ? mc : null;
   return mapWithConcurrency(items, 20, async (item) => {
     const entry = blob[item.symbol];
     if (entry && (now - entry.ts) < (entry.logo ? LOGO_POSITIVE_MS : LOGO_NEGATIVE_MS)) {
@@ -191,7 +211,8 @@ async function enrichWithLogos(items, finnhubKey, blob, budget, maxMarketCapM) {
       return { ...item, logo: entry ? entry.logo : null, marketCap: entry ? sane(entry.marketCap) : null };
     }
     budget.remaining--;
-    const { logo, marketCap } = await fetchProfile(item.symbol, finnhubKey);
+    const querySymbol = AR_LOCAL_TO_ADR_SYMBOL[item.symbol] || item.symbol;
+    const { logo, marketCap } = await fetchProfile(querySymbol, finnhubKey);
     blob[item.symbol] = { logo, marketCap, ts: now };
     budget.dirty = true;
     return { ...item, logo, marketCap: sane(marketCap) };
@@ -572,17 +593,15 @@ async function buildPayload(env) {
   // cap/logo en vez de mostrar un dato de otra compañia).
   const logoBlob = await loadLogoBlob(env);
   const logoBudget = { remaining: 20, dirty: false };
-  const MAX_MARKETCAP_AR = 500000;      // USD 500 mil millones -- ninguna empresa Argentina se acerca
-  const MAX_MARKETCAP_GLOBAL = 10000000; // USD 10 billones -- headroom generoso arriba de la mas grande del mundo
   const argStocksSorted = mapD912Rows(argStocksRaw);
   const argStocksKnown = argStocksSorted.filter(it => NAME_MAP[it.symbol] !== undefined);
-  const argStocksEnriched = await enrichWithLogos(argStocksKnown, finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_AR);
+  const argStocksEnriched = await enrichWithLogos(argStocksKnown, finnhubKey, logoBlob, logoBudget);
   const argStocksEnrichedBySymbol = Object.fromEntries(argStocksEnriched.map(it => [it.symbol, it]));
   const argStocksItems = argStocksSorted.map(it => argStocksEnrichedBySymbol[it.symbol] || { ...it, logo: null, marketCap: null });
   const [argCedearsItems, usaStocksItems, usaAdrsItems] = await Promise.all([
-    enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_GLOBAL),
-    enrichWithLogos(mapD912Rows(usaStocksRaw, { limit: 500 }), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_GLOBAL),
-    enrichWithLogos(mapD912Rows(usaAdrsRaw), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_GLOBAL),
+    enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), finnhubKey, logoBlob, logoBudget),
+    enrichWithLogos(mapD912Rows(usaStocksRaw, { limit: 500 }), finnhubKey, logoBlob, logoBudget),
+    enrichWithLogos(mapD912Rows(usaAdrsRaw), finnhubKey, logoBlob, logoBudget),
   ]);
   if (logoBudget.dirty) await saveLogoBlob(env, logoBlob);
 
