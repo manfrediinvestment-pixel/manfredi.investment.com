@@ -384,6 +384,7 @@ async function fetchCriptoCoinGecko() {
     price: c.current_price,
     change: c.price_change_percentage_24h,
     volume: c.total_volume || 0,
+    marketCap: (typeof c.market_cap === 'number' && c.market_cap > 0) ? c.market_cap : null,
   }));
 }
 
