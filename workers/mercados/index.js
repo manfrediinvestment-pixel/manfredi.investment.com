@@ -25,6 +25,7 @@ const NAME_MAP = {
   TECO2: 'Telecom Argentina', CEPU: 'Central Puerto', CRES: 'Cresud', COME: 'Comercial del Plata',
   TGSU2: 'Transportadora Gas del Sur', TGNO4: 'Transportadora Gas del Norte',
   EDN: 'Edenor', TRAN: 'Transener', VALO: 'Grupo Financiero Valores', SUPV: 'Banco Supervielle',
+  BBAR: 'BBVA Argentina', IRSA: 'IRSA', CVH: 'Cablevisión Holding',
   // ADRs
   YPF: 'YPF', PAM: 'Pampa Energía', TEO: 'Telecom Argentina', LOM: 'Loma Negra',
   TX: 'Ternium', IRS: 'IRSA', BIOX: 'Bioceres', DESP: 'Despegar', MELI: 'MercadoLibre',
@@ -93,6 +94,175 @@ function mapD912Rows(rows, { sortByVolume = true, limit = null, pin = [] } = {})
     items = kept.concat(missingPins);
   }
   return items;
+}
+
+// ─── Logo + market cap (Finnhub /stock/profile2, misma respuesta para las dos) ─
+// Guardados en UN SOLO blob de KV (no una key por simbolo) -- version previa
+// de esto usaba `env.MERCADOS_KV.get()` por cada uno de los ~1.200 simbolos
+// (Acciones AR + CEDEARs + Acciones USA + ADRs) en cada build, y cada
+// lectura de KV cuenta como un subrequest para Cloudflare Workers igual que
+// un fetch(): tumbo el endpoint entero con "Too many API requests by single
+// Worker invocation" (buildPayload ya gasta ~25 subrequests en precios antes
+// de llegar aca). Con el blob, el costo es 1 lectura + a lo sumo 1 escritura
+// por build, sin importar cuantos simbolos haya.
+// v3: el mismo pedido a /stock/profile2 que ya haciamos para el logo tambien
+// trae marketCapitalization (en millones de USD) -- se pide gratis en la
+// misma respuesta, sin sumar ningun fetch nuevo.
+// v4: Acciones AR ahora solo enriquece simbolos en NAME_MAP (ver comentario
+// en buildPayload) -- bump para descartar entradas viejas de simbolos como
+// GGAL que quedaron con logo cacheado (fresco por 30 dias, no se reintenta)
+// pero marketCap null por el choque de simbolo detectado con INTR/Finnhub.
+// v5: se saco el techo especial mas estricto para Acciones AR. Probando con
+// datos reales, Finnhub devuelve el market cap de las empresas argentinas
+// (GGAL, BMA, SUPV, LOMA, CEPU, EDN, YPF, PAM, TEO, CRESY, IRS -- todas con
+// country:"AR" en la respuesta) consistentemente ~1000x mas grande que el
+// valor real (ej. GGAL da $10,6 billones en vez de ~$10 mil millones). Es
+// un desvio de escala uniforme para TODO el mercado argentino -- no importa
+// para este feature porque el treemap de Acciones AR nunca se compara al
+// lado del de CEDEARs/Acciones USA, solo mide tamaño relativo DENTRO de la
+// misma seccion, y ese orden relativo se mantiene igual de correcto este
+// desviado o no. Bump para reintentar los simbolos que el techo anterior
+// habia descartado.
+const LOGO_BLOB_KEY = 'logos_v5';
+const LOGO_POSITIVE_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias -- no cambian de un dia para el otro
+const LOGO_NEGATIVE_MS = 3 * 24 * 60 * 60 * 1000;  // 3 dias -- reintentar simbolos sin datos
+
+async function loadLogoBlob(env) {
+  if (!env.MERCADOS_KV) return {};
+  try {
+    const raw = await env.MERCADOS_KV.get(LOGO_BLOB_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    console.error('[mercados] logo blob parse:', e.message);
+    return {};
+  }
+}
+
+async function saveLogoBlob(env, blob) {
+  if (!env.MERCADOS_KV) return;
+  try {
+    await env.MERCADOS_KV.put(LOGO_BLOB_KEY, JSON.stringify(blob));
+  } catch (e) {
+    console.error('[mercados] logo blob put:', e.message);
+  }
+}
+
+// querySymbol vs symbol: para algunos tickers locales de Acciones AR
+// (YPFD, PAMP, TECO2, CRES, IRSA), el ticker de BYMA no resuelve nada en
+// Finnhub -- solo devuelve datos si se pide el ticker del ADR equivalente
+// (YPF, PAM, TEO, CRESY, IRS respectivamente, ver AR_LOCAL_TO_ADR_SYMBOL).
+async function fetchProfile(querySymbol, finnhubKey) {
+  if (!finnhubKey) return { logo: null, marketCap: null, country: null };
+  try {
+    const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${encodeURIComponent(querySymbol)}&token=${finnhubKey}`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) return { logo: null, marketCap: null, country: null };
+    const data = await res.json();
+    return {
+      logo: (data && data.logo) || null,
+      marketCap: (data && typeof data.marketCapitalization === 'number') ? data.marketCapitalization : null,
+      country: (data && data.country) || null,
+    };
+  } catch (e) {
+    console.error(`[mercados] profile/${querySymbol}:`, e.message);
+    return { logo: null, marketCap: null, country: null };
+  }
+}
+
+// Concurrencia acotada para las llamadas a Finnhub (no para KV, que ahora es
+// una sola lectura/escritura fuera de este loop).
+async function mapWithConcurrency(items, limit, fn) {
+  const results = new Array(items.length);
+  let next = 0;
+  async function worker() {
+    while (next < items.length) {
+      const i = next++;
+      results[i] = await fn(items[i]);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return results;
+}
+
+// Techo de sanity para CEDEARs/Acciones USA/ADRs -- generoso, headroom
+// arriba de la compañia mas grande del mundo hoy. Acciones AR NO usa este
+// techo (ver maxMarketCapM=Infinity en el call site): el desvio de escala
+// ~1000x que devuelve Finnhub para empresas argentinas (ver comentario de
+// logos_v5 mas arriba) hace que justo las dos mas grandes -- GGAL (~USD
+// 10,6 billones inflado) e YPF (~USD 32 billones inflado) -- superen
+// incluso este techo generoso y quedarian nulificadas, cuando son
+// exactamente las que mas se necesitan en el treemap. El desvio es uniforme
+// para todo el mercado AR asi que no afecta el tamaño relativo entre
+// activos de esa misma seccion (que es lo unico que le importa al treemap).
+const MAX_MARKETCAP_M = 10000000; // USD 10 billones -- CEDEARs/USA/ADRs
+
+// Para estos tickers locales de Acciones AR, el ticker de BYMA no resuelve
+// nada en Finnhub -- solo el ticker del ADR equivalente trae datos (ver
+// comentario en fetchProfile). El resultado se sigue guardando/mostrando
+// bajo el ticker LOCAL (ej. "YPFD"), el alias solo se usa para el pedido.
+const AR_LOCAL_TO_ADR_SYMBOL = { YPFD: 'YPF', PAMP: 'PAM', TECO2: 'TEO', CRES: 'CRESY', IRSA: 'IRS' };
+
+// Acciones en circulacion (numero TOTAL de la compañia, no unidades ADR)
+// para las empresas argentinas mas grandes de Acciones AR. Investigado a
+// mano (SEC 20-F para las que tienen ADR en EE.UU., stockanalysis.com para
+// el resto -- agosto 2026) porque NINGUNA fuente gratis (Finnhub, Yahoo
+// Finance, data912, BYMA oficial, CNV) tiene market cap por ticker para el
+// mercado local completo: Finnhub solo cubria los ~12 tickers con ADR en
+// EE.UU., y encima con un desvio de escala ~1000x (ver comentario de
+// logos_v5 mas arriba). Con esto calculamos el market cap nosotros mismos
+// (acciones x precio en vivo, que ya tenemos de data912) -- el numero de
+// acciones es lo unico que hay que actualizar a mano, y cambia rarisima vez
+// (splits/emisiones), asi que alcanza con revisarlo cada tanto (mensual).
+// YPFD: usar el TOTAL de la compañia (3.930M), no las 393,31M que reportan
+// las fuentes centradas en el ADR (ratio ADR 1:10) -- confundir esto
+// hubiera subvaluado YPF 10x contra el resto.
+const AR_SHARES_OUTSTANDING = {
+  GGAL: 1606253729, YPFD: 3930000000, BMA: 639413408, PAMP: 1340000000,
+  BBAR: 612710000, CEPU: 1500000000, LOMA: 583483151, IRSA: 834570000,
+  EDN: 875680000, TECO2: 2150000000, SUPV: 437730000, CRES: 709250000,
+  BYMA: 7620000000, TXAR: 4520000000, ALUA: 2800000000, COME: 7000000000,
+  TGSU2: 752760000, TGNO4: 439370000, TRAN: 444670000, VALO: 1150000000,
+  CVH: 180640000,
+};
+
+// expectedCountry (opcional): valida el campo "country" que devuelve
+// Finnhub contra el pais esperado antes de aceptar el logo/marketCap --
+// reemplaza la lista curada fija que se usaba antes para Acciones AR.
+// Encontrado con datos reales: el ticker local "INTR" (papel chico de BYMA)
+// matcheaba por simbolo con Banco Inter (Brasil, country:"BR" en la
+// respuesta) en vez de con la empresa argentina real. Chequear el pais en
+// vivo deja pasar CUALQUIER empresa argentina real sin necesidad de una
+// lista fija, y rechaza automaticamente los choques de simbolo con
+// empresas de otros paises -- mas robusto y no requiere mantenimiento.
+async function enrichWithLogos(items, finnhubKey, blob, budget, maxMarketCapM = MAX_MARKETCAP_M, expectedCountry = null) {
+  if (!finnhubKey) return items;
+  const now = Date.now();
+  const sane = (mc) => (typeof mc === 'number' && mc > 0 && mc <= maxMarketCapM) ? mc : null;
+  return mapWithConcurrency(items, 20, async (item) => {
+    const entry = blob[item.symbol];
+    if (entry && (now - entry.ts) < (entry.logo ? LOGO_POSITIVE_MS : LOGO_NEGATIVE_MS)) {
+      return { ...item, logo: entry.logo, marketCap: sane(entry.marketCap) };
+    }
+    if (budget.remaining <= 0) {
+      return { ...item, logo: entry ? entry.logo : null, marketCap: entry ? sane(entry.marketCap) : null };
+    }
+    budget.remaining--;
+    const querySymbol = AR_LOCAL_TO_ADR_SYMBOL[item.symbol] || item.symbol;
+    let { logo, marketCap, country } = await fetchProfile(querySymbol, finnhubKey);
+    if (expectedCountry && country !== expectedCountry) { logo = null; marketCap = null; }
+    blob[item.symbol] = { logo, marketCap, ts: now };
+    budget.dirty = true;
+    return { ...item, logo, marketCap: sane(marketCap) };
+  });
+}
+
+// ─── Cripto: CDN estatico por simbolo (spothq/cryptocurrency-icons via
+// jsdelivr, gratis, sin key, sin KV) -- funciona igual sea que el precio
+// haya salido de CoinGecko o del fallback de Kraken (CoinGecko bloquea
+// seguido las IPs de Cloudflare Workers). Sin verificacion de si el icono
+// existe: el <img onerror> del frontend cae solo al circulo con la inicial.
+function cryptoIconUrl(symbol) {
+  return `https://cdn.jsdelivr.net/gh/spothq/cryptocurrency-icons@master/128/color/${symbol.toLowerCase()}.png`;
 }
 
 // ─── Finnhub (server-side, key nunca viaja al navegador) ──────────────────
@@ -254,17 +424,21 @@ async function fetchCriptoKraken() {
 }
 
 async function fetchCripto() {
+  let items;
   try {
-    return await fetchCriptoCoinGecko();
+    items = await fetchCriptoCoinGecko();
   } catch (e) {
     console.error('[mercados] coingecko:', e.message);
   }
-  try {
-    return await fetchCriptoKraken();
-  } catch (e) {
-    console.error('[mercados] kraken:', e.message);
-    return [];
+  if (!items) {
+    try {
+      items = await fetchCriptoKraken();
+    } catch (e) {
+      console.error('[mercados] kraken:', e.message);
+      items = [];
+    }
   }
+  return items.map(c => ({ ...c, logo: cryptoIconUrl(c.symbol) }));
 }
 
 // ─── Merval: ArgentinaDatos → Finnhub → Yahoo ─────────────────────────────
@@ -428,11 +602,56 @@ async function buildPayload(env) {
     { id: 'wti', flag: '🛢️', name: 'Petróleo WTI', unit: 'US$', price: wti?.price ?? null, change: wti?.change ?? null, spark: sparks.wti },
   ];
 
+  // Logos via Finnhub -- Acciones AR, CEDEARs, Acciones USA y ADRs. Un solo
+  // blob de KV para las 4 (ver comentario en enrichWithLogos): se carga una
+  // vez, se comparte, y se guarda una vez al final si hubo simbolos nuevos.
+  //
+  // Acciones AR va PRIMERO y awaited por separado, no en el mismo Promise.all
+  // que las otras 3 -- si las 4 corren concurrentes compitiendo por el mismo
+  // cupo compartido, CEDEARs/Acciones USA (cientos de simbolos, arrancan con
+  // mas "workers" en paralelo dentro de si mismas) le ganan la carrera casi
+  // siempre, dejando a Acciones AR (solo 95 simbolos en total) practicamente
+  // sin turno build tras build (confirmado con datos reales: 6/95 despues de
+  // muchos ciclos, mientras las otras ya estaban en 200-460 de cobertura).
+  // Dandole prioridad, se completa sola en ~5 builds (95/20) y despues el
+  // cupo entero queda libre para las demas -- mismo total de 20 por build,
+  // solo cambia el orden de reparto.
+  //
+  // Ademas, para Acciones AR se valida el "country" que devuelve Finnhub
+  // contra 'AR' antes de aceptar el LOGO (ver comentario en enrichWithLogos)
+  // -- reemplaza la lista curada fija que se usaba antes: ahora TODOS los
+  // ~95 simbolos son candidatos, no solo los ~20 conocidos de antemano, y
+  // el choque de simbolo tipo INTR (matcheaba con Banco Inter de Brasil,
+  // country:"BR") se descarta solo por el chequeo de pais.
+  //
+  // El market cap que devuelve Finnhub para Acciones AR se descarta y se
+  // reemplaza por AR_SHARES_OUTSTANDING x precio en vivo -- Finnhub solo
+  // cubre los ~12 tickers con ADR en EE.UU. (dejando afuera BYMA, TXAR,
+  // ALUA, COME, TGSU2, TGNO4, TRAN, VALO, CVH, que tambien queremos en el
+  // treemap), y ademas todo lo que SI cubre viene con el mismo desvio de
+  // escala ~1000x -- mezclar ambas fuentes (Finnhub para 12, calculo propio
+  // para el resto) haria que el tamaño relativo entre las dos mitades del
+  // treemap fuera incoherente entre si.
+  const logoBlob = await loadLogoBlob(env);
+  const logoBudget = { remaining: 20, dirty: false };
+  const argStocksItems = (await enrichWithLogos(mapD912Rows(argStocksRaw), finnhubKey, logoBlob, logoBudget, Infinity, 'AR'))
+    .map(it => {
+      const shares = AR_SHARES_OUTSTANDING[it.symbol];
+      const marketCap = (shares && typeof it.price === 'number') ? (shares * it.price / 1e6) : null;
+      return { ...it, marketCap };
+    });
+  const [argCedearsItems, usaStocksItems, usaAdrsItems] = await Promise.all([
+    enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), finnhubKey, logoBlob, logoBudget),
+    enrichWithLogos(mapD912Rows(usaStocksRaw, { limit: 500 }), finnhubKey, logoBlob, logoBudget),
+    enrichWithLogos(mapD912Rows(usaAdrsRaw), finnhubKey, logoBlob, logoBudget),
+  ]);
+  if (logoBudget.dirty) await saveLogoBlob(env, logoBlob);
+
   const categorias = {
-    arg_stocks:  { currency: 'ARS', total: argStocksRaw.length,  items: mapD912Rows(argStocksRaw) },
-    arg_cedears: { currency: 'ARS', total: argCedearsRaw.length, items: mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }) },
-    usa_stocks:  { currency: 'USD', total: usaStocksRaw.length,  items: mapD912Rows(usaStocksRaw, { limit: 500 }) },
-    usa_adrs:    { currency: 'USD', total: usaAdrsRaw.length,    items: mapD912Rows(usaAdrsRaw) },
+    arg_stocks:  { currency: 'ARS', total: argStocksRaw.length,  items: argStocksItems },
+    arg_cedears: { currency: 'ARS', total: argCedearsRaw.length, items: argCedearsItems },
+    usa_stocks:  { currency: 'USD', total: usaStocksRaw.length,  items: usaStocksItems },
+    usa_adrs:    { currency: 'USD', total: usaAdrsRaw.length,    items: usaAdrsItems },
     arg_bonds:   { currency: 'ARS', total: argBondsRaw.length,   items: mapD912Rows(argBondsRaw) },
     cripto:      { currency: 'USD', total: cripto.length,        items: cripto },
     commodities: { currency: 'USD', total: commodities.length,   items: commodities },
@@ -536,13 +755,14 @@ export default {
         const roe = firstNumber(m.roeTTM, m.roeRfy, m.roeAnnual);
         const pe = firstNumber(m.peBasicExclExtraTTM, m.peTTM, m.peExclExtraTTM, m.peAnnual);
         const divYield = firstNumber(m.currentDividendYieldTTM, m.dividendYieldIndicatedAnnual, m.dividendYield5Y);
-        let sector = null, country = null;
+        let sector = null, country = null, marketCap = null;
         if (profileResp.ok) {
           const profile = await profileResp.json();
           sector = (profile && profile.finnhubIndustry) || null;
           country = (profile && profile.country) || null;
+          marketCap = (profile && typeof profile.marketCapitalization === 'number') ? profile.marketCapitalization : null;
         }
-        const json = JSON.stringify({ symbol: symbol.toUpperCase(), roe, pe, divYield, sector, country });
+        const json = JSON.stringify({ symbol: symbol.toUpperCase(), roe, pe, divYield, sector, country, marketCap });
         await env.MERCADOS_KV.put(cacheKey, json, { expirationTtl: 86400 });
         return new Response(json, { headers });
       } catch (err) {
