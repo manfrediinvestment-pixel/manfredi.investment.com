@@ -543,12 +543,23 @@ async function buildPayload(env) {
   // Logos via Finnhub -- Acciones AR, CEDEARs, Acciones USA y ADRs. Un solo
   // blob de KV para las 4 (ver comentario en enrichWithLogos): se carga una
   // vez, se comparte, y se guarda una vez al final si hubo simbolos nuevos.
+  //
+  // Acciones AR va PRIMERO y awaited por separado, no en el mismo Promise.all
+  // que las otras 3 -- si las 4 corren concurrentes compitiendo por el mismo
+  // cupo compartido, CEDEARs/Acciones USA (cientos de simbolos, arrancan con
+  // mas "workers" en paralelo dentro de si mismas) le ganan la carrera casi
+  // siempre, dejando a Acciones AR (solo 95 simbolos en total) practicamente
+  // sin turno build tras build (confirmado con datos reales: 6/95 despues de
+  // muchos ciclos, mientras las otras ya estaban en 200-460 de cobertura).
+  // Dandole prioridad, se completa sola en ~5 builds (95/20) y despues el
+  // cupo entero queda libre para las demas -- mismo total de 20 por build,
+  // solo cambia el orden de reparto.
   const logoBlob = await loadLogoBlob(env);
   const logoBudget = { remaining: 20, dirty: false };
   const MAX_MARKETCAP_AR = 500000;      // USD 500 mil millones -- ninguna empresa Argentina se acerca
   const MAX_MARKETCAP_GLOBAL = 10000000; // USD 10 billones -- headroom generoso arriba de la mas grande del mundo
-  const [argStocksItems, argCedearsItems, usaStocksItems, usaAdrsItems] = await Promise.all([
-    enrichWithLogos(mapD912Rows(argStocksRaw), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_AR),
+  const argStocksItems = await enrichWithLogos(mapD912Rows(argStocksRaw), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_AR);
+  const [argCedearsItems, usaStocksItems, usaAdrsItems] = await Promise.all([
     enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_GLOBAL),
     enrichWithLogos(mapD912Rows(usaStocksRaw, { limit: 500 }), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_GLOBAL),
     enrichWithLogos(mapD912Rows(usaAdrsRaw), finnhubKey, logoBlob, logoBudget, MAX_MARKETCAP_GLOBAL),
