@@ -202,6 +202,29 @@ const MAX_MARKETCAP_M = 10000000; // USD 10 billones -- CEDEARs/USA/ADRs
 // bajo el ticker LOCAL (ej. "YPFD"), el alias solo se usa para el pedido.
 const AR_LOCAL_TO_ADR_SYMBOL = { YPFD: 'YPF', PAMP: 'PAM', TECO2: 'TEO', CRES: 'CRESY', IRSA: 'IRS' };
 
+// Acciones en circulacion (numero TOTAL de la compañia, no unidades ADR)
+// para las empresas argentinas mas grandes de Acciones AR. Investigado a
+// mano (SEC 20-F para las que tienen ADR en EE.UU., stockanalysis.com para
+// el resto -- agosto 2026) porque NINGUNA fuente gratis (Finnhub, Yahoo
+// Finance, data912, BYMA oficial, CNV) tiene market cap por ticker para el
+// mercado local completo: Finnhub solo cubria los ~12 tickers con ADR en
+// EE.UU., y encima con un desvio de escala ~1000x (ver comentario de
+// logos_v5 mas arriba). Con esto calculamos el market cap nosotros mismos
+// (acciones x precio en vivo, que ya tenemos de data912) -- el numero de
+// acciones es lo unico que hay que actualizar a mano, y cambia rarisima vez
+// (splits/emisiones), asi que alcanza con revisarlo cada tanto (mensual).
+// YPFD: usar el TOTAL de la compañia (3.930M), no las 393,31M que reportan
+// las fuentes centradas en el ADR (ratio ADR 1:10) -- confundir esto
+// hubiera subvaluado YPF 10x contra el resto.
+const AR_SHARES_OUTSTANDING = {
+  GGAL: 1606253729, YPFD: 3930000000, BMA: 639413408, PAMP: 1340000000,
+  BBAR: 612710000, CEPU: 1500000000, LOMA: 583483151, IRSA: 834570000,
+  EDN: 875680000, TECO2: 2150000000, SUPV: 437730000, CRES: 709250000,
+  BYMA: 7620000000, TXAR: 4520000000, ALUA: 2800000000, COME: 7000000000,
+  TGSU2: 752760000, TGNO4: 439370000, TRAN: 444670000, VALO: 1150000000,
+  CVH: 180640000,
+};
+
 // expectedCountry (opcional): valida el campo "country" que devuelve
 // Finnhub contra el pais esperado antes de aceptar el logo/marketCap --
 // reemplaza la lista curada fija que se usaba antes para Acciones AR.
@@ -595,14 +618,28 @@ async function buildPayload(env) {
   // solo cambia el orden de reparto.
   //
   // Ademas, para Acciones AR se valida el "country" que devuelve Finnhub
-  // contra 'AR' antes de aceptar el resultado (ver comentario en
-  // enrichWithLogos) -- reemplaza la lista curada fija que se usaba antes:
-  // ahora TODOS los ~95 simbolos son candidatos, no solo los ~20 conocidos
-  // de antemano, y el choque de simbolo tipo INTR (matcheaba con Banco
-  // Inter de Brasil, country:"BR") se descarta solo por el chequeo de pais.
+  // contra 'AR' antes de aceptar el LOGO (ver comentario en enrichWithLogos)
+  // -- reemplaza la lista curada fija que se usaba antes: ahora TODOS los
+  // ~95 simbolos son candidatos, no solo los ~20 conocidos de antemano, y
+  // el choque de simbolo tipo INTR (matcheaba con Banco Inter de Brasil,
+  // country:"BR") se descarta solo por el chequeo de pais.
+  //
+  // El market cap que devuelve Finnhub para Acciones AR se descarta y se
+  // reemplaza por AR_SHARES_OUTSTANDING x precio en vivo -- Finnhub solo
+  // cubre los ~12 tickers con ADR en EE.UU. (dejando afuera BYMA, TXAR,
+  // ALUA, COME, TGSU2, TGNO4, TRAN, VALO, CVH, que tambien queremos en el
+  // treemap), y ademas todo lo que SI cubre viene con el mismo desvio de
+  // escala ~1000x -- mezclar ambas fuentes (Finnhub para 12, calculo propio
+  // para el resto) haria que el tamaño relativo entre las dos mitades del
+  // treemap fuera incoherente entre si.
   const logoBlob = await loadLogoBlob(env);
   const logoBudget = { remaining: 20, dirty: false };
-  const argStocksItems = await enrichWithLogos(mapD912Rows(argStocksRaw), finnhubKey, logoBlob, logoBudget, Infinity, 'AR');
+  const argStocksItems = (await enrichWithLogos(mapD912Rows(argStocksRaw), finnhubKey, logoBlob, logoBudget, Infinity, 'AR'))
+    .map(it => {
+      const shares = AR_SHARES_OUTSTANDING[it.symbol];
+      const marketCap = (shares && typeof it.price === 'number') ? (shares * it.price / 1e6) : null;
+      return { ...it, marketCap };
+    });
   const [argCedearsItems, usaStocksItems, usaAdrsItems] = await Promise.all([
     enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), finnhubKey, logoBlob, logoBudget),
     enrichWithLogos(mapD912Rows(usaStocksRaw, { limit: 500 }), finnhubKey, logoBlob, logoBudget),
