@@ -77,15 +77,22 @@ async function fetchD912(endpoint) {
 // las empresas mas grandes y reconocidas de EE.UU. quedaban afuera del
 // treemap de "Acciones de Estados Unidos" antes de siquiera llegar a
 // pedirle el market cap a Finnhub. Cubre S&P 500 top ~80 aprox.
+// GOOG (Class C) se excluye a proposito -- es la misma empresa que GOOGL
+// (Class A), duplicarla en el treemap cuenta a Alphabet dos veces.
 const USA_MEGA_CAP_PINS = [
-  'AAPL','MSFT','GOOGL','GOOG','AMZN','NVDA','META','TSLA','BRK.B','JPM',
+  'AAPL','MSFT','GOOGL','AMZN','NVDA','META','TSLA','BRK.B','JPM',
   'JNJ','V','PG','UNH','HD','MA','XOM','CVX','ABBV','PFE','KO','PEP','WMT',
   'DIS','NFLX','ADBE','CRM','ORCL','CSCO','INTC','AMD','QCOM','TXN','IBM',
   'GS','MS','BAC','WFC','C','SPGI','BLK','SCHW','AXP','LOW','NKE','MCD',
   'SBUX','COST','TGT','LMT','RTX','BA','CAT','DE','HON','UPS','UNP','GE',
   'MMM','T','VZ','CMCSA','ABT','TMO','DHR','LLY','MRK','BMY','GILD','AMGN',
   'ISRG','NOW','INTU','PYPL','UBER','SHOP','PLTR','AVGO','LIN','ACN','PM',
+  'SPCX',
 ];
+// Simbolos que representan la MISMA empresa que otro ya en la lista (otra
+// clase de acciones) -- se excluyen aunque el volumen local los meta solos
+// en el top 500, para no duplicar la misma compañia en el treemap.
+const USA_DUPLICATE_CLASS_EXCLUDE = ['GOOG'];
 
 // pin: simbolos que siempre tienen que quedar en la lista aunque el limite por
 // volumen los deje afuera -- para activos reales de la cartera con poco volumen
@@ -668,7 +675,7 @@ async function buildPayload(env) {
     });
   const [argCedearsItems, usaStocksItems, usaAdrsItems] = await Promise.all([
     enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), finnhubKey, logoBlob, logoBudget),
-    enrichWithLogos(mapD912Rows(usaStocksRaw, { limit: 500, pin: USA_MEGA_CAP_PINS }), finnhubKey, logoBlob, logoBudget),
+    enrichWithLogos(mapD912Rows(usaStocksRaw.filter(r => !USA_DUPLICATE_CLASS_EXCLUDE.includes(r.symbol)), { limit: 500, pin: USA_MEGA_CAP_PINS }), finnhubKey, logoBlob, logoBudget),
     enrichWithLogos(mapD912Rows(usaAdrsRaw), finnhubKey, logoBlob, logoBudget),
   ]);
   if (logoBudget.dirty) await saveLogoBlob(env, logoBlob);
