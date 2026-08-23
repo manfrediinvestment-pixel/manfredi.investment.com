@@ -70,6 +70,23 @@ async function fetchD912(endpoint) {
   }
 }
 
+// El "volumen" que reporta data912 para usa_stocks resulto ser una metrica
+// local (probado con datos reales: AAPL rankea #2190 de 3158, MSFT #1991,
+// GOOGL #3132 -- muy por debajo del limite de 500), no el volumen real de
+// NYSE/NASDAQ -- mismo patron que ya vimos con Acciones AR. Sin este pin,
+// las empresas mas grandes y reconocidas de EE.UU. quedaban afuera del
+// treemap de "Acciones de Estados Unidos" antes de siquiera llegar a
+// pedirle el market cap a Finnhub. Cubre S&P 500 top ~80 aprox.
+const USA_MEGA_CAP_PINS = [
+  'AAPL','MSFT','GOOGL','GOOG','AMZN','NVDA','META','TSLA','BRK.B','JPM',
+  'JNJ','V','PG','UNH','HD','MA','XOM','CVX','ABBV','PFE','KO','PEP','WMT',
+  'DIS','NFLX','ADBE','CRM','ORCL','CSCO','INTC','AMD','QCOM','TXN','IBM',
+  'GS','MS','BAC','WFC','C','SPGI','BLK','SCHW','AXP','LOW','NKE','MCD',
+  'SBUX','COST','TGT','LMT','RTX','BA','CAT','DE','HON','UPS','UNP','GE',
+  'MMM','T','VZ','CMCSA','ABT','TMO','DHR','LLY','MRK','BMY','GILD','AMGN',
+  'ISRG','NOW','INTU','PYPL','UBER','SHOP','PLTR','AVGO','LIN','ACN','PM',
+];
+
 // pin: simbolos que siempre tienen que quedar en la lista aunque el limite por
 // volumen los deje afuera -- para activos reales de la cartera con poco volumen
 // de CEDEAR (ej. AIG), sin los cuales el buscador de Mercados y el pricing en
@@ -651,7 +668,7 @@ async function buildPayload(env) {
     });
   const [argCedearsItems, usaStocksItems, usaAdrsItems] = await Promise.all([
     enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), finnhubKey, logoBlob, logoBudget),
-    enrichWithLogos(mapD912Rows(usaStocksRaw, { limit: 500 }), finnhubKey, logoBlob, logoBudget),
+    enrichWithLogos(mapD912Rows(usaStocksRaw, { limit: 500, pin: USA_MEGA_CAP_PINS }), finnhubKey, logoBlob, logoBudget),
     enrichWithLogos(mapD912Rows(usaAdrsRaw), finnhubKey, logoBlob, logoBudget),
   ]);
   if (logoBudget.dirty) await saveLogoBlob(env, logoBlob);
