@@ -424,12 +424,20 @@ async function fetchCriptoKraken() {
     .slice(0, 200);
 }
 
+// CoinGecko bloquea/limita seguido las IPs compartidas de Cloudflare Workers
+// (confirmado: desde una IP normal responde 200 siempre, desde el worker
+// falla ~1 de cada 2-3 pedidos) -- es el unico que trae market_cap gratis
+// (Kraken, el fallback, no lo tiene), asi que vale la pena un par de
+// reintentos cortos antes de resignarse al fallback sin market cap.
 async function fetchCripto() {
   let items;
-  try {
-    items = await fetchCriptoCoinGecko();
-  } catch (e) {
-    console.error('[mercados] coingecko:', e.message);
+  for (let attempt = 0; attempt < 3 && !items; attempt++) {
+    if (attempt > 0) await new Promise(r => setTimeout(r, 400));
+    try {
+      items = await fetchCriptoCoinGecko();
+    } catch (e) {
+      console.error(`[mercados] coingecko (intento ${attempt + 1}):`, e.message);
+    }
   }
   if (!items) {
     try {
