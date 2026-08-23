@@ -9,6 +9,11 @@ SITE_URL = "https://manfredi-investment-com.pages.dev"
 binding = "MERCADOS_KV"
 id = "d5875fd93a4145c6af4703bd8ea309c8"
 
+# Refresca los mega-caps de Acciones USA (ver refreshMegaCapPins en index.js)
+# todos los lunes 8:00 AM ART (11:00 UTC), antes de que arranque la semana.
+[triggers]
+crons = ["0 11 * * MON"]
+
 # Secrets (nunca en este archivo, configurar via wrangler):
 #   wrangler secret put FINNHUB_KEY
 #   wrangler secret put TWELVEDATA_KEY

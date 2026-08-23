@@ -694,6 +694,32 @@ async function buildPayload(env) {
   return { updated: new Date().toISOString(), featured, categorias };
 }
 
+// ─── Cron semanal: refresca logos/market cap de los mega-caps de Acciones
+// USA que alimentan el mapa de la pestaña "Mapas" (ver [triggers] crons en
+// wrangler.toml). Solo re-pide USA_MEGA_CAP_PINS (~80 simbolos) -- Mercado
+// Argentino no lo necesita (marketCap se calcula en vivo con
+// AR_SHARES_OUTSTANDING x precio, sin Finnhub) y Cripto sale de CoinGecko en
+// cada pedido, ninguno de los dos depende de este blob. Con ~80 simbolos
+// queda comodo debajo del limite de subrequests por invocacion de Cloudflare
+// Workers (el mismo limite que tumbo produccion la primera vez, ver
+// comentario de logos_v2/v3 mas arriba) -- a diferencia de un refresh
+// completo de los ~1.100 simbolos de CEDEARs/Acciones USA/ADRs, que sigue
+// necesitando el loop externo de /admin/enrich en tandas.
+async function refreshMegaCapPins(env) {
+  const finnhubKey = env.FINNHUB_KEY;
+  if (!finnhubKey) return { error: 'FINNHUB_KEY no configurada' };
+  const blob = await loadLogoBlob(env);
+  const now = Date.now();
+  const results = await mapWithConcurrency(USA_MEGA_CAP_PINS, 20, async (symbol) => {
+    const querySymbol = AR_LOCAL_TO_ADR_SYMBOL[symbol] || symbol;
+    const { logo, marketCap } = await fetchProfile(querySymbol, finnhubKey);
+    blob[symbol] = { logo, marketCap, ts: now };
+    return { symbol, logo: !!logo, marketCap };
+  });
+  await saveLogoBlob(env, blob);
+  return { processed: results.length, results };
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -843,6 +869,15 @@ export default {
       return new Response(JSON.stringify({ processed: results.length, results }), { headers });
     }
 
+    if (url.pathname === '/admin/refresh-megacaps') {
+      const token = url.searchParams.get('token') || '';
+      if (!env.ADMIN_TOKEN || token !== env.ADMIN_TOKEN) {
+        return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers });
+      }
+      const result = await refreshMegaCapPins(env);
+      return new Response(JSON.stringify(result), { headers });
+    }
+
     if (url.pathname === '/debug-cripto') {
       const attempts = {};
       const tryOne = async (name, fn) => {
@@ -859,5 +894,13 @@ export default {
     }
 
     return new Response('Manfredi Mercados Worker OK', { headers: { 'Content-Type': 'text/plain' } });
+  },
+
+  // Cron trigger (ver [triggers] en wrangler.toml) -- corre solo, sin pedido
+  // HTTP de por medio. ctx.waitUntil evita que el runtime mate la invocacion
+  // apenas termina de encolarse (Cloudflare Workers puede cortar el trabajo
+  // async no esperado explicitamente en cuanto el handler retorna).
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(refreshMegaCapPins(env));
   },
 };

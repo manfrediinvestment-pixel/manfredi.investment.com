@@ -2515,6 +2515,34 @@
     .mkt-show-all:hover { background: rgba(242,201,76,.12); }
     .mkt-show-all[hidden] { display: none; }
 
+    /* Pestaña "Mapas" -- treemap tipo Finviz por market cap */
+    .mkt-maps-wrap[hidden] { display: none; }
+    .mkt-map-section { margin-bottom: 28px; }
+    .mkt-map-section:last-child { margin-bottom: 0; }
+    .mkt-map-title {
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+      color: rgba(255,255,255,.5); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+    }
+    .mkt-map-title .n { color: var(--gold); text-transform: none; letter-spacing: 0; }
+    .mkt-treemap {
+      position: relative; width: 100%; height: 300px; background: var(--navy-4);
+      border: 1px solid rgba(255,255,255,.08); border-radius: 8px; overflow: hidden;
+    }
+    .mkt-tile {
+      position: absolute; box-sizing: border-box; border: 1px solid var(--navy-1);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      overflow: hidden; cursor: pointer; transition: filter .12s ease;
+    }
+    .mkt-tile:hover { filter: brightness(1.25); z-index: 5; }
+    .mkt-tile .mt-sym { font-family: 'IBM Plex Mono', monospace; font-weight: 700; line-height: 1.1; white-space: nowrap; color: #fff; }
+    .mkt-tile .mt-chg { font-family: 'IBM Plex Mono', monospace; opacity: .9; line-height: 1.1; white-space: nowrap; color: #fff; }
+    .mkt-tile .mt-logo { border-radius: 50%; object-fit: contain; background: rgba(255,255,255,.15); margin-bottom: 2px; }
+    .mkt-map-legend {
+      display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 10.5px;
+      color: rgba(255,255,255,.4); font-family: 'IBM Plex Mono', monospace;
+    }
+    .mkt-map-legend .swatch { width: 60px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #EF4444, #1a1a1a, #10B981); }
+
     /* Estrella de favoritos en cada fila */
     .mkt-star-btn {
       background: none; border: none; padding: 0; cursor: pointer; color: rgba(255,255,255,.18);
@@ -3431,7 +3459,7 @@
         </aside>
         <div class="mkt-main">
           <div class="mkt-tabs" id="mktTabs" role="tablist"></div>
-          <div class="mkt-table-wrap">
+          <div class="mkt-table-wrap" id="mktTableWrap">
             <div class="mkt-table-head" id="mktTableHead">
               <span></span><span>Activo</span><span style="text-align:right;">Precio</span><span style="text-align:right;">Var%</span>
             </div>
@@ -3440,6 +3468,7 @@
             </div>
             <button type="button" id="mktShowAllBtn" class="mkt-show-all" hidden>Ver los <span id="mktShowAllCount">&mdash;</span> restantes &rarr;</button>
           </div>
+          <div class="mkt-maps-wrap" id="mktMapsWrap" hidden></div>
         </div>
       </div>
       <p class="last-updated" id="lastUpdated" style="margin-top:16px;text-align:right;font-size:11px;color:var(--text-sec);"></p>
@@ -6467,7 +6496,8 @@
     { key: 'dolares',     label: 'Dólares & Divisas' },
   ];
   const MKT_FAV_KEY = 'fav';
-  let mktActiveCategory = MKT_CATEGORIES[0].key;
+  const MKT_MAPS_KEY = 'mapas';
+  let mktActiveCategory = MKT_MAPS_KEY;
   let mktShowingAll = false;
 
   // ─── Favoritos: guardar/quitar activos y persistirlos en Firestore ───────
@@ -6524,6 +6554,7 @@
     if (!wrap) return;
     const favCount = (window._miFavoritos || []).length;
     let html = `<button type="button" class="mkt-tab mkt-tab-fav${mktActiveCategory === MKT_FAV_KEY ? ' active' : ''}" data-cat="${MKT_FAV_KEY}">${mktStarIcon(true)}Favoritos${favCount ? `<span class="mkt-tab-fav-count">${favCount}</span>` : ''}</button>`;
+    html += `<button type="button" class="mkt-tab${mktActiveCategory === MKT_MAPS_KEY ? ' active' : ''}" data-cat="${MKT_MAPS_KEY}">Mapas</button>`;
     html += MKT_CATEGORIES.map(c =>
       `<button type="button" class="mkt-tab${c.key === mktActiveCategory ? ' active' : ''}" data-cat="${c.key}">${c.label}</button>`
     ).join('');
@@ -6585,6 +6616,153 @@
     `;
   }
 
+  // ─── Mapas: treemap tipo Finviz por market cap ────────────────────────────
+  // 3 secciones fijas -- Mercado Argentino (arg_stocks), Acciones de Estados
+  // Unidos (usa_stocks solo, sin CEDEARs/ADRs que son las mismas empresas por
+  // otra via) y Cripto. Tamaño = market cap real; Argentina lo calcula el
+  // worker con una tabla propia de acciones en circulacion (Finnhub casi no
+  // cubre el mercado local y ademas viene con un error de escala ~1000x que
+  // no importa aca porque nunca se compara al lado de las otras 2 secciones).
+  const MKT_MAPS_SECTIONS = [
+    { key: 'arg_stocks', label: 'Mercado Argentino', currency: 'ARS', n: 50 },
+    { key: 'usa_stocks', label: 'Acciones de Estados Unidos', currency: 'USD', n: 60 },
+    { key: 'cripto', label: 'Cripto', currency: 'USD', n: 60 },
+  ];
+
+  // Algoritmo squarified treemap (Bruls, Huizing, van Wijk) -- misma logica
+  // que el prototipo local, portada tal cual.
+  function mktSquarify(items, x, y, w, h) {
+    const total = items.reduce((s, it) => s + it.size, 0);
+    if (!total || !items.length) return [];
+    const scale = (w * h) / total;
+    const values = items.map(it => it.size * scale);
+    const rects = [];
+
+    function worstRatio(row, length) {
+      if (!row.length) return Infinity;
+      const sum = row.reduce((a, b) => a + b, 0);
+      const max = Math.max(...row), min = Math.min(...row);
+      const s2 = sum * sum, l2 = length * length;
+      return Math.max((l2 * max) / s2, s2 / (l2 * min));
+    }
+
+    function layoutRow(row, rowItems, horizontal, x, y, w, h) {
+      const sum = row.reduce((a, b) => a + b, 0);
+      if (horizontal) {
+        const rowH = sum / w;
+        let cx = x;
+        rowItems.forEach((it, i) => {
+          const rw = row[i] / rowH;
+          rects.push({ item: it, x: cx, y: y, w: rw, h: rowH });
+          cx += rw;
+        });
+        return { x, y: y + rowH, w, h: h - rowH };
+      } else {
+        const rowW = sum / h;
+        let cy = y;
+        rowItems.forEach((it, i) => {
+          const rh = row[i] / rowW;
+          rects.push({ item: it, x: x, y: cy, w: rowW, h: rh });
+          cy += rh;
+        });
+        return { x: x + rowW, y, w: w - rowW, h };
+      }
+    }
+
+    let remaining = items.map((it, i) => ({ it, v: values[i] }));
+    let area = { x, y, w, h };
+    let curRow = [];
+    let curRowItems = [];
+
+    while (remaining.length) {
+      const horizontal = area.w >= area.h;
+      const length = horizontal ? area.w : area.h;
+      const next = remaining[0];
+      const testRow = [...curRow, next.v];
+      if (curRow.length === 0 || worstRatio(testRow, length) <= worstRatio(curRow, length)) {
+        curRow.push(next.v);
+        curRowItems.push(next.it);
+        remaining.shift();
+      } else {
+        area = layoutRow(curRow, curRowItems, horizontal, area.x, area.y, area.w, area.h);
+        curRow = [];
+        curRowItems = [];
+      }
+    }
+    if (curRow.length) {
+      const horizontal = area.w >= area.h;
+      layoutRow(curRow, curRowItems, horizontal, area.x, area.y, area.w, area.h);
+    }
+    return rects;
+  }
+
+  function mktMapColorFor(change) {
+    const c = typeof change === 'number' ? change : 0;
+    const clamped = Math.max(-5, Math.min(5, c));
+    const t = Math.abs(clamped) / 5;
+    if (c >= 0) {
+      const r = Math.round(10 + 6 * t), g = Math.round(40 + 145 * t), b = Math.round(35 + 94 * t);
+      return `rgb(${r},${g},${b})`;
+    }
+    const r = Math.round(50 + 189 * t), g = Math.round(20 + 48 * t), b = Math.round(20 + 48 * t);
+    return `rgb(${r},${g},${b})`;
+  }
+
+  function mktRenderTreemap(containerId, section, items) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '';
+    if (!items.length) {
+      container.innerHTML = '<div class="mkt-row-msg" style="height:100%;display:flex;align-items:center;justify-content:center;">No se pudo cargar el market cap en este momento &mdash; probá de nuevo en unos minutos.</div>';
+      return;
+    }
+    const w = container.clientWidth || 760, h = 300;
+    const rects = mktSquarify(items, 0, 0, w, h);
+    rects.forEach(r => {
+      const tile = document.createElement('div');
+      tile.className = 'mkt-tile';
+      tile.style.left = r.x + 'px';
+      tile.style.top = r.y + 'px';
+      tile.style.width = Math.max(0, r.w) + 'px';
+      tile.style.height = Math.max(0, r.h) + 'px';
+      tile.style.background = mktMapColorFor(r.item.change);
+      const area = r.w * r.h;
+      const symSize = Math.max(8, Math.min(15, Math.sqrt(area) / 4));
+      const showChg = area > 900;
+      const showLogo = area > 1800 && r.item.logo;
+      let html = '';
+      if (showLogo) html += `<img class="mt-logo" src="${pfEsc(r.item.logo)}" alt="" loading="lazy" style="width:${Math.min(20, symSize + 4)}px;height:${Math.min(20, symSize + 4)}px" onerror="this.remove()">`;
+      html += `<div class="mt-sym" style="font-size:${symSize}px">${pfEsc(r.item.symbol)}</div>`;
+      if (showChg) html += `<div class="mt-chg" style="font-size:${Math.max(8, symSize - 3)}px">${r.item.change >= 0 ? '+' : ''}${(r.item.change || 0).toFixed(1)}%</div>`;
+      tile.innerHTML = html;
+      const chg = r.item.change;
+      tile.title = `${r.item.symbol} · ${chg >= 0 ? '+' : ''}${(chg || 0).toFixed(2)}%`;
+      tile.addEventListener('click', () => openAssetModal(r.item, section.key, section.currency));
+      container.appendChild(tile);
+    });
+  }
+
+  function renderMapsView() {
+    const wrap = document.getElementById('mktMapsWrap');
+    if (!wrap || !MERCADOS) return;
+    wrap.innerHTML = MKT_MAPS_SECTIONS.map(s => `
+      <div class="mkt-map-section">
+        <div class="mkt-map-title">${s.label}</div>
+        <div class="mkt-treemap" id="mmap-tm-${s.key}"></div>
+        <div class="mkt-map-legend"><span>-5%</span><span class="swatch"></span><span>+5%</span></div>
+      </div>
+    `).join('');
+    MKT_MAPS_SECTIONS.forEach(s => {
+      const cat = MERCADOS.categorias[s.key];
+      const items = (cat ? cat.items : []).filter(it => it.marketCap);
+      const top = items
+        .map(it => ({ ...it, size: it.marketCap }))
+        .sort((a, b) => b.size - a.size)
+        .slice(0, s.n);
+      mktRenderTreemap('mmap-tm-' + s.key, s, top);
+    });
+  }
+
   function renderFavoritesTable() {
     const body = document.getElementById('mktTableBody');
     const btn  = document.getElementById('mktShowAllBtn');
@@ -6613,6 +6791,16 @@
   }
 
   function renderCategoryTable() {
+    const tableWrap = document.getElementById('mktTableWrap');
+    const mapsWrap = document.getElementById('mktMapsWrap');
+    if (mktActiveCategory === MKT_MAPS_KEY) {
+      if (tableWrap) tableWrap.hidden = true;
+      if (mapsWrap) mapsWrap.hidden = false;
+      renderMapsView();
+      return;
+    }
+    if (tableWrap) tableWrap.hidden = false;
+    if (mapsWrap) mapsWrap.hidden = true;
     if (mktActiveCategory === MKT_FAV_KEY) { renderFavoritesTable(); return; }
     const body = document.getElementById('mktTableBody');
     const btn  = document.getElementById('mktShowAllBtn');
