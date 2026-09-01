@@ -3469,7 +3469,7 @@
         <svg class="htx-metric__spark" id="htxSpxSpark" viewBox="0 0 480 110" preserveAspectRatio="none" aria-hidden="true">
           <polyline points="0,64 120,60 240,58 360,56 480,54" fill="none" stroke="rgba(232,238,246,.18)" stroke-width="1.5" />
         </svg>
-        <p class="htx-metric__foot">Tendencia de los &uacute;ltimos 30 d&iacute;as (S&amp;P 500 v&iacute;a SPY) &middot; nivel del &iacute;ndice del reporte diario</p>
+        <p class="htx-metric__foot">Movimiento de la jornada (S&amp;P 500 &middot; ^GSPC) &middot; nivel de cierre del reporte diario</p>
       </div>
     </div>
 
@@ -3701,6 +3701,8 @@
           var when = d.fecha || d.updated_at;
           var we = document.getElementById('htx-us-asof');
           if (we && when) we.textContent = String(when).replace(/ hs$/, '');
+          // el delta ya está seteado: re-pintar la sparkline del S&P según el signo del día
+          if (window._htxRefreshSpxSpark) window._htxRefreshSpxSpark();
         }
       } catch (e) { console.warn('[htx] wallstreet:', e.message); }
       // Yield del Treasury 10Y: worker manfredi-calendario /macro-us (mismo feed que la pestaña Calendario)
@@ -6211,17 +6213,50 @@
       (pl ? '<circle cx="'+pl[0]+'" cy="'+pl[1]+'" r="3.2" fill="'+ pCol +'" />' : '') +
       (bl ? '<circle cx="'+bl[0]+'" cy="'+bl[1]+'" r="2.6" fill="rgba(232,238,246,.4)" />' : '');
   }
+  async function htxYahooCloses(ticker, range, interval){
+    for(var i=0;i<2;i++){
+      var host = i===0 ? 'query1' : 'query2';
+      try{
+        var r = await fetch('https://'+host+'.finance.yahoo.com/v8/finance/chart/'+encodeURIComponent(ticker)+'?interval='+interval+'&range='+range, { signal: AbortSignal.timeout(6000) });
+        if(!r.ok) continue;
+        var d = await r.json();
+        var res = d && d.chart && d.chart.result && d.chart.result[0];
+        if(!res) continue;
+        var q = res.indicators && res.indicators.quote && res.indicators.quote[0];
+        var closes = (q && q.close ? q.close : []).filter(function(v){ return v != null; });
+        if(closes.length < 3) continue;
+        var prev = (res.meta && (res.meta.chartPreviousClose || res.meta.previousClose)) || closes[0];
+        return { closes: closes, prevClose: prev };
+      }catch(e){ /* probar el otro host */ }
+    }
+    return null;
+  }
   async function htxRenderSpxSpark(){
     var svg = document.getElementById('htxSpxSpark');
-    if(!svg || typeof pfFetchHistorico !== 'function') return;
+    if(!svg) return;
     try{
-      var closes = await pfFetchHistorico('usa_stocks', 'SPY', 30);
-      if(!closes || closes.length < 4) return;
+      // El color/dirección siguen al movimiento del día que muestra el delta.
+      var chgEl = document.getElementById('htx-spx-chg');
+      var chgTxt = chgEl ? chgEl.textContent.trim() : '';
+      var daySign = /^[\-−▼]/.test(chgTxt) ? -1 : (/^[+▲\d]/.test(chgTxt) ? 1 : 0);
+
+      var data = await htxYahooCloses('^GSPC', '1d', '5m');
+      if(!data) data = await htxYahooCloses('^GSPC', '5d', '30m');
+      var closes, refUp;
+      if(data){
+        closes = data.closes;
+        refUp = closes[closes.length-1] >= data.prevClose;
+      } else if(typeof pfFetchHistorico === 'function'){
+        closes = await pfFetchHistorico('usa_stocks', 'SPY', 30);
+        if(!closes || closes.length < 4) return;
+        refUp = closes[closes.length-1] >= closes[0];
+      } else { return; }
+
+      var up = daySign !== 0 ? (daySign > 0) : refUp;
       var lo = Math.min.apply(null, closes), hi = Math.max.apply(null, closes);
       if(lo === hi){ lo -= 1; hi += 1; }
       var W = 480, H = 110;
       var pts = htxSvgPoints(closes, W, H, lo, hi);
-      var up = closes[closes.length-1] >= closes[0];
       var col = up ? '#10b981' : '#ef4444';
       var fill = up ? 'rgba(16,185,129,.16)' : 'rgba(239,68,68,.14)';
       var last = pts[pts.length-1].split(',');
@@ -6232,6 +6267,7 @@
         '<circle cx="'+ last[0] +'" cy="'+ last[1] +'" r="3.2" fill="'+ col +'" />';
     }catch(e){ console.warn('[htx] spx spark:', e.message); }
   }
+  window._htxRefreshSpxSpark = htxRenderSpxSpark;
   (function(){
     var tabs = document.querySelectorAll('.htx-pf__tabs button');
     var map = ['1w','1m','ytd','1y'];
