@@ -2525,7 +2525,7 @@
     }
     .mkt-map-title .n { color: var(--gold); text-transform: none; letter-spacing: 0; }
     .mkt-treemap {
-      position: relative; width: 100%; height: 300px; background: var(--navy-4);
+      position: relative; width: 100%; height: 360px; background: var(--navy-4);
       border: 1px solid rgba(255,255,255,.08); border-radius: 8px; overflow: hidden;
     }
     .mkt-tile {
@@ -6675,8 +6675,11 @@
     let curRowItems = [];
 
     while (remaining.length) {
-      const horizontal = area.w >= area.h;
-      const length = horizontal ? area.w : area.h;
+      // Se apila la fila SIEMPRE contra el lado más corto del rectángulo restante
+      // (Bruls/Huizing/van Wijk). Hacerlo contra el lado largo genera filas finales
+      // de 1px con el texto derramándose fuera del cuadro.
+      const horizontal = area.w <= area.h;
+      const length = Math.min(area.w, area.h);
       const next = remaining[0];
       const testRow = [...curRow, next.v];
       if (curRow.length === 0 || worstRatio(testRow, length) <= worstRatio(curRow, length)) {
@@ -6690,7 +6693,7 @@
       }
     }
     if (curRow.length) {
-      const horizontal = area.w >= area.h;
+      const horizontal = area.w <= area.h;
       layoutRow(curRow, curRowItems, horizontal, area.x, area.y, area.w, area.h);
     }
     return rects;
@@ -6716,7 +6719,7 @@
       container.innerHTML = '<div class="mkt-row-msg" style="height:100%;display:flex;align-items:center;justify-content:center;">No se pudo cargar el market cap en este momento &mdash; probá de nuevo en unos minutos.</div>';
       return;
     }
-    const w = container.clientWidth || 760, h = 300;
+    const w = container.clientWidth || 760, h = container.clientHeight || 360;
     const rects = mktSquarify(items, 0, 0, w, h);
     rects.forEach(r => {
       const tile = document.createElement('div');
@@ -6728,11 +6731,12 @@
       tile.style.background = mktMapColorFor(r.item.change);
       const area = r.w * r.h;
       const symSize = Math.max(8, Math.min(15, Math.sqrt(area) / 4));
-      const showChg = area > 900;
-      const showLogo = area > 1800 && r.item.logo;
+      const showSym = r.h >= 14 && r.w >= 22;
+      const showChg = showSym && area > 900 && r.h >= 26;
+      const showLogo = area > 1800 && r.h >= 44 && r.item.logo;
       let html = '';
       if (showLogo) html += `<img class="mt-logo" src="${pfEsc(r.item.logo)}" alt="" loading="lazy" style="width:${Math.min(20, symSize + 4)}px;height:${Math.min(20, symSize + 4)}px" onerror="this.remove()">`;
-      html += `<div class="mt-sym" style="font-size:${symSize}px">${pfEsc(r.item.symbol)}</div>`;
+      if (showSym) html += `<div class="mt-sym" style="font-size:${symSize}px">${pfEsc(r.item.symbol)}</div>`;
       if (showChg) html += `<div class="mt-chg" style="font-size:${Math.max(8, symSize - 3)}px">${r.item.change >= 0 ? '+' : ''}${(r.item.change || 0).toFixed(1)}%</div>`;
       tile.innerHTML = html;
       const chg = r.item.change;
