@@ -3244,6 +3244,15 @@
     padding:11px 20px; background:var(--htx-amber); color:#07101e; border:0;
   }
   .htx-btn:hover { background:#f7dc6f; }
+  .htx-btn--soft {
+    display:inline-block;
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+    font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-weight:600;
+    padding:11px 20px; background:transparent; color:rgba(242,201,76,.92);
+    border:1px solid rgba(242,201,76,.38);
+    transition:background .18s ease, border-color .18s ease;
+  }
+  .htx-btn--soft:hover { background:rgba(242,201,76,.09); border-color:rgba(242,201,76,.7); }
   .htx-ghost {
     display:inline-block;
     font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
@@ -3268,19 +3277,27 @@
   .htx-deck { margin:0 0 30px; font-size:15.5px; line-height:1.65; color:var(--htx-ink2); max-width:52ch; }
   .htx-cta { display:flex; gap:12px; flex-wrap:wrap; }
   .htx-metric { padding:72px 32px 64px; display:flex; flex-direction:column; }
-  .htx-metric__label {
+  .htx-metric__id { display:flex; flex-direction:column; gap:4px; margin-bottom:20px; }
+  .htx-metric__name {
     font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
-    font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--htx-ink2);
-    display:flex; align-items:center; gap:10px; margin-bottom:18px;
+    font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--htx-ink);
+    display:flex; align-items:center; gap:10px;
+  }
+  .htx-metric__sub { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--htx-ink3); }
+  .htx-metric__row { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+  .htx-metric__badge {
+    flex:none; display:grid; place-items:center; width:44px; height:44px;
+    border:1px solid var(--htx-line); color:var(--htx-ink2);
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:12px; font-weight:600; letter-spacing:.02em;
   }
   .htx-metric__value {
     font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums;
-    font-size:clamp(32px,3.6vw,50px); font-weight:600; line-height:1; letter-spacing:-.015em;
-    color:rgba(232,238,246,.74); margin-bottom:10px;
+    font-size:clamp(26px,2.8vw,36px); font-weight:600; line-height:1.05; letter-spacing:-.01em;
+    color:rgba(232,238,246,.82);
   }
   .htx-metric__delta {
     font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums;
-    font-size:14px; font-weight:500; color:var(--htx-ink2); margin-bottom:26px;
+    font-size:12.5px; font-weight:500; color:var(--htx-ink2); margin-top:3px;
   }
   .htx-metric__delta .spot-chg.up, .htx-metric__delta .up { color:var(--htx-pos); }
   .htx-metric__delta .spot-chg.down, .htx-metric__delta .down { color:var(--htx-neg); }
@@ -3433,26 +3450,26 @@
         <h1 class="htx-h1">Tu mundo financiero, en un solo lugar.</h1>
         <p class="htx-deck">An&aacute;lisis institucional de las empresas que mueven el mercado, cotizaciones de Argentina y el mundo en tiempo real, y las herramientas para armar y seguir tu cartera &mdash; con un asesor de IA que la conoce.</p>
         <div class="htx-cta">
-          <a class="htx-btn" href="#informes" data-tab-target="informes">Ver informes</a>
+          <a class="htx-btn--soft" href="#informes" data-tab-target="informes">Ver informes</a>
           <a class="htx-ghost" href="#portfolio" data-tab-target="portfolio">Probar el portfolio</a>
         </div>
       </div>
       <div class="htx-metric">
-        <div class="htx-metric__label">S&amp;P 500 &middot; Estados Unidos <span class="htx-asof">cierre &middot; <span id="htx-us-asof">&mdash;</span></span></div>
-        <div class="htx-metric__value htx-num" id="htx-spx-price">&mdash;</div>
-        <div class="htx-metric__delta"><span id="htx-spx-chg">&mdash;</span></div>
-        <svg class="htx-metric__spark" viewBox="0 0 480 110" preserveAspectRatio="none" aria-hidden="true">
-          <defs>
-            <linearGradient id="htxHeroSpark" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="rgba(16,185,129,.24)" />
-              <stop offset="1" stop-color="rgba(16,185,129,0)" />
-            </linearGradient>
-          </defs>
-          <polygon points="0,110 0,86 60,80 120,84 180,64 240,68 300,50 360,42 420,46 480,24 480,110" fill="url(#htxHeroSpark)" />
-          <polyline points="0,86 60,80 120,84 180,64 240,68 300,50 360,42 420,46 480,24" fill="none" stroke="#10b981" stroke-width="2" />
-          <circle cx="480" cy="24" r="3.5" fill="#10b981" />
+        <div class="htx-metric__id">
+          <span class="htx-metric__name">S&amp;P 500 <span class="htx-live">Live</span></span>
+          <span class="htx-metric__sub">Estados Unidos &middot; &Iacute;ndice &middot; cierre <span id="htx-us-asof">&mdash;</span></span>
+        </div>
+        <div class="htx-metric__row">
+          <span class="htx-metric__badge">SPX</span>
+          <div>
+            <div class="htx-metric__value htx-num" id="htx-spx-price">&mdash;</div>
+            <div class="htx-metric__delta"><span id="htx-spx-chg">&mdash;</span></div>
+          </div>
+        </div>
+        <svg class="htx-metric__spark" id="htxSpxSpark" viewBox="0 0 480 110" preserveAspectRatio="none" aria-hidden="true">
+          <polyline points="0,64 120,60 240,58 360,56 480,54" fill="none" stroke="rgba(232,238,246,.18)" stroke-width="1.5" />
         </svg>
-        <p class="htx-metric__foot">Cierre de Wall Street, del reporte diario &middot; la curva es de referencia</p>
+        <p class="htx-metric__foot">Tendencia de los &uacute;ltimos 30 d&iacute;as (S&amp;P 500 v&iacute;a SPY) &middot; nivel del &iacute;ndice del reporte diario</p>
       </div>
     </div>
 
@@ -3535,25 +3552,21 @@
       </div>
 
       <div class="htx-tile htx-tile--pf">
-        <div class="htx-tile__head"><span class="htx-tile__title">Manfredi Portfolio</span></div>
+        <div class="htx-tile__head"><span class="htx-tile__title">Manfredi Portfolio <span class="htx-live">Live</span></span></div>
         <div class="htx-pf__tabs">
           <button type="button">1S</button><button type="button" class="on">1M</button><button type="button">YTD</button><button type="button">1A</button>
         </div>
         <div class="htx-pf__stat">
-          <span class="htx-pf__big">+12,4%</span>
-          <span class="htx-pf__bench">S&amp;P 500 &nbsp;+7,1%</span>
+          <span class="htx-pf__big" id="htxPfBig">&hellip;</span>
+          <span class="htx-pf__bench" id="htxPfBench">Calculando con datos hist&oacute;ricos&hellip;</span>
         </div>
-        <svg class="htx-pf__chart" viewBox="0 0 460 132" preserveAspectRatio="none" aria-hidden="true">
-          <polyline points="0,110 60,102 120,88 180,92 240,64 300,58 360,40 420,30 460,22" fill="none" stroke="#10b981" stroke-width="2" />
-          <circle cx="460" cy="22" r="3.4" fill="#10b981" />
-          <polyline points="0,110 60,106 120,98 180,100 240,86 300,84 360,74 420,70 460,64" fill="none" stroke="rgba(232,238,246,.32)" stroke-width="1.6" stroke-dasharray="4 3" />
-          <circle cx="460" cy="64" r="3" fill="rgba(232,238,246,.4)" />
+        <svg class="htx-pf__chart" id="htxPfChart" viewBox="0 0 460 132" preserveAspectRatio="none" aria-hidden="true">
+          <polyline points="0,66 115,64 230,62 345,60 460,58" fill="none" stroke="rgba(232,238,246,.18)" stroke-width="1.5" />
         </svg>
         <div class="htx-pf__legend">
           <span><i style="background:#10b981;"></i>Manfredi</span>
           <span><i style="background:rgba(232,238,246,.4);"></i>S&amp;P 500</span>
         </div>
-        <p class="htx-pf__note">Ejemplo &middot; el rendimiento real se calcula en la pesta&ntilde;a Portfolio</p>
         <div class="htx-pf__links">
           <a class="htx-tile__link" href="#portfolio" data-tab-target="portfolio">Ver el Manfredi Portfolio &rarr;</a>
           <a class="htx-tile__link" href="#portfolio" data-tab-target="portfolio">Armar el m&iacute;o &rarr;</a>
@@ -6136,21 +6149,97 @@
     window.addEventListener('mi:quiz-completed', function(){ pfRenderQuizStatus(); pfRenderAlignment(); pfRenderMetrics(); });
     pfRenderQuizStatus();
     pfRenderPositions();
-    if(!window._heroMfRendered && document.getElementById('heroMfChartCanvas')){
-      window._heroMfRendered = true;
-      mfRenderPerformance('heroMfSummary', 'heroMfChartCanvas', '1m');
+    if(!window._htxHomeInit && document.getElementById('htxPfChart')){
+      window._htxHomeInit = true;
+      htxRenderPf('1m');
+      htxRenderSpxSpark();
     }
   }
   if(document.readyState !== 'loading'){ pfInit(); } else { document.addEventListener('DOMContentLoaded', pfInit); }
 
+  /* ===== Home Terminal: portfolio real + sparkline S&P (datos de la seccion Portfolio) ===== */
+  function htxSvgPoints(arr, W, H, lo, hi){
+    var n = arr.length, out = [];
+    for(var i=0;i<n;i++){
+      if(arr[i] == null) continue;
+      var x = n>1 ? (i/(n-1))*W : 0;
+      var y = 8 + (1 - (arr[i]-lo)/((hi-lo)||1)) * (H-16);
+      out.push(x.toFixed(1)+','+y.toFixed(1));
+    }
+    return out;
+  }
+  async function htxRenderPf(windowKey){
+    var chart = document.getElementById('htxPfChart');
+    var bigEl = document.getElementById('htxPfBig');
+    var benchEl = document.getElementById('htxPfBench');
+    if(!chart) return;
+    var win = mfGetWindows().filter(function(w){ return w.key === (windowKey||'1m'); })[0] || mfGetWindows()[1];
+    var cacheKey = win.key + '_' + win.portfolioDays + '_' + win.benchDays;
+    var m = mfSeriesCache[cacheKey];
+    if(!m){
+      try { m = await mfBuildPerformanceSeries(win.portfolioDays, win.benchDays, win.granularity); }
+      catch(e){ m = { dataUnavailable:true }; }
+      mfSeriesCache[cacheKey] = m;
+    }
+    if(!m || m.dataUnavailable){
+      if(bigEl){ bigEl.textContent = '—'; bigEl.style.color = 'var(--htx-ink3)'; }
+      if(benchEl) benchEl.textContent = 'Sin historial suficiente todavía';
+      return;
+    }
+    var pr = m.totalReturn, br = m.benchTotalReturn;
+    if(bigEl){
+      bigEl.textContent = (pr>=0?'+':'−') + Math.abs(pr).toFixed(1).replace('.',',') + '%';
+      bigEl.style.color = pr>=0 ? 'var(--htx-pos)' : 'var(--htx-neg)';
+    }
+    if(benchEl){
+      benchEl.textContent = 'S&P 500 ' + (br>=0?'+':'−') + Math.abs(br).toFixed(1).replace('.',',') + '%  ·  ' + win.label;
+    }
+    var P = m.portfolioPct, B = m.benchPct;
+    var all = P.concat(B).filter(function(v){ return v != null; });
+    if(!all.length){ return; }
+    var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all);
+    if(lo === hi){ lo -= 1; hi += 1; }
+    var W = 460, H = 132;
+    var pPts = htxSvgPoints(P, W, H, lo, hi);
+    var bPts = htxSvgPoints(B, W, H, lo, hi);
+    var pCol = pr>=0 ? '#10b981' : '#ef4444';
+    var pl = pPts[pPts.length-1] ? pPts[pPts.length-1].split(',') : null;
+    var bl = bPts[bPts.length-1] ? bPts[bPts.length-1].split(',') : null;
+    chart.innerHTML =
+      '<polyline points="'+ bPts.join(' ') +'" fill="none" stroke="rgba(232,238,246,.32)" stroke-width="1.6" stroke-dasharray="4 3" />' +
+      '<polyline points="'+ pPts.join(' ') +'" fill="none" stroke="'+ pCol +'" stroke-width="2" />' +
+      (pl ? '<circle cx="'+pl[0]+'" cy="'+pl[1]+'" r="3.2" fill="'+ pCol +'" />' : '') +
+      (bl ? '<circle cx="'+bl[0]+'" cy="'+bl[1]+'" r="2.6" fill="rgba(232,238,246,.4)" />' : '');
+  }
+  async function htxRenderSpxSpark(){
+    var svg = document.getElementById('htxSpxSpark');
+    if(!svg || typeof pfFetchHistorico !== 'function') return;
+    try{
+      var closes = await pfFetchHistorico('usa_stocks', 'SPY', 30);
+      if(!closes || closes.length < 4) return;
+      var lo = Math.min.apply(null, closes), hi = Math.max.apply(null, closes);
+      if(lo === hi){ lo -= 1; hi += 1; }
+      var W = 480, H = 110;
+      var pts = htxSvgPoints(closes, W, H, lo, hi);
+      var up = closes[closes.length-1] >= closes[0];
+      var col = up ? '#10b981' : '#ef4444';
+      var fill = up ? 'rgba(16,185,129,.16)' : 'rgba(239,68,68,.14)';
+      var last = pts[pts.length-1].split(',');
+      var poly = pts.concat([W+','+H, '0,'+H]).join(' ');
+      svg.innerHTML =
+        '<polygon points="'+ poly +'" fill="'+ fill +'" />' +
+        '<polyline points="'+ pts.join(' ') +'" fill="none" stroke="'+ col +'" stroke-width="2" />' +
+        '<circle cx="'+ last[0] +'" cy="'+ last[1] +'" r="3.2" fill="'+ col +'" />';
+    }catch(e){ console.warn('[htx] spx spark:', e.message); }
+  }
   (function(){
-    var winTabs = document.querySelectorAll('#heroMfWindowTabs .mkt-tab');
-    winTabs.forEach(function(btn){
+    var tabs = document.querySelectorAll('.htx-pf__tabs button');
+    var map = ['1w','1m','ytd','1y'];
+    tabs.forEach(function(btn, i){
       btn.addEventListener('click', function(){
-        winTabs.forEach(function(b){ b.classList.toggle('active', b === btn); });
-        if(typeof mfRenderPerformance === 'function'){
-          mfRenderPerformance('heroMfSummary', 'heroMfChartCanvas', btn.getAttribute('data-mfwin'));
-        }
+        tabs.forEach(function(b){ b.classList.remove('on'); });
+        btn.classList.add('on');
+        htxRenderPf(map[i] || '1m');
       });
     });
   })();
