@@ -3205,234 +3205,426 @@
     </div>
   </header>
 
-  <!-- ââ HERO ââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="hero-v2" data-tab="inicio">
-    <div class="hero-v2-inner">
-      <div class="hero-v2-left">
-        <div class="spotlight-card">
-          <div class="spotlight-head">
-            <span>Mercados ahora</span>
-            <span class="s-live">LIVE</span>
-          </div>
-          <div class="spot-feature">
-            <div class="spot-feature-top">
-              <span class="spot-feature-label">Riesgo Pa&iacute;s <em>EMBI+</em></span>
-              <span class="spot-feature-chg" id="hero-riesgo-chg">&#8212;</span>
-            </div>
-            <div class="spot-feature-value" id="hero-riesgo-value">&#8212;</div>
-            <svg class="spot-feature-chart" id="hero-riesgo-chart" viewBox="0 0 400 110" preserveAspectRatio="none"></svg>
-          </div>
-          <div class="spot-row" style="--spot-accent:#3B82F6;">
-            <div class="spot-name">
-              <div class="spot-ticker">MERV</div>
-              <div class="spot-fullname">Merval</div>
-            </div>
-            <svg class="spot-sparkline" viewBox="0 0 80 32" fill="none">
-              <polyline points="0,24 10,20 20,22 30,16 40,18 50,12 60,10 70,8 80,6" stroke="var(--green)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              <polygon points="0,24 10,20 20,22 30,16 40,18 50,12 60,10 70,8 80,6 80,32 0,32" fill="rgba(16,185,129,.1)"/>
-            </svg>
-            <div class="spot-price">
-              <span class="spot-amt" id="hspot-merv-price">&#8212;</span>
-              <span class="spot-chg" id="hspot-merv-chg">&#8212;</span>
-            </div>
-          </div>
-          <div class="spot-row" style="--spot-accent:var(--green);">
-            <div class="spot-name">
-              <div class="spot-ticker">SPX</div>
-              <div class="spot-fullname">S&amp;P 500</div>
-            </div>
-            <svg class="spot-sparkline" viewBox="0 0 80 32" fill="none">
-              <polyline points="0,20 10,18 20,22 30,14 40,16 50,10 60,12 70,8 80,10" stroke="var(--green)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              <polygon points="0,20 10,18 20,22 30,14 40,16 50,10 60,12 70,8 80,10 80,32 0,32" fill="rgba(16,185,129,.1)"/>
-            </svg>
-            <div class="spot-price">
-              <span class="spot-amt" id="hspot-spx-price">&#8212;</span>
-              <span class="spot-chg" id="hspot-spx-chg">&#8212;</span>
-            </div>
-          </div>
-          <div class="spot-row" style="--spot-accent:var(--yellow);">
-            <div class="spot-name">
-              <div class="spot-ticker">BTC</div>
-              <div class="spot-fullname">Bitcoin</div>
-            </div>
-            <svg class="spot-sparkline" viewBox="0 0 80 32" fill="none">
-              <polyline points="0,28 10,22 20,26 30,18 40,14 50,16 60,10 70,12 80,6" stroke="var(--yellow)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              <polygon points="0,28 10,22 20,26 30,18 40,14 50,16 60,10 70,12 80,6 80,32 0,32" fill="rgba(245,158,11,.1)"/>
-            </svg>
-            <div class="spot-price">
-              <span class="spot-amt" id="hspot-btc-price">&#8212;</span>
-              <span class="spot-chg" id="hspot-btc-chg">&#8212;</span>
-            </div>
-          </div>
-          <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#mercados'">Ver todos los mercados &rarr;</button>
+  <!-- ââ HERO / HOME (redisenio Terminal) ââââââââââââââââââââââââââ -->
+  <style>
+  /* ============================================================
+     Rediseno del home ("inicio") - direccion Terminal.
+     Todo scoped bajo .htx para no chocar con el stylesheet global.
+     ============================================================ */
+  .htx {
+    --htx-bg:#07101e; --htx-raised:#0c1828; --htx-raised2:#0f1f34;
+    --htx-line:rgba(255,255,255,.09); --htx-line-soft:rgba(255,255,255,.05);
+    --htx-ink:#e8eef6; --htx-ink2:rgba(232,238,246,.58); --htx-ink3:rgba(232,238,246,.34);
+    --htx-amber:#f2c94c; --htx-pos:#10b981; --htx-neg:#ef4444; --htx-data:#5aa9e6;
+    background:var(--htx-bg); color:var(--htx-ink);
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+  }
+  .htx *, .htx *::before, .htx *::after { box-sizing:border-box; }
+  .htx a { color:inherit; text-decoration:none; }
+  .htx button { font-family:inherit; cursor:pointer; }
+  .htx .mono { font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace; }
+  .htx-num { font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace; font-variant-numeric:tabular-nums; }
+  .htx-inner { max-width:1280px; margin:0 auto; }
+
+  .htx-eyebrow {
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+    font-size:10.5px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--htx-amber); margin:0 0 22px;
+  }
+  .htx-live { display:inline-flex; align-items:center; gap:6px; color:var(--htx-pos); font-weight:600;
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+  .htx-live::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--htx-pos); }
+  @media (prefers-reduced-motion:no-preference){ .htx-live::before{ animation:htx-pulse 1.5s ease-in-out infinite; } }
+  @keyframes htx-pulse { 50%{ opacity:.25; } }
+
+  .htx-btn {
+    display:inline-block;
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+    font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-weight:600;
+    padding:11px 20px; background:var(--htx-amber); color:#07101e; border:0;
+  }
+  .htx-btn:hover { background:#f7dc6f; }
+  .htx-ghost {
+    display:inline-block;
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+    font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+    padding:11px 20px; background:transparent; color:var(--htx-ink);
+    border:1px solid var(--htx-line);
+  }
+  .htx-ghost:hover { border-color:var(--htx-amber); color:var(--htx-amber); }
+
+  /* hero */
+  .htx-hero {
+    max-width:1280px; margin:0 auto;
+    display:grid; grid-template-columns:1.05fr .95fr;
+    border-bottom:1px solid var(--htx-line);
+  }
+  .htx-hero__lead { padding:72px 32px 64px; border-right:1px solid var(--htx-line); }
+  .htx-h1 {
+    margin:0 0 20px; font-family:'IBM Plex Sans',system-ui,sans-serif;
+    font-size:clamp(30px,3.4vw,46px); line-height:1.12; font-weight:600;
+    letter-spacing:-.015em; color:var(--htx-ink); max-width:15ch;
+  }
+  .htx-deck { margin:0 0 30px; font-size:15.5px; line-height:1.65; color:var(--htx-ink2); max-width:52ch; }
+  .htx-cta { display:flex; gap:12px; flex-wrap:wrap; }
+  .htx-metric { padding:72px 32px 64px; display:flex; flex-direction:column; }
+  .htx-metric__label {
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+    font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--htx-ink2);
+    display:flex; align-items:center; gap:10px; margin-bottom:18px;
+  }
+  .htx-metric__value {
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums;
+    font-size:clamp(48px,7vw,84px); font-weight:600; line-height:.95; letter-spacing:-.02em;
+    color:var(--htx-ink); margin-bottom:12px;
+  }
+  .htx-metric__delta {
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums;
+    font-size:14px; font-weight:500; color:var(--htx-ink2); margin-bottom:26px;
+  }
+  .htx-metric__delta .spot-chg.up, .htx-metric__delta .up { color:var(--htx-pos); }
+  .htx-metric__delta .spot-chg.down, .htx-metric__delta .down { color:var(--htx-neg); }
+  .htx-metric__spark { width:100%; height:110px; display:block; margin-top:auto; }
+  .htx-metric__foot { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; color:var(--htx-ink3); margin-top:16px; letter-spacing:.03em; }
+
+  /* markets band */
+  .htx-markets { background:var(--htx-raised); border-bottom:1px solid var(--htx-line); }
+  .htx-markets__head {
+    max-width:1280px; margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 32px 16px;
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+    font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--htx-ink2);
+  }
+  .htx-markets__head span { display:inline-flex; align-items:center; gap:12px; }
+  .htx-markets__head a:hover { color:var(--htx-amber); }
+  .htx-markets__grid { max-width:1280px; margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); }
+  .htx-asof { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--htx-ink3); }
+  .htx-mk { padding:22px 28px 26px; border-left:1px solid var(--htx-line-soft); border-top:1px solid var(--htx-line); }
+  .htx-mk:first-child { border-left:0; }
+  .htx-mk__top { display:flex; align-items:baseline; gap:8px; margin-bottom:12px; }
+  .htx-mk__tk { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:12px; font-weight:600; letter-spacing:.04em; }
+  .htx-mk__nm { font-size:11px; color:var(--htx-ink3); }
+  .htx-mk__val { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums; font-size:22px; font-weight:600; letter-spacing:-.01em; margin-bottom:4px; }
+  .htx-mk__chg { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums; font-size:11.5px; font-weight:500; color:var(--htx-ink3); }
+  .htx-mk__chg.up, .htx-mk__chg .up { color:var(--htx-pos); }
+  .htx-mk__chg.down, .htx-mk__chg .down { color:var(--htx-neg); }
+  .htx-mk__spark { width:100%; height:34px; display:block; margin-top:12px; color:var(--htx-ink3); }
+
+  /* bento */
+  .htx-bento { max-width:1280px; margin:0 auto; display:grid; grid-template-columns:repeat(12,1fr); gap:1px; background:var(--htx-line); border-bottom:1px solid var(--htx-line); }
+  .htx-bento > * { background:var(--htx-bg); }
+  .htx-tile { padding:30px 32px 34px; }
+  .htx-tile--informes { grid-column:span 7; }
+  .htx-tile--pf { grid-column:span 5; }
+  .htx-tile--cal { grid-column:span 12; }
+  .htx-tile__head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:20px; gap:16px; }
+  .htx-tile__title { font-size:15px; font-weight:600; letter-spacing:.01em; color:var(--htx-ink); }
+  .htx-tile__count { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:11px; color:var(--htx-ink3); letter-spacing:.06em; }
+  .htx-tile__link {
+    display:inline-block; margin-top:18px;
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+    font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--htx-amber);
+  }
+  .htx-tile__link:hover { text-decoration:underline; }
+  .htx-pf__links { display:flex; gap:24px; flex-wrap:wrap; }
+
+  .htx-inf { display:flex; flex-direction:column; }
+  .htx-inf__row {
+    display:grid; grid-template-columns:64px 1fr auto; align-items:center; gap:16px;
+    padding:13px 8px; margin:0 -8px; border-bottom:1px solid var(--htx-line-soft);
+    transition:background .14s ease;
+  }
+  .htx-inf__row:last-child { border-bottom:0; }
+  .htx-inf__row:hover { background:var(--htx-raised); }
+  .htx-inf__tk { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:12.5px; font-weight:600; color:var(--htx-ink); }
+  .htx-inf__nm { font-size:12.5px; color:var(--htx-ink2); }
+  .htx-inf__nm .free {
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:8.5px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--htx-pos); border:1px solid rgba(16,185,129,.4); padding:1px 5px; margin-left:8px; vertical-align:middle;
+  }
+  .htx-inf__go { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--htx-ink3); white-space:nowrap; }
+  .htx-inf__row:hover .htx-inf__go { color:var(--htx-amber); }
+
+  /* portfolio widget (reusa IDs/JS existentes) */
+  .htx-tile--pf .mkt-tabs, .htx-tile--pf #heroMfWindowTabs { display:flex; gap:4px; margin-bottom:18px; flex-wrap:wrap; }
+  .htx-tile--pf .mkt-tab {
+    appearance:none; cursor:pointer; background:transparent; color:var(--htx-ink3);
+    border:1px solid var(--htx-line);
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.06em; padding:6px 11px;
+  }
+  .htx-tile--pf .mkt-tab.active { background:var(--htx-raised2); color:var(--htx-ink); }
+  .htx-tile--pf .mf-summary, .htx-tile--pf #heroMfSummary {
+    display:flex; gap:16px; flex-wrap:wrap;
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:12px; color:var(--htx-ink2); margin-bottom:12px;
+  }
+  .htx-tile--pf .mf-chart-wrap { height:150px; position:relative; }
+  .htx-tile--pf .mf-chart-wrap canvas { width:100% !important; height:100% !important; }
+
+  /* calendario (reusa #heroCalEvents / #heroCalDate) */
+  .htx-cal { display:flex; flex-direction:column; gap:2px; min-height:48px; }
+  .htx-cal .cal-ev { display:grid; grid-template-columns:10px 1fr; gap:12px; padding:14px 0; border-bottom:1px solid var(--htx-line-soft); }
+  .htx-cal .cal-ev:last-child { border-bottom:0; }
+  .htx-cal .cal-ev-dot { width:7px; height:7px; border-radius:50%; margin-top:6px; background:var(--htx-ink3); }
+  .htx-cal .cal-ev-dot.ar { background:var(--htx-data); }
+  .htx-cal .cal-ev-dot.us { background:#9fb4c9; }
+  .htx-cal .cal-ev-text { font-size:13px; line-height:1.5; color:var(--htx-ink2); }
+  .htx-cal .cal-ev-text strong { display:block; font-size:13px; color:var(--htx-ink); margin-bottom:3px; font-weight:600; }
+  .htx-cal__legend {
+    display:flex; gap:20px; margin-top:14px; padding-top:14px; border-top:1px solid var(--htx-line);
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--htx-ink3);
+  }
+  .htx-cal__legend i { width:6px; height:6px; border-radius:50%; display:inline-block; margin-right:7px; vertical-align:middle; }
+  .htx-cal__legend i.ar { background:var(--htx-data); }
+  .htx-cal__legend i.us { background:#9fb4c9; }
+
+  /* membresia */
+  .htx-member { background:#0a0f1e; padding:56px 32px; }
+  .htx-member__inner {
+    max-width:1280px; margin:0 auto;
+    display:grid; grid-template-columns:1.2fr 1fr; gap:44px; align-items:center;
+    border:1px solid rgba(242,201,76,.28);
+    background:linear-gradient(135deg,rgba(242,201,76,.08),rgba(242,201,76,0) 58%);
+    padding:40px 44px;
+  }
+  .htx-member__eyebrow { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--htx-amber); margin:0 0 16px; }
+  .htx-member h2 { margin:0 0 12px; font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:clamp(20px,2.3vw,28px); font-weight:600; letter-spacing:-.01em; line-height:1.25; color:var(--htx-ink); max-width:22ch; }
+  .htx-member p { margin:0 0 22px; font-size:13.5px; line-height:1.6; color:var(--htx-ink2); max-width:46ch; }
+  .htx-member__price { display:flex; align-items:baseline; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+  .htx-member__amt { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums; font-size:30px; font-weight:600; color:var(--htx-amber); }
+  .htx-member__per { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:12px; color:var(--htx-ink3); }
+  .htx-member__note { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10.5px; color:var(--htx-ink3); }
+  .htx-feat { display:flex; flex-direction:column; }
+  .htx-feat__row { display:grid; grid-template-columns:34px 1fr; gap:14px; padding:15px 0; border-bottom:1px solid var(--htx-line-soft); }
+  .htx-feat__row:last-child { border-bottom:0; }
+  .htx-feat__ic { width:30px; height:30px; display:grid; place-items:center; border:1px solid rgba(242,201,76,.3); color:var(--htx-amber); font-family:'DM Serif Display',Georgia,serif; font-size:14px; }
+  .htx-feat__row strong { display:block; font-size:12.5px; font-weight:600; color:var(--htx-ink); margin-bottom:3px; }
+  .htx-feat__row span { font-size:11.5px; color:var(--htx-ink3); line-height:1.5; }
+  .htx-badge-new { display:inline-block; font-size:8.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#07101e; background:var(--htx-amber); padding:2px 6px; margin-left:8px; }
+
+  @media (max-width:1040px) {
+    .htx-hero { grid-template-columns:1fr; }
+    .htx-hero__lead { border-right:0; border-bottom:1px solid var(--htx-line); }
+    .htx-tile--informes, .htx-tile--pf { grid-column:span 12; }
+    .htx-markets__grid { grid-template-columns:repeat(2,1fr); }
+    .htx-mk:nth-child(odd) { border-left:0; }
+    .htx-member__inner { grid-template-columns:1fr; }
+  }
+  @media (max-width:600px) {
+    .htx-markets__grid { grid-template-columns:1fr; }
+    .htx-mk { border-left:0; }
+  }
+  </style>
+
+  <section class="htx" data-tab="inicio">
+
+    <!-- hero -->
+    <div class="htx-hero">
+      <div class="htx-hero__lead">
+        <p class="htx-eyebrow">Research institucional &middot; Mercados &middot; Portfolio</p>
+        <h1 class="htx-h1">Tu mundo financiero, en un solo lugar.</h1>
+        <p class="htx-deck">An&aacute;lisis institucional de las empresas que mueven el mercado, cotizaciones de Argentina y el mundo en tiempo real, y las herramientas para armar y seguir tu cartera &mdash; con un asesor de IA que la conoce.</p>
+        <div class="htx-cta">
+          <a class="htx-btn" href="#informes" data-tab-target="informes">Ver informes</a>
+          <a class="htx-ghost" href="#portfolio" data-tab-target="portfolio">Probar el portfolio</a>
         </div>
       </div>
-      <div class="hero-v2-right">
-        <div class="spotlight-card hero-mf-card">
-          <div class="spotlight-head">
-            <span>Manfredi Investment Portfolio vs. S&amp;P 500</span>
-            <span class="s-live">EN VIVO</span>
-          </div>
-          <div class="mkt-tabs mf-window-tabs" id="heroMfWindowTabs">
-            <button type="button" class="mkt-tab" data-mfwin="1w">1 semana</button>
-            <button type="button" class="mkt-tab active" data-mfwin="1m">1 mes</button>
-            <button type="button" class="mkt-tab" data-mfwin="ytd">YTD</button>
-            <button type="button" class="mkt-tab" data-mfwin="1y">1 año</button>
-          </div>
-          <div class="mf-summary hero-mf-summary" id="heroMfSummary">Calculando con datos hist&oacute;ricos&hellip;</div>
-          <div class="mf-chart-wrap hero-mf-chart-wrap"><canvas id="heroMfChartCanvas"></canvas></div>
-          <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#portfolio'">Ver Manfredi Investment Portfolio &rarr;</button>
+      <div class="htx-metric">
+        <div class="htx-metric__label">S&amp;P 500 &middot; Estados Unidos <span class="htx-asof">cierre &middot; <span id="htx-us-asof">&mdash;</span></span></div>
+        <div class="htx-metric__value htx-num" id="htx-spx-price">&mdash;</div>
+        <div class="htx-metric__delta"><span id="htx-spx-chg">&mdash;</span></div>
+        <svg class="htx-metric__spark" viewBox="0 0 480 110" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="htxHeroSpark" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="rgba(16,185,129,.24)" />
+              <stop offset="1" stop-color="rgba(16,185,129,0)" />
+            </linearGradient>
+          </defs>
+          <polygon points="0,110 0,86 60,80 120,84 180,64 240,68 300,50 360,42 420,46 480,24 480,110" fill="url(#htxHeroSpark)" />
+          <polyline points="0,86 60,80 120,84 180,64 240,68 300,50 360,42 420,46 480,24" fill="none" stroke="#10b981" stroke-width="2" />
+          <circle cx="480" cy="24" r="3.5" fill="#10b981" />
+        </svg>
+        <p class="htx-metric__foot">Cierre de Wall Street, del reporte diario &middot; la curva es de referencia</p>
+      </div>
+    </div>
+
+    <!-- mercados ahora -->
+    <div class="htx-markets">
+      <div class="htx-markets__head">
+        <span>Mercados ahora <span class="htx-live">Live</span></span>
+        <a href="#mercados" data-tab-target="mercados">Ver todos los mercados &rarr;</a>
+      </div>
+      <div class="htx-markets__grid">
+        <div class="htx-mk">
+          <div class="htx-mk__top"><span class="htx-mk__tk">MERV</span><span class="htx-mk__nm">Merval &middot; BYMA</span></div>
+          <div class="htx-mk__val htx-num" id="hspot-merv-price">&mdash;</div>
+          <div class="htx-mk__chg"><span id="hspot-merv-chg">&mdash;</span></div>
+          <svg class="htx-mk__spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,28 25,24 50,26 75,18 100,20 125,12 150,14 175,8 200,6" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+        </div>
+        <div class="htx-mk">
+          <div class="htx-mk__top"><span class="htx-mk__tk">NDX</span><span class="htx-mk__nm">Nasdaq &middot; cierre</span></div>
+          <div class="htx-mk__val htx-num" id="htx-ndx-price">&mdash;</div>
+          <div class="htx-mk__chg"><span id="htx-ndx-chg">&mdash;</span></div>
+          <svg class="htx-mk__spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,24 25,21 50,25 75,14 100,17 125,10 150,12 175,7 200,6" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+        </div>
+        <div class="htx-mk">
+          <div class="htx-mk__top"><span class="htx-mk__tk">BTC</span><span class="htx-mk__nm">Bitcoin</span></div>
+          <div class="htx-mk__val htx-num" id="hspot-btc-price">&mdash;</div>
+          <div class="htx-mk__chg"><span id="hspot-btc-chg">&mdash;</span></div>
+          <svg class="htx-mk__spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,30 25,24 50,27 75,19 100,15 125,17 150,10 175,12 200,5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+        </div>
+        <div class="htx-mk">
+          <div class="htx-mk__top"><span class="htx-mk__tk">UST 10Y</span><span class="htx-mk__nm">Treasury &middot; yield</span></div>
+          <div class="htx-mk__val htx-num" id="htx-ust10-price">&mdash;</div>
+          <div class="htx-mk__chg"><span id="htx-ust10-note">Rendimiento a 10 a&ntilde;os</span></div>
+          <svg class="htx-mk__spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,10 25,12 50,9 75,14 100,13 125,18 150,16 175,20 200,19" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
         </div>
       </div>
     </div>
 
-    <div class="hero-bottom-row">
-      <div class="hero-cal-card hero-cal-card--wide" id="heroCalCard">
-        <div class="spotlight-head">
-          <span>Calendario econ&oacute;mico</span>
-          <span class="s-live" id="heroCalBadge">HOY</span>
+    <!-- bento -->
+    <div class="htx-bento">
+      <div class="htx-tile htx-tile--informes">
+        <div class="htx-tile__head"><span class="htx-tile__title">Informes institucionales</span></div>
+        <div class="htx-inf">
+          <a class="htx-inf__row" href="informes/msft.html" target="_blank" rel="noopener">
+            <span class="htx-inf__tk">MSFT</span>
+            <span class="htx-inf__nm">Microsoft Corporation<span class="free">Gratis</span></span>
+            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+          </a>
+          <a class="htx-inf__row" href="informes/pltr.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'PLTR')">
+            <span class="htx-inf__tk">PLTR</span>
+            <span class="htx-inf__nm">Palantir Technologies Inc.</span>
+            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+          </a>
+          <a class="htx-inf__row" href="informes/uber.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'UBER')">
+            <span class="htx-inf__tk">UBER</span>
+            <span class="htx-inf__nm">Uber Technologies, Inc.</span>
+            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+          </a>
+          <a class="htx-inf__row" href="informes/intc.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'INTC')">
+            <span class="htx-inf__tk">INTC</span>
+            <span class="htx-inf__nm">Intel Corporation</span>
+            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+          </a>
+          <a class="htx-inf__row" href="informes/mu.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MU')">
+            <span class="htx-inf__tk">MU</span>
+            <span class="htx-inf__nm">Micron Technology, Inc.</span>
+            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+          </a>
+          <a class="htx-inf__row" href="informes/meli.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MELI')">
+            <span class="htx-inf__tk">MELI</span>
+            <span class="htx-inf__nm">MercadoLibre, Inc.</span>
+            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+          </a>
+          <a class="htx-inf__row" href="informes/adbe.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ADBE')">
+            <span class="htx-inf__tk">ADBE</span>
+            <span class="htx-inf__nm">Adobe Inc.</span>
+            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+          </a>
         </div>
-        <div class="hero-cal-date" id="heroCalDate">&mdash;</div>
-        <div class="hero-cal-events" id="heroCalEvents">
-          <div class="cal-ev"><div class="cal-ev-dot ar"></div><div class="cal-ev-text">Cargando&hellip;</div></div>
-        </div>
-        <div class="hero-cal-legend">
-          <span><i class="cal-ev-dot us"></i>Estados Unidos</span>
-          <span><i class="cal-ev-dot ar"></i>Argentina</span>
-        </div>
-        <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#calendario'">Ver calendario completo &rarr;</button>
+        <a class="htx-tile__link" href="#inversiones" data-tab-target="inversiones">Ver secci&oacute;n Inversiones &rarr;</a>
       </div>
 
-      <div class="hero-cal-card hero-inv-card" id="heroInvCard">
-        <div class="spotlight-head">
-          <span>Informes institucionales</span>
-          <span style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);">16 de 60</span>
+      <div class="htx-tile htx-tile--pf">
+        <div class="htx-tile__head"><span class="htx-tile__title">Manfredi Portfolio</span></div>
+        <div class="mkt-tabs mf-window-tabs" id="heroMfWindowTabs">
+          <button type="button" class="mkt-tab" data-mfwin="1w">1 semana</button>
+          <button type="button" class="mkt-tab active" data-mfwin="1m">1 mes</button>
+          <button type="button" class="mkt-tab" data-mfwin="ytd">YTD</button>
+          <button type="button" class="mkt-tab" data-mfwin="1y">1 a&ntilde;o</button>
         </div>
-        <div class="hero-inv-list">
-          <div class="hero-inv-item">
-            <div class="hero-inv-item-info">
-              <span class="hero-inv-ticker">MSFT</span>
-              <span class="gratis-badge">Gratis</span>
-              <span class="hero-inv-name">Microsoft Corporation</span>
-            </div>
-            <a href="informes/msft.html" class="pick-btn" target="_blank" rel="noopener">Ver an&aacute;lisis &rarr;</a>
-          </div>
-          <div class="hero-inv-item">
-            <div class="hero-inv-item-info">
-              <span class="hero-inv-ticker">PLTR</span>
-              <span class="hero-inv-name">Palantir Technologies Inc.</span>
-            </div>
-            <a href="informes/pltr.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'PLTR')">Ver an&aacute;lisis &rarr;</a>
-          </div>
-          <div class="hero-inv-item">
-            <div class="hero-inv-item-info">
-              <span class="hero-inv-ticker">UBER</span>
-              <span class="hero-inv-name">Uber Technologies, Inc.</span>
-            </div>
-            <a href="informes/uber.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'UBER')">Ver an&aacute;lisis &rarr;</a>
-          </div>
-          <div class="hero-inv-item">
-            <div class="hero-inv-item-info">
-              <span class="hero-inv-ticker">INTC</span>
-              <span class="hero-inv-name">Intel Corporation</span>
-            </div>
-            <a href="informes/intc.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'INTC')">Ver an&aacute;lisis &rarr;</a>
-          </div>
-          <div class="hero-inv-item">
-            <div class="hero-inv-item-info">
-              <span class="hero-inv-ticker">MU</span>
-              <span class="hero-inv-name">Micron Technology, Inc.</span>
-            </div>
-            <a href="informes/mu.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MU')">Ver an&aacute;lisis &rarr;</a>
-          </div>
-          <div class="hero-inv-item">
-            <div class="hero-inv-item-info">
-              <span class="hero-inv-ticker">MELI</span>
-              <span class="hero-inv-name">MercadoLibre, Inc.</span>
-            </div>
-            <a href="informes/meli.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MELI')">Ver an&aacute;lisis &rarr;</a>
-          </div>
-          <div class="hero-inv-item">
-            <div class="hero-inv-item-info">
-              <span class="hero-inv-ticker">ADBE</span>
-              <span class="hero-inv-name">Adobe Inc.</span>
-            </div>
-            <a href="informes/adbe.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ADBE')">Ver an&aacute;lisis &rarr;</a>
-          </div>
+        <div class="mf-summary hero-mf-summary" id="heroMfSummary">Calculando con datos hist&oacute;ricos&hellip;</div>
+        <div class="mf-chart-wrap hero-mf-chart-wrap"><canvas id="heroMfChartCanvas"></canvas></div>
+        <div class="htx-pf__links">
+          <a class="htx-tile__link" href="#portfolio" data-tab-target="portfolio">Ver el Manfredi Portfolio &rarr;</a>
+          <a class="htx-tile__link" href="#portfolio" data-tab-target="portfolio">Armar el m&iacute;o &rarr;</a>
         </div>
-        <button type="button" class="btn-outline spot-goto-btn" onclick="location.hash='#inversiones'">Ver secci&oacute;n Inversiones &rarr;</button>
       </div>
 
-      <div class="hero-cal-card hero-inv-card hero-pf-card" id="heroPfCard">
-        <div class="spotlight-head">
-          <span>Manfredi Investment Portfolio &mdash; arm&aacute; el tuyo en 3 pasos</span>
+      <div class="htx-tile htx-tile--cal">
+        <div class="htx-tile__head">
+          <span class="htx-tile__title">Calendario econ&oacute;mico</span>
+          <span class="htx-tile__count" id="heroCalDate">&mdash;</span>
         </div>
-        <div class="hero-pf-list">
-          <div class="hero-pf-item">
-            <span class="hero-pf-num">1</span>
-            <div class="hero-pf-text">
-              <strong>Carg&aacute; todas tus posiciones</strong>
-              <span>Ej: 5 GOOGL a USD 154, 3 META a USD 144 &mdash; sum&aacute; cada ticker en menos de un minuto</span>
-            </div>
-          </div>
-          <div class="hero-pf-item">
-            <span class="hero-pf-num">2</span>
-            <div class="hero-pf-text">
-              <strong>Recib&iacute; las m&eacute;tricas de tu portfolio</strong>
-              <span>ROE, beta, volatilidad, drawdown y VaR, calculados en vivo al instante</span>
-            </div>
-          </div>
-          <div class="hero-pf-item">
-            <span class="hero-pf-num">3</span>
-            <div class="hero-pf-text">
-              <strong>Compar&aacute; tus resultados y potenci&aacute;los</strong>
-              <span>Contra la cartera real de Manfredi y el S&amp;P 500, con la ayuda del agente de IA Warren</span>
-            </div>
-          </div>
+        <div class="htx-cal" id="heroCalEvents">
+          <div class="cal-ev"><div class="cal-ev-dot"></div><div class="cal-ev-text">Cargando&hellip;</div></div>
         </div>
-        <button type="button" class="spot-goto-btn hero-pf-cta" onclick="location.hash='#portfolio'">Armar mi Portfolio &rarr;</button>
+        <div class="htx-cal__legend">
+          <span><i class="ar"></i>Argentina</span>
+          <span><i class="us"></i>Estados Unidos</span>
+        </div>
+        <a class="htx-tile__link" href="#calendario" data-tab-target="calendario">Ver calendario completo &rarr;</a>
       </div>
     </div>
+
+    <!-- membresia -->
+    <div class="htx-member">
+      <div class="htx-member__inner">
+        <div>
+          <p class="htx-member__eyebrow">Membres&iacute;a Manfredi Investment</p>
+          <h2>Un asesor IA, el an&aacute;lisis completo de cada activo y tu portfolio, sin l&iacute;mites.</h2>
+          <p>Consult&aacute; a Warren cuando quieras, acced&eacute; a la tesis completa de cada pick &mdash; catalysts, comparables y proyecciones &mdash; y arm&aacute; tu portafolio compar&aacute;ndolo con el nuestro.</p>
+          <div class="htx-member__price">
+            <span class="htx-member__amt">USD 15</span>
+            <span class="htx-member__per">/ mes</span>
+            <span class="htx-member__note">Cancel&aacute;s cuando quieras</span>
+          </div>
+          <button type="button" class="htx-btn" onclick="openPaymentModal()">Suscribirme &rarr;</button>
+        </div>
+        <div class="htx-feat">
+          <div class="htx-feat__row">
+            <span class="htx-feat__ic">W</span>
+            <span><strong>Warren, Asesor IA</strong><span>100 consultas por mes sobre tu cartera y el mercado, 24/7</span></span>
+          </div>
+          <div class="htx-feat__row">
+            <span class="htx-feat__ic">&#8599;</span>
+            <span><strong>Inversiones</strong><span>Tesis completas, catalysts y comparables de cada activo que seguimos</span></span>
+          </div>
+          <div class="htx-feat__row">
+            <span class="htx-feat__ic">&#9680;</span>
+            <span><strong>Manfredi Investment Portfolio<span class="htx-badge-new">Nuevo</span></strong><span>Arm&aacute; tu cartera, compar&aacute; su rendimiento con el nuestro y el S&amp;P 500, y mir&aacute; tus m&eacute;tricas de riesgo &mdash; beta, VaR, drawdown</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </section>
 
-  <!-- ââ STATS âââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="membership-promo" data-tab="inicio">
-    <div class="mp-inner" data-aos="fade-up">
-      <div class="mp-left">
-        <span class="mp-eyebrow">Membres&iacute;a Manfredi Investment</span>
-        <h2 class="mp-title">Un asesor IA, el an&aacute;lisis completo de cada activo y tu portfolio, sin l&iacute;mites.</h2>
-        <p class="mp-sub">Consult&aacute; a Warren cuando quieras, acced&eacute; a la tesis completa de cada pick &mdash; catalysts, comparables y proyecciones &mdash; y arm&aacute; tu portafolio compar&aacute;ndolo con el nuestro.</p>
-        <div class="mp-price-row">
-          <span class="mp-price">USD 15<span class="mp-price-period">/mes</span></span>
-          <span class="mp-price-note">Cancel&aacute;s cuando quieras</span>
-        </div>
-        <button class="mp-cta" onclick="openPaymentModal()">Suscribirme &rarr;</button>
-      </div>
-      <div class="mp-right">
-        <div class="mp-feature">
-          <div class="mp-feature-icon">W</div>
-          <div class="mp-feature-text">
-            <strong>Warren, Asesor IA</strong>
-            <span>100 consultas por mes sobre tu cartera y el mercado, 24/7</span>
-          </div>
-        </div>
-        <div class="mp-feature">
-          <div class="mp-feature-icon">&#8599;</div>
-          <div class="mp-feature-text">
-            <strong>Inversiones</strong>
-            <span>Tesis completas, catalysts y comparables de cada activo que seguimos</span>
-          </div>
-        </div>
-        <div class="mp-feature mp-feature--new">
-          <div class="mp-feature-icon">&#9680;</div>
-          <div class="mp-feature-text">
-            <strong>Manfredi Investment Portfolio<span class="mp-badge-new">Nuevo</span></strong>
-            <span>Arm&aacute; tu cartera, compar&aacute; su rendimiento con el nuestro y el S&amp;P 500, y mir&aacute; tus m&eacute;tricas de riesgo &mdash; beta, VaR, drawdown</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <script>
+  /* Home Terminal: S&P 500 / Nasdaq / UST 10Y del reporte diario (reports/wallstreet.json).
+     Merval y BTC los llena renderHeroSpot() con datos en vivo. */
+  (function () {
+    function setPair(o, priceId, chgId, loc) {
+      var pe = document.getElementById(priceId), ce = document.getElementById(chgId);
+      if (pe && o && o.valor != null) pe.textContent = Number(o.valor).toLocaleString(loc || 'en-US');
+      if (ce && o && o.variacion) {
+        var up = String(o.variacion).trim().charAt(0) !== '-';
+        ce.textContent = o.variacion;
+        ce.className = (ce.className.replace(/\b(up|down)\b/g, '').trim() + ' ' + (up ? 'up' : 'down')).trim();
+      }
+    }
+    async function loadHeroUsIndices() {
+      try {
+        var r = await fetch('reports/wallstreet.json?t=' + Date.now(), { signal: AbortSignal.timeout(8000) });
+        if (!r.ok) return;
+        var d = await r.json();
+        var idx = d.indices || {};
+        setPair(idx.sp500, 'htx-spx-price', 'htx-spx-chg');
+        setPair(idx.nasdaq, 'htx-ndx-price', 'htx-ndx-chg');
+        var t10 = (d.bonos_usa || {}).t10_yield;
+        var te = document.getElementById('htx-ust10-price');
+        if (te && t10) te.textContent = t10;
+        var when = d.fecha || d.updated_at;
+        var we = document.getElementById('htx-us-asof');
+        if (we && when) we.textContent = String(when).replace(/ hs$/, '');
+      } catch (e) { console.warn('[htx] us indices:', e.message); }
+    }
+    if (document.readyState !== 'loading') loadHeroUsIndices();
+    else document.addEventListener('DOMContentLoaded', loadHeroUsIndices);
+    setInterval(loadHeroUsIndices, 300000);
+  })();
+  </script>
 
   <!-- ââ MERCADOS âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
   <section class="section section-mercados" id="mercados" data-tab="mercados">
