@@ -6629,6 +6629,29 @@
     { key: 'cripto', label: 'Cripto', currency: 'USD', n: 60 },
   ];
 
+  // Respaldo de market cap (en millones de USD, aprox.) para los grandes de
+  // EE.UU. El worker manfredi-mercados saca el market cap de Finnhub y lo
+  // cachea; cuando Finnhub devuelve el perfil sin marketCapitalization queda
+  // null cacheado y esas empresas (AAPL, MSFT, AMZN, ...) desaparecen del
+  // treemap, que descarta todo lo que no tenga market cap. Esta tabla se usa
+  // SOLO como fallback si el worker manda null -- si trae el valor real, gana
+  // el del worker. Valores orientativos (~sep-2026); un 10-20% de desvio no
+  // se nota en el tamaño de un tile. Mismo criterio que la tabla de acciones
+  // en circulacion que el worker ya usa para el Mercado Argentino.
+  const MKT_US_MARKETCAP_M = {
+    AAPL: 4800000, MSFT: 3720000, AMZN: 2700000, META: 1470000, AVGO: 1730000,
+    TSLA: 1145000, 'BRK.B': 1075000, LLY: 1040000, WMT: 850000, ORCL: 780000,
+    XOM: 705000, JNJ: 655000, MA: 525000, NFLX: 520000, BAC: 470000,
+    CSCO: 435000, PLTR: 425000, COST: 415000, MRK: 375000, CAT: 370000,
+    GE: 355000, MS: 340000, HD: 315000, PM: 290000, WFC: 285000,
+    RTX: 273000, TMUS: 265000, CRM: 245000, AMGN: 235000, LIN: 231000,
+    TXN: 230000, TMO: 227000, AXP: 227000, IBM: 215000, VZ: 210000,
+    NOW: 200000, DIS: 195000, INTU: 195000, ABT: 189000, T: 187000,
+    MCD: 187000, DE: 184000, QCOM: 180000, UBER: 157000, DHR: 148000,
+    HON: 135000, ISRG: 131000, ADBE: 125000, ACN: 118000, LOW: 113000,
+    NKE: 110000,
+  };
+
   // Algoritmo squarified treemap (Bruls, Huizing, van Wijk) -- misma logica
   // que el prototipo local, portada tal cual.
   function mktSquarify(items, x, y, w, h) {
@@ -6758,7 +6781,23 @@
     `).join('');
     MKT_MAPS_SECTIONS.forEach(s => {
       const cat = MERCADOS.categorias[s.key];
-      const items = (cat ? cat.items : []).filter(it => it.marketCap);
+      let rows = cat ? cat.items : [];
+      if (s.key === 'usa_stocks') {
+        rows = rows.map(it => {
+          // 1) descarta market caps disparatados del worker (Finnhub a veces
+          //    manda basura para ADRs extranjeros -- ej. INFY con mc que
+          //    implica 380.000 millones de acciones). Corte: 30.000 millones
+          //    de acciones (NVDA, la mas alta real, ronda 24.000M).
+          let mc = it.marketCap;
+          if (mc && it.price > 0 && mc / it.price > 30000) mc = null;
+          // 2) completa el market cap de los grandes que quedan sin dato
+          if (!mc && MKT_US_MARKETCAP_M[it.symbol]) {
+            return { ...it, marketCap: MKT_US_MARKETCAP_M[it.symbol], marketCapEst: true };
+          }
+          return mc === it.marketCap ? it : { ...it, marketCap: mc };
+        });
+      }
+      const items = rows.filter(it => it.marketCap);
       const top = items
         .map(it => ({ ...it, size: it.marketCap }))
         .sort((a, b) => b.size - a.size)
