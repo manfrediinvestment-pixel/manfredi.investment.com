@@ -4774,6 +4774,87 @@
     .pf-disclaimer { font-size: 11px; color: rgba(255,255,255,.35); font-style: italic; }
     .pf-view-panel { display: none; }
     .pf-view-panel.active { display: block; }
+
+    /* ---- Rediseño compacto: "Tu Portafolio" en un solo panel con divisores ---- */
+    .pf-compact {
+      background: var(--navy-4);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+      padding: 4px 24px;
+    }
+    .pf-compact > .pf-card,
+    .pf-compact > .pf-row-split,
+    .pf-compact > .pf-row-align { border-top: 1px solid rgba(255,255,255,.09); }
+    .pf-compact > .pf-card:first-child,
+    .pf-compact > .pf-row-split:first-child,
+    .pf-compact > .pf-row-align:first-child { border-top: 0; }
+    .pf-compact .pf-card {
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+      padding: 22px 0;
+    }
+    .pf-compact #pfQuizCard { padding: 16px 0; }
+    .pf-compact #pfQuizCard:empty { display: none; }
+
+    .pf-row-split, .pf-row-align { display: grid; gap: 0; }
+    .pf-row-split { grid-template-columns: 1.7fr 1fr; }
+    .pf-row-align { grid-template-columns: 2fr 1fr; }
+    .pf-row-split > .pf-card:first-child,
+    .pf-row-align > .pf-card:first-child {
+      padding-right: 26px;
+      border-right: 1px solid rgba(255,255,255,.09);
+    }
+    .pf-row-split > .pf-card:last-child,
+    .pf-row-align > .pf-card:last-child { padding-left: 26px; }
+
+    /* número héroe: valor actual grande */
+    .pf-compact .pf-totals-row { display: block; margin: 0 0 18px; font-size: inherit; }
+    .pf-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .pf-hero-lbl { display: block; font-size: 10px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.34); margin-bottom: 6px; }
+    .pf-hero-big { font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; font-size: 30px; font-weight: 600; color: var(--white); line-height: 1; letter-spacing: -.01em; }
+    .pf-hero-big::after { content: ''; display: block; width: 52px; height: 2px; background: var(--gold); margin-top: 10px; }
+    .pf-hero-ctx { text-align: right; font-size: 11.5px; color: rgba(255,255,255,.55); line-height: 1.9; }
+    .pf-hero-ctx b { font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; color: var(--white); font-weight: 500; }
+
+    .pf-compact #pfPieWrap { max-width: none !important; margin: 0 !important; }
+
+    /* sectores de tu cartera (mini) */
+    .pf-sect-bars { display: grid; gap: 9px; }
+    .pf-sb { display: grid; grid-template-columns: minmax(60px,auto) 1fr 34px; align-items: center; gap: 9px; font-size: 11px; color: rgba(255,255,255,.6); font-family: 'IBM Plex Mono', monospace; }
+    .pf-sb-l { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pf-sb-t { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
+    .pf-sb-f { display: block; height: 100%; background: var(--gold); }
+    .pf-sb-v { text-align: right; color: var(--white); font-variant-numeric: tabular-nums; }
+
+    /* ratios / métricas: sin barra de acento ni glow, más compactas */
+    .pf-compact .pf-metric-card {
+      background: var(--navy-1);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 10px;
+      padding: 13px 15px;
+    }
+    .pf-compact .pf-metric-card::before,
+    .pf-compact .pf-metric-card::after { content: none; }
+    .pf-compact .pf-metric-card:hover { transform: none; box-shadow: none; border-color: rgba(255,255,255,.14); }
+    .pf-compact .pf-metric-val { font-size: 19px; }
+    .pf-compact .pf-metric-grid { gap: 10px; margin-bottom: 12px; }
+    .pf-compact .pf-metric-note { font-size: 11px; }
+    .pf-compact .pf-metric-bench { font-size: 10.5px; }
+
+    @media (max-width: 820px) {
+      .pf-row-split, .pf-row-align { grid-template-columns: 1fr; }
+      .pf-row-split > .pf-card:first-child,
+      .pf-row-align > .pf-card:first-child {
+        padding-right: 0;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255,255,255,.09);
+      }
+      .pf-row-split > .pf-card:last-child,
+      .pf-row-align > .pf-card:last-child { padding-left: 0; }
+    }
+
     .pf-stub-card { text-align: center; padding: 48px 20px; color: rgba(255,255,255,.45); }
     .pf-stub-card h3 { font-family: var(--font-display); font-weight: 400; color: var(--white); margin: 0 0 10px; }
     .mf-summary { display: flex; gap: 22px; flex-wrap: wrap; margin-bottom: 16px; font-size: 13.5px; color: rgba(255,255,255,.55); }
@@ -4818,10 +4899,11 @@
         <button type="button" class="mkt-tab" data-pfview="manfredi">Portafolio de Manfredi</button>
       </div>
 
-      <div class="pf-view-panel active" data-pfview-panel="tuyo">
+      <div class="pf-view-panel active pf-compact" data-pfview-panel="tuyo">
 
         <div class="pf-card" id="pfQuizCard"></div>
 
+        <div class="pf-row-split">
         <div class="pf-card">
           <h2 class="pf-metrics-label" style="margin-bottom:14px;">Tus posiciones</h2>
           <div class="pf-totals-row" id="pfTotalsRow"></div>
@@ -4854,12 +4936,18 @@
         </div>
 
         <div class="pf-card">
-          <h2 class="pf-metrics-label" style="margin-bottom:14px;">Composición del portafolio</h2>
+          <h2 class="pf-metrics-label" style="margin-bottom:14px;">Composición</h2>
           <div id="pfPieWrap" style="max-width:340px;margin:0 auto;"><canvas id="pfPieCanvas"></canvas></div>
         </div>
+        </div>
 
+        <div class="pf-row-align">
         <div class="pf-card" id="pfAlignWrapper" style="position:relative;">
           <div id="pfAlignGrid"></div>
+        </div>
+        <div class="pf-card" id="pfSectorMiniWrapper" style="position:relative;">
+          <div id="pfSectorMini"></div>
+        </div>
         </div>
 
         <div class="pf-card" id="pfMetricsWrapper" style="position:relative;">
@@ -5271,9 +5359,12 @@
       var totGainPct = totalInv > 0 ? (totGain/totalInv*100) : 0;
       var totColor = totGain > 0 ? 'var(--green)' : (totGain < 0 ? 'var(--red)' : 'rgba(255,255,255,.7)');
       document.getElementById('pfTotalsRow').innerHTML =
-        '<span>Invertido: <b>'+ pfMoney(totalInv) +'</b></span>'
-        + '<span>Valor actual: <b>'+ pfMoney(total) +'</b></span>'
-        + '<span>Resultado: <b style="color:'+ totColor +';">'+ (totGain>=0?'+':'−') + pfMoney(Math.abs(totGain)) +' ('+ (totGain>=0?'+':'−') + Math.abs(totGainPct).toFixed(1) +'%)</b></span>';
+        '<div class="pf-hero">'
+        + '<div><span class="pf-hero-lbl">Valor actual</span><span class="pf-hero-big">'+ pfMoney(total) +'</span></div>'
+        + '<div class="pf-hero-ctx">'
+        +   '<div>Resultado <b style="color:'+ totColor +';">'+ (totGain>=0?'+':'−') + pfMoney(Math.abs(totGain)) +' ('+ (totGain>=0?'+':'−') + Math.abs(totGainPct).toFixed(1) +'%)</b></div>'
+        +   '<div>Invertido <b>'+ pfMoney(totalInv) +'</b></div>'
+        + '</div></div>';
     }
 
     pfRenderPieChart(rows, total);
@@ -5281,6 +5372,7 @@
     var saveBtn = document.getElementById('pfSaveBtn');
     if(saveBtn) saveBtn.style.display = (window._miIsMember && window._miIsMember()) ? '' : 'none';
     pfRenderAlignment();
+    pfRenderSectorMini();
     pfRenderMetrics();
     pfRenderAdvancedMetrics();
   }
@@ -5459,6 +5551,68 @@
       country: topCountry ? { label: topCountry.label, value: topCountry.value/total*100, status: pfConcStatus(topCountry.value/total*100) } : null
     };
   }
+
+  // ---- "Sectores de tu cartera" (mini, al lado de la comparación vs perfil) ----
+  // Reusa pfFetchFundamentals (mismo cache que la concentración sectorial de más
+  // abajo -- cero fetch nuevo) para armar el reparto COMPLETO por sector, no solo
+  // el sector top. El efectivo entra como su propia franja.
+  async function pfRenderSectorMini(){
+    var wrapper = document.getElementById('pfSectorMiniWrapper');
+    var el = document.getElementById('pfSectorMini');
+    if(!wrapper || !el) return;
+    var existingOverlay = wrapper.querySelector('.mi-paywall-overlay');
+    if(existingOverlay) existingOverlay.remove();
+
+    var rows = pfBuildRows();
+    var total = rows.reduce(function(s,r){ return s + r.valorActual; }, 0);
+    if(total <= 0){
+      el.innerHTML = '<div class="pf-metrics-label">Sectores de tu cartera</div>'
+        + '<div class="pf-metrics-empty">Cargá al menos una posición para ver el reparto por sector.</div>';
+      return;
+    }
+    el.innerHTML = '<div class="pf-metrics-label">Sectores de tu cartera</div>'
+      + '<div class="pf-metrics-empty">Calculando el sector de cada posición…</div>';
+
+    var byTicker = {}, cashVal = 0;
+    rows.forEach(function(r){
+      if(r.isCash){ cashVal += r.valorActual; }
+      else { byTicker[r.ticker.toUpperCase()] = (byTicker[r.ticker.toUpperCase()]||0) + r.valorActual; }
+    });
+    var tickers = Object.keys(byTicker);
+    var fundas = await Promise.all(tickers.map(pfFetchFundamentals));
+    if(document.getElementById('pfSectorMini') !== el || !wrapper.isConnected) return;
+
+    var map = {};
+    tickers.forEach(function(t, i){
+      var f = fundas[i];
+      var sector = (f && f.sector && (PF_SECTOR_ES[f.sector] || f.sector)) || 'Sin clasificar';
+      map[sector] = (map[sector]||0) + byTicker[t];
+    });
+    if(cashVal > 0) map['Efectivo'] = (map['Efectivo']||0) + cashVal;
+
+    var items = Object.keys(map).map(function(k){ return { label:k, pct: map[k]/total*100 }; })
+      .sort(function(a,b){ return b.pct - a.pct; });
+    var top = items[0];
+
+    el.innerHTML = '<div class="pf-metrics-label">Sectores de tu cartera</div>'
+      + '<div class="pf-sect-bars">'
+      + items.map(function(it){
+          return '<div class="pf-sb"><span class="pf-sb-l">'+ pfEsc(it.label) +'</span>'
+            + '<span class="pf-sb-t"><span class="pf-sb-f" style="width:'+ Math.max(2, Math.min(100, it.pct)).toFixed(0) +'%;"></span></span>'
+            + '<span class="pf-sb-v">'+ it.pct.toFixed(0) +'%</span></div>';
+        }).join('')
+      + '</div>'
+      + '<p class="pf-metric-note" style="margin-top:12px;">'
+      + (top && top.pct > 40
+          ? '<b>'+ pfEsc(top.label) +'</b> concentra el '+ top.pct.toFixed(0) +'% de la cartera.'
+          : 'Repartida entre '+ items.length +' sector'+(items.length===1?'':'es')+'.')
+      + '</p>';
+
+    if(!(window._miIsMember && window._miIsMember())){
+      if(window._miApplyPaywall) window._miApplyPaywall('#pfSectorMini', '#pfSectorMiniWrapper');
+    }
+  }
+  window._pfRenderSectorMini = pfRenderSectorMini;
 
   async function pfRenderMetrics(){
     var wrapper = document.getElementById('pfMetricsWrapper');
