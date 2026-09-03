@@ -4722,6 +4722,18 @@
     .pf-metric-val { position:relative; font-family: 'IBM Plex Mono', monospace; font-size: 27px; font-weight: 700; color: var(--white); line-height: 1.1; letter-spacing: -.01em; }
     .pf-metric-note { position:relative; font-size: 11.5px; color: rgba(255,255,255,.42); margin-top: 8px; line-height: 1.5; }
 
+    /* Bloque de membresía: estructura visible, sin dato; el "cartel" para comprar vive en Warren */
+    .pf-metric-card.pf-locked { opacity: .92; }
+    .pf-metric-card.pf-locked .pf-metric-val { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: .02em; color: rgba(255,255,255,.4); display: inline-flex; align-items: center; gap: 6px; }
+    .pf-metric-card.pf-locked .pf-metric-val svg { width: 12px; height: 12px; flex: none; opacity: .8; }
+    .pf-mini-warren.pf-mini-warren--lock { background: rgba(242,201,76,.16); border-color: rgba(242,201,76,.5); }
+    .pf-mini-warren.pf-mini-warren--lock:hover { background: rgba(242,201,76,.3); }
+    .pf-lock-cta { margin-top: 2px; display: inline-flex; align-items: center; gap: 7px; background: rgba(242,201,76,.12); border: 1px solid rgba(242,201,76,.4); color: var(--gold); border-radius: 8px; padding: 8px 13px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; transition: background .15s ease; }
+    .pf-lock-cta:hover { background: rgba(242,201,76,.24); }
+    .pf-lock-warren { display: flex; gap: 10px; align-items: flex-start; }
+    .pf-lock-warren .pf-lw-av { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--gold); color: var(--gold); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 12px; }
+    .pf-lock-warren p { margin: 0 0 10px; font-size: 12px; line-height: 1.55; color: rgba(255,255,255,.7); }
+
     .pf-metric-top-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     .pf-mini-warren {
       width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0; padding: 0;
@@ -5610,6 +5622,43 @@
   }
   window._pfRenderSectorMini = pfRenderSectorMini;
 
+  // ---- Bloques de membresía: se ve la estructura, no el dato. El "cartel" para
+  // ---- comprar la membresía aparece dentro de Warren (mini-círculo de cada card). --
+  var PF_LOCK_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 1 1 6 0v3H9z"/></svg>';
+  var PF_SPARK_SVG = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2L12 2z"/></svg>';
+  function pfLockedMetricCard(key, name){
+    return '<div class="pf-metric-card status-neutral pf-locked">'
+      + '<div class="pf-metric-top"><span class="name">'+ name +'</span>'
+      + '<span class="pf-metric-top-right">'
+      + '<button type="button" class="pf-mini-warren pf-mini-warren--lock" onclick="pfMetricUpsell(event)" title="Desbloqueá esto con la membresía" aria-label="Desbloqueá esto con la membresía">'+ PF_SPARK_SVG +'</button>'
+      + '</span></div>'
+      + '<div class="pf-metric-val">'+ PF_LOCK_SVG +' Solo con membresía</div>'
+      + '<div class="pf-metric-note">Se calcula sobre tu cartera con la membresía activa.</div>'
+      + '<div class="pf-mini-warren-answer" id="pfMWA-'+ key +'"></div></div>';
+  }
+  function pfLockedWarrenPanel(){
+    return '<div class="pf-warren-panel"><div class="pf-warren-avatar">W</div><div class="pf-warren-body">'
+      + '<div class="pf-w-name">Warren &middot; IA</div>'
+      + '<div class="pf-w-headline">Te leo la cartera entera.</div>'
+      + '<div class="pf-w-sub">Con la membresía, Warren calcula tu concentración y tus ratios, te los explica en criollo y responde lo que le preguntes sobre tus posiciones.</div>'
+      + '<button class="pf-warren-cta" onclick="if(typeof openPaymentModal===\'function\')openPaymentModal()">'+ PF_SPARK_SVG +' Ver la membresía</button>'
+      + '</div></div>';
+  }
+  function pfMetricUpsell(evt){
+    if(evt) evt.stopPropagation();
+    var btn = evt && (evt.currentTarget || evt.target);
+    var card = btn && btn.closest ? btn.closest('.pf-metric-card') : null;
+    var box = card && card.querySelector('.pf-mini-warren-answer');
+    if(!box) return;
+    var open = box.classList.toggle('expanded');
+    if(!open) return;
+    box.innerHTML = '<div class="pf-lock-warren"><span class="pf-lw-av">W</span><div>'
+      + '<p>Con la membresía te calculo esta métrica sobre tu cartera y te la explico en criollo &mdash; además de responder cualquier consulta sobre tus posiciones.</p>'
+      + '<button type="button" class="pf-lock-cta" onclick="if(typeof openPaymentModal===\'function\')openPaymentModal()">Ver la membresía &rarr;</button>'
+      + '</div></div>';
+  }
+  window.pfMetricUpsell = pfMetricUpsell;
+
   async function pfRenderMetrics(){
     var wrapper = document.getElementById('pfMetricsWrapper');
     var grid = document.getElementById('pfMetricsGrid');
@@ -5623,6 +5672,17 @@
       grid.innerHTML = '<div class="pf-metrics-empty">Cargá al menos una posición para ver la concentración sectorial y geográfica.</div>';
       return;
     }
+
+    if(!(window._miIsMember && window._miIsMember())){
+      grid.innerHTML = '<div class="pf-metrics-label">Resultados del chequeo</div>'
+        + '<div class="pf-metric-grid pf-metric-grid-2col">'
+        + pfLockedMetricCard('sect', 'Concentración sectorial')
+        + pfLockedMetricCard('geo', 'Concentración geográfica')
+        + '</div>'
+        + pfLockedWarrenPanel();
+      return;
+    }
+
     grid.innerHTML = '<div class="pf-metrics-label">Resultados del chequeo</div><div class="pf-metrics-empty">Calculando sector y país de cada posición…</div>';
 
     var sg = await pfComputeSectorGeo(rows);
@@ -5651,10 +5711,6 @@
       + '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2L12 2z"/></svg>'
       + 'Preguntale a Warren</button>'
       + '<div id="pfWarrenBubble"></div></div></div>';
-
-    if(!(window._miIsMember && window._miIsMember())){
-      if(window._miApplyPaywall) window._miApplyPaywall('#pfMetricsGrid', '#pfMetricsWrapper');
-    }
   }
 
   function pfBuildNarrationPrompt(sg, profileEntry){
@@ -5910,6 +5966,20 @@
       return;
     }
 
+    if(!(window._miIsMember && window._miIsMember())){
+      var locked = [
+        ['beta','Beta vs S&amp;P 500'], ['vol','Volatilidad anual'], ['sharpe','Sharpe Ratio'],
+        ['dd','Máximo drawdown'], ['corr','Correlación promedio'], ['var','VaR diario (95%)'],
+        ['roe','ROE ponderado'], ['pe','P/E ponderado'], ['div','Dividend yield ponderado']
+      ];
+      grid.innerHTML = '<div class="pf-metrics-label">Métricas de cartera</div>'
+        + '<div class="pf-metric-grid">'
+        + locked.map(function(x){ return pfLockedMetricCard(x[0], x[1]); }).join('')
+        + '</div>'
+        + '<div class="pf-metric-note">Beta, volatilidad, Sharpe, drawdown, VaR y fundamentales ponderados de tu cartera. Tocá el &#10022; de cualquiera para verlo con la membresía.</div>';
+      return;
+    }
+
     grid.innerHTML = '<div class="pf-metrics-label">Métricas de cartera</div><div class="pf-metrics-empty">Calculando con datos históricos...</div>';
     var reqId = ++pfAdvReqSeq;
     var m = await pfBuildAdvancedMetrics();
@@ -5975,10 +6045,6 @@
              'Promedio histórico S&amp;P 500: <b>~1,3%</b> (referencia aproximada, no en vivo).')
       + '</div>'
       + '<div class="pf-metric-note">Calculado con los últimos '+ m.daysUsed +' cierres diarios disponibles de cada activo. La tasa libre de riesgo y los promedios de referencia son aproximaciones fijas, no datos en vivo.</div>';
-
-    if(!(window._miIsMember && window._miIsMember())){
-      if(window._miApplyPaywall) window._miApplyPaywall('#pfAdvGrid', '#pfAdvWrapper');
-    }
   }
   var pfAdvReqSeq = 0;
   // Datos crudos de cada una de las 9 tarjetas de "Metricas de cartera", para que el
