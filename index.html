@@ -3671,7 +3671,7 @@
     </div>
 
     <!-- membresia -->
-    <div class="htx-member">
+    <div class="htx-member" id="membresia">
       <div class="htx-member__inner">
         <div>
           <p class="htx-member__eyebrow">Membres&iacute;a Manfredi Investment</p>
@@ -6660,13 +6660,10 @@
     document.getElementById('reportBannerClose').onclick = dismiss;
     document.getElementById('reportBannerCta').onclick = () => {
       if (latest.href) {
-        const gated = latest.ticker && latest.ticker !== 'MSFT' && !(window._miIsMember && window._miIsMember());
-        if (gated) {
-          const backdrop = document.getElementById('mi-analysis-paywall-backdrop');
-          if (backdrop) { backdrop.classList.add('active'); document.body.style.overflow = 'hidden'; }
-        } else {
-          window.open(latest.href, '_blank', 'noopener');
-        }
+        // El informe es de acceso abierto con vista previa: lo abrimos siempre
+        // y el propio informe difumina de la Sección 02 en adelante para el
+        // no-miembro (informes/_preview-gate.js).
+        window.open(latest.href, '_blank', 'noopener');
       } else {
         openPdf('papers/' + encodeURIComponent(latest.file), latest.title);
       }
@@ -12398,12 +12395,11 @@ AOS.init({
 </style>
 <script>
   function miGateAnalysis(ev, ticker){
-    if (ticker === 'MSFT') return true;
-    if (window._miIsMember && window._miIsMember()) return true;
-    ev.preventDefault();
-    document.getElementById('mi-analysis-paywall-backdrop').classList.add('active');
-    document.body.style.overflow = 'hidden';
-    return false;
+    // Los informes ahora son de acceso abierto con vista previa: el no-miembro
+    // puede abrirlos y leer portada + Resumen Ejecutivo; de la Sección 02 en
+    // adelante el propio informe difumina el contenido y ofrece la membresía
+    // (ver informes/_preview-gate.js). Ya no interceptamos la navegación.
+    return true;
   }
   function miCloseAnalysisPaywall(){
     document.getElementById('mi-analysis-paywall-backdrop').classList.remove('active');
