@@ -420,12 +420,18 @@ async function fetchCriptoCoinGecko() {
 // Kraken nombra sus 10 pares originales con prefijo legacy X+código+Z (ej.
 // XXBTZUSD), pero esa misma terminación "ZUSD" también aparece en tickers
 // modernos que legítimamente terminan en Z (AI16ZUSD = AI16Z, XTZUSD = XTZ).
-// No hay forma genérica de distinguirlos, así que los 10 legacy van a mano.
+// No hay forma genérica de distinguirlos, así que los casos que necesitan
+// mapeo a mano son: los 10 legacy, USDTZUSD (Kraken cotiza USDT contra su
+// código fiat "ZUSD" en vez de "USD" -- sin esto quedaba "USDTZ") y XDGUSD
+// (Kraken le dice "XDG" a Dogecoin). ZEURZUSD/ZGBPZUSD/AUDUSD son pares
+// fiat-fiat que Kraken mezcla en el mismo endpoint -- se descartan más abajo,
+// no son cripto.
 const KRAKEN_LEGACY_SYMBOLS = {
   XETCZUSD: 'ETC', XETHZUSD: 'ETH', XLTCZUSD: 'LTC', XMLNZUSD: 'MLN',
   XREPZUSD: 'REP', XXBTZUSD: 'BTC', XXLMZUSD: 'XLM', XXMRZUSD: 'XMR',
-  XXRPZUSD: 'XRP', XZECZUSD: 'ZEC',
+  XXRPZUSD: 'XRP', XZECZUSD: 'ZEC', USDTZUSD: 'USDT', XDGUSD: 'DOGE',
 };
+const KRAKEN_FIAT_PAIRS = new Set(['ZEURZUSD', 'ZGBPZUSD', 'AUDUSD']);
 
 async function fetchCriptoKraken() {
   const resp = await fetch('https://api.kraken.com/0/public/Ticker', { signal: AbortSignal.timeout(10000) });
@@ -434,7 +440,7 @@ async function fetchCriptoKraken() {
   const result = json.result;
   if (!result) throw new Error('Kraken: respuesta vacía');
   return Object.entries(result)
-    .filter(([pair]) => pair.endsWith('USD'))
+    .filter(([pair]) => pair.endsWith('USD') && !KRAKEN_FIAT_PAIRS.has(pair))
     .map(([pair, t]) => {
       const symbol = KRAKEN_LEGACY_SYMBOLS[pair] || pair.slice(0, -3);
       const last = parseFloat(t.c?.[0]);
@@ -447,6 +453,29 @@ async function fetchCriptoKraken() {
     .sort((a, b) => b.volume - a.volume)
     .slice(0, 200);
 }
+
+// Fallback de market cap (USD, aprox., orientativo) para las criptos mas
+// importantes -- Kraken (fallback de fetchCripto de aca abajo cuando
+// CoinGecko esta bloqueado desde Cloudflare Workers) no trae market cap, y
+// sin esto el mapa de Cripto de /mercados (mkt-treemap en index.html) se
+// queda vacio entero mientras dura el fallback: el frontend arma el
+// treemap con `items.filter(it => it.marketCap)`, y si ningun item de la
+// categoria lo tiene, la seccion completa desaparece. Mismo criterio que
+// MKT_US_MARKETCAP_M en index.html para Acciones USA -- un 10-20% de
+// desvio no se nota en el tamaño de un tile.
+const CRYPTO_MARKETCAP_FALLBACK = {
+  BTC: 1_750_000_000_000, ETH: 420_000_000_000, USDT: 145_000_000_000,
+  XRP: 155_000_000_000, BNB: 95_000_000_000, SOL: 95_000_000_000,
+  USDC: 62_000_000_000, DOGE: 28_000_000_000, ADA: 26_000_000_000,
+  TRX: 24_000_000_000, LINK: 14_000_000_000, AVAX: 13_000_000_000,
+  XLM: 11_000_000_000, SUI: 10_000_000_000, HYPE: 9_500_000_000,
+  LTC: 9_000_000_000, BCH: 8_500_000_000, TON: 8_000_000_000,
+  DOT: 6_500_000_000, UNI: 6_000_000_000, NEAR: 4_500_000_000,
+  AAVE: 4_200_000_000, PEPE: 4_000_000_000, ONDO: 3_200_000_000,
+  XMR: 3_200_000_000, TAO: 3_000_000_000, APT: 2_600_000_000,
+  ARB: 2_600_000_000, POL: 2_500_000_000, CRV: 1_200_000_000,
+  INJ: 1_000_000_000, DASH: 400_000_000, PAXG: 900_000_000,
+};
 
 // CoinGecko bloquea/limita seguido las IPs compartidas de Cloudflare Workers
 // (confirmado: desde una IP normal responde 200 siempre, desde el worker
@@ -471,7 +500,11 @@ async function fetchCripto() {
       items = [];
     }
   }
-  return items.map(c => ({ ...c, logo: cryptoIconUrl(c.symbol) }));
+  return items.map(c => ({
+    ...c,
+    logo: cryptoIconUrl(c.symbol),
+    marketCap: c.marketCap ?? CRYPTO_MARKETCAP_FALLBACK[c.symbol] ?? null,
+  }));
 }
 
 // ─── Merval: ArgentinaDatos → Finnhub → Yahoo ─────────────────────────────
