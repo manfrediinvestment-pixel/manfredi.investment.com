@@ -4703,6 +4703,16 @@
     .calc-goal-amount b { color: var(--white); }
     .calc-goal-del { display: inline-block; margin-top: 8px; font-size: 10.5px; color: rgba(255,255,255,.35); cursor: pointer; text-decoration: underline; }
     .calc-goal-del:hover { color: var(--red); }
+    .calc-goal-plan-note { font-size: 11px; color: rgba(255,255,255,.4); margin-bottom: 10px; line-height: 1.5; }
+    .calc-goal-aporte-row { display: flex; gap: 8px; margin-top: 4px; }
+    .calc-goal-aporte-input {
+      flex: 1; min-width: 0; background: var(--navy-1); border: 1px solid rgba(255,255,255,.15); border-radius: 5px;
+      color: var(--white); padding: 7px 9px; font-size: 12.5px; font-family: inherit;
+    }
+    .calc-goal-aporte-row .calc-scenario-btn { padding: 7px 14px; font-size: 11.5px; white-space: nowrap; }
+    .calc-goal-log { margin-top: 10px; max-height: 96px; overflow-y: auto; }
+    .calc-goal-log-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: rgba(255,255,255,.45); padding: 4px 0; border-top: 1px solid rgba(255,255,255,.06); }
+    .calc-goal-log-row .calc-goal-del { margin-top: 0; font-size: 13px; }
     .pf-ticker-wrap { position: relative; }
     .pf-ticker-dropdown {
       display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 270px; max-width: 340px;
@@ -5438,6 +5448,40 @@
       return Math.max(0, months);
     }
 
+    // Cuanto llevás REALMENTE ahorrado: el ahorro inicial declarado al crear
+    // el objetivo + cada aporte que la persona fue registrando a mano. Esto
+    // es independiente de "cuánto deberías llevar según el plan" -- uno es
+    // lo real, el otro la referencia teórica.
+    function calcGoalTotalReal(g){
+      var aportes = (g.aportes || []).reduce(function(s, a){ return s + (a.monto || 0); }, 0);
+      return (g.initial || 0) + aportes;
+    }
+
+    window.calcRegistrarAporte = function(id){
+      var input = document.getElementById('calcAporteInput_' + id);
+      if (!input) return;
+      var monto = parseFloat(input.value);
+      if (!(monto > 0)) return;
+      var goals = calcLoadGoals();
+      var g = null;
+      for (var i = 0; i < goals.length; i++) { if (goals[i].id === id) { g = goals[i]; break; } }
+      if (!g) return;
+      g.aportes = g.aportes || [];
+      g.aportes.push({ monto: monto, fecha: new Date().toISOString() });
+      calcSaveGoals(goals);
+      calcRenderGoals();
+    };
+
+    window.calcDeleteAporte = function(goalId, idx){
+      var goals = calcLoadGoals();
+      var g = null;
+      for (var i = 0; i < goals.length; i++) { if (goals[i].id === goalId) { g = goals[i]; break; } }
+      if (!g || !g.aportes) return;
+      g.aportes.splice(idx, 1);
+      calcSaveGoals(goals);
+      calcRenderGoals();
+    };
+
     function calcRenderGoals(){
       var wrap = document.getElementById('calcGoalsWrap');
       if (!wrap) return;
@@ -5449,15 +5493,34 @@
           var elapsed = calcMonthsElapsed(g.savedAt);
           var remaining = Math.max(0, Math.round(g.months - elapsed));
           var expected = Math.min(g.goal, (g.initial || 0) + (g.monthly || 0) * elapsed);
-          var pct = g.goal > 0 ? Math.min(100, (expected / g.goal * 100)) : 0;
+          var totalReal = calcGoalTotalReal(g);
+          var pctReal = g.goal > 0 ? Math.min(100, (totalReal / g.goal * 100)) : 0;
+          var diff = totalReal - expected;
+          var diffHtml = Math.abs(diff) < 1 ? '' :
+            (diff > 0
+              ? '<span style="color:var(--green);">vas ' + calcFmtMoney(diff) + ' adelantado &#128994;</span>'
+              : '<span style="color:var(--red);">vas ' + calcFmtMoney(-diff) + ' atrasado &#128308;</span>');
+          var aportes = g.aportes || [];
+          var aportesHtml = aportes.length
+            ? '<div class="calc-goal-log">' + aportes.map(function(a, idx){
+                var d = new Date(a.fecha);
+                return '<div class="calc-goal-log-row"><span>' + d.toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit'}) + ' &middot; ' + calcFmtMoney(a.monto) + '</span><span class="calc-goal-del" onclick="calcDeleteAporte(' + g.id + ',' + idx + ')">&times;</span></div>';
+              }).join('') + '</div>'
+            : '';
           return '<div class="calc-goal-card">' +
             (g.foto ? '<div class="calc-goal-photo" style="background-image:url(\'' + g.foto + '\');"></div>' : '<div class="calc-goal-photo calc-goal-photo-empty">&#127919;</div>') +
             '<div class="calc-goal-body">' +
               '<div class="calc-goal-name">' + pfEsc(g.nombre) + '</div>' +
               '<div class="calc-goal-months">' + (remaining > 0 ? ('Faltan <b>' + remaining + '</b> meses') : '<b>Plazo cumplido</b>') + '</div>' +
-              '<div class="calc-goal-bar"><div class="calc-goal-bar-fill" style="width:' + pct.toFixed(0) + '%;"></div></div>' +
-              '<div class="calc-goal-amount">Deberías llevar acumulados: <b>' + calcFmtMoney(expected) + '</b> de ' + calcFmtMoney(g.goal) + '</div>' +
-              '<span class="calc-goal-del" onclick="calcDeleteGoal(' + g.id + ')">Eliminar</span>' +
+              '<div class="calc-goal-bar"><div class="calc-goal-bar-fill" style="width:' + pctReal.toFixed(0) + '%;"></div></div>' +
+              '<div class="calc-goal-amount">Llevás ahorrado: <b>' + calcFmtMoney(totalReal) + '</b> de ' + calcFmtMoney(g.goal) + ' (' + pctReal.toFixed(0) + '%)</div>' +
+              '<div class="calc-goal-plan-note">Según el plan deberías llevar ' + calcFmtMoney(expected) + (diffHtml ? ' &mdash; ' + diffHtml : '') + '</div>' +
+              '<div class="calc-goal-aporte-row">' +
+                '<input type="number" min="0" step="any" class="calc-goal-aporte-input" id="calcAporteInput_' + g.id + '" placeholder="Monto ahorrado (USD)">' +
+                '<button class="calc-scenario-btn" onclick="calcRegistrarAporte(' + g.id + ')">+ Aporte</button>' +
+              '</div>' +
+              aportesHtml +
+              '<span class="calc-goal-del" onclick="calcDeleteGoal(' + g.id + ')" style="margin-top:8px;display:inline-block;">Eliminar objetivo</span>' +
             '</div>' +
           '</div>';
         }).join('') + '</div>';
