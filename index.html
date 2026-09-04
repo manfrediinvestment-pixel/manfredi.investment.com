@@ -5359,7 +5359,24 @@
     });
   })();
 
-  window._pfPositions = window._pfPositions || [];
+  // "Tu Portafolio" no persiste en ningun lado para quien no es socio pago
+  // (solo Firestore, via el boton "Guardar", que esta bloqueado por membresia)
+  // -- asi que cualquier recarga de pagina borraba todo. Este respaldo en
+  // localStorage (por navegador, no sincroniza entre dispositivos) evita esa
+  // perdida; si despues llega el auth de Firebase con datos guardados de un
+  // socio, esos pisan lo local (ver mfCheckMembership/onAuthStateChanged mas
+  // arriba, que solo sobreescribe si userData.portfolioManfredi.positions existe).
+  function pfLoadLocalBackup(){
+    try {
+      var raw = localStorage.getItem('mi_pf_positions_backup');
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function pfSaveLocalBackup(){
+    try { localStorage.setItem('mi_pf_positions_backup', JSON.stringify(window._pfPositions || [])); } catch (e) {}
+  }
+  window._pfPositions = window._pfPositions || pfLoadLocalBackup();
   var pfIdSeq = 1;
   var PF_MERCADOS_BASE = 'https://manfredi-mercados.nachito2502.workers.dev';
   var PF_MERCADOS_URL = PF_MERCADOS_BASE + '/mercados';
@@ -5814,6 +5831,7 @@
   }
 
   async function pfRenderPositions(){
+    pfSaveLocalBackup();
     var body = document.getElementById('pfPositionsBody');
     if(!body) return;
     if((window._pfPositions||[]).length) await pfFetchMarketData(false);
