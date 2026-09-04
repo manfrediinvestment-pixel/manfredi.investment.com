@@ -2528,6 +2528,17 @@
     }
     .mkt-map-legend .swatch { width: 60px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #EF4444, #1a1a1a, #10B981); }
 
+    /* Mapa de tu cartera (Portfolio): grilla pareja de filas/columnas, no squarify --
+       incluso peso para cada activo, así el cuadro se ve igual de prolijo con 3 que con 7. */
+    .pf-map-tile {
+      box-sizing: border-box; border: 1px solid var(--navy-1); border-radius: 3px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      overflow: hidden; cursor: pointer; transition: filter .12s ease;
+    }
+    .pf-map-tile:hover { filter: brightness(1.25); z-index: 5; }
+    .pf-map-tile .mt-sym { font-family: 'IBM Plex Mono', monospace; font-weight: 700; line-height: 1.1; white-space: nowrap; color: #fff; }
+    .pf-map-tile .mt-chg { font-family: 'IBM Plex Mono', monospace; opacity: .9; line-height: 1.1; white-space: nowrap; color: #fff; }
+
     /* Estrella de favoritos en cada fila */
     .mkt-star-btn {
       background: none; border: none; padding: 0; cursor: pointer; color: rgba(255,255,255,.18);
@@ -4827,7 +4838,7 @@
 
     .pf-row-split, .pf-row-align { display: grid; gap: 0; }
     .pf-row-split { grid-template-columns: 1.7fr 1fr; }
-    .pf-row-align { grid-template-columns: 2fr 1fr; }
+    .pf-row-align { grid-template-columns: 1.7fr 1fr; }
     .pf-row-split > .pf-card:first-child,
     .pf-row-align > .pf-card:first-child {
       padding-right: 26px;
@@ -4974,6 +4985,7 @@
         </div>
         <div class="pf-card" id="pfSectorMiniWrapper" style="position:relative;">
           <div id="pfSectorMini"></div>
+          <div id="pfAssetMap"></div>
         </div>
         </div>
 
@@ -5272,6 +5284,12 @@
     var entry = hit && hit[moneda === 'ARS' ? 'ARS' : 'USD'];
     return entry ? entry.category : null;
   }
+  function pfGetCurrentChange(ticker, moneda){
+    var idx = window._pfMarketData || {};
+    var hit = idx[(ticker||'').toUpperCase()];
+    var entry = hit && hit[moneda === 'ARS' ? 'ARS' : 'USD'];
+    return entry ? entry.change : null;
+  }
   // Dolar CCL: viaja en el mismo payload (categoria "dolares", simbolo CONTADOCONLIQUI) y ya
   // queda indexado por el mecanismo de arriba -- cero fetch nuevo.
   function pfGetCclRate(){ return pfGetCurrentPrice('CONTADOCONLIQUI', 'ARS'); }
@@ -5400,6 +5418,7 @@
     if(saveBtn) saveBtn.style.display = (window._miIsMember && window._miIsMember()) ? '' : 'none';
     pfRenderAlignment();
     pfRenderSectorMini();
+    pfRenderAssetMiniMap();
     pfRenderMetrics();
     pfRenderAdvancedMetrics();
   }
@@ -5636,6 +5655,70 @@
     // "Sectores de tu cartera" es gratis: el paywall arranca recién en "Resultados del chequeo".
   }
   window._pfRenderSectorMini = pfRenderSectorMini;
+
+  // ---- Mapa de tu cartera (grilla pareja, NO el squarify de Mercados > Mapas):
+  // como todos los activos pesan igual, un treemap proporcional por área queda
+  // irregular según la cantidad de posiciones (3 vs 7 arman formas distintas).
+  // Se arma una grilla fija de filas x columnas -- mismo contenedor (mismo
+  // ancho/alto) sea cual sea N, así el cuadro siempre se ve parejo y prolijo.
+  function pfMapGridDims(n){
+    var rows = n <= 8 ? 1 : (n <= 16 ? 2 : 3);
+    var cols = Math.ceil(n / rows);
+    return { rows: rows, cols: cols };
+  }
+  function pfRenderAssetTreemap(containerId, items){
+    var container = document.getElementById(containerId);
+    if(!container) return;
+    container.innerHTML = '';
+    if(!items.length) return;
+    var dims = pfMapGridDims(items.length);
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = 'repeat('+ dims.cols +', 1fr)';
+    container.style.gridTemplateRows = 'repeat('+ dims.rows +', 1fr)';
+    container.style.gap = '2px';
+    var rowH = container.clientHeight / dims.rows || 55;
+    items.forEach(function(item){
+      var tile = document.createElement('div');
+      tile.className = 'pf-map-tile';
+      tile.style.background = mktMapColorFor(item.change);
+      var symSize = Math.max(9, Math.min(13, rowH / 4));
+      var chg = item.change;
+      var html = '<div class="mt-sym" style="font-size:'+ symSize +'px">'+ pfEsc(item.symbol) +'</div>';
+      if(rowH >= 40) html += '<div class="mt-chg" style="font-size:'+ Math.max(8, symSize - 3) +'px">'+ (chg != null ? ((chg>=0?'+':'') + chg.toFixed(1) + '%') : 's/d') +'</div>';
+      tile.innerHTML = html;
+      tile.title = item.symbol + (chg != null ? ' · ' + (chg>=0?'+':'') + chg.toFixed(2) + '%' : ' · variación no disponible hoy');
+      if(item.category && item.price != null){
+        tile.addEventListener('click', function(){ openAssetModal(item, item.category, item.currency); });
+      }
+      container.appendChild(tile);
+    });
+  }
+  function pfRenderAssetMiniMap(){
+    var el = document.getElementById('pfAssetMap');
+    if(!el) return;
+    var rows = pfBuildRows();
+    var grouped = pfGroupByTicker(rows).filter(function(g){ return !g.isCash; });
+    if(!grouped.length){
+      el.innerHTML = '<div class="pf-metrics-label" style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);">Mapa de tu cartera</div>'
+        + '<div class="pf-metrics-empty">Cargá al menos una posición para ver el mapa.</div>';
+      return;
+    }
+    var items = grouped.map(function(g){
+      return {
+        symbol: g.tickerRaw,
+        price: pfGetCurrentPrice(g.tickerRaw, g.moneda),
+        change: pfGetCurrentChange(g.tickerRaw, g.moneda),
+        category: pfGetCurrentCategory(g.tickerRaw, g.moneda),
+        currency: g.moneda,
+        size: 1
+      };
+    });
+    el.innerHTML = '<div class="pf-metrics-label" style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);">Mapa de tu cartera</div>'
+      + '<div class="mkt-treemap" id="pfAssetMapTreemap" style="height:110px;margin-top:8px;"></div>'
+      + '<div class="mkt-map-legend" style="margin-top:6px;"><span>-5%</span><span class="swatch" style="width:36px;"></span><span>+5%</span></div>';
+    pfRenderAssetTreemap('pfAssetMapTreemap', items);
+  }
+  window._pfRenderAssetMiniMap = pfRenderAssetMiniMap;
 
   // ---- Bloques de membresía: se ve la estructura, no el dato. El "cartel" para
   // ---- comprar la membresía aparece dentro de Warren (mini-círculo de cada card). --
