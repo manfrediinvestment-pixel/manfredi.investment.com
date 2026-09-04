@@ -310,6 +310,88 @@ function extractText(content) {
         .trim();
 }
 
+// ─── Importar posiciones desde el PDF de tenencias de un broker ────────────
+// El frontend extrae el texto del PDF con pdf.js (client-side, gratis) y solo
+// nos manda texto plano -- nunca el archivo -- para mantener el costo bajo
+// (Haiku 4.5, ~$0.004 por carga con un resumen tipico). Tope de 6000
+// caracteres de entrada para que el costo por request tenga un techo duro
+// pase lo que pase, y un limite diario por IP en WARREN_KV para que un abuso
+// (script, bot) no dispare de mas llamadas pagas sin que nadie lo note.
+const PDF_IMPORT_DAILY_LIMIT = 30;
+const PDF_IMPORT_MAX_CHARS = 6000;
+
+const PDF_EXTRACT_SYSTEM_PROMPT = `Sos un extractor de datos de resumenes de cuenta de brokers argentinos (IOL, Balanz, Cocos Capital, Bull Market, Interactive Brokers, etc). Te paso el texto extraido de un PDF de tenencias. Devolve UNICAMENTE un JSON valido (sin texto adicional, sin markdown, sin explicaciones) con este formato exacto:
+
+{
+  "posiciones": [
+    { "ticker": "AAPL", "cantidad": 10, "precioCompra": null, "precioActual": 22100.00, "moneda": "ARS", "tipo": "accion" }
+  ],
+  "efectivo": [
+    { "moneda": "ARS", "monto": 42300.00 }
+  ]
+}
+
+Reglas:
+- "ticker": el simbolo de la especie, en mayusculas, sin sufijos de mercado.
+- "cantidad": numero de unidades/nominales, como numero (no string).
+- "precioCompra": si el resumen no incluye precio de compra original, usa null.
+- "precioActual": el ultimo precio/cotizacion que figure en el resumen.
+- "moneda": "ARS" o "USD" segun corresponda a esa fila.
+- "tipo": "accion", "cedear", "bono", "fci" o "cripto" segun corresponda.
+- Ignora totales, subtotales y lineas que no sean posiciones individuales.
+- Si un campo no esta disponible, usa null -- nunca inventes un valor.
+- Si el texto no parece un resumen de cuenta de broker, devolve {"posiciones":[],"efectivo":[]}.
+- No incluyas explicaciones fuera del JSON.`;
+
+async function handleExtractPortfolioPdf(request, env) {
+    const ANTHROPIC_API_KEY = env.ANTHROPIC_API_KEY;
+    if (!ANTHROPIC_API_KEY) {
+        return new Response(JSON.stringify({ error: 'config' }), { status: 500, headers: JSON_HEADERS });
+    }
+
+    const body = await request.json();
+    const text = (body && body.text ? String(body.text) : '').slice(0, PDF_IMPORT_MAX_CHARS);
+    if (!text.trim()) {
+        return new Response(JSON.stringify({ error: 'sin_texto' }), { status: 400, headers: JSON_HEADERS });
+    }
+
+    if (env.WARREN_KV) {
+        try {
+            const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+            const dayKey = new Date().toISOString().slice(0, 10);
+            const rlKey = 'pdfimport:' + dayKey + ':' + ip;
+            const current = parseInt((await env.WARREN_KV.get(rlKey)) || '0', 10);
+            if (current >= PDF_IMPORT_DAILY_LIMIT) {
+                return new Response(JSON.stringify({ error: 'limite_diario' }), { status: 429, headers: JSON_HEADERS });
+            }
+            await env.WARREN_KV.put(rlKey, String(current + 1), { expirationTtl: 172800 });
+        } catch (e) {
+            console.error('[warren] pdf-import rate limit KV error:', e && e.message);
+        }
+    }
+
+    try {
+        const data = await callClaude(ANTHROPIC_API_KEY, MODEL_HAIKU, PDF_EXTRACT_SYSTEM_PROMPT, [
+            { role: 'user', content: text }
+        ], null);
+        const raw = extractText(data.content);
+        const jsonMatch = raw.match(/\{[\s\S]*\}/);
+        let parsed;
+        try {
+            parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
+        } catch (e) {
+            return new Response(JSON.stringify({ error: 'parse_fallido' }), { status: 502, headers: JSON_HEADERS });
+        }
+        if (!parsed || !Array.isArray(parsed.posiciones)) {
+            return new Response(JSON.stringify({ error: 'formato_invalido' }), { status: 502, headers: JSON_HEADERS });
+        }
+        return new Response(JSON.stringify({ ok: true, data: parsed }), { headers: JSON_HEADERS });
+    } catch (e) {
+        console.error('[warren] extract-pdf error:', e && e.message);
+        return new Response(JSON.stringify({ error: 'anthropic_error' }), { status: 502, headers: JSON_HEADERS });
+    }
+}
+
 export default {
     async fetch(request, env) {
         if (request.method === 'OPTIONS') {
@@ -322,6 +404,7 @@ export default {
             if (request.method === 'GET' && url.pathname === '/conversation') return await handleConversationGet(request, env);
             if (request.method === 'POST' && url.pathname === '/conversation/save') return await handleConversationSave(request, env);
             if (request.method === 'POST' && url.pathname === '/conversation/delete') return await handleConversationDelete(request, env);
+            if (request.method === 'POST' && url.pathname === '/extract-portfolio-pdf') return await handleExtractPortfolioPdf(request, env);
         } catch (err) {
             return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: JSON_HEADERS });
         }

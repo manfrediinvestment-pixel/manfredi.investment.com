@@ -4633,6 +4633,9 @@
     .section-portfolio { background: var(--navy-1); position: relative; }
     .section-portfolio .section-title { color: var(--white); }
     .section-portfolio .section-sub   { color: rgba(255,255,255,.38); }
+    .section-calculadora { background: var(--navy-1); position: relative; }
+    .section-calculadora .section-title { color: var(--white); }
+    .section-calculadora .section-sub   { color: rgba(255,255,255,.38); }
     .pf-card { background: var(--navy-4); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 20px 22px; margin-bottom: 20px; }
     .pf-quiz-cta { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
     .pf-quiz-cta h3 { font-family: var(--font-display); font-weight: 400; font-size: 18px; margin: 0 0 6px; color: var(--white); }
@@ -4921,7 +4924,20 @@
             <thead><tr><th>Activo</th><th style="text-align:right;">Cant.</th><th style="text-align:right;">Compra</th><th style="text-align:right;">Actual</th><th style="text-align:right;">Resultado</th><th style="text-align:right;">% cartera</th><th></th></tr></thead>
             <tbody id="pfPositionsBody"></tbody>
           </table>
-          <div class="pf-add-row" id="pfAddRowBtn" onclick="pfShowAddForm()">+ Agregar posición</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div class="pf-add-row" id="pfAddRowBtn" onclick="pfShowAddForm()" style="flex:1;">+ Agregar posición</div>
+            <div class="pf-add-row" id="pfImportPdfBtn" onclick="document.getElementById('pfPdfFileInput').click()" style="flex:1;">📄 Importar PDF del broker</div>
+          </div>
+          <input type="file" id="pfPdfFileInput" accept="application/pdf" style="display:none;" onchange="pfImportPdfFile(this.files[0])">
+          <div id="pfPdfImportStatus" style="display:none;margin-top:12px;font-size:12.5px;color:rgba(255,255,255,.5);"></div>
+          <div id="pfPdfReviewCard" style="display:none;margin-top:12px;background:var(--navy-1);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:16px;">
+            <div style="font-size:12.5px;color:rgba(255,255,255,.6);margin-bottom:12px;">Revisá lo que se detectó antes de importar — desmarcá lo que no corresponda o esté mal, después podés editarlo a mano.</div>
+            <div id="pfPdfReviewRows"></div>
+            <div style="display:flex;gap:10px;margin-top:14px;">
+              <button class="pf-btn-gold" onclick="pfConfirmPdfImport()">Importar seleccionadas</button>
+              <button class="pf-btn-ghost" onclick="pfCancelPdfImport()">Cancelar</button>
+            </div>
+          </div>
           <div class="pf-add-form" id="pfAddForm" style="display:none;">
             <div class="pf-ticker-wrap">
               <input type="text" id="pfInputTicker" placeholder="Ticker o nombre (ej: AAPL, Apple)" autocomplete="off">
@@ -5028,6 +5044,9 @@
             <label>¿Ya tenés algo ahorrado? (opcional, USD)
               <input type="number" id="calcAhorroInicial" placeholder="0" min="0" step="any">
             </label>
+            <div id="calcUsePortfolioLink" style="font-size:11.5px;color:rgba(255,255,255,.4);margin-top:-6px;">
+              <a href="#" onclick="calcUsePortfolioValue();return false;" style="color:var(--gold);text-decoration:none;">Usar el valor actual de Tu Portafolio &rarr;</a>
+            </div>
             <button class="pf-btn-gold" onclick="calcCompute()" style="margin-top:4px;">Calcular aporte mensual</button>
           </div>
         </div>
@@ -5156,44 +5175,70 @@
       var wrap = document.getElementById('calcInvestToggleWrap');
       var note = document.getElementById('calcChartNote');
       note.textContent = 'Proyección con el aporte mensual calculado arriba, sin asumir ningún rendimiento — es el escenario base (ahorro puro).';
-      wrap.innerHTML = '<button class="pf-btn-ghost" style="margin-top:14px;" onclick="calcShowInvested()">¿Y si en vez de guardarlo lo invertís? Ver proyección &rarr;</button>';
+      wrap.innerHTML = '<button class="pf-btn-ghost" style="margin-top:14px;" onclick="calcShowInvested()">¿Y si en vez de guardarlo lo invertís en tu portafolio? Ver proyección &rarr;</button>';
     }
 
-    // Usa el rendimiento REAL del Manfredi Portfolio (ventana "1 año", con Dietz
-    // Modificado) como tasa de referencia -- la cartera personal del usuario no
-    // guarda fecha de compra por posición, así que no se puede anualizar con la
-    // misma precisión todavía.
+    // Pre-carga el campo "ya tenés ahorrado" con el valor REAL actual de Tu
+    // Portafolio (ya neto de ganancia/perdida vs. lo invertido) -- asi la
+    // calculadora arranca del estado real de la persona, no de un numero a ojo.
+    window.calcUsePortfolioValue = async function(){
+      var linkWrap = document.getElementById('calcUsePortfolioLink');
+      var positions = window._pfPositions || [];
+      if (!positions.length) {
+        linkWrap.innerHTML = '<span style="color:rgba(255,255,255,.4);">Todavía no cargaste posiciones en <a href="#portfolio" data-tab-target="portfolio" style="color:var(--gold);">Tu Portafolio</a>.</span>';
+        return;
+      }
+      linkWrap.textContent = 'Calculando el valor actual de tu portafolio...';
+      try {
+        if (typeof pfFetchMarketData === 'function') await pfFetchMarketData(false);
+        var rows = pfBuildRows();
+        var total = rows.reduce(function(s, r){ return s + (r.valorActual || 0); }, 0);
+        document.getElementById('calcAhorroInicial').value = Math.round(total);
+        linkWrap.innerHTML = 'Valor actual de Tu Portafolio: <b style="color:var(--gold);">' + calcFmtMoney(total) + '</b> — ya cargado arriba. <a href="#" onclick="calcUsePortfolioValue();return false;" style="color:rgba(255,255,255,.4);">Actualizar</a>';
+      } catch (e) {
+        linkWrap.innerHTML = 'No pudimos calcular el valor de tu portafolio ahora. <a href="#" onclick="calcUsePortfolioValue();return false;" style="color:var(--gold);">Reintentar</a>';
+      }
+    };
+
+    // Usa el rendimiento REAL de TU PORTAFOLIO (el que la persona cargó en la
+    // pestaña Portfolio) como tasa de referencia: simula cómo se hubiera
+    // comportado esa mezcla de activos actual en los últimos ~90 días
+    // (pfBuildAdvancedMetrics, la misma base que usan el beta/vol/sharpe de
+    // Portfolio) y anualiza ese ritmo. No hace falta fecha de compra por
+    // posición porque no es "tu retorno realizado", es "el ritmo reciente de
+    // tu mezcla actual" -- por eso la aclaración de que es una proyección.
     window.calcShowInvested = async function(){
       var wrap = document.getElementById('calcInvestToggleWrap');
-      wrap.innerHTML = '<div class="pf-metric-note">Calculando con datos históricos reales del Manfredi Portfolio...</div>';
+      wrap.innerHTML = '<div class="pf-metric-note">Calculando con el rendimiento histórico de tu portafolio...</div>';
       try {
-        if (typeof mfGetWindows !== 'function' || typeof mfBuildPerformanceSeries !== 'function') throw new Error('no disponible');
-        var win1y = mfGetWindows().filter(function(w){ return w.key === '1y'; })[0];
-        var m = await mfBuildPerformanceSeries(win1y.portfolioDays, win1y.benchDays, win1y.granularity);
-        if (m.dataUnavailable || typeof m.totalReturn !== 'number') throw new Error('sin datos');
+        if (typeof pfBuildAdvancedMetrics !== 'function') throw new Error('no disponible');
+        var m = await pfBuildAdvancedMetrics();
+        if (m.insufficientData) {
+          wrap.innerHTML = '<div class="pf-metric-note">Necesitás al menos 2 posiciones distintas cargadas en <a href="#portfolio" data-tab-target="portfolio" style="color:var(--gold);">Tu Portafolio</a> para calcular esto.</div>';
+          return;
+        }
+        if (m.dataUnavailable || typeof m.retAnual !== 'number') throw new Error('sin datos');
 
-        var days = m.daysUsedPortfolio || 1;
-        var periodReturn = m.totalReturn / 100;
-        var annualRate = Math.pow(1 + periodReturn, 365 / days) - 1;
-        // Piso/techo para no proyectar disparates si el historial todavía es corto.
-        annualRate = Math.max(-0.5, Math.min(1.0, annualRate));
+        var days = m.daysUsed || 1;
+        // Piso/techo para no proyectar disparates con una ventana corta y volatil.
+        var annualRate = Math.max(-0.5, Math.min(1.0, m.retAnual));
         var monthlyRate = Math.pow(1 + annualRate, 1/12) - 1;
 
         var monthsInvested = calcMonthsToGoal(calcState.goal, calcState.initial, calcState.monthly, monthlyRate);
         var monthsSaved = calcState.months - monthsInvested;
-        var lowHistory = days < 90;
 
-        calcRenderChart(calcState.months, calcState.initial, calcState.monthly, monthlyRate, 'Invertido (Manfredi Portfolio, ' + (annualRate*100).toFixed(1) + '% anual)');
+        calcRenderChart(calcState.months, calcState.initial, calcState.monthly, monthlyRate, 'Invertido (tu portafolio, ' + (annualRate*100).toFixed(1) + '% anual)');
 
         wrap.innerHTML = '<div class="pf-card" style="margin:14px 0 0;background:rgba(242,201,76,.06);border-color:rgba(242,201,76,.25);">' +
             '<div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.6;">' +
-              'Invirtiendo esos mismos ' + calcFmtMoney(calcState.monthly) + '/mes al ritmo real del <b>Manfredi Portfolio</b> (' + (annualRate*100).toFixed(1) + '% anual, últimos ' + days + ' días de historial), ' +
+              'Invirtiendo esos mismos ' + calcFmtMoney(calcState.monthly) + '/mes al ritmo reciente de <b>tu portafolio</b> (' + (annualRate*100).toFixed(1) + '% anual, últimos ' + days + ' días), ' +
               (monthsInvested < calcState.months && isFinite(monthsInvested)
                 ? 'llegarías a tu objetivo en <b style="color:var(--gold);">' + monthsInvested + ' meses</b> en vez de ' + calcState.months + ' &mdash; ' + monthsSaved + ' meses antes.'
-                : 'el objetivo se alcanza en ' + (isFinite(monthsInvested) ? monthsInvested : '—') + ' meses.') +
+                : (annualRate < 0
+                    ? 'con el ritmo reciente de tu cartera (negativo) no alcanzarías el objetivo solo con este aporte — te haría falta aportar más o revisar la mezcla de activos.'
+                    : 'el objetivo se alcanza en ' + (isFinite(monthsInvested) ? monthsInvested : '—') + ' meses.')) +
             '</div>' +
-            (lowHistory ? '<div class="pf-metric-note" style="margin-top:10px;">&#9888; Esta cartera todavía tiene poco historial (' + days + ' días), así que esta proyección es menos confiable &mdash; tomala como orientativa, no como promesa.</div>' : '') +
-            '<div class="pf-metric-note" style="margin-top:10px;">Es una proyección matemática basada en el rendimiento pasado del Manfredi Portfolio. El rendimiento pasado no garantiza resultados futuros.</div>' +
+            '<div class="pf-metric-note" style="margin-top:10px;">Es una proyección matemática basada en cómo se movieron tus activos actuales en los últimos ~90 días, no en tu resultado real desde que compraste. El rendimiento pasado no garantiza resultados futuros.</div>' +
           '</div>';
       } catch (e) {
         wrap.innerHTML = '<div class="pf-metric-note">No pudimos calcular la proyección con datos reales en este momento. Probá de nuevo en unos segundos.</div>';
@@ -5302,6 +5347,142 @@
     pfHideAddForm();
     pfRenderPositions();
   }
+
+  // ─── Importar posiciones desde el PDF de tenencias de un broker ─────────
+  // pdf.js (ya cargado en la pagina para el visor de papers) extrae el TEXTO
+  // del PDF en el navegador -- nunca se manda el archivo a ningun lado, solo
+  // el texto plano al worker de Warren, que lo procesa con Haiku 4.5 y
+  // devuelve las posiciones detectadas. El usuario siempre revisa y confirma
+  // antes de que se agregue nada a su portafolio real.
+  var pfPdfExtracted = null;
+
+  async function pfExtractPdfText(file){
+    var buf = await file.arrayBuffer();
+    var pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    var text = '';
+    for (var i = 1; i <= pdf.numPages; i++) {
+      var page = await pdf.getPage(i);
+      var content = await page.getTextContent();
+      text += content.items.map(function(it){ return it.str; }).join(' ') + '\n';
+    }
+    return text;
+  }
+
+  async function pfImportPdfFile(file){
+    if (!file) return;
+    var statusEl = document.getElementById('pfPdfImportStatus');
+    statusEl.style.display = '';
+    statusEl.textContent = 'Leyendo el PDF...';
+    document.getElementById('pfPdfReviewCard').style.display = 'none';
+    try {
+      if (typeof pdfjsLib === 'undefined') throw new Error('pdfjs no disponible');
+      var text = await pfExtractPdfText(file);
+      if (!text.trim()) throw new Error('sin texto');
+
+      statusEl.textContent = 'Identificando posiciones...';
+      var res = await fetch('https://warren.nachito2502.workers.dev/extract-portfolio-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text.slice(0, 6000) })
+      });
+      var body = await res.json();
+      if (!res.ok || !body.ok) {
+        var msg = body && body.error === 'limite_diario'
+          ? 'Llegaste al límite de importaciones de hoy. Probá de nuevo mañana, o cargá la posición a mano.'
+          : 'No pudimos leer ese PDF. Probá con otro archivo o cargá la posición a mano.';
+        statusEl.textContent = msg;
+        return;
+      }
+      pfPdfExtracted = body.data;
+      pfRenderPdfReview(body.data);
+      statusEl.style.display = 'none';
+    } catch (e) {
+      statusEl.textContent = 'No pudimos procesar ese PDF. Probá con otro archivo o cargá la posición a mano.';
+    } finally {
+      document.getElementById('pfPdfFileInput').value = '';
+    }
+  }
+
+  function pfRenderPdfReview(data){
+    var card = document.getElementById('pfPdfReviewCard');
+    var rowsEl = document.getElementById('pfPdfReviewRows');
+    var posiciones = (data.posiciones || []).filter(function(p){ return p.tipo !== 'fci'; });
+    var omitidos = (data.posiciones || []).length - posiciones.length;
+    var efectivo = data.efectivo || [];
+
+    if (!posiciones.length && !efectivo.length) {
+      rowsEl.innerHTML = '<div class="pf-metric-note">No detectamos posiciones en ese PDF. Probá con otro archivo o cargá a mano.</div>';
+      card.style.display = '';
+      return;
+    }
+
+    var rows = posiciones.map(function(p, i){
+      return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;">'
+        + '<input type="checkbox" id="pfPdfChk_' + i + '" checked>'
+        + '<span style="width:70px;font-family:monospace;color:var(--gold);">' + pfEsc(p.ticker || '—') + '</span>'
+        + '<span style="width:80px;color:rgba(255,255,255,.6);">' + (p.cantidad != null ? p.cantidad : '—') + ' u.</span>'
+        + '<span style="width:110px;color:rgba(255,255,255,.6);">' + (p.precioActual != null ? pfMoney(p.precioActual) : 'sin precio') + '</span>'
+        + '<span style="width:50px;color:rgba(255,255,255,.4);">' + pfEsc(p.moneda || 'USD') + '</span>'
+        + '</div>';
+    }).join('');
+
+    var cashRows = efectivo.map(function(c, i){
+      return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;">'
+        + '<input type="checkbox" id="pfPdfChkCash_' + i + '" checked>'
+        + '<span>&#128176; Efectivo</span>'
+        + '<span style="color:rgba(255,255,255,.6);">' + pfMoney(c.monto) + ' ' + pfEsc(c.moneda || 'ARS') + '</span>'
+        + '</div>';
+    }).join('');
+
+    rowsEl.innerHTML = rows + cashRows
+      + (omitidos > 0 ? '<div class="pf-metric-note" style="margin-top:8px;">' + omitidos + ' fondo(s) común(es) de inversión detectado(s) — todavía no se importan automáticamente, cargalos a mano si querés incluirlos.</div>' : '');
+    card.style.display = '';
+  }
+
+  function pfConfirmPdfImport(){
+    if (!pfPdfExtracted) return;
+    var posiciones = (pfPdfExtracted.posiciones || []).filter(function(p){ return p.tipo !== 'fci'; });
+    var efectivo = pfPdfExtracted.efectivo || [];
+    var added = 0;
+
+    posiciones.forEach(function(p, i){
+      var chk = document.getElementById('pfPdfChk_' + i);
+      if (!chk || !chk.checked) return;
+      if (!p.ticker || !(p.cantidad > 0)) return;
+      var precio = p.precioCompra != null ? p.precioCompra : p.precioActual;
+      if (!(precio > 0)) return; // sin precio de referencia no se puede cargar la posicion
+      window._pfPositions.push({
+        id: pfIdSeq++, ticker: String(p.ticker).toUpperCase(), cantidad: p.cantidad,
+        precioCompra: precio, moneda: p.moneda === 'ARS' ? 'ARS' : 'USD',
+        notas: 'Importado de PDF', isCash: false
+      });
+      added++;
+    });
+
+    efectivo.forEach(function(c, i){
+      var chk = document.getElementById('pfPdfChkCash_' + i);
+      if (!chk || !chk.checked) return;
+      if (!(c.monto > 0)) return;
+      window._pfPositions.push({
+        id: pfIdSeq++, ticker: 'Efectivo', cantidad: c.monto, precioCompra: 1,
+        moneda: c.moneda === 'USD' ? 'USD' : 'ARS', notas: 'Importado de PDF', isCash: true
+      });
+      added++;
+    });
+
+    pfCancelPdfImport();
+    pfRenderPositions();
+    var statusEl = document.getElementById('pfPdfImportStatus');
+    statusEl.style.display = '';
+    statusEl.textContent = added > 0 ? ('Se importaron ' + added + ' posición(es). Revisalas en la tabla.') : 'No se importó nada — desmarcaste todo o faltaban datos.';
+    setTimeout(function(){ statusEl.style.display = 'none'; }, 5000);
+  }
+
+  function pfCancelPdfImport(){
+    pfPdfExtracted = null;
+    document.getElementById('pfPdfReviewCard').style.display = 'none';
+  }
+
   function pfRemovePosition(id){
     window._pfPositions = window._pfPositions.filter(function(p){ return p.id !== id; });
     pfRenderPositions();
