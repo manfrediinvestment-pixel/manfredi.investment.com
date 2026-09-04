@@ -3203,6 +3203,7 @@
         <li><a href="#university" class="nav-link" data-tab-target="university">University</a></li>
         <li><a href="#inversiones" class="nav-link" data-tab-target="inversiones">Inversiones</a></li>
         <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
+        <li><a href="#calculadora" class="nav-link" data-tab-target="calculadora">Calculadora</a></li>
         <li>
           <span class="nav-link" data-member-required="true" onclick="toggleWarren()" style="cursor:pointer;">
             Asesor IA <span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;margin-left:4px;vertical-align:middle;"></span>
@@ -4658,6 +4659,15 @@
       padding: 8px 10px; font-size: 13px; font-family: inherit;
     }
     .pf-add-form label { color: rgba(255,255,255,.6); font-size: 12.5px; display: flex; align-items: center; gap: 5px; }
+    .calc-form { display: flex; flex-direction: column; gap: 14px; }
+    .calc-form label { color: rgba(255,255,255,.6); font-size: 12.5px; display: flex; flex-direction: column; gap: 6px; }
+    .calc-form input[type="text"], .calc-form input[type="number"], .calc-form select {
+      background: var(--navy-1); border: 1px solid rgba(255,255,255,.15); border-radius: 5px; color: var(--white);
+      padding: 10px 12px; font-size: 14px; font-family: inherit; width: 100%; box-sizing: border-box;
+    }
+    .calc-plazo-row { display: flex; gap: 8px; }
+    .calc-plazo-row input { flex: 1.4; }
+    .calc-plazo-row select { flex: 1; }
     .pf-ticker-wrap { position: relative; }
     .pf-ticker-dropdown {
       display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 270px; max-width: 340px;
@@ -4981,6 +4991,216 @@
 
     </div>
   </section>
+
+  <!-- ── CALCULADORA DE OBJETIVOS ─────────────────────────────────────── -->
+  <section class="section section-calculadora" id="calculadora" data-tab="calculadora">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Calculadora de Objetivos</span>
+        <h2 class="section-title">¿Cuánto necesitás ahorrar por mes?</h2>
+        <p class="section-sub">Definí tu objetivo financiero y calculá el aporte mensual necesario para alcanzarlo — y cuánto antes podrías llegar si lo invertís en vez de guardarlo.</p>
+      </div>
+
+      <div class="inv-disclaimer">
+        <span style="color:#D97706;font-size:14px;flex-shrink:0;">&#9888;</span>
+        <span>Herramienta educativa. Los cálculos son proyecciones matemáticas, no garantías de rendimiento ni asesoramiento financiero personalizado.</span>
+      </div>
+
+      <div class="pf-row-split">
+        <div class="pf-card">
+          <h2 class="pf-metrics-label" style="margin-bottom:14px;">Tu objetivo</h2>
+          <div class="calc-form">
+            <label>¿Cuál es tu objetivo? (opcional)
+              <input type="text" id="calcObjetivoNombre" placeholder="Ej: comprar un auto, viajar, fondo de emergencia" maxlength="60">
+            </label>
+            <label>¿Cuánto necesitás? (USD)
+              <input type="number" id="calcObjetivoMonto" placeholder="10000" min="0" step="any">
+            </label>
+            <label>¿En cuánto tiempo?
+              <div class="calc-plazo-row">
+                <input type="number" id="calcPlazoNum" placeholder="24" min="1" step="1">
+                <select id="calcPlazoUnidad">
+                  <option value="meses">meses</option>
+                  <option value="anios">años</option>
+                </select>
+              </div>
+            </label>
+            <label>¿Ya tenés algo ahorrado? (opcional, USD)
+              <input type="number" id="calcAhorroInicial" placeholder="0" min="0" step="any">
+            </label>
+            <button class="pf-btn-gold" onclick="calcCompute()" style="margin-top:4px;">Calcular aporte mensual</button>
+          </div>
+        </div>
+
+        <div class="pf-card" id="calcResultCard" style="display:none;">
+          <h2 class="pf-metrics-label" style="margin-bottom:14px;">Resultado</h2>
+          <div id="calcResultBody"></div>
+        </div>
+      </div>
+
+      <div class="pf-card" id="calcChartCard" style="display:none;">
+        <h2 class="pf-metrics-label" style="margin-bottom:14px;">Cómo crecen tus aportes en el tiempo</h2>
+        <div class="mf-chart-wrap"><canvas id="calcChartCanvas"></canvas></div>
+        <div id="calcInvestToggleWrap"></div>
+        <div class="pf-metric-note" id="calcChartNote"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <script>
+  (function(){
+    function calcNum(id){ var el = document.getElementById(id); var v = el ? parseFloat(el.value) : NaN; return isNaN(v) ? 0 : v; }
+
+    function calcMonthsFromForm(){
+      var n = calcNum('calcPlazoNum');
+      var unidad = document.getElementById('calcPlazoUnidad').value;
+      return Math.max(1, Math.round(unidad === 'anios' ? n * 12 : n));
+    }
+
+    // Aporte mensual necesario asumiendo CERO rendimiento (ahorro puro): reparte
+    // linealmente lo que falta entre los meses disponibles.
+    function calcRequiredMonthly(goal, initial, months){
+      return Math.max(0, (goal - initial) / months);
+    }
+
+    // Serie mes a mes de saldo acumulado, con aporte fijo `monthly` y tasa mensual `rate`.
+    function calcBuildSeries(months, initial, monthly, rateMonthly){
+      var arr = [initial];
+      var balance = initial;
+      for (var i = 1; i <= months; i++) {
+        balance = balance * (1 + rateMonthly) + monthly;
+        arr.push(balance);
+      }
+      return arr;
+    }
+
+    // Cuántos meses tardarías en llegar al objetivo aportando `monthly` por mes a tasa `rateMonthly`.
+    function calcMonthsToGoal(goal, initial, monthly, rateMonthly){
+      if (monthly <= 0 && initial >= goal) return 0;
+      if (monthly <= 0) return Infinity;
+      if (rateMonthly <= 0.00001) return Math.ceil((goal - initial) / monthly);
+      var n = 0, balance = initial;
+      while (balance < goal && n < 1200) { // tope: 100 años
+        balance = balance * (1 + rateMonthly) + monthly;
+        n++;
+      }
+      return n;
+    }
+
+    function calcFmtMoney(n){
+      return 'USD ' + Math.round(n).toLocaleString('es-AR');
+    }
+
+    var calcChart = null;
+    var calcState = {};
+
+    window.calcCompute = function(){
+      var nombre = (document.getElementById('calcObjetivoNombre').value || '').trim();
+      var goal = calcNum('calcObjetivoMonto');
+      var initial = calcNum('calcAhorroInicial');
+      var months = calcMonthsFromForm();
+      if (!(goal > 0)) { return; }
+
+      var monthly = calcRequiredMonthly(goal, initial, months);
+      calcState = { nombre: nombre, goal: goal, initial: initial, months: months, monthly: monthly };
+
+      document.getElementById('calcResultCard').style.display = '';
+      document.getElementById('calcResultBody').innerHTML =
+        '<div style="text-align:center;padding:6px 0 18px;">' +
+          '<div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:8px;">Para llegar a ' + calcFmtMoney(goal) + ' en ' + months + ' meses' + (nombre ? ' &middot; ' + pfEsc(nombre) : '') + '</div>' +
+          '<div style="font-size:34px;color:var(--gold);font-weight:700;">' + calcFmtMoney(monthly) + '<span style="font-size:14px;color:rgba(255,255,255,.5);font-weight:400;"> / mes</span></div>' +
+        '</div>' +
+        (initial > 0 ? '<div class="pf-metric-note">Ya arrancás con ' + calcFmtMoney(initial) + ' ahorrado, así que ese monto se descuenta del cálculo.</div>' : '');
+
+      calcRenderChart(months, initial, monthly, null, null);
+      calcRenderInvestToggle();
+    };
+
+    function calcRenderChart(months, initial, monthly, investRate, investLabel){
+      var canvas = document.getElementById('calcChartCanvas');
+      document.getElementById('calcChartCard').style.display = '';
+      if (!canvas || typeof Chart === 'undefined') return;
+      var savings = calcBuildSeries(months, initial, monthly, 0);
+      var tickEvery = Math.max(1, Math.round(months / 8));
+      var labels = savings.map(function(_, i){ return (i === 0 ? 'Hoy' : (i % tickEvery === 0 || i === months ? 'Mes ' + i : '')); });
+      var datasets = [
+        { label: 'Ahorro (sin invertir)', data: savings, borderColor: '#60A5FA', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0, tension: .1 }
+      ];
+      if (investRate != null) {
+        var invested = calcBuildSeries(months, initial, monthly, investRate);
+        datasets.push({ label: investLabel || 'Invertido', data: invested, borderColor: '#F2C94C', backgroundColor: 'rgba(242,201,76,.08)', borderWidth: 2, pointRadius: 0, tension: .1, fill: true });
+      }
+      datasets.push({ label: 'Objetivo', data: savings.map(function(){ return calcState.goal; }), borderColor: 'rgba(255,255,255,.25)', borderWidth: 1, borderDash: [4,3], pointRadius: 0 });
+
+      if (calcChart) calcChart.destroy();
+      calcChart = new Chart(canvas, {
+        type: 'line',
+        data: { labels: labels, datasets: datasets },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: { display: true, grid: { display: false }, ticks: { color: 'rgba(255,255,255,.45)', font: { size: 10.5 }, autoSkip: false, maxRotation: 0 } },
+            y: { ticks: { color: 'rgba(255,255,255,.5)', callback: function(v){ return 'USD ' + v.toLocaleString('es-AR'); } }, grid: { color: 'rgba(255,255,255,.06)' } }
+          },
+          plugins: {
+            legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,.65)', font: { size: 11.5 }, boxWidth: 12, padding: 14 } },
+            tooltip: { callbacks: { label: function(ctx){ return ctx.dataset.label + ': ' + calcFmtMoney(ctx.parsed.y); } } }
+          }
+        }
+      });
+    }
+
+    function calcRenderInvestToggle(){
+      var wrap = document.getElementById('calcInvestToggleWrap');
+      var note = document.getElementById('calcChartNote');
+      note.textContent = 'Proyección con el aporte mensual calculado arriba, sin asumir ningún rendimiento — es el escenario base (ahorro puro).';
+      wrap.innerHTML = '<button class="pf-btn-ghost" style="margin-top:14px;" onclick="calcShowInvested()">¿Y si en vez de guardarlo lo invertís? Ver proyección &rarr;</button>';
+    }
+
+    // Usa el rendimiento REAL del Manfredi Portfolio (ventana "1 año", con Dietz
+    // Modificado) como tasa de referencia -- la cartera personal del usuario no
+    // guarda fecha de compra por posición, así que no se puede anualizar con la
+    // misma precisión todavía.
+    window.calcShowInvested = async function(){
+      var wrap = document.getElementById('calcInvestToggleWrap');
+      wrap.innerHTML = '<div class="pf-metric-note">Calculando con datos históricos reales del Manfredi Portfolio...</div>';
+      try {
+        if (typeof mfGetWindows !== 'function' || typeof mfBuildPerformanceSeries !== 'function') throw new Error('no disponible');
+        var win1y = mfGetWindows().filter(function(w){ return w.key === '1y'; })[0];
+        var m = await mfBuildPerformanceSeries(win1y.portfolioDays, win1y.benchDays, win1y.granularity);
+        if (m.dataUnavailable || typeof m.totalReturn !== 'number') throw new Error('sin datos');
+
+        var days = m.daysUsedPortfolio || 1;
+        var periodReturn = m.totalReturn / 100;
+        var annualRate = Math.pow(1 + periodReturn, 365 / days) - 1;
+        // Piso/techo para no proyectar disparates si el historial todavía es corto.
+        annualRate = Math.max(-0.5, Math.min(1.0, annualRate));
+        var monthlyRate = Math.pow(1 + annualRate, 1/12) - 1;
+
+        var monthsInvested = calcMonthsToGoal(calcState.goal, calcState.initial, calcState.monthly, monthlyRate);
+        var monthsSaved = calcState.months - monthsInvested;
+        var lowHistory = days < 90;
+
+        calcRenderChart(calcState.months, calcState.initial, calcState.monthly, monthlyRate, 'Invertido (Manfredi Portfolio, ' + (annualRate*100).toFixed(1) + '% anual)');
+
+        wrap.innerHTML = '<div class="pf-card" style="margin:14px 0 0;background:rgba(242,201,76,.06);border-color:rgba(242,201,76,.25);">' +
+            '<div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.6;">' +
+              'Invirtiendo esos mismos ' + calcFmtMoney(calcState.monthly) + '/mes al ritmo real del <b>Manfredi Portfolio</b> (' + (annualRate*100).toFixed(1) + '% anual, últimos ' + days + ' días de historial), ' +
+              (monthsInvested < calcState.months && isFinite(monthsInvested)
+                ? 'llegarías a tu objetivo en <b style="color:var(--gold);">' + monthsInvested + ' meses</b> en vez de ' + calcState.months + ' &mdash; ' + monthsSaved + ' meses antes.'
+                : 'el objetivo se alcanza en ' + (isFinite(monthsInvested) ? monthsInvested : '—') + ' meses.') +
+            '</div>' +
+            (lowHistory ? '<div class="pf-metric-note" style="margin-top:10px;">&#9888; Esta cartera todavía tiene poco historial (' + days + ' días), así que esta proyección es menos confiable &mdash; tomala como orientativa, no como promesa.</div>' : '') +
+            '<div class="pf-metric-note" style="margin-top:10px;">Es una proyección matemática basada en el rendimiento pasado del Manfredi Portfolio. El rendimiento pasado no garantiza resultados futuros.</div>' +
+          '</div>';
+      } catch (e) {
+        wrap.innerHTML = '<div class="pf-metric-note">No pudimos calcular la proyección con datos reales en este momento. Probá de nuevo en unos segundos.</div>';
+      }
+    };
+  })();
+  </script>
 
   <script>
   (function(){
@@ -13121,11 +13341,11 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
 <script>
   // ââ Navegacion por pestanas: una sola seccion visible a la vez âââââââââââ
   (function() {
-    var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'portfolio', 'asesoria'];
+    var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'portfolio', 'calculadora', 'asesoria'];
     var TAB_TITLES = {
       inicio: 'Inicio', mercados: 'Mercados', calendario: 'Calendario Economico',
       informes: 'Informes & Reportes', university: 'University', inversiones: 'Inversiones',
-      portfolio: 'Portfolio', asesoria: 'Asesoria'
+      portfolio: 'Portfolio', calculadora: 'Calculadora de Objetivos', asesoria: 'Asesoria'
     };
 
     function resolveTab(hash) {
