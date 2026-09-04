@@ -4685,6 +4685,24 @@
     .calc-compare-value small { font-size: 11px; font-weight: 400; color: rgba(255,255,255,.4); }
     .calc-compare-delta { font-size: 11.5px; color: var(--green); width: 100%; text-align: right; }
     .calc-compare-delta.up { color: var(--red); }
+    .calc-form input[type="file"] {
+      background: var(--navy-1); border: 1px solid rgba(255,255,255,.15); border-radius: 5px; color: rgba(255,255,255,.6);
+      padding: 8px 10px; font-size: 12.5px; font-family: inherit; width: 100%; box-sizing: border-box;
+    }
+    .calc-goals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .calc-goal-card { background: var(--navy-4); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 28px rgba(0,0,0,.3); }
+    .calc-goal-photo { height: 110px; background-size: cover; background-position: center; background-color: var(--navy-1); }
+    .calc-goal-photo-empty { display: flex; align-items: center; justify-content: center; font-size: 32px; background: rgba(242,201,76,.08); }
+    .calc-goal-body { padding: 14px 16px; }
+    .calc-goal-name { font-family: var(--font-display); font-weight: 400; font-size: 16px; color: var(--white); margin-bottom: 6px; }
+    .calc-goal-months { font-size: 12.5px; color: rgba(255,255,255,.6); margin-bottom: 8px; }
+    .calc-goal-months b { color: var(--gold); }
+    .calc-goal-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; margin-bottom: 8px; }
+    .calc-goal-bar-fill { height: 100%; background: var(--gold); }
+    .calc-goal-amount { font-size: 11.5px; color: rgba(255,255,255,.5); }
+    .calc-goal-amount b { color: var(--white); }
+    .calc-goal-del { display: inline-block; margin-top: 8px; font-size: 10.5px; color: rgba(255,255,255,.35); cursor: pointer; text-decoration: underline; }
+    .calc-goal-del:hover { color: var(--red); }
     .pf-ticker-wrap { position: relative; }
     .pf-ticker-dropdown {
       display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 270px; max-width: 340px;
@@ -5036,6 +5054,8 @@
         <span>Herramienta educativa. Los cálculos son proyecciones matemáticas, no garantías de rendimiento ni asesoramiento financiero personalizado.</span>
       </div>
 
+      <div id="calcGoalsWrap" style="display:none;"></div>
+
       <div class="pf-row-split">
         <div class="pf-card">
           <h2 class="pf-metrics-label" style="margin-bottom:14px;">Tu objetivo</h2>
@@ -5043,6 +5063,13 @@
             <label>¿Cuál es tu objetivo? (opcional)
               <input type="text" id="calcObjetivoNombre" placeholder="Ej: comprar un auto, viajar, fondo de emergencia" maxlength="60">
             </label>
+            <label>Foto del objetivo (opcional)
+              <input type="file" id="calcObjetivoFoto" accept="image/*" onchange="calcPreviewFoto(this)">
+            </label>
+            <div id="calcFotoPreview" style="display:none;align-items:center;gap:10px;margin-top:-6px;">
+              <img id="calcFotoPreviewImg" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,.15);">
+              <a href="#" onclick="calcClearFoto();return false;" style="font-size:11px;color:rgba(255,255,255,.4);">Quitar foto</a>
+            </div>
             <label>¿Cuánto necesitás? (USD)
               <input type="number" id="calcObjetivoMonto" placeholder="10000" min="0" step="any">
             </label>
@@ -5167,7 +5194,10 @@
           '<button class="calc-scenario-btn" id="calcBtnOwn" onclick="calcToggleScenario(\'own\')">Ver con Tu Portafolio</button>' +
           '<button class="calc-scenario-btn" id="calcBtnMf" onclick="calcToggleScenario(\'manfredi\')">Ver con Manfredi Portfolio</button>' +
         '</div>' +
-        '<div id="calcCompareRows"></div>';
+        '<div id="calcCompareRows"></div>' +
+        '<div style="text-align:center;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);">' +
+          '<button class="pf-btn-ghost" id="calcSaveGoalBtn" onclick="calcSaveGoal()">&#128190; Guardar este objetivo</button>' +
+        '</div>';
 
       calcRenderChart(months, initial, monthly, []);
       var note = document.getElementById('calcChartNote');
@@ -5327,6 +5357,113 @@
       });
       wrap.innerHTML = rows.join('') + (rows.length ? '<div class="pf-metric-note" style="margin-top:8px;">Proyección matemática basada en rendimiento pasado/reciente. No garantiza resultados futuros.</div>' : '');
     }
+
+    // ─── Objetivos guardados (localStorage, por navegador) ─────────────────
+    // No hay backend para esto -- se guarda ahí mismo donde ya guardamos el
+    // respaldo de Tu Portafolio. La foto se reduce a un máximo de 320px y se
+    // recomprime en JPEG antes de guardarla para no llenar el localStorage.
+    var calcPendingFoto = null;
+
+    function calcResizeImage(file, maxSize, callback){
+      var reader = new FileReader();
+      reader.onload = function(e){
+        var img = new Image();
+        img.onload = function(){
+          var scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+          var canvas = document.createElement('canvas');
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          callback(canvas.toDataURL('image/jpeg', 0.75));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    window.calcPreviewFoto = function(input){
+      var file = input.files && input.files[0];
+      if (!file) return;
+      calcResizeImage(file, 320, function(dataUrl){
+        calcPendingFoto = dataUrl;
+        document.getElementById('calcFotoPreviewImg').src = dataUrl;
+        document.getElementById('calcFotoPreview').style.display = 'flex';
+      });
+    };
+
+    window.calcClearFoto = function(){
+      calcPendingFoto = null;
+      document.getElementById('calcObjetivoFoto').value = '';
+      document.getElementById('calcFotoPreview').style.display = 'none';
+    };
+
+    function calcLoadGoals(){
+      try { var arr = JSON.parse(localStorage.getItem('mi_calc_goals') || '[]'); return Array.isArray(arr) ? arr : []; }
+      catch (e) { return []; }
+    }
+    function calcSaveGoals(goals){
+      try { localStorage.setItem('mi_calc_goals', JSON.stringify(goals)); } catch (e) {}
+    }
+
+    window.calcSaveGoal = function(){
+      if (!calcState || !(calcState.goal > 0)) return;
+      var goals = calcLoadGoals();
+      goals.push({
+        id: Date.now(),
+        nombre: calcState.nombre || 'Mi objetivo',
+        foto: calcPendingFoto,
+        goal: calcState.goal, months: calcState.months, initial: calcState.initial, monthly: calcState.monthly,
+        savedAt: new Date().toISOString()
+      });
+      calcSaveGoals(goals);
+      calcClearFoto();
+      calcRenderGoals();
+      var btn = document.getElementById('calcSaveGoalBtn');
+      if (btn) {
+        var orig = btn.innerHTML;
+        btn.innerHTML = 'Guardado ✓';
+        setTimeout(function(){ btn.innerHTML = orig; }, 2000);
+      }
+    };
+
+    window.calcDeleteGoal = function(id){
+      calcSaveGoals(calcLoadGoals().filter(function(g){ return g.id !== id; }));
+      calcRenderGoals();
+    };
+
+    function calcMonthsElapsed(savedAt){
+      var then = new Date(savedAt), now = new Date();
+      var months = (now.getFullYear() - then.getFullYear()) * 12 + (now.getMonth() - then.getMonth());
+      months += (now.getDate() - then.getDate()) / 30.44;
+      return Math.max(0, months);
+    }
+
+    function calcRenderGoals(){
+      var wrap = document.getElementById('calcGoalsWrap');
+      if (!wrap) return;
+      var goals = calcLoadGoals();
+      if (!goals.length) { wrap.style.display = 'none'; wrap.innerHTML = ''; return; }
+      wrap.style.display = '';
+      wrap.innerHTML = '<h2 class="pf-metrics-label" style="margin-bottom:14px;">Tus objetivos guardados</h2>' +
+        '<div class="calc-goals-grid">' + goals.map(function(g){
+          var elapsed = calcMonthsElapsed(g.savedAt);
+          var remaining = Math.max(0, Math.round(g.months - elapsed));
+          var expected = Math.min(g.goal, (g.initial || 0) + (g.monthly || 0) * elapsed);
+          var pct = g.goal > 0 ? Math.min(100, (expected / g.goal * 100)) : 0;
+          return '<div class="calc-goal-card">' +
+            (g.foto ? '<div class="calc-goal-photo" style="background-image:url(\'' + g.foto + '\');"></div>' : '<div class="calc-goal-photo calc-goal-photo-empty">&#127919;</div>') +
+            '<div class="calc-goal-body">' +
+              '<div class="calc-goal-name">' + pfEsc(g.nombre) + '</div>' +
+              '<div class="calc-goal-months">' + (remaining > 0 ? ('Faltan <b>' + remaining + '</b> meses') : '<b>Plazo cumplido</b>') + '</div>' +
+              '<div class="calc-goal-bar"><div class="calc-goal-bar-fill" style="width:' + pct.toFixed(0) + '%;"></div></div>' +
+              '<div class="calc-goal-amount">Deberías llevar acumulados: <b>' + calcFmtMoney(expected) + '</b> de ' + calcFmtMoney(g.goal) + '</div>' +
+              '<span class="calc-goal-del" onclick="calcDeleteGoal(' + g.id + ')">Eliminar</span>' +
+            '</div>' +
+          '</div>';
+        }).join('') + '</div>';
+    }
+
+    calcRenderGoals();
   })();
   </script>
 
