@@ -5463,7 +5463,15 @@
         }).join('') + '</div>';
     }
 
-    calcRenderGoals();
+    // Se difiere a DOMContentLoaded: calcRenderGoals() usa pfEsc(), definida en
+    // un <script> mas abajo en la pagina que todavia no corrio en este punto
+    // -- llamarla ahora tiraba ReferenceError en silencio y las tarjetas
+    // guardadas nunca aparecian al recargar.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', calcRenderGoals);
+    } else {
+      calcRenderGoals();
+    }
   })();
   </script>
 
