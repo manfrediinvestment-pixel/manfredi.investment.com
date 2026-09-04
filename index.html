@@ -4671,6 +4671,20 @@
     .calc-plazo-row { display: flex; gap: 8px; }
     .calc-plazo-row input { flex: 1.4; }
     .calc-plazo-row select { flex: 1; }
+    .calc-scenario-btn {
+      background: transparent; border: 1.5px solid rgba(242,201,76,.45); color: var(--gold);
+      border-radius: 24px; padding: 9px 20px; font-size: 12.5px; font-weight: 600;
+      letter-spacing: .01em; cursor: pointer; font-family: inherit;
+      transition: background .18s, color .18s, border-color .18s, box-shadow .18s;
+    }
+    .calc-scenario-btn:hover { border-color: var(--gold); background: rgba(242,201,76,.08); }
+    .calc-scenario-btn.active { background: var(--gold); color: var(--primary); border-color: var(--gold); box-shadow: 0 4px 16px rgba(242,201,76,.25); }
+    .calc-compare-row { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 12px; flex-wrap: wrap; padding: 12px 0; border-top: 1px solid rgba(255,255,255,.08); text-align: left; }
+    .calc-compare-label { font-size: 13px; color: rgba(255,255,255,.75); }
+    .calc-compare-value { font-size: 17px; font-weight: 700; color: var(--gold); font-family: 'IBM Plex Mono', monospace; }
+    .calc-compare-value small { font-size: 11px; font-weight: 400; color: rgba(255,255,255,.4); }
+    .calc-compare-delta { font-size: 11.5px; color: var(--green); width: 100%; text-align: right; }
+    .calc-compare-delta.up { color: var(--red); }
     .pf-ticker-wrap { position: relative; }
     .pf-ticker-dropdown {
       display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 270px; max-width: 340px;
@@ -5060,7 +5074,6 @@
       <div class="pf-card" id="calcChartCard" style="display:none;">
         <h2 class="pf-metrics-label" style="margin-bottom:14px;">Cómo crecen tus aportes en el tiempo</h2>
         <div class="mf-chart-wrap"><canvas id="calcChartCanvas"></canvas></div>
-        <div id="calcInvestToggleWrap"></div>
         <div class="pf-metric-note" id="calcChartNote"></div>
       </div>
 
@@ -5114,6 +5127,24 @@
     var calcChart = null;
     var calcState = {};
 
+    // Aporte mensual necesario para llegar al objetivo en `months` meses,
+    // asumiendo que ese aporte crece a `monthlyRate` por mes (formula de
+    // anualidad despejada para PMT). Con rateMonthly=0 da lo mismo que
+    // calcRequiredMonthly (ahorro puro).
+    function calcRequiredMonthlyAtRate(goal, initial, months, monthlyRate){
+      if (monthlyRate <= 0.00001) return calcRequiredMonthly(goal, initial, months);
+      var growthInitial = initial * Math.pow(1 + monthlyRate, months);
+      if (growthInitial >= goal) return 0; // el ahorro inicial solo, invertido, ya alcanza
+      var annuityFactor = (Math.pow(1 + monthlyRate, months) - 1) / monthlyRate;
+      return Math.max(0, (goal - growthInitial) / annuityFactor);
+    }
+
+    var calcScenarios = { own: null, manfredi: null };
+    var CALC_SCENARIO_META = {
+      own:      { label: 'Tu Portafolio',       color: '#F2C94C', btnId: 'calcBtnOwn' },
+      manfredi: { label: 'Manfredi Portfolio',  color: '#34D399', btnId: 'calcBtnMf' }
+    };
+
     window.calcCompute = function(){
       var nombre = (document.getElementById('calcObjetivoNombre').value || '').trim();
       var goal = calcNum('calcObjetivoMonto');
@@ -5123,20 +5154,28 @@
 
       var monthly = calcRequiredMonthly(goal, initial, months);
       calcState = { nombre: nombre, goal: goal, initial: initial, months: months, monthly: monthly };
+      calcScenarios = { own: null, manfredi: null };
 
       document.getElementById('calcResultCard').style.display = '';
       document.getElementById('calcResultBody').innerHTML =
-        '<div style="text-align:center;padding:6px 0 18px;">' +
+        '<div style="text-align:center;padding:6px 0 16px;">' +
           '<div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:8px;">Para llegar a ' + calcFmtMoney(goal) + ' en ' + months + ' meses' + (nombre ? ' &middot; ' + pfEsc(nombre) : '') + '</div>' +
           '<div style="font-size:34px;color:var(--gold);font-weight:700;">' + calcFmtMoney(monthly) + '<span style="font-size:14px;color:rgba(255,255,255,.5);font-weight:400;"> / mes</span></div>' +
         '</div>' +
-        (initial > 0 ? '<div class="pf-metric-note">Ya arrancás con ' + calcFmtMoney(initial) + ' ahorrado, así que ese monto se descuenta del cálculo.</div>' : '');
+        (initial > 0 ? '<div class="pf-metric-note" style="text-align:center;margin-bottom:14px;">Ya arrancás con ' + calcFmtMoney(initial) + ' ahorrado, así que ese monto se descuenta del cálculo.</div>' : '') +
+        '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:6px;">' +
+          '<button class="calc-scenario-btn" id="calcBtnOwn" onclick="calcToggleScenario(\'own\')">Ver con Tu Portafolio</button>' +
+          '<button class="calc-scenario-btn" id="calcBtnMf" onclick="calcToggleScenario(\'manfredi\')">Ver con Manfredi Portfolio</button>' +
+        '</div>' +
+        '<div id="calcCompareRows"></div>';
 
-      calcRenderChart(months, initial, monthly, null, null);
-      calcRenderInvestToggle();
+      calcRenderChart(months, initial, monthly, []);
+      var note = document.getElementById('calcChartNote');
+      if (note) note.textContent = 'Proyección con el aporte mensual calculado arriba, sin asumir ningún rendimiento — es el escenario base (ahorro puro).';
     };
 
-    function calcRenderChart(months, initial, monthly, investRate, investLabel){
+    function calcRenderChart(months, initial, monthly, scenarios){
+      scenarios = scenarios || [];
       var canvas = document.getElementById('calcChartCanvas');
       document.getElementById('calcChartCard').style.display = '';
       if (!canvas || typeof Chart === 'undefined') return;
@@ -5146,10 +5185,10 @@
       var datasets = [
         { label: 'Ahorro (sin invertir)', data: savings, borderColor: '#60A5FA', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0, tension: .1 }
       ];
-      if (investRate != null) {
-        var invested = calcBuildSeries(months, initial, monthly, investRate);
-        datasets.push({ label: investLabel || 'Invertido', data: invested, borderColor: '#F2C94C', backgroundColor: 'rgba(242,201,76,.08)', borderWidth: 2, pointRadius: 0, tension: .1, fill: true });
-      }
+      scenarios.forEach(function(s){
+        var invested = calcBuildSeries(months, initial, monthly, s.monthlyRate);
+        datasets.push({ label: s.label + ' (' + (s.annualRate*100).toFixed(1) + '% anual)', data: invested, borderColor: s.color, backgroundColor: s.color + '14', borderWidth: 2, pointRadius: 0, tension: .1, fill: true });
+      });
       datasets.push({ label: 'Objetivo', data: savings.map(function(){ return calcState.goal; }), borderColor: 'rgba(255,255,255,.25)', borderWidth: 1, borderDash: [4,3], pointRadius: 0 });
 
       if (calcChart) calcChart.destroy();
@@ -5169,13 +5208,6 @@
           }
         }
       });
-    }
-
-    function calcRenderInvestToggle(){
-      var wrap = document.getElementById('calcInvestToggleWrap');
-      var note = document.getElementById('calcChartNote');
-      note.textContent = 'Proyección con el aporte mensual calculado arriba, sin asumir ningún rendimiento — es el escenario base (ahorro puro).';
-      wrap.innerHTML = '<button class="pf-btn-ghost" style="margin-top:14px;" onclick="calcShowInvested()">¿Y si en vez de guardarlo lo invertís en tu portafolio? Ver proyección &rarr;</button>';
     }
 
     // Pre-carga el campo "ya tenés ahorrado" con el valor REAL actual de Tu
@@ -5200,50 +5232,101 @@
       }
     };
 
-    // Usa el rendimiento REAL de TU PORTAFOLIO (el que la persona cargó en la
-    // pestaña Portfolio) como tasa de referencia: simula cómo se hubiera
-    // comportado esa mezcla de activos actual en los últimos ~90 días
-    // (pfBuildAdvancedMetrics, la misma base que usan el beta/vol/sharpe de
-    // Portfolio) y anualiza ese ritmo. No hace falta fecha de compra por
-    // posición porque no es "tu retorno realizado", es "el ritmo reciente de
-    // tu mezcla actual" -- por eso la aclaración de que es una proyección.
-    window.calcShowInvested = async function(){
-      var wrap = document.getElementById('calcInvestToggleWrap');
-      wrap.innerHTML = '<div class="pf-metric-note">Calculando con el rendimiento histórico de tu portafolio...</div>';
-      try {
-        if (typeof pfBuildAdvancedMetrics !== 'function') throw new Error('no disponible');
-        var m = await pfBuildAdvancedMetrics();
-        if (m.insufficientData) {
-          wrap.innerHTML = '<div class="pf-metric-note">Necesitás al menos 2 posiciones distintas cargadas en <a href="#portfolio" data-tab-target="portfolio" style="color:var(--gold);">Tu Portafolio</a> para calcular esto.</div>';
-          return;
-        }
-        if (m.dataUnavailable || typeof m.retAnual !== 'number') throw new Error('sin datos');
+    // Rendimiento REAL de TU PORTAFOLIO (el que la persona cargó en la pestaña
+    // Portfolio): simula cómo se hubiera comportado esa mezcla de activos
+    // actual en los últimos ~90 días (pfBuildAdvancedMetrics, la misma base
+    // que usan el beta/vol/sharpe de Portfolio) y anualiza ese ritmo. No hace
+    // falta fecha de compra por posición porque no es "tu retorno realizado",
+    // es "el ritmo reciente de tu mezcla actual".
+    async function calcComputeOwnRate(){
+      if (typeof pfBuildAdvancedMetrics !== 'function') return { error: true };
+      var m = await pfBuildAdvancedMetrics();
+      if (m.insufficientData) return { insufficientData: true };
+      if (m.dataUnavailable || typeof m.retAnual !== 'number') return { error: true };
+      return { annualRate: Math.max(-0.5, Math.min(1.0, m.retAnual)), days: m.daysUsed || 90 };
+    }
 
-        var days = m.daysUsed || 1;
-        // Piso/techo para no proyectar disparates con una ventana corta y volatil.
-        var annualRate = Math.max(-0.5, Math.min(1.0, m.retAnual));
-        var monthlyRate = Math.pow(1 + annualRate, 1/12) - 1;
+    // Rendimiento REAL del Manfredi Portfolio (ventana "1 año", Dietz Modificado).
+    async function calcComputeManfrediRate(){
+      if (typeof mfGetWindows !== 'function' || typeof mfBuildPerformanceSeries !== 'function') return { error: true };
+      var win1y = mfGetWindows().filter(function(w){ return w.key === '1y'; })[0];
+      var m = await mfBuildPerformanceSeries(win1y.portfolioDays, win1y.benchDays, win1y.granularity);
+      if (m.dataUnavailable || typeof m.totalReturn !== 'number') return { error: true };
+      var days = m.daysUsedPortfolio || 1;
+      var annualRate = Math.pow(1 + m.totalReturn / 100, 365 / days) - 1;
+      return { annualRate: Math.max(-0.5, Math.min(1.0, annualRate)), days: days };
+    }
 
-        var monthsInvested = calcMonthsToGoal(calcState.goal, calcState.initial, calcState.monthly, monthlyRate);
-        var monthsSaved = calcState.months - monthsInvested;
-
-        calcRenderChart(calcState.months, calcState.initial, calcState.monthly, monthlyRate, 'Invertido (tu portafolio, ' + (annualRate*100).toFixed(1) + '% anual)');
-
-        wrap.innerHTML = '<div class="pf-card" style="margin:14px 0 0;background:rgba(242,201,76,.06);border-color:rgba(242,201,76,.25);">' +
-            '<div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.6;">' +
-              'Invirtiendo esos mismos ' + calcFmtMoney(calcState.monthly) + '/mes al ritmo reciente de <b>tu portafolio</b> (' + (annualRate*100).toFixed(1) + '% anual, últimos ' + days + ' días), ' +
-              (monthsInvested < calcState.months && isFinite(monthsInvested)
-                ? 'llegarías a tu objetivo en <b style="color:var(--gold);">' + monthsInvested + ' meses</b> en vez de ' + calcState.months + ' &mdash; ' + monthsSaved + ' meses antes.'
-                : (annualRate < 0
-                    ? 'con el ritmo reciente de tu cartera (negativo) no alcanzarías el objetivo solo con este aporte — te haría falta aportar más o revisar la mezcla de activos.'
-                    : 'el objetivo se alcanza en ' + (isFinite(monthsInvested) ? monthsInvested : '—') + ' meses.')) +
-            '</div>' +
-            '<div class="pf-metric-note" style="margin-top:10px;">Es una proyección matemática basada en cómo se movieron tus activos actuales en los últimos ~90 días, no en tu resultado real desde que compraste. El rendimiento pasado no garantiza resultados futuros.</div>' +
-          '</div>';
-      } catch (e) {
-        wrap.innerHTML = '<div class="pf-metric-note">No pudimos calcular la proyección con datos reales en este momento. Probá de nuevo en unos segundos.</div>';
+    window.calcToggleScenario = async function(kind){
+      var meta = CALC_SCENARIO_META[kind];
+      var btn = document.getElementById(meta.btnId);
+      if (calcScenarios[kind]) {
+        calcScenarios[kind] = null;
+        if (btn) btn.classList.remove('active');
+        calcRenderComparison();
+        calcRefreshChart();
+        return;
       }
+      if (btn) btn.classList.add('active');
+      calcScenarios[kind] = { loading: true };
+      calcRenderComparison();
+      try {
+        var r = kind === 'own' ? await calcComputeOwnRate() : await calcComputeManfrediRate();
+        calcScenarios[kind] = r;
+      } catch (e) {
+        calcScenarios[kind] = { error: true };
+      }
+      calcRenderComparison();
+      calcRefreshChart();
     };
+
+    function calcRefreshChart(){
+      var scenarios = [];
+      ['own', 'manfredi'].forEach(function(kind){
+        var s = calcScenarios[kind];
+        if (s && typeof s.annualRate === 'number') {
+          scenarios.push({
+            label: CALC_SCENARIO_META[kind].label, color: CALC_SCENARIO_META[kind].color,
+            annualRate: s.annualRate, monthlyRate: Math.pow(1 + s.annualRate, 1/12) - 1
+          });
+        }
+      });
+      calcRenderChart(calcState.months, calcState.initial, calcState.monthly, scenarios);
+    }
+
+    function calcRenderComparison(){
+      var wrap = document.getElementById('calcCompareRows');
+      if (!wrap) return;
+      var rows = [];
+      ['own', 'manfredi'].forEach(function(kind){
+        var s = calcScenarios[kind];
+        if (!s) return;
+        var label = CALC_SCENARIO_META[kind].label;
+        if (s.loading) { rows.push('<div class="pf-metric-note" style="padding:10px 0;">Calculando ' + label + '...</div>'); return; }
+        if (s.insufficientData) { rows.push('<div class="pf-metric-note" style="padding:10px 0;">Necesitás al menos 2 posiciones distintas cargadas en <a href="#portfolio" data-tab-target="portfolio" style="color:var(--gold);">Tu Portafolio</a> para calcular esto.</div>'); return; }
+        if (s.error || typeof s.annualRate !== 'number') { rows.push('<div class="pf-metric-note" style="padding:10px 0;">No pudimos calcular ' + label + ' ahora. Probá de nuevo en unos segundos.</div>'); return; }
+
+        var monthlyRate = Math.pow(1 + s.annualRate, 1/12) - 1;
+        var pmt = calcRequiredMonthlyAtRate(calcState.goal, calcState.initial, calcState.months, monthlyRate);
+        var delta = calcState.monthly - pmt;
+        var deltaHtml = '';
+        if (pmt <= 0) {
+          deltaHtml = '<span class="calc-compare-delta">Con este ritmo, tu ahorro inicial ya alcanza solo — no haría falta aportar más.</span>';
+        } else if (delta > 0.5) {
+          deltaHtml = '<span class="calc-compare-delta">&minus; ' + calcFmtMoney(delta) + '/mes vs. ahorro puro</span>';
+        } else if (delta < -0.5) {
+          deltaHtml = '<span class="calc-compare-delta up">+ ' + calcFmtMoney(-delta) + '/mes (rendimiento reciente negativo)</span>';
+        }
+        rows.push(
+          '<div class="calc-compare-row">' +
+            '<span class="calc-compare-label">' + pfEsc(label) + ' <span style="color:rgba(255,255,255,.4);">(' + (s.annualRate*100).toFixed(1) + '% anual, últimos ' + s.days + ' días)</span></span>' +
+            '<span class="calc-compare-value">' + calcFmtMoney(pmt) + '<small> /mes</small></span>' +
+            deltaHtml +
+          '</div>'
+        );
+      });
+      wrap.innerHTML = rows.join('') + (rows.length ? '<div class="pf-metric-note" style="margin-top:8px;">Proyección matemática basada en rendimiento pasado/reciente. No garantiza resultados futuros.</div>' : '');
+    }
   })();
   </script>
 
