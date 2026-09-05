@@ -3203,7 +3203,7 @@
         <li><a href="#university" class="nav-link" data-tab-target="university">University</a></li>
         <li><a href="#inversiones" class="nav-link" data-tab-target="inversiones">Inversiones</a></li>
         <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
-        <li><a href="#calculadora" class="nav-link" data-tab-target="calculadora">Calculadora</a></li>
+        <li><a href="#calculadora" class="nav-link" data-tab-target="calculadora">Finanzas Personales</a></li>
         <li>
           <span class="nav-link" data-member-required="true" onclick="toggleWarren()" style="cursor:pointer;">
             Asesor IA <span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;margin-left:4px;vertical-align:middle;"></span>
@@ -4713,6 +4713,7 @@
     .calc-goal-log { margin-top: 10px; max-height: 96px; overflow-y: auto; }
     .calc-goal-log-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: rgba(255,255,255,.45); padding: 4px 0; border-top: 1px solid rgba(255,255,255,.06); }
     .calc-goal-log-row .calc-goal-del { margin-top: 0; font-size: 13px; }
+    .mono { font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
     .calc-goal-card { cursor: pointer; transition: transform .15s, box-shadow .15s; }
     .calc-goal-card:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,0,0,.4); }
     .calc-goal-tap-hint { font-size: 10.5px; color: rgba(242,201,76,.6); margin-top: 8px; }
@@ -5086,10 +5087,17 @@
   <section class="section section-calculadora" id="calculadora" data-tab="calculadora">
     <div class="container">
       <div class="section-header">
-        <span class="section-label">Calculadora de Objetivos</span>
-        <h2 class="section-title">¿Cuánto necesitás ahorrar por mes?</h2>
-        <p class="section-sub">Definí tu objetivo financiero y calculá el aporte mensual necesario para alcanzarlo — y cuánto antes podrías llegar si lo invertís en vez de guardarlo.</p>
+        <span class="section-label">Finanzas Personales</span>
+        <h2 class="section-title">Tu plata, en un solo lugar</h2>
+        <p class="section-sub">Objetivos y gastos, conectados con tu portafolio real.</p>
       </div>
+
+      <div class="mkt-tabs" id="finViewTabs" role="tablist">
+        <button type="button" class="mkt-tab active" data-finview="calculadora">Calculadora</button>
+        <button type="button" class="mkt-tab" data-finview="gastos">Gastos</button>
+      </div>
+
+      <div class="pf-view-panel active" data-finview-panel="calculadora">
 
       <div class="inv-disclaimer">
         <span style="color:#D97706;font-size:14px;flex-shrink:0;">&#9888;</span>
@@ -5153,8 +5161,92 @@
         <div class="pf-metric-note" id="calcChartNote"></div>
       </div>
 
+      </div><!-- /panel calculadora -->
+
+      <div class="pf-view-panel" data-finview-panel="gastos">
+
+        <div class="pf-row-align">
+          <div class="pf-card">
+            <h2 class="pf-metrics-label" style="margin-bottom:10px;">Patrimonio neto</h2>
+            <div id="gastosPatrimonioValor" class="mono" style="font-size:26px;font-weight:600;color:var(--white);">Calculando...</div>
+            <div class="pf-metric-note" style="margin-top:6px;">Valor actual de Tu Portafolio (posiciones + efectivo).</div>
+          </div>
+          <div class="pf-card">
+            <h2 class="pf-metrics-label" style="margin-bottom:10px;">Gasto del mes</h2>
+            <div id="gastosTotalMesValor" class="mono" style="font-size:26px;font-weight:600;color:var(--gold);">USD 0</div>
+            <div class="pf-metric-note" style="margin-top:6px;" id="gastosTotalMesNote">Todavía no cargaste gastos este mes.</div>
+          </div>
+        </div>
+
+        <div class="pf-card">
+          <div style="display:flex;align-items:center;justify-content:center;gap:18px;">
+            <button class="pf-btn-ghost" onclick="gastosPrevMonth()" aria-label="Mes anterior">&larr;</button>
+            <span id="gastosMesLabel" style="font-family:var(--font-display);font-size:18px;min-width:180px;text-align:center;">&mdash;</span>
+            <button class="pf-btn-ghost" onclick="gastosNextMonth()" aria-label="Mes siguiente">&rarr;</button>
+          </div>
+        </div>
+
+        <div class="pf-row-split">
+          <div class="pf-card">
+            <h2 class="pf-metrics-label" style="margin-bottom:14px;">Agregar gasto</h2>
+            <div class="calc-form">
+              <label>Monto
+                <div class="calc-plazo-row">
+                  <input type="number" id="gastoMonto" placeholder="0" min="0" step="any">
+                  <select id="gastoMoneda">
+                    <option value="ARS" selected>ARS</option>
+                    <option value="USD">USD</option>
+                  </select>
+                </div>
+              </label>
+              <label>Categoría
+                <select id="gastoCategoria"></select>
+              </label>
+              <label>Fecha
+                <input type="date" id="gastoFecha">
+              </label>
+              <label>Nota (opcional)
+                <input type="text" id="gastoNota" placeholder="Ej: supermercado, nafta..." maxlength="60">
+              </label>
+              <button class="pf-btn-gold" onclick="gastosAgregar()" style="margin-top:4px;">+ Agregar gasto</button>
+            </div>
+            <div class="pf-metric-note" style="margin-top:14px;">Cargar el gasto sacándole una foto al ticket es una función para socios. <a href="#" onclick="if(window.showLoginOverlay)window.showLoginOverlay();return false;" style="color:var(--gold);">Conocé la membresía &rarr;</a></div>
+          </div>
+
+          <div class="pf-card">
+            <h2 class="pf-metrics-label" style="margin-bottom:14px;">Por categoría</h2>
+            <div id="gastosDonutWrap" style="display:flex;flex-direction:column;align-items:center;">
+              <div class="pf-metric-note">Cargá algún gasto para ver el desglose.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pf-card">
+          <h2 class="pf-metrics-label" style="margin-bottom:14px;">Movimientos del mes</h2>
+          <div id="gastosListaWrap"><div class="pf-metric-note">Todavía no hay gastos cargados en este mes.</div></div>
+        </div>
+
+      </div><!-- /panel gastos -->
+
     </div>
   </section>
+
+  <script>
+  (function(){
+    var finTabs = document.querySelectorAll('#finViewTabs .mkt-tab');
+    var finPanels = document.querySelectorAll('#calculadora .pf-view-panel');
+    finTabs.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        finTabs.forEach(function(b){ b.classList.toggle('active', b === btn); });
+        var v = btn.getAttribute('data-finview');
+        finPanels.forEach(function(p){
+          p.classList.toggle('active', p.getAttribute('data-finview-panel') === v);
+        });
+        if (v === 'gastos' && typeof gastosRenderAll === 'function') gastosRenderAll();
+      });
+    });
+  })();
+  </script>
 
   <script>
   (function(){
@@ -5618,6 +5710,186 @@
     } else {
       calcRenderGoals();
     }
+  })();
+  </script>
+
+  <script>
+  (function(){
+    // ─── Gastos: carga manual, multi-moneda (ARS convertido a USD con el CCL
+    // real ya usado en Portfolio), navegacion mes a mes, desglose por
+    // categoria y patrimonio neto (reusa Tu Portafolio via pfBuildRows). Todo
+    // en localStorage -- mismo patron que el respaldo de Tu Portafolio y los
+    // objetivos guardados. La carga por foto queda deliberadamente afuera de
+    // esta version (va a ser una funcion de socios, para no exponer costo de
+    // API sin control a todo el mundo).
+    var GASTOS_CATS = [
+      { id: 'comida',     label: 'Comida',      color: '#F2C94C' },
+      { id: 'transporte', label: 'Transporte',  color: '#60A5FA' },
+      { id: 'ocio',       label: 'Ocio',        color: '#34D399' },
+      { id: 'servicios',  label: 'Servicios',   color: '#F87171' },
+      { id: 'salud',      label: 'Salud',       color: '#A78BFA' },
+      { id: 'educacion',  label: 'Educación',   color: '#FB923C' },
+      { id: 'otros',      label: 'Otros',       color: '#22D3EE' }
+    ];
+
+    var gastosView = new Date();
+    gastosView.setDate(1);
+
+    function gastosLoad(){
+      try { var arr = JSON.parse(localStorage.getItem('mi_calc_gastos') || '[]'); return Array.isArray(arr) ? arr : []; }
+      catch (e) { return []; }
+    }
+    function gastosSave(arr){
+      try { localStorage.setItem('mi_calc_gastos', JSON.stringify(arr)); } catch (e) {}
+    }
+    function gastosFmt(n){ return 'USD ' + Math.round(n).toLocaleString('es-AR'); }
+    function gastosCatMeta(id){
+      for (var i = 0; i < GASTOS_CATS.length; i++) { if (GASTOS_CATS[i].id === id) return GASTOS_CATS[i]; }
+      return GASTOS_CATS[GASTOS_CATS.length - 1];
+    }
+    // Convierte a USD con el dolar CCL real (misma fuente que usa Tu
+    // Portafolio) -- sin eso, un gasto en ARS no se puede sumar con uno en
+    // USD de forma que tenga sentido con inflacion de por medio.
+    function gastosToUsd(monto, moneda){
+      if (moneda !== 'ARS') return monto;
+      var ccl = (typeof pfGetCclRate === 'function') ? pfGetCclRate() : null;
+      return ccl ? monto / ccl : null;
+    }
+
+    function gastosPopulateCategorias(){
+      var sel = document.getElementById('gastoCategoria');
+      if (!sel || sel.options.length) return;
+      sel.innerHTML = GASTOS_CATS.map(function(c){ return '<option value="' + c.id + '">' + c.label + '</option>'; }).join('');
+    }
+
+    window.gastosAgregar = function(){
+      var montoInput = document.getElementById('gastoMonto');
+      var monto = parseFloat(montoInput.value);
+      if (!(monto > 0)) return;
+      var moneda = document.getElementById('gastoMoneda').value === 'USD' ? 'USD' : 'ARS';
+      var categoria = document.getElementById('gastoCategoria').value;
+      var fecha = document.getElementById('gastoFecha').value || new Date().toISOString().slice(0, 10);
+      var nota = (document.getElementById('gastoNota').value || '').trim();
+      var arr = gastosLoad();
+      arr.push({ id: Date.now(), monto: monto, moneda: moneda, categoria: categoria, fecha: fecha, nota: nota });
+      gastosSave(arr);
+      montoInput.value = '';
+      document.getElementById('gastoNota').value = '';
+      gastosRenderAll();
+    };
+
+    window.gastosEliminar = function(id){
+      gastosSave(gastosLoad().filter(function(g){ return g.id !== id; }));
+      gastosRenderAll();
+    };
+
+    window.gastosPrevMonth = function(){ gastosView.setMonth(gastosView.getMonth() - 1); gastosRenderAll(); };
+    window.gastosNextMonth = function(){ gastosView.setMonth(gastosView.getMonth() + 1); gastosRenderAll(); };
+
+    function gastosMesLabel(){
+      var meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+      return meses[gastosView.getMonth()] + ' ' + gastosView.getFullYear();
+    }
+
+    function gastosDelMes(){
+      var y = gastosView.getFullYear(), m = gastosView.getMonth();
+      return gastosLoad().filter(function(g){
+        var d = new Date(g.fecha + 'T00:00:00');
+        return d.getFullYear() === y && d.getMonth() === m;
+      }).sort(function(a, b){ return new Date(b.fecha) - new Date(a.fecha); });
+    }
+
+    window.gastosRenderAll = function(){
+      gastosPopulateCategorias();
+      var fechaInput = document.getElementById('gastoFecha');
+      if (fechaInput && !fechaInput.value) fechaInput.value = new Date().toISOString().slice(0, 10);
+
+      var mesLabelEl = document.getElementById('gastosMesLabel');
+      if (mesLabelEl) mesLabelEl.textContent = gastosMesLabel();
+
+      var gastos = gastosDelMes();
+      var totalUsd = 0, sinCcl = false;
+      var porCategoria = {};
+      gastos.forEach(function(g){
+        var usd = gastosToUsd(g.monto, g.moneda);
+        if (usd == null) { sinCcl = true; return; }
+        totalUsd += usd;
+        porCategoria[g.categoria] = (porCategoria[g.categoria] || 0) + usd;
+      });
+
+      var totalEl = document.getElementById('gastosTotalMesValor');
+      var noteEl = document.getElementById('gastosTotalMesNote');
+      if (totalEl) totalEl.textContent = gastosFmt(totalUsd);
+      if (noteEl) {
+        noteEl.textContent = sinCcl
+          ? 'Algunos gastos en ARS no se pudieron convertir (sin cotización CCL disponible).'
+          : (gastos.length ? (gastos.length + ' movimiento' + (gastos.length === 1 ? '' : 's') + ' este mes') : 'Todavía no cargaste gastos este mes.');
+      }
+
+      var listaWrap = document.getElementById('gastosListaWrap');
+      if (listaWrap) {
+        listaWrap.innerHTML = !gastos.length
+          ? '<div class="pf-metric-note">Todavía no hay gastos cargados en este mes.</div>'
+          : gastos.map(function(g){
+              var cat = gastosCatMeta(g.categoria);
+              var d = new Date(g.fecha + 'T00:00:00');
+              return '<div class="calc-goal-log-row" style="padding:10px 0;">' +
+                '<span style="display:flex;align-items:center;gap:9px;">' +
+                  '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + cat.color + ';flex-shrink:0;"></span>' +
+                  pfEsc(g.nota || cat.label) +
+                  ' <span style="color:rgba(255,255,255,.35);font-size:11px;">' + d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' }) + '</span>' +
+                '</span>' +
+                '<span style="display:flex;align-items:center;gap:10px;">' +
+                  '<span class="mono" style="font-size:12.5px;color:rgba(255,255,255,.7);">' + pfEsc(g.moneda) + ' ' + g.monto.toLocaleString('es-AR') + '</span>' +
+                  '<span class="calc-goal-del" onclick="gastosEliminar(' + g.id + ')">&times;</span>' +
+                '</span>' +
+              '</div>';
+            }).join('');
+      }
+
+      var donutWrap = document.getElementById('gastosDonutWrap');
+      if (donutWrap) {
+        if (!gastos.length || totalUsd <= 0) {
+          donutWrap.innerHTML = '<div class="pf-metric-note">Cargá algún gasto para ver el desglose.</div>';
+        } else {
+          var stops = [], legendRows = [], acc = 0;
+          GASTOS_CATS.forEach(function(c){
+            var v = porCategoria[c.id];
+            if (!v) return;
+            var pct = v / totalUsd * 100;
+            var start = acc / 100 * 360;
+            acc += pct;
+            var end = acc / 100 * 360;
+            stops.push(c.color + ' ' + start.toFixed(1) + 'deg ' + end.toFixed(1) + 'deg');
+            legendRows.push('<div style="display:flex;align-items:center;gap:9px;font-size:12.5px;color:rgba(255,255,255,.65);width:100%;"><span style="width:9px;height:9px;border-radius:50%;background:' + c.color + ';flex-shrink:0;"></span>' + c.label + '<span class="mono" style="margin-left:auto;">' + pct.toFixed(0) + '%</span></div>');
+          });
+          donutWrap.innerHTML =
+            '<div style="position:relative;width:180px;height:180px;margin-bottom:18px;">' +
+              '<div style="width:180px;height:180px;border-radius:50%;background:conic-gradient(' + stops.join(',') + ');"></div>' +
+              '<div style="position:absolute;top:22px;left:22px;width:136px;height:136px;border-radius:50%;background:var(--navy-4);display:flex;align-items:center;justify-content:center;">' +
+                '<span class="mono" style="font-size:15px;">' + gastosFmt(totalUsd) + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div style="width:100%;display:grid;gap:8px;">' + legendRows.join('') + '</div>';
+        }
+      }
+
+      gastosRenderPatrimonio();
+    };
+
+    window.gastosRenderPatrimonio = async function(){
+      var el = document.getElementById('gastosPatrimonioValor');
+      if (!el) return;
+      try {
+        if (typeof pfFetchMarketData === 'function') await pfFetchMarketData(false);
+        if (typeof pfBuildRows !== 'function') throw new Error('no disponible');
+        var rows = pfBuildRows();
+        var total = rows.reduce(function(s, r){ return s + (r.valorActual || 0); }, 0);
+        el.textContent = gastosFmt(total);
+      } catch (e) {
+        el.textContent = '—';
+      }
+    };
   })();
   </script>
 
