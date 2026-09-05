@@ -3599,7 +3599,12 @@
           </a>
           <a class="htx-inf__row" href="informes/now.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'NOW')">
             <span class="htx-inf__tk">NOW</span>
-            <span class="htx-inf__nm">ServiceNow, Inc.<span class="htx-inf__new">Nuevo</span></span>
+            <span class="htx-inf__nm">ServiceNow, Inc.</span>
+            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+          </a>
+          <a class="htx-inf__row" href="informes/snow.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'SNOW')">
+            <span class="htx-inf__tk">SNOW</span>
+            <span class="htx-inf__nm">Snowflake Inc.<span class="htx-inf__new">Nuevo</span></span>
             <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
           </a>
         </div>
@@ -4359,7 +4364,7 @@
         </div>
 
         <div class="inv-panel active" data-sector-panel="software">
-          <div class="inv-panel-progress">5 de 10 con informe completo</div>
+          <div class="inv-panel-progress">6 de 10 con informe completo</div>
           <div class="sector-cards">
             <div class="pick-card" data-aos="fade-up">
               <div class="pick-accent neutral"></div>
@@ -4406,14 +4411,14 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,8 15,20 30,32 45,36 60,26 75,20 90,18" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/now.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'NOW')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="60">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card" data-aos="fade-up" data-aos-delay="60">
+              <div class="pick-accent neutral"></div>
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">SNOW</span><span class="pick-tag pick-tag-us">USA &middot; Software</span></div>
                 <div class="pick-name">Snowflake Inc.</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,34 30,36 45,24 60,14 75,8 90,6" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/snow.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'SNOW')">Ver análisis &rarr;</a></div>
             </div>
             <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="120">
               <div class="pick-accent soon"></div>
@@ -4959,7 +4964,15 @@
             <thead><tr><th>Activo</th><th style="text-align:right;">Cant.</th><th style="text-align:right;">Compra</th><th style="text-align:right;">Actual</th><th style="text-align:right;">Resultado</th><th style="text-align:right;">% cartera</th><th></th></tr></thead>
             <tbody id="pfPositionsBody"></tbody>
           </table>
-          <div class="pf-add-row" id="pfAddRowBtn" onclick="pfShowAddForm()">+ Agregar posición</div>
+          <div class="pf-add-actions">
+            <div class="pf-add-row" id="pfAddRowBtn" onclick="pfShowAddForm()">+ Agregar posición</div>
+            <div class="pf-add-row pf-import-row" id="pfImportRowBtn" onclick="pfImportPdfClick()">
+              <span>&#128196; Importar PDF del broker</span>
+              <span class="pf-import-hint">IOL · Balanz · Cocos · PPI · Bull Market</span>
+            </div>
+          </div>
+          <input type="file" id="pfPdfInput" accept="application/pdf,.pdf" style="display:none;" onchange="pfPdfSelected(this)">
+          <div class="pf-import-box" id="pfImportBox" style="display:none;"></div>
           <div class="pf-add-form" id="pfAddForm" style="display:none;">
             <div class="pf-ticker-wrap">
               <input type="text" id="pfInputTicker" placeholder="Ticker o nombre (ej: AAPL, Apple)" autocomplete="off">
