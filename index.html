@@ -4688,6 +4688,40 @@
     .pf-empty-row td { color: rgba(255,255,255,.35); font-style: italic; padding: 16px 6px; }
     .pf-add-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; color: rgba(255,255,255,.4); font-size: 13px; cursor: pointer; padding: 10px 6px; border: 1px dashed rgba(255,255,255,.18); border-radius: 6px; }
     .pf-add-row:hover { color: var(--gold); border-color: var(--gold-dark,#B8943F); }
+    .pf-add-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .pf-add-actions .pf-add-row { margin-top: 12px; }
+    .pf-import-row { flex-direction: column; gap: 3px; }
+    .pf-import-row .pf-import-hint { font-size: 10.5px; color: rgba(255,255,255,.3); font-family: 'IBM Plex Mono', monospace; }
+    @media (max-width: 640px) { .pf-add-actions { grid-template-columns: 1fr; } }
+    /* ---- Revisión de importación de PDF ---- */
+    .pf-import-box { margin-top: 12px; background: var(--navy-5); border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 14px; }
+    .pf-import-box h4 { margin: 0 0 4px; font-size: 14px; color: var(--white); }
+    .pf-import-box .pf-imp-sub { font-size: 12px; color: rgba(255,255,255,.5); margin: 0 0 12px; }
+    .pf-imp-status { font-size: 13px; color: rgba(255,255,255,.6); display: flex; align-items: center; gap: 9px; padding: 6px 0; }
+    .pf-imp-spin { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.2); border-top-color: var(--gold); border-radius: 50%; animation: pfImpSpin .7s linear infinite; flex-shrink: 0; }
+    @keyframes pfImpSpin { to { transform: rotate(360deg); } }
+    .pf-imp-err { color: var(--red); font-size: 12.5px; line-height: 1.45; }
+    .pf-imp-avisos { list-style: none; margin: 0 0 12px; padding: 10px 12px; background: rgba(242,201,76,.08); border: 1px solid rgba(242,201,76,.25); border-radius: 6px; }
+    .pf-imp-avisos li { font-size: 11.5px; color: rgba(255,255,255,.7); line-height: 1.5; padding-left: 14px; position: relative; }
+    .pf-imp-avisos li::before { content: '·'; position: absolute; left: 4px; color: var(--gold); }
+    .pf-imp-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .pf-imp-table th { text-align: left; font-weight: 600; color: rgba(255,255,255,.4); font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,.12); }
+    .pf-imp-table td { padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .pf-imp-table tr.pf-imp-flag td { background: rgba(242,201,76,.06); }
+    .pf-imp-table tr.pf-imp-off { opacity: .4; }
+    .pf-imp-table input, .pf-imp-table select { width: 100%; background: var(--navy-1); border: 1px solid rgba(255,255,255,.15); border-radius: 4px; color: var(--white); padding: 5px 6px; font-size: 12px; font-family: inherit; }
+    .pf-imp-table input.pf-imp-warnfield { border-color: rgba(242,201,76,.6); }
+    .pf-imp-tk { width: 84px; }
+    .pf-imp-qty { width: 78px; text-align: right; }
+    .pf-imp-px { width: 92px; text-align: right; }
+    .pf-imp-badge { display: inline-block; font-size: 9.5px; padding: 1px 5px; border-radius: 3px; margin-left: 5px; vertical-align: middle; }
+    .pf-imp-badge.baja { background: rgba(224,90,90,.18); color: #E9A0A0; }
+    .pf-imp-badge.media { background: rgba(242,201,76,.16); color: #E7CB74; }
+    .pf-imp-badge.nuevo { background: rgba(255,255,255,.1); color: rgba(255,255,255,.55); }
+    .pf-imp-chk { width: auto; }
+    .pf-imp-actions { display: flex; gap: 8px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+    .pf-imp-cuota { font-size: 11px; color: rgba(255,255,255,.4); margin-left: auto; }
+    .pf-imp-scroll { overflow-x: auto; }
     .pf-add-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; background: var(--navy-5); border-radius: 8px; padding: 12px; }
     .pf-add-form input[type="text"], .pf-add-form input[type="number"], .pf-add-form select, .pf-ticker-wrap input[type="text"] {
       background: var(--navy-1); border: 1px solid rgba(255,255,255,.15); border-radius: 5px; color: var(--white);
@@ -5093,6 +5127,7 @@
   function pfMoney(n){ return '$'+ (n||0).toLocaleString('es-AR',{maximumFractionDigits: Math.abs(n)<1000?2:0}); }
 
   function pfShowAddForm(){
+    if(typeof pfImportCancel === 'function') pfImportCancel();
     document.getElementById('pfAddForm').style.display = 'flex';
     document.getElementById('pfAddRowBtn').style.display = 'none';
     pfFetchMarketData(false); // precarga la lista de activos para el buscador
@@ -5442,6 +5477,241 @@
     btn.disabled = false; btn.textContent = 'Guardar mi portafolio';
     status.textContent = ok ? 'Guardado ✓' : 'No se pudo guardar, probá de nuevo.';
     setTimeout(function(){ status.textContent=''; }, 4000);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  //  Importar tenencias desde el PDF del broker
+  //  El PDF se lee 100% en el navegador (PDF.js). Al Worker solo viaja el
+  //  texto extraido, nunca el archivo. Warren lo pasa por Claude y devuelve
+  //  las posiciones normalizadas -> tabla de revision editable -> _pfPositions.
+  // ─────────────────────────────────────────────────────────────────────────
+  var PF_WARREN_PARSE_URL = 'https://warren.nachito2502.workers.dev/portfolio/parse';
+  var PF_PDFJS_VER = '3.11.174';
+  var pfPdfJsLoading = null;
+  var pfImportParsed = null; // ultima respuesta del Worker, para el confirm
+
+  function pfImportBoxEl(){ return document.getElementById('pfImportBox'); }
+  function pfImportShow(html){
+    var box = pfImportBoxEl();
+    if(!box) return;
+    // no mostrar el formulario manual y la revision del PDF a la vez
+    var addForm = document.getElementById('pfAddForm');
+    if(addForm && addForm.style.display !== 'none' && typeof pfHideAddForm === 'function') pfHideAddForm();
+    box.innerHTML = html;
+    box.style.display = 'block';
+  }
+  function pfImportCancel(){
+    var box = pfImportBoxEl();
+    if(box){ box.style.display = 'none'; box.innerHTML = ''; }
+    pfImportParsed = null;
+    var inp = document.getElementById('pfPdfInput');
+    if(inp) inp.value = '';
+  }
+
+  function pfImportPdfClick(){
+    if(!(window._currentUser && window._currentUser.email)){
+      pfImportShow('<h4>Importar PDF del broker</h4>'
+        + '<p class="pf-imp-sub">Necesitás iniciar sesión con tu cuenta de Google para usar la importación.</p>'
+        + '<div class="pf-imp-actions"><button class="pf-btn-gold" onclick="window.signInWithGoogle && window.signInWithGoogle()">Iniciar sesión con Google</button>'
+        + '<button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    var inp = document.getElementById('pfPdfInput');
+    if(inp) inp.click();
+  }
+
+  function pfPdfSelected(input){
+    var file = input && input.files && input.files[0];
+    if(!file) return;
+    if(file.type && file.type.indexOf('pdf') === -1 && !/\.pdf$/i.test(file.name)){
+      pfImportShow('<h4>Importar PDF del broker</h4><p class="pf-imp-err">Ese archivo no parece un PDF. Subí el PDF de tenencias que te da el broker.</p><div class="pf-imp-actions"><button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    if(file.size > 12 * 1024 * 1024){
+      pfImportShow('<h4>Importar PDF del broker</h4><p class="pf-imp-err">El archivo pesa más de 12 MB. Suele ser un PDF escaneado (imagen); por ahora solo soportamos PDF con texto real.</p><div class="pf-imp-actions"><button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    pfImportShow('<h4>Importar PDF del broker</h4><div class="pf-imp-status"><span class="pf-imp-spin"></span> Leyendo el PDF en tu navegador…</div>');
+    pfProcessPdfFile(file);
+  }
+
+  function pfLoadPdfJs(){
+    if(window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    if(pfPdfJsLoading) return pfPdfJsLoading;
+    pfPdfJsLoading = new Promise(function(resolve, reject){
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/' + PF_PDFJS_VER + '/pdf.min.js';
+      s.onload = function(){
+        if(!window.pdfjsLib){ reject(new Error('pdfjs no expuso pdfjsLib')); return; }
+        try {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/' + PF_PDFJS_VER + '/pdf.worker.min.js';
+        } catch(e){}
+        resolve(window.pdfjsLib);
+      };
+      s.onerror = function(){ reject(new Error('no se pudo cargar pdf.js')); };
+      document.head.appendChild(s);
+    });
+    return pfPdfJsLoading;
+  }
+
+  async function pfExtractPdfText(arrayBuffer){
+    var pdfjsLib = await pfLoadPdfJs();
+    var pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    var maxPages = Math.min(pdf.numPages, 20);
+    var out = [];
+    for(var i = 1; i <= maxPages; i++){
+      var page = await pdf.getPage(i);
+      var tc = await page.getTextContent();
+      var line = tc.items.map(function(it){ return (it && it.str) || ''; }).join(' ');
+      out.push(line);
+    }
+    return out.join('\n');
+  }
+
+  async function pfProcessPdfFile(file){
+    var text;
+    try {
+      var buf = await file.arrayBuffer();
+      text = await pfExtractPdfText(buf);
+    } catch(e){
+      console.warn('pdf extract failed:', e);
+      pfImportShow('<h4>Importar PDF del broker</h4><p class="pf-imp-err">No se pudo leer el PDF. Si es un PDF escaneado (una foto/imagen), por ahora solo soportamos PDF con texto real. Probá descargar de nuevo el resumen desde el broker.</p><div class="pf-imp-actions"><button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    if(!text || text.replace(/\s/g,'').length < 30){
+      pfImportShow('<h4>Importar PDF del broker</h4><p class="pf-imp-err">El PDF no tiene texto seleccionable (parece escaneado). Por ahora solo soportamos PDF con texto real.</p><div class="pf-imp-actions"><button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    pfImportShow('<h4>Importar PDF del broker</h4><div class="pf-imp-status"><span class="pf-imp-spin"></span> Interpretando tus tenencias…</div>');
+    var resp, data;
+    try {
+      resp = await fetch(PF_WARREN_PARSE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: window._currentUser.email, text: text })
+      });
+      data = await resp.json();
+    } catch(e){
+      pfImportShow('<h4>Importar PDF del broker</h4><p class="pf-imp-err">No se pudo conectar con el servidor. Probá de nuevo en un rato.</p><div class="pf-imp-actions"><button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    if(!resp.ok || data.error){
+      var msg = data && data.message ? data.message : 'No se pudo procesar el PDF.';
+      pfImportShow('<h4>Importar PDF del broker</h4><p class="pf-imp-err">'+ pfEsc(msg) +'</p><div class="pf-imp-actions"><button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    if(!data.positions || !data.positions.length){
+      var av = (data.avisos && data.avisos.length) ? (' ' + data.avisos.join(' ')) : '';
+      pfImportShow('<h4>Importar PDF del broker</h4><p class="pf-imp-err">No encontré posiciones en este PDF.'+ pfEsc(av) +'</p><div class="pf-imp-actions"><button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    try { await pfFetchMarketData(false); } catch(e){}
+    pfImportParsed = data;
+    pfRenderImportReview(data);
+  }
+
+  function pfKnownTicker(sym){
+    var list = window._pfTickerList || [];
+    sym = (sym || '').toUpperCase();
+    for(var i = 0; i < list.length; i++){ if(list[i].symbol === sym) return true; }
+    return false;
+  }
+
+  function pfRenderImportReview(data){
+    var TIPO_LABEL = { accion:'Acción', cedear:'CEDEAR', bono:'Bono', cripto:'Cripto', fci:'FCI', efectivo:'Efectivo', otro:'Otro' };
+    var rowsHtml = data.positions.map(function(p, i){
+      var isCash = p.tipo === 'efectivo';
+      var unknown = !isCash && !pfKnownTicker(p.ticker);
+      var noPx = !isCash && (p.precioCompra == null);
+      var flag = unknown || noPx || p.confianza === 'baja' || p.confianza === 'media';
+      var badge = '';
+      if(unknown) badge = '<span class="pf-imp-badge nuevo">sin match</span>';
+      else if(p.confianza === 'baja') badge = '<span class="pf-imp-badge baja">revisar</span>';
+      else if(p.confianza === 'media') badge = '<span class="pf-imp-badge media">chequear</span>';
+      return '<tr data-i="'+ i +'" class="'+ (flag ? 'pf-imp-flag' : '') +'">'
+        + '<td><input type="checkbox" class="pf-imp-chk" checked onchange="pfImpToggleRow(this)"></td>'
+        + '<td><input class="pf-imp-tk'+ (unknown ? ' pf-imp-warnfield' : '') +'" value="'+ pfEsc(p.ticker) +'" maxlength="20">'+ badge +'</td>'
+        + '<td><input class="pf-imp-qty" type="number" step="any" value="'+ (p.cantidad != null ? p.cantidad : '') +'"></td>'
+        + '<td><input class="pf-imp-px'+ (noPx ? ' pf-imp-warnfield' : '') +'" type="number" step="any" value="'+ (p.precioCompra != null ? p.precioCompra : '') +'" placeholder="'+ (isCash ? '1' : 's/d') +'"></td>'
+        + '<td><select class="pf-imp-mon"><option value="ARS"'+ (p.moneda !== 'USD' ? ' selected' : '') +'>ARS</option><option value="USD"'+ (p.moneda === 'USD' ? ' selected' : '') +'>USD</option></select></td>'
+        + '<td style="color:rgba(255,255,255,.5);white-space:nowrap;">'+ pfEsc(TIPO_LABEL[p.tipo] || 'Otro') +'</td>'
+        + '</tr>';
+    }).join('');
+
+    var avisosHtml = (data.avisos && data.avisos.length)
+      ? '<ul class="pf-imp-avisos">' + data.avisos.map(function(a){ return '<li>'+ pfEsc(a) +'</li>'; }).join('') + '</ul>'
+      : '';
+
+    var cuota = data.cuota || {};
+    var cuotaHtml = cuota.ilimitado
+      ? '<span class="pf-imp-cuota">Importaciones ilimitadas (miembro)</span>'
+      : '<span class="pf-imp-cuota">'+ (cuota.usados || 0) +' de '+ (cuota.limite || 3) +' importaciones usadas este mes</span>';
+
+    var brokerTxt = data.broker ? (' · ' + data.broker) : '';
+
+    pfImportShow(
+      '<h4>Revisá lo que leímos'+ pfEsc(brokerTxt) +'</h4>'
+      + '<p class="pf-imp-sub">Corregí ticker, cantidad, precio de compra (PPC) o moneda antes de importar. Las filas marcadas necesitan una mirada. Los precios que figuran como «s/d» no venían en el PDF — completalos o se importan sin resultado.</p>'
+      + avisosHtml
+      + '<div class="pf-imp-scroll"><table class="pf-imp-table">'
+      + '<thead><tr><th></th><th>Ticker</th><th>Cantidad</th><th>PPC</th><th>Moneda</th><th>Tipo</th></tr></thead>'
+      + '<tbody id="pfImpBody">'+ rowsHtml +'</tbody></table></div>'
+      + '<div class="pf-imp-actions">'
+      + '<button class="pf-btn-gold" onclick="pfConfirmImport()">Importar seleccionadas</button>'
+      + '<button class="pf-btn-ghost" onclick="pfImportCancel()">Descartar</button>'
+      + cuotaHtml
+      + '</div>'
+    );
+  }
+
+  function pfImpToggleRow(chk){
+    var tr = chk.closest('tr');
+    if(tr) tr.classList.toggle('pf-imp-off', !chk.checked);
+  }
+
+  function pfConfirmImport(){
+    var body = document.getElementById('pfImpBody');
+    if(!body || !pfImportParsed) return;
+    var trs = body.querySelectorAll('tr');
+    var added = 0;
+    trs.forEach(function(tr){
+      var chk = tr.querySelector('.pf-imp-chk');
+      if(!chk || !chk.checked) return;
+      var i = parseInt(tr.getAttribute('data-i'), 10);
+      var orig = pfImportParsed.positions[i] || {};
+      var ticker = (tr.querySelector('.pf-imp-tk').value || '').trim().toUpperCase();
+      var cantidad = parseFloat(tr.querySelector('.pf-imp-qty').value);
+      var moneda = tr.querySelector('.pf-imp-mon').value === 'USD' ? 'USD' : 'ARS';
+      var isCash = orig.tipo === 'efectivo';
+      var pxRaw = tr.querySelector('.pf-imp-px').value;
+      var precio = isCash ? 1 : (pxRaw === '' ? null : parseFloat(pxRaw));
+      if(!ticker || !(cantidad > 0)) return;
+      if(!isCash && precio != null && !(precio > 0)) precio = null;
+      window._pfPositions.push({
+        id: pfIdSeq++,
+        ticker: ticker,
+        cantidad: cantidad,
+        precioCompra: isCash ? 1 : precio,
+        moneda: moneda,
+        notas: 'Importado del PDF' + (pfImportParsed.broker ? (' · ' + pfImportParsed.broker) : ''),
+        isCash: isCash
+      });
+      added++;
+    });
+    pfImportCancel();
+    if(added){
+      pfRenderPositions();
+      var st = document.getElementById('pfSaveStatus');
+      if(st){
+        st.textContent = added + (added === 1 ? ' posición importada ✓' : ' posiciones importadas ✓');
+        setTimeout(function(){ st.textContent = ''; }, 5000);
+      }
+      var saveBtn = document.getElementById('pfSaveBtn');
+      if(saveBtn && window._miIsMember && window._miIsMember()){
+        saveBtn.style.display = '';
+      }
+    }
   }
 
   function pfRenderQuizStatus(){
