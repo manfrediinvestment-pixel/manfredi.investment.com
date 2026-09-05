@@ -5745,6 +5745,7 @@
       { id: 'otros',      label: 'Otros',       color: '#22D3EE', icon: '📦' }
     ];
     var gastosQuickCat = null;
+    var gastosRetriedCcl = false;
 
     var gastosView = new Date();
     gastosView.setDate(1);
@@ -5862,8 +5863,16 @@
       if (totalEl) totalEl.textContent = gastosFmt(totalUsd);
       if (noteEl) {
         noteEl.textContent = sinCcl
-          ? 'Algunos gastos en ARS no se pudieron convertir (sin cotización CCL disponible).'
+          ? 'Actualizando la cotización del dólar...'
           : (gastos.length ? (gastos.length + ' movimiento' + (gastos.length === 1 ? '' : 's') + ' este mes') : 'Todavía no cargaste gastos este mes.');
+      }
+      // El dólar CCL se carga de forma asincrónica al abrir la página y puede
+      // no estar listo todavía en el primer render (sobre todo porque Gastos
+      // ahora es la pestaña por defecto) -- un solo reintento a los 2s alcanza,
+      // sin meterse en un loop si de verdad no hay cotización disponible.
+      if (sinCcl && !gastosRetriedCcl) {
+        gastosRetriedCcl = true;
+        setTimeout(gastosRenderAll, 2000);
       }
 
       var listaWrap = document.getElementById('gastosListaWrap');
