@@ -368,10 +368,14 @@ Recibis el texto plano de un PDF de posiciones/tenencias. Devolves UNICAMENTE un
 }
 Reglas:
 - No inventes posiciones. Si el texto no parece un resumen de tenencias, devolve positions:[] y un aviso explicandolo.
-- Efectivo / saldo disponible: tipo "efectivo", cantidad = monto, precioCompra = 1.
-- Ignora totales, subtotales, rendimientos y datos personales de la cuenta (titular, numero de cuenta, CUIT). No los pongas en ningun campo.
+- "broker": SOLO si el nombre del broker / ALyC aparece textualmente en el PDF (ej. "Balanz", "IOL", "InvertirOnline", "Cocos", "Bull Market"). Si no figura, null. No lo adivines por el formato.
+- Precio de compra: usa SIEMPRE la columna de costo / PPC / "precio promedio de compra". NUNCA uses la columna de precio actual / cotizacion / ultimo, aunque multiplicada por la cantidad de justo con la columna de importe. Costo x cantidad normalmente NO coincide con el importe, y esta bien: el importe se calcula con el precio actual, no con el costo.
+- Efectivo / saldo disponible: tipo "efectivo", cantidad = monto, precioCompra = 1. Si la linea de efectivo es en dolares ("DOLAR CABLE", "DOLAR MEP", "DOLAR BILLETE", "U$S", "USD", "dolares"), moneda "USD" y cantidad = monto en USD. Efectivo en pesos: moneda "ARS".
+- Ignora totales, subtotales, rendimientos y datos personales de la cuenta (titular, numero de cuenta/comitente, CUIT). No los pongas en ningun campo.
 - Numeros en formato argentino (1.234,56) convertilos a number JS (1234.56).
-- confianza "baja" si tuviste que adivinar el ticker o la cantidad no estaba clara.`;
+- Cuotapartes de FCI / fondos comunes: la cantidad suele tener muchos decimales y el separador se lee mal (ej. "392.187,07" podria ser 392,18707). Para cualquier fila con tipo "fci": confianza "baja" y un aviso pidiendo al usuario que verifique cantidad y precio de compra contra su resumen.
+- confianza "baja" si tuviste que adivinar el ticker, la cantidad no estaba clara, o es un FCI; "media" si el renglon estaba partido en varias lineas o la columna de costo no era obvia; "alta" si la fila se leia limpia.
+- "avisos": SOLO advertencias utiles para el usuario (ej. "No se detecto el nombre del broker en el PDF", "El PPC de X no figuraba", "La fila Y quedo dudosa, revisala"). NO narres tu proceso de extraccion ni menciones que ignoraste datos personales.`;
 
 async function handlePortfolioParse(request, env) {
     const ANTHROPIC_API_KEY = env.ANTHROPIC_API_KEY;
@@ -429,15 +433,21 @@ async function handlePortfolioParse(request, env) {
 
     const positions = parsed.positions
         .filter(p => p && p.ticker && Number(p.cantidad) > 0)
-        .map(p => ({
-            ticker: String(p.ticker).toUpperCase().trim().slice(0, 20),
-            nombre: p.nombre ? String(p.nombre).slice(0, 80) : null,
-            cantidad: Number(p.cantidad),
-            precioCompra: (p.precioCompra != null && Number(p.precioCompra) > 0) ? Number(p.precioCompra) : null,
-            moneda: p.moneda === 'USD' ? 'USD' : 'ARS',
-            tipo: ['accion', 'cedear', 'bono', 'cripto', 'fci', 'efectivo', 'otro'].includes(p.tipo) ? p.tipo : 'otro',
-            confianza: ['alta', 'media', 'baja'].includes(p.confianza) ? p.confianza : 'media'
-        }))
+        .map(p => {
+            const moneda = p.moneda === 'USD' ? 'USD' : 'ARS';
+            const tipo = ['accion', 'cedear', 'bono', 'cripto', 'fci', 'efectivo', 'otro'].includes(p.tipo) ? p.tipo : 'otro';
+            let ticker = String(p.ticker).toUpperCase().trim().slice(0, 20);
+            if (tipo === 'efectivo') ticker = moneda; // "ARS"/"USD" en vez de "PESOS"/"DOLAR CABLE"
+            return {
+                ticker,
+                nombre: p.nombre ? String(p.nombre).slice(0, 80) : null,
+                cantidad: Number(p.cantidad),
+                precioCompra: tipo === 'efectivo' ? 1 : ((p.precioCompra != null && Number(p.precioCompra) > 0) ? Number(p.precioCompra) : null),
+                moneda,
+                tipo,
+                confianza: ['alta', 'media', 'baja'].includes(p.confianza) ? p.confianza : 'media'
+            };
+        })
         .slice(0, 100);
 
     if (!member) {

@@ -4993,7 +4993,15 @@
             <thead><tr><th>Activo</th><th style="text-align:right;">Cant.</th><th style="text-align:right;">Compra</th><th style="text-align:right;">Actual</th><th style="text-align:right;">Resultado</th><th style="text-align:right;">% cartera</th><th></th></tr></thead>
             <tbody id="pfPositionsBody"></tbody>
           </table>
-          <div class="pf-add-row" id="pfAddRowBtn" onclick="pfShowAddForm()">+ Agregar posición</div>
+          <div class="pf-add-actions">
+            <div class="pf-add-row" id="pfAddRowBtn" onclick="pfShowAddForm()">+ Agregar posición</div>
+            <div class="pf-add-row pf-import-row" id="pfImportRowBtn" onclick="pfImportPdfClick()">
+              <span>&#128196; Importar PDF del broker</span>
+              <span class="pf-import-hint">IOL &middot; Balanz &middot; Cocos &middot; PPI &middot; Bull Market</span>
+            </div>
+          </div>
+          <input type="file" id="pfPdfInput" accept="application/pdf,.pdf" style="display:none;" onchange="pfPdfSelected(this)">
+          <div class="pf-import-box" id="pfImportBox" style="display:none;"></div>
           <div class="pf-add-form" id="pfAddForm" style="display:none;">
             <div class="pf-ticker-wrap">
               <input type="text" id="pfInputTicker" placeholder="Ticker o nombre (ej: AAPL, Apple)" autocomplete="off">
@@ -5555,6 +5563,45 @@
     return pfPdfJsLoading;
   }
 
+  // Reconstruye filas y columnas a partir de la posicion (transform x/y + width)
+  // de cada fragmento que devuelve PDF.js. Sin esto las columnas de un resumen
+  // de tenencias salen entreveradas y el parser lee mal (cantidad/PPC de una
+  // fila terminan pegadas a otra). Probado contra un resumen real de Balanz:
+  // el join naive daba filas cruzadas, este metodo las alinea bien.
+  function pfLayoutTextItems(items){
+    var frags = [];
+    (items || []).forEach(function(it){
+      if(!it || !it.str || !it.str.trim()) return;
+      var tr = it.transform || [1,0,0,1,0,0];
+      frags.push({ x: tr[4], y: tr[5], w: it.width || (it.str.length * 4), str: it.str });
+    });
+    if(!frags.length) return '';
+    frags.sort(function(a,b){ return (b.y - a.y) || (a.x - b.x); });
+    var lines = [], cur = null;
+    frags.forEach(function(f){
+      if(cur && Math.abs(f.y - cur.y) <= 3){ cur.items.push(f); }
+      else { cur = { y: f.y, items: [f] }; lines.push(cur); }
+    });
+    var totW = 0, totC = 0;
+    frags.forEach(function(f){ totW += f.w; totC += f.str.length; });
+    var charW = totC ? (totW / totC) : 4;
+    if(!(charW > 0)) charW = 4;
+    return lines.map(function(ln){
+      ln.items.sort(function(a,b){ return a.x - b.x; });
+      var out = '', prevEnd = null;
+      ln.items.forEach(function(f){
+        if(prevEnd != null){
+          var gap = f.x - prevEnd;
+          var sp = gap > charW * 0.6 ? Math.max(1, Math.round(gap / charW)) : (gap > 0 ? 1 : 0);
+          out += new Array(Math.min(sp, 14) + 1).join(' ');
+        }
+        out += f.str;
+        prevEnd = f.x + f.w;
+      });
+      return out.replace(/\s+$/, '');
+    }).join('\n');
+  }
+
   async function pfExtractPdfText(arrayBuffer){
     var pdfjsLib = await pfLoadPdfJs();
     var pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -5563,10 +5610,9 @@
     for(var i = 1; i <= maxPages; i++){
       var page = await pdf.getPage(i);
       var tc = await page.getTextContent();
-      var line = tc.items.map(function(it){ return (it && it.str) || ''; }).join(' ');
-      out.push(line);
+      out.push(pfLayoutTextItems(tc.items));
     }
-    return out.join('\n');
+    return out.join('\n\n');
   }
 
   async function pfProcessPdfFile(file){
