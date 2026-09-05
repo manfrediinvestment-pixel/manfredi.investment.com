@@ -4713,6 +4713,38 @@
     .calc-goal-log { margin-top: 10px; max-height: 96px; overflow-y: auto; }
     .calc-goal-log-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: rgba(255,255,255,.45); padding: 4px 0; border-top: 1px solid rgba(255,255,255,.06); }
     .calc-goal-log-row .calc-goal-del { margin-top: 0; font-size: 13px; }
+    .calc-goal-card { cursor: pointer; transition: transform .15s, box-shadow .15s; }
+    .calc-goal-card:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,0,0,.4); }
+    .calc-goal-tap-hint { font-size: 10.5px; color: rgba(242,201,76,.6); margin-top: 8px; }
+
+    .calc-goal-modal-overlay {
+      position: fixed; inset: 0; background: rgba(5,10,20,.88); backdrop-filter: blur(6px);
+      z-index: 9999; display: flex; align-items: flex-start; justify-content: center;
+      padding: 40px 20px; opacity: 0; pointer-events: none; transition: opacity .2s ease; overflow-y: auto;
+    }
+    .calc-goal-modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .calc-goal-modal-box {
+      background: var(--navy-4); border: 1px solid rgba(242,201,76,.2); border-radius: 14px;
+      width: 100%; max-width: 560px; padding: 28px; position: relative;
+    }
+    .calc-goal-modal-close {
+      position: absolute; top: 14px; right: 16px; background: transparent; border: none;
+      color: rgba(255,255,255,.5); font-size: 22px; cursor: pointer; line-height: 1;
+    }
+    .calc-goal-modal-close:hover { color: var(--white); }
+    .calc-goal-modal-photo { width: 100%; height: 160px; background-size: cover; background-position: center; border-radius: 10px; margin-bottom: 18px; }
+    .calc-goal-modal-name { font-family: var(--font-display); font-weight: 400; font-size: 24px; color: var(--white); margin: 0 0 8px; }
+    .calc-goal-steps { display: grid; gap: 6px; max-height: 260px; overflow-y: auto; padding-right: 4px; }
+    .calc-goal-step { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; background: rgba(255,255,255,.03); font-size: 12.5px; color: rgba(255,255,255,.5); }
+    .calc-goal-step.done { background: rgba(16,185,129,.08); color: rgba(255,255,255,.8); }
+    .calc-goal-step-check {
+      width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 10.5px; font-weight: 700; flex-shrink: 0; background: rgba(255,255,255,.08); color: rgba(255,255,255,.4);
+    }
+    .calc-goal-step.done .calc-goal-step-check { background: var(--green); color: var(--primary); }
+    .calc-goal-step-label { flex: 1; }
+    .calc-goal-step-amount { font-family: 'IBM Plex Mono', monospace; color: rgba(255,255,255,.6); }
+    .calc-goal-step.done .calc-goal-step-amount { color: var(--white); }
     .pf-ticker-wrap { position: relative; }
     .pf-ticker-dropdown {
       display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 270px; max-width: 340px;
@@ -5065,6 +5097,13 @@
       </div>
 
       <div id="calcGoalsWrap" style="display:none;"></div>
+
+      <div id="calcGoalModal" class="calc-goal-modal-overlay" onclick="if(event.target===this) calcCloseGoalModal();">
+        <div class="calc-goal-modal-box">
+          <button class="calc-goal-modal-close" onclick="calcCloseGoalModal()">&times;</button>
+          <div id="calcGoalModalBody"></div>
+        </div>
+      </div>
 
       <div class="pf-row-split">
         <div class="pf-card">
@@ -5470,6 +5509,7 @@
       g.aportes.push({ monto: monto, fecha: new Date().toISOString() });
       calcSaveGoals(goals);
       calcRenderGoals();
+      calcOpenGoalModal(id); // re-renderiza el modal abierto con el nuevo aporte
     };
 
     window.calcDeleteAporte = function(goalId, idx){
@@ -5480,6 +5520,7 @@
       g.aportes.splice(idx, 1);
       calcSaveGoals(goals);
       calcRenderGoals();
+      calcOpenGoalModal(goalId);
     };
 
     function calcRenderGoals(){
@@ -5492,39 +5533,81 @@
         '<div class="calc-goals-grid">' + goals.map(function(g){
           var elapsed = calcMonthsElapsed(g.savedAt);
           var remaining = Math.max(0, Math.round(g.months - elapsed));
-          var expected = Math.min(g.goal, (g.initial || 0) + (g.monthly || 0) * elapsed);
           var totalReal = calcGoalTotalReal(g);
           var pctReal = g.goal > 0 ? Math.min(100, (totalReal / g.goal * 100)) : 0;
-          var diff = totalReal - expected;
-          var diffHtml = Math.abs(diff) < 1 ? '' :
-            (diff > 0
-              ? '<span style="color:var(--green);">vas ' + calcFmtMoney(diff) + ' adelantado &#128994;</span>'
-              : '<span style="color:var(--red);">vas ' + calcFmtMoney(-diff) + ' atrasado &#128308;</span>');
-          var aportes = g.aportes || [];
-          var aportesHtml = aportes.length
-            ? '<div class="calc-goal-log">' + aportes.map(function(a, idx){
-                var d = new Date(a.fecha);
-                return '<div class="calc-goal-log-row"><span>' + d.toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit'}) + ' &middot; ' + calcFmtMoney(a.monto) + '</span><span class="calc-goal-del" onclick="calcDeleteAporte(' + g.id + ',' + idx + ')">&times;</span></div>';
-              }).join('') + '</div>'
-            : '';
-          return '<div class="calc-goal-card">' +
+          return '<div class="calc-goal-card" onclick="calcOpenGoalModal(' + g.id + ')">' +
             (g.foto ? '<div class="calc-goal-photo" style="background-image:url(\'' + g.foto + '\');"></div>' : '<div class="calc-goal-photo calc-goal-photo-empty">&#127919;</div>') +
             '<div class="calc-goal-body">' +
               '<div class="calc-goal-name">' + pfEsc(g.nombre) + '</div>' +
               '<div class="calc-goal-months">' + (remaining > 0 ? ('Faltan <b>' + remaining + '</b> meses') : '<b>Plazo cumplido</b>') + '</div>' +
               '<div class="calc-goal-bar"><div class="calc-goal-bar-fill" style="width:' + pctReal.toFixed(0) + '%;"></div></div>' +
               '<div class="calc-goal-amount">Llevás ahorrado: <b>' + calcFmtMoney(totalReal) + '</b> de ' + calcFmtMoney(g.goal) + ' (' + pctReal.toFixed(0) + '%)</div>' +
-              '<div class="calc-goal-plan-note">Según el plan deberías llevar ' + calcFmtMoney(expected) + (diffHtml ? ' &mdash; ' + diffHtml : '') + '</div>' +
-              '<div class="calc-goal-aporte-row">' +
-                '<input type="number" min="0" step="any" class="calc-goal-aporte-input" id="calcAporteInput_' + g.id + '" placeholder="Monto ahorrado (USD)">' +
-                '<button class="calc-scenario-btn" onclick="calcRegistrarAporte(' + g.id + ')">+ Aporte</button>' +
-              '</div>' +
-              aportesHtml +
-              '<span class="calc-goal-del" onclick="calcDeleteGoal(' + g.id + ')" style="margin-top:8px;display:inline-block;">Eliminar objetivo</span>' +
+              '<div class="calc-goal-tap-hint">Tocá para ver el detalle mes a mes &rarr;</div>' +
+              '<span class="calc-goal-del" onclick="event.stopPropagation();calcDeleteGoal(' + g.id + ')" style="margin-top:8px;display:inline-block;">Eliminar objetivo</span>' +
             '</div>' +
           '</div>';
         }).join('') + '</div>';
     }
+
+    // ─── Detalle del objetivo: pasos mes a mes + registrar aportes ─────────
+    window.calcOpenGoalModal = function(id){
+      var g = null;
+      var goals = calcLoadGoals();
+      for (var i = 0; i < goals.length; i++) { if (goals[i].id === id) { g = goals[i]; break; } }
+      if (!g) return;
+
+      var elapsed = calcMonthsElapsed(g.savedAt);
+      var remaining = Math.max(0, Math.round(g.months - elapsed));
+      var totalReal = calcGoalTotalReal(g);
+      var pctReal = g.goal > 0 ? Math.min(100, (totalReal / g.goal * 100)) : 0;
+
+      // Pasos: uno por mes del plan, con el acumulado esperado a esa altura.
+      // Se marca "hecho" si lo que realmente llevás ahorrado ya cubre ese paso.
+      var stepsHtml = '';
+      for (var m = 1; m <= g.months; m++) {
+        var stepTarget = Math.min(g.goal, (g.initial || 0) + (g.monthly || 0) * m);
+        var done = totalReal >= stepTarget - 0.5;
+        stepsHtml += '<div class="calc-goal-step' + (done ? ' done' : '') + '">' +
+          '<span class="calc-goal-step-check">' + (done ? '&#10003;' : m) + '</span>' +
+          '<span class="calc-goal-step-label">Mes ' + m + '</span>' +
+          '<span class="calc-goal-step-amount">' + calcFmtMoney(stepTarget) + '</span>' +
+        '</div>';
+      }
+
+      var aportes = g.aportes || [];
+      var aportesHtml = aportes.length
+        ? '<div class="calc-goal-log">' + aportes.map(function(a, idx){
+            var d = new Date(a.fecha);
+            return '<div class="calc-goal-log-row"><span>' + d.toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric'}) + ' &middot; ' + calcFmtMoney(a.monto) + '</span><span class="calc-goal-del" onclick="calcDeleteAporte(' + g.id + ',' + idx + ')">&times;</span></div>';
+          }).join('') + '</div>'
+        : '<div class="pf-metric-note" style="margin-top:6px;">Todavía no registraste ningún aporte.</div>';
+
+      document.getElementById('calcGoalModalBody').innerHTML =
+        (g.foto ? '<div class="calc-goal-modal-photo" style="background-image:url(\'' + g.foto + '\');"></div>' : '') +
+        '<h2 class="calc-goal-modal-name">' + pfEsc(g.nombre) + '</h2>' +
+        '<div class="calc-goal-months" style="margin-bottom:10px;">' + (remaining > 0 ? ('Faltan <b>' + remaining + '</b> meses de ' + g.months) : '<b>Plazo cumplido</b>') + '</div>' +
+        '<div class="calc-goal-bar"><div class="calc-goal-bar-fill" style="width:' + pctReal.toFixed(0) + '%;"></div></div>' +
+        '<div class="calc-goal-amount" style="margin-bottom:18px;">Llevás ahorrado: <b>' + calcFmtMoney(totalReal) + '</b> de ' + calcFmtMoney(g.goal) + ' (' + pctReal.toFixed(0) + '%)</div>' +
+
+        '<div class="calc-goal-aporte-row" style="margin-bottom:18px;">' +
+          '<input type="number" min="0" step="any" class="calc-goal-aporte-input" id="calcAporteInput_' + g.id + '" placeholder="Monto que acabás de ahorrar (USD)">' +
+          '<button class="pf-btn-gold" onclick="calcRegistrarAporte(' + g.id + ')">+ Registrar aporte</button>' +
+        '</div>' +
+
+        '<h2 class="pf-metrics-label" style="margin-bottom:10px;">Pasos del plan, mes a mes</h2>' +
+        '<div class="calc-goal-steps">' + stepsHtml + '</div>' +
+
+        '<h2 class="pf-metrics-label" style="margin:18px 0 10px;">Aportes registrados</h2>' +
+        aportesHtml;
+
+      document.getElementById('calcGoalModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.calcCloseGoalModal = function(){
+      document.getElementById('calcGoalModal').classList.remove('open');
+      document.body.style.overflow = '';
+    };
 
     // Se difiere a DOMContentLoaded: calcRenderGoals() usa pfEsc(), definida en
     // un <script> mas abajo en la pagina que todavia no corrio en este punto
