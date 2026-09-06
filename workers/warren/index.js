@@ -310,6 +310,160 @@ function extractText(content) {
         .trim();
 }
 
+// ─── Importar tenencias desde el PDF del broker ────────────────────────────
+// Recibe el TEXTO ya extraido del PDF en el navegador (el archivo nunca se
+// sube: PDF.js corre client-side). Se lo pasa a Claude con un esquema de
+// salida fijo y devuelve las posiciones normalizadas para la tabla de
+// revision de "Tu Portafolio". Cuota: socios (y admin) ilimitado; logueado
+// no-socio 3 importaciones por mes, contador en WARREN_KV (pdfparse:email:mes).
+const PDF_PARSE_FREE_LIMIT = 3;
+const PDF_TEXT_CAP = 24000; // caracteres; acota costo y entra cualquier resumen de tenencias
+
+function pdfParseMonthKey() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+async function isMemberEmail(env, email) {
+    try {
+        const res = await env.MEMBERSHIPS.fetch(`${MEMBERSHIPS_BASE}/verificar-membresia?email=${encodeURIComponent(email)}`);
+        const data = await res.json();
+        return !!data.miembro;
+    } catch (e) {
+        console.error('[warren] verificar-membresia fallo, asumimos no-socio:', e && e.message);
+        return false;
+    }
+}
+
+// Extrae el primer objeto JSON de la respuesta del modelo (tolera fences ```json
+// y texto envolvente, aunque el system prompt pide JSON puro).
+function safeJsonFromModel(s) {
+    if (!s) return null;
+    let t = String(s).trim();
+    const fence = t.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fence) t = fence[1].trim();
+    const first = t.indexOf('{');
+    const last = t.lastIndexOf('}');
+    if (first === -1 || last === -1 || last <= first) return null;
+    try { return JSON.parse(t.slice(first, last + 1)); } catch (e) { return null; }
+}
+
+const PDF_PARSE_SYSTEM = `Sos un extractor de datos de resumenes de tenencias de brokers argentinos (IOL / InvertirOnline, Balanz, Cocos Capital, PPI / Portfolio Personal, Bull Market Brokers, entre otros).
+Recibis el texto plano de un PDF de posiciones/tenencias. Devolves UNICAMENTE un objeto JSON valido, sin markdown ni explicaciones, con esta forma exacta:
+{
+  "broker": string|null,
+  "moneda_resumen": "ARS"|"USD"|null,
+  "positions": [
+    {
+      "ticker": string,             // simbolo en MAYUSCULAS (ej "AAPL", "GGAL", "AL30"). Si el PDF solo da el nombre, inferi el ticker conocido; si no podes, deja un nombre corto.
+      "nombre": string|null,
+      "cantidad": number,           // nominales / cantidad de papeles. Obligatorio.
+      "precioCompra": number|null,  // precio promedio de compra (PPC) por unidad si figura; si el PDF solo trae valor actual, null
+      "moneda": "ARS"|"USD",
+      "tipo": "accion"|"cedear"|"bono"|"cripto"|"fci"|"efectivo"|"otro",
+      "confianza": "alta"|"media"|"baja"
+    }
+  ],
+  "avisos": [ string ]
+}
+Reglas:
+- No inventes posiciones. Si el texto no parece un resumen de tenencias, devolve positions:[] y un aviso explicandolo.
+- "broker": SOLO si el nombre del broker / ALyC aparece textualmente en el PDF (ej. "Balanz", "IOL", "InvertirOnline", "Cocos", "Bull Market"). Si no figura, null. No lo adivines por el formato.
+- Precio de compra: usa SIEMPRE la columna de costo / PPC / "precio promedio de compra". NUNCA uses la columna de precio actual / cotizacion / ultimo, aunque multiplicada por la cantidad de justo con la columna de importe. Costo x cantidad normalmente NO coincide con el importe, y esta bien: el importe se calcula con el precio actual, no con el costo.
+- Efectivo / saldo disponible: tipo "efectivo", cantidad = monto, precioCompra = 1. Si la linea de efectivo es en dolares ("DOLAR CABLE", "DOLAR MEP", "DOLAR BILLETE", "U$S", "USD", "dolares"), moneda "USD" y cantidad = monto en USD. Efectivo en pesos: moneda "ARS".
+- Ignora totales, subtotales, rendimientos y datos personales de la cuenta (titular, numero de cuenta/comitente, CUIT). No los pongas en ningun campo.
+- Numeros en formato argentino (1.234,56) convertilos a number JS (1234.56).
+- Cuotapartes de FCI / fondos comunes: la cantidad suele tener muchos decimales y el separador se lee mal (ej. "392.187,07" podria ser 392,18707). Para cualquier fila con tipo "fci": confianza "baja" y un aviso pidiendo al usuario que verifique cantidad y precio de compra contra su resumen.
+- confianza "baja" si tuviste que adivinar el ticker, la cantidad no estaba clara, o es un FCI; "media" si el renglon estaba partido en varias lineas o la columna de costo no era obvia; "alta" si la fila se leia limpia.
+- "avisos": SOLO advertencias utiles para el usuario (ej. "No se detecto el nombre del broker en el PDF", "El PPC de X no figuraba", "La fila Y quedo dudosa, revisala"). NO narres tu proceso de extraccion ni menciones que ignoraste datos personales.`;
+
+async function handlePortfolioParse(request, env) {
+    const ANTHROPIC_API_KEY = env.ANTHROPIC_API_KEY;
+    if (!ANTHROPIC_API_KEY) {
+        return new Response(JSON.stringify({ error: 'config', message: 'API key no configurada.' }), { status: 500, headers: JSON_HEADERS });
+    }
+
+    let body;
+    try { body = await request.json(); } catch (e) {
+        return new Response(JSON.stringify({ error: 'bad_request', message: 'Pedido invalido.' }), { status: 400, headers: JSON_HEADERS });
+    }
+
+    const email = String(body.email || '').trim().toLowerCase();
+    if (!email) {
+        return new Response(JSON.stringify({ error: 'login_required', message: 'Iniciá sesión para importar un PDF.' }), { status: 401, headers: JSON_HEADERS });
+    }
+
+    let text = String(body.text || '').replace(/ /g, ' ').replace(/ /g, '').trim();
+    if (text.length < 40) {
+        return new Response(JSON.stringify({ error: 'empty_pdf', message: 'No se pudo leer texto del PDF. Si es un PDF escaneado (imagen), por ahora solo soportamos PDF con texto real.' }), { status: 422, headers: JSON_HEADERS });
+    }
+    if (text.length > PDF_TEXT_CAP) text = text.slice(0, PDF_TEXT_CAP);
+
+    const isAdmin = ADMIN_EMAILS.includes(email);
+    const member = isAdmin || await isMemberEmail(env, email);
+    const month = pdfParseMonthKey();
+    const quotaKey = `pdfparse:${email}:${month}`;
+    let usados = 0;
+    if (!member) {
+        try { usados = parseInt(await env.WARREN_KV.get(quotaKey), 10) || 0; } catch (e) {}
+        if (usados >= PDF_PARSE_FREE_LIMIT) {
+            return new Response(JSON.stringify({
+                error: 'quota_exceeded',
+                message: `Usaste tus ${PDF_PARSE_FREE_LIMIT} importaciones de PDF gratuitas de este mes. Con la membresía es ilimitado.`,
+                cuota: { usados, limite: PDF_PARSE_FREE_LIMIT, ilimitado: false }
+            }), { status: 429, headers: JSON_HEADERS });
+        }
+    }
+
+    let claudeData;
+    try {
+        // Haiku 4.5 alcanza para extraccion estructurada de una lista de tenencias
+        // y mantiene el costo por importacion en centavos.
+        claudeData = await callClaude(ANTHROPIC_API_KEY, MODEL_HAIKU, PDF_PARSE_SYSTEM, [
+            { role: 'user', content: 'Texto del PDF de tenencias:\n\n' + text }
+        ], null);
+    } catch (e) {
+        return new Response(JSON.stringify({ error: 'ai_error', message: 'No se pudo procesar el PDF en este momento. Probá de nuevo en un rato.' }), { status: 502, headers: JSON_HEADERS });
+    }
+
+    const parsed = safeJsonFromModel(extractText(claudeData.content));
+    if (!parsed || !Array.isArray(parsed.positions)) {
+        return new Response(JSON.stringify({ error: 'parse_failed', message: 'No pude entender el formato de este PDF. Cargá las posiciones a mano o probá con otro resumen.' }), { status: 422, headers: JSON_HEADERS });
+    }
+
+    const positions = parsed.positions
+        .filter(p => p && p.ticker && Number(p.cantidad) > 0)
+        .map(p => {
+            const moneda = p.moneda === 'USD' ? 'USD' : 'ARS';
+            const tipo = ['accion', 'cedear', 'bono', 'cripto', 'fci', 'efectivo', 'otro'].includes(p.tipo) ? p.tipo : 'otro';
+            let ticker = String(p.ticker).toUpperCase().trim().slice(0, 20);
+            if (tipo === 'efectivo') ticker = moneda; // "ARS"/"USD" en vez de "PESOS"/"DOLAR CABLE"
+            return {
+                ticker,
+                nombre: p.nombre ? String(p.nombre).slice(0, 80) : null,
+                cantidad: Number(p.cantidad),
+                precioCompra: tipo === 'efectivo' ? 1 : ((p.precioCompra != null && Number(p.precioCompra) > 0) ? Number(p.precioCompra) : null),
+                moneda,
+                tipo,
+                confianza: ['alta', 'media', 'baja'].includes(p.confianza) ? p.confianza : 'media'
+            };
+        })
+        .slice(0, 100);
+
+    if (!member) {
+        usados += 1;
+        // TTL ~40 dias: la clave del mes se limpia sola despues del reset.
+        try { await env.WARREN_KV.put(quotaKey, String(usados), { expirationTtl: 60 * 60 * 24 * 40 }); } catch (e) {}
+    }
+
+    return new Response(JSON.stringify({
+        broker: parsed.broker || null,
+        positions,
+        avisos: Array.isArray(parsed.avisos) ? parsed.avisos.slice(0, 8) : [],
+        cuota: { usados, limite: PDF_PARSE_FREE_LIMIT, ilimitado: member }
+    }), { headers: JSON_HEADERS });
+}
+
 export default {
     async fetch(request, env) {
         if (request.method === 'OPTIONS') {
@@ -322,6 +476,7 @@ export default {
             if (request.method === 'GET' && url.pathname === '/conversation') return await handleConversationGet(request, env);
             if (request.method === 'POST' && url.pathname === '/conversation/save') return await handleConversationSave(request, env);
             if (request.method === 'POST' && url.pathname === '/conversation/delete') return await handleConversationDelete(request, env);
+            if (request.method === 'POST' && url.pathname === '/portfolio/parse') return await handlePortfolioParse(request, env);
         } catch (err) {
             return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: JSON_HEADERS });
         }
