@@ -305,7 +305,7 @@ consola, solo se ve mal.
 
 ## Cómo conectar el ticker al sitio
 
-Una vez que `informes/<ticker>.html` está listo, hay que enlazarlo desde **tres** lugares:
+Una vez que `informes/<ticker>.html` está listo, hay que enlazarlo desde **dos** lugares:
 
 1. **Picks-list de la sección Inversiones** (buscar `class="picks-list"`, dentro de
    `id="inversiones"`): agregar una `pick-card` nueva (copiar el bloque de AAPL o MSFT como
@@ -313,13 +313,7 @@ Una vez que `informes/<ticker>.html` está listo, hay que enlazarlo desde **tres
    `href="informes/<ticker>.html" class="pick-btn" target="_blank" rel="noopener"` — **sin**
    `data-ticker` (ese atributo dispara el modal viejo vía JS, que ya no queremos para tickers
    nuevos).
-2. **Widget del hero** (buscar `id="heroInvCard"`, dentro de `class="hero-bottom-row"`): agregar un
-   `hero-inv-item` (copiar el bloque de AAPL o MSFT) con ticker/nombre/postura + el mismo link
-   `informes/<ticker>.html`. El widget muestra 3 activos visibles: si ya hay 3 informes reales,
-   sacá el placeholder `hero-inv-item--soon` ("Próximo análisis en camino"); si vas a cubrir más de
-   3 en simultáneo, priorizá mostrar los más recientes y dejá el resto solo en el picks-list de
-   `#inversiones` (el hero es una vidriera, no tiene que listar toda la cobertura).
-3. **Cartel de "nuevo informe"** (`informes/manifest.json`, en la raíz de `informes/`): agregar una
+2. **Cartel de "nuevo informe"** (`informes/manifest.json`, en la raíz de `informes/`): agregar una
    entrada nueva **al principio** de la lista (el manifest va ordenado del más nuevo al más viejo,
    `list[0]` es siempre el último publicado) con este formato:
    ```json
@@ -341,6 +335,10 @@ Una vez que `informes/<ticker>.html` está listo, hay que enlazarlo desde **tres
    el HTML directo. No hace falta borrar entradas viejas del manifest — solo la más reciente
    (`list[0]`) dispara el cartel.
 
+**NO tocar la lista de la home** (`class="htx-inf"` dentro de `htx-tile--informes`, en la sección
+`class="htx"`): quedó **fija en los 7 primeros informes** (MSFT, AMD, PLTR, UBER, INTC, MU, MELI) para
+mantener el hero compacto. Los informes nuevos van solo al picks-list de `#inversiones` y al manifest.
+
 No hace falta tocar `MI_ASSETS`, `reports/fundamentals.json` ni `TICKERS_CIK` — ese pipeline
 alimentaba el modal resumen viejo, que quedó retirado para los tickers que usan este formato nuevo.
 
@@ -360,12 +358,11 @@ con: *"hacé el informe institucional de [TICKER], nivel AAPL"*.
 1. Generá `informes/<ticker>.html` completo (14 secciones) siguiendo la estructura de arriba.
 2. Corré el grep de lenguaje relativo a fechas (ver regla no-negociable) y limpiá cualquier
    coincidencia antes de seguir.
-3. Agregá la card en el picks-list de `#inversiones`, el row en `heroInvCard`, y la entrada al
-   principio de `informes/manifest.json` para el cartel de anuncio (ver "Cómo conectar el ticker al
-   sitio"), todos linkeando a `informes/<ticker>.html`.
+3. Agregá la card en el picks-list de `#inversiones` y la entrada al principio de
+   `informes/manifest.json` para el cartel de anuncio (ver "Cómo conectar el ticker al sitio"), ambas
+   linkeando a `informes/<ticker>.html`. La lista de la home (`htx-inf`) NO se toca — es fija.
 4. Probá en el navegador: abrí `#inversiones`, click en "Ver análisis" del ticker nuevo — debe abrir
-   el informe completo en pestaña nueva con los gráficos Canvas renderizando — y repetí el chequeo
-   desde el botón del widget del hero. Recorré **cada** `drawHBars` del informe (no solo el football
+   el informe completo en pestaña nueva con los gráficos Canvas renderizando. Recorré **cada** `drawHBars` del informe (no solo el football
    field) y confirmá visualmente que ningún label quedó cortado contra el borde del canvas (ver "Bug
    conocido de drawHBars" más arriba) — este bug no tira error de consola, solo se detecta mirando.
 5. Antes de dar la Sección 13 por terminada, corré el chequeo de sesgo del DCF (ver "Regla
