@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORCL — Oracle Corporation | Manfredi Investment Research</title>
+<link rel="icon" href="/assets/img/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/assets/img/favicon-48x48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+<link rel="canonical" href="https://manfredinvestment.com/informes/orcl.html">
+<meta name="description" content="Informe institucional sobre ORCL (Oracle): la acción cayó ~54% desde su máximo de septiembre de 2025 tras el shock de RPO de $455.000M, y el backlog llegó a $638.000M (+363%). Pero el flujo de caja libre FY2026 fue de -$23.700M por un capex de $55.700M, la deuda neta ronda los $98.000M y más de la mitad del backlog es OpenAI. DCF, comparables, reversión, consenso y fair value.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Manfredi Investment">
+<meta property="og:locale" content="es_AR">
+<meta property="og:url" content="https://manfredinvestment.com/informes/orcl.html">
+<meta property="og:title" content="ORCL — Oracle Corporation | Manfredi Investment Research">
+<meta property="og:description" content="Oracle cayó ~54% desde su máximo de septiembre de 2025. El backlog llegó a $638.000M (+363%) pero el FCF FY2026 fue -$23.700M y &gt;50% del backlog es OpenAI. El blend de cuatro métodos ($183,85) queda por encima del mercado, pero el DCF Base ($95,96) queda 40% por debajo. Tesis, valuación y fair value.">
+<meta property="og:image" content="https://manfredinvestment.com/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ORCL — Oracle Corporation | Manfredi Investment Research">
+<meta name="twitter:description" content="Oracle: backlog de $638.000M (+363%) contra un FCF de -$23.700M y deuda neta de ~$98.000M. Cheap on earnings, expensive on cash. El blend propio y el DCF Base difieren en 90 puntos.">
+<meta name="twitter:image" content="https://manfredinvestment.com/assets/img/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-dark:#0b1f3a;
+    --navy:#0e2748;
+    --navy2:#15335c;
+    --blue:#2f5f9e;
+    --blue-light:#5f8fc7;
+    --blue-pale:#eaf1f9;
+    --line:#d7e0ea;
+    --text:#161a20;
+    --muted:#69707c;
+    --green:#1a7a54;
+    --red:#a8291f;
+    --serif:'Newsreader',serif;
+    --sans:'Inter',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#fff; color:var(--text); font-family:var(--sans); font-size:15.5px; line-height:1.7;}
+  .wrap{max-width:900px; margin:0 auto; padding:0 30px 90px;}
+
+  .brandbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:26px 30px 20px; max-width:900px; margin:0 auto; border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:38px; height:38px; border:1.5px solid var(--navy-dark); display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-weight:700; color:var(--navy-dark); font-size:16px;
+  }
+  .brand-name{font-family:var(--serif); font-weight:700; font-size:17px; color:var(--text); line-height:1.15;}
+  .brand-sub{font-family:var(--sans); font-size:10px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase;}
+  .brandbar .doctype{font-family:var(--mono); font-size:11px; color:var(--muted); text-align:right;}
+
+  .frontbox{border:1px solid var(--navy-dark); margin:34px 0 8px; padding:0;}
+  .frontbox-top{display:flex; justify-content:space-between; align-items:baseline; padding:22px 28px 14px; border-bottom:1px solid var(--line);}
+  .ticker-big{font-family:var(--serif); font-size:42px; font-weight:700; color:var(--navy-dark);}
+  .exch{font-family:var(--mono); font-size:12px; color:var(--muted); margin-left:10px;}
+  .rating{font-family:var(--mono); font-size:12px; font-weight:600; color:var(--blue); text-align:right; letter-spacing:.03em;}
+  .rating small{display:block; font-family:var(--mono); font-size:10.5px; color:var(--muted); font-weight:400; margin-top:3px; letter-spacing:normal;}
+  .frontbox-body{padding:20px 28px 26px;}
+  .company-line{color:var(--muted); font-size:13.5px; margin-bottom:16px;}
+  .thesis-block{font-family:var(--serif); font-size:17.5px; line-height:1.65; color:var(--text); font-style:italic;}
+
+  .statsrow{display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line);}
+  .statcell{padding:16px 20px; border-right:1px solid var(--line);}
+  .statcell:last-child{border-right:none;}
+  .statcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:6px;}
+  .statcell .v{font-family:var(--mono); font-size:16px; font-weight:600; color:var(--text);}
+  .pos{color:var(--green);} .neg{color:var(--red);}
+
+  .secnum{font-family:var(--mono); font-size:11px; color:var(--blue-light); letter-spacing:.1em; margin:50px 0 2px;}
+  h2{font-family:var(--serif); font-size:24px; font-weight:600; color:var(--navy2); margin:2px 0 18px; padding-bottom:10px; border-bottom:1.5px solid var(--navy-dark); text-wrap:balance;}
+  h3{font-family:var(--serif); font-size:17px; font-weight:600; color:var(--navy2); margin:30px 0 10px;}
+  p{margin:0 0 15px; max-width:68ch;}
+  strong{color:var(--text);}
+
+  .table-scroll{overflow-x:auto; margin:18px 0 22px;}
+  .table-scroll table{margin:0;}
+  table{width:100%; min-width:520px; border-collapse:collapse; font-size:13.5px;}
+  th{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); text-align:left; padding:8px 10px; border-bottom:1.5px solid var(--navy-dark); white-space:nowrap;}
+  td{padding:8px 10px; border-bottom:1px solid var(--line); font-family:var(--mono); color:var(--text); font-variant-numeric:tabular-nums;}
+  td.label{font-family:var(--sans); color:var(--text);}
+  tr.total td{font-weight:600; border-top:1px solid var(--navy-dark); border-bottom:none;}
+  .right-al{text-align:right;}
+
+  .chartbox{border:1px solid var(--line); padding:20px 22px 16px; margin:22px 0;}
+  .chartbox canvas{width:100% !important; display:block;}
+  .chartcap{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:14px; text-align:center;}
+
+  .pull{border-left:2px solid var(--navy-dark); padding-left:18px; margin:22px 0; color:var(--muted); font-size:13.5px; max-width:68ch;}
+
+  .footnote{font-family:var(--mono); font-size:11px; color:var(--muted); margin:-6px 0 18px; max-width:none;}
+
+  .watermark-block{
+    position:relative; margin:60px 0; padding:26px 30px; border:1px solid var(--line); overflow:hidden;
+  }
+  .watermark-block::before{
+    content:"ORCL"; position:absolute; right:10px; top:-30px; font-family:var(--serif); font-weight:700;
+    font-size:110px; color:var(--blue-pale); z-index:0; line-height:1;
+  }
+  .watermark-block > *{position:relative; z-index:1;}
+
+  .toc{border:1px solid var(--line); padding:22px 26px; margin:30px 0;}
+  .toc-title{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px;}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:30px;}
+  .toc li{font-size:13px; margin-bottom:7px; break-inside:avoid;}
+  .toc a{color:var(--navy2); text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  .toc .toc-final a{font-weight:600;}
+
+  .disclosure{margin-top:70px; padding-top:22px; border-top:1px solid var(--navy-dark); font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.8; max-width:none;}
+
+  .fv-block{text-align:right;}
+  .fv-block .fv-label{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+  .fv-block .fv-value{font-family:var(--mono); font-size:22px; font-weight:600; color:var(--navy-dark); line-height:1.3;}
+  .fv-block .fv-gap{font-family:var(--mono); font-size:12.5px; font-weight:600;}
+  .fv-block .fv-gap.neg{color:var(--red);} .fv-block .fv-gap.pos{color:var(--green);}
+  .fv-block .fv-gap.neutral{color:var(--muted);}
+
+  .verdict-bar{display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; background:var(--blue-pale); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:14px 28px;}
+  .verdict-stance{font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--navy-dark);}
+  .verdict-stance strong{color:var(--navy-dark);}
+  .verdict-note{font-family:var(--sans); font-size:11.5px; color:var(--muted); max-width:56ch; line-height:1.5;}
+
+  .sens-table td, .sens-table th{text-align:center;}
+  .sens-table td.axis{font-family:var(--mono); font-weight:600; background:#fff; color:var(--text);}
+  .sens-table td.base-cell{outline:2px solid var(--navy-dark); outline-offset:-2px;}
+
+  .govrow{display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:1px solid var(--line); margin:20px 0;}
+  .govcell{padding:16px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .govcell:nth-child(3n){border-right:none;}
+  .govcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px;}
+  .govcell .v{font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text);}
+  .govcell .sub{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.4;}
+
+  a{color:var(--blue);}
+  :focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
+
+  @media (max-width:720px){
+    .statsrow{grid-template-columns:repeat(2,1fr);}
+    .frontbox-top{flex-direction:column; gap:10px;}
+    .rating{text-align:left;}
+    .toc ol{columns:1;}
+    .verdict-bar{flex-direction:column; align-items:flex-start;}
+    .govrow{grid-template-columns:1fr;}
+    .govcell{border-right:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <div class="brand">
+    <div class="brand-mark">MI</div>
+    <div>
+      <div class="brand-name">Manfredi Investment</div>
+      <div class="brand-sub">Research &amp; Markets</div>
+    </div>
+  </div>
+  <div class="doctype">Equity Research · Informe Institucional<br>Datos al 4Q FY2026 (cierre 31 may 2026, publicado 10 jun 2026) · Precio al 5 sep 2026</div>
+</div>
+
+<div class="wrap">
+
+  <div class="frontbox">
+    <div class="frontbox-top">
+      <div><span class="ticker-big">ORCL</span><span class="exch">NYSE · Oracle Corporation</span></div>
+      <div class="fv-block">
+        <div class="fv-label">Fair value (blend propio)</div>
+        <div class="fv-value">$183.85</div>
+        <div class="fv-gap pos">vs. $158.78 mercado · +15.8%</div>
+      </div>
+    </div>
+    <div class="verdict-bar">
+      <div class="verdict-stance">POSTURA DEL ANÁLISIS: <strong>NEUTRAL — NEGOCIO DE CALIDAD REAL, VALUACIÓN YA CORREGIDA ~54% DESDE EL MÁXIMO DE SEPTIEMBRE DE 2025, PERO CONVERTIDO EN UNA APUESTA CONCENTRADA A QUE $638.000 MILLONES DE RPO SE CONVIERTAN EN CAJA A LOS MÁRGENES CONTRATADOS. EL DCF BASE ($95.96) QUEDA 39.6% POR DEBAJO DEL MERCADO Y EL DCF INVERSO EXIGE UN CRECIMIENTO DE INGRESOS DE ~32,5% ANUAL DURANTE CINCO AÑOS SEGUIDOS PARA JUSTIFICAR EL PRECIO; LOS OTROS TRES MÉTODOS —COMPARABLES ($175.45), REVERSIÓN HISTÓRICA ($221.28) Y CONSENSO WALL STREET ($242.69)— QUEDAN POR ENCIMA. EL BLEND DE CUATRO MÉTODOS ($183.85) QUEDA 15.8% POR ENCIMA DEL PRECIO, PERO ESE PROMEDIO ESCONDE LA MAYOR DISPERSIÓN ENTRE MÉTODOS DE TODA LA COBERTURA DE ESTE DESK Y SE APOYA EN TRES MÉTODOS DE MÚLTIPLO QUE NO "VEN" NI EL CAPEX NETO DE ~$70.000 MILLONES GUIADO PARA FY2027 NI LA CONCENTRACIÓN EN OPENAI (&gt;50% DEL BACKLOG SEGÚN BofA)</strong> — Oracle es barata sobre utilidad (19.7x utilidad no-GAAP forward, por debajo de SAP y Microsoft) y cara sobre caja (flujo de caja libre FY2026 de &minus;$23.686 millones, con la deuda financiera neta cerca de $98.000 millones y subiendo)</div>
+      <div class="verdict-note">Este documento es análisis independiente con fines informativos y educativos. El autor no es un asesor financiero registrado (no CFA / no matriculado ante la CNV/SEC) y este contenido no constituye una recomendación de compra, venta o mantenimiento para ningún lector en particular. Ver disclosure completo al pie.</div>
+    </div>
+    <div class="frontbox-body">
+      <div class="company-line">Oracle Database (incl. Autonomous Database, 23ai) · Oracle Cloud Infrastructure (OCI Gen2, AI infrastructure, multicloud: Database@Azure / @AWS / @Google&nbsp;Cloud) · Fusion Cloud Applications (ERP, HCM, SCM) · NetSuite · Cerner / Oracle Health · MySQL / HeatWave · soporte de licencias on-premise · hardware (Exadata) y servicios</div>
+      <div class="thesis-block">
+        Oracle llega a este informe con el recorrido invertido respecto de casi toda la cobertura de software de este desk: en vez de haber rebotado hacia una valuación exigente, se desplomó desde ella. La acción tocó un máximo intradiario de $345.72 alrededor del 10 de septiembre de 2025 —el día en que Oracle reveló que sus obligaciones de desempeño remanentes (RPO) habían saltado a $455.000 millones tras firmar contratos gigantes de infraestructura de IA— y desde ahí cayó hasta $158.78 al 5 de septiembre de 2026, un 54% por debajo del pico y apenas un 39% por encima de su mínimo de 52 semanas ($114.50). El backlog siguió creciendo durante toda la caída: cerró el año fiscal 2026 (31-may-2026) en <strong>$638.000 millones, un aumento del 363% interanual</strong>, con el segmento OCI creciendo 77% en el año (a $18.100 millones) y 93% en el trimestre. Y sin embargo, al 5 de septiembre de 2026, la acción vale la mitad. El motivo está en el estado de flujo de efectivo: para construir la capacidad que respalda ese backlog, Oracle gastó <strong>$55.663 millones de capex en el año fiscal 2026</strong> —el 82,6% de sus ingresos— y generó un <strong>flujo de caja libre de &minus;$23.686 millones</strong>; para el año fiscal 2027 guió un capex neto de ~$70.000 millones y anunció que levantará ~$40.000 millones adicionales de deuda y capital, sobre una deuda financiera que ya pasó de $92.600 millones a $129.500 millones en un solo año. A eso se suma la concentración: distintas estimaciones de research (Bank of America) ubican a <strong>OpenAI en más de la mitad del backlog</strong> de Oracle —una compañía privada que perdió más de $20.000 millones operativos en 2025, cuyo evento de liquidez se postergó a 2027, y cuyos compromisos plurianuales con Oracle se reportan en cientos de miles de millones—. Este informe recorre el negocio completo —los 49 años de historia desde la base de datos relacional hasta el pivote a la nube, la ola de adquisiciones (PeopleSoft, Sun, Cerner por $28.300 millones), los segmentos y el modelo de contratos de IA con prepago del cliente, el balance apalancado, la transición a los co-CEOs Clay Magouyrk y Mike Sicilia con Larry Ellison (40,6% del capital) como presidente ejecutivo, y los riesgos— antes de llegar, en la Sección 13, a cuatro métodos que por primera vez en esta cobertura apuntan en direcciones opuestas: el DCF Base ($95.96) y el DCF inverso dicen que la acción descuenta una conversión de RPO casi perfecta, mientras comparables, reversión histórica y consenso —los tres ciegos al capex— la ubican entre $175 y $243. El blend ($183.85) queda por encima del precio, pero la conclusión honesta no es "comprar barato": es que a $158.78 la acción ya no está obviamente cara, y que todo depende de una sola variable —si $638.000 millones de backlog se cobran— sobre la que ni Oracle ni este modelo tienen certeza.
+      </div>
+    </div>
+    <div class="statsrow">
+      <div class="statcell"><div class="k">Ingresos FY2026 (TTM)</div><div class="v">$67.36B</div></div>
+      <div class="statcell"><div class="k">Var. ingresos interanual</div><div class="v pos">+17.4%</div></div>
+      <div class="statcell"><div class="k">Margen FCF TTM</div><div class="v neg">&minus;35.2%</div></div>
+      <div class="statcell"><div class="k">RPO (backlog contratado)</div><div class="v">$638B</div></div>
+    </div>
+  </div>
+  <p class="footnote">Cifras fundamentales: SEC EDGAR XBRL (Form 10-K FY2026, Form 10-Q, CIK 0001341439) y comunicado de resultados oficial del 10-jun-2026, correspondiente al 4Q y al año fiscal cerrado el 31 de mayo de 2026 (el año fiscal de Oracle cierra el 31 de mayo). Precio de mercado y múltiplos de comparables al cierre del 5 de septiembre de 2026 (Yahoo Finance chart API, stockanalysis.com). Oracle publicará su 1Q/FY2027 alrededor del 9–11 de septiembre de 2026; este informe no incorpora ese resultado. Los múltiplos de utilidad se calculan sobre EPS no-GAAP salvo aclaración expresa. Este documento es 100% analítico — no constituye una recomendación de compra, venta ni mantenimiento. Ver disclosure completo al pie.</p>
+
+  <div class="toc">
+    <div class="toc-title">Contenido</div>
+    <ol>
+      <li><a href="#s01">Resumen Ejecutivo</a></li>
+      <li><a href="#s02">Historia y Evolución</a></li>
+      <li><a href="#s03">Modelo de Negocio y Segmentos</a></li>
+      <li><a href="#s04">Desarrollos Recientes y Perspectiva</a></li>
+      <li><a href="#s05">Estados Financieros</a></li>
+      <li><a href="#s06">Deuda y Balance</a></li>
+      <li><a href="#s07">Flujo de Caja y Capital Allocation</a></li>
+      <li><a href="#s08">Comparables de Industria</a></li>
+      <li><a href="#s09">Gobierno Corporativo y Estructura Accionaria</a></li>
+      <li><a href="#s10">Registro de Riesgos</a></li>
+      <li><a href="#s11">Catalizadores</a></li>
+      <li><a href="#s12">Modelo Financiero Proyectado y Momentum de Estimados</a></li>
+      <li class="toc-final"><a href="#s13">Valuación: Cuatro Métodos y el Fair Value</a></li>
+      <li><a href="#s14">Limitaciones del Modelo</a></li>
+    </ol>
+  </div>
+
+  <!-- 01 -->
+  <p class="secnum" id="s01">01 — Resumen Ejecutivo</p>
+  <h2>El backlog se multiplicó por 4,6 en un año; la acción se partió al medio. La diferencia es el flujo de caja</h2>
+  <p>
+    Oracle es la historia más difícil de valuar de toda la cobertura de software de este desk, y no porque el negocio
+    sea malo. En el año fiscal cerrado el 31 de mayo de 2026 facturó <strong>$67.357 millones (+17,4% interanual)</strong>,
+    con una utilidad operativa GAAP de $20.606 millones (margen del 30,6%), una utilidad neta GAAP de $17.087 millones y
+    un EPS diluido GAAP de $5.83 ($7.63 no-GAAP). El segmento de infraestructura de nube (OCI) creció 77% en el año y
+    93% en el 4Q, y las <strong>obligaciones de desempeño remanentes (RPO) —el backlog total contratado— cerraron el año
+    en $638.000 millones, un aumento del 363% interanual y $85.000 millones más que un trimestre antes</strong>. Ese es
+    el número que, en septiembre de 2025, cuando la primera lectura del salto llevó el RPO a $455.000 millones, hizo
+    subir la acción hasta un máximo intradiario de $345.72 y convirtió brevemente a Larry Ellison en la persona más rica
+    del mundo.
+  </p>
+  <p>
+    Un año después, al 5 de septiembre de 2026, la acción cotiza a <strong>$158.78 — un 54% por debajo de aquel
+    máximo</strong>, cerca de su mínimo de 52 semanas ($114.50), y con una caída del 24,8% solo en la primera mitad de
+    2026. El backlog, mientras tanto, siguió creciendo. La divergencia entre un backlog que se multiplica y una acción
+    que se parte al medio se explica casi enteramente por el <strong>estado de flujo de efectivo</strong>:
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Año fiscal (cierre 31 may)</th><th class="right-al">Flujo de caja operativo</th><th class="right-al">Capex</th><th class="right-al">Flujo de caja libre</th></tr>
+    <tr><td class="label">FY2024</td><td class="right-al">$18.67B</td><td class="right-al">$6.87B</td><td class="right-al pos">+$11.81B</td></tr>
+    <tr><td class="label">FY2025</td><td class="right-al">$20.82B</td><td class="right-al">$21.21B</td><td class="right-al neg">&minus;$0.39B</td></tr>
+    <tr class="total"><td class="label">FY2026</td><td class="right-al">$31.98B</td><td class="right-al">$55.66B</td><td class="right-al neg">&minus;$23.69B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL (NetCashProvidedByUsedInOperatingActivities, PaymentsToAcquirePropertyPlantAndEquipment), Form 10-K FY2024–FY2026. El capex de FY2026 ($55.663M) equivale al 82,6% de los ingresos del año.</p>
+  <p>
+    Para el año fiscal 2027, Oracle guió <strong>ingresos totales de ~$90.000 millones (+33,6%)</strong>, un EPS no-GAAP
+    de $8.05, y un <strong>capex neto de ~$70.000 millones</strong> (el capex bruto reportado será $20.000–$25.000
+    millones mayor por la porción de hardware que los clientes de IA prepagan o aportan directamente). Para financiarlo,
+    la compañía anunció que levantará <strong>~$40.000 millones adicionales</strong> entre deuda y capital (incluidos
+    ~$20.000 millones de un programa de emisión de acciones "at-the-market"), sobre una deuda financiera que ya pasó de
+    $92.568 millones a $129.541 millones en el año fiscal 2026. S&amp;P estimó públicamente un capex FY2027 superior a
+    $90.000 millones y un flujo de caja operativo neto negativo de ~$42.000 millones, y advirtió que el apalancamiento
+    ajustado se acerca a 4,5x —por encima del umbral de 4x que asocia a una calificación BBB—.
+  </p>
+  <p>
+    A eso se suma la <strong>concentración</strong>. La mayor parte del incremento de RPO de los dos últimos trimestres
+    proviene de un puñado de contratos de infraestructura de IA a gran escala —cuatro clientes contratados por más de
+    $8.000 millones cada uno—, y distintas estimaciones de research ubican a <strong>OpenAI en más del 50% del backlog
+    de Oracle</strong>. OpenAI es una compañía privada que reportó una pérdida operativa de ~$20.900 millones en 2025,
+    cuyo evento de liquidez (IPO) se postergó a 2027, y cuyos compromisos plurianuales de nube con Oracle se reportan en
+    cifras de hasta $300.000 millones. Si esos compromisos se reprograman, se renegocian o no se cobran al ritmo
+    contratado, buena parte del backlog que sostiene la tesis alcista pierde valor — y Oracle ya habría construido (y
+    financiado con deuda) la capacidad.
+  </p>
+  <p>
+    La contracara es que <strong>el mercado ya corrigió mucho de esto</strong>. A $158.78 Oracle cotiza a 19,7x utilidad
+    no-GAAP forward (consenso FY2027 de $8.06) —por debajo de SAP (~26x), de Microsoft (~25x) y apenas por encima de IBM
+    (~18x)— y a 6,8x ventas, muy lejos de las 40x de CrowdStrike o las 21x de Snowflake en los informes equivalentes de
+    este desk. Sobre <em>utilidad</em>, Oracle no está cara. La tensión de la Sección 13 es exactamente esa: el DCF
+    Base ($95.96) y el DCF inverso —los únicos métodos que incorporan el capex y la deuda— quedan ~40% por debajo del
+    mercado y exigen una conversión de RPO casi perfecta para cerrar la brecha; comparables ($175.45), reversión
+    histórica ($221.28) y consenso ($242.69) —los tres ciegos al flujo de caja— quedan por encima. El blend simple de
+    los cuatro da <strong>$183.85</strong>, un 15,8% por encima del precio, pero con la dispersión entre métodos más
+    amplia de toda la cobertura. La postura es <strong>neutral</strong>: el negocio es real y la valuación ya no es
+    absurda, pero al precio del 5-sep-2026 la acción es una apuesta apalancada y concentrada a que $638.000 millones de backlog se conviertan
+    en caja, no una ganga.
+  </p>
+
+  <!-- 02 -->
+  <p class="secnum" id="s02">02 — Historia y Evolución</p>
+  <h2>De la primera base de datos relacional comercial (1979) a la mayor apuesta de infraestructura de IA de una empresa de software</h2>
+  <p>
+    <strong>Oracle</strong> fue fundada en 1977 en Santa Clara por <strong>Larry Ellison</strong>, <strong>Bob
+    Miner</strong> y <strong>Ed Oates</strong> como Software Development Laboratories, inspirada en un paper de IBM de
+    Edgar Codd sobre bases de datos relacionales que IBM misma no había comercializado. En 1979 lanzó <strong>Oracle
+    v2</strong>, la primera base de datos relacional comercial basada en SQL. Durante las dos décadas siguientes la
+    compañía —renombrada Oracle en 1982, con IPO en 1986, la misma semana que Microsoft— se convirtió en el estándar de
+    facto de las bases de datos empresariales, el sistema donde las grandes organizaciones guardan sus transacciones
+    críticas, con un modelo de licencia perpetua más un contrato de <em>soporte</em> anual recurrente (típicamente 22%
+    del valor de licencia) que resultó ser una de las rentas más duraderas y de mayor margen del software.
+  </p>
+  <p>
+    A partir de 2005 Oracle ejecutó una <strong>ola de adquisiciones</strong> que la transformó de proveedor de bases de
+    datos en conglomerado de software empresarial: <strong>PeopleSoft</strong> ($10.300 millones, 2005, tras una OPA
+    hostil de 18 meses), <strong>Siebel</strong> (CRM, 2006), <strong>Hyperion</strong> (2007), <strong>BEA
+    Systems</strong> (middleware, 2008), <strong>Sun Microsystems</strong> ($7.400 millones, 2010, que le dio Java, MySQL
+    y el negocio de hardware), <strong>NetSuite</strong> (ERP cloud para pymes, $9.300 millones, 2016) y —la mayor de su
+    historia— <strong>Cerner</strong> ($28.300 millones, 2022), el segundo proveedor de historias clínicas electrónicas
+    de Estados Unidos, más tarde rebautizado <em>Oracle Health</em>. Cada compra sumó otra renta de soporte recurrente; el
+    costo fue un balance con goodwill elevado y una integración —la de Cerner en particular— que todavía pesa sobre el
+    crecimiento del segmento de aplicaciones.
+  </p>
+  <div class="chartbox">
+    <canvas id="historyChart" height="320"></canvas>
+    <p class="chartcap">Ingresos anuales reportados, FY2017–FY2026 (año fiscal cerrado el 31 de mayo). El salto de FY2022 a FY2023 incorpora un año completo de Cerner. La aceleración de FY2025 a FY2026 (+17,4%) es la primera contribución material de los contratos de infraestructura de IA de OCI. Fuente: SEC EDGAR XBRL / comunicados de resultados de Oracle.</p>
+  </div>
+  <p>
+    El <strong>pivote a la nube</strong> llegó tarde y en dos frentes. En aplicaciones, Oracle reconstruyó su suite ERP,
+    HCM y SCM como <strong>Fusion Cloud Applications</strong> (SaaS) y la combinó con NetSuite para el mercado medio; ese
+    negocio compite con SAP y con Workday y crece a un dígito bajo-medio. En infraestructura, tras un primer intento
+    fallido, Oracle relanzó en 2018 <strong>OCI Gen2</strong>, una nube de infraestructura rediseñada. El punto de
+    inflexión estratégico fue reconocer que no ganaría la guerra de la nube de propósito general contra AWS, Azure y
+    Google Cloud, y en cambio: (a) firmar acuerdos <strong>multicloud</strong> para correr la base de datos Oracle
+    <em>dentro</em> de los centros de datos de sus tres rivales (Oracle Database@Azure, @AWS, @Google&nbsp;Cloud,
+    2023–2024), y (b) a partir de 2024, posicionar OCI como el proveedor de <strong>capacidad de cómputo para
+    entrenamiento e inferencia de IA</strong>, apoyándose en un diseño de red de baja latencia (RDMA) atractivo para
+    cargas de GPU a gran escala.
+  </p>
+  <p>
+    El resultado de (b) es lo que domina la historia actual. En enero de 2025 Oracle fue anunciada como socio de
+    infraestructura del proyecto <strong>Stargate</strong> —la iniciativa de OpenAI, SoftBank, Oracle y MGX para
+    construir centros de datos de IA en Estados Unidos por hasta $500.000 millones—. A lo largo del año fiscal 2026
+    Oracle firmó una serie de contratos plurianuales de capacidad de IA en los que, de forma inusual para el software,
+    <strong>el cliente prepaga las GPU o directamente las compra y se las entrega a Oracle</strong>. Esos contratos son
+    la causa del salto de RPO de $130.000 millones (fin FY2025) a $638.000 millones (fin FY2026) y, a la vez, de un
+    capex que pasó de $21.000 millones a $55.700 millones en un año.
+  </p>
+  <p class="pull">
+    El patrón de 49 años de Oracle: identificar una categoría de software crítico, imponerse en ella, y monetizarla con
+    una renta de soporte recurrente de altísimo margen —primero la base de datos, luego las aplicaciones empresariales
+    adquiridas—. La apuesta de la etapa actual rompe ese patrón: en vez de vender software con costo marginal cercano a
+    cero, Oracle está construyendo —y financiando con deuda— la infraestructura física más intensiva en capital de su
+    historia, con la expectativa de que la renta de la nube de IA sea igual de duradera. El precio de la acción al
+    5-sep-2026 dice que el mercado todavía no está convencido.
+  </p>
+
+  <!-- 03 -->
+  <p class="secnum" id="s03">03 — Modelo de Negocio y Segmentos</p>
+  <h2>Una renta de soporte de licencias madura y de alto margen, y encima un negocio de infraestructura de IA que crece 90% y consume caja</h2>
+  <p>
+    Oracle reporta sus ingresos en cuatro líneas. La más grande, <strong>Cloud Services y soporte de licencias</strong>
+    (~$44.000 millones en FY2026, ~66% del total), mezcla dos cosas de naturaleza muy distinta: la renta de
+    <em>soporte</em> de las licencias on-premise históricas (madura, plana, con márgenes brutos que superan el 90%) y
+    los <em>servicios de nube</em> (OCI + SaaS), que crecen rápido pero con márgenes brutos mucho más bajos, sobre todo
+    en la parte de infraestructura. Las otras tres líneas —<strong>licencias nuevas</strong> (en declive estructural),
+    <strong>hardware</strong> (Exadata y sistemas de ingeniería, plano) y <strong>servicios</strong> (consultoría, de
+    bajo margen)— suman en conjunto ~34% de los ingresos y aportan poco al crecimiento.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Línea de ingreso (FY2026)</th><th class="right-al">Ingresos aprox.</th><th class="right-al">% del total</th><th class="right-al">Dinámica</th></tr>
+    <tr><td class="label">Cloud services y soporte de licencias</td><td class="right-al">$44.0B</td><td class="right-al">~65%</td><td class="right-al">Crece (empuja OCI)</td></tr>
+    <tr><td class="label">Licencias nuevas (cloud license + on-premise)</td><td class="right-al">$5.0B</td><td class="right-al">~7%</td><td class="right-al">Declive</td></tr>
+    <tr><td class="label">Hardware</td><td class="right-al">$3.0B</td><td class="right-al">~4%</td><td class="right-al">Plano</td></tr>
+    <tr><td class="label">Servicios</td><td class="right-al">$5.5B</td><td class="right-al">~8%</td><td class="right-al">Plano / bajo margen</td></tr>
+    <tr class="total"><td class="label">Total ingresos FY2026</td><td class="right-al">$67.36B</td><td class="right-al">100%</td><td class="right-al">+17,4%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL para el total de ingresos FY2026 (cifra exacta $67.357M). La desagregación por línea es una aproximación redondeada a partir de la estructura de reporte histórica de Oracle y los comentarios del comunicado del 10-jun-2026; Oracle cambió la presentación de segmentos en años recientes y no todas las líneas se publican con el mismo detalle cada trimestre. La suma de las aproximaciones puede no cerrar exactamente por redondeo.</p>
+  <p>
+    Para entender el negocio hay que mirar <strong>"Total Cloud Revenue"</strong>, la métrica que Oracle destaca y que
+    corta transversalmente las líneas de arriba. En FY2026 fue de <strong>$34.000 millones (+39% interanual)</strong>, y
+    se divide en:
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Componente de nube (FY2026)</th><th class="right-al">Ingresos</th><th class="right-al">Crecimiento</th><th class="right-al">Perfil</th></tr>
+    <tr><td class="label">OCI — Cloud Infrastructure (IaaS)</td><td class="right-al">$18.1B</td><td class="right-al pos">+77%</td><td class="right-al">Capital-intensivo, margen bruto bajo</td></tr>
+    <tr><td class="label">Cloud Applications (SaaS: Fusion, NetSuite, Health)</td><td class="right-al">$15.9B</td><td class="right-al pos">+11%</td><td class="right-al">Alto margen, crecimiento moderado</td></tr>
+    <tr class="total"><td class="label">Total Cloud Revenue</td><td class="right-al">$34.0B</td><td class="right-al pos">+39%</td><td class="right-al">—</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: comunicado de resultados de Oracle del 10-jun-2026 (Q4 &amp; FY2026). El resto de los ingresos (~$33.400M) corresponde a soporte de licencias on-premise, licencias nuevas, hardware y servicios.</p>
+  <div class="chartbox">
+    <canvas id="cloudChart" height="240"></canvas>
+    <p class="chartcap">OCI (infraestructura) vs. SaaS (aplicaciones), ingresos anuales FY2024–FY2026 y guía propia de Oracle para OCI hasta FY2030 ($32B, $73B, $114B, $144B en los cuatro años posteriores a FY2026). La guía de OCI implica un crecimiento anual compuesto cercano al 68% desde FY2026 — el supuesto más agresivo de toda la tesis. Fuente: comunicado del 10-jun-2026 y earnings call.</p>
+  </div>
+  <h3>El modelo de contratos de IA: prepago del cliente y "bring-your-own-GPU"</h3>
+  <p>
+    La mecánica de los grandes contratos de infraestructura de IA es lo que hace a Oracle difícil de modelar. Según la
+    compañía, en la mayoría de esos contratos <strong>el cliente prepaga la compra de las GPU, o directamente compra el
+    hardware y se lo entrega a Oracle</strong>; la porción de hardware prepagada o aportada por el cliente en los grandes
+    contratos de IA suma <strong>$75.000 millones</strong> del RPO. Eso tiene dos consecuencias contables importantes:
+    (1) infla el flujo de caja operativo de corto plazo (entra caja de prepago antes de que se reconozca el ingreso), lo
+    que hace que el margen de OCF reportado de FY2026 (47,5%) sea más alto de lo que el negocio sostendrá cuando la
+    mezcla de contratos se normalice; y (2) parte del capex bruto reportado no es inversión "de riesgo" de Oracle sino
+    hardware ya financiado por el cliente — por eso Oracle guía el capex <em>neto</em> (~$70.000 millones para FY2027)
+    como la cifra relevante. La CFO Hilary Maxson señaló que Oracle usa "contratos a precio fijo cuando los costos se
+    conocen" y mecanismos de traspaso de costo cuando hay incertidumbre — es decir, el riesgo de precio de las GPU está
+    parcialmente, pero no totalmente, trasladado al cliente.
+  </p>
+  <h3>Las métricas que el mercado mira</h3>
+  <p>
+    Tres números concentran la atención: (1) <strong>RPO</strong> ($638.000 millones), el backlog contratado total, del
+    cual Oracle espera reconocer aproximadamente el 40% en los próximos 24 meses; (2) el <strong>crecimiento de
+    OCI</strong> (77% en FY2026, guía de +77% para FY2027 hasta $32.000 millones); y (3) la <strong>utilización de
+    GPU</strong>, que Oracle reporta en 97,5% a nivel global — es decir, toda la capacidad instalada está vendida, y la
+    oferta sigue por detrás de la demanda. La contracara que el mercado también mira: el capex, la deuda y qué fracción
+    del RPO corresponde a un solo cliente.
+  </p>
+
+  <!-- 04 -->
+  <p class="secnum" id="s04">04 — Desarrollos Recientes y Perspectiva</p>
+  <h2>Tres frentes: el backlog de $638.000M, el capex que no encuentra techo, y la transición a los co-CEOs</h2>
+  <h3>4Q y FY2026 (publicado el 10-jun-2026): el backlog explota, la caja se hunde</h3>
+  <p>
+    Oracle reportó ingresos del 4Q de <strong>$19.184 millones (+20,6% interanual)</strong>, con OCI +93% a $5.800
+    millones y aplicaciones cloud +10%. El EPS no-GAAP del trimestre fue $2.11 (+24%). Para el año completo: ingresos
+    <strong>$67.357 millones (+17,4%)</strong>, utilidad operativa GAAP $20.606 millones (30,6% de margen), EPS GAAP
+    $5.83, EPS no-GAAP $7.63 (+27%), flujo de caja operativo $31.977 millones (+53,6%). El dato que dominó la reacción
+    fue el <strong>RPO de $638.000 millones, +363% interanual y +$85.000 millones respecto del 3Q</strong>, con
+    $67.000 millones de contratos de infraestructura de IA firmados solo en el 4Q y cuatro clientes contratados por más
+    de $8.000 millones cada uno. Oracle entregó más de 1,2 gigavatios de capacidad en FY2026 y guió ~1 GW adicional para
+    el 1Q/FY2027.
+  </p>
+  <p>
+    La guía para <strong>FY2027</strong>: ingresos totales de ~$90.000 millones (+33,6%), EPS no-GAAP de $8.05, y para
+    el 1Q crecimiento de ingresos del 27%–29% y de ingresos de nube del 58%–64%, con EPS no-GAAP de $1.72–$1.76. La guía
+    de largo plazo, reiterada en la earnings call: <strong>crecimiento anual compuesto de ingresos del 31% y de EPS del
+    28% hasta FY2030</strong>, con la línea de OCI llegando a $144.000 millones ese año (desde $18.100 millones en
+    FY2026). La CFO advirtió que los <strong>márgenes brutos de FY2027 van a "escalonar hacia abajo"</strong> por el
+    momento del ramp-up de centros de datos y la mezcla de producto, con recuperación esperada a medida que la
+    infraestructura alcance su contribución plena de ingresos contratados.
+  </p>
+  <h3>El capex y el financiamiento</h3>
+  <p>
+    En FY2026 Oracle gastó <strong>$55.663 millones de capex</strong> (82,6% de los ingresos) y levantó ~$43.000
+    millones de deuda más ~$5.000 millones de capital. Para FY2027 guió un <strong>capex neto de ~$70.000 millones</strong>
+    (bruto $20.000–$25.000 millones mayor por prepagos de clientes) y anunció que levantará ~$40.000 millones adicionales
+    entre deuda y capital, incluidos ~$20.000 millones vía un programa de emisión "at-the-market" de acciones —lo que
+    implica dilución explícita, algo inusual para Oracle, que durante una década fue una máquina de recomprar acciones—.
+    Management dijo no esperar deuda adicional en el año calendario 2026 más allá de lo ya previsto. S&amp;P, más
+    pesimista que la guía, estimó capex FY2027 &gt;$90.000 millones y flujo de caja operativo neto de ~&minus;$42.000
+    millones.
+  </p>
+  <h3>La transición a co-CEOs y la concentración en OpenAI</h3>
+  <p>
+    El 22 de septiembre de 2025 Oracle anunció que <strong>Safra Catz</strong>, CEO desde 2014, pasaba a
+    <strong>vicepresidenta ejecutiva del directorio</strong>, y que la compañía sería dirigida por dos co-CEOs
+    ascendidos internamente: <strong>Clay Magouyrk</strong> (que dirigía OCI) y <strong>Mike Sicilia</strong> (que
+    dirigía las aplicaciones de industria). Larry Ellison sigue como presidente ejecutivo y CTO, con el 40,6% del
+    capital (Sección 09). Sobre la concentración: Oracle no divulga la identidad ni el peso de sus mayores clientes de
+    IA, pero estimaciones de Bank of America ubican a <strong>OpenAI en más del 50% del backlog</strong>. Reportes de
+    prensa de mediados de 2026 señalaron que OpenAI habría quedado por debajo de sus propias metas internas de usuarios
+    e ingresos para el año, y que modelos de IA chinos ganaron participación — lo que reavivó la pregunta sobre la
+    capacidad de OpenAI de honrar compromisos de nube de hasta $300.000 millones sin haber concretado todavía su evento
+    de liquidez, ahora postergado a 2027.
+  </p>
+
+  <!-- 05 -->
+  <p class="secnum" id="s05">05 — Estados Financieros</p>
+  <h2>Los últimos dos trimestres y el año fiscal 2026 — utilidad GAAP sólida, flujo de caja libre profundamente negativo</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">3Q FY26 (feb-26)</th><th class="right-al">4Q FY26 (may-26)</th><th class="right-al">FY2026 (12 meses)</th></tr>
+    <tr><td class="label">Ingresos totales</td><td class="right-al">$17.19B</td><td class="right-al">$19.18B</td><td class="right-al">$67.36B</td></tr>
+    <tr><td class="label">Var. interanual</td><td class="right-al pos">+21.7%</td><td class="right-al pos">+20.6%</td><td class="right-al pos">+17.4%</td></tr>
+    <tr><td class="label">Utilidad operativa (GAAP)</td><td class="right-al">$5.46B</td><td class="right-al">$6.13B</td><td class="right-al">$20.61B</td></tr>
+    <tr><td class="label">Margen operativo (GAAP)</td><td class="right-al">31.8%</td><td class="right-al">32.0%</td><td class="right-al">30.6%</td></tr>
+    <tr><td class="label">Utilidad neta (GAAP)</td><td class="right-al">$3.72B</td><td class="right-al">$4.30B</td><td class="right-al">$17.09B</td></tr>
+    <tr><td class="label">EPS diluido (GAAP)</td><td class="right-al">$1.27</td><td class="right-al">$1.45</td><td class="right-al">$5.83</td></tr>
+    <tr><td class="label">EPS diluido (no-GAAP)</td><td class="right-al">$1.79</td><td class="right-al">$2.11</td><td class="right-al">$7.63</td></tr>
+    <tr><td class="label">Flujo de caja operativo</td><td class="right-al">$7.15B</td><td class="right-al">$14.62B</td><td class="right-al">$31.98B</td></tr>
+    <tr><td class="label">Capex</td><td class="right-al neg">$18.64B</td><td class="right-al neg">$16.49B</td><td class="right-al neg">$55.66B</td></tr>
+    <tr class="total"><td class="label">Flujo de caja libre</td><td class="right-al neg">&minus;$11.49B</td><td class="right-al neg">&minus;$1.87B</td><td class="right-al neg">&minus;$23.69B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL companyfacts API (CIK 0001341439) y comunicado de resultados del 10-jun-2026. Los trimestres standalone se aíslan restando el acumulado YTD del período previo (OCF y capex vienen acumulados en los 10-Q). El 4Q se obtiene restando los nueve meses del año fiscal completo. El EPS no-GAAP trimestral es dato oficial del comunicado.</p>
+  <p>
+    La tabla contiene la doble cara de Oracle. Del lado <strong>GAAP la compañía luce sana</strong>: margen operativo del
+    30,6%, utilidad neta de $17.100 millones, EPS creciendo a doble dígito. El puente GAAP → no-GAAP es chico para los
+    estándares del software de crecimiento —Oracle es una compañía madura, con compensación en acciones de
+    aproximadamente el 8%–9% de los ingresos, no del 20%–30% como Snowflake o CrowdStrike—; la brecha de ~$1.80 entre
+    EPS GAAP ($5.83) y no-GAAP ($7.63) es principalmente compensación en acciones y amortización de intangibles
+    adquiridos (Cerner, Sun). Un rasgo a marcar: <strong>el 2Q FY2026 tuvo una utilidad neta GAAP de $6.135 millones
+    contra una utilidad operativa de $4.731 millones</strong> — es decir, ~$1.400 millones de ganancia <em>no
+    operativa</em>, en su mayoría revaluación no-caja de participaciones de Oracle en otras compañías. Ese ítem infla el
+    EPS TTM y hay que tenerlo presente al mirar múltiplos de utilidad (Sección 13, Método 3).
+  </p>
+  <p>
+    Del lado del <strong>flujo de caja, el cuadro es el opuesto</strong>: cada trimestre de FY2026 tuvo flujo de caja
+    libre negativo, y el año cerró en &minus;$23.686 millones. El 4Q (&minus;$1,87B) fue el "mejor" porque entró un
+    volumen grande de prepagos de clientes de IA que abultó el OCF a $14.620 millones. Esa estacionalidad de prepagos
+    —caja que entra antes de que se reconozca el ingreso o se despliegue el capex asociado— es precisamente lo que hace
+    que el margen de OCF de FY2026 (47,5%) sea un mal ancla para el futuro: cuando la mezcla de contratos madure hacia
+    facturación en período, el margen de OCF va a converger hacia algo más cercano al margen operativo más D&amp;A.
+  </p>
+  <div class="chartbox">
+    <canvas id="marginChart" height="260"></canvas>
+    <p class="chartcap">Margen operativo GAAP vs. margen de flujo de caja libre, por año fiscal FY2022–FY2026. El margen operativo se mantiene estable en torno al 30%; el margen de FCF se derrumbó de +26% (FY2022) a &minus;35% (FY2026) a medida que el capex de infraestructura de IA superó al flujo de caja operativo. Fuente: SEC EDGAR XBRL.</p>
+  </div>
+
+  <!-- 06 -->
+  <p class="secnum" id="s06">06 — Deuda y Balance</p>
+  <h2>Deuda financiera de $129.500 millones (+$37.000M en un año), deuda neta cercana a $98.000 millones, y creciendo por diseño</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica (al 31 may 2026)</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Efectivo y equivalentes</td><td class="right-al">$31.29B</td></tr>
+    <tr><td class="label">Deuda financiera total (corriente + no corriente)</td><td class="right-al neg">$129.54B</td></tr>
+    <tr><td class="label">— de la cual, porción corriente</td><td class="right-al">$7.20B</td></tr>
+    <tr class="total"><td class="label">Deuda financiera neta (deuda &minus; efectivo)</td><td class="right-al neg">&minus;$98.25B</td></tr>
+    <tr><td class="label">RPO (obligaciones de desempeño remanentes)</td><td class="right-al">$638B</td></tr>
+    <tr><td class="label">Deuda financiera total — FY2024 / FY2025 / FY2026</td><td class="right-al">$86.9B / $92.6B / $129.5B</td></tr>
+    <tr><td class="label">Deuda "ajustada" incl. arrendamientos (estimación S&amp;P / agregadores)</td><td class="right-al neg">~$165–167B</td></tr>
+    <tr><td class="label">Apalancamiento ajustado estimado (S&amp;P)</td><td class="right-al neg">~4.5x</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL (DebtLongtermAndShorttermCombinedAmount $129.541M; DebtCurrent $7.199M; CashAndCashEquivalentsAtCarryingValue $31.289M), Form 10-K FY2026. La deuda neta de este informe (&minus;$98.25B) usa solo efectivo y equivalentes contra deuda financiera, sin netear inversiones de corto plazo ni sumar pasivos por arrendamiento; stockanalysis.com reporta una deuda neta de ~$135.5B usando una definición más amplia. S&amp;P Global Ratings publicó la estimación de apalancamiento ajustado de ~4,5x y la advertencia sobre el umbral BBB.</p>
+  <p>
+    El balance de Oracle es el más apalancado de toda la cobertura de software de este desk, y a diferencia de casi
+    todos los demás —que tienen caja neta positiva— acá la conversión del valor de empresa a valor por acción
+    <strong>resta ~$98.000 millones de deuda neta</strong>, y esa cifra está subiendo por decisión de la compañía: la
+    guía de FY2027 contempla otros ~$40.000 millones de financiamiento. La deuda financiera bruta creció $37.000 millones
+    en el año fiscal 2026 (de $92.600 millones a $129.500 millones), y si se le suman los pasivos por arrendamiento de
+    centros de datos, distintas fuentes ubican la carga total en $165.000–$167.000 millones.
+  </p>
+  <p>
+    El punto no es la solvencia inmediata —Oracle genera $32.000 millones de flujo de caja operativo y tiene una renta
+    de soporte de licencias muy estable que cubre con holgura los intereses—, sino la <strong>trayectoria y la
+    sensibilidad</strong>. Con un apalancamiento ajustado que S&amp;P estima cerca de 4,5x y por encima del umbral que
+    asocia a una calificación BBB, cualquier rebaja de rating encarece los ~$40.000 millones anuales de emisión que la
+    compañía necesita para financiar el plan de capex. Y como el equity es un residuo relativamente chico sobre una base
+    de activos financiada mayormente con deuda, <strong>cualquier diferencia operativa razonable entre escenarios se
+    amplifica en el valor por acción</strong> — es la razón por la que el rango entre el DCF Bear y el DCF Bull de la
+    Sección 13 (de ~$40 a ~$255, un factor de 6,4x) es mucho más ancho que en una cobertura con balance sano, y no es
+    un error del modelo sino la consecuencia matemática del apalancamiento.
+  </p>
+
+  <!-- 07 -->
+  <p class="secnum" id="s07">07 — Flujo de Caja y Capital Allocation</p>
+  <h2>&minus;$23.686 millones de flujo de caja libre, dividendo mantenido, recompras congeladas y dilución nueva</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">FY2025</th><th class="right-al">FY2026</th></tr>
+    <tr><td class="label">Flujo de caja operativo (OCF)</td><td class="right-al">$20.82B</td><td class="right-al">$31.98B</td></tr>
+    <tr><td class="label">Margen de OCF</td><td class="right-al">36.3%</td><td class="right-al">47.5%</td></tr>
+    <tr><td class="label">Capex (adiciones a PP&amp;E)</td><td class="right-al neg">$21.21B</td><td class="right-al neg">$55.66B</td></tr>
+    <tr><td class="label">Capex / Ingresos</td><td class="right-al neg">37.0%</td><td class="right-al neg">82.6%</td></tr>
+    <tr class="total"><td class="label">Flujo de caja libre (FCF)</td><td class="right-al neg">&minus;$0.39B</td><td class="right-al neg">&minus;$23.69B</td></tr>
+    <tr><td class="label">Margen de FCF sobre ingresos</td><td class="right-al neg">&minus;0.7%</td><td class="right-al neg">&minus;35.2%</td></tr>
+    <tr><td class="label">Dividendos pagados (aprox.)</td><td class="right-al neg">~$5.6B</td><td class="right-al neg">~$5.8B</td></tr>
+    <tr><td class="label">Recompras netas de acciones</td><td class="right-al">~nulas</td><td class="right-al">~nulas</td></tr>
+    <tr><td class="label">Acciones diluidas (var. interanual)</td><td class="right-al neg">+2%</td><td class="right-al neg">+2%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL companyfacts API (NetCashProvidedByUsedInOperatingActivities, PaymentsToAcquirePropertyPlantAndEquipment), Form 10-K. Dividendos: dividendo trimestral de $0.50 por acción (yield ~1,26% al precio actual) × ~2.880M de acciones. Oracle recompró de forma agresiva entre 2017 y 2023 (redujo el conteo de acciones de ~4.100M a ~2.700M) pero prácticamente suspendió el programa desde FY2024; el conteo de acciones ahora sube ~2% al año por compensación en acciones, y la guía FY2027 contempla emisión adicional "at-the-market".</p>
+  <p>
+    El flujo de caja es la razón por la que Oracle, al 5-sep-2026, vale la mitad de lo que valía en septiembre de 2025. El margen de OCF de FY2026 (47,5%)
+    parece excelente, pero está inflado por los prepagos de los contratos de IA y por eso <strong>el DCF de la Sección 13
+    ancla el margen de OCF del Año 1 del caso Base en 44%</strong> —por debajo del reportado, para descontar el
+    componente de prepago no recurrente— y no en el margen operativo GAAP por analogía. El capex del Año 1 se fija en
+    <strong>78% de los ingresos</strong>, exactamente la guía de capex neto de la compañía para FY2027 (~$70.000
+    millones sobre ~$90.000 millones), y se normaliza gradualmente hacia 26% de los ingresos en el Año 5 a medida que el
+    grueso del backlog contratado queda construido — una normalización más lenta que la de un negocio de software puro,
+    porque el RPO de $638.000 millones obliga a Oracle a seguir invirtiendo aunque la demanda incremental se enfríe.
+  </p>
+  <p>
+    Sobre capital allocation: Oracle <strong>mantiene el dividendo</strong> (~$5.800 millones al año, yield ~1,26%),
+    <strong>congeló las recompras</strong> (durante 2017–2023 fue una de las mayores recompradoras del S&amp;P 500;
+    ahora el conteo de acciones sube ~2% al año), y destina la totalidad del flujo de caja operativo más los ~$40.000
+    millones de financiamiento nuevo al capex. Es un cambio de régimen de asignación de capital tan grande como el del
+    negocio: de devolver caja a los accionistas a diluirlos para financiar infraestructura.
+  </p>
+  <div class="chartbox">
+    <canvas id="capexChart" height="260"></canvas>
+    <p class="chartcap">Flujo de caja operativo vs. capex, por año fiscal FY2022–FY2026 ($ miles de millones). El capex superó al OCF por primera vez en FY2025 y lo duplicó con creces en FY2026; la guía FY2027 (capex neto ~$70.000M) mantiene la brecha abierta. Fuente: SEC EDGAR XBRL.</p>
+  </div>
+
+  <!-- 08 -->
+  <p class="secnum" id="s08">08 — Comparables de Industria</p>
+  <h2>ORCL frente a cuatro pares de software empresarial — barata sobre utilidad, sin par real sobre intensidad de capital</h2>
+  <p>
+    Oracle es difícil de comparar porque es cuatro negocios a la vez: una renta de base de datos madura, una suite de
+    aplicaciones SaaS, un negocio de hardware, y una nube de infraestructura de IA hiper-intensiva en capital. Elegimos
+    cuatro comparables cotizantes de software empresarial de gran capitalización: <strong>Microsoft</strong> (MSFT, el
+    competidor directo de OCI con Azure y el estándar de "software + nube a escala"), <strong>SAP</strong> (el rival
+    histórico en aplicaciones empresariales / ERP, en plena transición a la nube), <strong>IBM</strong> (el otro
+    proveedor "de la vieja guardia" con base instalada, servicios y una transición de plataforma en curso, el
+    comparable más cercano por perfil) y <strong>Salesforce</strong> (CRM, aplicaciones SaaS puras, cubierto por este
+    desk). Ninguno tiene la intensidad de capital de Oracle en este momento — esa es justamente la métrica que la
+    comparación no captura.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Ticker</th><th class="right-al">P/E Forward</th><th class="right-al">EV/EBITDA</th><th class="right-al">Market cap</th><th class="right-al">Crec. ingresos</th><th class="right-al">Margen FCF</th></tr>
+    <tr class="total"><td class="label">ORCL (Oracle)</td><td class="right-al">19.7x</td><td class="right-al">19.4x</td><td class="right-al">$457B</td><td class="right-al">+17.4% FY26</td><td class="right-al neg">&minus;35.2%</td></tr>
+    <tr><td class="label">MSFT (Microsoft)</td><td class="right-al">24.9x</td><td class="right-al">~21x</td><td class="right-al">$3.71T</td><td class="right-al">~+15%</td><td class="right-al">~25%</td></tr>
+    <tr><td class="label">SAP</td><td class="right-al">25.8x</td><td class="right-al">~19x</td><td class="right-al">$251B</td><td class="right-al">~+10%</td><td class="right-al">~20%</td></tr>
+    <tr><td class="label">IBM</td><td class="right-al">18.4x</td><td class="right-al">~15x</td><td class="right-al">$218B</td><td class="right-al">~+6%</td><td class="right-al">~13%</td></tr>
+    <tr><td class="label">CRM (Salesforce)</td><td class="right-al">18.0x</td><td class="right-al">~19x</td><td class="right-al">$247B</td><td class="right-al">~+9%</td><td class="right-al">~30%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: stockanalysis.com y valueinvesting.io, cierre del 5-sep-2026, para P/E forward de ORCL (19,7x sobre consenso no-GAAP FY2027 de $8.06) y de los peers. EV/EBITDA de ORCL (19,4x) de stockanalysis.com; los de los peers son <strong>aproximaciones de mercado, no verificadas en tiempo real, referenciales</strong>. Crecimiento de ingresos: FY2026 real para ORCL; consenso aproximado a un año para los peers. Margen de FCF: TTM; el de ORCL (&minus;35,2%) es el dato que ningún múltiplo de utilidad de esta tabla refleja.</p>
+  <div class="chartbox">
+    <canvas id="compsChart" height="220"></canvas>
+    <p class="chartcap">P/E forward comparado. Oracle cotiza al múltiplo forward más bajo del panel junto con Salesforce — por debajo de Microsoft y de SAP. Sobre utilidad no-GAAP, Oracle es el nombre "barato" del grupo; la tabla no muestra que también es el único con flujo de caja libre profundamente negativo.</p>
+  </div>
+  <h3>Microsoft (MSFT) — el competidor directo de OCI, a otra escala de balance</h3>
+  <p>
+    Microsoft es el punto de referencia de "software + nube a escala hecho bien": Azure compite con OCI por las mismas
+    cargas de IA, pero Microsoft financia su propio capex récord (&gt;$80.000 millones al año) con ~$70.000 millones de
+    flujo de caja libre <em>positivo</em> y una posición de caja neta. Cotiza a 24,9x forward. La comparación es
+    instructiva: el mercado paga una prima de ~5 puntos de P/E por la misma exposición a la IA cuando viene con un
+    balance que se autofinancia.
+  </p>
+  <h3>SAP — el rival de aplicaciones, revalorizado por la nube</h3>
+  <p>
+    SAP cotiza a 25,8x forward, el múltiplo más alto del panel, tras años de re-rating por su transición de licencias a
+    la nube (RISE with SAP) y una expansión de márgenes sostenida. Es el recordatorio de que el mercado <em>sí</em> paga
+    múltiplos altos por una transición a la nube creíble en aplicaciones empresariales — pero SAP la ejecuta sin
+    intensidad de capital y con flujo de caja libre positivo y creciente.
+  </p>
+  <h3>IBM — el comparable más cercano por perfil</h3>
+  <p>
+    IBM es el par más parecido a Oracle en naturaleza: base instalada enorme, renta de soporte, negocio de servicios de
+    bajo margen, crecimiento de un dígito bajo, y una apuesta de plataforma (hybrid cloud con Red Hat, más watsonx en
+    IA) que el mercado todavía valora con escepticismo. Cotiza a 18,4x forward — casi exactamente donde cotiza Oracle.
+    La lectura: despojada de la narrativa de hipercrecimiento de OCI, la "vieja Oracle" (base de datos + apps + soporte)
+    probablemente cotizaría cerca del múltiplo de IBM, y el mercado le está pagando poco y nada de prima por encima
+    de eso — es decir, el precio actual <em>ya</em> descuenta bastante escepticismo sobre la conversión del backlog.
+  </p>
+  <h3>Salesforce (CRM) — aplicaciones SaaS puras</h3>
+  <p>
+    Salesforce cotiza a 18,0x forward con un margen de FCF del ~30% y crecimiento de un dígito alto. En el informe
+    equivalente de este desk, el blend de cuatro métodos para CRM quedó apenas 6,5% por encima del mercado. Es el ancla
+    de "cuánto vale una franquicia de aplicaciones empresariales madura y muy generadora de caja": ~18x utilidad. Oracle
+    cotiza a un múltiplo similar, pero con la mitad del negocio quemando caja.
+  </p>
+  <p class="pull">
+    El patrón del panel: sobre utilidad no-GAAP forward, Oracle (19,7x) es de los más baratos — por debajo de Microsoft
+    y SAP, en línea con IBM y Salesforce. La prima de crecimiento que el mercado le pagó en 2025 se evaporó. Pero la
+    tabla no puede mostrar la variable que define la tesis: Oracle es el único del grupo con flujo de caja libre de
+    &minus;35% de los ingresos y deuda neta creciente. Aplicar un múltiplo de utilidad de estos pares a Oracle
+    —lo que hace el Método 2 de la Sección 13— produce, por eso, un número <em>por encima</em> del mercado: el método es
+    estructuralmente ciego al capex.
+  </p>
+
+  <!-- 09 -->
+  <p class="secnum" id="s09">09 — Gobierno Corporativo y Estructura Accionaria</p>
+  <h2>Una compañía de $457.000 millones controlada de hecho por su fundador, con dos co-CEOs nuevos y un directorio sin contrapeso real</h2>
+  <p>
+    <strong>Larry Ellison</strong>, cofundador en 1977, es <strong>presidente ejecutivo del directorio y CTO</strong>, y
+    a través de su family trust posee <strong>~1.160 millones de acciones, el 40,6% de la compañía</strong> (valor de
+    mercado ~$184.000 millones al precio actual). Con ese paquete, Oracle es en la práctica una <em>controlled
+    company</em>: ningún accionista minoritario ni bloque institucional tiene el poder de forzar un cambio de estrategia,
+    de directorio o de política de capital contra la voluntad de Ellison. El 22 de septiembre de 2025, la CEO de larga
+    data <strong>Safra Catz</strong> (CEO 2014–2025) pasó a vicepresidenta ejecutiva del directorio, y la conducción
+    quedó en manos de dos co-CEOs ascendidos internamente: <strong>Clay Magouyrk</strong> (venía de dirigir OCI) y
+    <strong>Mike Sicilia</strong> (venía de dirigir las aplicaciones de industria y Oracle Health).
+  </p>
+  <div class="govrow">
+    <div class="govcell"><div class="k">Ownership insider (Ellison)</div><div class="v">40.6%</div><div class="sub">~1.160M de acciones vía family trust. Larry Ellison es presidente ejecutivo y CTO. Control de hecho de la compañía.</div></div>
+    <div class="govcell"><div class="k">Ownership institucional</div><div class="v">~43.6%</div><div class="sub">Vanguard ~5,9% (dos vehículos), BlackRock ~4,1%, State Street ~2,6%, Geode ~1,4%. El float efectivo es &lt;60% del capital.</div></div>
+    <div class="govcell"><div class="k">Co-CEO</div><div class="v">Clay Magouyrk</div><div class="sub">Ex-responsable de OCI. Concesión de opciones por ~$250M al asumir (22-sep-2025): 80% time-based, 20% por desempeño, vesting hasta may-2028.</div></div>
+    <div class="govcell"><div class="k">Co-CEO</div><div class="v">Mike Sicilia</div><div class="sub">Ex-responsable de aplicaciones de industria y Oracle Health. Concesión de opciones por ~$100M al asumir, misma estructura 80/20.</div></div>
+    <div class="govcell"><div class="k">Presidente ejecutivo y CTO</div><div class="v">Larry Ellison</div><div class="sub">Salario base de $1. Compensación histórica vía grandes concesiones de opciones. Sigue definiendo la estrategia de producto e infraestructura.</div></div>
+    <div class="govcell"><div class="k">Vicepresidenta ejecutiva</div><div class="v">Safra Catz</div><div class="sub">CEO 2014–2025. Pasó al directorio en sep-2025. Tenencia muy inferior al 1% pero de valor alto por acumulación histórica de equity.</div></div>
+  </div>
+  <p class="footnote">Fuentes: agregadores de tenencias 13-F, GuruFocus / WallStreetZen / RankRed (ownership institucional e insider), SEC Form 8-K del 24-sep-2025 y Form 4 (concesiones de opciones a los co-CEOs), cobertura de Reuters, Fortune y CIO sobre la transición de liderazgo. Los montos de las concesiones (~$250M y ~$100M) son valores nominales de opciones sujetas a vesting por tiempo y por metas de ingresos, no flujo de caja.</p>
+  <p>
+    Dos puntos de gobierno merecen atención. El primero es la <strong>ausencia de contrapeso</strong>: con Ellison
+    controlando el 40,6% y ocupando la presidencia ejecutiva, y con dos co-CEOs recién ascendidos y todavía sin
+    trayectoria pública como number-one, las decisiones de mayor consecuencia —el ritmo de capex, cuánta deuda tomar,
+    qué contratos de IA firmar y a qué precio— dependen esencialmente del juicio de una persona. El plan de capex de
+    $70.000 millones y de dilución "at-the-market" es, en los hechos, la apuesta personal de Ellison.
+  </p>
+  <p>
+    El segundo es una <strong>distracción de asignación de capital y de atención</strong> fuera de Oracle: durante 2026
+    Larry Ellison respaldó personalmente una porción muy grande (reportada en ~$40.400 millones) del financiamiento de
+    la operación mediática de su hijo David Ellison (la fusión Skydance–Paramount y adquisiciones asociadas). Aunque es
+    una transacción personal de Ellison y no de Oracle, un accionista de Oracle debe descontar que el presidente
+    ejecutivo y mayor accionista tiene, en simultáneo, un compromiso financiero de decenas de miles de millones apalancado
+    en buena medida contra su propia tenencia de acciones de Oracle — lo que introduce un riesgo de venta forzada o de
+    conflicto de prioridades que no existiría con un fundador sin ese compromiso paralelo.
+  </p>
+
+  <!-- 10 -->
+  <p class="secnum" id="s10">10 — Registro de Riesgos</p>
+  <h2>Qué podría cambiar esta lectura</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Riesgo</th><th>Descripción</th><th class="right-al">Severidad</th></tr>
+    <tr><td class="label">Concentración en OpenAI (&gt;50% del backlog)</td><td class="label">Estimaciones de research (BofA) ubican a OpenAI en más de la mitad del RPO de $638.000M. OpenAI perdió ~$20.900M operativos en 2025, postergó su IPO a 2027, y sus compromisos de nube con Oracle se reportan en hasta $300.000M. Una reprogramación, renegociación o incumplimiento de esos contratos —o un problema de financiamiento de OpenAI— destruiría una fracción grande del valor del backlog con la capacidad ya construida y financiada con deuda.</td><td class="right-al">Alta</td></tr>
+    <tr><td class="label">Flujo de caja libre negativo sin fecha de normalización</td><td class="label">FCF FY2026 de &minus;$23.686M; guía FY2027 de capex neto ~$70.000M (S&amp;P estima capex bruto &gt;$90.000M y OCF neto &minus;$42.000M). Management no fijó una fecha en la que el capex haga pico ni en la que el FCF vuelva a positivo. El DCF Base de este informe asume que ocurre gradualmente hacia FY2029–FY2031; si el capex se sostiene más alto y por más tiempo, el fair value baja materialmente.</td><td class="right-al">Alta</td></tr>
+    <tr><td class="label">Apalancamiento y riesgo de rating</td><td class="label">Deuda financiera de $129.500M (+$37.000M en un año), ~$165.000M incluyendo arrendamientos. Apalancamiento ajustado estimado por S&amp;P en ~4,5x, por encima del umbral BBB. Una rebaja de calificación encarece los ~$40.000M anuales de emisión que el plan de capex necesita, en un círculo que se retroalimenta.</td><td class="right-al">Alta</td></tr>
+    <tr><td class="label">La guía de OCI (+68% CAGR a FY2030) puede no cumplirse</td><td class="label">Oracle guía la línea de OCI de $18.100M (FY2026) a $144.000M (FY2030). Es el supuesto más agresivo de toda la tesis y depende de: (a) que el backlog se convierta en ingreso al ritmo contratado, (b) que Oracle consiga energía, terrenos y GPU en tiempo, y (c) que la demanda de cómputo de IA no se enfríe. El escenario Bear del DCF asume un crecimiento de OCI que se estanca hacia ~20% anual hacia el Año 5 — no un colapso, sino un incumplimiento de la guía; su causa documentada es esta fila más la de concentración en OpenAI.</td><td class="right-al">Alta</td></tr>
+    <tr><td class="label">Márgenes de los contratos de infraestructura de IA</td><td class="label">La CFO advirtió que los márgenes brutos "escalonan hacia abajo" en FY2027. El negocio de alquilar GPU es estructuralmente de menor margen que el de licenciar software, y el poder de fijación de precios frente a clientes que contratan &gt;$8.000M cada uno es limitado. Si el margen de OCF se normaliza por debajo del 42%–44% que asume el caso Base (por ejemplo, hacia 38%–40% si el traspaso de costo de GPU es imperfecto y el mix de prepagos se agota), el DCF cae hacia el escenario Bear.</td><td class="right-al">Media-Alta</td></tr>
+    <tr><td class="label">Competencia de los hiperescaladores</td><td class="label">AWS, Azure y Google Cloud tienen balances que se autofinancian, chips propios (Trainium, TPU) y relaciones más profundas con desarrolladores. Oracle compite por precio y por diseño de red; su ventana puede cerrarse si los tres grandes agregan capacidad más rápido o si los clientes de IA internalizan su cómputo.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Gobierno: control de hecho de un solo fundador + distracción externa</td><td class="label">Ellison controla el 40,6% y preside el directorio; dos co-CEOs nuevos sin trayectoria como number-one. En paralelo, Ellison respaldó personalmente ~$40.400M del financiamiento de la operación mediática de su hijo, en buena parte apalancado contra acciones de Oracle — riesgo de venta forzada y de conflicto de prioridades.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Financiamiento circular en el ecosistema de IA</td><td class="label">Parte del capital que financia los compromisos de los clientes de IA de Oracle proviene de los mismos proveedores de chips y de inversores cruzados del sector (Nvidia → laboratorios de IA → Oracle → Nvidia). Si el flujo de financiamiento del ecosistema se frena, la demanda contratada podría revisarse.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Integración de Cerner / Oracle Health</td><td class="label">La mayor adquisición de la historia de Oracle ($28.300M) todavía diluye el crecimiento del segmento de aplicaciones y la migración de la plataforma de Cerner a OCI avanza más lento de lo previsto.</td><td class="right-al">Media-Baja</td></tr>
+  </table></div>
+
+  <!-- 11 -->
+  <p class="secnum" id="s11">11 — Catalizadores</p>
+  <h2>Agenda de eventos relevantes</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Fecha</th><th>Evento</th></tr>
+    <tr><td class="label">Mar 1986</td><td class="label">IPO de Oracle (la misma semana que Microsoft).</td></tr>
+    <tr><td class="label">2005–2022</td><td class="label">Ola de adquisiciones: PeopleSoft ($10,3B), Siebel, BEA, Sun ($7,4B), NetSuite ($9,3B), Cerner ($28,3B).</td></tr>
+    <tr><td class="label">2018</td><td class="label">Relanzamiento de OCI Gen2.</td></tr>
+    <tr><td class="label">2023–2024</td><td class="label">Acuerdos multicloud: Oracle Database@Azure, @AWS y @Google Cloud.</td></tr>
+    <tr><td class="label">Ene 2025</td><td class="label">Oracle anunciada como socio de infraestructura del proyecto Stargate (OpenAI, SoftBank, Oracle, MGX).</td></tr>
+    <tr><td class="label">~10 Sep 2025</td><td class="label">Reporte 1Q/FY2026: RPO salta a $455.000M. La acción sube ~36% en el día, a un máximo intradiario de $345.72.</td></tr>
+    <tr><td class="label">22 Sep 2025</td><td class="label">Safra Catz pasa al directorio; Clay Magouyrk y Mike Sicilia asumen como co-CEOs. Larry Ellison sigue como presidente ejecutivo y CTO.</td></tr>
+    <tr><td class="label">10 Jun 2026</td><td class="label">Reporte 4Q/FY2026: ingresos $67.357M (+17,4%), RPO $638.000M (+363%), OCI FY26 +77%. FCF FY2026 de &minus;$23.686M. Guía FY2027 de ~$90.000M de ingresos y ~$70.000M de capex neto.</td></tr>
+    <tr><td class="label">1H 2026</td><td class="label">La acción cae 24,8% en el primer semestre por preocupación de capex/FCF, concentración en OpenAI y postergación de la IPO de OpenAI a 2027.</td></tr>
+    <tr><td class="label">~9–11 Sep 2026 (estimado)</td><td class="label">Reporte 1Q/FY2027 — primera lectura del ritmo de conversión de RPO a ingreso, del capex trimestral y del margen bruto tras el "escalón hacia abajo" anticipado.</td></tr>
+    <tr><td class="label">FY2027 (en curso)</td><td class="label">Ejecución del plan de financiamiento de ~$40.000M (deuda + emisión "at-the-market"). Cualquier acción de las calificadoras sobre el rating.</td></tr>
+    <tr><td class="label">2027</td><td class="label">Evento de liquidez (IPO) de OpenAI, si se concreta — relevante para la percepción de riesgo del mayor cliente de Oracle.</td></tr>
+    <tr><td class="label">En curso, sin fecha fija</td><td class="label">Firma (o no) de nuevos contratos de IA a gran escala · trayectoria de la utilización de GPU (97,5%) · disponibilidad de energía y GPU para el ramp-up · evolución de la demanda de cómputo de IA de la industria.</td></tr>
+  </table></div>
+
+  <!-- 12 -->
+  <p class="secnum" id="s12">12 — Modelo Financiero Proyectado y Momentum de Estimados</p>
+  <h2>Un consenso que revisó ingresos con fuerza al alza, pero cuyo precio objetivo promedio ($242.69) implica que el mercado no le cree del todo</h2>
+  <p>
+    El consenso de 44 analistas (stockanalysis.com, al 5-sep-2026) proyecta <strong>ingresos totales FY2027 de $89.370
+    millones (+32,7% interanual)</strong> y un <strong>EPS no-GAAP FY2027 de $8.06</strong> (+5,6%; el bajo crecimiento
+    del EPS pese al salto de ingresos refleja el "escalón hacia abajo" de margen bruto y el mayor gasto de
+    depreciación). La guía propia de Oracle para FY2027 es de ~$90.000 millones de ingresos y $8.05 de EPS no-GAAP. Para
+    FY2028 en adelante no hay consenso público gratuito detallado; para esos años este informe remite explícitamente a
+    los supuestos del DCF de la Sección 13 en vez de fabricar una proyección línea por línea. La guía de largo plazo de
+    la compañía —crecimiento anual compuesto de ingresos del 31% y de EPS del 28% hasta FY2030, con OCI llegando a
+    $144.000 millones— es la referencia alcista, pero es guía, no consenso.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">FY2026 (real, cerrado 31-may-2026)</th><th class="right-al">FY2027 (guía propia / consenso)</th></tr>
+    <tr><td class="label">Ingresos totales</td><td class="right-al">$67.36B</td><td class="right-al">~$90B (guía, +33,6%)</td></tr>
+    <tr><td class="label">OCI / Cloud Infrastructure</td><td class="right-al">$18.1B (+77%)</td><td class="right-al">$32B (guía, +77%)</td></tr>
+    <tr><td class="label">RPO (fin de período)</td><td class="right-al">$638B (+363%)</td><td class="right-al">— (Oracle no guía RPO)</td></tr>
+    <tr><td class="label">EPS diluido no-GAAP</td><td class="right-al">$7.63 (+27%)</td><td class="right-al">$8.05–$8.06 (guía/consenso, +5,6%)</td></tr>
+    <tr><td class="label">Capex (neto)</td><td class="right-al">$55.66B (bruto)</td><td class="right-al">~$70B (neto; bruto $20–25B mayor)</td></tr>
+    <tr><td class="label">Flujo de caja libre</td><td class="right-al neg">&minus;$23.69B</td><td class="right-al neg">negativo (S&amp;P: OCF neto ~&minus;$42B)</td></tr>
+  </table></div>
+  <p class="footnote">FY2026: SEC EDGAR XBRL y comunicado de resultados de Oracle del 10-jun-2026. Consenso de analistas: stockanalysis.com, 5-sep-2026, 44 analistas. Guía oficial de Oracle: comunicado 4Q/FY2026 y earnings call. La estimación de capex y OCF FY2027 de S&amp;P Global Ratings es más pesimista que la guía de la compañía.</p>
+  <div class="chartbox">
+    <canvas id="revisionChart" height="200"></canvas>
+    <p class="chartcap">Consenso de ingresos totales FY2027: la revisión fue fuertemente al alza tras el reporte del 10-jun-2026 (de ~$76B pre-reporte a ~$89B), incorporando la guía de ~$90B de la compañía. El momentum de estimados de <em>ingresos</em> es netamente positivo; el de <em>EPS</em> es mucho más plano (+5,6% FY27) porque el margen se comprime. Fuente: stockanalysis.com / comunicados de Oracle.</p>
+  </div>
+  <p>
+    El patrón de revisión es inequívocamente positivo en la línea de arriba: tras el salto de RPO, los analistas subieron
+    con fuerza sus estimaciones de ingresos FY2027 y FY2028. La calificación de consenso entre los 44 analistas es
+    mayoritariamente compradora —28 Strong Buy, 8 Buy, 7 Hold, 1 Strong Sell— y el <strong>precio objetivo promedio a 12
+    meses es de $242.69, un 52,8% por encima del precio de mercado</strong>. Pero la dispersión es enorme: el rango va de
+    <strong>$110 (&minus;30,7%) a $400 (+151,9%)</strong>, un factor de 3,6x entre extremos, y refleja exactamente la
+    división de esta tesis — para un grupo de analistas el backlog de $638.000 millones vale gran parte de su valor
+    nominal descontado; para otro, la combinación de capex, deuda y concentración en OpenAI justifica un precio por
+    debajo del actual. El consenso entra al blend de la Sección 13 como información de mercado legítima, pero su propia
+    dispersión es la mejor evidencia de que no hay una respuesta de mercado establecida.
+  </p>
+
+  <!-- 13 -->
+  <p class="secnum" id="s13">13 — Valuación: Cuatro Métodos y el Fair Value</p>
+  <h2>Cuánto vale la acción, con la misma vara que este desk aplicó a Salesforce, ServiceNow, Snowflake o CrowdStrike</h2>
+  <p>
+    Llegamos a la valuación tras recorrer el negocio completo a propósito. Calculamos el valor razonable con cuatro
+    enfoques independientes —flujo de caja descontado, múltiplos de comparables, reversión a la media histórica propia
+    de P/E, y el consenso de analistas de Wall Street— y mostramos las cuatro cifras sin forzarlas a converger. Sumamos
+    además un DCF inverso como diagnóstico no promediado. La particularidad de Oracle: <strong>por primera vez en esta
+    cobertura, los métodos apuntan en direcciones opuestas</strong>. El DCF y el DCF inverso —los únicos que incorporan
+    el capex de $55.700 millones y la deuda neta de $98.000 millones— quedan ~40% por debajo del mercado; los otros tres
+    —basados en múltiplos de utilidad y en el sentimiento de los analistas, todos ciegos al flujo de caja— quedan por
+    encima.
+  </p>
+
+  <h3>Método 1 — Flujo de caja descontado (DCF), tres escenarios</h3>
+  <p>
+    Modelo de dos etapas (cinco años explícitos más valor terminal por crecimiento perpetuo), partiendo de los ingresos
+    FY2026 ($67.357 millones). El caso Base asume un crecimiento de ingresos que arranca en <strong>+34% en el Año 1</strong>
+    (la guía de la compañía para FY2027) y desacelera hasta <strong>+14% en el Año 5</strong> —una trayectoria con un
+    CAGR de ~23%, deliberadamente por debajo de la guía de largo plazo de la compañía (31%), porque esa guía asume
+    conversión perfecta del backlog y disponibilidad ilimitada de energía y GPU—.
+  </p>
+  <p>
+    <strong>Margen de flujo de caja operativo:</strong> lo anclamos en el Año 1 del caso Base en <strong>44,0%</strong>,
+    <em>por debajo</em> del margen de OCF real reportado en FY2026 (47,5%). La razón es explícita: el margen de FY2026
+    está inflado por la entrada de caja de los prepagos de los grandes contratos de IA ($75.000 millones de hardware
+    prepagado o aportado por el cliente dentro del RPO), un componente que no se repite al mismo ritmo una vez que la
+    mezcla de contratos madura. El 44% del Año 1 lo dejamos expandir levemente hasta 47,0% en el Año 5 a medida que la
+    escala de OCI mejora el margen unitario. <strong>No usamos el margen operativo GAAP (30,6%) por analogía</strong> —el
+    OCF real está muy por encima de eso porque suma D&amp;A (~$9.300 millones) y el capital de trabajo de los
+    diferidos—, pero tampoco usamos el 47,5% reportado sin descontar el prepago.
+  </p>
+  <p>
+    <strong>Capex:</strong> el Año 1 se fija en <strong>78% de los ingresos</strong> —exactamente la guía de capex neto
+    de Oracle para FY2027 (~$70.000 millones sobre ~$90.000 millones)—, y se normaliza de forma escalonada hacia
+    <strong>26% de los ingresos en el Año 5</strong>. Esa normalización es más lenta que la de un negocio de software
+    puro (donde el capex maduro es &lt;5% de los ingresos) porque Oracle es, de hecho, un operador de
+    infraestructura: incluso un hiperescalador maduro corre capex del 20%–35% de los ingresos. El escenario Bear
+    normaliza a 24% y el Bull a 22%.
+  </p>
+  <p>
+    <strong>WACC:</strong> Oracle tiene deuda neta, así que el WACC no es igual al costo de equity. Rf ancla en el
+    Treasury a 10 años (~4,75%) + beta × premio de riesgo accionario (5,0%). El beta a 5 años reportado (1,73) está
+    inflado por la volatilidad extrema de 2025–2026; usamos un beta normalizado de ~1,35 → costo de equity ~11,5%. Costo
+    de deuda ~5,5% antes de impuestos (~4,35% después). Con una estructura de ~78% equity / ~22% deuda a valores de
+    mercado, el WACC Base es <strong>10,0%</strong> (10,5% Bear, 9,0% Bull). Un lector que prefiera usar el beta de 1,73
+    sin normalizar llegaría a un WACC de ~11,4% — la grilla de sensibilidad de más abajo cubre ese caso, y en él el fair
+    value Base baja a ~$68.
+  </p>
+  <p>
+    <strong>Nota de proceso — chequeo de sesgo obligatorio:</strong> el escenario Base da $95.96, un <em>39,6% por
+    debajo</em> del mercado; el Bear da $39.86 (&minus;74,9%). Ambos por debajo del umbral que este desk marca como zona
+    de revisión. Revisamos los tres puntos del chequeo: <strong>(1)</strong> el margen de OCF del Año 1 (44%) está
+    anclado en el OCF <em>real</em> de FY2026, con un descuento explícito y documentado por el componente de prepago — no
+    en una analogía al margen operativo. Si acaso, 44% podría ser conservador si los prepagos se sostienen; a 47,5%
+    (el margen reportado sin descontar) el fair value Base subiría a ~$118. <strong>(2)</strong> El capex del Año 1
+    (78%) <em>es</em> la guía literal de la compañía, y se normaliza a 26% al Año 5 — no está "congelado" en el pico.
+    <strong>(3)</strong> El ingreso base es el FY2026 real reportado. <strong>Conclusión del chequeo:</strong> el
+    resultado del DCF es un hallazgo genuino, no un error de calibración — pero es un resultado <em>muy sensible</em>,
+    por dos razones que hay que decir con todas las letras. Primera: como el flujo de caja libre explícito de los Años 1
+    y 2 es negativo (&minus;$30.700M y &minus;$12.700M en el caso Base), <strong>entre el 93% y el 104% del valor de
+    empresa proviene del valor terminal</strong> —muy por encima del umbral de 65%–70% de este desk—; el DCF de Oracle
+    es, esencialmente, una apuesta al flujo de caja del año FY2031. Segunda: con ~$98.000 millones de deuda neta
+    restándose de un valor de empresa, el equity es un residuo apalancado, y por eso el rango Bear→Bull ($39.86 → $255.28,
+    un factor de 6,4x) es el más ancho de toda la cobertura — es aritmética del apalancamiento, no ruido del modelo.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Supuesto</th><th class="right-al">Bear</th><th class="right-al">Base</th><th class="right-al">Bull</th></tr>
+    <tr><td class="label">Crecimiento de ingresos (año 1 → año 5)</td><td class="right-al">30.0% → 8.0%</td><td class="right-al">34.0% → 14.0%</td><td class="right-al">36.0% → 18.0%</td></tr>
+    <tr><td class="label">Margen de OCF (año 1 → año 5)</td><td class="right-al">42.0% → 44.0%</td><td class="right-al">44.0% → 47.0%</td><td class="right-al">46.0% → 50.0%</td></tr>
+    <tr><td class="label">Capex / Ingresos (año 1 → año 5)</td><td class="right-al">78.0% → 24.0%</td><td class="right-al">78.0% → 26.0%</td><td class="right-al">76.0% → 22.0%</td></tr>
+    <tr><td class="label">Beta / WACC</td><td class="right-al">1.55 / 10.50%</td><td class="right-al">1.35 / 10.00%</td><td class="right-al">1.15 / 9.00%</td></tr>
+    <tr><td class="label">Crecimiento terminal</td><td class="right-al">2.5%</td><td class="right-al">3.0%</td><td class="right-al">3.5%</td></tr>
+    <tr><td class="label">% del EV desde valor terminal</td><td class="right-al">~104%</td><td class="right-al">97.9%</td><td class="right-al">93.0%</td></tr>
+    <tr class="total"><td class="label">Fair value por acción</td><td class="right-al">$39.86</td><td class="right-al">$95.96</td><td class="right-al">$255.28</td></tr>
+  </table></div>
+  <p class="footnote">Valor de empresa convertido a valor por acción restando la deuda financiera neta de $98.252M (Sección 06) y dividiendo por ~2.880M de acciones diluidas. Modelo de dos etapas, cinco años explícitos con glide-path escalonado de crecimiento, margen de OCF y capex entre el Año 1 y el Año 5. El "% del EV desde valor terminal" supera el 100% en el caso Bear porque el valor presente del flujo explícito de cinco años es negativo (los dos primeros años tienen FCF negativo que no compensan los tres siguientes).</p>
+  <p>
+    Ponderado por probabilidad (25% Bear / 45% Base / 30% Bull) el valor esperado es <strong>$129.73 por acción</strong>;
+    el promedio simple de los tres escenarios es <strong>$130.37</strong>. Ambos ~18% por debajo del precio de mercado.
+    El caso Bull ($255.28) es el <em>único</em> escenario del DCF que supera el precio, y requiere que Oracle sostenga un
+    crecimiento del 36%→18% con el margen de OCF expandiendo a 50% y el capex normalizando a 22% de los ingresos hacia
+    el Año 5 — es decir, ejecución esencialmente perfecta de la guía de la compañía.
+  </p>
+  <h3>Sensibilidad del caso Base: WACC × crecimiento terminal</h3>
+  <p>
+    Dado que ~98% del valor de empresa del caso Base proviene del valor terminal, mostramos cómo se mueve el fair value
+    variando únicamente WACC y crecimiento terminal, con el resto de los inputs fijos. La celda marcada es el caso Base
+    reportado ($95.96, WACC 10,00%, g 3,0%).
+  </p>
+  <div class="table-scroll"><table class="sens-table">
+    <tr><th>WACC \ g terminal</th><th class="right-al">2.0%</th><th class="right-al">2.5%</th><th class="right-al">3.0%</th><th class="right-al">3.5%</th><th class="right-al">4.0%</th></tr>
+    <tr><td class="axis">9.00%</td><td class="right-al">$101.12</td><td class="right-al">$111.97</td><td class="right-al">$124.63</td><td class="right-al">$139.58</td><td class="right-al">$157.53</td></tr>
+    <tr><td class="axis">9.50%</td><td class="right-al">$89.28</td><td class="right-al">$98.51</td><td class="right-al">$109.16</td><td class="right-al">$121.59</td><td class="right-al">$136.28</td></tr>
+    <tr><td class="axis">10.00%</td><td class="right-al">$78.96</td><td class="right-al">$86.89</td><td class="right-al base-cell">$95.96</td><td class="right-al">$106.42</td><td class="right-al">$118.62</td></tr>
+    <tr><td class="axis">10.50%</td><td class="right-al">$69.90</td><td class="right-al">$76.77</td><td class="right-al">$84.56</td><td class="right-al">$93.47</td><td class="right-al">$103.74</td></tr>
+    <tr><td class="axis">11.00%</td><td class="right-al">$61.89</td><td class="right-al">$67.89</td><td class="right-al">$74.64</td><td class="right-al">$82.29</td><td class="right-al">$91.03</td></tr>
+  </table></div>
+  <p class="footnote">Grilla propia, recalculando el modelo de dos etapas del caso Base (mismo crecimiento, margen de OCF y capex por año declarados arriba) para cada combinación WACC/g. La celda base ($95.96) corresponde a WACC 10,00% y g 3,0%. En la esquina más generosa de toda la grilla (WACC 9,0%, g 4,0% → $157.53), el fair value recién alcanza el precio de mercado — el DCF no supera el precio actual bajo ninguna combinación razonable de WACC y crecimiento terminal, solo lo iguala en el extremo más optimista.</p>
+
+  <h3>Método 2 — Múltiplos de comparables</h3>
+  <p>
+    Aplicamos el P/E forward promedio del panel de cuatro pares de software empresarial de la Sección 08 (Microsoft
+    24,9x; SAP 25,8x; IBM 18,4x; Salesforce 18,0x; promedio <strong>21,77x</strong>) al EPS no-GAAP forward de consenso
+    de Oracle para FY2027 ($8.06).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Múltiplo P/E forward aplicado</th><th class="right-al">Precio implícito</th></tr>
+    <tr><td class="label">18.00x (CRM, piso del panel)</td><td class="right-al">$145.08</td></tr>
+    <tr><td class="label">18.20x (promedio IBM + CRM, "vieja guardia")</td><td class="right-al">$146.69</td></tr>
+    <tr class="total"><td class="label">21.77x (promedio de los 4 comparables)</td><td class="right-al">$175.45</td></tr>
+    <tr><td class="label">25.80x (SAP, techo del panel)</td><td class="right-al">$207.95</td></tr>
+  </table></div>
+  <p>
+    Tomamos <strong>$175.45</strong> (el promedio de los cuatro) como el resultado formal de este método. El hallazgo
+    —y su límite— es directo: sobre <em>utilidad no-GAAP</em>, Oracle no está cara frente a sus pares; su propio
+    múltiplo forward (19,7x) está por debajo del promedio del panel, y aplicar el promedio da un precio implícito
+    <em>por encima</em> del mercado. Pero este método es <strong>estructuralmente ciego a la variable que define la
+    tesis</strong>: el EPS no-GAAP de Oracle excluye la compensación en acciones y la amortización, pero <em>no</em>
+    penaliza el capex de $55.700 millones ni la deuda neta creciente. Como verificación cruzada usamos EV/EBITDA:
+    Oracle cotiza a 19,4x, el panel promedia ~18,5x — es decir, sobre EBITDA Oracle ya cotiza <em>con una leve prima</em>
+    sobre sus pares, lo que implicaría un valor cercano a $150, no a $175. El rango honesto de este método es
+    <strong>~$150–$175</strong>, y en cualquier punto de ese rango la conclusión es la misma: descontando el flujo de
+    caja, Oracle sobre múltiplos de utilidad se ve razonablemente valuada, no barata ni cara.
+  </p>
+
+  <h3>Método 3 — Reversión a la media histórica propia (P/E)</h3>
+  <p>
+    Oracle tiene utilidad GAAP positiva y estable, así que el P/E histórico <em>es</em> utilizable — pero su dispersión
+    es alta (P/E promedio de 5 años ~34,5x; de 10 años ~27,4x; de 3 años ~37,7x; actual ~27,2x) y uno de los cuatro
+    trimestres recientes (2Q FY2026) tiene la utilidad neta GAAP inflada por ~$1.400 millones de una ganancia no-caja de
+    revaluación de participaciones. Para no arrastrar esa contaminación al denominador, reconstruimos una
+    <strong>ventana limpia</strong>: el P/E de la acción en los últimos cuatro cierres de trimestre fiscal, cada uno
+    calculado con el precio real de esa fecha sobre el <strong>EPS TTM no-GAAP</strong> vigente entonces (el no-GAAP
+    diluye mejor el efecto de la ganancia puntual que el GAAP).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Cierre de trimestre fiscal</th><th class="right-al">Precio</th><th class="right-al">EPS TTM no-GAAP</th><th class="right-al">P/E</th></tr>
+    <tr><td class="label">1Q FY2026 (29-ago-2025)</td><td class="right-al">$226.13</td><td class="right-al">$6.11</td><td class="right-al">37.0x</td></tr>
+    <tr><td class="label">2Q FY2026 (28-nov-2025)</td><td class="right-al">$201.95</td><td class="right-al">$6.90</td><td class="right-al">29.3x</td></tr>
+    <tr><td class="label">3Q FY2026 (27-feb-2026)</td><td class="right-al">$145.40</td><td class="right-al">$7.22</td><td class="right-al">20.1x</td></tr>
+    <tr class="total"><td class="label">4Q FY2026 (29-may-2026)</td><td class="right-al">$225.78</td><td class="right-al">$7.63</td><td class="right-al">29.6x</td></tr>
+  </table></div>
+  <p class="footnote">Precios: Yahoo Finance (chart API), cierre de mercado en el mes de cada cierre de trimestre fiscal. EPS TTM no-GAAP: estimación propia de la suma de los 4 trimestres standalone previos a cada fecha (los trimestres de FY2025 son aproximados a partir del EPS no-GAAP anual FY2025 de ~$6.01). Promedio de los 4 múltiplos: 29,0x. El rango contaminado con EPS GAAP (26x–52x, promedio ~39x) se muestra solo como referencia y no se usa.</p>
+  <p>
+    El promedio de la ventana (29,0x) aplicado al EPS TTM no-GAAP actual ($7.63) da <strong>$221.28 por acción</strong> —
+    el resultado formal de este método, y el segundo más alto de los cuatro. Tres salvedades importantes, todas en la
+    misma dirección: (a) <strong>la ventana es muy volátil</strong> —el múltiplo osciló de 37x a 20x y de vuelta a 30x en
+    nueve meses, siguiendo el precio de la acción—, así que el promedio no describe "un múltiplo estable al que la
+    acción reversiona" sino cuatro fotos de un múltiplo en movimiento; (b) <strong>29x es alto para Oracle</strong>: su
+    promedio de 10 años sobre EPS GAAP es 27x y, antes del re-rating de OCI de 2023–2025, la acción cotizaba de forma
+    rutinaria a 15x–19x utilidad forward — el múltiplo de la ventana refleja el régimen de optimismo de IA, no una media
+    de largo plazo; (c) como referencia alternativa, el promedio histórico de 10 años (27,4x) aplicado al EPS TTM
+    <em>GAAP</em> ($5.83) da $159.74, prácticamente el precio de mercado. Es decir: si uno cree que Oracle "reversiona"
+    a su multiplicador de la última década sobre utilidad contable, la acción está en fair value <em>ahora</em>; si cree
+    que reversiona al multiplicador del último año sobre utilidad ajustada, vale ~$221. Usamos $221.28 en el blend por
+    consistencia metodológica con el resto de la cobertura (ventana limpia reciente, EPS no-GAAP), pero con esta
+    advertencia explícita.
+  </p>
+
+  <h3>Método 4 — Consenso de Wall Street</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Analistas cubriendo ORCL</td><td class="right-al">44</td></tr>
+    <tr><td class="label">Calificación consenso</td><td class="right-al">Buy (28 Strong Buy, 8 Buy, 7 Hold, 1 Strong Sell)</td></tr>
+    <tr class="total"><td class="label">Precio objetivo promedio (12 meses)</td><td class="right-al">$242.69</td></tr>
+    <tr><td class="label">Rango de precios objetivo</td><td class="right-al">$110.00 – $400.00</td></tr>
+    <tr><td class="label">Upside implícito vs. mercado</td><td class="right-al pos">+52.8%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: stockanalysis.com, consenso al 5-sep-2026.</p>
+  <p>
+    El consenso ($242.69) es el método más alcista de los cuatro e implica un 52,8% de upside a doce meses. Entra al
+    blend como información de mercado legítima y sin descuento. Pero su <strong>rango es el más ancho de toda la
+    cobertura de este desk —de $110 a $400, un factor de 3,6x—</strong>, y esa dispersión no es ruido: es la misma
+    división que tiene este informe. El analista más bajista ($110, &minus;31% respecto del mercado) está por debajo del
+    caso Base del DCF de este informe; el más alcista ($400) valora el backlog casi a su valor nominal descontado. El
+    consenso "valida" un precio muy superior al actual, pero con la convicción menos homogénea de toda la cobertura
+    reciente.
+  </p>
+
+  <h3>Método adicional (diagnóstico, no promediado) — DCF inverso: qué tiene que creer el mercado para que $158.78 tenga sentido</h3>
+  <p>
+    Un DCF inverso parte del precio de mercado y resuelve qué trayectoria sería necesaria para justificarlo, dentro del
+    mismo marco de WACC (10,0%) y crecimiento terminal (3,0%) del caso Base, y con la misma trayectoria de margen de OCF
+    y capex. Manteniendo el crecimiento de ingresos <em>plano</em> durante los cinco años, el resultado es:
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Crecimiento de ingresos plano (5 años)</th><th class="right-al">Fair value</th><th class="right-al">vs. mercado</th><th class="right-al">Ingresos FY2031 implícitos</th></tr>
+    <tr><td class="label">+20% anual</td><td class="right-al">$80.45</td><td class="right-al neg">&minus;49.3%</td><td class="right-al">$168B</td></tr>
+    <tr><td class="label">+25% anual</td><td class="right-al">$107.97</td><td class="right-al neg">&minus;32.0%</td><td class="right-al">$206B</td></tr>
+    <tr><td class="label">+30% anual</td><td class="right-al">$140.29</td><td class="right-al neg">&minus;11.6%</td><td class="right-al">$250B</td></tr>
+    <tr class="total"><td class="label">~+32.5% anual (implícito en el precio)</td><td class="right-al">~$158.44</td><td class="right-al">~0%</td><td class="right-al">~$275B</td></tr>
+    <tr><td class="label">+35% anual</td><td class="right-al">$178.01</td><td class="right-al pos">+12.1%</td><td class="right-al">$302B</td></tr>
+    <tr><td class="label">+40% anual</td><td class="right-al">$221.77</td><td class="right-al pos">+39.7%</td><td class="right-al">$362B</td></tr>
+  </table></div>
+  <p class="footnote">Grilla propia, mismo modelo de dos etapas del caso Base, variando solo el crecimiento de ingresos (fijo durante los 5 años) y despejando el que iguala el precio de mercado. Los ingresos FY2031 implícitos son el resultado de aplicar ese crecimiento a la base FY2026 de $67.357M.</p>
+  <p class="pull">
+    La lectura del DCF inverso: para justificar $158.78, el mercado necesita que Oracle sostenga un crecimiento de
+    ingresos de <strong>~32,5% anual durante cinco años seguidos, sin desaceleración</strong> —llevando la facturación a
+    ~$275.000 millones en FY2031, más de cuatro veces la actual—, con el margen de OCF y la normalización de capex del
+    caso Base. Eso es esencialmente la guía de largo plazo de la propia compañía (31% CAGR), tomada al pie de la letra y
+    sin margen de error. No es una cifra imposible como en el informe de CrowdStrike (donde el DCF inverso ni siquiera
+    convergía); es una cifra <em>exigente pero alcanzable si todo sale bien</em>. La diferencia entre el fair value del
+    DCF Base y el precio de mercado <em>es</em>, casi exactamente, la diferencia entre "el backlog se convierte a un
+    ritmo razonable pero imperfecto" (23% CAGR, $96) y "el backlog se convierte casi como lo promete la guía"
+    (~32,5% CAGR, $159).
+  </p>
+
+  <h3>Síntesis: los cuatro métodos, uno al lado del otro</h3>
+  <div class="chartbox">
+    <canvas id="footballChart" height="280"></canvas>
+    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado ($158.78); la línea azul marca el blend propio ($183.85). El precio de mercado cae dentro del rango de tres de las cuatro metodologías y por encima de todo el DCF salvo el caso Bull. La dispersión total (de ~$40 a $400) es la más amplia de toda la cobertura de este desk.</p>
+  </div>
+  <div class="table-scroll"><table>
+    <tr><th>Método</th><th class="right-al">Fair value</th></tr>
+    <tr><td class="label">DCF — Bear</td><td class="right-al">$39.86</td></tr>
+    <tr class="total"><td class="label">DCF — Base</td><td class="right-al">$95.96</td></tr>
+    <tr><td class="label">DCF — Bull</td><td class="right-al">$255.28</td></tr>
+    <tr><td class="label">DCF — valor esperado ponderado (25% Bear / 45% Base / 30% Bull)</td><td class="right-al">$129.73</td></tr>
+    <tr><td class="label">Comparables (P/E forward promedio del panel de 4)</td><td class="right-al">$175.45</td></tr>
+    <tr><td class="label">Reversión histórica (P/E no-GAAP, ventana limpia de 4 cierres de trimestre)</td><td class="right-al">$221.28</td></tr>
+    <tr><td class="label">Consenso Wall Street (precio objetivo promedio)</td><td class="right-al">$242.69</td></tr>
+    <tr class="total"><td class="label">Promedio simple — DCF Base, Comparables, Reversión histórica, Consenso Wall Street</td><td class="right-al">$183.85</td></tr>
+  </table></div>
+  <p>
+    El promedio simple de las cuatro metodologías da <strong>$183.85 por acción</strong>, un 15,8% por encima del precio
+    de mercado de $158.78. Pero ese número esconde la disputa. Tres de los cuatro métodos —comparables ($175.45),
+    reversión ($221.28) y consenso ($242.69)— quedan por encima del mercado, y los tres comparten el mismo punto ciego:
+    valúan la corriente de <em>utilidad</em> de Oracle sin penalizar el capex de $55.700 millones ni la deuda neta de
+    $98.000 millones. El cuarto método —el DCF, más su versión inversa— es el único que incorpora esos dos hechos, y
+    ubica el fair value entre $40 (Bear) y $96 (Base), con el precio de mercado justificable solo si Oracle ejecuta la
+    guía de 31% de crecimiento casi sin desviación. <strong>Leído con la misma vara que este desk aplicó a Salesforce,
+    ServiceNow o CrowdStrike, el resultado no es una recomendación de compra ni de venta:</strong> Oracle es un negocio
+    de calidad real, líder en base de datos, con una posición genuina en la infraestructura de IA y una valuación que ya
+    corrigió el 54% de exceso que llevaba en su máximo de septiembre de 2025. Pero a $158.78 la acción es una <strong>apuesta apalancada y
+    concentrada</strong> —OpenAI en más de la mitad del backlog, deuda neta creciendo hacia $140.000 millones, flujo de
+    caja libre negativo sin fecha de normalización— a que $638.000 millones de RPO se cobran a los márgenes contratados.
+    La postura es neutral: "barata sobre utilidad, cara sobre caja", y con la respuesta a la pregunta que importa —¿se
+    convierte el backlog?— fuera del alcance de este o de cualquier modelo.
+  </p>
+
+  <!-- 14 -->
+  <p class="secnum" id="s14">14 — Limitaciones del Modelo</p>
+  <h2>Qué asume este análisis, y dónde puede fallar</h2>
+  <div class="watermark-block">
+    <p style="margin-bottom:0;">
+      Este informe tiene una fragilidad estructural mayor que el resto de la cobertura de este desk, y hay que decirla
+      sin vueltas. <strong>Primero: el DCF de Oracle es casi todo valor terminal.</strong> Como el flujo de caja libre
+      explícito de los dos primeros años es negativo, entre el 93% y el 104% del valor de empresa de cada escenario
+      proviene del valor terminal —el flujo de caja del año FY2031 y su crecimiento a perpetuidad—. Ninguna cifra actual
+      puede verificar ese flujo terminal; el DCF Base ($95.96) y el DCF Bear ($39.86) deben leerse como "lo que vale el
+      negocio si la normalización de capex y margen ocurre como asumimos", no como una medición precisa.
+      <strong>Segundo: el equity está apalancado.</strong> Con ~$98.000 millones de deuda neta —y subiendo hacia
+      ~$140.000 millones según la propia guía de financiamiento— restándose de un valor de empresa, cualquier diferencia
+      operativa razonable entre escenarios se amplifica en el valor por acción. El rango Bear→Bull de 6,4x ($40 → $255)
+      no es un modelo roto: es la consecuencia matemática de valuar un residuo chico sobre una base grande y financiada
+      con deuda. <strong>Tercero: la variable que decide todo —la conversión del RPO— es exógena al modelo.</strong> Si
+      OpenAI (más de la mitad del backlog) reprograma o incumple sus compromisos, o si Oracle no consigue energía, GPU o
+      capital al ritmo necesario, el crecimiento de ingresos del caso Base (34%→14%) es demasiado alto y el fair value
+      cae hacia el Bear. Si, en cambio, la demanda de cómputo de IA sostiene la guía de 31% de CAGR y el margen de OCI
+      escala como Oracle espera, el caso Bull ($255) es el relevante y la acción está barata. <strong>Cuarto: los tres
+      métodos de múltiplo son ciegos al capex.</strong> Comparables, reversión y consenso valúan la utilidad no-GAAP o
+      GAAP de Oracle, que no refleja los $55.700 millones de inversión de capital ni el flujo de caja libre de &minus;35%
+      de los ingresos; por eso los tres dan números por encima del mercado y por eso el blend ($183.85) queda por
+      encima del precio. Un lector que asigne más peso al DCF —el único método que incorpora el balance real— debería
+      leer el fair value más cerca de $100–$130 que de $184. <strong>Quinto:</strong> el margen de OCF del caso Base
+      (44%→47%) descuenta el efecto de los prepagos de clientes sobre el OCF reportado de FY2026 (47,5%), pero ese
+      descuento es un juicio, no un cálculo — si los prepagos se sostienen, el fair value sube; si se agotan más rápido y
+      el traspaso de costo de GPU es imperfecto, baja. Finalmente, el análisis no incorpora el desenlace del plan de
+      financiamiento (una rebaja de rating encarecería el capital), ni el efecto de futuras adquisiciones, ni un cambio
+      de política de dividendos, ni el riesgo de gobierno derivado del compromiso financiero personal de Larry Ellison
+      fuera de Oracle.
+    </p>
+  </div>
+
+  <div class="disclosure">
+    Documento elaborado a partir de fuentes públicas: SEC EDGAR (Form 10-K FY2026, Form 10-Q, Form 8-K, Form DEF 14A,
+    Form 4, XBRL companyfacts API, CIK 0001341439), comunicado de resultados y earnings call de Oracle del 10-jun-2026,
+    material de resultados de Microsoft, SAP, IBM y Salesforce, stockanalysis.com, valueinvesting.io, GuruFocus,
+    WallStreetZen, RankRed, Yahoo Finance (chart API), y cobertura de CNBC, Reuters, Fortune, CIO, ERP Today, The Motley
+    Fool y Barchart sobre los resultados 4Q/FY2026, la guía de la compañía, el RPO de $638.000 millones, el plan de
+    capex y financiamiento, la transición a los co-CEOs Magouyrk y Sicilia, la concentración estimada en OpenAI, el
+    proyecto Stargate, y las estimaciones de S&amp;P Global Ratings sobre capex, flujo de caja y apalancamiento. Cifras
+    fundamentales con fecha de corte en el Form 10-K de Oracle correspondiente al año fiscal cerrado el 31 de mayo de
+    2026, resultados publicados el 10 de junio de 2026; precio de mercado y múltiplos de comparables al cierre del 5 de
+    septiembre de 2026. Oracle publicará su 1Q/FY2027 alrededor del 9–11 de septiembre de 2026 y este informe no
+    incorpora ese resultado.
+    <br><br>
+    <strong>Sobre el autor y la naturaleza de este documento:</strong> este informe es un análisis independiente
+    elaborado por Manfredi Investment Research &amp; Markets con fines exclusivamente informativos y educativos. El
+    autor no es un asesor de inversión registrado, no está matriculado ante la Comisión Nacional de Valores (CNV), la
+    SEC, ni ningún otro organismo regulador equivalente, y no mantiene una relación de asesoramiento financiero
+    personalizado con el lector. Ninguna cifra de este documento —incluido el "fair value" de portada, los escenarios
+    de DCF, ni la síntesis de la Sección 13— constituye una recomendación de compra, venta o mantenimiento para ningún
+    lector en particular, ni considera la situación financiera, los objetivos o el perfil de riesgo individual de quien
+    lo lee. Los escenarios de DCF son estimaciones propias sujetas a los supuestos declarados explícitamente en la
+    Sección 13, y no representan guidance oficial de ninguna de las compañías mencionadas salvo donde se cita de forma
+    directa y atribuida. Verificar cifras contra el 10-K/10-Q/8-K más reciente de cada compañía, y consultar a un
+    asesor financiero matriculado, antes de tomar cualquier decisión de inversión.
+  </div>
+
+</div>
+
+<script>
+/* ---- Motor de gráficos propio, sin dependencias externas (Canvas 2D) ---- */
+(function(){
+  var PALETTE = {ink:'#161a20', muted:'#69707c', line:'#e3e9f0', navy:'#0b1f3a', navy2:'#15335c', blue:'#2f5f9e', blueLight:'#5f8fc7', pale:'#c7d9ec', red:'#a8291f', gold:'#c99a3c'};
+
+  function setupCanvas(canvas, cssHeight){
+    var dpr = window.devicePixelRatio || 1;
+    var cssWidth = canvas.parentElement.clientWidth - 44; // padding del chartbox
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = Math.max(1, Math.round(cssWidth * dpr));
+    canvas.height = Math.max(1, Math.round(cssHeight * dpr));
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return {ctx: ctx, w: cssWidth, h: cssHeight};
+  }
+
+  function drawVBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+    ctx.font = '11px "IBM Plex Mono", monospace';
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var log = !!opts.log;
+    var padL = 46, padR = 10, padT = 16, padB = 46;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var maxV = Math.max.apply(null, values);
+    var minV = log ? Math.min.apply(null, values) : Math.min(0, Math.min.apply(null, values));
+    function scaleY(v){
+      return padT + plotH - ((v - minV) / (maxV*1.15 - minV)) * plotH;
+    }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    var gridSteps = 4;
+    for(var g=0; g<=gridSteps; g++){
+      var yy = padT + (plotH/gridSteps)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    var yZero = scaleY(0);
+    ctx.strokeStyle = PALETTE.navy; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(padL, yZero); ctx.lineTo(W-padR, yZero); ctx.stroke();
+
+    var n = values.length;
+    var slot = plotW / n;
+    var barW = Math.min(slot * 0.56, 64);
+
+    for(var i=0;i<n;i++){
+      var cx = padL + slot*i + slot/2;
+      var y0 = scaleY(values[i]);
+      ctx.fillStyle = colors[i % colors.length];
+      var bw = barW;
+      if(values[i] >= 0){ ctx.fillRect(cx - bw/2, y0, bw, yZero - y0); }
+      else { ctx.fillRect(cx - bw/2, yZero, bw, y0 - yZero); }
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'center';
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, cx, (values[i] >= 0 ? y0 - 6 : y0 + 14));
+
+      ctx.fillStyle = PALETTE.muted;
+      ctx.font = '10px "Inter", sans-serif';
+      wrapLabel(ctx, labels[i], cx, padT + plotH + 16, slot + 6);
+    }
+  }
+
+  function wrapLabel(ctx, text, cx, y, maxW, align){
+    var words = String(text).split(' ');
+    var lines = [];
+    var cur = '';
+    for(var i=0;i<words.length;i++){
+      var test = cur ? cur + ' ' + words[i] : words[i];
+      if(ctx.measureText(test).width > maxW && cur){ lines.push(cur); cur = words[i]; }
+      else cur = test;
+    }
+    if(cur) lines.push(cur);
+    lines = lines.slice(0,2);
+    ctx.textAlign = align || 'center';
+    for(var j=0;j<lines.length;j++){
+      ctx.fillText(lines[j], cx, y + j*11);
+    }
+  }
+
+  function drawHBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var padL = opts.padL || 128, padR = 54, padT = 10, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var maxV = Math.max.apply(null, values) * 1.12;
+
+    var n = values.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.5, 30);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, padT+plotH); ctx.stroke();
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = padL;
+      var w = (values[i]/maxV) * plotW;
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, w, barH);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      wrapLabel(ctx, labels[i], padL - 10, cy - 4, padL - 20, 'right');
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'left';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, x0 + w + 8, cy + 4);
+    }
+  }
+
+  function drawRangeBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, ranges = opts.ranges, colors = opts.colors, refLines = opts.refLines || [];
+    var padL = opts.padL || 168, padR = 16, padT = 34, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    ranges.forEach(function(r){ allVals.push(r[0], r[1]); });
+    refLines.forEach(function(r){ allVals.push(r.value); });
+    var rawMin = Math.min.apply(null, allVals), rawMax = Math.max.apply(null, allVals);
+    var rawRange = rawMax - rawMin;
+    var domMin = rawMin - rawRange * 0.15;
+    var domMax = rawMax + rawRange * 0.04;
+    function scaleX(v){ return padL + ((v - domMin)/(domMax - domMin)) * plotW; }
+
+    var n = ranges.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.42, 22);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = scaleX(ranges[i][0]), x1 = scaleX(ranges[i][1]);
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, Math.max(x1-x0,2), barH);
+      ctx.beginPath(); ctx.arc(x0, cy, barH/2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x1, cy, barH/2, 0, Math.PI*2); ctx.fill();
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      wrapLabel(ctx, labels[i], padL - 12, cy - 4, padL - 20, 'right');
+
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      var vf = opts.valueFmt || function(v){ return '$'+v.toFixed(0); };
+      ctx.textAlign = 'right';
+      ctx.fillText(vf(ranges[i][0]), x0 - 8, cy + 4);
+      ctx.textAlign = 'left';
+      ctx.fillText(vf(ranges[i][1]), x1 + 8, cy + 4);
+    }
+
+    var refX = refLines.map(function(r){ return scaleX(r.value); });
+    refLines.forEach(function(r, ri){
+      var x = refX[ri];
+      ctx.strokeStyle = r.color; ctx.lineWidth = 1.6; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x, padT-6); ctx.lineTo(x, padT+plotH); ctx.stroke();
+      ctx.setLineDash([]);
+      var stacked = false;
+      for(var pj=0; pj<ri; pj++){ if(Math.abs(refX[pj]-x) < 60){ stacked = true; } }
+      ctx.fillStyle = r.color;
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(r.label, x, stacked ? padT - 24 : padT - 12);
+    });
+  }
+
+  function drawLines(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, series = opts.series;
+    var padL = 44, padR = 14, padT = 16, padB = 54;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    series.forEach(function(s){ allVals = allVals.concat(s.values); });
+    var maxV = Math.max.apply(null, allVals);
+    var minV = Math.min.apply(null, allVals);
+    var pad = (maxV - minV) * 0.12 || 1;
+    maxV += pad; minV -= pad;
+
+    function scaleX(i){ return padL + (plotW/(labels.length-1)) * i; }
+    function scaleY(v){ return padT + plotH - ((v - minV)/(maxV-minV)) * plotH; }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var yy = padT + (plotH/4)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    var zeroY = scaleY(0);
+    if(minV < 0 && maxV > 0){
+      ctx.beginPath(); ctx.moveTo(padL, zeroY); ctx.lineTo(W-padR, zeroY); ctx.stroke();
+      ctx.fillStyle = PALETTE.muted;
+      ctx.font = '9px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('0%', padL + 2, zeroY - 4);
+    } else {
+      ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+    }
+
+    series.forEach(function(s){
+      ctx.strokeStyle = s.color; ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        ctx.fillStyle = s.color;
+        ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
+      });
+    });
+
+    ctx.fillStyle = PALETTE.muted;
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    labels.forEach(function(l,i){ ctx.fillText(l, scaleX(i), padT+plotH+16); });
+
+    var lx = padL, ly = H - 12;
+    ctx.font = '11px "Inter", sans-serif';
+    series.forEach(function(s){
+      ctx.fillStyle = s.color;
+      ctx.fillRect(lx, ly-8, 10, 10);
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'left';
+      ctx.fillText(s.name, lx+14, ly);
+      lx += 14 + ctx.measureText(s.name).width + 22;
+    });
+  }
+
+  function renderAll(){
+    drawVBars(document.getElementById('historyChart'), {
+      labels:['FY17','FY18','FY19','FY20','FY21','FY22','FY23','FY24','FY25','FY26'],
+      values:[37.7,39.8,39.5,39.1,40.5,42.4,50.0,52.96,57.40,67.36],
+      colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.blue,PALETTE.navy],
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawVBars(document.getElementById('cloudChart'), {
+      labels:['OCI FY24','OCI FY25','OCI FY26','OCI FY27g','OCI FY28g','OCI FY29g','OCI FY30g','SaaS FY26'],
+      values:[6.9,10.2,18.1,32.0,73.0,114.0,144.0,15.9],
+      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.gold],
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawLines(document.getElementById('marginChart'), {
+      labels:['FY22','FY23','FY24','FY25','FY26'],
+      series:[
+        {name:'Margen operativo (GAAP)', color:PALETTE.navy, values:[25.7,26.2,29.0,30.8,30.6]},
+        {name:'Margen de flujo de caja libre', color:PALETTE.red, values:[11.8,17.0,22.3,-0.7,-35.2]}
+      ]
+    });
+
+    drawLines(document.getElementById('capexChart'), {
+      labels:['FY22','FY23','FY24','FY25','FY26'],
+      series:[
+        {name:'Flujo de caja operativo ($B)', color:PALETTE.navy, values:[9.5,17.2,18.7,20.8,32.0]},
+        {name:'Capex ($B)', color:PALETTE.red, values:[4.5,8.7,6.9,21.2,55.7]}
+      ]
+    });
+
+    drawHBars(document.getElementById('compsChart'), {
+      labels:['SAP','MSFT','ORCL','IBM','CRM'],
+      values:[25.8,24.9,19.7,18.4,18.0],
+      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.navy,PALETTE.pale,PALETTE.pale],
+      padL:70,
+      valueFmt:function(v){ return v.toFixed(1)+'x'; }
+    });
+
+    drawHBars(document.getElementById('revisionChart'), {
+      labels:['Consenso ingresos FY27 — pre-reporte (may-2026)','Consenso ingresos FY27 — post-reporte (sep-2026)'],
+      values:[76.0, 89.4],
+      colors:[PALETTE.pale,PALETTE.green],
+      padL:290,
+      valueFmt:function(v){ return '$'+v.toFixed(1)+'B'; }
+    });
+
+    drawRangeBars(document.getElementById('footballChart'), {
+      labels:['DCF (Bear → Bull)','Comparables (EV/EBITDA → P/E panel)','Reversión hist. P/E (piso → techo ventana)','Consenso Wall Street'],
+      ranges:[[39.86,255.28],[150.00,207.95],[153.53,282.30],[110.00,400.00]],
+      colors:[PALETTE.blue,PALETTE.navy2,PALETTE.blueLight,PALETTE.gold],
+      padL:262,
+      refLines:[{value:158.78,color:PALETTE.red,label:'Mercado $159'},{value:183.85,color:PALETTE.navy,label:'Blend $184'}],
+      valueFmt:function(v){ return '$'+v.toFixed(0); }
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', renderAll);
+  } else {
+    renderAll();
+  }
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderAll, 150);
+  });
+})();
+</script>
+<script src="_preview-gate.js" defer></script>
+</body>
+</html>
