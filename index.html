@@ -3444,6 +3444,21 @@
   .htx-cal2__title { font-size:13px; color:var(--htx-ink); line-height:1.4; margin-bottom:5px; }
   .htx-cal2__sub { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; color:var(--htx-ink3); line-height:1.55; }
   .htx-cal2__sub b { color:var(--htx-ink2); font-weight:500; }
+  .htx-cal2__col { display:flex; flex-direction:column; }
+  .htx-cal2__evs { flex:1 0 auto; }
+  .htx-cal2__evs > .htx-cal2__ev:last-child,
+  .htx-cal2__evs > .htx-cal2__newsitem:last-child { border-bottom:0; }
+  .htx-cal2__col > .htx-tile__link { margin-top:14px; align-self:flex-start; }
+  .htx-cal2__legendbar { display:flex; flex-wrap:wrap; gap:20px; padding-top:16px; margin-top:6px; border-top:1px solid var(--htx-line); font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--htx-ink3); }
+  .htx-cal2__legendbar i { width:6px; height:6px; border-radius:50%; display:inline-block; margin-right:7px; vertical-align:middle; }
+  .htx-cal2__legend--news { justify-content:space-between; }
+  .htx-cal2__newsasof { text-transform:none; letter-spacing:.03em; color:var(--htx-ink3); }
+  .htx-cal2__newsitem { display:grid; grid-template-columns:46px 1fr; gap:18px; padding:20px 0; border-bottom:1px solid var(--htx-line-soft); text-decoration:none; }
+  .htx-cal2__newsitem:hover .htx-cal2__title { color:var(--htx-amber); }
+  .htx-cal2__newsitem .htx-cal2__title { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .htx-cal2__newsitem .htx-cal2__day .m { text-transform:uppercase; }
+  .htx-cal2__src { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:8px; letter-spacing:.08em; text-transform:uppercase; color:var(--htx-ink3); }
+  .htx-cal2__newsempty { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; color:var(--htx-ink3); padding:20px 0; }
 
   /* membresia */
   .htx-member { background:#0a0f1e; padding:56px 32px; }
@@ -3473,7 +3488,8 @@
     .htx-hero { grid-template-columns:1fr; }
     .htx-hero__lead { border-right:0; border-bottom:1px solid var(--htx-line); }
     .htx-tile--informes, .htx-tile--pf { grid-column:span 12; }
-    .htx-cal2 { grid-template-columns:1fr; gap:0; }
+    .htx-cal2 { grid-template-columns:1fr; gap:8px 0; }
+    .htx-cal2__col + .htx-cal2__col { border-top:1px solid var(--htx-line); padding-top:8px; }
     .htx-member__inner { grid-template-columns:1fr; }
   }
   @media (max-width:600px) {
@@ -3551,6 +3567,7 @@
     <div class="htx-bento">
       <div class="htx-tile htx-tile--informes">
         <div class="htx-tile__head"><span class="htx-tile__title">Informes institucionales</span></div>
+        <!-- Lista fija: los 7 primeros informes. No sumar m&aacute;s (mantiene la home compacta). -->
         <div class="htx-inf">
           <a class="htx-inf__row" href="informes/msft.html" target="_blank" rel="noopener">
             <span class="htx-inf__tk">MSFT</span>
@@ -3587,46 +3604,8 @@
             <span class="htx-inf__nm">MercadoLibre, Inc.</span>
             <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
           </a>
-          <a class="htx-inf__row" href="informes/adbe.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ADBE')">
-            <span class="htx-inf__tk">ADBE</span>
-            <span class="htx-inf__nm">Adobe Inc.</span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/crm.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'CRM')">
-            <span class="htx-inf__tk">CRM</span>
-            <span class="htx-inf__nm">Salesforce, Inc.</span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/now.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'NOW')">
-            <span class="htx-inf__tk">NOW</span>
-            <span class="htx-inf__nm">ServiceNow, Inc.</span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/snow.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'SNOW')">
-            <span class="htx-inf__tk">SNOW</span>
-            <span class="htx-inf__nm">Snowflake Inc.</span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/crwd.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'CRWD')">
-            <span class="htx-inf__tk">CRWD</span>
-            <span class="htx-inf__nm">CrowdStrike Holdings, Inc.</span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/orcl.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ORCL')">
-            <span class="htx-inf__tk">ORCL</span>
-            <span class="htx-inf__nm">Oracle Corporation</span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/intu.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'INTU')">
-            <span class="htx-inf__tk">INTU</span>
-            <span class="htx-inf__nm">Intuit Inc.</span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/sap.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'SAP')">
-            <span class="htx-inf__tk">SAP</span>
-            <span class="htx-inf__nm">SAP SE<span class="htx-inf__new">Nuevo</span></span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
-          </a>
+          <!-- FIJO: 7 informes destacados en la home. NO agregar filas nuevas ac&aacute;.
+               Los informes nuevos van solo al picks-list de la secci&oacute;n #inversiones. -->
         </div>
         <a class="htx-tile__link" href="#inversiones" data-tab-target="inversiones">Ver secci&oacute;n Inversiones &rarr;</a>
       </div>
@@ -3656,71 +3635,74 @@
       <div class="htx-tile htx-tile--cal">
         <div class="htx-tile__head">
           <span class="htx-tile__title">Calendario econ&oacute;mico</span>
-          <span class="htx-tile__count">Semana del 1 al 5 de septiembre</span>
         </div>
         <div class="htx-cal2">
-          <div class="htx-cal2__legend">
-            <span><i style="background:var(--htx-data);"></i>Argentina</span>
-            <span><i style="background:#9fb4c9;"></i>Estados Unidos</span>
-            <span><i style="background:var(--htx-amber);"></i>Alta relevancia de mercado</span>
+          <div class="htx-cal2__col">
+            <div class="htx-cal2__legend htx-cal2__legend--news">
+              <span>Semana del 1 al 5 de septiembre</span>
+            </div>
+            <div class="htx-cal2__evs">
+
+            <div class="htx-cal2__ev">
+              <div class="htx-cal2__day"><span class="htx-cal2__hoy">HOY</span></div>
+              <div>
+                <div class="htx-cal2__meta"><span class="htx-cal2__time">15:30</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
+                <div class="htx-cal2__title">&Iacute;ndice de precios PCE &mdash; julio</div>
+              </div>
+            </div>
+
+            <div class="htx-cal2__ev">
+              <div class="htx-cal2__day"><span class="d">02</span><span class="m">SEP</span></div>
+              <div>
+                <div class="htx-cal2__meta"><span class="htx-cal2__time">16:00</span><span class="htx-cal2__tag ar">Argentina</span><span class="htx-cal2__imp">&#9679;&#9679;&#9675;</span></div>
+                <div class="htx-cal2__title">Recaudaci&oacute;n tributaria &mdash; agosto</div>
+              </div>
+            </div>
+
+            <div class="htx-cal2__ev">
+              <div class="htx-cal2__day"><span class="d">03</span><span class="m">SEP</span></div>
+              <div>
+                <div class="htx-cal2__meta"><span class="htx-cal2__time">11:00</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
+                <div class="htx-cal2__title">ISM Manufacturero &mdash; agosto</div>
+              </div>
+            </div>
+
+            <div class="htx-cal2__ev">
+              <div class="htx-cal2__day"><span class="d">04</span><span class="m">SEP</span></div>
+              <div>
+                <div class="htx-cal2__meta"><span class="htx-cal2__time">08:30</span><span class="htx-cal2__tag ar">Argentina</span><span class="htx-cal2__imp">&#9679;&#9679;&#9675;</span></div>
+                <div class="htx-cal2__title">IPC CABA &mdash; agosto</div>
+              </div>
+            </div>
+
+            <div class="htx-cal2__ev">
+              <div class="htx-cal2__day"><span class="d">05</span><span class="m">SEP</span></div>
+              <div>
+                <div class="htx-cal2__meta"><span class="htx-cal2__time">09:30</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
+                <div class="htx-cal2__title">N&oacute;minas no agr&iacute;colas &mdash; agosto</div>
+              </div>
+            </div>
+            </div>
+            <a class="htx-tile__link" href="#calendario" data-tab-target="calendario">Ver calendario completo &rarr;</a>
           </div>
 
-          <div class="htx-cal2__ev">
-            <div class="htx-cal2__day"><span class="htx-cal2__hoy">HOY</span></div>
-            <div>
-              <div class="htx-cal2__meta"><span class="htx-cal2__time">15:30</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
-              <div class="htx-cal2__title">&Iacute;ndice de precios PCE &mdash; julio</div>
-              <div class="htx-cal2__sub">La medida de inflaci&oacute;n que mira la Fed &middot; consenso <b>+0,2% m/m</b> &middot; previo +0,1%</div>
+          <div class="htx-cal2__col">
+            <div class="htx-cal2__legend htx-cal2__legend--news">
+              <span>Noticias &middot; reportes diarios</span>
+              <span class="htx-cal2__newsasof" id="htxCalNewsAsof"></span>
             </div>
-          </div>
-
-          <div class="htx-cal2__ev">
-            <div class="htx-cal2__day"><span class="d">02</span><span class="m">SEP</span></div>
-            <div>
-              <div class="htx-cal2__meta"><span class="htx-cal2__time">16:00</span><span class="htx-cal2__tag ar">Argentina</span><span class="htx-cal2__imp">&#9679;&#9679;&#9675;</span></div>
-              <div class="htx-cal2__title">Recaudaci&oacute;n tributaria &mdash; agosto</div>
-              <div class="htx-cal2__sub">ARCA &middot; term&oacute;metro fiscal del mes &middot; previo <b>$13,2 bn</b></div>
+            <div id="htxCalNewsList" class="htx-cal2__evs">
+              <div class="htx-cal2__newsempty">Cargando noticias&hellip;</div>
             </div>
-          </div>
-
-          <div class="htx-cal2__ev">
-            <div class="htx-cal2__day"><span class="d">03</span><span class="m">SEP</span></div>
-            <div>
-              <div class="htx-cal2__meta"><span class="htx-cal2__time">11:00</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
-              <div class="htx-cal2__title">ISM Manufacturero &mdash; agosto</div>
-              <div class="htx-cal2__sub">Consenso <b>48,3</b> &middot; previo 48,0 &middot; sigue en zona de contracci&oacute;n</div>
-            </div>
-          </div>
-
-          <div class="htx-cal2__ev">
-            <div class="htx-cal2__day"><span class="d">04</span><span class="m">SEP</span></div>
-            <div>
-              <div class="htx-cal2__meta"><span class="htx-cal2__time">08:30</span><span class="htx-cal2__tag ar">Argentina</span><span class="htx-cal2__imp">&#9679;&#9679;&#9675;</span></div>
-              <div class="htx-cal2__title">IPC CABA &mdash; agosto</div>
-              <div class="htx-cal2__sub">Anticipo del IPC nacional del INDEC &middot; previo <b>+2,2% m/m</b></div>
-            </div>
-          </div>
-
-          <div class="htx-cal2__ev">
-            <div class="htx-cal2__day"><span class="d">05</span><span class="m">SEP</span></div>
-            <div>
-              <div class="htx-cal2__meta"><span class="htx-cal2__time">09:30</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
-              <div class="htx-cal2__title">N&oacute;minas no agr&iacute;colas &mdash; agosto</div>
-              <div class="htx-cal2__sub">Consenso <b>+160k</b> &middot; previo +142k &middot; desempleo esperado 4,3%</div>
-            </div>
-          </div>
-
-          <div class="htx-cal2__ev">
-            <div class="htx-cal2__day"><span class="d">12</span><span class="m">SEP</span></div>
-            <div>
-              <div class="htx-cal2__meta"><span class="htx-cal2__time">16:00</span><span class="htx-cal2__tag ar">Argentina</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
-              <div class="htx-cal2__title">IPC Nacional INDEC &mdash; agosto</div>
-              <div class="htx-cal2__sub">El dato de inflaci&oacute;n de referencia del mes</div>
-            </div>
+            <a class="htx-tile__link" href="#reportes" data-tab-target="informes">Ver reportes diarios &rarr;</a>
           </div>
         </div>
-        <p class="htx-pf__note">Eventos de ejemplo &middot; el calendario en vivo est&aacute; en su pesta&ntilde;a</p>
-        <a class="htx-tile__link" href="#calendario" data-tab-target="calendario">Ver calendario completo &rarr;</a>
+        <div class="htx-cal2__legendbar">
+          <span><i style="background:var(--htx-data);"></i>Argentina</span>
+          <span><i style="background:#9fb4c9;"></i>Estados Unidos</span>
+          <span><i style="background:var(--htx-amber);"></i>Alta relevancia de mercado</span>
+        </div>
+        <p class="htx-pf__note">Eventos de ejemplo &middot; noticias en vivo de los reportes diarios</p>
       </div>
     </div>
 
@@ -7462,6 +7444,45 @@
   }
 
   loadDailyReports();
+
+  // Panel "Noticias" del cuadro Calendario en la home (htx-tile--cal): mismas noticias
+  // que los reportes diarios (worker manfredi-noticias, fallback a reports/*.json). 5 ítems.
+  async function loadHtxCalNews() {
+    var box = document.getElementById('htxCalNewsList');
+    if (!box) return;
+    function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+    function shortAgo(iso){var t=(typeof timeAgo==='function'?timeAgo(iso):'')||'';return t.replace(/^hace\s+/,'').toUpperCase();}
+    function tagFor(o){return o==='ar'?'<span class="htx-cal2__tag ar">Argentina</span>':'<span class="htx-cal2__tag us">Wall Street</span>';}
+    function merge(ar,ws){
+      var a=(ar||[]).map(function(n){var o={};for(var k in n)o[k]=n[k];o._o='ar';return o;});
+      var w=(ws||[]).map(function(n){var o={};for(var k in n)o[k]=n[k];o._o='us';return o;});
+      return a.concat(w).sort(function(x,y){return new Date(y.fecha||0)-new Date(x.fecha||0);});
+    }
+    function render(items){
+      if(!items||!items.length){box.innerHTML='<div class="htx-cal2__newsempty">Sin noticias disponibles.</div>';return;}
+      box.innerHTML=items.slice(0,5).map(function(n){
+        var inner='<div class="htx-cal2__day"><span class="m">'+esc(shortAgo(n.fecha)||'&mdash;')+'</span></div>'+
+          '<div><div class="htx-cal2__meta">'+tagFor(n._o)+(n.fuente?'<span class="htx-cal2__src">'+esc(n.fuente)+'</span>':'')+'</div>'+
+          '<div class="htx-cal2__title">'+esc(n.titulo||'')+'</div></div>';
+        return n.link
+          ? '<a class="htx-cal2__newsitem" href="'+esc(n.link)+'" target="_blank" rel="noopener noreferrer">'+inner+'</a>'
+          : '<div class="htx-cal2__newsitem">'+inner+'</div>';
+      }).join('');
+      var asof=document.getElementById('htxCalNewsAsof');
+      if(asof&&items[0]&&items[0].fecha){var a=shortAgo(items[0].fecha);asof.textContent=a?('hace '+a.toLowerCase()):'';}
+    }
+    try{
+      var r=await fetch('https://manfredi-noticias.nachito2502.workers.dev/noticias',{signal:AbortSignal.timeout(8000)});
+      if(r.ok){var d=await r.json();var m=merge(d.argentina,d.wallstreet);if(m.length){render(m);return;}}
+    }catch(e){console.warn('[MI] htxCalNews worker:',e.message);}
+    try{
+      var res=await Promise.all([fetch('reports/argentina.json?t='+Date.now()),fetch('reports/wallstreet.json?t='+Date.now())]);
+      var aj=await res[0].json(); var wj=await res[1].json();
+      render(merge(aj.noticias,wj.noticias));
+    }catch(e){console.warn('[MI] htxCalNews json:',e.message);render([]);}
+  }
+  loadHtxCalNews();
+  setInterval(loadHtxCalNews, 600000);
   </script>
 
   <script>
