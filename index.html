@@ -4724,6 +4724,24 @@
     .gasto-tile.active { border-color: var(--gold); background: rgba(242,201,76,.08); }
     .gasto-tile-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
     .gasto-tile-label { font-size: 11px; color: rgba(255,255,255,.7); text-align: center; line-height: 1.3; }
+    .gasto-tile-add .gasto-tile-dot { background: rgba(255,255,255,.05); border: 1.5px dashed rgba(255,255,255,.3); color: rgba(255,255,255,.5); font-size: 18px; }
+    .gasto-tile-add:hover .gasto-tile-dot { border-color: rgba(242,201,76,.5); color: var(--gold); }
+    .pf-row-3col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 20px; }
+    @media (max-width: 680px) { .pf-row-3col { grid-template-columns: 1fr; } }
+    .gasto-add-btn {
+      width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      background: rgba(242,201,76,.12); color: var(--gold); font-size: 15px; font-weight: 700; line-height: 1;
+      cursor: pointer; flex-shrink: 0; transition: background .15s;
+    }
+    .gasto-add-btn:hover { background: rgba(242,201,76,.25); }
+    .gasto-mov-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-top: 1px solid rgba(255,255,255,.06); }
+    .gasto-mov-ingreso { color: var(--green) !important; }
+    .gasto-mov-gasto { color: #F87171 !important; }
+    .gasto-bar-row { display: grid; grid-template-columns: 74px 1fr 64px; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 11.5px; }
+    .gasto-bar-label { color: rgba(255,255,255,.65); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gasto-bar-track { height: 10px; border-radius: 5px; background: rgba(255,255,255,.06); overflow: hidden; }
+    .gasto-bar-fill { height: 100%; border-radius: 5px; }
+    .gasto-bar-value { text-align: right; color: rgba(255,255,255,.6); }
     .calc-goal-card { cursor: pointer; transition: transform .15s, box-shadow .15s; }
     .calc-goal-card:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,0,0,.4); }
     .calc-goal-tap-hint { font-size: 10.5px; color: rgba(242,201,76,.6); margin-top: 8px; }
@@ -5103,8 +5121,8 @@
       </div>
 
       <div class="mkt-tabs" id="finViewTabs" role="tablist">
-        <button type="button" class="mkt-tab" data-finview="calculadora">Calculadora</button>
         <button type="button" class="mkt-tab active" data-finview="gastos">Gastos</button>
+        <button type="button" class="mkt-tab" data-finview="calculadora">Calculadora</button>
       </div>
 
       <div class="pf-view-panel" data-finview-panel="calculadora">
@@ -5175,23 +5193,49 @@
 
       <div class="pf-view-panel active" data-finview-panel="gastos">
 
-        <div class="pf-row-align">
+        <div class="pf-row-3col">
           <div class="pf-card">
-            <h2 class="pf-metrics-label" style="margin-bottom:10px;">Patrimonio neto</h2>
-            <div id="gastosPatrimonioValor" class="mono" style="font-size:26px;font-weight:600;color:var(--white);">Calculando...</div>
-            <div class="pf-metric-note" style="margin-top:6px;">Valor actual de Tu Portafolio (posiciones + efectivo).</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <h2 class="pf-metrics-label" style="margin:0;">Patrimonio neto</h2>
+              <span class="gasto-add-btn" onclick="gastosAbrirIngreso()" title="Agregar ingreso">+</span>
+            </div>
+            <div id="gastosPatrimonioValor" class="mono" style="font-size:23px;font-weight:600;color:var(--gold);">Calculando...</div>
+
+            <div id="gastoIngresoAdd" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);">
+              <div class="calc-form">
+                <label>¿De dónde viene?
+                  <input type="text" id="ingresoNombre" placeholder="Ej: Salario, Membresía, Venta..." maxlength="40">
+                </label>
+                <label>Monto
+                  <div class="calc-plazo-row">
+                    <input type="number" id="ingresoMonto" placeholder="0" min="0" step="any">
+                    <select id="ingresoMoneda">
+                      <option value="ARS" selected>ARS</option>
+                      <option value="USD">USD</option>
+                    </select>
+                  </div>
+                </label>
+                <div style="display:flex;gap:10px;">
+                  <button class="pf-btn-gold" onclick="gastosConfirmarIngreso()" style="flex:1;">Guardar ingreso</button>
+                  <button class="pf-btn-ghost" onclick="gastosCancelarIngreso()">Cancelar</button>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="pf-card">
             <h2 class="pf-metrics-label" style="margin-bottom:10px;">Gasto del mes</h2>
-            <div id="gastosTotalMesValor" class="mono" style="font-size:26px;font-weight:600;color:var(--gold);">USD 0</div>
-            <div class="pf-metric-note" style="margin-top:6px;" id="gastosTotalMesNote">Todavía no cargaste gastos este mes.</div>
+            <div id="gastosTotalMesValor" class="mono" style="font-size:23px;font-weight:600;color:var(--red);">USD 0</div>
+          </div>
+          <div class="pf-card">
+            <h2 class="pf-metrics-label" style="margin-bottom:10px;">Último movimiento</h2>
+            <div id="gastosUltimoMov" class="mono" style="font-size:15px;font-weight:600;color:var(--white);">&mdash;</div>
           </div>
         </div>
 
         <div class="pf-card">
           <div style="display:flex;align-items:center;justify-content:center;gap:18px;">
             <button class="pf-btn-ghost" onclick="gastosPrevMonth()" aria-label="Mes anterior">&larr;</button>
-            <span id="gastosMesLabel" style="font-family:var(--font-display);font-size:18px;min-width:180px;text-align:center;">&mdash;</span>
+            <span id="gastosMesLabel" style="font-family:var(--font-display);font-size:18px;min-width:180px;text-align:center;color:var(--white);">&mdash;</span>
             <button class="pf-btn-ghost" onclick="gastosNextMonth()" aria-label="Mes siguiente">&rarr;</button>
           </div>
         </div>
@@ -5223,20 +5267,38 @@
               </div>
             </div>
 
+            <div id="gastoNuevaCategoriaForm" style="display:none;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);">
+              <div class="calc-form">
+                <label>Nombre de la categoría
+                  <input type="text" id="nuevaCategoriaNombre" placeholder="Ej: Mascotas, Regalos..." maxlength="24">
+                </label>
+                <div style="display:flex;gap:10px;">
+                  <button class="pf-btn-gold" onclick="gastosConfirmarNuevaCategoria()" style="flex:1;">Crear categoría</button>
+                  <button class="pf-btn-ghost" onclick="gastosCancelarNuevaCategoria()">Cancelar</button>
+                </div>
+              </div>
+            </div>
+
             <div class="pf-metric-note" style="margin-top:14px;">Cargar el gasto sacándole una foto al ticket es una función para socios. <a href="#" onclick="if(window.showLoginOverlay)window.showLoginOverlay();return false;" style="color:var(--gold);">Conocé la membresía &rarr;</a></div>
           </div>
 
           <div class="pf-card">
-            <h2 class="pf-metrics-label" style="margin-bottom:14px;">Por categoría</h2>
+            <h2 class="pf-metrics-label" style="margin-bottom:14px;" id="gastosDonutTitle">Por categoría</h2>
             <div id="gastosDonutWrap" style="display:flex;flex-direction:column;align-items:center;">
               <div class="pf-metric-note">Cargá algún gasto para ver el desglose.</div>
             </div>
           </div>
         </div>
 
-        <div class="pf-card">
-          <h2 class="pf-metrics-label" style="margin-bottom:14px;">Movimientos del mes</h2>
-          <div id="gastosListaWrap"><div class="pf-metric-note">Todavía no hay gastos cargados en este mes.</div></div>
+        <div class="pf-row-split">
+          <div class="pf-card">
+            <h2 class="pf-metrics-label" style="margin-bottom:14px;">Movimientos del mes</h2>
+            <div id="gastosListaWrap"><div class="pf-metric-note">Todavía no hay gastos cargados en este mes.</div></div>
+          </div>
+          <div class="pf-card">
+            <h2 class="pf-metrics-label" style="margin-bottom:14px;">Gasto por categoría</h2>
+            <div id="gastosBarChartWrap"><div class="pf-metric-note">Cargá algún gasto para ver la comparación.</div></div>
+          </div>
         </div>
 
       </div><!-- /panel gastos -->
@@ -5730,12 +5792,12 @@
   (function(){
     // ─── Gastos: carga manual, multi-moneda (ARS convertido a USD con el CCL
     // real ya usado en Portfolio), navegacion mes a mes, desglose por
-    // categoria y patrimonio neto (reusa Tu Portafolio via pfBuildRows). Todo
-    // en localStorage -- mismo patron que el respaldo de Tu Portafolio y los
-    // objetivos guardados. La carga por foto queda deliberadamente afuera de
-    // esta version (va a ser una funcion de socios, para no exponer costo de
-    // API sin control a todo el mundo).
-    var GASTOS_CATS = [
+    // categoria, ingresos y patrimonio neto (reusa Tu Portafolio via
+    // pfBuildRows). Todo en localStorage -- mismo patron que el respaldo de
+    // Tu Portafolio y los objetivos guardados. La carga por foto queda
+    // deliberadamente afuera de esta version (va a ser funcion de socios,
+    // para no exponer costo de API sin control a todo el mundo).
+    var GASTOS_CATS_BASE = [
       { id: 'comida',     label: 'Comida',      color: '#F2C94C', icon: '🍔' },
       { id: 'transporte', label: 'Transporte',  color: '#60A5FA', icon: '🚗' },
       { id: 'ocio',       label: 'Ocio',        color: '#34D399', icon: '🎬' },
@@ -5744,8 +5806,13 @@
       { id: 'educacion',  label: 'Educación',   color: '#FB923C', icon: '📚' },
       { id: 'otros',      label: 'Otros',       color: '#22D3EE', icon: '📦' }
     ];
+    // Paleta para categorias creadas a mano -- rota en orden fijo para que
+    // dos categorias custom no se pisen de color.
+    var GASTOS_CUSTOM_PALETTE = ['#EAB308', '#F472B6', '#84CC16', '#38BDF8', '#FB7185', '#C084FC', '#2DD4BF'];
+
     var gastosQuickCat = null;
     var gastosRetriedCcl = false;
+    var gastosFiltroCategoria = null; // categoria activa para el desglose (null = todas)
 
     var gastosView = new Date();
     gastosView.setDate(1);
@@ -5757,10 +5824,19 @@
     function gastosSave(arr){
       try { localStorage.setItem('mi_calc_gastos', JSON.stringify(arr)); } catch (e) {}
     }
+    function gastosLoadCats(){
+      try { var arr = JSON.parse(localStorage.getItem('mi_calc_gastos_cats') || '[]'); return Array.isArray(arr) ? arr : []; }
+      catch (e) { return []; }
+    }
+    function gastosSaveCats(arr){
+      try { localStorage.setItem('mi_calc_gastos_cats', JSON.stringify(arr)); } catch (e) {}
+    }
+    function gastosAllCats(){ return GASTOS_CATS_BASE.concat(gastosLoadCats()); }
     function gastosFmt(n){ return 'USD ' + Math.round(n).toLocaleString('es-AR'); }
     function gastosCatMeta(id){
-      for (var i = 0; i < GASTOS_CATS.length; i++) { if (GASTOS_CATS[i].id === id) return GASTOS_CATS[i]; }
-      return GASTOS_CATS[GASTOS_CATS.length - 1];
+      var all = gastosAllCats();
+      for (var i = 0; i < all.length; i++) { if (all[i].id === id) return all[i]; }
+      return all[all.length - 1];
     }
     // Convierte a USD con el dolar CCL real (misma fuente que usa Tu
     // Portafolio) -- sin eso, un gasto en ARS no se puede sumar con uno en
@@ -5772,39 +5848,48 @@
     }
 
     // Grilla de categorias siempre visible -- tocar una abre la carga rapida
-    // (monto + nota) para esa categoria. Pensado para gente que usa esto
-    // poco: nada de elegir categoria de un desplegable, se toca directo.
+    // (monto + nota) para esa categoria y filtra el desglose a solo esa
+    // categoria. El ultimo tile ("+ Nueva") deja crear una categoria propia.
     function gastosRenderTiles(){
       var grid = document.getElementById('gastoTilesGrid');
-      if (!grid || grid.childElementCount) return;
-      grid.innerHTML = GASTOS_CATS.map(function(c){
-        return '<div class="gasto-tile" id="gastoTile_' + c.id + '" onclick="gastosAbrirQuick(\'' + c.id + '\')">' +
+      if (!grid) return;
+      grid.innerHTML = gastosAllCats().map(function(c){
+        return '<div class="gasto-tile' + (gastosFiltroCategoria === c.id ? ' active' : '') + '" id="gastoTile_' + c.id + '" onclick="gastosAbrirQuick(\'' + c.id + '\')">' +
           '<span class="gasto-tile-dot" style="background:' + c.color + '22;border:1.5px solid ' + c.color + ';">' + c.icon + '</span>' +
-          '<span class="gasto-tile-label">' + c.label + '</span>' +
+          '<span class="gasto-tile-label">' + pfEsc(c.label) + '</span>' +
         '</div>';
-      }).join('');
+      }).join('') +
+      '<div class="gasto-tile gasto-tile-add" onclick="gastosAbrirNuevaCategoria()">' +
+        '<span class="gasto-tile-dot">+</span>' +
+        '<span class="gasto-tile-label">Nueva</span>' +
+      '</div>';
     }
 
     window.gastosAbrirQuick = function(catId){
       gastosQuickCat = catId;
+      gastosFiltroCategoria = catId;
       var cat = gastosCatMeta(catId);
       document.querySelectorAll('.gasto-tile').forEach(function(t){
         t.classList.toggle('active', t.id === 'gastoTile_' + catId);
       });
+      document.getElementById('gastoNuevaCategoriaForm').style.display = 'none';
       document.getElementById('gastoQuickAddCat').innerHTML =
         '<span class="gasto-tile-dot" style="width:26px;height:26px;font-size:13px;background:' + cat.color + '22;border:1.5px solid ' + cat.color + ';">' + cat.icon + '</span>' +
-        '<b>' + cat.label + '</b>';
+        '<b>' + pfEsc(cat.label) + '</b>';
       document.getElementById('gastoQuickAdd').style.display = '';
       var montoInput = document.getElementById('gastoMontoQuick');
       montoInput.value = '';
       document.getElementById('gastoNotaQuick').value = '';
       montoInput.focus();
+      gastosRenderDesglose();
     };
 
     window.gastosCancelarQuick = function(){
       gastosQuickCat = null;
+      gastosFiltroCategoria = null;
       document.getElementById('gastoQuickAdd').style.display = 'none';
       document.querySelectorAll('.gasto-tile').forEach(function(t){ t.classList.remove('active'); });
+      gastosRenderDesglose();
     };
 
     window.gastosConfirmarQuick = function(){
@@ -5815,10 +5900,31 @@
       var nota = (document.getElementById('gastoNotaQuick').value || '').trim();
       var fecha = new Date().toISOString().slice(0, 10);
       var arr = gastosLoad();
-      arr.push({ id: Date.now(), monto: monto, moneda: moneda, categoria: gastosQuickCat, fecha: fecha, nota: nota });
+      arr.push({ id: Date.now(), tipo: 'gasto', monto: monto, moneda: moneda, categoria: gastosQuickCat, fecha: fecha, nota: nota });
       gastosSave(arr);
       gastosCancelarQuick();
       gastosRenderAll();
+    };
+
+    window.gastosAbrirNuevaCategoria = function(){
+      document.getElementById('gastoQuickAdd').style.display = 'none';
+      document.getElementById('gastoNuevaCategoriaForm').style.display = '';
+      var input = document.getElementById('nuevaCategoriaNombre');
+      input.value = '';
+      input.focus();
+    };
+    window.gastosCancelarNuevaCategoria = function(){
+      document.getElementById('gastoNuevaCategoriaForm').style.display = 'none';
+    };
+    window.gastosConfirmarNuevaCategoria = function(){
+      var nombre = (document.getElementById('nuevaCategoriaNombre').value || '').trim();
+      if (!nombre) return;
+      var custom = gastosLoadCats();
+      var color = GASTOS_CUSTOM_PALETTE[custom.length % GASTOS_CUSTOM_PALETTE.length];
+      custom.push({ id: 'custom_' + Date.now(), label: nombre, color: color, icon: '⭐' });
+      gastosSaveCats(custom);
+      gastosCancelarNuevaCategoria();
+      gastosRenderTiles();
     };
 
     window.gastosEliminar = function(id){
@@ -5842,13 +5948,44 @@
       }).sort(function(a, b){ return new Date(b.fecha) - new Date(a.fecha); });
     }
 
+    // ─── Ingresos: mismo patron que un gasto, pero con nombre libre en vez
+    // de categoria (salario, membresia, venta, lo que sea) ────────────────
+    window.gastosAbrirIngreso = function(){
+      var box = document.getElementById('gastoIngresoAdd');
+      var abrir = box.style.display === 'none';
+      box.style.display = abrir ? '' : 'none';
+      if (abrir) {
+        document.getElementById('ingresoNombre').value = '';
+        document.getElementById('ingresoMonto').value = '';
+        document.getElementById('ingresoNombre').focus();
+      }
+    };
+    window.gastosCancelarIngreso = function(){
+      document.getElementById('gastoIngresoAdd').style.display = 'none';
+    };
+    window.gastosConfirmarIngreso = function(){
+      var nombre = (document.getElementById('ingresoNombre').value || '').trim();
+      var monto = parseFloat(document.getElementById('ingresoMonto').value);
+      if (!nombre || !(monto > 0)) return;
+      var moneda = document.getElementById('ingresoMoneda').value === 'USD' ? 'USD' : 'ARS';
+      var fecha = new Date().toISOString().slice(0, 10);
+      var arr = gastosLoad();
+      arr.push({ id: Date.now(), tipo: 'ingreso', monto: monto, moneda: moneda, nombre: nombre, fecha: fecha });
+      gastosSave(arr);
+      gastosCancelarIngreso();
+      gastosRenderAll();
+    };
+
     window.gastosRenderAll = function(){
       gastosRenderTiles();
 
       var mesLabelEl = document.getElementById('gastosMesLabel');
       if (mesLabelEl) mesLabelEl.textContent = gastosMesLabel();
 
-      var gastos = gastosDelMes();
+      var movimientos = gastosDelMes();
+      var gastos = movimientos.filter(function(g){ return (g.tipo || 'gasto') === 'gasto'; });
+      var ingresos = movimientos.filter(function(g){ return g.tipo === 'ingreso'; });
+
       var totalUsd = 0, sinCcl = false;
       var porCategoria = {};
       gastos.forEach(function(g){
@@ -5857,74 +5994,166 @@
         totalUsd += usd;
         porCategoria[g.categoria] = (porCategoria[g.categoria] || 0) + usd;
       });
+      ingresos.forEach(function(g){ if (gastosToUsd(g.monto, g.moneda) == null) sinCcl = true; });
 
       var totalEl = document.getElementById('gastosTotalMesValor');
-      var noteEl = document.getElementById('gastosTotalMesNote');
       if (totalEl) totalEl.textContent = gastosFmt(totalUsd);
-      if (noteEl) {
-        noteEl.textContent = sinCcl
-          ? 'Actualizando la cotización del dólar...'
-          : (gastos.length ? (gastos.length + ' movimiento' + (gastos.length === 1 ? '' : 's') + ' este mes') : 'Todavía no cargaste gastos este mes.');
-      }
+
       // El dólar CCL se carga de forma asincrónica al abrir la página y puede
-      // no estar listo todavía en el primer render (sobre todo porque Gastos
-      // ahora es la pestaña por defecto) -- un solo reintento a los 2s alcanza,
-      // sin meterse en un loop si de verdad no hay cotización disponible.
+      // no estar listo todavía en el primer render (Gastos es la pestaña por
+      // defecto) -- un solo reintento a los 2s alcanza.
       if (sinCcl && !gastosRetriedCcl) {
         gastosRetriedCcl = true;
         setTimeout(gastosRenderAll, 2000);
       }
 
+      var ultimoEl = document.getElementById('gastosUltimoMov');
+      if (ultimoEl) {
+        var todos = gastosLoad().sort(function(a, b){ return b.id - a.id; });
+        if (!todos.length) {
+          ultimoEl.textContent = '—';
+        } else {
+          var u = todos[0];
+          var esIngresoU = u.tipo === 'ingreso';
+          var etiquetaU = esIngresoU ? u.nombre : (u.nota || gastosCatMeta(u.categoria).label);
+          ultimoEl.innerHTML = pfEsc(etiquetaU) + ' <span class="' + (esIngresoU ? 'gasto-mov-ingreso' : 'gasto-mov-gasto') + '">' + (esIngresoU ? '+' : '−') + pfEsc(u.moneda) + ' ' + u.monto.toLocaleString('es-AR') + '</span>';
+        }
+      }
+
       var listaWrap = document.getElementById('gastosListaWrap');
       if (listaWrap) {
-        listaWrap.innerHTML = !gastos.length
-          ? '<div class="pf-metric-note">Todavía no hay gastos cargados en este mes.</div>'
-          : gastos.map(function(g){
-              var cat = gastosCatMeta(g.categoria);
+        listaWrap.innerHTML = !movimientos.length
+          ? '<div class="pf-metric-note">Todavía no hay movimientos cargados en este mes.</div>'
+          : movimientos.map(function(g){
+              var esIngreso = g.tipo === 'ingreso';
               var d = new Date(g.fecha + 'T00:00:00');
-              return '<div class="calc-goal-log-row" style="padding:10px 0;">' +
-                '<span style="display:flex;align-items:center;gap:9px;">' +
-                  '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + cat.color + ';flex-shrink:0;"></span>' +
-                  pfEsc(g.nota || cat.label) +
+              var dot, etiqueta;
+              if (esIngreso) {
+                dot = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>';
+                etiqueta = pfEsc(g.nombre);
+              } else {
+                var cat = gastosCatMeta(g.categoria);
+                dot = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + cat.color + ';flex-shrink:0;"></span>';
+                etiqueta = pfEsc(g.nota || cat.label);
+              }
+              return '<div class="gasto-mov-row">' +
+                '<span style="display:flex;align-items:center;gap:9px;">' + dot + etiqueta +
                   ' <span style="color:rgba(255,255,255,.35);font-size:11px;">' + d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' }) + '</span>' +
                 '</span>' +
                 '<span style="display:flex;align-items:center;gap:10px;">' +
-                  '<span class="mono" style="font-size:12.5px;color:rgba(255,255,255,.7);">' + pfEsc(g.moneda) + ' ' + g.monto.toLocaleString('es-AR') + '</span>' +
+                  '<span class="mono ' + (esIngreso ? 'gasto-mov-ingreso' : 'gasto-mov-gasto') + '" style="font-size:12.5px;">' + (esIngreso ? '+' : '−') + pfEsc(g.moneda) + ' ' + g.monto.toLocaleString('es-AR') + '</span>' +
                   '<span class="calc-goal-del" onclick="gastosEliminar(' + g.id + ')">&times;</span>' +
                 '</span>' +
               '</div>';
             }).join('');
       }
 
-      var donutWrap = document.getElementById('gastosDonutWrap');
-      if (donutWrap) {
-        if (!gastos.length || totalUsd <= 0) {
-          donutWrap.innerHTML = '<div class="pf-metric-note">Cargá algún gasto para ver el desglose.</div>';
-        } else {
-          var stops = [], legendRows = [], acc = 0;
-          GASTOS_CATS.forEach(function(c){
-            var v = porCategoria[c.id];
-            if (!v) return;
-            var pct = v / totalUsd * 100;
-            var start = acc / 100 * 360;
-            acc += pct;
-            var end = acc / 100 * 360;
-            stops.push(c.color + ' ' + start.toFixed(1) + 'deg ' + end.toFixed(1) + 'deg');
-            legendRows.push('<div style="display:flex;align-items:center;gap:9px;font-size:12.5px;color:rgba(255,255,255,.65);width:100%;"><span style="width:9px;height:9px;border-radius:50%;background:' + c.color + ';flex-shrink:0;"></span>' + c.label + '<span class="mono" style="margin-left:auto;">' + pct.toFixed(0) + '%</span></div>');
-          });
-          donutWrap.innerHTML =
-            '<div style="position:relative;width:180px;height:180px;margin-bottom:18px;">' +
-              '<div style="width:180px;height:180px;border-radius:50%;background:conic-gradient(' + stops.join(',') + ');"></div>' +
-              '<div style="position:absolute;top:22px;left:22px;width:136px;height:136px;border-radius:50%;background:var(--navy-4);display:flex;align-items:center;justify-content:center;">' +
-                '<span class="mono" style="font-size:15px;">' + gastosFmt(totalUsd) + '</span>' +
-              '</div>' +
-            '</div>' +
-            '<div style="width:100%;display:grid;gap:8px;">' + legendRows.join('') + '</div>';
-        }
-      }
-
+      gastosRenderDesglose();
+      gastosRenderBarChart(porCategoria);
       gastosRenderPatrimonio();
     };
+
+    // Sin categoria tocada: donut agregado por categoria (como siempre). Con
+    // una categoria activa (se tocó un tile): en cambio muestra cómo se
+    // repartió el gasto DENTRO de esa categoria entre las distintas cargas
+    // (por nota), para cuando hay mas de un gasto en la misma seccion.
+    function gastosRenderDesglose(){
+      var wrap = document.getElementById('gastosDonutWrap');
+      var titleEl = document.getElementById('gastosDonutTitle');
+      if (!wrap) return;
+      var gastos = gastosDelMes().filter(function(g){ return (g.tipo || 'gasto') === 'gasto'; });
+
+      if (gastosFiltroCategoria) {
+        var cat = gastosCatMeta(gastosFiltroCategoria);
+        if (titleEl) titleEl.textContent = cat.label + ': cómo se repartió';
+        var deEstaCategoria = gastos.filter(function(g){ return g.categoria === gastosFiltroCategoria; });
+        var totalCat = 0;
+        var items = deEstaCategoria.map(function(g, idx){
+          var usd = gastosToUsd(g.monto, g.moneda) || 0;
+          totalCat += usd;
+          return { label: g.nota || (cat.label + ' #' + (idx + 1)), usd: usd };
+        });
+        if (!items.length || totalCat <= 0) {
+          wrap.innerHTML = '<div class="pf-metric-note">Todavía no cargaste gastos en ' + pfEsc(cat.label) + ' este mes.</div>';
+          return;
+        }
+        gastosRenderRing(wrap, items.map(function(it, i){
+          return { color: gastosShade(cat.color, i, items.length), label: it.label, usd: it.usd };
+        }), totalCat);
+        return;
+      }
+
+      if (titleEl) titleEl.textContent = 'Por categoría';
+      var totalUsd = 0;
+      var porCategoria = {};
+      gastos.forEach(function(g){
+        var usd = gastosToUsd(g.monto, g.moneda);
+        if (usd == null) return;
+        totalUsd += usd;
+        porCategoria[g.categoria] = (porCategoria[g.categoria] || 0) + usd;
+      });
+      if (!gastos.length || totalUsd <= 0) {
+        wrap.innerHTML = '<div class="pf-metric-note">Cargá algún gasto para ver el desglose.</div>';
+        return;
+      }
+      var rows = [];
+      gastosAllCats().forEach(function(c){
+        var v = porCategoria[c.id];
+        if (!v) return;
+        rows.push({ color: c.color, label: c.label, usd: v });
+      });
+      gastosRenderRing(wrap, rows, totalUsd);
+    }
+
+    // Variacion de tono de un color base para diferenciar cargas individuales
+    // dentro de la misma categoria sin salirse de su paleta.
+    function gastosShade(hex, idx, total){
+      if (total <= 1) return hex;
+      var f = 1 - (idx / total) * 0.5;
+      var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+      var mix = function(c){ return Math.round(c * f + 255 * (1 - f) * 0.15); };
+      return 'rgb(' + mix(r) + ',' + mix(g) + ',' + mix(b) + ')';
+    }
+
+    function gastosRenderRing(wrap, rows, total){
+      var stops = [], legendRows = [], acc = 0;
+      rows.forEach(function(r){
+        var pct = r.usd / total * 100;
+        var start = acc / 100 * 360;
+        acc += pct;
+        var end = acc / 100 * 360;
+        stops.push(r.color + ' ' + start.toFixed(1) + 'deg ' + end.toFixed(1) + 'deg');
+        legendRows.push('<div style="display:flex;align-items:center;gap:9px;font-size:12.5px;color:rgba(255,255,255,.65);width:100%;"><span style="width:9px;height:9px;border-radius:50%;background:' + r.color + ';flex-shrink:0;"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + pfEsc(r.label) + '</span><span class="mono" style="margin-left:auto;flex-shrink:0;">' + pct.toFixed(0) + '%</span></div>');
+      });
+      wrap.innerHTML =
+        '<div style="position:relative;width:180px;height:180px;margin-bottom:18px;">' +
+          '<div style="width:180px;height:180px;border-radius:50%;background:conic-gradient(' + stops.join(',') + ');"></div>' +
+          '<div style="position:absolute;top:22px;left:22px;width:136px;height:136px;border-radius:50%;background:var(--navy-4);display:flex;align-items:center;justify-content:center;">' +
+            '<span class="mono" style="font-size:15px;">' + gastosFmt(total) + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div style="width:100%;display:grid;gap:8px;">' + legendRows.join('') + '</div>';
+    }
+
+    function gastosRenderBarChart(porCategoria){
+      var wrap = document.getElementById('gastosBarChartWrap');
+      if (!wrap) return;
+      var rows = gastosAllCats().map(function(c){ return { cat: c, v: porCategoria[c.id] || 0 }; }).filter(function(r){ return r.v > 0; });
+      if (!rows.length) {
+        wrap.innerHTML = '<div class="pf-metric-note">Cargá algún gasto para ver la comparación.</div>';
+        return;
+      }
+      rows.sort(function(a, b){ return b.v - a.v; });
+      var max = rows[0].v;
+      wrap.innerHTML = rows.map(function(r){
+        var pct = max > 0 ? (r.v / max * 100) : 0;
+        return '<div class="gasto-bar-row">' +
+          '<span class="gasto-bar-label">' + pfEsc(r.cat.label) + '</span>' +
+          '<span class="gasto-bar-track"><span class="gasto-bar-fill" style="width:' + pct.toFixed(0) + '%;background:' + r.cat.color + ';"></span></span>' +
+          '<span class="gasto-bar-value mono">' + gastosFmt(r.v) + '</span>' +
+        '</div>';
+      }).join('');
+    }
 
     window.gastosRenderPatrimonio = async function(){
       var el = document.getElementById('gastosPatrimonioValor');
