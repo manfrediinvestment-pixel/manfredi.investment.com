@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARM — Arm Holdings plc | Manfredi Investment Research</title>
+<link rel="icon" href="/assets/img/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/assets/img/favicon-48x48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+<link rel="canonical" href="https://manfredinvestment.com/informes/arm.html">
+<meta name="description" content="Informe institucional sobre ARM (Arm Holdings plc) tras el 1T del año fiscal 2027 (trimestre cerrado 30-jun-2026): ingresos de US$1.289 mil millones (+22% interanual), margen bruto de 97,5%, y una tesis deliberada: valuar a Arm con la vara del sector de software —no de semiconductores— porque es un negocio de licenciamiento de PI sin fábricas. DCF a tres escenarios, comparables de software, reversión y consenso, con un fair value blend de US$151.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Manfredi Investment">
+<meta property="og:locale" content="es_AR">
+<meta property="og:url" content="https://manfredinvestment.com/informes/arm.html">
+<meta property="og:title" content="ARM — Arm Holdings plc | Manfredi Investment Research">
+<meta property="og:description" content="Informe institucional sobre Arm Holdings (ARM) tras el 1T FY2027: una máquina de licenciamiento de PI con 97,5% de margen bruto, valuada acá con múltiplos de software premium en vez de semis. Cinco métodos de valuación y un fair value blend de US$151 —42% por debajo del mercado.">
+<meta property="og:image" content="https://manfredinvestment.com/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ARM — Arm Holdings plc | Manfredi Investment Research">
+<meta name="twitter:description" content="Arm Holdings (ARM) valuada con la vara del software premium, no de los semiconductores. Cinco métodos, fair value blend US$151 vs US$261,53 de mercado. Tesis, DCF, comparables y riesgos.">
+<meta name="twitter:image" content="https://manfredinvestment.com/assets/img/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-dark:#0b1f3a;
+    --navy:#0e2748;
+    --navy2:#15335c;
+    --blue:#2f5f9e;
+    --blue-light:#5f8fc7;
+    --blue-pale:#eaf1f9;
+    --line:#d7e0ea;
+    --text:#161a20;
+    --muted:#69707c;
+    --green:#1a7a54;
+    --red:#a8291f;
+    --serif:'Newsreader',serif;
+    --sans:'Inter',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#fff; color:var(--text); font-family:var(--sans); font-size:15.5px; line-height:1.7;}
+  .wrap{max-width:900px; margin:0 auto; padding:0 30px 90px;}
+
+  .brandbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:26px 30px 20px; max-width:900px; margin:0 auto; border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:38px; height:38px; border:1.5px solid var(--navy-dark); display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-weight:700; color:var(--navy-dark); font-size:16px;
+  }
+  .brand-name{font-family:var(--serif); font-weight:700; font-size:17px; color:var(--text); line-height:1.15;}
+  .brand-sub{font-family:var(--sans); font-size:10px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase;}
+  .brandbar .doctype{font-family:var(--mono); font-size:11px; color:var(--muted); text-align:right;}
+
+  .frontbox{border:1px solid var(--navy-dark); margin:34px 0 8px; padding:0;}
+  .frontbox-top{display:flex; justify-content:space-between; align-items:baseline; padding:22px 28px 14px; border-bottom:1px solid var(--line);}
+  .ticker-big{font-family:var(--serif); font-size:42px; font-weight:700; color:var(--navy-dark);}
+  .exch{font-family:var(--mono); font-size:12px; color:var(--muted); margin-left:10px;}
+  .rating{font-family:var(--mono); font-size:12px; font-weight:600; color:var(--blue); text-align:right; letter-spacing:.03em;}
+  .rating small{display:block; font-family:var(--mono); font-size:10.5px; color:var(--muted); font-weight:400; margin-top:3px; letter-spacing:normal;}
+  .frontbox-body{padding:20px 28px 26px;}
+  .company-line{color:var(--muted); font-size:13.5px; margin-bottom:16px;}
+  .thesis-block{font-family:var(--serif); font-size:17.5px; line-height:1.65; color:var(--text); font-style:italic;}
+
+  .statsrow{display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line);}
+  .statcell{padding:16px 20px; border-right:1px solid var(--line);}
+  .statcell:last-child{border-right:none;}
+  .statcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:6px;}
+  .statcell .v{font-family:var(--mono); font-size:16px; font-weight:600; color:var(--text);}
+  .pos{color:var(--green);} .neg{color:var(--red);}
+
+  .secnum{font-family:var(--mono); font-size:11px; color:var(--blue-light); letter-spacing:.1em; margin:50px 0 2px;}
+  h2{font-family:var(--serif); font-size:24px; font-weight:600; color:var(--navy2); margin:2px 0 18px; padding-bottom:10px; border-bottom:1.5px solid var(--navy-dark); text-wrap:balance;}
+  h3{font-family:var(--serif); font-size:17px; font-weight:600; color:var(--navy2); margin:30px 0 10px;}
+  p{margin:0 0 15px; max-width:68ch;}
+  strong{color:var(--text);}
+
+  .table-scroll{overflow-x:auto; margin:18px 0 22px;}
+  .table-scroll table{margin:0;}
+  table{width:100%; min-width:520px; border-collapse:collapse; font-size:13.5px;}
+  th{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); text-align:left; padding:8px 10px; border-bottom:1.5px solid var(--navy-dark); white-space:nowrap;}
+  td{padding:8px 10px; border-bottom:1px solid var(--line); font-family:var(--mono); color:var(--text); font-variant-numeric:tabular-nums;}
+  td.label{font-family:var(--sans); color:var(--text);}
+  tr.total td{font-weight:600; border-top:1px solid var(--navy-dark); border-bottom:none;}
+  .right-al{text-align:right;}
+
+  .chartbox{border:1px solid var(--line); padding:20px 22px 16px; margin:22px 0;}
+  .chartbox canvas{width:100% !important; display:block;}
+  .chartcap{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:14px; text-align:center;}
+
+  .pull{border-left:2px solid var(--navy-dark); padding-left:18px; margin:22px 0; color:var(--muted); font-size:13.5px; max-width:68ch;}
+
+  .footnote{font-family:var(--mono); font-size:11px; color:var(--muted); margin:-6px 0 18px; max-width:none;}
+
+  .watermark-block{
+    position:relative; margin:60px 0; padding:26px 30px; border:1px solid var(--line); overflow:hidden;
+  }
+  .watermark-block::before{
+    content:"ARM"; position:absolute; right:10px; top:-30px; font-family:var(--serif); font-weight:700;
+    font-size:110px; color:var(--blue-pale); z-index:0; line-height:1;
+  }
+  .watermark-block > *{position:relative; z-index:1;}
+
+  .toc{border:1px solid var(--line); padding:22px 26px; margin:30px 0;}
+  .toc-title{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px;}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:30px;}
+  .toc li{font-size:13px; margin-bottom:7px; break-inside:avoid;}
+  .toc a{color:var(--navy2); text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  .toc .toc-final a{font-weight:600;}
+
+  .disclosure{margin-top:70px; padding-top:22px; border-top:1px solid var(--navy-dark); font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.8; max-width:none;}
+
+  .fv-block{text-align:right;}
+  .fv-block .fv-label{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+  .fv-block .fv-value{font-family:var(--mono); font-size:22px; font-weight:600; color:var(--navy-dark); line-height:1.3;}
+  .fv-block .fv-gap{font-family:var(--mono); font-size:12.5px; font-weight:600;}
+  .fv-block .fv-gap.neg{color:var(--red);} .fv-block .fv-gap.pos{color:var(--green);}
+
+  .verdict-bar{display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; background:var(--blue-pale); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:14px 28px;}
+  .verdict-stance{font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--navy-dark);}
+  .verdict-stance strong{color:var(--navy-dark);}
+  .verdict-note{font-family:var(--sans); font-size:11.5px; color:var(--muted); max-width:56ch; line-height:1.5;}
+
+  .sens-table td, .sens-table th{text-align:center;}
+  .sens-table td.axis{font-family:var(--mono); font-weight:600; background:#fff; color:var(--text);}
+  .sens-table td.base-cell{outline:2px solid var(--navy-dark); outline-offset:-2px;}
+
+  .govrow{display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:1px solid var(--line); margin:20px 0;}
+  .govcell{padding:16px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .govcell:nth-child(3n){border-right:none;}
+  .govcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px;}
+  .govcell .v{font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text);}
+  .govcell .sub{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.4;}
+
+  a{color:var(--blue);}
+  :focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
+
+  @media (max-width:720px){
+    .statsrow{grid-template-columns:repeat(2,1fr);}
+    .frontbox-top{flex-direction:column; gap:10px;}
+    .rating{text-align:left;}
+    .toc ol{columns:1;}
+    .verdict-bar{flex-direction:column; align-items:flex-start;}
+    .govrow{grid-template-columns:1fr;}
+    .govcell{border-right:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <div class="brand">
+    <div class="brand-mark">MI</div>
+    <div>
+      <div class="brand-name">Manfredi Investment</div>
+      <div class="brand-sub">Research &amp; Markets</div>
+    </div>
+  </div>
+  <div class="doctype">Equity Research · Informe Institucional<br>Datos al 1T FY2027 (trimestre cerrado 30-jun-2026, publicado 29-jul-2026) · Form 20-F FY2026 (26-may-2026) · Precio al 8 sep 2026</div>
+</div>
+
+<div class="wrap">
+
+  <div class="frontbox">
+    <div class="frontbox-top">
+      <div><span class="ticker-big">ARM</span><span class="exch">Nasdaq (ADS) · Arm Holdings plc</span></div>
+      <div class="fv-block">
+        <div class="fv-label">Fair value (blend propio)</div>
+        <div class="fv-value">US$151,00</div>
+        <div class="fv-gap neg">vs. US$261,53 mercado · &minus;42,3%</div>
+      </div>
+    </div>
+    <div class="verdict-bar">
+      <div class="verdict-stance">POSTURA DEL ANÁLISIS: <strong>NEUTRAL CON SESGO BAJISTA — NEGOCIO DE CALIDAD EXTRAORDINARIA, PRECIO QUE EXIGE UNA DÉCADA DE COMPOSICIÓN AL ~35%</strong> — el blend de cinco métodos (US$151,00) queda 42,3% por debajo del mercado. Cuatro de los cinco métodos (DCF, comparables de software, reversión histórica y suma de partes) están por debajo del precio; solo el consenso de analistas (~US$290) está por encima. La tesis de este informe es deliberada: valuar a Arm <em>con la vara del software premium</em> —no de los semiconductores— y aun así el precio no cierra (ver Sección 13)</div>
+      <div class="verdict-note">Este documento es análisis independiente con fines informativos y educativos. El autor no es un asesor financiero registrado (no CFA / no matriculado ante la CNV/SEC) y este contenido no constituye una recomendación de compra, venta o mantenimiento para ningún lector en particular. Ver disclosure completo al pie.</div>
+    </div>
+    <div class="frontbox-body">
+      <div class="company-line">Diseñador y licenciante de arquitecturas de procesador ("PI de cómputo"): no fabrica chips ni obleas. Cobra un pago de licencia por el derecho a usar sus diseños (Cortex, Neoverse, la arquitectura Armv9) y una regalía por cada chip que un cliente fabrica con esa PI —modelo de peaje con cola de varias décadas. En marzo de 2026 dio un giro histórico: lanzó su primer CPU propio de centro de datos (el "Arm AGI CPU"), compitiendo por primera vez con sus propios licenciatarios. Es sociedad británica; reporta bajo US GAAP en dólares (Form 20-F / 6-K), año fiscal cerrado el 31 de marzo. SoftBank controla ~86% del capital.</div>
+      <div class="thesis-block">
+        El 29 de julio de 2026, Arm reportó el primer trimestre de su año fiscal 2027 (cerrado el 30 de junio de 2026):
+        ingresos de <strong>US$1.289 millones, +22% interanual</strong> —regalías US$715 millones (+22%, con las regalías
+        de centro de datos más que duplicándose) y licencias US$574 millones (+23%)—, superando el consenso en ingresos
+        y en utilidad. El margen bruto fue de <strong>97,2%</strong>: Arm no tiene costo de mercadería vendida en el
+        sentido de un fabricante —su costo es I+D—. En términos no-GAAP, el margen operativo fue de 41,2% y la utilidad
+        por acción de US$0,45. Pero en términos GAAP el margen operativo cae a 7,1% y la utilidad por acción a US$0,25,
+        porque la compensación en acciones (~22% de los ingresos, US$1.154 millones en los últimos doce meses) y la
+        amortización de intangibles se comen casi toda la utilidad contable. La acción cerró el 8 de septiembre de 2026
+        en <strong>US$261,53</strong>, ~40% por debajo de su máximo histórico de US$439,46 del 18 de junio de 2026 pero
+        todavía a ~117x la utilidad no-GAAP estimada de FY2027 y ~54x los ingresos de los últimos doce meses. La pregunta
+        de este informe no es si Arm es un gran negocio —lo es, con una posición cuasi-monopólica en PI de CPU y una
+        opción real y grande en el CPU de centro de datos—. La pregunta es cuánto vale esa combinación, y este informe
+        la responde con una decisión metodológica explícita: <strong>medir a Arm con los múltiplos del software premium
+        (ServiceNow, CrowdStrike, Palantir, Cadence, Synopsys) y no con los de sus pares de semiconductores</strong>,
+        porque el modelo de PI-sin-fábricas se parece mucho más a lo primero. La Sección 13 cierra con cinco métodos —DCF
+        a tres escenarios, comparables de software, reversión histórica en ventana limpia, consenso de Wall Street y suma
+        de partes por la apuesta del CPU propio— promediados en un blend de <strong>US$151</strong>.
+      </div>
+    </div>
+    <div class="statsrow">
+      <div class="statcell"><div class="k">Ingresos TTM (a 1T FY27)</div><div class="v">US$5.156M</div></div>
+      <div class="statcell"><div class="k">Var. ingresos TTM interanual</div><div class="v pos">~+25%</div></div>
+      <div class="statcell"><div class="k">Margen bruto TTM</div><div class="v">97,5%</div></div>
+      <div class="statcell"><div class="k">Desde máx. 52 sem.</div><div class="v neg">&minus;42,2%</div></div>
+    </div>
+  </div>
+  <p class="footnote">Cifras fundamentales: SEC EDGAR (Form 20-F para el año fiscal cerrado el 31-mar-2026, presentado el 26-may-2026; Form 6-K y exhibits de resultados; XBRL companyfacts API, CIK 0001973239) — último trimestre reportado: 1T del año fiscal 2027, cerrado el 30 de junio de 2026, publicado el 29 de julio de 2026. Arm es sociedad británica pero presenta en US GAAP y en dólares estadounidenses; su año fiscal cierra el 31 de marzo, de modo que "FY2026" = doce meses cerrados el 31-mar-2026 y "1T FY2027" = trimestre abr-jun 2026. Precio de mercado y múltiplos de comparables: Yahoo Finance y stockanalysis.com, consultados el 8 de septiembre de 2026 (cierre US$261,53; el cierre del 4-sep-2026 fue US$252,09). Rango de 52 semanas: US$100,02 – US$452,70 (intradía). "TTM" = suma de los cuatro trimestres cerrados entre jul-2025 y jun-2026. Este documento es 100% analítico — no constituye una recomendación de compra, venta ni mantenimiento. Ver disclosure completo al pie.</p>
+
+  <div class="toc">
+    <div class="toc-title">Contenido</div>
+    <ol>
+      <li><a href="#s01">Resumen Ejecutivo</a></li>
+      <li><a href="#s02">Historia y Evolución</a></li>
+      <li><a href="#s03">Modelo de Negocio y Segmentos</a></li>
+      <li><a href="#s04">Desarrollos Recientes y Perspectiva</a></li>
+      <li><a href="#s05">Estados Financieros</a></li>
+      <li><a href="#s06">Deuda y Balance</a></li>
+      <li><a href="#s07">Flujo de Caja y Capital Allocation</a></li>
+      <li><a href="#s08">Comparables: por qué software y no semis</a></li>
+      <li><a href="#s09">Gobierno Corporativo y Estructura Accionaria</a></li>
+      <li><a href="#s10">Registro de Riesgos</a></li>
+      <li><a href="#s11">Catalizadores</a></li>
+      <li><a href="#s12">Modelo Financiero Proyectado y Momentum de Estimados</a></li>
+      <li class="toc-final"><a href="#s13">Valuación: Cinco Métodos y el Fair Value</a></li>
+      <li><a href="#s14">Limitaciones del Modelo</a></li>
+    </ol>
+  </div>
+
+  <!-- 01 -->
+  <p class="secnum" id="s01">01 — Resumen Ejecutivo</p>
+  <h2>Una máquina de licenciamiento con 97,5% de margen bruto, valuada acá como software premium — y aun así, cara</h2>
+  <p>
+    El 29 de julio de 2026, Arm Holdings reportó el primer trimestre de su año fiscal 2027 (cerrado el 30 de junio de
+    2026): ingresos de <strong>US$1.289 millones</strong>, un aumento de 22% interanual y otro récord trimestral.
+    Las <strong>regalías</strong> —el pago por cada chip fabricado con PI de Arm— sumaron US$715 millones (+22%), con
+    las regalías de centro de datos más que duplicándose interanualmente por tercer trimestre consecutivo; el
+    <strong>licenciamiento y otros</strong> aportó US$574 millones (+23%). En términos no-GAAP, el margen operativo fue
+    de 41,2% y la utilidad diluida por acción de US$0,45, por encima del consenso de US$0,40. Para el 2T FY2027,
+    management guió ingresos de US$1.380 millones ±US$50 millones y utilidad no-GAAP por acción de US$0,47 ±US$0,04.
+  </p>
+  <p>
+    El dato estructural de Arm es su estado de resultados. El <strong>margen bruto es de 97,2%–97,5%</strong>: Arm no
+    fabrica nada, no compra obleas, no tiene inventario relevante. Su único "costo de producción" es la nómina de
+    ingeniería, que aparece más abajo, en I+D. Eso hace que Arm se parezca mucho más —en la forma de sus números— a
+    una empresa de software de infraestructura que a Nvidia, Qualcomm o Broadcom. Pero hay una diferencia enorme entre
+    el resultado no-GAAP y el GAAP: en GAAP, el margen operativo cae a <strong>7,1%</strong> y la utilidad por acción a
+    US$0,25, porque la <strong>compensación en acciones</strong> (US$1.154 millones en los últimos doce meses, ~22% de
+    los ingresos) y la amortización de intangibles de la readquisición por SoftBank consumen casi toda la utilidad
+    contable. Un análisis honesto de Arm tiene que decidir cuánto peso darle a cada versión de la utilidad; este
+    informe usa la no-GAAP para los múltiplos (es la base sobre la que cotiza el mercado y sobre la que publica el
+    consenso) pero trata la compensación en acciones como un costo económico real en el DCF y en las advertencias de
+    la Sección 13.
+  </p>
+  <p>
+    La acción cerró el 8 de septiembre de 2026 en <strong>US$261,53</strong>. Eso es ~40% por debajo del máximo
+    histórico de US$439,46 alcanzado el 18 de junio de 2026 —el pico de euforia tras el lanzamiento del CPU propio de
+    Arm en marzo—, pero todavía deja a la acción a <strong>~117x</strong> la utilidad no-GAAP estimada de FY2027
+    (US$2,23 de consenso) —o ~140x sobre la utilidad no-GAAP de los últimos doce meses; stockanalysis.com reporta
+    ~105x en su campo de P/E forward— y <strong>~54x</strong> los ingresos de los últimos doce meses. La
+    capitalización de mercado es de <strong>~US$282 mil millones</strong> (valor de empresa
+    ~US$278 mil millones, ajustando por ~US$4,0 mil millones de caja neta). Para poner esos múltiplos en escala: los
+    pares de semiconductores de Arm (Nvidia, Qualcomm, Broadcom, AMD) cotizan a ~18x–30x utilidad forward y ~8x–16x
+    ingresos; incluso el software premium más caro del panel (Palantir, CrowdStrike, Snowflake) cotiza a ~40x–65x
+    ingresos. Arm está por encima de casi todos.
+  </p>
+  <p>
+    La respuesta a la pregunta central —cuánto vale la acción—, desarrollada en la Sección 13: promediando cinco
+    métodos independientes (DCF a tres escenarios, comparables contra un canasto de software premium, reversión a la
+    media histórica propia en ventana limpia, consenso de Wall Street y una suma de partes que separa el negocio de PI
+    de la apuesta del CPU de centro de datos), el blend da <strong>US$151,00 por acción</strong>, 42,3%
+    <em>por debajo</em> del precio de mercado. El único método que queda por encima del mercado es el consenso de
+    analistas (~US$290, 42 analistas, calificación "Buy"). El DCF Base —descontando el flujo de caja del negocio
+    después de tratar la compensación en acciones como un costo y de asumir una desaceleración de crecimiento
+    creíble— da <strong>US$39</strong>, y un DCF inverso muestra que para justificar el precio actual hay que asumir un
+    crecimiento de ingresos de ~40% anual durante cinco años y luego ~25% durante cinco años más, o un WACC de 6%. Esa
+    es la tensión que define la postura: Arm es uno de los mejores modelos de negocio de todo este desk —cuasi-monopolio
+    en PI de CPU, regalías con cola de décadas, caja neta, y una opción real en el CPU de centro de datos—, pero el
+    precio actual ya descuenta que casi todo eso salga bien. "Buen negocio" y "buena inversión a este precio" son
+    preguntas distintas.
+  </p>
+
+  <!-- 02 -->
+  <p class="secnum" id="s02">02 — Historia y Evolución</p>
+  <h2>De un joint venture de Acorn en 1990 al estándar de cómputo del planeta —vía SoftBank y una IPO</h2>
+  <p>
+    Arm nació en 1990 en Cambridge, Inglaterra, como <strong>Advanced RISC Machines</strong>, un joint venture entre
+    Acorn Computers, Apple y VLSI Technology, para desarrollar un procesador de bajo consumo —el "Acorn RISC Machine"—
+    que Apple quería para su asistente digital Newton. El Newton fracasó; la arquitectura, no. El diseño de Arm era
+    tan eficiente en consumo de energía que se volvió la elección natural para todo lo que funcionaba a batería.
+    Cuando llegó el smartphone, Arm ya estaba adentro: prácticamente <strong>todos</strong> los teléfonos del mundo
+    —iPhone y Android— usan un CPU basado en la arquitectura de Arm. La compañía nunca fabricó un chip; licencia la
+    PI y cobra regalías.
+  </p>
+  <p>
+    Arm cotizó en Londres y Nasdaq desde 1998. En <strong>2016, SoftBank la compró por US$32 mil millones</strong> y
+    la sacó de bolsa, con la tesis de que Arm sería central en el "internet de las cosas". El período privado
+    (2016–2023) fue mixto: SoftBank invirtió en expandir el equipo de ingeniería y las líneas de producto (Neoverse
+    para servidores, la automotriz), pero también intentó vender Arm a Nvidia por US$40 mil millones en 2020 —una
+    operación que colapsó en 2022 por la oposición de los reguladores de Estados Unidos, Reino Unido y la UE, y por
+    la resistencia de los propios licenciatarios de Arm, que no querían que su proveedor de PI neutral pasara a manos
+    de un competidor directo.
+  </p>
+  <p class="pull">
+    En septiembre de 2023, SoftBank volvió a listar Arm en Nasdaq (ticker ARM) a US$51 por acción, vendiendo solo
+    ~10% del capital y quedándose con el resto. Esa estructura —flotante chico, controlante único— sigue definiendo
+    la dinámica de la acción: pocos papeles disponibles, volatilidad alta, y un accionista mayoritario cuyas
+    decisiones (incluida cualquier venta futura de acciones) pesan más que los fundamentals trimestrales.
+  </p>
+  <p>
+    De la IPO en adelante, la historia de Arm es la de una re-calificación. Los ingresos pasaron de US$2.679 millones
+    en FY2023 a US$3.233 millones en FY2024, US$4.007 millones en FY2025 y <strong>US$4.920 millones en FY2026</strong>
+    —tres años consecutivos de crecimiento superior al 20%—. Los motores: la <strong>arquitectura Armv9</strong>, que
+    cobra una regalía por chip más alta que la Armv8 y que ya era ~31% de las regalías al cierre de FY2026; los
+    <strong>Compute Subsystems (CSS)</strong>, bloques pre-integrados que Arm vende listos para fabricar y que suben
+    todavía más la regalía; y, sobre todo, el <strong>centro de datos</strong>, donde los chips propios de los
+    hiperescaladores (Graviton de Amazon, Axion de Google) y los aceleradores de IA con CPU Arm (Grace de Nvidia)
+    hicieron que las regalías de data center más que se dupliquen interanualmente varios trimestres seguidos. En junio
+    de 2026 la acción tocó US$439, casi 9x el precio de la IPO en menos de tres años.
+  </p>
+  <div class="chartbox">
+    <canvas id="historyChart" height="320"></canvas>
+    <p class="chartcap">Ingresos anuales de Arm en US$ (US GAAP), año fiscal cerrado el 31 de marzo, FY2021–FY2026 más el consenso FY2027E (~US$6.050 millones). Los años previos a FY2024 provienen del prospecto de IPO (Form F-1). Tres años seguidos de crecimiento &gt;20%. Fuente: SEC EDGAR (Form 20-F y F-1) y consenso stockanalysis.com para FY2027E.</p>
+  </div>
+
+  <!-- 03 -->
+  <p class="secnum" id="s03">03 — Modelo de Negocio y Segmentos</p>
+  <h2>Dos líneas de ingreso: la licencia (por adelantado) y la regalía (por décadas)</h2>
+  <p>
+    Arm gana plata de dos formas, y la diferencia entre ellas es la clave para entender el negocio.
+  </p>
+  <p>
+    <strong>Licenciamiento y otros (~45% de los ingresos).</strong> Cuando una empresa —Apple, Nvidia, un
+    hiperescalador, una automotriz— quiere diseñar un chip usando la PI de Arm, paga un contrato de licencia por
+    adelantado. Puede ser una licencia de un núcleo específico (un Cortex, un Neoverse), una licencia de arquitectura
+    (el derecho a diseñar un núcleo propio compatible con el set de instrucciones de Arm, como hacen Apple y
+    Qualcomm), o un acuerdo de acceso amplio tipo suscripción (Arm Total Access, Arm Flexible Access). El ingreso de
+    licenciamiento es <strong>grumoso</strong>: depende de cuántos contratos grandes se firman o renuevan en un
+    trimestre dado, y puede saltar o caer 20% de un trimestre a otro sin que cambie nada estructural.
+  </p>
+  <p>
+    <strong>Regalías (~53% de los ingresos).</strong> Una vez que el cliente fabrica y vende chips con esa PI, Arm
+    cobra una regalía —un porcentaje del precio de venta del chip, o un monto fijo por unidad—. Las regalías son
+    <strong>lo contrario</strong> del licenciamiento: recurrentes, predecibles, y con una cola larguísima. Un chip
+    diseñado con Armv9 hoy paga regalías durante toda su vida comercial, que en automotriz o industrial puede ser de
+    15–20 años. El stock de regalías de Arm crece con cada generación: más chips, con arquitecturas más nuevas (Armv9
+    &gt; Armv8) y más contenido de Arm por chip (CSS), a una tasa de regalía por chip más alta. Management guía que
+    las regalías crecen a una tasa compuesta de <strong>~20% anual entre FY2026 y FY2031</strong>.
+  </p>
+  <div class="chartbox">
+    <canvas id="revMixChart" height="260"></canvas>
+    <p class="chartcap">Regalías vs. licenciamiento y otros, US$ millones, FY2024–FY2026 y 1T FY2027 (este último anualizado ×4). La regalía es la base recurrente; el licenciamiento es grumoso y el 1T suele ser su trimestre estacionalmente más flojo, por eso la línea de licencias anualizada aparece plana. Los valores de FY2024 se derivan de las tasas de crecimiento reportadas. Fuente: SEC EDGAR (Form 20-F FY2026, comunicados 6-K).</p>
+  </div>
+  <h3>Por qué la regalía es un "peaje" y no un contrato de venta</h3>
+  <p>
+    El valor de Arm está en que su PI es un <strong>estándar</strong>. Hay un ecosistema de software, herramientas,
+    compiladores y talento construido alrededor del set de instrucciones de Arm que representa décadas de inversión
+    acumulada de toda la industria. Cambiar de Arm a otra arquitectura (x86, o el RISC-V de código abierto) obliga a
+    reescribir y re-optimizar ese stack. Eso le da a Arm un poder de fijación de precios que se ve en el dato más
+    importante del modelo: cada generación nueva (Armv8 → Armv9, núcleo suelto → CSS) sube la regalía por chip sin
+    que los clientes se vayan. Es el mismo mecanismo económico que sostiene a un Cadence o un Synopsys en el diseño de
+    chips, o a un Microsoft en el sistema operativo: no es el producto de este año, es el costo de cambiarse.
+  </p>
+  <h3>Segmentos de mercado final</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Mercado final</th><th class="right-al">Rol para Arm</th><th class="right-al">Dinámica a 2026</th></tr>
+    <tr><td class="label">Smartphone / cómputo del consumidor</td><td class="right-al">Base instalada, ~casi 100% share</td><td class="right-al">Maduro; unidades planas, la regalía crece por mezcla Armv9 y CSS</td></tr>
+    <tr><td class="label">Centro de datos / nube</td><td class="right-al">El motor de crecimiento</td><td class="right-al">Regalías &gt;2x interanual; silicio propio de hiperescaladores + CPU Arm en IA</td></tr>
+    <tr><td class="label">Automotriz</td><td class="right-al">Crecimiento estructural</td><td class="right-al">Más contenido de cómputo por vehículo; cola de regalías de 15–20 años</td></tr>
+    <tr><td class="label">IoT / embebido / industrial</td><td class="right-al">Larga cola, baja regalía unitaria</td><td class="right-al">Débil en el ciclo actual; expuesto a inventarios de microcontroladores</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: Form 20-F FY2026 de Arm y comunicados de resultados. A partir del 1T FY2027, Arm dejó de publicar el desglose trimestral de regalías por mercado final y por arquitectura, así como el conteo de licenciatarios de Arm Total Access y el backlog de obligaciones de desempeño remanentes (RPO) —ver Sección 10, riesgo 7.</p>
+
+  <!-- 04 -->
+  <p class="secnum" id="s04">04 — Desarrollos Recientes y Perspectiva</p>
+  <h2>El giro histórico: Arm ahora fabrica —bueno, diseña— su propio chip, y compite con sus clientes</h2>
+  <h3>El Arm AGI CPU (24 de marzo de 2026): el cambio de modelo</h3>
+  <p>
+    El 24 de marzo de 2026, Arm anunció su <strong>primer procesador propio</strong>: el "Arm AGI CPU", un CPU de
+    centro de datos basado en núcleos Neoverse V3, fabricado por TSMC en 3nm, con <strong>Meta como cliente
+    principal y co-desarrollador</strong>. La lista de clientes de lanzamiento incluye a OpenAI, SAP, Cerebras,
+    Cloudflare y SK Telecom; la producción a volumen está prevista para el segundo semestre de 2026. Es un quiebre
+    con 35 años de historia: Arm pasó de <em>solo licenciar</em> arquitectura a <em>vender un producto terminado</em>,
+    y con eso compite —por primera vez— con sus propios licenciatarios: Qualcomm, Nvidia, y los equipos de silicio
+    propio de Amazon (Graviton) y Google (Axion). Management fijó una meta de <strong>~US$15 mil millones de ingresos
+    anuales de este negocio hacia FY2031</strong> y, en el reporte del 1T FY2027, dijo que los compromisos de clientes
+    para FY2027 y FY2028 combinados ya superan los <strong>US$2 mil millones</strong>, más del doble de lo que se
+    esperaba en el lanzamiento.
+  </p>
+  <p>
+    Los dos lados de esta apuesta. A favor: el CPU de centro de datos es un mercado de decenas de miles de millones de
+    dólares donde Arm captura hoy solo una regalía chica por chip; vendiendo el chip entero, el ingreso por unidad se
+    multiplica. En contra: es un negocio de <strong>márgenes mucho más bajos</strong> que el licenciamiento (hay que
+    pagarle a TSMC la oblea, y competir en precio), tensiona la relación con licenciatarios que representan la mayor
+    parte de los ingresos actuales, y consume capital —el capex de Arm se <strong>triplicó</strong> de US$219 millones
+    en FY2025 a US$545 millones en FY2026, y sigue subiendo, en gran parte por esta iniciativa y por la infraestructura
+    de cómputo para diseñar los chips—. La Sección 13 valúa este negocio por separado, de forma deliberadamente
+    conservadora.
+  </p>
+  <h3>El reporte del 1T FY2027 (29-jul-2026): buen trimestre, señales mixtas</h3>
+  <p>
+    Arm superó el consenso en ingresos (US$1.289M vs. ~US$1.260M) y en utilidad no-GAAP (US$0,45 vs. US$0,40). Pero
+    tres cosas del reporte enfriaron a la acción, que venía de US$439 en junio: management <strong>recortó el supuesto
+    de crecimiento de regalías para FY2027</strong> de "aproximadamente 20%" a "adolescentes altos" (high teens) por
+    debilidad en smartphones; <strong>dejó de dar guía anual</strong> y de publicar métricas que el mercado usaba para
+    modelar (RPO, conteo de licenciatarios, desglose de regalías por arquitectura); y no elevó la meta de largo plazo.
+    En las seis semanas siguientes al reporte, la acción bajó de ~US$355 a ~US$252.
+  </p>
+  <h3>La disputa con Qualcomm</h3>
+  <p>
+    En diciembre de 2024, un jurado de Delaware falló mayormente a favor de Qualcomm en el litigio por las licencias
+    de los núcleos que Qualcomm adquirió al comprar Nuvia. En 2026, un juez federal de Delaware
+    <strong>cerró el caso a favor de Qualcomm</strong>: dictaminó que ni Qualcomm ni Nuvia violaron el acuerdo de
+    licencia de arquitectura de Arm, y rechazó el pedido de Arm de un nuevo juicio. Qualcomm conserva el derecho a
+    usar sus núcleos Oryon. Queda pendiente una <strong>contrademanda de Qualcomm contra Arm</strong> (incumplimiento
+    de contrato, interferencia con relaciones con clientes y un "patrón de conducta" para favorecer los productos
+    propios de Arm por sobre los de sus socios), con fecha de juicio fijada para marzo de 2026 —su resolución y
+    eventual apelación son un frente abierto—. El punto de fondo, más allá del veredicto puntual: el licenciatario más
+    grande de Arm en smartphones litiga contra su proveedor de PI y desarrolla alternativas, en el mismo momento en
+    que Arm empieza a venderle chips a los competidores de Qualcomm.
+  </p>
+
+  <!-- 05 -->
+  <p class="secnum" id="s05">05 — Estados Financieros</p>
+  <h2>El abismo entre el resultado no-GAAP y el GAAP</h2>
+  <p>
+    Arm reporta bajo US GAAP en dólares. Presenta también un resultado "no-GAAP" que excluye principalmente la
+    compensación en acciones y la amortización de intangibles de la readquisición por SoftBank. La brecha entre las
+    dos versiones es de las más grandes de todo este desk, y define cómo se lee la valuación.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica (US GAAP, US$)</th><th class="right-al">4T FY2026</th><th class="right-al">1T FY2027</th><th class="right-al">TTM (a 1T FY27)</th></tr>
+    <tr><td class="label">Ingresos</td><td class="right-al">$1.490M</td><td class="right-al">$1.289M</td><td class="right-al">$5.156M</td></tr>
+    <tr><td class="label">Var. interanual</td><td class="right-al pos">+20%</td><td class="right-al pos">+22%</td><td class="right-al pos">~+25%</td></tr>
+    <tr><td class="label">Regalías (est.)</td><td class="right-al">~$720M</td><td class="right-al">$715M</td><td class="right-al">~$2.740M</td></tr>
+    <tr><td class="label">Licenciamiento y otros (est.)</td><td class="right-al">~$770M</td><td class="right-al">$574M</td><td class="right-al">~$2.416M</td></tr>
+    <tr><td class="label">Margen bruto</td><td class="right-al">97,9%</td><td class="right-al">97,2%</td><td class="right-al">97,5%</td></tr>
+    <tr><td class="label">Utilidad operativa GAAP</td><td class="right-al">$438M</td><td class="right-al">$91M</td><td class="right-al">$877M</td></tr>
+    <tr><td class="label">Margen operativo GAAP</td><td class="right-al">29,4%</td><td class="right-al">7,1%</td><td class="right-al">17,0%</td></tr>
+    <tr><td class="label">Utilidad operativa no-GAAP</td><td class="right-al">~$620M</td><td class="right-al">$531M</td><td class="right-al">~$2.350M</td></tr>
+    <tr><td class="label">Margen operativo no-GAAP</td><td class="right-al">~42%</td><td class="right-al">41,2%</td><td class="right-al">~45%</td></tr>
+    <tr><td class="label">Utilidad neta GAAP</td><td class="right-al">$313M</td><td class="right-al">$270M</td><td class="right-al">$1.044M</td></tr>
+    <tr><td class="label">EPS diluido GAAP</td><td class="right-al">$0,29</td><td class="right-al">$0,25</td><td class="right-al">~$0,97</td></tr>
+    <tr><td class="label">EPS diluido no-GAAP</td><td class="right-al">~$0,52</td><td class="right-al">$0,45</td><td class="right-al">~$1,87</td></tr>
+    <tr><td class="label">Compensación en acciones (SBC)</td><td class="right-al">$261M</td><td class="right-al">$343M</td><td class="right-al">$1.154M</td></tr>
+    <tr><td class="label">SBC como % de ingresos</td><td class="right-al">17,5%</td><td class="right-al">26,6%</td><td class="right-al">22,4%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR — carta a accionistas y exhibits 6-K del 1T FY2027 (29-jul-2026) y del 4T/FY2026 (6-may-2026); Form 20-F FY2026; XBRL companyfacts (CIK 0001973239). Los trimestres standalone de partidas que se informan acumuladas en el año fiscal (SBC, impuestos, flujo de caja) se calculan restando el acumulado del trimestre previo. El desglose regalías/licenciamiento del 4T FY2026 y del TTM es una estimación de este informe a partir de los totales anuales y trimestrales publicados; Arm dejó de dar el desglose trimestral a partir del 1T FY2027. EPS no-GAAP: 1T FY2027 (US$0,45) es cifra reportada; el resto son estimaciones de este informe consistentes con el EPS no-GAAP anual FY2026 (~US$1,77) y el consenso.</p>
+  <p>
+    Tres lecturas de la tabla. Primero, el <strong>crecimiento es real y de alta calidad</strong>: 22% interanual en
+    el 1T FY2027, con las regalías (la parte recurrente) creciendo tan rápido como el total. Segundo, la
+    <strong>volatilidad trimestral del margen operativo GAAP</strong> (29,4% en el 4T FY2026, 7,1% en el 1T FY2027) no
+    es deterioro del negocio: es el efecto combinado de la grumosidad del licenciamiento y de un pico de compensación
+    en acciones en el 1T (26,6% de los ingresos, vs. 17,5% el trimestre anterior, por el calendario de
+    otorgamientos). Tercero, y lo más importante: <strong>la compensación en acciones no es ruido</strong>. A
+    US$1.154 millones en los últimos doce meses —22,4% de los ingresos—, es el costo que separa un margen operativo
+    no-GAAP de ~45% de un margen GAAP de 17%. Cualquier valuación que use la utilidad no-GAAP sin ajustar está, de
+    hecho, ignorando una transferencia de ~US$1.150 millones anuales de los accionistas a los empleados.
+  </p>
+  <div class="chartbox">
+    <canvas id="marginChart" height="260"></canvas>
+    <p class="chartcap">Margen operativo GAAP vs. no-GAAP, últimos cinco trimestres. La brecha —12 a 34 puntos porcentuales según el trimestre— es casi toda compensación en acciones más amortización de intangibles. El pico del 1T FY2027 en la brecha coincide con el pico de SBC del año (26,6% de los ingresos). Fuente: SEC EDGAR (cartas a accionistas y exhibits 6-K).</p>
+  </div>
+  <div class="chartbox">
+    <canvas id="revenueQChart" height="260"></canvas>
+    <p class="chartcap">Ingresos trimestrales en US$, 1T FY2026 a 2T FY2027E (el último dato es el punto medio de la guía de management, US$1.380 millones, no un resultado real). Fuente: SEC EDGAR (comunicados 6-K) y guía de 2T FY2027E.</p>
+  </div>
+
+  <!-- 06 -->
+  <p class="secnum" id="s06">06 — Deuda y Balance</p>
+  <h2>Sin deuda, ~US$4,0 mil millones de caja neta, y un balance liviano de activos</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica (al 30 jun 2026)</th><th class="right-al">US$</th></tr>
+    <tr><td class="label">Efectivo, equivalentes e inversiones de corto plazo</td><td class="right-al">$3.888M</td></tr>
+    <tr><td class="label">Inversiones de largo plazo</td><td class="right-al">$589M</td></tr>
+    <tr><td class="label">Deuda financiera (bonos / préstamos)</td><td class="right-al">$0</td></tr>
+    <tr><td class="label">Pasivos por arrendamiento (financiero + operativo)</td><td class="right-al">~$491M</td></tr>
+    <tr class="total"><td class="label">Caja neta (de arrendamientos)</td><td class="right-al">~$3.986M</td></tr>
+    <tr><td class="label">Patrimonio neto</td><td class="right-al">$8.630M</td></tr>
+    <tr><td class="label">Activos totales</td><td class="right-al">$11.196M</td></tr>
+    <tr><td class="label">Pasivo por ingresos diferidos (contract liability)</td><td class="right-al">$939M</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR — carta a accionistas y exhibit 6-K del 1T FY2027 (balance al 30-jun-2026); XBRL companyfacts (CIK 0001973239). Arm no tiene deuda financiera emitida; los únicos pasivos onerosos son arrendamientos (pasivo por arrendamiento financiero US$59M + operativo US$432M al 31-mar-2026). "Caja neta" resta esos arrendamientos de la caja e inversiones de corto plazo.</p>
+  <p>
+    El balance de Arm es lo opuesto al de un fabricante. No hay fábricas: la propiedad, planta y equipo es una
+    fracción chica del activo (oficinas, equipos de laboratorio, infraestructura de cómputo para diseño). No hay
+    deuda. La posición de <strong>caja neta de ~US$4,0 mil millones</strong> crece cada trimestre con el flujo de
+    caja libre. El activo más grande del balance, en rigor, es el <strong>goodwill e intangibles</strong> heredados
+    de la contabilidad de la readquisición por SoftBank en 2016 —y su amortización es justamente una de las partidas
+    que la utilidad no-GAAP excluye—. Para el DCF, la implicancia es simple: como Arm tiene caja neta y cero deuda, el
+    <strong>WACC es igual al costo de capital propio</strong>, sin ajuste por apalancamiento, y la dispersión entre
+    escenarios Bear y Bull no viene de una estructura de capital riesgosa (no la hay) sino de la sensibilidad del
+    valor terminal, que se discute en la Sección 13.
+  </p>
+
+  <!-- 07 -->
+  <p class="secnum" id="s07">07 — Flujo de Caja y Capital Allocation</p>
+  <h2>Genera caja de verdad —pero menos de lo que el margen no-GAAP sugiere, por la compensación en acciones</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">FY2026</th><th class="right-al">TTM (a 1T FY27)</th></tr>
+    <tr><td class="label">Flujo de caja operativo (OCF)</td><td class="right-al">$1.524M</td><td class="right-al">$2.094M</td></tr>
+    <tr><td class="label">Capex</td><td class="right-al">$545M</td><td class="right-al">$588M</td></tr>
+    <tr class="total"><td class="label">Flujo de caja libre (FCF)</td><td class="right-al">$979M</td><td class="right-al">$1.506M</td></tr>
+    <tr><td class="label">Margen de OCF sobre ingresos</td><td class="right-al">31,0%</td><td class="right-al">40,6%</td></tr>
+    <tr><td class="label">Margen de FCF sobre ingresos</td><td class="right-al">19,9%</td><td class="right-al">29,2%</td></tr>
+    <tr><td class="label">Compensación en acciones (sumada de vuelta en el OCF)</td><td class="right-al">$1.052M</td><td class="right-al">$1.154M</td></tr>
+    <tr><td class="label">FCF menos compensación en acciones</td><td class="right-al">&minus;$73M</td><td class="right-al">$352M</td></tr>
+    <tr><td class="label">Capex como % de ingresos</td><td class="right-al">11,1%</td><td class="right-al">11,4%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR — estados de flujo de efectivo de los exhibits 6-K (los importes trimestrales acumulados en el año fiscal se convierten a standalone restando el trimestre previo); XBRL companyfacts (CIK 0001973239). El FCF TTM (US$1.506M) usa OCF TTM US$2.094M menos capex TTM US$588M. "FCF menos compensación en acciones" resta el SBC del período: es una medida de cuánta caja quedaría para el accionista si la compañía pagara sueldos en efectivo en vez de en acciones —o, equivalentemente, si recomprara acciones para neutralizar la dilución.</p>
+  <p>
+    Este es el número que hay que mirar dos veces. El OCF de Arm —US$2.094 millones en los últimos doce meses, 40,6%
+    de los ingresos— parece de software de altísima calidad. Pero <strong>ese OCF le suma de vuelta US$1.154 millones
+    de compensación en acciones</strong>, que es un gasto real de la empresa: paga a sus ingenieros con acciones que
+    diluyen a los accionistas existentes (el conteo de acciones diluidas pasó de 1.044 millones en FY2024 a 1.078
+    millones en el 1T FY2027, ~1,5% de dilución anual, y sería más si Arm no retuviera acciones para impuestos). Si se
+    trata la compensación en acciones como el costo que es, el "FCF ajustado" de Arm cae de US$1.506 millones a
+    <strong>US$352 millones</strong> —un margen de ~7% sobre ingresos, no 29%—. La verdad está en el medio: parte de
+    la compensación en acciones es un costo de arranque que debería bajar como porcentaje de los ingresos a medida que
+    la empresa escala. El DCF de la Sección 13 modela esa convergencia explícitamente, en vez de elegir una de las dos
+    puntas.
+  </p>
+  <p>
+    <strong>Volatilidad del OCF:</strong> el flujo operativo trimestral de Arm es errático por el capital de trabajo.
+    El 1T FY2027 tuvo un OCF de US$902 millones (70% de los ingresos del trimestre) por timing de cobranzas, mientras
+    que el 4T FY2026 tuvo US$260 millones (17%). El año fiscal completo —31,0% de margen de OCF— es el ancla limpia;
+    el TTM de 40,6% está inflado por ese trimestre de cobranzas y no se usa como base del DCF.
+  </p>
+  <p>
+    <strong>Capital allocation:</strong> Arm <em>no</em> paga dividendo y <em>no</em> recompra acciones de forma
+    material (solo retiene acciones para cubrir impuestos de los empleados). Todo el FCF se acumula como caja neta o
+    financia el capex creciente del CPU propio. El capex se triplicó en un año (US$219M → US$545M) y es el renglón a
+    vigilar: si sube hacia US$700–900 millones para escalar el negocio de silicio, comprime el FCF justo cuando el
+    mercado espera que se expanda.
+  </p>
+  <div class="chartbox">
+    <canvas id="capexChart" height="260"></canvas>
+    <p class="chartcap">Capex de Arm en US$ millones, FY2024–FY2026 y TTM. El salto de FY2025 a FY2026 (US$219M → US$545M, +149%) es el costo de entrada al negocio de silicio propio y de la infraestructura de cómputo para diseño. Fuente: SEC EDGAR (estados de flujo de efectivo 6-K / 20-F).</p>
+  </div>
+
+  <!-- 08 -->
+  <p class="secnum" id="s08">08 — Comparables: por qué software y no semiconductores</p>
+  <h2>Arm tiene el estado de resultados de una empresa de software, no de un fabricante de chips</h2>
+  <p>
+    La decisión metodológica central de este informe es <strong>a qué grupo comparar a Arm</strong>. El instinto es
+    ponerla con Nvidia, Qualcomm, Broadcom, AMD —"es una empresa de chips"—. Este informe argumenta lo contrario, y
+    lo hace de forma deliberada: <strong>Arm se parece mucho más, en la estructura de sus números y de su foso
+    competitivo, a una empresa de software de infraestructura</strong>. Las razones:
+  </p>
+  <ul style="max-width:68ch; margin:0 0 15px; padding-left:22px;">
+    <li style="margin-bottom:8px;"><strong>Margen bruto de 97,5%.</strong> No hay costo de mercadería vendida en el sentido físico. El de Nvidia es ~75%, el de Qualcomm ~56%, el de Broadcom ~68%. El de Arm está por encima incluso del de Adobe (~89%) y Palantir (~85%). Es un número de software de licenciamiento puro.</li>
+    <li style="margin-bottom:8px;"><strong>Sin capex de fábrica.</strong> Arm no compra obleas ni equipos de litografía. Su capex histórico es ~2–4% de los ingresos (el pico reciente de 11% es por el CPU propio y sigue siendo bajo). TSMC gasta ~36%.</li>
+    <li style="margin-bottom:8px;"><strong>Ingreso recurrente con costo de cambio.</strong> Las regalías con cola de décadas y el lock-in del ecosistema Arm funcionan como una suscripción de software: el cliente no se va porque migrar el stack es carísimo. Es el mismo mecanismo de Cadence/Synopsys en EDA o de Microsoft en SO.</li>
+    <li style="margin-bottom:8px;"><strong>El mercado ya la valúa así.</strong> A ~54x ingresos y ~105–140x utilidad forward, Arm cotiza a múltiplos de software premium, no de semis. Compararla con Nvidia (~19x utilidad, ~16x ingresos) haría que pareciera 5x sobrevaluada de entrada; el ejercicio honesto es medirla contra lo que el mercado paga por negocios con su misma economía.</li>
+  </ul>
+  <p>
+    El canasto de comparables, entonces, es de <strong>software de infraestructura y de diseño premium</strong>:
+    ServiceNow y CrowdStrike (plataformas de suscripción de alto margen y crecimiento), Snowflake (modelo de consumo,
+    análogo a las regalías por uso), Palantir (plataforma de altísimo múltiplo), Adobe (software maduro y muy
+    rentable, el ancla "barata"), y Cadence y Synopsys —los dos que <em>literalmente le venden software de diseño a
+    los mismos clientes que Arm</em> y son el puente estructural más cercano.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Compañía</th><th class="right-al">Precio</th><th class="right-al">EV/Ingresos (TTM)</th><th class="right-al">P/E Forward</th><th class="right-al">Margen bruto</th><th class="right-al">Crec. ~3 años</th></tr>
+    <tr class="total"><td class="label">Arm Holdings (ARM)</td><td class="right-al">$261,53</td><td class="right-al">~54x</td><td class="right-al">~105–140x</td><td class="right-al">97,5%</td><td class="right-al">~23%</td></tr>
+    <tr><td class="label">ServiceNow (NOW)</td><td class="right-al">$134,21</td><td class="right-al">~9,5x</td><td class="right-al">~29,6x</td><td class="right-al">74,8%</td><td class="right-al">~20%</td></tr>
+    <tr><td class="label">CrowdStrike (CRWD)</td><td class="right-al">$210,02</td><td class="right-al">~39,1x</td><td class="right-al">~151x</td><td class="right-al">75,2%</td><td class="right-al">~23%</td></tr>
+    <tr><td class="label">Snowflake (SNOW)</td><td class="right-al">$243,29</td><td class="right-al">~21,7x</td><td class="right-al">~134x</td><td class="right-al">67,0%</td><td class="right-al">~30%</td></tr>
+    <tr><td class="label">Palantir (PLTR)</td><td class="right-al">$170,30</td><td class="right-al">~65,6x</td><td class="right-al">~91,6x</td><td class="right-al">84,8%</td><td class="right-al">~58%</td></tr>
+    <tr><td class="label">Adobe (ADBE)</td><td class="right-al">$257,26</td><td class="right-al">~4,1x</td><td class="right-al">~9,9x</td><td class="right-al">89,4%</td><td class="right-al">~10%</td></tr>
+    <tr><td class="label">Cadence (CDNS)</td><td class="right-al">$284,11</td><td class="right-al">~13,7x</td><td class="right-al">~34,1x</td><td class="right-al">85,9%</td><td class="right-al">~15%</td></tr>
+    <tr><td class="label">Synopsys (SNPS)</td><td class="right-al">$392,03</td><td class="right-al">~8,7x</td><td class="right-al">~23,3x</td><td class="right-al">~83%</td><td class="right-al">~19%</td></tr>
+    <tr class="total"><td class="label">Promedio de los 7 comparables</td><td class="right-al">—</td><td class="right-al">~23,2x</td><td class="right-al">~67,6x</td><td class="right-al">~79%</td><td class="right-al">~25%</td></tr>
+  </table></div>
+  <p class="footnote">Múltiplos "aproximados, consultados en stockanalysis.com el 8-sep-2026" — EV/Ingresos y P/E forward por compañía; no verificados uno por uno en tiempo real contra el mercado en cada instante. Precios: Yahoo Finance, 8-sep-2026. "Crec. ~3 años" es el pronóstico de crecimiento de ingresos a 3 años que reporta stockanalysis.com. El P/E forward de Arm se muestra como rango porque las fuentes difieren: ~117x sobre EPS no-GAAP FY2027 de consenso (US$2,23), ~140x sobre EPS no-GAAP TTM (~US$1,87), y ~105x en el campo de "P/E forward" de stockanalysis.com. EV/Ingresos de Arm sobre ingresos TTM US$5.156M y EV ~US$278.000M.</p>
+  <div class="chartbox">
+    <canvas id="compsChart" height="300"></canvas>
+    <p class="chartcap">EV/Ingresos (TTM) — Arm (~54x) contra el canasto de software premium. Solo Palantir (~66x, que crece ~58%) cotiza más caro por ventas. Arm crece ~23% —similar a CrowdStrike y por debajo de Snowflake— pero cotiza por encima de ambos. Su único argumento para una prima es el margen bruto (97,5%, el más alto del grupo) y la cola de regalías. Fuente: stockanalysis.com, 8-sep-2026.</p>
+  </div>
+  <div class="chartbox">
+    <canvas id="peChart" height="300"></canvas>
+    <p class="chartcap">P/E forward — Arm (~117x sobre EPS no-GAAP FY2027 de consenso) queda por debajo solo de CrowdStrike (~151x, márgenes GAAP cerca de cero) y Snowflake (~134x, márgenes GAAP negativos). Contra los comparables rentables del grupo (ADBE ~10x, SNPS ~23x, NOW ~30x, CDNS ~34x, PLTR ~92x) Arm es el más caro con amplitud. Fuente: stockanalysis.com, 8-sep-2026.</p>
+  </div>
+  <p class="pull">
+    El hallazgo de la Sección 08: incluso concediéndole a Arm la comparación más favorable posible —medirla contra
+    software premium en vez de contra semiconductores—, Arm cotiza en el techo o por encima del techo de ese grupo en
+    las dos métricas que importan. La prima está puesta casi enteramente sobre el margen bruto de 97,5% y sobre la
+    narrativa del CPU de centro de datos. Ninguna de las dos, por sí sola, cierra la brecha con un múltiplo de software
+    "normal".
+  </p>
+
+  <!-- 09 -->
+  <p class="secnum" id="s09">09 — Gobierno Corporativo y Estructura Accionaria</p>
+  <h2>SoftBank controla el 86%, el CEO también dirige SoftBank, y hay un paquete de US$800 millones a votación</h2>
+  <div class="govrow">
+    <div class="govcell"><div class="k">CEO</div><div class="v">Rene Haas</div><div class="sub">CEO de Arm desde febrero de 2022. Desde abril de 2026 también es CEO de SoftBank Group International y miembro del directorio de SoftBank desde 2023. Compensación total FY2026: ~US$60,6 millones.</div></div>
+    <div class="govcell"><div class="k">Presidente del directorio</div><div class="v">Masayoshi Son</div><div class="sub">Fundador, presidente y CEO de SoftBank Group. Preside el directorio de Arm desde 2016. ISS recomendó votar en contra de su reelección por falta de independencia del directorio.</div></div>
+    <div class="govcell"><div class="k">Accionista controlante</div><div class="v">SoftBank ~86,4%</div><div class="sub">~922,7 millones de acciones. El flotante público es de ~145 millones de ADS (~13,6%). Instituciones (ex-SoftBank) ~8%. Mayor institucional: Capital World Investors.</div></div>
+    <div class="govcell"><div class="k">Paquete de compensación a votación</div><div class="v">Hasta US$800M</div><div class="sub">Premio único de 425.000 PSU para Rene Haas, en tramos que sólo se pagan si Arm alcanza US$1 billón (25%, a mar-2029), US$1,5 billones (25%, a mar-2030) y US$2 billones (50%, a mar-2031) de capitalización.</div></div>
+    <div class="govcell"><div class="k">Asesores de voto</div><div class="v">ISS y Glass Lewis: en contra</div><div class="sub">Ambos recomendaron rechazar el paquete de pago. ISS además aconsejó votar en contra de la reelección de Haas y de Son. Asamblea anual: 9 de septiembre de 2026.</div></div>
+    <div class="govcell"><div class="k">Estatus regulatorio</div><div class="v">"Controlled company"</div><div class="sub">Por el control de SoftBank, Arm está exenta de las reglas de Nasdaq que exigen directorio con mayoría independiente. Un accionista del flotante es minoritario en una empresa controlada.</div></div>
+  </div>
+  <p class="footnote">Fuentes: Form 20-F FY2026 de Arm, Form 6-K con la convocatoria a la asamblea 2026, cobertura de prensa (Reuters, Tom's Hardware, Seeking Alpha, TechSpot) sobre las recomendaciones de ISS/Glass Lewis y el paquete de pago, y datos de tenencia institucional (Yahoo Finance, WallStreetZen). Los porcentajes de tenencia son al segundo trimestre de 2026 y varían levemente según la fuente y la fecha de corte.</p>
+  <p>
+    El gobierno corporativo de Arm es, para un accionista del flotante, el segundo riesgo más grande después de la
+    valuación —y está entrelazado con ella—. Tres puntos.
+  </p>
+  <p>
+    <strong>Primero, el control y el flotante.</strong> SoftBank tiene ~86% del capital. El flotante libre es de
+    ~13,6%, uno de los más chicos de cualquier empresa de esta capitalización. Eso tiene dos consecuencias: la acción
+    es <em>estructuralmente volátil</em> (poca oferta de papel amplifica cualquier flujo comprador o vendedor —parte
+    del recorrido de US$100 a US$439 y de vuelta a US$261 en 2025–2026 es esto), y hay un <strong>riesgo de
+    overhang</strong> permanente: si SoftBank decidiera vender aunque sea una porción chica de su tenencia para
+    financiar sus otras apuestas (OpenAI, Stargate), el impacto sobre el precio sería grande. El accionista minoritario
+    no controla nada y convive con esa espada.
+  </p>
+  <p>
+    <strong>Segundo, los roles cruzados.</strong> El presidente de Arm es el CEO de su controlante. El CEO de Arm es,
+    desde abril de 2026, también CEO de SoftBank Group International y director de SoftBank. Los asesores de voto ISS y
+    Glass Lewis señalaron la falta de independencia del directorio y recomendaron votar en contra de la reelección de
+    ambos en la asamblea del 9 de septiembre de 2026. Las decisiones de Arm —incluida la de competir con sus propios
+    licenciatarios mediante el CPU propio— se toman en un directorio donde el interés de SoftBank y el de los
+    accionistas minoritarios no siempre coinciden.
+  </p>
+  <p>
+    <strong>Tercero, la compensación.</strong> Rene Haas cobró ~US$60,6 millones en FY2026. Por encima de eso, Arm
+    pidió a los accionistas aprobar un premio único de hasta <strong>US$800 millones</strong> en acciones para Haas,
+    que sólo se paga si la capitalización de Arm llega a US$1 billón, US$1,5 billones y US$2 billones —es decir, entre
+    3,5x y 7x el valor actual—. Es un paquete "de fundador" en tamaño, para un CEO que no es fundador, en una empresa
+    controlada. ISS y Glass Lewis lo rechazaron. Que se apruebe igual (SoftBank tiene los votos) diría algo sobre cómo
+    se tratan los intereses del flotante.
+  </p>
+
+  <!-- 10 -->
+  <p class="secnum" id="s10">10 — Registro de Riesgos</p>
+  <h2>Ocho riesgos concretos</h2>
+  <h3>1. Valuación: el precio ya descuenta que casi todo salga bien</h3>
+  <p>
+    Es el riesgo dominante, y está cuantificado en la Sección 13. A ~54x ingresos y ~105–140x utilidad forward, Arm
+    cotiza por encima del techo de un canasto de software premium. El DCF Base da US$39; el DCF inverso muestra que el
+    precio exige ~40% de crecimiento anual por cinco años y luego ~25% por cinco más, o un WACC de 6%. Una
+    desaceleración a un crecimiento "sólo" de 15–18% —que es lo que management ya guió para las regalías de FY2027— es
+    suficiente para una corrección de múltiplo grande, incluso si el negocio sigue siendo excelente.
+  </p>
+  <h3>2. Concentración en smartphones y madurez de la base instalada</h3>
+  <p>
+    La mayor parte de las regalías todavía viene de smartphones y cómputo de consumo, un mercado con unidades planas.
+    El crecimiento de regalías ahí depende enteramente de subir la regalía por chip (mezcla Armv9, CSS), no de vender
+    a más dispositivos. Management recortó el supuesto de crecimiento de regalías de FY2027 de ~20% a "adolescentes
+    altos" citando debilidad de smartphones: la palanca de volumen está agotada en el segmento más grande.
+  </p>
+  <h3>3. Competir con los propios licenciatarios (el CPU AGI)</h3>
+  <p>
+    Al vender su propio CPU de centro de datos, Arm compite con Qualcomm, Nvidia, Amazon y Google —clientes que hoy
+    pagan la mayor parte de sus ingresos—. El riesgo es doble: que la iniciativa <em>no</em> escale (y Arm haya
+    gastado capital y capital político para nada) o que <em>sí</em> escale y acelere la búsqueda de alternativas por
+    parte de los licenciatarios molestos (RISC-V, arquitecturas propias). El negocio de silicio es además de margen
+    mucho más bajo que el licenciamiento.
+  </p>
+  <h3>4. RISC-V y la erosión del foso a largo plazo</h3>
+  <p>
+    RISC-V es un set de instrucciones abierto y sin regalías, respaldado por Qualcomm, Nvidia, Google, Meta y un
+    consorcio amplio. Hoy no es competitivo con Arm en el ecosistema de software para el grueso del mercado, pero
+    avanza en nichos (microcontroladores, aceleradores, dominios donde el software se controla de punta a punta) y es
+    la opción de salida que cada licenciatario tiene sobre la mesa como palanca de negociación. Es un riesgo de erosión
+    lento, no un evento.
+  </p>
+  <h3>5. Litigio y relación con Qualcomm</h3>
+  <p>
+    Arm perdió el litigio principal contra Qualcomm/Nuvia (fallo de 2026, sin nuevo juicio). Queda la contrademanda de
+    Qualcomm por incumplimiento de contrato e interferencia, con juicio fijado para marzo de 2026 —resultado y
+    apelación pendientes—. Más allá del dinero, el litigio deteriora la relación con el mayor licenciatario de
+    smartphones justo cuando Arm entra a competir en su terreno.
+  </p>
+  <h3>6. Dependencia de SoftBank y riesgo de overhang</h3>
+  <p>
+    SoftBank posee ~86%. Cualquier venta de acciones para financiar sus otras apuestas presionaría un flotante ya
+    chico. Y la gobernanza —presidente y CEO con doble sombrero de SoftBank— implica que las prioridades de Arm pueden
+    subordinarse a las del grupo.
+  </p>
+  <h3>7. Deterioro de la calidad de divulgación</h3>
+  <p>
+    A partir del 1T FY2027, Arm dejó de publicar el RPO (backlog de obligaciones de desempeño), el conteo de
+    licenciatarios de Arm Total Access, el desglose de regalías por arquitectura y por mercado final, y la guía anual.
+    Menos información verificable para modelar el negocio, justo cuando el modelo se vuelve más complejo (entra el
+    silicio). Es una regresión en transparencia que un accionista debería penalizar en el múltiplo, no premiar.
+  </p>
+  <h3>8. Compensación en acciones y dilución</h3>
+  <p>
+    La compensación en acciones es ~22% de los ingresos y crece. Diluye ~1,5% de las acciones por año y es la
+    diferencia entre un margen no-GAAP de ~45% y uno GAAP de 17%. Si el precio de la acción cae y retener talento
+    obliga a otorgar más acciones a menor precio, la dilución se acelera justo cuando el negocio más necesita
+    estabilidad.
+  </p>
+
+  <!-- 11 -->
+  <p class="secnum" id="s11">11 — Catalizadores</p>
+  <h2>Lo que puede mover la acción antes del próximo informe de este desk</h2>
+  <h3>Reporte del 2T FY2027 (esperado ~fines de octubre / principios de noviembre de 2026)</h3>
+  <p>
+    El nivel a batir es la guía: ingresos de US$1.380 millones ±US$50 millones y utilidad no-GAAP por acción de
+    US$0,47 ±US$0,04. Lo más observado: si las regalías de FY2027 se sostienen en "adolescentes altos" o se recortan
+    más, y cualquier dato sobre el ramp del CPU AGI hacia producción a volumen en el segundo semestre.
+  </p>
+  <h3>Asamblea anual del 9 de septiembre de 2026</h3>
+  <p>
+    El voto sobre el paquete de compensación de US$800 millones y la reelección de Haas y Son. Es casi seguro que
+    pasen (SoftBank tiene los votos), pero el nivel de disidencia del flotante y la reacción de los asesores de voto
+    son una señal de gobernanza.
+  </p>
+  <h3>Primeros ingresos materiales del CPU AGI</h3>
+  <p>
+    La producción a volumen está prevista para el 2S 2026. El primer trimestre con ingresos de silicio reconocidos,
+    y cualquier señal de margen de ese negocio, cambia la forma del modelo. Arm planea reportar el silicio como línea
+    separada cuando supere el 10% de los ingresos (esperado en FY2028).
+  </p>
+  <h3>Movimientos de SoftBank sobre su tenencia</h3>
+  <p>
+    Cualquier anuncio de venta, colocación secundaria o uso de las acciones de Arm como colateral por parte de
+    SoftBank es un evento directo sobre el flotante.
+  </p>
+  <h3>Guías de capex de los hiperescaladores</h3>
+  <p>
+    Microsoft, Alphabet, Amazon y Meta: sus planes de inversión en centros de datos son el indicador adelantado de
+    las regalías de data center de Arm, el único segmento que hoy crece a tres dígitos.
+  </p>
+  <h3>Avances de RISC-V y anuncios de licenciatarios</h3>
+  <p>
+    Cualquier migración pública de un cliente grande hacia RISC-V, o un diseño propio que reduzca contenido de Arm,
+    es una señal de erosión del foso.
+  </p>
+
+  <!-- 12 -->
+  <p class="secnum" id="s12">12 — Modelo Financiero Proyectado y Momentum de Estimados</p>
+  <h2>El consenso proyecta ~US$6.050 millones para FY2027 y US$2,23 de utilidad no-GAAP</h2>
+  <p>
+    El consenso de analistas (stockanalysis.com, 42 analistas, al 8 de septiembre de 2026) proyecta ingresos de
+    <strong>US$6.050 millones para FY2027</strong> (+23,0% interanual) y utilidad no-GAAP por acción de
+    <strong>US$2,23</strong> (+26%). Para FY2028 no hay un consenso público completo y consistente; la propia compañía
+    guía que las regalías crecen a ~20% compuesto hasta FY2031 y que el negocio de silicio (CPU AGI) llega a ~US$15
+    mil millones de ingresos anuales hacia FY2031 —una cifra que, de cumplirse, más que triplicaría los ingresos
+    totales actuales—. Para los años sin consenso público, este informe remite a los supuestos del DCF de la Sección
+    13 en vez de fabricar una proyección línea por línea.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">FY2026 (real)</th><th class="right-al">FY2027E (consenso)</th></tr>
+    <tr><td class="label">Ingresos</td><td class="right-al">$4.920M</td><td class="right-al">$6.050M</td></tr>
+    <tr><td class="label">Crecimiento interanual</td><td class="right-al pos">+22,8%</td><td class="right-al pos">+23,0%</td></tr>
+    <tr><td class="label">EPS no-GAAP</td><td class="right-al">~$1,77</td><td class="right-al">$2,23</td></tr>
+    <tr><td class="label">Crecimiento de EPS no-GAAP</td><td class="right-al">—</td><td class="right-al pos">+26%</td></tr>
+    <tr><td class="label">EPS GAAP</td><td class="right-al">$0,85</td><td class="right-al">n.d.</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: stockanalysis.com/stocks/arm/forecast/, consultado el 8-sep-2026 (42 analistas). El "EPS" de consenso que reporta la fuente es no-GAAP (ajustado), consistente con el US$0,45 no-GAAP reportado en el 1T FY2027. El EPS GAAP FY2026 (US$0,85) es de los estados financieros (Form 20-F). Guías de largo plazo (regalías +20% CAGR a FY2031, CPU AGI ~US$15.000M a FY2031): earnings calls de Arm del 4T FY2026 y 1T FY2027.</p>
+  <div class="chartbox">
+    <canvas id="revisionChart" height="240"></canvas>
+    <p class="chartcap">Momentum del estimado de utilidad no-GAAP del trimestre: el consenso previo al 1T FY2027 pedía US$0,40; Arm reportó US$0,45 (beat de 12,5%); la guía del 2T FY2027 (US$0,47) también quedó por encima del consenso previo (~US$0,43). El beat de utilidad convive con un recorte del supuesto de crecimiento de regalías para el año fiscal completo. Ilustra dirección, no una serie verificada día por día.</p>
+  </div>
+  <p>
+    El precio objetivo promedio de los ~42 analistas que cubren la acción es de aproximadamente <strong>US$290</strong>
+    (rango citado por las fuentes: US$125 a US$500), con calificación consenso "Buy". Es ~11% por encima del precio de
+    mercado —el único de los cinco métodos de la Sección 13 que queda por encima—. La amplitud del rango de precios
+    objetivo (US$125 a US$500, una relación de 4x entre el más bajo y el más alto) es en sí misma un dato: refleja que
+    ni la comunidad de analistas tiene una idea firme de cuánto vale Arm, porque el valor depende casi por completo de
+    supuestos sobre un futuro (el CPU de centro de datos, la trayectoria de regalías a 5–10 años) que todavía no
+    ocurrió.
+  </p>
+
+  <!-- 13 -->
+  <p class="secnum" id="s13">13 — Valuación: Cinco Métodos y el Fair Value</p>
+  <h2>Cinco enfoques, cuatro por debajo del mercado, y un blend de US$151</h2>
+  <p>
+    Calculamos el valor razonable de la acción con cinco enfoques independientes: flujo de caja descontado (tres
+    escenarios), múltiplos contra el canasto de software premium de la Sección 08, reversión a la media histórica
+    propia en ventana limpia, consenso de Wall Street, y una suma de partes que separa el negocio de PI del CPU de
+    centro de datos. Promediamos los cinco sin forzarlos a converger. Aplicamos las reglas fijas del desk: el consenso
+    de Wall Street entra al promedio (no es "referencia externa"); la reversión histórica entra con una ventana
+    reciente limpia; y como Arm tiene una apuesta de plataforma grande y todavía no monetizada (el CPU AGI), sumamos
+    una suma de partes y un DCF inverso.
+  </p>
+
+  <h3>Método 1 — Flujo de caja descontado (DCF), tres escenarios</h3>
+  <p>
+    Modelo a dos etapas: cinco años explícitos (FY2027 a FY2031) más valor terminal por crecimiento perpetuo. El año 1
+    (FY2027) usa el mismo ingreso ancla en los tres escenarios —el consenso de US$6.050 millones—. La variable que
+    difiere es el ritmo de desaceleración posterior y la trayectoria del margen de flujo de caja operativo neto del
+    costo real de la compensación en acciones.
+  </p>
+  <p>
+    <strong>Anclaje del margen de OCF (regla no-negociable del desk):</strong> el margen de OCF del año 1 (34% en el
+    caso Base) está anclado en el <strong>margen de OCF real del año fiscal 2026 completo (31,0%)</strong>, normalizado
+    ligeramente al alza por apalancamiento operativo — no en el TTM de 40,6%, que está inflado por un único trimestre
+    de cobranzas (el 1T FY2027 tuvo un OCF de 70% de los ingresos por timing de capital de trabajo, con el pasivo por
+    ingresos diferidos plano; ver Sección 07). El capex del año 1 (10% de los ingresos) está anclado en el nivel real
+    de FY2026 (11,1%) y se normaliza gradualmente hacia ~6,5% a medida que pasa la fase de inversión inicial del CPU
+    propio. El <strong>WACC del caso Base (11,0%)</strong> se construye con tasa libre de riesgo ~4,2% (Treasury 10
+    años), premio de riesgo accionario 5,0% y beta ~1,4 (la acción es muy volátil por el flotante chico): CAPM ≈ 11,2%,
+    redondeado a 11,0%. Como Arm tiene caja neta, no hay ajuste por deuda. El escenario Bear usa 12,0% y el Bull 10,0%.
+  </p>
+  <p>
+    <strong>Tratamiento de la compensación en acciones:</strong> el margen de OCF de cada escenario ya
+    <em>descuenta</em> una porción del gasto de compensación en acciones, en vez de sumárselo de vuelta como hace el
+    estado de flujo de efectivo reportado. En el caso Base, el margen de OCF converge de 34% a 40% en cinco años, lo
+    que asume que la compensación en acciones baja de ~22% de los ingresos a ~14% a medida que la empresa escala —una
+    convergencia, no una desaparición—. En el Bear, la compensación en acciones se mantiene elevada y el margen de OCF
+    se estanca en 30%. En el Bull, la compensación normaliza más rápido y el margen de OCF llega a 46%.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Supuesto</th><th class="right-al">Bear</th><th class="right-al">Base</th><th class="right-al">Bull</th></tr>
+    <tr><td class="label">Ingresos año 1 (FY2027, ancla consenso)</td><td class="right-al">$6.050M</td><td class="right-al">$6.050M</td><td class="right-al">$6.050M</td></tr>
+    <tr><td class="label">Crecimiento de ingresos (FY2028 → FY2031)</td><td class="right-al">14% → 7%</td><td class="right-al">21% → 11%</td><td class="right-al">26% → 15%</td></tr>
+    <tr><td class="label">Margen de OCF (FY2027 → FY2031)</td><td class="right-al">30% → 31%</td><td class="right-al">34% → 40%</td><td class="right-al">36% → 46%</td></tr>
+    <tr><td class="label">Capex / ingresos (FY2027 → FY2031)</td><td class="right-al">10% → 9%</td><td class="right-al">10% → 6,5%</td><td class="right-al">9% → 6%</td></tr>
+    <tr><td class="label">Margen de FCF implícito (FY2027 → FY2031)</td><td class="right-al">20% → 22%</td><td class="right-al">24% → 33%</td><td class="right-al">27% → 40%</td></tr>
+    <tr><td class="label">WACC</td><td class="right-al">12,0%</td><td class="right-al">11,0%</td><td class="right-al">10,0%</td></tr>
+    <tr><td class="label">Crecimiento terminal</td><td class="right-al">3,0%</td><td class="right-al">3,5%</td><td class="right-al">4,0%</td></tr>
+    <tr><td class="label">% del EV desde valor terminal</td><td class="right-al">69,6%</td><td class="right-al">77,2%</td><td class="right-al">82,4%</td></tr>
+    <tr class="total"><td class="label">Fair value por acción</td><td class="right-al">$20,63</td><td class="right-al">$39,32</td><td class="right-al">$64,63</td></tr>
+  </table></div>
+  <p>
+    El caso Base (<strong>US$39,32</strong>) queda 85% por debajo del precio de mercado. Según la regla de chequeo de
+    sesgo del desk, un resultado tan extremo obliga a preguntarse si viene de datos reales o de un supuesto estimado a
+    ojo. La respuesta acá es que viene de datos reales: (1) el ingreso ancla es el consenso; (2) el margen de OCF del
+    año 1 (34%) está <em>por encima</em> del margen de OCF real de FY2026 (31,0%) —si acaso, es generoso—; (3) el capex
+    del año 1 (10%) está <em>por debajo</em> del real de FY2026 (11,1%). El resultado bajo no es un error de
+    calibración: es la consecuencia de descontar el flujo de caja de un negocio que, aun con 97,5% de margen bruto,
+    convierte ~24% de sus ingresos en FCF <em>después</em> de tratar la compensación en acciones como un costo, y de
+    asumir una desaceleración de crecimiento creíble (de 21% en FY2028 —cerca del consenso— a 11% en FY2031). El
+    escenario Bull (US$64,63) sigue estando 75% por debajo del mercado. Ninguno de los tres escenarios se acerca al
+    precio.
+  </p>
+  <p>
+    El promedio simple de los tres escenarios da US$41,53 por acción; un valor esperado ponderado por probabilidad
+    explícita (25% Bear, 45% Base, 30% Bull) da US$42,24. Usamos el caso Base puntual (US$39,32) como el número del
+    Método 1 que entra al blend, consistente con el resto de la cobertura del desk. <strong>Advertencia de
+    sensibilidad:</strong> el 77,2% del valor de empresa del caso Base proviene del valor terminal, y el FCF es un
+    residuo delgado. Esa combinación —no el apalancamiento, porque Arm tiene caja neta— es la que hace que el rango
+    entre Bear (US$21) y Bull (US$65) sea tan amplio: cualquier diferencia razonable de pocos puntos en el margen de
+    OCF o en la tasa de desaceleración se amplifica cuando el flujo descontado es una fracción chica de los ingresos y
+    la mayor parte del valor está en la perpetuidad.
+  </p>
+  <h3>Sensibilidad del caso Base: WACC × crecimiento terminal</h3>
+  <p>
+    Cómo se mueve el fair value del caso Base variando únicamente WACC y crecimiento terminal, con el resto de los
+    inputs fijos. La celda marcada es el caso Base reportado arriba (US$39,32, WACC 11,0%, g 3,5%).
+  </p>
+  <div class="table-scroll"><table class="sens-table">
+    <tr><th>WACC \ g terminal</th><th class="right-al">2,5%</th><th class="right-al">3,0%</th><th class="right-al">3,5%</th><th class="right-al">4,0%</th><th class="right-al">4,5%</th></tr>
+    <tr><td class="axis">10,0%</td><td class="right-al">$40,56</td><td class="right-al">$42,74</td><td class="right-al">$45,26</td><td class="right-al">$48,21</td><td class="right-al">$51,68</td></tr>
+    <tr><td class="axis">10,5%</td><td class="right-al">$38,05</td><td class="right-al">$39,93</td><td class="right-al">$42,08</td><td class="right-al">$44,55</td><td class="right-al">$47,44</td></tr>
+    <tr><td class="axis">11,0%</td><td class="right-al">$35,85</td><td class="right-al">$37,47</td><td class="right-al base-cell">$39,32</td><td class="right-al">$41,43</td><td class="right-al">$43,86</td></tr>
+    <tr><td class="axis">11,5%</td><td class="right-al">$33,89</td><td class="right-al">$35,31</td><td class="right-al">$36,91</td><td class="right-al">$38,72</td><td class="right-al">$40,79</td></tr>
+    <tr><td class="axis">12,0%</td><td class="right-al">$32,14</td><td class="right-al">$33,39</td><td class="right-al">$34,78</td><td class="right-al">$36,35</td><td class="right-al">$38,13</td></tr>
+  </table></div>
+  <p class="footnote">Grilla propia, recalculando el modelo de dos etapas del caso Base (mismo crecimiento explícito y misma trayectoria de margen de OCF y capex por año) para cada combinación WACC/g. La celda base (US$39,32) corresponde a WACC 11,0% y g 3,5%.</p>
+  <p>
+    Ninguna celda de la grilla pasa de US$52. Para que el DCF justifique el precio de mercado no alcanza con mover
+    WACC o crecimiento terminal: hay que asumir una trayectoria de flujo de caja radicalmente más rica que la del
+    caso Base. Eso es lo que hace el DCF inverso, abajo.
+  </p>
+
+  <h3>Método 1-bis — DCF inverso: qué habría que creer para pagar US$261,53</h3>
+  <p>
+    Partiendo del precio de mercado (US$261,53 × ~1.078 millones de acciones ≈ US$282 mil millones de capitalización;
+    ~US$278 mil millones de valor de empresa, restando la caja neta) y resolviendo hacia atrás:
+  </p>
+  <ul style="max-width:68ch; margin:0 0 15px; padding-left:22px;">
+    <li style="margin-bottom:8px;">Con un horizonte explícito de 5 años, un crecimiento de ingresos <strong>generoso de 30% anual</strong> y un margen de OCF sostenido de <strong>45%</strong>, el precio actual requiere un <strong>WACC de 6,0%</strong> (contra el ~11% defendible) <strong>o</strong> un crecimiento terminal de <strong>9,3%</strong> (contra el techo de 2,5%–4% y muy por encima del crecimiento nominal de la economía). Ninguna de las dos es un supuesto sostenible.</li>
+    <li style="margin-bottom:8px;">Con un horizonte explícito de 10 años, el precio actual se justifica sólo si Arm compone ingresos al <strong>~40% anual durante cinco años y luego ~25% anual durante cinco años más</strong> —llegando a ~US$81 mil millones de ingresos hacia FY2036, unas 16x los de FY2026— con un margen de OCF del 50%.</li>
+  </ul>
+  <p>
+    Traducido: el mercado está valuando a Arm como si la combinación de "el estándar de cómputo del mundo" más "el
+    CPU de centro de datos escala a US$15 mil millones" fuera un hecho, no una probabilidad. Es una apuesta
+    defendible para quien tenga alta convicción en esa tesis; no es lo que un flujo de caja descontado con supuestos
+    anclados en datos reales respalda.
+  </p>
+
+  <h3>Método 2 — Comparables contra software premium</h3>
+  <p>
+    Aplicamos los múltiplos del canasto de la Sección 08 (ServiceNow, CrowdStrike, Snowflake, Palantir, Adobe,
+    Cadence, Synopsys) a las cifras forward de Arm. Dos sub-métodos:
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Sub-método</th><th class="right-al">Múltiplo aplicado</th><th class="right-al">Base de Arm</th><th class="right-al">Precio implícito</th></tr>
+    <tr><td class="label">EV/Ingresos forward</td><td class="right-al">26,0x</td><td class="right-al">Ingresos FY2027E $6.050M</td><td class="right-al">$147,97</td></tr>
+    <tr><td class="label">P/E forward</td><td class="right-al">67,6x (promedio del canasto)</td><td class="right-al">EPS no-GAAP FY2027E $2,23</td><td class="right-al">$150,84</td></tr>
+    <tr class="total"><td class="label">Promedio de los dos sub-métodos (usado en el blend)</td><td class="right-al"></td><td class="right-al"></td><td class="right-al">$149,41</td></tr>
+  </table></div>
+  <p>
+    El sub-método de EV/Ingresos usa <strong>26x</strong> —el promedio del canasto (~23,2x) más una prima de ~12% por
+    el margen bruto de 97,5% de Arm, el más alto del grupo, y la cola de regalías—. El de P/E forward usa el
+    <strong>promedio del canasto tal cual (67,6x)</strong>, que ya incorpora los múltiplos extremos de CrowdStrike
+    (~151x) y Snowflake (~134x). Los dos sub-métodos dan casi lo mismo (~US$148 y ~US$151), y el resultado del Método
+    2 es <strong>US$149,41</strong>, 43% por debajo del mercado. El rango de sensibilidad —usando la mediana del
+    canasto en la punta baja (~US$78) y una prima agresiva de 40x ingresos / 100x utilidad en la alta (~US$224)— se
+    muestra en el football field.
+  </p>
+  <p>
+    La lectura importante: <strong>este método le concede a Arm la comparación más favorable posible</strong> —la
+    valúa como software premium, no como semiconductor— y aun así da 43% menos que el precio. Valuada contra sus pares
+    de semis (Nvidia ~16x ingresos, Qualcomm ~4x, Broadcom ~15x), el resultado sería una fracción de eso.
+  </p>
+
+  <h3>Método 3 — Reversión a la media histórica propia (ventana limpia)</h3>
+  <p>
+    Arm cotiza en bolsa desde septiembre de 2023, así que la serie histórica es corta y siempre con múltiplos altos.
+    Además, el P/E GAAP de Arm está contaminado por trimestres de utilidad casi nula (cargos de reestructuración,
+    volatilidad impositiva). Según la regla del desk, reconstruimos una ventana limpia: el P/E promedio de los últimos
+    cuatro cierres de trimestre fiscal, cada uno con el precio real de esa fecha sobre la utilidad <strong>no-GAAP</strong>
+    de los últimos doce meses vigente en ese momento.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Cierre de trimestre</th><th class="right-al">Precio (real)</th><th class="right-al">EPS no-GAAP TTM (aprox.)</th><th class="right-al">P/E implícito</th></tr>
+    <tr><td class="label">1T FY2026 (30-jun-2025)</td><td class="right-al">$161,74</td><td class="right-al">~$1,62</td><td class="right-al">99,8x</td></tr>
+    <tr><td class="label">2T FY2026 (30-sep-2025)</td><td class="right-al">$141,49</td><td class="right-al">~$1,71</td><td class="right-al">82,7x</td></tr>
+    <tr><td class="label">3T FY2026 (31-dic-2025)</td><td class="right-al">$109,31</td><td class="right-al">~$1,77</td><td class="right-al">61,8x</td></tr>
+    <tr><td class="label">4T FY2026 (31-mar-2026)</td><td class="right-al">$151,28</td><td class="right-al">~$1,77</td><td class="right-al">85,5x</td></tr>
+    <tr class="total"><td class="label">Promedio ventana limpia (4 trimestres)</td><td class="right-al"></td><td class="right-al"></td><td class="right-al">82,5x</td></tr>
+  </table></div>
+  <p class="footnote">Precios: cierre real más cercano a cada fecha de cierre de trimestre fiscal (Yahoo Finance). EPS no-GAAP TTM: aproximación de este informe, consistente con el EPS no-GAAP anual FY2025 (~US$1,63) y FY2026 (~US$1,77) y con el ritmo trimestral reportado; Arm no publica una serie histórica de EPS no-GAAP TTM por fecha. Construcción propia; el promedio de la última fila se calcula sobre los múltiplos sin redondear (82,45x).</p>
+  <p>
+    Aplicado al EPS no-GAAP TTM actual (~US$1,87), el múltiplo de la ventana limpia (82,5x) implica un fair value de
+    <strong>US$154,19</strong> —el número del Método 3, 41% por debajo del mercado—. El matiz: 82,5x es un múltiplo ya
+    altísimo en términos absolutos; la reversión "a la media propia" de Arm es, en la práctica, reversión a un
+    múltiplo que casi ninguna otra empresa del mundo sostiene. El método dice que, incluso volviendo Arm a su propio
+    P/E promedio reciente (no a uno "normal"), la acción vale ~US$154. El rango del football field usa el mínimo
+    (61,8x → ~US$116) y el máximo (99,8x → ~US$187) de la ventana.
+  </p>
+
+  <h3>Método 4 — Consenso de Wall Street</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Analistas cubriendo la acción</td><td class="right-al">~42</td></tr>
+    <tr><td class="label">Calificación consenso</td><td class="right-al">Buy</td></tr>
+    <tr class="total"><td class="label">Precio objetivo promedio (12 meses)</td><td class="right-al">~$290</td></tr>
+    <tr><td class="label">Rango de precios objetivo</td><td class="right-al">$125 – $500</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: agregación de stockanalysis.com (US$288,36, 42 analistas) y S&amp;P Global Market Intelligence (US$295,95, 40 analistas), consultadas el 8-sep-2026. Se usa ~US$290 como punto medio de las dos fuentes.</p>
+  <p>
+    El consenso —~US$290, ~11% por encima del mercado— es el único de los cinco métodos que queda por encima del
+    precio, y el más optimista por amplitud. Refleja que la comunidad de analistas modela el crecimiento de regalías
+    de largo plazo y la rampa del CPU AGI de forma mucho más completa (y más favorable) que nuestro DCF. Lo
+    incorporamos al blend por la regla del desk —el consenso es información de mercado tan legítima como un múltiplo—,
+    pero con dos reservas: el rango de US$125 a US$500 (4x entre extremos) muestra que ni los analistas coinciden, y
+    el consenso de precios objetivo de sell-side tiene un sesgo alcista estructural bien documentado.
+  </p>
+
+  <h3>Método 5 — Suma de partes: el negocio de PI + la apuesta del CPU AGI</h3>
+  <p>
+    Arm tiene una línea de crecimiento futura grande y todavía no monetizada —el CPU AGI de centro de datos, con
+    &lt;10% de los ingresos hoy y una meta de US$15 mil millones a FY2031—. Un DCF o un múltiplo consolidado valúan
+    sólo lo que ya factura. La suma de partes separa las dos cosas:
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Componente</th><th class="right-al">Método</th><th class="right-al">Valor (US$ mil millones)</th></tr>
+    <tr><td class="label">Negocio de PI (regalías + licenciamiento)</td><td class="right-al">20x EV/Ingresos FY2027E ($6.050M)</td><td class="right-al">$121,0B</td></tr>
+    <tr><td class="label">Negocio de silicio (CPU AGI)</td><td class="right-al">Backlog ~$2B FY27–28 × ~3x ventas forward + opcionalidad</td><td class="right-al">$8,0B</td></tr>
+    <tr><td class="label">Caja neta</td><td class="right-al">Balance al 30-jun-2026</td><td class="right-al">$4,0B</td></tr>
+    <tr class="total"><td class="label">Valor de patrimonio SOTP</td><td class="right-al">÷ ~1.090M acciones</td><td class="right-al">$133,0B → $122,01/acción</td></tr>
+  </table></div>
+  <p class="footnote">El negocio de PI se valúa a 20x EV/Ingresos forward —una prima sobre Cadence (~13,7x) y Synopsys (~8,7x), los comparables de PI de diseño más cercanos, justificada por el margen bruto de 97,5% y la cola de regalías, pero por debajo de la prima de crecimiento de CrowdStrike/Snowflake porque Arm crece ~23%, no 30%+—. El negocio de silicio se ancla en el backlog divulgado (&gt;US$2.000M para FY2027–FY2028 combinados) a un múltiplo de ~3x ventas forward, propio de un negocio de sistemas/silicio de menor margen, más una prima de opcionalidad; como referencia de mercado privado, la última ronda de SiFive (PI de cómputo alternativa, RISC-V) se cerró en torno a US$2.500M de valuación en 2023. Sensibilidad: PI a 15x y silicio a US$4.000M dan ~US$91/acción; PI a 26x y silicio a US$16.000M dan ~US$163/acción.</p>
+  <p>
+    La suma de partes da <strong>US$122,01</strong>, 53% por debajo del mercado. Incluso poniéndole al negocio de
+    silicio un valor de US$16 mil millones —ocho veces el backlog actual, asumiendo que la meta de US$15 mil millones
+    de ingresos a FY2031 se cumple— el resultado llega a ~US$163, todavía muy por debajo de US$261.
+  </p>
+
+  <h3>Síntesis: los cinco métodos, uno al lado del otro</h3>
+  <div class="chartbox">
+    <canvas id="footballChart" height="300"></canvas>
+    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado (US$261,53); la línea azul marca el blend propio (US$151,00), promedio simple de los cinco métodos.</p>
+  </div>
+  <div class="table-scroll"><table>
+    <tr><th>Método</th><th class="right-al">Fair value por acción</th><th class="right-al">vs. mercado</th></tr>
+    <tr><td class="label">DCF — Bear</td><td class="right-al">$20,63</td><td class="right-al neg">&minus;92,1%</td></tr>
+    <tr><td class="label">DCF — Base (entra al blend)</td><td class="right-al">$39,32</td><td class="right-al neg">&minus;85,0%</td></tr>
+    <tr><td class="label">DCF — Bull</td><td class="right-al">$64,63</td><td class="right-al neg">&minus;75,3%</td></tr>
+    <tr><td class="label">Comparables (software premium)</td><td class="right-al">$149,41</td><td class="right-al neg">&minus;42,9%</td></tr>
+    <tr><td class="label">Reversión histórica (ventana limpia, 82,5x)</td><td class="right-al">$154,19</td><td class="right-al neg">&minus;41,0%</td></tr>
+    <tr><td class="label">Suma de partes (PI + CPU AGI)</td><td class="right-al">$122,01</td><td class="right-al neg">&minus;53,3%</td></tr>
+    <tr><td class="label">Consenso Wall Street (promedio)</td><td class="right-al">$290,00</td><td class="right-al pos">+10,9%</td></tr>
+    <tr class="total"><td class="label">Blend propio — promedio simple de los cinco métodos</td><td class="right-al">$151,00</td><td class="right-al neg">&minus;42,3%</td></tr>
+  </table></div>
+  <p>
+    El blend propio —promedio simple de DCF Base (US$39,32), Comparables de software premium (US$149,41), Reversión en
+    ventana limpia (US$154,19), Suma de partes (US$122,01) y Consenso de Wall Street (US$290,00)— da
+    <strong>US$151,00 por acción</strong>, 42,3% <em>por debajo</em> del precio de mercado de US$261,53. Reemplazar el
+    DCF Base por el DCF ponderado por probabilidad (US$42,24) mueve el blend a US$151,57: el resultado es robusto a esa
+    elección. La composición es tan importante como el promedio: <strong>cuatro de los cinco métodos están por debajo
+    del mercado</strong>, tres de ellos por más del 40%. El único método por encima es el consenso de precios objetivo
+    de analistas, que arrastra el promedio hacia arriba pero no lo lleva ni cerca del precio.
+  </p>
+  <p>
+    La postura de portada —<strong>neutral con sesgo bajista</strong>— refleja esa tensión. Arm es, por modelo de
+    negocio, uno de los mejores activos de todo este desk: 97,5% de margen bruto, un estándar de cómputo con costo de
+    cambio altísimo, regalías con cola de décadas que crecen ~20% al año, caja neta, y una opción real y potencialmente
+    enorme en el CPU de centro de datos. Nada de eso está en discusión. Lo que está en discusión es el precio: a
+    ~54x ingresos y ~105–140x utilidad forward, la acción ya incorpora que la mayor parte de esa tesis se cumpla.
+    Valuada incluso con la vara del software premium —la más favorable que se le puede aplicar de forma honesta— vale
+    ~US$150. Para que US$261 tenga sentido, hay que creer no sólo que Arm es un gran negocio, sino que va a componer al
+    ~35% durante una década. "Buen negocio" y "buena inversión a este precio" son preguntas distintas, y este informe
+    responde que sí a la primera y que no a la segunda.
+  </p>
+
+  <!-- 14 -->
+  <p class="secnum" id="s14">14 — Limitaciones del Modelo</p>
+  <h2>Qué asume este análisis, y dónde puede fallar</h2>
+  <div class="watermark-block">
+    <p style="margin-bottom:0;">
+      La decisión metodológica de mayor impacto de este informe es <strong>valuar a Arm contra software premium en vez
+      de contra semiconductores</strong>. Es una elección defendible —el margen bruto de 97,5%, la ausencia de fábricas
+      y el ingreso recurrente lo justifican— pero es una elección, y quien crea que Arm debe valuarse como un semi
+      (Nvidia ~19x utilidad forward) obtendría un fair value bastante más bajo que el de este informe, no más alto. El
+      DCF Base (US$39) descansa en una convergencia asumida de la compensación en acciones de ~22% de los ingresos a
+      ~14% en cinco años; si esa convergencia no ocurre (el Bear la deja plana), el valor cae más; si ocurre más rápido
+      (el Bull), sube. El margen de OCF del año 1 (34%) está anclado en el año fiscal 2026 real (31,0%) y no en el TTM
+      (40,6%), que este informe considera inflado por un trimestre de cobranzas —un lector que crea que el TTM es la
+      base correcta obtendría un DCF más alto—. El 77,1% del valor de empresa del caso Base viene del valor terminal:
+      dependencia alta y sensibilidad alta. El Método 2 (comparables) usa 26x EV/Ingresos y el promedio del canasto de
+      P/E forward (67,6x); ese promedio está inflado por CrowdStrike (~151x) y Snowflake (~134x), dos compañías con
+      márgenes GAAP cerca de cero o negativos —usar la mediana del canasto (~13,7x ingresos, ~34x utilidad) en vez del
+      promedio bajaría el Método 2 a ~US$78—. El Método 3 (reversión) usa EPS no-GAAP TTM estimados para los cierres de
+      trimestre de 2025, no cifras publicadas por Arm para cada fecha, y un múltiplo promedio (82,5x) que es extremo en
+      términos absolutos. El Método 5 (suma de partes) valúa el negocio de silicio (CPU AGI) en US$8 mil millones a
+      partir de un backlog de ~US$2 mil millones y un múltiplo de ventas elegido por juicio; si ese negocio escala a la
+      meta de US$15 mil millones de ingresos de management, está infravalorado acá, y si fracasa, sobrevalorado. La
+      caja neta (~US$4,0 mil millones) resta los arrendamientos de la caja e inversiones de corto plazo; sumar las
+      inversiones de largo plazo la llevaría a ~US$4,5 mil millones (efecto de ~US$0,5 por acción). El conteo de
+      acciones usado en el DCF y la suma de partes (~1.090 millones diluidas) proyecta ~1% anual de dilución sobre las
+      1.078 millones actuales. Y el riesgo de gobernanza —SoftBank con 86% del capital, un flotante de 13,6% y roles
+      cruzados en la conducción— no se modela como probabilidad: está reflejado de forma difusa en el beta alto (1,4)
+      del WACC, pero una venta de acciones de SoftBank o un conflicto de interés material invalidaría cualquier fair
+      value de este informe por el lado del flujo de fondos técnico, no del negocio.
+    </p>
+  </div>
+
+  <div class="disclosure">
+    Documento elaborado a partir de fuentes públicas: SEC EDGAR (Form 20-F para el año fiscal cerrado el 31-mar-2026,
+    Form 6-K y exhibits de resultados, XBRL companyfacts API, CIK 0001973239), cartas a accionistas y sitio de
+    relaciones con inversores de Arm Holdings plc, comunicados de Arm, Meta, Nvidia y Qualcomm sobre el Arm AGI CPU y
+    la disputa de licencias, convocatoria a la asamblea general 2026 de Arm, recomendaciones publicadas de ISS y Glass
+    Lewis según cobertura de prensa (Reuters, Tom's Hardware, TechSpot, Seeking Alpha), stockanalysis.com,
+    S&amp;P Global Market Intelligence, GuruFocus, Yahoo Finance, CNBC, Investing.com, y cobertura de mercado de las
+    llamadas de resultados de Arm del 4T FY2026 (6-may-2026) y 1T FY2027 (29-jul-2026). Cifras fundamentales con fecha
+    de corte en el exhibit 6-K de Arm correspondiente al trimestre cerrado el 30 de junio de 2026 (1T FY2027),
+    publicado el 29 de julio de 2026. El precio de mercado usado en la portada y en la Sección 13 refleja el cierre del
+    8 de septiembre de 2026 (US$261,53); desarrollos corporativos y de mercado con fecha de corte de la misma fecha.
+    <br><br>
+    <strong>Sobre el autor y la naturaleza de este documento:</strong> este informe es un análisis independiente
+    elaborado por Manfredi Investment Research &amp; Markets con fines exclusivamente informativos y educativos. El
+    autor no es un asesor de inversión registrado, no está matriculado ante la Comisión Nacional de Valores (CNV), la
+    SEC, ni ningún otro organismo regulador equivalente, y no mantiene una relación de asesoramiento financiero
+    personalizado con el lector. Ninguna cifra de este documento —incluido el "fair value" de portada, los escenarios
+    de DCF, ni la síntesis de la Sección 13— constituye una recomendación de compra, venta o mantenimiento para ningún
+    lector en particular, ni considera la situación financiera, los objetivos o el perfil de riesgo individual de quien
+    lo lee. Los escenarios de DCF son estimaciones propias sujetas a los supuestos declarados explícitamente en la
+    Sección 13, y no representan guidance oficial de ninguna de las compañías mencionadas salvo donde se cita de forma
+    directa y atribuida. Arm reporta bajo US GAAP en dólares estadounidenses; las cifras "no-GAAP" son medidas
+    ajustadas de la propia compañía y se usan acá para los múltiplos por consistencia con el mercado, no como
+    respaldo de su validez contable. Verificar cifras contra el 20-F/6-K más reciente de la compañía, y consultar a un
+    asesor financiero matriculado, antes de tomar cualquier decisión de inversión.
+  </div>
+
+</div>
+
+<script>
+/* ---- Motor de gráficos propio, sin dependencias externas (Canvas 2D) ---- */
+(function(){
+  var PALETTE = {ink:'#161a20', muted:'#69707c', line:'#e3e9f0', navy:'#0b1f3a', navy2:'#15335c', blue:'#2f5f9e', blueLight:'#5f8fc7', pale:'#c7d9ec', red:'#a8291f', gold:'#c99a3c'};
+
+  function setupCanvas(canvas, cssHeight){
+    var dpr = window.devicePixelRatio || 1;
+    var cssWidth = canvas.parentElement.clientWidth - 44;
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = Math.max(1, Math.round(cssWidth * dpr));
+    canvas.height = Math.max(1, Math.round(cssHeight * dpr));
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return {ctx: ctx, w: cssWidth, h: cssHeight};
+  }
+
+  function drawVBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+    ctx.font = '11px "IBM Plex Mono", monospace';
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var log = !!opts.log;
+    var padL = 46, padR = 10, padT = 16, padB = 46;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var maxV = Math.max.apply(null, values);
+    var minV = log ? Math.min.apply(null, values) : 0;
+    function scaleY(v){
+      if(log){
+        var lv = Math.log10(Math.max(v,0.01)), lmax = Math.log10(maxV*1.15), lmin = Math.log10(Math.max(minV*0.5,1));
+        return padT + plotH - ((lv - lmin) / (lmax - lmin)) * plotH;
+      }
+      return padT + plotH - (v / (maxV*1.15)) * plotH;
+    }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    var gridSteps = 4;
+    for(var g=0; g<=gridSteps; g++){
+      var yy = padT + (plotH/gridSteps)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    var n = values.length;
+    var slot = plotW / n;
+    var barW = Math.min(slot * 0.56, 64);
+
+    for(var i=0;i<n;i++){
+      var cx = padL + slot*i + slot/2;
+      var y0 = scaleY(values[i]);
+      var yBase = padT + plotH;
+      ctx.fillStyle = colors[i % colors.length];
+      var bw = barW;
+      ctx.fillRect(cx - bw/2, y0, bw, yBase - y0);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'center';
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, cx, y0 - 6);
+
+      ctx.fillStyle = PALETTE.muted;
+      ctx.font = '10px "Inter", sans-serif';
+      wrapLabel(ctx, labels[i], cx, yBase + 16, slot + 6);
+    }
+  }
+
+  function wrapLabel(ctx, text, cx, y, maxW){
+    var words = String(text).split(' ');
+    var lines = [];
+    var cur = '';
+    for(var i=0;i<words.length;i++){
+      var test = cur ? cur + ' ' + words[i] : words[i];
+      if(ctx.measureText(test).width > maxW && cur){ lines.push(cur); cur = words[i]; }
+      else cur = test;
+    }
+    if(cur) lines.push(cur);
+    lines = lines.slice(0,2);
+    ctx.textAlign = 'center';
+    for(var j=0;j<lines.length;j++){
+      ctx.fillText(lines[j], cx, y + j*11);
+    }
+  }
+
+  function drawHBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var padL = opts.padL || 128, padR = 54, padT = 10, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var maxV = Math.max.apply(null, values) * 1.12;
+
+    var n = values.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.5, 30);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, padT+plotH); ctx.stroke();
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = padL;
+      var w = (values[i]/maxV) * plotW;
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, w, barH);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(labels[i], padL - 10, cy + 4);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'left';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, x0 + w + 8, cy + 4);
+    }
+  }
+
+  function drawRangeBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, ranges = opts.ranges, colors = opts.colors, refLines = opts.refLines || [];
+    var padL = 168, padR = 16, padT = 40, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    ranges.forEach(function(r){ allVals.push(r[0], r[1]); });
+    refLines.forEach(function(r){ allVals.push(r.value); });
+    var rawMin = Math.min.apply(null, allVals), rawMax = Math.max.apply(null, allVals);
+    var span = rawMax - rawMin;
+    var domMin = rawMin - span * 0.16;
+    var domMax = rawMax + span * 0.04;
+    function scaleX(v){ return padL + ((v - domMin)/(domMax - domMin)) * plotW; }
+
+    var n = ranges.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.42, 22);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = scaleX(ranges[i][0]), x1 = scaleX(ranges[i][1]);
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, Math.max(x1-x0,2), barH);
+      ctx.beginPath(); ctx.arc(x0, cy, barH/2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x1, cy, barH/2, 0, Math.PI*2); ctx.fill();
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      wrapLabel(ctx, labels[i], padL - 12, cy - 4, padL - 20);
+
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      var vf = opts.valueFmt || function(v){ return '$'+v.toFixed(0); };
+      ctx.textAlign = 'right';
+      ctx.fillText(vf(ranges[i][0]), x0 - 8, cy + 4);
+      ctx.textAlign = 'left';
+      ctx.fillText(vf(ranges[i][1]), x1 + 8, cy + 4);
+    }
+
+    var sortedRefs = refLines.map(function(r,i){ return {r:r, i:i, x:scaleX(r.value)}; }).sort(function(a,b){ return a.x-b.x; });
+    for(var ri=1; ri<sortedRefs.length; ri++){
+      if(sortedRefs[ri].x - sortedRefs[ri-1].x < 90){ sortedRefs[ri].row = (sortedRefs[ri-1].row||0) + 1; }
+    }
+    refLines.forEach(function(r){
+      var x = scaleX(r.value);
+      ctx.strokeStyle = r.color; ctx.lineWidth = 1.6; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x, padT-6); ctx.lineTo(x, padT+plotH); ctx.stroke();
+      ctx.setLineDash([]);
+    });
+    sortedRefs.forEach(function(item){
+      var row = item.row || 0;
+      ctx.fillStyle = item.r.color;
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(item.r.label, item.x, padT - 12 - row*13);
+    });
+  }
+
+  function drawLines(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, series = opts.series;
+    var padL = 40, padR = 14, padT = 16, padB = 54;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    series.forEach(function(s){ allVals = allVals.concat(s.values); });
+    var maxV = Math.max.apply(null, allVals) * 1.08;
+    var minV = Math.min.apply(null, allVals) * 0.92;
+
+    function scaleX(i){ return padL + (plotW/(labels.length-1)) * i; }
+    function scaleY(v){ return padT + plotH - ((v - minV)/(maxV-minV)) * plotH; }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var yy = padT + (plotH/4)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    series.forEach(function(s){
+      ctx.strokeStyle = s.color; ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        ctx.fillStyle = s.color;
+        ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
+      });
+    });
+
+    ctx.fillStyle = PALETTE.muted;
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    labels.forEach(function(l,i){ ctx.fillText(l, scaleX(i), padT+plotH+16); });
+
+    var lx = padL, ly = H - 12;
+    ctx.font = '11px "Inter", sans-serif';
+    series.forEach(function(s){
+      ctx.fillStyle = s.color;
+      ctx.fillRect(lx, ly-8, 10, 10);
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'left';
+      ctx.fillText(s.name, lx+14, ly);
+      lx += 14 + ctx.measureText(s.name).width + 22;
+    });
+  }
+
+  function renderAll(){
+    drawVBars(document.getElementById('historyChart'), {
+      labels:['FY2021','FY2022','FY2023','FY2024','FY2025','FY2026','FY2027E'],
+      values:[2027,2703,2679,3233,4007,4920,6050],
+      colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.navy,PALETTE.gold],
+      valueFmt:function(v){ return '$'+(v/1000).toFixed(1)+'B'; }
+    });
+
+    drawLines(document.getElementById('revMixChart'), {
+      labels:['FY2024','FY2025','FY2026','1T FY27 x4'],
+      series:[
+        {name:'Regalías', color:PALETTE.navy, values:[1807,2168,2610,2860]},
+        {name:'Licenciamiento y otros', color:PALETTE.blueLight, values:[1426,1839,2310,2296]}
+      ]
+    });
+
+    drawLines(document.getElementById('marginChart'), {
+      labels:['1T FY26','2T FY26','3T FY26','4T FY26','1T FY27'],
+      series:[
+        {name:'Margen operativo no-GAAP', color:PALETTE.navy, values:[39.1,42.0,42.5,42.0,41.2]},
+        {name:'Margen operativo GAAP', color:PALETTE.red, values:[10.8,14.4,14.9,29.4,7.1]}
+      ]
+    });
+
+    drawVBars(document.getElementById('revenueQChart'), {
+      labels:['1T FY26','2T FY26','3T FY26','4T FY26','1T FY27','2T FY27E'],
+      values:[1053,1135,1242,1490,1289,1380],
+      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.navy,PALETTE.gold],
+      valueFmt:function(v){ return '$'+(v/1000).toFixed(2)+'B'; }
+    });
+
+    drawVBars(document.getElementById('capexChart'), {
+      labels:['FY2024','FY2025','FY2026','TTM'],
+      values:[92,219,545,588],
+      colors:[PALETTE.pale,PALETTE.blueLight,PALETTE.navy,PALETTE.navy],
+      valueFmt:function(v){ return '$'+v+'M'; }
+    });
+
+    drawHBars(document.getElementById('compsChart'), {
+      labels:['Palantir','ARM','CrowdStrike','Snowflake','Cadence','ServiceNow','Synopsys','Adobe'],
+      values:[65.6,54.0,39.1,21.7,13.7,9.5,8.7,4.1],
+      colors:[PALETTE.pale,PALETTE.red,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight],
+      padL:120,
+      valueFmt:function(v){ return v.toFixed(1)+'x'; }
+    });
+
+    drawHBars(document.getElementById('peChart'), {
+      labels:['CrowdStrike','Snowflake','ARM','Palantir','Cadence','ServiceNow','Synopsys','Adobe'],
+      values:[151,134,117,91.6,34.1,29.6,23.3,9.9],
+      colors:[PALETTE.pale,PALETTE.pale,PALETTE.red,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight],
+      padL:120,
+      valueFmt:function(v){ return v.toFixed(0)+'x'; }
+    });
+
+    drawVBars(document.getElementById('revisionChart'), {
+      labels:['Consenso EPS pre-1T FY27','1T FY27 real','Guía 2T FY27','Consenso 2T FY27 previo'],
+      values:[0.40,0.45,0.47,0.43],
+      colors:[PALETTE.pale,PALETTE.navy,PALETTE.gold,PALETTE.pale],
+      valueFmt:function(v){ return '$'+v.toFixed(2); }
+    });
+
+    drawRangeBars(document.getElementById('footballChart'), {
+      labels:['DCF (Bear→Bull)','Comparables software','Reversión (ventana limpia)','Suma de partes','Consenso Wall St.'],
+      ranges:[[20.63,64.63],[78,224],[116,187],[91,163],[285,300]],
+      colors:[PALETTE.blue,PALETTE.navy2,PALETTE.gold,PALETTE.blueLight,PALETTE.pale],
+      refLines:[{value:261.53,color:PALETTE.red,label:'Mercado $262'},{value:151.00,color:PALETTE.navy,label:'Blend $151'}],
+      valueFmt:function(v){ return '$'+v.toFixed(0); }
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', renderAll);
+  } else {
+    renderAll();
+  }
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderAll, 150);
+  });
+})();
+</script>
+<script src="_preview-gate.js" defer></script>
+</body>
+</html>
