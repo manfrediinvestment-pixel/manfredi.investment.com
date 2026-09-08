@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSM — Taiwan Semiconductor (TSMC) | Manfredi Investment Research</title>
+<link rel="icon" href="/assets/img/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/assets/img/favicon-48x48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+<link rel="canonical" href="https://manfredinvestment.com/informes/tsm.html">
+<meta name="description" content="Informe institucional sobre TSM (Taiwan Semiconductor Manufacturing Company, ADR) tras el segundo trimestre de 2026: ingresos récord de US$40.2 mil millones (+36% interanual), margen bruto de 67.7%, HPC ya en 66% de los ingresos, y una guía de capex 2026 elevada a US$60-64 mil millones. Tesis de inversión, DCF y fair value.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Manfredi Investment">
+<meta property="og:locale" content="es_AR">
+<meta property="og:url" content="https://manfredinvestment.com/informes/tsm.html">
+<meta property="og:title" content="TSM — Taiwan Semiconductor (TSMC) | Manfredi Investment Research">
+<meta property="og:description" content="Informe institucional sobre TSMC (TSM) tras el 2Q 2026: récord de ingresos y márgenes, la IA ya es dos tercios del negocio, capex disparado a US$60-64 mil millones — y un DCF que, cargando ese capex completo, queda muy por debajo del mercado. Tesis, cuatro métodos de valuación y fair value.">
+<meta property="og:image" content="https://manfredinvestment.com/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TSM — Taiwan Semiconductor (TSMC) | Manfredi Investment Research">
+<meta name="twitter:description" content="Informe institucional sobre TSMC (TSM) tras el 2Q 2026: récord de ingresos y márgenes, IA en dos tercios del negocio, capex de US$60-64 mil millones. Tesis, cuatro métodos de valuación y fair value.">
+<meta name="twitter:image" content="https://manfredinvestment.com/assets/img/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-dark:#0b1f3a;
+    --navy:#0e2748;
+    --navy2:#15335c;
+    --blue:#2f5f9e;
+    --blue-light:#5f8fc7;
+    --blue-pale:#eaf1f9;
+    --line:#d7e0ea;
+    --text:#161a20;
+    --muted:#69707c;
+    --green:#1a7a54;
+    --red:#a8291f;
+    --serif:'Newsreader',serif;
+    --sans:'Inter',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#fff; color:var(--text); font-family:var(--sans); font-size:15.5px; line-height:1.7;}
+  .wrap{max-width:900px; margin:0 auto; padding:0 30px 90px;}
+
+  .brandbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:26px 30px 20px; max-width:900px; margin:0 auto; border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:38px; height:38px; border:1.5px solid var(--navy-dark); display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-weight:700; color:var(--navy-dark); font-size:16px;
+  }
+  .brand-name{font-family:var(--serif); font-weight:700; font-size:17px; color:var(--text); line-height:1.15;}
+  .brand-sub{font-family:var(--sans); font-size:10px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase;}
+  .brandbar .doctype{font-family:var(--mono); font-size:11px; color:var(--muted); text-align:right;}
+
+  .frontbox{border:1px solid var(--navy-dark); margin:34px 0 8px; padding:0;}
+  .frontbox-top{display:flex; justify-content:space-between; align-items:baseline; padding:22px 28px 14px; border-bottom:1px solid var(--line);}
+  .ticker-big{font-family:var(--serif); font-size:42px; font-weight:700; color:var(--navy-dark);}
+  .exch{font-family:var(--mono); font-size:12px; color:var(--muted); margin-left:10px;}
+  .rating{font-family:var(--mono); font-size:12px; font-weight:600; color:var(--blue); text-align:right; letter-spacing:.03em;}
+  .rating small{display:block; font-family:var(--mono); font-size:10.5px; color:var(--muted); font-weight:400; margin-top:3px; letter-spacing:normal;}
+  .frontbox-body{padding:20px 28px 26px;}
+  .company-line{color:var(--muted); font-size:13.5px; margin-bottom:16px;}
+  .thesis-block{font-family:var(--serif); font-size:17.5px; line-height:1.65; color:var(--text); font-style:italic;}
+
+  .statsrow{display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line);}
+  .statcell{padding:16px 20px; border-right:1px solid var(--line);}
+  .statcell:last-child{border-right:none;}
+  .statcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:6px;}
+  .statcell .v{font-family:var(--mono); font-size:16px; font-weight:600; color:var(--text);}
+  .pos{color:var(--green);} .neg{color:var(--red);}
+
+  .secnum{font-family:var(--mono); font-size:11px; color:var(--blue-light); letter-spacing:.1em; margin:50px 0 2px;}
+  h2{font-family:var(--serif); font-size:24px; font-weight:600; color:var(--navy2); margin:2px 0 18px; padding-bottom:10px; border-bottom:1.5px solid var(--navy-dark); text-wrap:balance;}
+  h3{font-family:var(--serif); font-size:17px; font-weight:600; color:var(--navy2); margin:30px 0 10px;}
+  p{margin:0 0 15px; max-width:68ch;}
+  strong{color:var(--text);}
+
+  .table-scroll{overflow-x:auto; margin:18px 0 22px;}
+  .table-scroll table{margin:0;}
+  table{width:100%; min-width:520px; border-collapse:collapse; font-size:13.5px;}
+  th{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); text-align:left; padding:8px 10px; border-bottom:1.5px solid var(--navy-dark); white-space:nowrap;}
+  td{padding:8px 10px; border-bottom:1px solid var(--line); font-family:var(--mono); color:var(--text); font-variant-numeric:tabular-nums;}
+  td.label{font-family:var(--sans); color:var(--text);}
+  tr.total td{font-weight:600; border-top:1px solid var(--navy-dark); border-bottom:none;}
+  .right-al{text-align:right;}
+
+  .chartbox{border:1px solid var(--line); padding:20px 22px 16px; margin:22px 0;}
+  .chartbox canvas{width:100% !important; display:block;}
+  .chartcap{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:14px; text-align:center;}
+
+  .pull{border-left:2px solid var(--navy-dark); padding-left:18px; margin:22px 0; color:var(--muted); font-size:13.5px; max-width:68ch;}
+
+  .footnote{font-family:var(--mono); font-size:11px; color:var(--muted); margin:-6px 0 18px; max-width:none;}
+
+  .watermark-block{
+    position:relative; margin:60px 0; padding:26px 30px; border:1px solid var(--line); overflow:hidden;
+  }
+  .watermark-block::before{
+    content:"TSM"; position:absolute; right:10px; top:-30px; font-family:var(--serif); font-weight:700;
+    font-size:110px; color:var(--blue-pale); z-index:0; line-height:1;
+  }
+  .watermark-block > *{position:relative; z-index:1;}
+
+  .toc{border:1px solid var(--line); padding:22px 26px; margin:30px 0;}
+  .toc-title{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px;}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:30px;}
+  .toc li{font-size:13px; margin-bottom:7px; break-inside:avoid;}
+  .toc a{color:var(--navy2); text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  .toc .toc-final a{font-weight:600;}
+
+  .disclosure{margin-top:70px; padding-top:22px; border-top:1px solid var(--navy-dark); font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.8; max-width:none;}
+
+  .fv-block{text-align:right;}
+  .fv-block .fv-label{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+  .fv-block .fv-value{font-family:var(--mono); font-size:22px; font-weight:600; color:var(--navy-dark); line-height:1.3;}
+  .fv-block .fv-gap{font-family:var(--mono); font-size:12.5px; font-weight:600;}
+  .fv-block .fv-gap.neg{color:var(--red);} .fv-block .fv-gap.pos{color:var(--green);}
+
+  .verdict-bar{display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; background:var(--blue-pale); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:14px 28px;}
+  .verdict-stance{font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--navy-dark);}
+  .verdict-stance strong{color:var(--navy-dark);}
+  .verdict-note{font-family:var(--sans); font-size:11.5px; color:var(--muted); max-width:56ch; line-height:1.5;}
+
+  .sens-table td, .sens-table th{text-align:center;}
+  .sens-table td.axis{font-family:var(--mono); font-weight:600; background:#fff; color:var(--text);}
+  .sens-table td.base-cell{outline:2px solid var(--navy-dark); outline-offset:-2px;}
+
+  .govrow{display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:1px solid var(--line); margin:20px 0;}
+  .govcell{padding:16px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .govcell:nth-child(3n){border-right:none;}
+  .govcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px;}
+  .govcell .v{font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text);}
+  .govcell .sub{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.4;}
+
+  a{color:var(--blue);}
+  :focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
+
+  @media (max-width:720px){
+    .statsrow{grid-template-columns:repeat(2,1fr);}
+    .frontbox-top{flex-direction:column; gap:10px;}
+    .rating{text-align:left;}
+    .toc ol{columns:1;}
+    .verdict-bar{flex-direction:column; align-items:flex-start;}
+    .govrow{grid-template-columns:1fr;}
+    .govcell{border-right:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <div class="brand">
+    <div class="brand-mark">MI</div>
+    <div>
+      <div class="brand-name">Manfredi Investment</div>
+      <div class="brand-sub">Research &amp; Markets</div>
+    </div>
+  </div>
+  <div class="doctype">Equity Research · Informe Institucional<br>Datos al 2Q 2026 (trimestre cerrado 30-jun-2026, publicado 16-jul-2026) · Ingresos de julio 2026 (publicados 10-ago-2026) · Precio al 4 sep 2026</div>
+</div>
+
+<div class="wrap">
+
+  <div class="frontbox">
+    <div class="frontbox-top">
+      <div><span class="ticker-big">TSM</span><span class="exch">NYSE (ADR) · Taiwan Semiconductor Manufacturing Company</span></div>
+      <div class="fv-block">
+        <div class="fv-label">Fair value (blend propio)</div>
+        <div class="fv-value">US$420.19</div>
+        <div class="fv-gap neg">vs. US$428.91 mercado · −2.0%</div>
+      </div>
+    </div>
+    <div class="verdict-bar">
+      <div class="verdict-stance">POSTURA DEL ANÁLISIS: <strong>NEUTRAL — NEGOCIO DE CALIDAD EXCEPCIONAL A UN PRECIO QUE YA LO REFLEJA</strong> — el blend de cuatro métodos (US$420.19) queda 2.0% por debajo del mercado. Pero la dispersión es enorme y no simétrica: el DCF Base (US$263.11, −38.7%) —el único método que carga el capex completo de ~36% de los ingresos— está muy por debajo; comparables, la reversión histórica en múltiplo re-calificado y el consenso de Wall Street están en línea o por encima (ver Sección 13)</div>
+      <div class="verdict-note">Este documento es análisis independiente con fines informativos y educativos. El autor no es un asesor financiero registrado (no CFA / no matriculado ante la CNV/SEC) y este contenido no constituye una recomendación de compra, venta o mantenimiento para ningún lector en particular. Ver disclosure completo al pie.</div>
+    </div>
+    <div class="frontbox-body">
+      <div class="company-line">Fundición de semiconductores pura ("pure-play foundry"): fabrica silicio diseñado por terceros (Apple, Nvidia, AMD, Broadcom, Qualcomm, MediaTek) en nodos de proceso de vanguardia (2nm, 3nm, 5nm, 7nm) y maduros, más empaquetado avanzado (CoWoS, SoIC). Sin productos de marca propia. Reporta en dólares de Taiwán (NT$) bajo NIIF; se valúa acá por su ADR (1 ADR = 5 acciones ordinarias).</div>
+      <div class="thesis-block">
+        El 16 de julio de 2026, TSMC reportó el segundo trimestre de 2026: ingresos consolidados de NT$1,270.38 mil
+        millones (US$40.20 mil millones, +36.0% interanual, +12.0% intertrimestral, récord absoluto), con margen bruto
+        de 67.7%, margen operativo de 60.3% y margen neto de 55.6% —los tres, máximos históricos—. La utilidad diluida
+        por acción fue de NT$27.25 (US$4.31 por ADR), +77.4% interanual. La plataforma de cómputo de alto rendimiento
+        (HPC) —que agrupa aceleradores de IA, CPUs, GPUs y networking de centro de datos— creció 20% intertrimestral y
+        ya representa el <strong>66% de los ingresos</strong>, contra 60% un año antes y 52% dos años antes: la IA
+        pasó, trimestre a trimestre, a ser dos tercios del negocio. Management subió dos veces la guía en la misma llamada: crecimiento de
+        ingresos en dólares de "algo más de 40%" para 2026 completo (desde "más de 30%"), y presupuesto de capital de
+        <strong>US$60–64 mil millones</strong> para 2026 (desde US$52–56 mil millones), un récord. Y aun así hay una
+        tensión central: TSMC convierte ~60% de sus ingresos en flujo de caja operativo, pero reinvierte ~36% de los
+        ingresos en fábricas, de modo que el flujo de caja libre —el que un DCF descuenta— es apenas un ~25% de los
+        ingresos. Este informe recorre el negocio completo y cierra, en la Sección 13, con cuatro metodologías de
+        valuación independientes: un DCF que carga ese capex entero y queda muy por debajo del precio, y tres métodos
+        (comparables, reversión y consenso) que descansan en lo que el mercado paga por otros nombres de la cadena de IA.
+      </div>
+    </div>
+    <div class="statsrow">
+      <div class="statcell"><div class="k">Ingresos TTM (2Q26)</div><div class="v">US$142.9B</div></div>
+      <div class="statcell"><div class="k">Var. ingresos TTM (USD)</div><div class="v pos">~+35%</div></div>
+      <div class="statcell"><div class="k">Margen bruto TTM</div><div class="v">64.1%</div></div>
+      <div class="statcell"><div class="k">Desde máx. 52 sem.</div><div class="v neg">−10.5%</div></div>
+    </div>
+  </div>
+  <p class="footnote">Cifras fundamentales: SEC EDGAR (Form 6-K y exhibits de resultados, CIK 0001046179; Form 20-F para datos anuales; TSMC es emisor privado extranjero y no presenta 10-Q/10-K) — trimestre cerrado el 30 de junio de 2026 (2Q 2026), publicado el 16 de julio de 2026; ingresos mensuales de julio de 2026 publicados el 10 de agosto de 2026. Precio de mercado del ADR: Yahoo Finance, cierre del 4 de septiembre de 2026 (US$428.91). Rango de 52 semanas: US$246.93 – US$479.00. TSMC reporta sus estados financieros en NT$ bajo NIIF; las cifras en US$ son las traducciones que la propia compañía publica en cada comunicado, o conversiones a los tipos de cambio promedio del período indicado. Este documento es 100% analítico — no constituye una recomendación de compra, venta ni mantenimiento. Ver disclosure completo al pie.</p>
+
+  <div class="toc">
+    <div class="toc-title">Contenido</div>
+    <ol>
+      <li><a href="#s01">Resumen Ejecutivo</a></li>
+      <li><a href="#s02">Historia y Evolución</a></li>
+      <li><a href="#s03">Modelo de Negocio y Segmentos</a></li>
+      <li><a href="#s04">Desarrollos Recientes y Perspectiva</a></li>
+      <li><a href="#s05">Estados Financieros</a></li>
+      <li><a href="#s06">Deuda y Balance</a></li>
+      <li><a href="#s07">Flujo de Caja y Capital Allocation</a></li>
+      <li><a href="#s08">Comparables de Industria</a></li>
+      <li><a href="#s09">Gobierno Corporativo y Estructura Accionaria</a></li>
+      <li><a href="#s10">Registro de Riesgos</a></li>
+      <li><a href="#s11">Catalizadores</a></li>
+      <li><a href="#s12">Modelo Financiero Proyectado y Momentum de Estimados</a></li>
+      <li class="toc-final"><a href="#s13">Valuación: Cuatro Métodos y el Fair Value</a></li>
+      <li><a href="#s14">Limitaciones del Modelo</a></li>
+    </ol>
+  </div>
+
+  <!-- 01 -->
+  <p class="secnum" id="s01">01 — Resumen Ejecutivo</p>
+  <h2>Récord en todo, la IA ya es dos tercios del negocio, y un DCF que no llega al precio porque el capex se lo come</h2>
+  <p>
+    El 16 de julio de 2026, TSMC reportó el segundo trimestre de 2026: ingresos consolidados de NT$1,270.38 mil
+    millones (US$40.20 mil millones), un aumento de 36.0% interanual y 12.0% intertrimestral, récord absoluto. El
+    margen bruto fue de 67.7% (desde 66.2% el trimestre anterior y 58.6% un año antes), el margen operativo de 60.3%
+    y el margen neto de 55.6% —los tres, máximos históricos para la compañía—. La utilidad neta fue de NT$706.56 mil
+    millones (US$22.35 mil millones), +77.4% interanual, y la utilidad diluida por acción, NT$27.25 (US$4.31 por
+    ADR). Con el reporte, management elevó la guía de crecimiento de ingresos en dólares para 2026 completo de "más
+    de 30%" a <strong>"algo más de 40%"</strong>, y el presupuesto de capital de 2026 de US$52–56 mil millones a
+    <strong>US$60–64 mil millones</strong>.
+  </p>
+  <p>
+    El dato estructural del trimestre es la mezcla. La plataforma de <strong>cómputo de alto rendimiento (HPC)</strong>
+    —aceleradores de IA, GPUs, CPUs de servidor y silicio de networking de centro de datos— creció 20% intertrimestral
+    y llegó al 66% de los ingresos totales, contra 60% un año antes y 52% en el 2Q 2024. La plataforma de smartphones
+    cayó a 22% (desde 27% un año antes, −4% intertrimestral); IoT, automotriz y electrónica de consumo suman el ~12%
+    restante y crecen poco. En nodos de proceso, el 2nm (N2) aportó su primer 3% de los ingresos de obleas, el 3nm el
+    30% y el 5nm el 33%; la tecnología avanzada (7nm y por debajo) fue el 77% de los ingresos de obleas. En una frase:
+    TSMC es, a 2026, la empresa por la que pasa físicamente casi todo el gasto de infraestructura de IA del mundo —el silicio de Nvidia,
+    de los ASICs de Broadcom, de las GPUs de AMD, del silicio propio de los hyperscalers— y el trimestre lo confirma.
+  </p>
+  <p>
+    Y sin embargo la acción cerró el 4 de septiembre de 2026 en <strong>US$428.91</strong> —10.5% por debajo de su
+    máximo de 52 semanas de US$479.00 (fin de junio de 2026) y aproximadamente 41% por encima del cierre de 2025—.
+    La capitalización de mercado del ADR asciende a <strong>~US$2.22 billones</strong>, la segunda de todo el sector
+    de semiconductores por detrás de Nvidia (~US$5.5 billones) y por delante de Broadcom (~US$1.7 billones). A ese
+    precio el ADR cotiza a ~31x utilidad de los últimos doce meses (US$13.86 por ADR), ~25x la utilidad estimada de
+    2026 y ~19x la de 2027 —múltiplos que, para el nombre con la mejor posición competitiva de toda la cadena
+    (participación de ~70–73% en el mercado de fundición pura, monopolio efectivo en el nodo de vanguardia), no
+    parecen exigentes a primera vista.
+  </p>
+  <p>
+    La respuesta a la pregunta central —cuánto vale la acción—, desarrollada en la Sección 13: promediando los cuatro
+    métodos de este informe (DCF a tres escenarios, comparables de industria, reversión a la media histórica en
+    ventana limpia y consenso de Wall Street), el blend da <strong>US$420.19 por ADR</strong>, 2.0% <em>por debajo</em>
+    del precio de mercado. Pero el promedio esconde una tensión que es el hallazgo real de este informe: el
+    <strong>DCF Base (US$263.11, −38.7%)</strong> —el único método que descuenta el flujo de caja del negocio
+    <em>después</em> de restar el capex real de ~36% de los ingresos— queda muy por debajo del precio, incluso con un
+    WACC de 10.5% y una desaceleración de crecimiento razonable. Los otros tres métodos, que están en línea o por
+    encima del mercado, descansan cada uno en "lo que otros pagan": comparables aplica un múltiplo de EBITDA que
+    ignora que TSMC reinvierte más del doble de su depreciación; la reversión histórica usa un P/E promedio de los
+    últimos cuatro trimestres que ya incorpora la re-calificación de la era IA; y el consenso (precio objetivo
+    promedio US$554.45, 19 analistas, "Strong Buy") modela la demanda de cómputo de IA compuesta durante muchos años.
+    Esa tensión —negocio insustituible, precio que la calidad ya justifica pero que el flujo de caja descontado del
+    ciclo actual no alcanza a cubrir— es lo que define la postura neutral de la portada. "Buen negocio" y "buena
+    inversión a este precio" son preguntas distintas.
+  </p>
+
+  <!-- 02 -->
+  <p class="secnum" id="s02">02 — Historia y Evolución</p>
+  <h2>De una idea que "nadie iba a querer" a la infraestructura crítica de la economía digital</h2>
+  <p>
+    TSMC fue fundada en 1987 en Hsinchu, Taiwán, por Morris Chang —un ingeniero nacido en China continental, formado
+    en el MIT y Stanford, con 25 años de carrera en Texas Instruments— a instancias del gobierno taiwanés, que aportó
+    capital a través del National Development Fund y consiguió a Philips como socio tecnológico e inversor inicial. La
+    idea de Chang era, en su momento, contraintuitiva: una fábrica de semiconductores que <em>no diseñara ni vendiera
+    chips propios</em>, dedicada exclusivamente a fabricar el silicio que diseñaban otros. Las grandes empresas
+    integradas de la época (Intel, Motorola, TI) fabricaban lo que diseñaban; los diseñadores independientes no
+    tenían dónde producir a escala. TSMC creó la categoría de la <strong>fundición pura ("pure-play foundry")</strong>
+    y, con ella, hizo posible toda la industria "fabless" —Nvidia, Qualcomm, Broadcom, Marvell, y más tarde el propio
+    silicio de Apple— que pasó a dominar el diseño de chips.
+  </p>
+  <p>
+    Durante tres décadas TSMC fue una empresa importante pero no central en la conversación pública. Eso cambió entre
+    2018 y 2022 por dos hechos. El primero, técnico: alrededor de 2018–2020, con los nodos de 7nm y 5nm, TSMC
+    <strong>superó a Intel en liderazgo de proceso</strong> por primera vez en la historia —Intel se estancó en 10nm
+    mientras TSMC ejecutaba una hoja de ruta anual—. El segundo, geopolítico: la escasez global de chips de 2020–2022
+    puso a Taiwán, y a TSMC en particular, en el centro de la rivalidad tecnológica entre Estados Unidos y China. El
+    término "escudo de silicio" ("silicon shield") —la idea de que la dependencia mundial de las fábricas taiwanesas
+    de TSMC disuade una invasión china— pasó del análisis académico a los titulares.
+  </p>
+  <p class="pull">
+    En 2024 se cerró formalmente la era del fundador: Morris Chang ya se había retirado de la presidencia en junio de
+    2018, y en junio de 2024 el directorio designó a C.C. Wei para ocupar de forma concurrente los cargos de
+    presidente del directorio y CEO. Ese mismo año TSMC cruzó por primera vez el billón de dólares de capitalización
+    de mercado.
+  </p>
+  <p>
+    De 2022 en adelante, TSMC empezó a construir capacidad fuera de Taiwán por primera vez de forma material: un
+    complejo en Arizona (Estados Unidos), una fábrica en Kumamoto (Japón) y otra en Dresde (Alemania). El compromiso
+    en Estados Unidos escaló hasta <strong>US$165 mil millones</strong> —seis módulos de fábrica, dos plantas de
+    empaquetado avanzado y un centro de I+D— y, en enero de 2026, quedó atado a un acuerdo marco comercial entre
+    Estados Unidos y Taiwán que exime a las empresas taiwanesas de los aranceles de la Sección 232 sobre
+    semiconductores en la medida en que cumplan con inversión y capacidad en suelo estadounidense (Sección 04 y 10).
+  </p>
+  <p>
+    El período 2025–2026 es el de la consolidación de TSMC como cuello de botella único de la infraestructura de IA:
+    los ingresos anuales pasaron de US$88.3 mil millones en 2024 a ~US$122.4 mil millones en 2025 (+35.9% en dólares
+    según la traducción de la compañía) y el consenso proyecta ~US$173 mil millones para 2026. La plataforma HPC
+    superó a smartphones como la mayor fuente de ingresos, y la acción prácticamente se duplicó desde comienzos de
+    2025.
+  </p>
+  <div class="chartbox">
+    <canvas id="historyChart" height="320"></canvas>
+    <p class="chartcap">Ingresos anuales reportados en US$ (traducción de la compañía), 2019–2025, más consenso 2026E (~US$173 mil millones). El salto de 2024→2025→2026E refleja la explosión de la demanda de HPC/IA. La caída de 2023 (~−4% en dólares) fue el último ciclo bajista de la industria (smartphones y PC). Fuente: SEC EDGAR (Form 20-F y comunicados 6-K) y consenso stockanalysis.com para 2026E.</p>
+  </div>
+
+  <!-- 03 -->
+  <p class="secnum" id="s03">03 — Modelo de Negocio y Segmentos</p>
+  <h2>Una sola cosa, hecha mejor que nadie: fabricar el silicio que diseñan otros</h2>
+  <p>
+    TSMC tiene un solo negocio. No diseña chips, no vende productos de marca propia, no compite con sus clientes.
+    Fabrica obleas de silicio según los diseños de sus clientes y les cobra por oblea, con el precio determinado
+    fundamentalmente por el nodo de proceso: cuanto más avanzado (2nm, 3nm), más caro. A eso se suma, de forma cada
+    vez más relevante, el <strong>empaquetado avanzado</strong> (CoWoS, SoIC, InFO) —el proceso de integrar múltiples
+    chiplets y memoria de alto ancho de banda en un solo paquete—, que se volvió un diferenciador y un cuello de
+    botella específico para los aceleradores de IA. La compañía reporta su negocio de dos maneras: por plataforma de
+    mercado final y por nodo de proceso.
+  </p>
+  <h3>Por plataforma: HPC pasó a ser dos tercios del negocio</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Plataforma</th><th class="right-al">2Q 2026 (% ingresos)</th><th class="right-al">Var. QoQ</th><th class="right-al">~1 año antes</th></tr>
+    <tr><td class="label">HPC (cómputo alto rendimiento: IA, GPU, CPU servidor, networking)</td><td class="right-al">66%</td><td class="right-al pos">+20%</td><td class="right-al">60%</td></tr>
+    <tr><td class="label">Smartphone</td><td class="right-al">22%</td><td class="right-al neg">−4%</td><td class="right-al">27%</td></tr>
+    <tr><td class="label">IoT</td><td class="right-al">5%</td><td class="right-al">—</td><td class="right-al">5%</td></tr>
+    <tr><td class="label">Automotriz</td><td class="right-al">4%</td><td class="right-al">—</td><td class="right-al">5%</td></tr>
+    <tr><td class="label">Electrónica de consumo (DCE) + otros</td><td class="right-al">3%</td><td class="right-al">—</td><td class="right-al">3%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: comunicado y presentación de resultados de TSMC del 2Q 2026 (SEC EDGAR 6-K, 16-jul-2026) y cobertura de la llamada de resultados. Los porcentajes de "~1 año antes" son aproximados, reconstruidos de la cobertura de mercado del 2Q 2025; TSMC no publica una serie histórica trimestral homogénea de mezcla por plataforma en el comunicado.</p>
+  <div class="chartbox">
+    <canvas id="platformChart" height="240"></canvas>
+    <p class="chartcap">Ingresos por plataforma, 2Q 2026 (% del total). HPC (66%) es ya tres veces el tamaño de smartphones (22%) y crece 20% intertrimestral mientras smartphones cae 4%. La mezcla se inclina hacia IA cada trimestre.</p>
+  </div>
+  <h3>Por nodo: el 63% de las obleas ya es 3nm o 5nm</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Nodo</th><th class="right-al">2Q 2026 (% ingresos de obleas)</th><th class="right-al">1Q 2026</th></tr>
+    <tr><td class="label">2nm (N2)</td><td class="right-al">3%</td><td class="right-al">—</td></tr>
+    <tr><td class="label">3nm</td><td class="right-al">30%</td><td class="right-al">25%</td></tr>
+    <tr><td class="label">5nm</td><td class="right-al">33%</td><td class="right-al">36%</td></tr>
+    <tr><td class="label">7nm</td><td class="right-al">11%</td><td class="right-al">13%</td></tr>
+    <tr><td class="label">16/20nm y 28nm</td><td class="right-al">12%</td><td class="right-al">~12%</td></tr>
+    <tr><td class="label">40nm y maduros (≥65nm)</td><td class="right-al">11%</td><td class="right-al">~14%</td></tr>
+    <tr class="total"><td class="label">Avanzado (7nm y más avanzado)</td><td class="right-al">77%</td><td class="right-al">74%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: comunicados de resultados 2Q 2026 y 1Q 2026 de TSMC (SEC EDGAR 6-K). El desglose de nodos maduros del 2Q 2026 proviene de la presentación de resultados; algunos porcentajes de nodos individuales se agrupan acá por legibilidad.</p>
+  <div class="chartbox">
+    <canvas id="nodeChart" height="260"></canvas>
+    <p class="chartcap">Mezcla de ingresos de obleas por nodo, 2Q 2026. El 2nm entró en producción con su primer 3%; el 3nm subió 5 puntos intertrimestrales. El nodo de vanguardia es donde se concentra la economía del negocio: precio por oblea más alto y menos competidores capaces de fabricarlo.</p>
+  </div>
+  <h3>Economía del negocio</h3>
+  <p>
+    El resultado de operar el nodo de vanguardia con una participación de mercado dominante es una estructura de
+    márgenes sin equivalente para una empresa de esta intensidad de capital: margen bruto de 67.7%, margen operativo
+    de 60.3% y retorno sobre patrimonio de ~40% en el 2Q 2026. Geográficamente, la gran mayoría de los ingresos
+    proviene de clientes con sede en Norteamérica (las empresas fabless estadounidenses), seguidos a distancia por
+    China y Asia-Pacífico. La contracara —desarrollada en las Secciones 06 y 07— es que ese negocio exige un gasto de
+    capital estructural de entre el 30% y el 40% de los ingresos cada año, muy por encima de cualquier otro nombre de
+    su escala.
+  </p>
+
+  <!-- 04 -->
+  <p class="secnum" id="s04">04 — Desarrollos Recientes y Perspectiva</p>
+  <h2>El reporte del 2Q 2026, dos subidas de guía, y un margen bruto que baja en el 3Q por el 2nm</h2>
+  <h3>El reporte del 16-jul-2026: récord y superación holgada</h3>
+  <p>
+    TSMC reportó ingresos del 2Q 2026 de US$40.20 mil millones frente a su propia guía de US$39.0–40.2 mil millones
+    —en el techo del rango— y un consenso de mercado de aproximadamente US$39.4 mil millones. El margen bruto de
+    67.7% superó el rango guiado de 65.5%–67.5%, y la utilidad por ADR de US$4.31 quedó bien por encima de lo
+    esperado. La reacción de la acción fue moderada: el ADR había tocado su máximo de 52 semanas (US$479) a fines de
+    junio y operó lateral-a-la-baja en las semanas siguientes, cerrando cerca de US$429 al 4 de septiembre de 2026.
+  </p>
+  <h3>Dos subidas de guía en la misma llamada</h3>
+  <p>
+    Management elevó el crecimiento de ingresos en dólares para 2026 completo de "más de 30%" a
+    <strong>"algo más de 40%"</strong> —lo que, sobre la base de ~US$122.4 mil millones de 2025, implica ~US$172–175
+    mil millones—; y subió el presupuesto de capital de 2026 de US$52–56 mil millones a
+    <strong>US$60–64 mil millones</strong>, un récord y un salto de ~50% frente a los US$40.9 mil millones
+    efectivamente invertidos en 2025. El capex se dirige, en su mayor parte, a capacidad de 2nm y 3nm y a expansión
+    de empaquetado avanzado (CoWoS). Analistas de mesas extranjeras leyeron la subida de capex como una señal de que
+    la demanda contratada de IA para 2027–2028 corre por encima de la capacidad instalada, y varios anticipan
+    aumentos de precio de obleas para 2027.
+  </p>
+  <h3>La guía de 3Q 2026: otro récord de ingresos, pero margen bruto en baja</h3>
+  <p>
+    Para el tercer trimestre de 2026, TSMC guió ingresos de <strong>US$44.6–45.8 mil millones</strong> (otro récord
+    secuencial, ~+12% intertrimestral en el punto medio), pero con margen bruto de <strong>65%–67%</strong> —por
+    debajo del 67.7% del 2Q— y margen operativo de 56%–58%. La caída de margen es deliberada y explicada: el
+    escalamiento de la producción de 2nm diluye el margen bruto consolidado en aproximadamente 3–4 puntos
+    porcentuales mientras la nueva capacidad madura su rendimiento ("yield") y absorbe su depreciación. Es el mismo
+    patrón que TSMC atravesó con cada nodo nuevo; la diferencia esta vez es que el 2nm arranca con un precio de oblea
+    reportado en torno a US$30,000, el más alto de la historia de la compañía.
+  </p>
+  <h3>Ingresos mensuales: julio 2026 confirmó la aceleración</h3>
+  <p>
+    TSMC publica ingresos mensuales. Los de julio de 2026 fueron de NT$467.58 mil millones, +44.7% interanual y
+    +5.6% intermensual; el acumulado enero–julio de 2026 llegó a NT$2,872.06 mil millones, +37.0% interanual. El
+    dato mensual de agosto de 2026 no había sido publicado a la fecha de corte de este informe (se publica alrededor
+    del 10 de septiembre de 2026).
+  </p>
+  <h3>2nm, CoWoS y la carrera de capacidad</h3>
+  <p>
+    El 2nm (N2) aportó su primer 3% de los ingresos de obleas en el 2Q 2026 y, según estimaciones de mercado citadas
+    en la llamada, la familia N2 crecería a una tasa compuesta superior al 70% entre 2026 y 2028, con capacidad
+    reservada hasta 2028. En empaquetado avanzado, TSMC apunta a llevar la capacidad de CoWoS a ~135,000 obleas por
+    mes a fin de 2026 y ~195,000 a fin de 2027 —y la demanda, según management, absorbe la nueva capacidad tan rápido
+    como entra en línea—. El empaquetado avanzado es, a 2026, tanto o más limitante que la fabricación de obleas para el
+    ritmo al que puede crecer el ingreso de IA.
+  </p>
+  <h3>Expansión en Estados Unidos y el acuerdo arancelario</h3>
+  <p>
+    En enero de 2026, Estados Unidos y Taiwán anunciaron un marco comercial que permite a las empresas taiwanesas que
+    construyan nueva capacidad de semiconductores en suelo estadounidense exportar cantidades determinadas de chips
+    sin pagar los aranceles de la Sección 232. La exención de TSMC quedó condicionada a que cumpla con su compromiso
+    de US$165 mil millones en Arizona (con versiones del acuerdo que contemplan una expansión mucho mayor). TSMC
+    estima que hasta el 30% de su capacidad de N2 y nodos más avanzados podría fabricarse en Estados Unidos con el
+    tiempo. La contrapartida es un costo estructural más alto (mano de obra, construcción, servicios) que en Taiwán y
+    una dilución de margen bruto que management ha cuantificado en 2–4 puntos en el corto plazo, ampliándose a medida
+    que sube la proporción de producción en el exterior (Sección 10).
+  </p>
+
+  <!-- 05 -->
+  <p class="secnum" id="s05">05 — Estados Financieros</p>
+  <h2>Márgenes en máximos históricos, con la utilidad creciendo más rápido que los ingresos</h2>
+  <p>
+    TSMC reporta en dólares de Taiwán bajo NIIF. Este informe presenta las cifras en US$ usando las traducciones que
+    la propia compañía publica en cada comunicado trimestral (a los tipos de cambio promedio de cada período), y
+    calcula el TTM (últimos cuatro trimestres) sumando esas cifras trimestrales. Todas las métricas son NIIF; no hay
+    ajustes "non-GAAP" de management que reconciliar, a diferencia de otros nombres del panel.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica (NIIF, US$)</th><th class="right-al">1Q 2026</th><th class="right-al">2Q 2026</th><th class="right-al">TTM (3Q25 a 2Q26)</th></tr>
+    <tr><td class="label">Ingresos</td><td class="right-al">$35.90B</td><td class="right-al">$40.20B</td><td class="right-al">$142.93B</td></tr>
+    <tr><td class="label">Var. interanual</td><td class="right-al pos">+35.1%</td><td class="right-al pos">+36.0%</td><td class="right-al pos">~+35%</td></tr>
+    <tr><td class="label">Utilidad bruta</td><td class="right-al">$23.77B</td><td class="right-al">$27.22B</td><td class="right-al">$91.69B</td></tr>
+    <tr><td class="label">Margen bruto</td><td class="right-al">66.2%</td><td class="right-al">67.7%</td><td class="right-al">64.1%</td></tr>
+    <tr><td class="label">Utilidad operativa</td><td class="right-al">$20.86B</td><td class="right-al">$24.24B</td><td class="right-al">$80.06B</td></tr>
+    <tr><td class="label">Margen operativo</td><td class="right-al">58.1%</td><td class="right-al">60.3%</td><td class="right-al">56.0%</td></tr>
+    <tr><td class="label">Utilidad neta</td><td class="right-al">$18.10B</td><td class="right-al">$22.35B</td><td class="right-al">$71.88B</td></tr>
+    <tr><td class="label">Margen neto</td><td class="right-al">50.5%</td><td class="right-al">55.6%</td><td class="right-al">50.3%</td></tr>
+    <tr><td class="label">EPS diluido (US$ por ADR)</td><td class="right-al">$3.49</td><td class="right-al">$4.31</td><td class="right-al">$13.86</td></tr>
+    <tr><td class="label">EPS diluido (NT$ por acción)</td><td class="right-al">NT$22.08</td><td class="right-al">NT$27.25</td><td class="right-al">NT$86.27</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR, comunicados de resultados 6-K de 1Q 2026 (16-abr-2026), 2Q 2026 (16-jul-2026), 3Q 2025 (16-oct-2025) y 4Q 2025 (15-ene-2026). Utilidad bruta y operativa TTM calculadas aplicando los márgenes reportados de cada trimestre a sus ingresos en US$. El EPS por ADR TTM (US$13.86) es la suma de los cuatro EPS trimestrales por ADR reportados ($2.92 + $3.14 + $3.49 + $4.31); stockanalysis.com reporta ~US$13.44 por diferencias en la conversión de NT$ a US$. Un ADR equivale a 5 acciones ordinarias.</p>
+  <p>
+    La progresión es la parte relevante de la tabla. El margen bruto pasó de 59.5% (3Q 2025) a 62.3% (4Q 2025) a
+    66.2% (1Q 2026) a 67.7% (2Q 2026) —una expansión de más de 8 puntos porcentuales en cuatro trimestres, empujada
+    por la mezcla hacia HPC/IA de alto valor, mejor rendimiento en 3nm y un tipo de cambio favorable—. El margen
+    operativo hizo el mismo recorrido, de 50.6% a 60.3%. La utilidad neta creció 77% interanual en el 2Q 2026 contra
+    un crecimiento de ingresos de 36%: apalancamiento operativo puro. La guía de 3Q 2026 (margen bruto 65%–67%)
+    marca la primera pausa de esa expansión, por la dilución del escalamiento de 2nm —management fue explícito en que
+    es un efecto de escalamiento de nodo, no de deterioro del negocio.
+  </p>
+  <div class="chartbox">
+    <canvas id="marginChart" height="260"></canvas>
+    <p class="chartcap">Margen bruto y margen operativo NIIF, últimos cuatro trimestres, más el punto medio de la guía de 3Q 2026 (65%–67% bruto). Expansión consistente hasta el 2Q 2026; el 3Q marca la pausa esperada por la dilución del 2nm. Fuente: SEC EDGAR (comunicados 6-K) y guía de management para 3Q 2026E.</p>
+  </div>
+  <div class="chartbox">
+    <canvas id="revenueQChart" height="260"></canvas>
+    <p class="chartcap">Ingresos trimestrales en US$, 2Q 2025 a 3Q 2026E (el último dato es el punto medio de la guía de management, US$45.2 mil millones, no un resultado real). Cinco trimestres consecutivos de récord secuencial. Fuente: SEC EDGAR (comunicados 6-K) y guía de 3Q 2026E.</p>
+  </div>
+
+  <!-- 06 -->
+  <p class="secnum" id="s06">06 — Deuda y Balance</p>
+  <h2>Caja neta de ~US$77 mil millones y un balance dominado por las fábricas</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica (al 30 jun 2026, aprox.)</th><th class="right-al">US$</th></tr>
+    <tr><td class="label">Efectivo, equivalentes y valores negociables</td><td class="right-al">~$111B</td></tr>
+    <tr><td class="label">Deuda total (bonos + préstamos bancarios)</td><td class="right-al">~$34B</td></tr>
+    <tr class="total"><td class="label">Caja neta</td><td class="right-al">~$77B</td></tr>
+    <tr><td class="label">Propiedad, planta y equipo (neto)</td><td class="right-al">~$136B</td></tr>
+    <tr><td class="label">Activos totales</td><td class="right-al">~$297B</td></tr>
+    <tr><td class="label">Patrimonio neto</td><td class="right-al">~$200B</td></tr>
+    <tr><td class="label">Deuda total / EBITDA (TTM)</td><td class="right-al">~0.3x</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: presentación de resultados del 2Q 2026 de TSMC (balance en NT$: efectivo y valores negociables NT$3,518.0 mil millones; deuda de largo plazo con intereses NT$864.3 mil millones; PP&E neto NT$4,302.9 mil millones; activos totales NT$9,375.7 mil millones) y stockanalysis.com para las cifras agregadas en US$ (caja total $110.58B, deuda total $33.59B, caja neta $76.99B) al 8-sep-2026. Conversión a US$ a ~NT$31.6/US$. El patrimonio neto es una estimación (2024: NT$4,279 mil millones ≈ US$130.5B; más utilidad retenida de 2025 y 1H26, menos dividendos).</p>
+  <p>
+    A diferencia de Broadcom u Oracle —cuyas hojas de balance cargan la deuda y el goodwill de una década de
+    adquisiciones—, el balance de TSMC es de manual para una compañía que crece orgánicamente: caja neta de ~US$77
+    mil millones, deuda de apenas ~0.3x el EBITDA, sin goodwill relevante. Lo que domina el activo no es papel
+    financiero sino <strong>fábricas</strong>: ~US$136 mil millones de propiedad, planta y equipo neto (el 46% del
+    activo total), y subiendo cada trimestre a medida que se ejecuta el capex de US$60–64 mil millones de 2026. Esa
+    base de activos fijos es a la vez la fortaleza (barrera de entrada de cientos de miles de millones de dólares y
+    varios años) y la carga (depreciación creciente que presiona el margen si la utilización de las fábricas nuevas
+    tarda en llegar). La deuda que TSMC sí tiene —bonos corporativos, en su mayoría emitidos en 2020–2023— se tomó de
+    forma oportunista a tasas bajas, no por necesidad de financiamiento; con el nivel de caja que genera, TSMC no
+    necesita endeudarse para financiar el plan de capex.
+  </p>
+
+  <!-- 07 -->
+  <p class="secnum" id="s07">07 — Flujo de Caja y Capital Allocation</p>
+  <h2>El rasgo que define la tesis: TSMC genera muchísima caja operativa, y reinvierte casi todo</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">TTM (3Q25 a 2Q26)</th></tr>
+    <tr><td class="label">Flujo de caja operativo (OCF)</td><td class="right-al">$83.6B</td></tr>
+    <tr><td class="label">Capex (compra de propiedad, planta y equipo)</td><td class="right-al">$47.3B</td></tr>
+    <tr class="total"><td class="label">Flujo de caja libre (FCF)</td><td class="right-al">$36.3B</td></tr>
+    <tr><td class="label">Margen de OCF sobre ingresos</td><td class="right-al">~58.5%</td></tr>
+    <tr><td class="label">Margen de FCF sobre ingresos</td><td class="right-al">~25.4%</td></tr>
+    <tr><td class="label">Capex como % de ingresos</td><td class="right-al">~33% (TTM) · ~36% (guía 2026)</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: stockanalysis.com (OCF, capex y FCF TTM en US$, al 8-sep-2026) y presentación de resultados 2Q 2026 de TSMC (1H 2026: OCF NT$1,482.3 mil millones, capex NT$846.8 mil millones, FCF NT$635.6 mil millones). El margen de OCF sobre ingresos TTM usa ingresos TTM de US$142.9B; con la base de ingresos TTM de stockanalysis (US$139.6B) el margen de OCF es ~59.9%. Ambos rondan el 60%.</p>
+  <p>
+    Este es el número que hay que entender antes que cualquier otro de este informe. TSMC convierte alrededor del
+    <strong>60% de sus ingresos en flujo de caja operativo</strong> —una cifra extraordinaria, comparable a la de las
+    mejores empresas de software—. Pero después gasta alrededor del <strong>33–36% de los ingresos en capex</strong>,
+    de modo que lo que queda —el flujo de caja libre, que es lo que un accionista puede recibir o lo que un DCF
+    descuenta— es apenas un <strong>~25% de los ingresos</strong>. En términos absolutos: US$83.6 mil millones de
+    caja operativa TTM, US$47.3 mil millones de capex, US$36.3 mil millones de FCF. Y el capex está guiado
+    <em>al alza</em>: US$60–64 mil millones para 2026 completo (~36% de los ingresos estimados), contra US$40.9 mil
+    millones efectivamente invertidos en 2025 (~33%) y US$29.8 mil millones en 2024 (~34%).
+  </p>
+  <p>
+    Es exactamente el perfil opuesto al de Broadcom —que monetiza el mismo ciclo de gasto de IA con un capex de
+    apenas 1.4% de los ingresos porque no fabrica nada—. TSMC <em>es</em> la fábrica: absorbe todo el gasto de
+    capital de la carrera de IA en su propio balance. Cuando la demanda de IA se cumple, ese capex se convierte en
+    obleas vendidas a 68% de margen bruto; cuando decepciona, TSMC igual carga la depreciación de las fábricas nuevas.
+    El gráfico siguiente pone la intensidad de capital de TSMC al lado de los nombres fabless de la cadena de IA.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Compañía</th><th class="right-al">Capex / Ingresos (aprox.)</th><th class="right-al">Modelo</th></tr>
+    <tr class="total"><td class="label">TSMC (TSM)</td><td class="right-al">~36%</td><td class="right-al">Fundición (fabrica)</td></tr>
+    <tr><td class="label">Nvidia (NVDA)</td><td class="right-al">~3%</td><td class="right-al">Fabless</td></tr>
+    <tr><td class="label">AMD</td><td class="right-al">~4%</td><td class="right-al">Fabless</td></tr>
+    <tr><td class="label">Broadcom (AVGO)</td><td class="right-al">~1.4%</td><td class="right-al">Fabless + software</td></tr>
+    <tr><td class="label">Qualcomm (QCOM)</td><td class="right-al">~5%</td><td class="right-al">Fabless</td></tr>
+  </table></div>
+  <p class="footnote">Capex/ingresos de pares: informes de este desk (NVDA, AMD, AVGO, sep-2026) y estimaciones de mercado; no directamente comparable trimestre a trimestre por diferencias de año fiscal. El punto es de orden de magnitud: TSMC reinvierte una fracción de sus ingresos entre 7x y 25x más alta que cualquier nombre fabless de la cadena.</p>
+  <div class="chartbox">
+    <canvas id="capexChart" height="260"></canvas>
+    <p class="chartcap">Capex como porcentaje de ingresos — TSMC (~36%) es, por varios órdenes de magnitud, el <em>outlier de mayor intensidad de capital</em> de la cadena de valor de la IA. La imagen espejo del gráfico equivalente del informe de Broadcom de este desk.</p>
+  </div>
+  <p>
+    <strong>Capital allocation:</strong> después del capex, TSMC destina caja a un dividendo trimestral creciente
+    —cerca de NT$5.0–5.5 por acción ordinaria, ~US$3.1 por ADR anualizado, rendimiento de ~0.7%—, que suma del orden
+    de US$11–12 mil millones al año (aproximadamente un tercio del FCF). TSMC históricamente <em>no</em> recompra
+    acciones de forma material (no es práctica habitual entre las grandes cotizadas taiwanesas). El resto del FCF
+    engrosa la posición de caja neta. En resumen: la prioridad número uno, dos y tres del capital de TSMC es
+    construir fábricas; el dividendo es la cuarta.
+  </p>
+
+  <!-- 08 -->
+  <p class="secnum" id="s08">08 — Comparables de Industria</p>
+  <h2>TSMC no tiene un comparable limpio: está entre las fundiciones baratas y los "habilitadores de IA" caros</h2>
+  <p>
+    El problema de valuar a TSMC por comparables es que no hay otra empresa igual. Elegimos cuatro referencias que la
+    encuadran por arriba y por abajo: <strong>ASML</strong> (monopolio de equipos de litografía EUV, aguas arriba de
+    TSMC en la cadena, sin competencia real), <strong>Nvidia</strong> (el mayor cliente individual de TSMC y el
+    termómetro de la demanda de cómputo de IA), <strong>GlobalFoundries</strong> (fundición pura pero de nodos
+    maduros, sin exposición al nodo de vanguardia) y <strong>United Microelectronics (UMC)</strong> (la otra
+    fundición taiwanesa de nodos maduros). Samsung, la única otra empresa que fabrica en el nodo de vanguardia,
+    cotiza como conglomerado de memoria a ~10x utilidad y no es un comparable útil de su negocio de fundición.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Ticker</th><th class="right-al">Precio</th><th class="right-al">P/E Forward</th><th class="right-al">EV/EBITDA</th></tr>
+    <tr class="total"><td class="label">TSM</td><td class="right-al">$428.91</td><td class="right-al">~24.9x*</td><td class="right-al">~21.6x*</td></tr>
+    <tr><td class="label">ASML</td><td class="right-al">$1,753.69</td><td class="right-al">~28–31x</td><td class="right-al">~28x</td></tr>
+    <tr><td class="label">NVDA</td><td class="right-al">$226.88</td><td class="right-al">~19.1x</td><td class="right-al">~27.5x</td></tr>
+    <tr><td class="label">GFS</td><td class="right-al">$46.15</td><td class="right-al">~20x</td><td class="right-al">~9x</td></tr>
+    <tr><td class="label">UMC</td><td class="right-al">$21.86</td><td class="right-al">~15x</td><td class="right-al">~7x</td></tr>
+  </table></div>
+  <p class="footnote">*Múltiplos "aproximados, no verificados en tiempo real". TSM: P/E forward sobre EPS 2026E de ~US$17.2 por ADR (consenso), EV/EBITDA sobre EBITDA TTM de ~US$99.6 mil millones y valor de empresa de ~US$2.15 billones. ASML y NVDA: stockanalysis.com y GuruFocus, consultados sep-2026 (informe AVGO de este desk para NVDA). GFS y UMC: estimaciones de mercado. Precios de pares: Yahoo Finance, cierre 4-sep-2026. Capitalización de mercado: TSM ~$2.22B (billones), NVDA ~$5.56B, ASML ~$690B, GFS ~$26B, UMC ~$27B.</p>
+  <div class="chartbox">
+    <canvas id="compsChart" height="260"></canvas>
+    <p class="chartcap">EV/EBITDA comparado — TSMC (~21.6x) queda por encima de las fundiciones de nodos maduros (GFS ~9x, UMC ~7x) y por debajo de los habilitadores fabless de IA (NVDA ~27.5x, ASML ~28x). Un EV/EBITDA de TSMC de ~21.6x es, además, generoso: TSMC gasta en capex más del doble de su depreciación, algo que la métrica de EBITDA ignora por completo.</p>
+  </div>
+  <h3>ASML — el otro monopolio de la cadena, valuado más caro</h3>
+  <p>
+    ASML es el único proveedor mundial de máquinas de litografía ultravioleta extrema (EUV), sin las cuales TSMC no
+    puede fabricar por debajo de 7nm. Es, como TSMC, un cuello de botella insustituible; a diferencia de TSMC, tiene
+    una intensidad de capital baja y márgenes de flujo de caja libre altos. Cotiza a ~28–31x utilidad forward y ~28x
+    EV/EBITDA —una prima frente a TSMC que el mercado justifica por la conversión de caja superior de ASML y por su
+    posición aún más protegida—. Lo usamos como el techo razonable del rango de comparables.
+  </p>
+  <h3>Nvidia — el cliente, y el termómetro de la demanda</h3>
+  <p>
+    Cada acelerador de IA que Nvidia vende se fabrica en TSMC. La salud de la demanda de TSMC en HPC es, en buena
+    medida, un derivado de la de Nvidia. Nvidia cotiza a ~19x utilidad forward y ~27.5x EV/EBITDA; su múltiplo de
+    utilidad es más bajo que el de TSMC porque su base de utilidad ya es mucho mayor en términos absolutos. Es el
+    comparable más grande del panel y el mejor indicador de si el ciclo de IA que sostiene la valuación de TSMC sigue
+    intacto.
+  </p>
+  <h3>GlobalFoundries y UMC — el "piso" de fundición sin el nodo de vanguardia</h3>
+  <p>
+    GFS y UMC son fundiciones puras, igual que TSMC, pero abandonaron la carrera del nodo de vanguardia hace años y
+    fabrican silicio maduro (para automotriz, industrial, comunicaciones). Cotizan a ~7–9x EV/EBITDA y ~15–20x
+    utilidad —el múltiplo que el mercado le paga a la <em>fabricación de chips como tal</em>, despojada de la prima de
+    liderazgo tecnológico y de exposición a IA—. Son el piso del rango: lo que valdría TSMC si perdiera su ventaja de
+    proceso. La brecha entre ese piso (~7–9x) y el múltiplo de TSMC (~21.6x) es, exactamente, el valor que el mercado
+    le asigna al monopolio del nodo de vanguardia.
+  </p>
+  <p class="pull">
+    El patrón: TSMC cotiza más cerca de los habilitadores fabless de IA (NVDA, ASML) que de las fundiciones de nodos
+    maduros (GFS, UMC), pese a tener el balance intensivo en capital de una fundición. El mercado lo trata, en la
+    práctica, como un peaje sobre todo el cómputo de IA del mundo —y le cobra un múltiplo acorde a ese rol, no al de
+    un fabricante de obleas.
+  </p>
+
+  <!-- 09 -->
+  <p class="secnum" id="s09">09 — Gobierno Corporativo y Estructura Accionaria</p>
+  <h2>CEO y presidente en la misma persona, el Estado taiwanés como mayor accionista, y una compensación récord</h2>
+  <div class="govrow">
+    <div class="govcell"><div class="k">Presidente y CEO</div><div class="v">Dr. C.C. Wei</div><div class="sub">Ocupa ambos cargos de forma concurrente desde junio de 2024 (al retirarse Mark Liu de la presidencia). Fue CEO y vicepresidente desde junio de 2018. Ingeniero, doctorado en Yale.</div></div>
+    <div class="govcell"><div class="k">Compensación CEO 2025</div><div class="v">NT$2,422.7M</div><div class="sub">≈ US$76M (a ~NT$32/US$); +156% interanual — récord para una empresa cotizada en Taiwán, y ~0.14% de la utilidad neta. Composición: NT$17.3M salario (0.7%), el resto en bonos, premios en acciones y participación en resultados. 27 ejecutivos superaron NT$100M de compensación.</div></div>
+    <div class="govcell"><div class="k">Fundador</div><div class="v">Morris Chang</div><div class="sub">Fundó TSMC en 1987. Se retiró de la presidencia del directorio en junio de 2018. Ya no tiene rol ejecutivo ni participación de control.</div></div>
+    <div class="govcell"><div class="k">Directorio</div><div class="v">10 directores</div><div class="sub">Roles de presidente del directorio y CEO combinados en C.C. Wei desde jun-2024. El National Development Fund (Estado taiwanés) tiene un director representante.</div></div>
+    <div class="govcell"><div class="k">Mayor accionista</div><div class="v">Estado de Taiwán</div><div class="sub">El National Development Fund del Yuan Ejecutivo posee ~1,650M de acciones, ~6.38% del capital — el mayor accionista individual. No hay accionista de control.</div></div>
+    <div class="govcell"><div class="k">Estructura accionaria</div><div class="v">~73–75% extranjero*</div><div class="sub">Inversores institucionales extranjeros (incluidos los ADR, que son ~20%+ del capital). Insiders y management por debajo de ~0.5%. Ver nota al pie.</div></div>
+  </div>
+  <p class="footnote">*Fuentes: comunicados y annual report de TSMC, cobertura de prensa (BigGo Finance sobre compensación 2025, KamilFranek Business Analytics y marketscreener sobre estructura accionaria). El porcentaje de tenencia extranjera varía según la fuente y la fecha de corte; el rango ~73–75% es consistente con la estructura conocida (los ADR listados en NYSE representan más del 20% del capital y la mayor parte del resto en manos institucionales internacionales). El National Development Fund figura en algunos reportes con tenencias directoriales del ~16% que combinan participación directa e indirecta; la participación directa citada habitualmente es ~6.38%.</p>
+  <p>
+    Tres puntos de gobierno corporativo a monitorear. Primero, la <strong>combinación de los roles de presidente del
+    directorio y CEO</strong> en C.C. Wei desde junio de 2024 —lo contrario del movimiento que hizo Broadcom en 2026
+    al separarlos—: concentra el poder de decisión en una sola persona, lo que en el caso de TSMC se atenúa por una
+    cultura de ingeniería muy institucionalizada y una banca de ejecutivos profunda, pero sigue siendo una
+    dependencia de una figura. Segundo, la <strong>compensación récord de 2025</strong> (NT$2,422.7 millones, ~US$76 millones, +156%
+    interanual): un salto inusual, casi enteramente en bonos, premios en acciones y participación en resultados, que
+    probablemente genere disidencia en la próxima asamblea.
+    Tercero, y el más relevante desde el punto de vista de un accionista del ADR: el <strong>Estado taiwanés es el
+    mayor accionista individual</strong> y tiene un asiento en el directorio. TSMC es, por lejos, el activo económico
+    y estratégico más importante de Taiwán —el "escudo de silicio"—, y sus decisiones de dónde construir capacidad
+    (Arizona, Japón, Alemania) se toman en un contexto donde el interés nacional taiwanés y la política industrial
+    estadounidense son variables explícitas, no ruido de fondo. Un accionista del ADR es, en la práctica, un
+    inversor minoritario extranjero en una empresa cuya gobernanza última está entrelazada con la geopolítica de
+    Taiwán.
+  </p>
+
+  <!-- 10 -->
+  <p class="secnum" id="s10">10 — Registro de Riesgos</p>
+  <h2>Nueve riesgos concretos, no genéricos</h2>
+  <h3>1. Geopolítica: Taiwán y China (el riesgo de cola dominante)</h3>
+  <p>
+    Aproximadamente el 85–90% de la capacidad de TSMC —y prácticamente toda la capacidad de nodo de vanguardia— está
+    en Taiwán. Un bloqueo naval, un conflicto militar o incluso una escalada grave de tensión entre China y Taiwán
+    tendría un impacto de primer orden sobre TSMC y, por extensión, sobre la industria tecnológica mundial. La tesis
+    del "escudo de silicio" sostiene que esa misma dependencia global disuade una invasión; es una hipótesis, no una
+    garantía. Este es el riesgo que explica buena parte del descuento persistente al que cotiza TSMC frente a lo que
+    sus fundamentals aislados sugerirían, y es un riesgo que ningún accionista puede cubrir ni la compañía mitigar
+    unilateralmente. La expansión a Arizona, Japón y Alemania reduce marginalmente la concentración, pero pasarán
+    años antes de que la capacidad fuera de Taiwán sea material en el nodo de vanguardia.
+  </p>
+  <h3>2. Concentración de clientes y de mercado final</h3>
+  <p>
+    Con HPC en el 66% de los ingresos, TSMC depende de un puñado de diseñadores de silicio de IA —Nvidia, AMD,
+    Broadcom (por sus ASICs para hyperscalers), Apple, y el silicio propio de Google, Amazon y Microsoft—. Los diez
+    principales clientes concentran del orden de dos tercios de los ingresos. Una pausa en el ciclo de despliegue de
+    centros de datos de IA, o una decisión de un cliente grande de trasladar volumen a Samsung o a Intel Foundry,
+    golpearía directamente el segmento de mayor crecimiento.
+  </p>
+  <h3>3. Dilución de margen por la expansión en el exterior</h3>
+  <p>
+    Las fábricas de Arizona, Kumamoto (Japón) y Dresde (Alemania) operan con una estructura de costos más alta que
+    Taiwán (mano de obra, construcción, servicios, cadena de suministro local menos desarrollada). Management ha
+    guiado que la producción en el exterior diluye el margen bruto consolidado en 2–4 puntos porcentuales en el corto
+    plazo, y que esa dilución <em>se amplía</em> en los próximos años a medida que la proporción de capacidad fuera
+    de Taiwán sube hacia ~30% del nodo avanzado. Este es el supuesto que sostiene el retroceso de margen del
+    escenario Bear del DCF (Sección 13): no una competencia hipotética, sino una mezcla geográfica de producción de
+    mayor costo que la propia compañía ya anticipó.
+  </p>
+  <h3>4. Economía del escalamiento de 2nm</h3>
+  <p>
+    El 2nm entró en producción con un precio de oblea reportado en torno a US$30,000 —el más alto de la historia— y
+    diluye el margen bruto en 3–4 puntos en el 3Q 2026 mientras madura el rendimiento y absorbe la depreciación de
+    fábricas nuevas. Si el rendimiento del 2nm tarda más de lo previsto en madurar, o si los clientes resisten los
+    precios, la recuperación de margen que el mercado da por descontada para 2027 podría demorarse.
+  </p>
+  <h3>5. Súper-ciclo de capex y compresión del flujo de caja libre</h3>
+  <p>
+    El capex de 2026 (US$60–64 mil millones, ~36% de los ingresos) es un récord y se financia con una demanda de IA
+    que, en gran parte, está contratada pero cuyo despliegue efectivo depende de energía, terreno, construcción de
+    centros de datos y suministro de memoria de alto ancho de banda. Si esa demanda se materializa más lento de lo
+    planificado, TSMC carga la depreciación de la capacidad nueva con menor utilización, y el FCF —ya comprimido a
+    ~25% de los ingresos frente a un OCF de ~60%— se comprime más.
+  </p>
+  <h3>6. Ciclicidad de la fundición</h3>
+  <p>
+    La fabricación de semiconductores es un negocio cíclico. En 2023, los ingresos de TSMC cayeron ~4% en dólares
+    (−4.5% en NT$) por la baja de smartphones y PC. A 2026, los segmentos no-IA (smartphone −4% intertrimestral en el
+    2Q 2026, IoT, automotriz, consumo) están planos a débiles; toda la aceleración viene de HPC. Una fase de digestión
+    de la inversión en IA expondría el núcleo cíclico del negocio que queda tapado por el crecimiento del segmento de
+    IA.
+  </p>
+  <h3>7. Competencia en el nodo de vanguardia, por primera vez en años</h3>
+  <p>
+    Intel Foundry está escalando su proceso 18A y promociona 14A como el siguiente, con respaldo explícito de la
+    política industrial estadounidense; hay reportes —no confirmados por TSMC ni verificables de forma independiente
+    a la fecha de este informe— de que estaría cortejando a clientes grandes para 18A. Samsung Foundry mantiene ~7%
+    del mercado de fundición pura y sigue trabajando en el rendimiento de su nodo SF2. TSMC domina con ~70–73% del
+    mercado de fundición pura, pero la irrupción de un competidor con respaldo estatal en el nodo de vanguardia —algo
+    que no ocurría desde hace años— es un riesgo estructural a vigilar, aunque no un problema de resultados
+    inmediato.
+  </p>
+  <h3>8. Política comercial de Estados Unidos y aranceles de la Sección 232</h3>
+  <p>
+    La exención arancelaria de TSMC bajo el marco Estados Unidos–Taiwán de enero de 2026 está condicionada a que la
+    compañía cumpla con su inversión y capacidad comprometidas en suelo estadounidense. Un cambio de política, o
+    aranceles efectivos sobre chips fabricados en Taiwán, encarecería los productos de los clientes de TSMC y, de
+    forma indirecta, presionaría la demanda. La magnitud del compromiso de inversión en Estados Unidos (US$165 mil
+    millones, con versiones del acuerdo que contemplan cifras mucho mayores) es en sí misma una restricción sobre la
+    flexibilidad de asignación de capital de TSMC.
+  </p>
+  <h3>9. Tipo de cambio</h3>
+  <p>
+    TSMC factura mayoritariamente en dólares y tiene una base de costos mayoritariamente en dólares de Taiwán. Una
+    apreciación del NT$ frente al USD comprime el margen bruto —management usa como regla de referencia que cada 1%
+    de apreciación del NT$ resta aproximadamente 0.4 puntos de margen bruto—. El movimiento del par USD/NT$ ha sido un
+    factor de swing en los márgenes reportados de 2025–2026, tanto a favor como en contra.
+  </p>
+
+  <!-- 11 -->
+  <p class="secnum" id="s11">11 — Catalizadores</p>
+  <h2>Lo que puede mover la acción antes del próximo informe de este desk</h2>
+  <h3>Reporte de 3Q 2026 (esperado ~mediados de octubre de 2026)</h3>
+  <p>
+    El nivel a batir es la guía de management: US$44.6–45.8 mil millones de ingresos y margen bruto de 65%–67%. Lo
+    más observado será el margen bruto real (si la dilución del 2nm queda en el rango guiado o se desvía) y cualquier
+    señal preliminar sobre el presupuesto de capital y el crecimiento de ingresos de 2027.
+  </p>
+  <h3>Ingresos mensuales de agosto y septiembre de 2026</h3>
+  <p>
+    TSMC publica ingresos mensuales alrededor del día 10 de cada mes. Después del +44.7% interanual de julio, cada
+    dato mensual es una lectura de alta frecuencia sobre si la aceleración de HPC se sostiene.
+  </p>
+  <h3>Hitos de escalamiento y precios del 2nm</h3>
+  <p>
+    Volumen, rendimiento y adopción del 2nm por parte de Apple, Nvidia, AMD y otros; y confirmación de los aumentos
+    de precio de obleas y de empaquetado avanzado para 2027 que varios analistas anticipan (reportes de subas de
+    10%–25%). Si esos aumentos se concretan, hay una vía directa de mejora de margen no incorporada en el escenario
+    Base del DCF.
+  </p>
+  <h3>Capacidad de empaquetado avanzado (CoWoS)</h3>
+  <p>
+    La expansión de CoWoS hacia ~135,000 obleas/mes a fin de 2026 y ~195,000 a fin de 2027 es, a la fecha de este
+    informe, el limitante físico más directo del ritmo al que puede crecer el ingreso de IA. Cualquier aceleración o
+    retraso de ese plan es material.
+  </p>
+  <h3>Señales de demanda de los clientes de IA</h3>
+  <p>
+    Los reportes de Nvidia, AMD, Broadcom y las guías de capex de los hyperscalers (Microsoft, Alphabet, Amazon,
+    Meta) son indicadores adelantados de la demanda de TSMC —TSMC es el derivado apalancado de todos ellos.
+  </p>
+  <h3>Avances en Arizona y política estadounidense</h3>
+  <p>
+    Durabilidad de la exención arancelaria, anuncios de inversión adicional en Estados Unidos, y primera producción
+    de 2nm en suelo estadounidense. Cualquiera de estos modifica tanto el perfil de riesgo geopolítico como la
+    trayectoria de margen.
+  </p>
+  <h3>Titulares geopolíticos Taiwán–China</h3>
+  <p>
+    Cualquier escalación —ejercicios militares, retórica, medidas comerciales— es un evento de múltiplo directo para
+    TSMC, con más peso sobre la valuación que casi cualquier dato operativo.
+  </p>
+
+  <!-- 12 -->
+  <p class="secnum" id="s12">12 — Modelo Financiero Proyectado y Momentum de Estimados</p>
+  <h2>El consenso subió todo el año detrás de la guía, y proyecta ~US$173 mil millones para 2026</h2>
+  <p>
+    El consenso de analistas (stockanalysis.com, 19 analistas, al 8 de septiembre de 2026) proyecta ingresos de
+    <strong>NT$5.44 billones para 2026</strong> (+42.7% interanual) y utilidad por acción de NT$107.64 (+62.5%) —lo
+    que, a un tipo de cambio de ~NT$31.5/US$, equivale a ingresos de aproximadamente <strong>US$172–175 mil
+    millones</strong> y una utilidad por ADR de aproximadamente <strong>US$17.1–17.3</strong>—. De ese año, tres
+    trimestres ya están cerrados (1H 2026 real: US$76.1 mil millones) o guiados (3Q 2026: US$45.2 mil millones en el
+    punto medio), de modo que ~70% del año está determinado por resultados reales o guía de management, y el resto
+    depende de un 4Q consistente con "algo más de 40%" de crecimiento anual. Para 2027, el consenso proyecta ingresos
+    de NT$7.29 billones (+34.2%) y utilidad por acción de NT$142.13 (+32.0%), equivalente a ~US$230–235 mil millones
+    de ingresos y ~US$22.5–23.0 de utilidad por ADR.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">2026E (consenso)</th><th class="right-al">2027E (consenso)</th></tr>
+    <tr><td class="label">Ingresos (NT$)</td><td class="right-al">NT$5.44B (billones)</td><td class="right-al">NT$7.29B (billones)</td></tr>
+    <tr><td class="label">Ingresos (US$ aprox., ~NT$31.5)</td><td class="right-al">~$173B</td><td class="right-al">~$232B</td></tr>
+    <tr><td class="label">Crecimiento interanual</td><td class="right-al pos">+42.7%</td><td class="right-al pos">+34.2%</td></tr>
+    <tr><td class="label">EPS (NT$ por acción)</td><td class="right-al">NT$107.64</td><td class="right-al">NT$142.13</td></tr>
+    <tr><td class="label">EPS (US$ por ADR, aprox.)</td><td class="right-al">~$17.1–17.3</td><td class="right-al">~$22.5–23.0</td></tr>
+    <tr><td class="label">Margen bruto implícito</td><td class="right-al">~66.5%</td><td class="right-al">n.d.</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: stockanalysis.com/stocks/tsm/forecast/, consultado 8-sep-2026. El consenso se publica en NT$; las conversiones a US$ y a US$ por ADR son de este informe, a un tipo de cambio de referencia de ~NT$31.5/US$ (el promedio de 1H 2026 fue ~NT$31.6). La utilidad por ADR se obtiene multiplicando la utilidad por acción por 5.</p>
+  <div class="chartbox">
+    <canvas id="revisionChart" height="240"></canvas>
+    <p class="chartcap">Evolución del consenso de ingresos 2026 en US$ a lo largo de 2026: de ~US$150 mil millones a comienzos de año, a ~US$160 mil millones tras el 1Q, a ~US$173 mil millones tras la subida de guía del 2Q. Ilustra una tendencia de revisión al alza sostenida —no una serie temporal verificada punto por punto—; el valor actual (~US$173B) es el consenso confirmado más reciente.</p>
+  </div>
+  <p>
+    El precio objetivo promedio de los 19 analistas que cubren el ADR es de <strong>US$554.45</strong> (mediana
+    US$538.50, rango US$440–US$700), 29% por encima del precio de mercado, con calificación consenso "Strong Buy" (6
+    "Strong Buy", 12 "Buy", 1 "Hold", 0 "Sell"). La divergencia entre lo que hicieron los analistas con sus modelos
+    —revisar al alza toda la trayectoria de crecimiento— y lo que hizo la acción —caer ~10% desde el máximo de fin de
+    junio— es la misma tensión que atraviesa toda esta cobertura: los modelos capitalizan el crecimiento de IA
+    compuesto durante años; el precio, en el corto plazo, se mueve con el múltiplo y con los titulares.
+  </p>
+
+  <!-- 13 -->
+  <p class="secnum" id="s13">13 — Valuación: Cuatro Métodos y el Fair Value</p>
+  <h2>Cuánto vale el ADR, con el DCF muy por debajo del precio y los otros tres métodos en línea o por encima</h2>
+  <p>
+    Calculamos el valor razonable del ADR con cuatro enfoques independientes entre sí —flujo de caja descontado,
+    múltiplos de comparables, reversión a la media histórica propia y consenso de analistas de Wall Street— y
+    promediamos los cuatro sin forzarlos a converger. Aplicamos las dos reglas fijas del desk: (1) el consenso de
+    Wall Street entra al promedio, no se muestra solo como referencia externa; y (2) la reversión histórica entra al
+    promedio con una ventana reciente —en el caso de TSMC, naturalmente limpia, porque la compañía nunca reportó un
+    trimestre de pérdida y no hay P/E contaminados que excluir—. No usamos suma de las partes: TSMC es una fundición
+    pura de un solo segmento, y su oportunidad de IA ya está <em>dentro</em> de los ingresos reportados, no es una
+    apuesta de plataforma todavía sin monetizar.
+  </p>
+
+  <h3>Método 1 — Flujo de caja descontado (DCF), tres escenarios</h3>
+  <p>
+    Construimos un modelo de flujo de caja descontado a dos etapas (cinco años explícitos —2026 a 2030— más valor
+    terminal por crecimiento perpetuo). El año 1 (2026) usa el mismo ingreso ancla en los tres escenarios: el
+    consenso de ingresos 2026 de <strong>US$173 mil millones</strong>, del cual ~70% ya está determinado por
+    resultados reales (1H 2026: US$76.1 mil millones) o guía de management (3Q: US$45.2 mil millones). La variable
+    que difiere entre escenarios es el ritmo de crecimiento posterior y —clave para TSMC— la brecha entre el
+    <strong>margen de flujo de caja operativo</strong> y el <strong>capex como porcentaje de los ingresos</strong>,
+    porque el FCF es la diferencia entre esos dos.
+  </p>
+  <p>
+    <strong>Anclaje del margen de OCF (regla no-negociable del desk):</strong> el margen de OCF del año 1 (60% en el
+    caso Base) está anclado en el margen de OCF real de los últimos cuatro trimestres —US$83.6 mil millones de OCF
+    sobre ~US$142.9 mil millones de ingresos = ~58.5%, y ~61.6% en el primer semestre de 2026—, no derivado por
+    analogía del margen operativo. El capex del año 1 (36% de los ingresos) está anclado en la guía explícita de
+    management de US$60–64 mil millones para 2026. En los escenarios Base y Bull, el capex se normaliza de forma
+    gradual hacia ~28–30% de los ingresos hacia 2030 —un nivel consistente con la intensidad de capital efectiva de
+    TSMC en 2024–2025 (~33–34%), no una cifra elegida para mejorar el resultado—. El WACC del caso Base (10.5%) se
+    construye con una tasa libre de riesgo de ~4.3% (rendimiento del Treasury a 10 años), un premio de riesgo
+    accionario de 5.0% y un beta de ~1.25 —lo que da un costo de capital CAPM de ~10.5% antes de cualquier ajuste—;
+    como TSMC tiene caja neta, no hay ajuste por deuda. El escenario Bear usa 11.5% (beta al alza más un plus de
+    estrés) y el Bull 9.0%.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Supuesto</th><th class="right-al">Bear</th><th class="right-al">Base</th><th class="right-al">Bull</th></tr>
+    <tr><td class="label">Ingresos año 1 (2026, ancla consenso)</td><td class="right-al">$173B</td><td class="right-al">$173B</td><td class="right-al">$173B</td></tr>
+    <tr><td class="label">Crecimiento de ingresos (2027 → 2030)</td><td class="right-al">14% → 4%</td><td class="right-al">32% → 12%</td><td class="right-al">40% → 16%</td></tr>
+    <tr><td class="label">Margen de OCF (2026 → 2030)</td><td class="right-al">60% → 56%</td><td class="right-al">60% → 63%</td><td class="right-al">61% → 66%</td></tr>
+    <tr><td class="label">Capex / ingresos (2026 → 2030)</td><td class="right-al">37% → 33%</td><td class="right-al">36% → 30%</td><td class="right-al">36% → 24%</td></tr>
+    <tr><td class="label">Margen de FCF implícito (2026 → 2030)</td><td class="right-al">23% → 23%</td><td class="right-al">24% → 33%</td><td class="right-al">25% → 42%</td></tr>
+    <tr><td class="label">WACC</td><td class="right-al">11.5%</td><td class="right-al">10.5%</td><td class="right-al">9.0%</td></tr>
+    <tr><td class="label">Crecimiento terminal</td><td class="right-al">2.5%</td><td class="right-al">3.0%</td><td class="right-al">3.5%</td></tr>
+    <tr><td class="label">% del EV desde valor terminal</td><td class="right-al">67.9%</td><td class="right-al">77.3%</td><td class="right-al">84.2%</td></tr>
+    <tr class="total"><td class="label">Fair value por ADR</td><td class="right-al">$115.26</td><td class="right-al">$263.11</td><td class="right-al">$539.17</td></tr>
+  </table></div>
+  <p>
+    El caso Base (<strong>US$263.11</strong>) queda 38.7% por debajo del precio de mercado (US$428.91). No es un error
+    de calibración: el ingreso ancla es el consenso, el margen de OCF está anclado en el OCF real reportado, y el
+    capex del año 1 está anclado en la guía de la propia compañía. Es el resultado honesto de descontar el flujo de
+    caja de un negocio que, después de reinvertir ~36% de sus ingresos en fábricas, deja un FCF de apenas ~24% de los
+    ingresos, y de asumir una desaceleración de crecimiento creíble (de 32% en 2027 —cerca del consenso— a 12% en
+    2030). El escenario Bull (US$539.17) supera al mercado, pero requiere sostener 40% de crecimiento en 2027 y que
+    el capex baje al 24% de los ingresos hacia 2030 (una normalización más rápida de lo que TSMC ha demostrado). El
+    escenario Bear (US$115.26) asume que el ciclo de IA entra en digestión (crecimiento de 14% en 2027, cayendo a 4%
+    en 2030) y que el margen de OCF <em>retrocede</em> de 60% a 56% —un retroceso que, según la regla del desk, exige
+    una causa documentada: acá es la dilución de margen por la producción en Arizona/Japón/Alemania, que management ya
+    cuantificó y que se amplía a medida que sube la proporción de capacidad fuera de Taiwán (Sección 10, riesgo 3).
+  </p>
+  <p>
+    El promedio simple de los tres escenarios da US$305.85 por ADR. Un valor esperado ponderado por probabilidad
+    explícita —25% Bear, 45% Base, 30% Bull— da US$308.97. Usamos el caso Base puntual (US$263.11), no ninguno de
+    estos dos promedios, como el número del Método 1 que entra al blend final, consistente con el resto de la
+    cobertura del desk. <strong>Advertencia de sensibilidad:</strong> el 77.3% del valor de empresa del caso Base
+    proviene del valor terminal, y el FCF es un residuo delgado (~24% de los ingresos = margen de OCF de 60% menos
+    capex de 36%). La combinación de esas dos cosas —no el apalancamiento, porque TSMC tiene caja neta— es la que
+    hace que el rango entre Bear (US$115) y Bull (US$539) sea tan amplio: cualquier diferencia razonable de pocos
+    puntos en el margen de OCF, en el capex o en el crecimiento se amplifica mucho cuando el flujo que se descuenta
+    es una fracción chica de los ingresos y la mayor parte del valor está en la perpetuidad.
+  </p>
+  <h3>Sensibilidad del caso Base: WACC × crecimiento terminal</h3>
+  <p>
+    Mostramos cómo se mueve el fair value del caso Base variando únicamente WACC y crecimiento terminal, con el resto
+    de los inputs fijos. La celda marcada es el caso Base reportado arriba (US$263.11, WACC 10.5%, g 3.0%).
+  </p>
+  <div class="table-scroll"><table class="sens-table">
+    <tr><th>WACC \ g terminal</th><th class="right-al">2.0%</th><th class="right-al">2.5%</th><th class="right-al">3.0%</th><th class="right-al">3.5%</th><th class="right-al">4.0%</th></tr>
+    <tr><td class="axis">9.5%</td><td class="right-al">$271.80</td><td class="right-al">$287.06</td><td class="right-al">$304.66</td><td class="right-al">$325.20</td><td class="right-al">$349.47</td></tr>
+    <tr><td class="axis">10.0%</td><td class="right-al">$254.30</td><td class="right-al">$267.41</td><td class="right-al">$282.39</td><td class="right-al">$299.67</td><td class="right-al">$319.84</td></tr>
+    <tr><td class="axis">10.5%</td><td class="right-al">$238.88</td><td class="right-al">$250.23</td><td class="right-al base-cell">$263.11</td><td class="right-al">$277.82</td><td class="right-al">$294.79</td></tr>
+    <tr><td class="axis">11.0%</td><td class="right-al">$225.19</td><td class="right-al">$235.10</td><td class="right-al">$246.26</td><td class="right-al">$258.90</td><td class="right-al">$273.35</td></tr>
+    <tr><td class="axis">11.5%</td><td class="right-al">$212.96</td><td class="right-al">$221.67</td><td class="right-al">$231.41</td><td class="right-al">$242.37</td><td class="right-al">$254.79</td></tr>
+  </table></div>
+  <p class="footnote">Grilla propia, recalculando el modelo de dos etapas del caso Base (mismo crecimiento explícito y misma trayectoria de margen de OCF y capex por año declarados arriba) para cada combinación WACC/g. La celda base (US$263.11) corresponde a WACC 10.5% y g 3.0%.</p>
+  <p>
+    Ninguna celda de la grilla llega al precio de mercado (US$428.91). Ni siquiera la esquina más generosa —WACC
+    9.5%, g 4.0%— pasa de US$349. En otras palabras: para que el DCF justifique el precio actual no alcanza con
+    elegir un WACC más benévolo o un crecimiento terminal más alto; hay que asumir una trayectoria de FCF
+    materialmente más rica que la del caso Base —esencialmente, el escenario Bull, con el capex normalizándose al 24%
+    de los ingresos y el crecimiento de 2027 en 40%—. Ese es el hallazgo del Método 1, reportado sin suavizar: el
+    flujo de caja descontado del negocio actual, cargando su capex real, vale bastante menos de lo que cotiza.
+  </p>
+
+  <h3>Método 2 — Múltiplos de comparables (EV/EBITDA)</h3>
+  <p>
+    Estimamos el EBITDA 2026 en aproximadamente <strong>US$123 mil millones</strong> (ingresos de US$173 mil millones
+    × margen de EBITDA de ~71%, en línea con el margen de EBITDA TTM real de 71.3%) y le aplicamos múltiplos
+    EV/EBITDA. TSMC no tiene un comparable directo: las fundiciones de nodos maduros (GFS ~9x, UMC ~7x) son el piso;
+    los habilitadores fabless de IA (NVDA ~27.5x, ASML ~28x) son el techo, y no cargan la intensidad de capital de
+    una fundición. Usamos <strong>18.0x</strong> como múltiplo central —una prima amplia sobre las fundiciones
+    maduras por el liderazgo tecnológico y la exposición a IA, y un descuento sobre los fabless por el capex—, con un
+    rango de sensibilidad de 14x a 22x.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>EV/EBITDA aplicado</th><th class="right-al">Precio implícito por ADR</th></tr>
+    <tr><td class="label">14.0x (piso, sesgo a fundición)</td><td class="right-al">$347.80</td></tr>
+    <tr class="total"><td class="label">18.0x (caso propio, usado en el blend)</td><td class="right-al">$442.93</td></tr>
+    <tr><td class="label">22.0x (techo, ~múltiplo actual de TSMC)</td><td class="right-al">$538.07</td></tr>
+  </table></div>
+  <p>
+    Tomamos <strong>US$442.93</strong> (18x EV/EBITDA sobre el EBITDA 2026E) como el resultado de este método, 3.3%
+    por encima del precio de mercado. La advertencia metodológica: EV/EBITDA es una métrica generosa para TSMC porque
+    ignora que la compañía gasta en capex más del doble de su depreciación (US$47 mil millones de capex TTM contra
+    ~US$21 mil millones de D&amp;A). Un inversor que valúa a TSMC por EV/EBITDA está, implícitamente, tratando ese
+    exceso de reinversión como si fuera valor para el accionista, cuando en realidad es la condición para mantener el
+    negocio en la frontera tecnológica. El DCF (Método 1), que resta el capex completo, es el contrapunto necesario
+    de este método.
+  </p>
+
+  <h3>Método 3 — Reversión a la media histórica propia (ventana limpia)</h3>
+  <p>
+    TSMC nunca reportó un trimestre de pérdida, de modo que —a diferencia de Broadcom u Oracle— no hay P/E
+    contaminados por utilidad negativa que excluir: la ventana reciente es naturalmente limpia. Tomamos el P/E
+    promedio de los últimos cuatro cierres de trimestre fiscal, cada uno calculado con el precio real del ADR en esa
+    fecha sobre la utilidad por ADR de los últimos doce meses vigente en ese momento.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Cierre de trimestre</th><th class="right-al">Precio ADR (real)</th><th class="right-al">EPS/ADR TTM</th><th class="right-al">P/E implícito</th></tr>
+    <tr><td class="label">3Q 2025 (30-sep-2025)</td><td class="right-al">$279.29</td><td class="right-al">~$9.41</td><td class="right-al">29.7x</td></tr>
+    <tr><td class="label">4Q 2025 (31-dic-2025)</td><td class="right-al">$303.89</td><td class="right-al">~$10.55</td><td class="right-al">28.8x</td></tr>
+    <tr><td class="label">1Q 2026 (31-mar-2026)</td><td class="right-al">$337.95</td><td class="right-al">~$11.92</td><td class="right-al">28.4x</td></tr>
+    <tr><td class="label">2Q 2026 (30-jun-2026)</td><td class="right-al">$477.57</td><td class="right-al">~$13.86</td><td class="right-al">34.5x</td></tr>
+    <tr class="total"><td class="label">Promedio ventana limpia (4 trimestres)</td><td class="right-al"></td><td class="right-al"></td><td class="right-al">30.3x</td></tr>
+  </table></div>
+  <p class="footnote">Precios del ADR: cierre real más cercano a cada fecha de cierre de trimestre (Yahoo Finance). EPS/ADR TTM: suma de los cuatro EPS trimestrales por ADR reportados por TSMC hasta cada fecha; los trimestres de 1Q y 2Q de 2025 se derivan del EPS en NT$ reportado, convertido a US$ por ADR al tipo de cambio promedio del período (aproximación de este informe, no una cifra publicada por TSMC). Construcción propia; el promedio de la última fila se calcula sobre los múltiplos sin redondear (30.32x).</p>
+  <p>
+    Aplicado al EPS/ADR TTM actual (US$13.86), el múltiplo de la ventana limpia (30.3x) implica un fair value de
+    <strong>US$420.27</strong> —este es el número que usamos como resultado del Método 3, 2.0% por debajo del
+    mercado—. El matiz importante: 30.3x es un múltiplo <em>ya re-calificado</em> por la era de IA. El P/E histórico
+    de TSMC de más largo plazo (5 años) promedia más cerca de 20–24x; si se aplicara ese múltiplo "viejo" al EPS
+    actual, el resultado colapsa a ~US$300. Según la regla del desk, cuando el múltiplo está alto porque el
+    crecimiento cambió de escalón de forma real —y el caso de TSMC, con la IA estructuralmente elevando la tasa de
+    crecimiento, es exactamente eso— no se fuerza el método hacia el promedio viejo; se usa la ventana reciente. Lo
+    hacemos así, pero el lector debería tener presente que este método hereda el múltiplo elevado del período, no lo
+    cuestiona.
+  </p>
+
+  <h3>Método 4 — Consenso de Wall Street</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Analistas cubriendo el ADR</td><td class="right-al">19</td></tr>
+    <tr><td class="label">Calificación consenso</td><td class="right-al">Strong Buy</td></tr>
+    <tr class="total"><td class="label">Precio objetivo promedio (12 meses)</td><td class="right-al">$554.45</td></tr>
+    <tr><td class="label">Precio objetivo mediano</td><td class="right-al">$538.50</td></tr>
+    <tr><td class="label">Rango de precios objetivo</td><td class="right-al">$440.00 – $700.00</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: stockanalysis.com (consultado 8-sep-2026), agregando 19 analistas. Distribución: 6 "Strong Buy", 12 "Buy", 1 "Hold", 0 "Sell".</p>
+  <p>
+    El consenso de Wall Street —US$554.45 promedio, 29% por encima del mercado— es el más optimista de los cuatro
+    métodos, y refleja que la comunidad de analistas está modelando la demanda de cómputo de IA de forma mucho más
+    completa que nuestro DCF Base. Notablemente, incluso el <em>piso</em> del rango de precios objetivo (US$440) está
+    por encima del precio de mercado. Lo incorporamos al blend con la regla fija del desk: el consenso de analistas es
+    información de mercado tan legítima como un múltiplo de comparables. No tenemos el detalle línea por línea de los
+    19 modelos para saber cuánto crecimiento de IA, qué múltiplo terminal o qué WACC asume cada uno —esa
+    incertidumbre es, precisamente, la razón para promediarlo con los otros tres métodos en lugar de tratarlo como la
+    última palabra.
+  </p>
+
+  <h3>Síntesis: los cuatro métodos, uno al lado del otro</h3>
+  <div class="chartbox">
+    <canvas id="footballChart" height="300"></canvas>
+    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado (US$428.91); la línea azul marca el blend propio (US$420.19), promedio de los cuatro métodos.</p>
+  </div>
+  <div class="table-scroll"><table>
+    <tr><th>Método</th><th class="right-al">Fair value por ADR</th></tr>
+    <tr><td class="label">DCF — Bear</td><td class="right-al">$115.26</td></tr>
+    <tr><td class="label">DCF — Base</td><td class="right-al">$263.11</td></tr>
+    <tr><td class="label">DCF — Bull</td><td class="right-al">$539.17</td></tr>
+    <tr><td class="label">Comparables (EV/EBITDA, 18x)</td><td class="right-al">$442.93</td></tr>
+    <tr><td class="label">Reversión histórica (ventana limpia, 30.3x)</td><td class="right-al">$420.27</td></tr>
+    <tr><td class="label">Consenso Wall Street (promedio)</td><td class="right-al">$554.45</td></tr>
+    <tr class="total"><td class="label">Blend propio — promedio simple de los cuatro métodos</td><td class="right-al">$420.19</td></tr>
+  </table></div>
+  <p>
+    El blend propio de este informe —promedio simple de DCF Base (US$263.11), Comparables (US$442.93), Reversión
+    histórica en ventana limpia (US$420.27) y Consenso de Wall Street (US$554.45)— da <strong>US$420.19 por
+    ADR</strong>, 2.0% <em>por debajo</em> del precio de mercado de US$428.91. El promedio queda casi en línea con el
+    mercado, pero la composición importa más que el promedio: de los cuatro métodos, el único que descuenta el flujo
+    de caja del negocio <em>después</em> de restar su enorme capex —el DCF Base— queda 38.7% por debajo del precio, y
+    ni siquiera la esquina más favorable de la grilla de sensibilidad llega. Los otros tres están en línea o por
+    encima, y cada uno descansa en una comparación externa: un múltiplo de EBITDA que ignora la reinversión, un P/E
+    promedio ya re-calificado por la era de IA, y un consenso de analistas que modela años de crecimiento compuesto.
+    La postura de portada —neutral— refleja esa tensión: TSMC es, por posición competitiva (monopolio efectivo del
+    nodo de vanguardia, ~70–73% del mercado de fundición pura, la empresa por la que pasa físicamente casi todo el
+    cómputo de IA del mundo), uno de los mejores negocios de todo este desk; y el precio actual es defendible si uno
+    cree que el ciclo de IA sostiene un crecimiento alto durante varios años más y que el capex se normaliza. Lo que
+    el flujo de caja descontado del negocio <em>actual</em> no alcanza a justificar, con supuestos anclados en datos
+    reales, es ese mismo precio.
+  </p>
+
+  <!-- 14 -->
+  <p class="secnum" id="s14">14 — Limitaciones del Modelo</p>
+  <h2>Qué asume este análisis, y dónde puede fallar</h2>
+  <div class="watermark-block">
+    <p style="margin-bottom:0;">
+      El 77.3% del valor de empresa del caso Base del DCF proviene del valor terminal —una dependencia alta—, y los
+      años 2–5 asumen una desaceleración de crecimiento de ingresos de 32% a 12% y una normalización de capex de 36%
+      a 30% de los ingresos que son proyecciones propias, calibradas contra la guía de management y la intensidad de
+      capital histórica pero no idénticas a ninguna cifra oficial. El margen de OCF del año 1 (60%) está anclado en el
+      OCF real TTM (~58.5%–61.6% según la base de ingresos), pero la trayectoria posterior es un supuesto. El Método 2
+      (comparables) usa un único múltiplo, 18x EV/EBITDA, elegido por juicio entre el rango de las fundiciones maduras
+      (~7–9x) y el de los fabless de IA (~27–28x); con 22x (el múltiplo actual de la propia TSMC) el resultado sube a
+      US$538, y con 14x baja a US$348. La estimación de EBITDA 2026 (~US$123 mil millones) es una proyección propia
+      sobre el margen de EBITDA consolidado, no un dato oficial. El Método 3 (reversión) usa una ventana de cuatro
+      trimestres cuyo P/E promedio (30.3x) está elevado por la re-calificación de la era IA; con el P/E histórico de
+      más largo plazo (~20–24x) el resultado colapsa a ~US$300, y los EPS/ADR TTM de los cierres de 3Q y 4Q de 2025 y
+      1Q de 2026 se derivan en parte de EPS en NT$ convertidos a un tipo de cambio promedio, no de cifras por ADR
+      publicadas directamente por TSMC para cada fecha. Incorporar el Método 4 (consenso, US$554.45) al blend, en
+      lugar de tratarlo como referencia, es la decisión metodológica de mayor impacto individual: sin él, el promedio
+      de los otros tres daría ~US$375, aproximadamente 12.5% por debajo del mercado. La caja neta usada en el DCF
+      (~US$77 mil millones) es una cifra agregada de un proveedor de datos, no un desglose línea por línea del balance
+      del 2Q 2026 —el rango razonable, según se cuente solo el efectivo o toda la cartera de valores negociables, va
+      de ~US$50 mil millones a ~US$80 mil millones, un efecto de ±US$5 por ADR sobre el fair value—. El tipo de cambio
+      USD/NT$ es una variable no modelada explícitamente: todo el análisis en dólares asume implícitamente que el par
+      se mantiene cerca de los niveles de 2026 (~NT$31.5/US$); una apreciación sostenida del NT$ comprimiría los
+      márgenes reportados en dólares y, con ellos, todos los métodos. Y el riesgo geopolítico Taiwán–China —el más
+      importante para esta acción— no se puede modelar como una probabilidad ponderada creíble: está reflejado de
+      forma difusa en el WACC del caso Base (10.5%) y en el escenario Bear, pero un evento de cola en ese frente
+      invalidaría cualquier fair value de este informe.
+    </p>
+  </div>
+
+  <div class="disclosure">
+    Documento elaborado a partir de fuentes públicas: SEC EDGAR (Form 20-F, Form 6-K y exhibits de resultados, XBRL
+    companyfacts API, CIK 0001046179), comunicados de resultados y sitio de relaciones con inversores de Taiwan
+    Semiconductor Manufacturing Company Limited, comunicados de Nvidia, ASML, GlobalFoundries, United Microelectronics
+    y Broadcom, stockanalysis.com, TrendForce, Counterpoint Research, GuruFocus, Yahoo Finance, CNBC, Reuters,
+    Investing.com, Tom's Hardware, SemiWiki, y cobertura de mercado de las llamadas de resultados de TSMC de 2025 y
+    2026. Cifras fundamentales con fecha de corte en el comunicado 6-K de TSMC correspondiente al trimestre cerrado el
+    30 de junio de 2026 (2Q 2026), publicado el 16 de julio de 2026; los ingresos mensuales de julio de 2026 se
+    publicaron el 10 de agosto de 2026; el dato mensual de agosto de 2026 no estaba disponible a la fecha de corte. El
+    precio de mercado del ADR usado en la portada y en la Sección 13 refleja el cierre del 4 de septiembre de 2026
+    (US$428.91); desarrollos corporativos y de mercado con fecha de corte de la misma fecha.
+    <br><br>
+    <strong>Sobre el autor y la naturaleza de este documento:</strong> este informe es un análisis independiente
+    elaborado por Manfredi Investment Research &amp; Markets con fines exclusivamente informativos y educativos. El
+    autor no es un asesor de inversión registrado, no está matriculado ante la Comisión Nacional de Valores (CNV), la
+    SEC, ni ningún otro organismo regulador equivalente, y no mantiene una relación de asesoramiento financiero
+    personalizado con el lector. Ninguna cifra de este documento —incluido el "fair value" de portada, los escenarios
+    de DCF, ni la síntesis de la Sección 13— constituye una recomendación de compra, venta o mantenimiento para
+    ningún lector en particular, ni considera la situación financiera, los objetivos o el perfil de riesgo individual
+    de quien lo lee. Los escenarios de DCF son estimaciones propias sujetas a los supuestos declarados explícitamente
+    en la Sección 13, y no representan guidance oficial de ninguna de las compañías mencionadas salvo donde se cita de
+    forma directa y atribuida. TSMC reporta bajo NIIF en dólares de Taiwán; las cifras en dólares estadounidenses y
+    por ADR de este informe son traducciones y conversiones sujetas a variación cambiaria. Verificar cifras contra el
+    20-F/6-K más reciente de la compañía, y consultar a un asesor financiero matriculado, antes de tomar cualquier
+    decisión de inversión.
+  </div>
+
+</div>
+
+<script>
+/* ---- Motor de gráficos propio, sin dependencias externas (Canvas 2D) ---- */
+(function(){
+  var PALETTE = {ink:'#161a20', muted:'#69707c', line:'#e3e9f0', navy:'#0b1f3a', navy2:'#15335c', blue:'#2f5f9e', blueLight:'#5f8fc7', pale:'#c7d9ec', red:'#a8291f', gold:'#c99a3c'};
+
+  function setupCanvas(canvas, cssHeight){
+    var dpr = window.devicePixelRatio || 1;
+    var cssWidth = canvas.parentElement.clientWidth - 44;
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = Math.max(1, Math.round(cssWidth * dpr));
+    canvas.height = Math.max(1, Math.round(cssHeight * dpr));
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return {ctx: ctx, w: cssWidth, h: cssHeight};
+  }
+
+  function drawVBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+    ctx.font = '11px "IBM Plex Mono", monospace';
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var log = !!opts.log;
+    var padL = 46, padR = 10, padT = 16, padB = 46;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var maxV = Math.max.apply(null, values);
+    var minV = log ? Math.min.apply(null, values) : 0;
+    function scaleY(v){
+      if(log){
+        var lv = Math.log10(Math.max(v,0.01)), lmax = Math.log10(maxV*1.15), lmin = Math.log10(Math.max(minV*0.5,1));
+        return padT + plotH - ((lv - lmin) / (lmax - lmin)) * plotH;
+      }
+      return padT + plotH - (v / (maxV*1.15)) * plotH;
+    }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    var gridSteps = 4;
+    for(var g=0; g<=gridSteps; g++){
+      var yy = padT + (plotH/gridSteps)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    var n = values.length;
+    var slot = plotW / n;
+    var barW = Math.min(slot * 0.56, 64);
+
+    for(var i=0;i<n;i++){
+      var cx = padL + slot*i + slot/2;
+      var y0 = scaleY(values[i]);
+      var yBase = padT + plotH;
+      ctx.fillStyle = colors[i % colors.length];
+      var bw = barW;
+      ctx.fillRect(cx - bw/2, y0, bw, yBase - y0);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'center';
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, cx, y0 - 6);
+
+      ctx.fillStyle = PALETTE.muted;
+      ctx.font = '10px "Inter", sans-serif';
+      wrapLabel(ctx, labels[i], cx, yBase + 16, slot + 6);
+    }
+  }
+
+  function wrapLabel(ctx, text, cx, y, maxW){
+    var words = String(text).split(' ');
+    var lines = [];
+    var cur = '';
+    for(var i=0;i<words.length;i++){
+      var test = cur ? cur + ' ' + words[i] : words[i];
+      if(ctx.measureText(test).width > maxW && cur){ lines.push(cur); cur = words[i]; }
+      else cur = test;
+    }
+    if(cur) lines.push(cur);
+    lines = lines.slice(0,2);
+    ctx.textAlign = 'center';
+    for(var j=0;j<lines.length;j++){
+      ctx.fillText(lines[j], cx, y + j*11);
+    }
+  }
+
+  function drawHBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var padL = opts.padL || 128, padR = 54, padT = 10, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var maxV = Math.max.apply(null, values) * 1.12;
+
+    var n = values.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.5, 30);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, padT+plotH); ctx.stroke();
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = padL;
+      var w = (values[i]/maxV) * plotW;
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, w, barH);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(labels[i], padL - 10, cy + 4);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'left';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, x0 + w + 8, cy + 4);
+    }
+  }
+
+  function drawRangeBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, ranges = opts.ranges, colors = opts.colors, refLines = opts.refLines || [];
+    var padL = 168, padR = 16, padT = 40, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    ranges.forEach(function(r){ allVals.push(r[0], r[1]); });
+    refLines.forEach(function(r){ allVals.push(r.value); });
+    var rawMin = Math.min.apply(null, allVals), rawMax = Math.max.apply(null, allVals);
+    var span = rawMax - rawMin;
+    var domMin = rawMin - span * 0.16;
+    var domMax = rawMax + span * 0.04;
+    function scaleX(v){ return padL + ((v - domMin)/(domMax - domMin)) * plotW; }
+
+    var n = ranges.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.42, 22);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = scaleX(ranges[i][0]), x1 = scaleX(ranges[i][1]);
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, Math.max(x1-x0,2), barH);
+      ctx.beginPath(); ctx.arc(x0, cy, barH/2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x1, cy, barH/2, 0, Math.PI*2); ctx.fill();
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      wrapLabel(ctx, labels[i], padL - 12, cy - 4, padL - 20);
+
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      var vf = opts.valueFmt || function(v){ return '$'+v.toFixed(0); };
+      ctx.textAlign = 'right';
+      ctx.fillText(vf(ranges[i][0]), x0 - 8, cy + 4);
+      ctx.textAlign = 'left';
+      ctx.fillText(vf(ranges[i][1]), x1 + 8, cy + 4);
+    }
+
+    var sortedRefs = refLines.map(function(r,i){ return {r:r, i:i, x:scaleX(r.value)}; }).sort(function(a,b){ return a.x-b.x; });
+    for(var ri=1; ri<sortedRefs.length; ri++){
+      if(sortedRefs[ri].x - sortedRefs[ri-1].x < 90){ sortedRefs[ri].row = (sortedRefs[ri-1].row||0) + 1; }
+    }
+    refLines.forEach(function(r){
+      var x = scaleX(r.value);
+      ctx.strokeStyle = r.color; ctx.lineWidth = 1.6; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x, padT-6); ctx.lineTo(x, padT+plotH); ctx.stroke();
+      ctx.setLineDash([]);
+    });
+    sortedRefs.forEach(function(item){
+      var row = item.row || 0;
+      ctx.fillStyle = item.r.color;
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(item.r.label, item.x, padT - 12 - row*13);
+    });
+  }
+
+  function drawLines(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, series = opts.series;
+    var padL = 40, padR = 14, padT = 16, padB = 54;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    series.forEach(function(s){ allVals = allVals.concat(s.values); });
+    var maxV = Math.max.apply(null, allVals) * 1.08;
+    var minV = Math.min.apply(null, allVals) * 0.92;
+
+    function scaleX(i){ return padL + (plotW/(labels.length-1)) * i; }
+    function scaleY(v){ return padT + plotH - ((v - minV)/(maxV-minV)) * plotH; }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var yy = padT + (plotH/4)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+
+    series.forEach(function(s){
+      ctx.strokeStyle = s.color; ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        ctx.fillStyle = s.color;
+        ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
+      });
+    });
+
+    ctx.fillStyle = PALETTE.muted;
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    labels.forEach(function(l,i){ ctx.fillText(l, scaleX(i), padT+plotH+16); });
+
+    var lx = padL, ly = H - 12;
+    ctx.font = '11px "Inter", sans-serif';
+    series.forEach(function(s){
+      ctx.fillStyle = s.color;
+      ctx.fillRect(lx, ly-8, 10, 10);
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'left';
+      ctx.fillText(s.name, lx+14, ly);
+      lx += 14 + ctx.measureText(s.name).width + 22;
+    });
+  }
+
+  function renderAll(){
+    drawVBars(document.getElementById('historyChart'), {
+      labels:['2019','2020','2021','2022','2023','2024','2025','2026E'],
+      values:[35.77,47.69,57.22,73.67,70.60,88.27,122.42,173.00],
+      colors:[PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.navy2,PALETTE.navy2,PALETTE.navy],
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawHBars(document.getElementById('platformChart'), {
+      labels:['HPC','Smartphone','IoT','Automotriz','DCE + otros'],
+      values:[66,22,5,4,3],
+      colors:[PALETTE.navy,PALETTE.blueLight,PALETTE.pale,PALETTE.pale,PALETTE.pale],
+      padL:120,
+      valueFmt:function(v){ return v.toFixed(0)+'%'; }
+    });
+
+    drawVBars(document.getElementById('nodeChart'), {
+      labels:['2nm','3nm','5nm','7nm','16/28nm','40nm y maduros'],
+      values:[3,30,33,11,12,11],
+      colors:[PALETTE.gold,PALETTE.navy,PALETTE.navy,PALETTE.navy2,PALETTE.pale,PALETTE.pale],
+      valueFmt:function(v){ return v.toFixed(0)+'%'; }
+    });
+
+    drawLines(document.getElementById('marginChart'), {
+      labels:['3Q 2025','4Q 2025','1Q 2026','2Q 2026','3Q 2026E'],
+      series:[
+        {name:'Margen bruto', color:PALETTE.navy, values:[59.5,62.3,66.2,67.7,66.0]},
+        {name:'Margen operativo', color:PALETTE.blueLight, values:[50.6,54.0,58.1,60.3,57.0]}
+      ]
+    });
+
+    drawVBars(document.getElementById('revenueQChart'), {
+      labels:['2Q 2025','3Q 2025','4Q 2025','1Q 2026','2Q 2026','3Q 2026E'],
+      values:[30.07,33.10,33.73,35.90,40.20,45.20],
+      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.navy,PALETTE.gold],
+      valueFmt:function(v){ return '$'+v.toFixed(1)+'B'; }
+    });
+
+    drawVBars(document.getElementById('capexChart'), {
+      labels:['TSMC','QCOM','AMD','NVDA','AVGO'],
+      values:[36,5,4,3,1.4],
+      colors:[PALETTE.red,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale],
+      valueFmt:function(v){ return v.toFixed(1)+'%'; }
+    });
+
+    drawHBars(document.getElementById('compsChart'), {
+      labels:['ASML','NVDA','TSM','GFS','UMC'],
+      values:[28.0,27.5,21.6,9.0,7.0],
+      colors:[PALETTE.pale,PALETTE.blueLight,PALETTE.red,PALETTE.pale,PALETTE.pale],
+      valueFmt:function(v){ return v.toFixed(1)+'x'; }
+    });
+
+    drawVBars(document.getElementById('revisionChart'), {
+      labels:['Consenso inicio 2026','Consenso tras 1Q','Consenso tras 2Q (actual)'],
+      values:[150,160,173],
+      colors:[PALETTE.pale,PALETTE.blueLight,PALETTE.navy],
+      valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
+    });
+
+    drawRangeBars(document.getElementById('footballChart'), {
+      labels:['DCF (Bear→Bull)','Comparables (14x→22x)','Reversión (22x→34.5x)','Consenso Wall St.'],
+      ranges:[[115.26,539.17],[347.80,538.07],[304.92,477.62],[440.00,700.00]],
+      colors:[PALETTE.blue,PALETTE.navy2,PALETTE.gold,PALETTE.pale],
+      refLines:[{value:428.91,color:PALETTE.red,label:'Mercado $429'},{value:420.19,color:PALETTE.navy,label:'Blend $420'}],
+      valueFmt:function(v){ return '$'+v.toFixed(0); }
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', renderAll);
+  } else {
+    renderAll();
+  }
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderAll, 150);
+  });
+})();
+</script>
+<script src="_preview-gate.js" defer></script>
+</body>
+</html>
