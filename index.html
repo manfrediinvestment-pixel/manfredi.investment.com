@@ -1657,6 +1657,26 @@
     }
     .section-inversiones .section-title { color: var(--white); }
     .section-inversiones .section-sub   { color: rgba(255,255,255,.38); }
+    /* "Proximamente": la seccion se puede visitar (aparece en el nav y se
+       puede entrar), pero el contenido de adentro queda desenfocado con un
+       cartel fijo encima -- no es un paywall de membresia, es "todavia no
+       esta lista" para todo el mundo por igual. */
+    .mi-soon-wrap { position: relative; }
+    .mi-soon-blur { filter: blur(6px); opacity: .45; pointer-events: none; user-select: none; }
+    .mi-soon-card-wrap {
+      position: absolute; inset: 0; z-index: 20;
+      display: flex; justify-content: center; pointer-events: none;
+    }
+    .mi-soon-card {
+      position: sticky; top: 160px; align-self: flex-start; margin-top: 40px;
+      pointer-events: auto; background: var(--primary,#0A0F1E); border: 1px solid var(--gold,#F2C94C);
+      border-radius: 12px; padding: 32px 28px; max-width: 380px; width: 90%; text-align: center;
+      color: var(--white); box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    }
+    .mi-soon-card svg { width: 44px; height: 44px; display: block; margin: 0 auto 14px; }
+    .mi-soon-card h3 { margin: 0 0 8px; font-size: 1.2rem; font-weight: 700; color: var(--gold,#F2C94C); }
+    .mi-soon-card p { margin: 0; font-size: .92rem; color: rgba(255,255,255,.7); line-height: 1.5; }
+    .mi-soon-card a { color: var(--gold,#F2C94C); }
     .inv-disclaimer {
       display: flex;
       gap: 10px;
@@ -2360,7 +2380,7 @@
     .markets-v2-live { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--green); background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.2); border-radius: 20px; padding: 4px 10px; margin-bottom: 10px; }
     .markets-v2-live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse-dot 1.4s ease-in-out infinite; }
 
-    /* PPP MERCADOS oscuro terminal, consistente con Informes/Warren/Inversiones PPP */
+    /* PPP MERCADOS oscuro terminal, consistente con Reportes/Warren/Informes PPP */
     .section-mercados { background: var(--navy-1); position: relative; }
     .section-mercados .section-title { color: var(--white); }
     .section-mercados .section-sub   { color: rgba(255,255,255,.38); }
@@ -2892,7 +2912,7 @@
     // ââ Guest Mode: show login overlay on scroll or protected nav click âââââââââ
     function setupGuestMode() {
       // Sin bloqueo de pagina completa: el login solo se pide al entrar a
-      // contenido premium (Inversiones, Warren) via los gates propios de esas
+      // contenido premium (Informes, Warren) via los gates propios de esas
       // secciones/paneles. Aca solo dejamos un acceso discreto y voluntario.
       const navEl = document.getElementById('navUserArea');
       if (navEl) {
@@ -3183,25 +3203,25 @@
       <ul class="nav-links">
         <li>
           <span class="nav-link">
-            Informes &amp; Reportes
+            Reportes &amp; News
             <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 6l4 4 4-4"/></svg>
           </span>
           <div class="dropdown">
             <div class="dropdown-label">Contenido</div>
             <a href="#informes" class="dropdown-item" data-tab-target="informes">
               <span class="dropdown-icon">IN</span>
-              <span class="dropdown-item-text">Informes<small>Análisis profundos semanales</small></span>
+              <span class="dropdown-item-text">Reportes<small>Análisis profundos semanales</small></span>
             </a>
             <a href="#reportes" class="dropdown-item" data-tab-target="informes">
               <span class="dropdown-icon">IA</span>
-              <span class="dropdown-item-text">Reportes Diarios<small>Actualizados por agente IA</small></span>
+              <span class="dropdown-item-text">News Diarias<small>Actualizados por agente IA</small></span>
             </a>
           </div>
         </li>
         <li><a href="#mercados" class="nav-link" data-tab-target="mercados">Mercados</a></li>
         <li><a href="#calendario" class="nav-link" data-tab-target="calendario">Calendario</a></li>
         <li><a href="#university" class="nav-link" data-tab-target="university">University</a></li>
-        <li><a href="#inversiones" class="nav-link" data-tab-target="inversiones">Inversiones</a></li>
+        <li><a href="#inversiones" class="nav-link" data-tab-target="inversiones">Informes</a></li>
         <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
         <li><a href="#calculadora" class="nav-link" data-tab-target="calculadora">Finanzas Personales</a></li>
         <li>
@@ -3472,7 +3492,7 @@
         <h1 class="htx-h1">Tu mundo financiero, en un solo lugar.</h1>
         <p class="htx-deck">An&aacute;lisis institucional de las empresas que mueven el mercado, cotizaciones de Argentina y el mundo en tiempo real, y las herramientas para armar y seguir tu cartera &mdash; con un asesor de IA que la conoce.</p>
         <div class="htx-cta">
-          <a class="htx-btn--soft" href="#informes" data-tab-target="informes">Ver informes</a>
+          <a class="htx-btn--soft" href="#informes" data-tab-target="informes">Ver reportes</a>
           <a class="htx-ghost" href="#portfolio" data-tab-target="portfolio">Probar el portfolio</a>
         </div>
       </div>
@@ -3575,7 +3595,7 @@
             <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
           </a>
         </div>
-        <a class="htx-tile__link" href="#inversiones" data-tab-target="inversiones">Ver secci&oacute;n Inversiones &rarr;</a>
+        <a class="htx-tile__link" href="#inversiones" data-tab-target="inversiones">Ver secci&oacute;n Informes &rarr;</a>
       </div>
 
       <div class="htx-tile htx-tile--pf">
@@ -3692,7 +3712,7 @@
           </div>
           <div class="htx-feat__row">
             <span class="htx-feat__ic">&#8599;</span>
-            <span><strong>Inversiones</strong><span>Tesis completas, catalysts y comparables de cada activo que seguimos</span></span>
+            <span><strong>Informes</strong><span>Tesis completas, catalysts y comparables de cada activo que seguimos</span></span>
           </div>
           <div class="htx-feat__row">
             <span class="htx-feat__ic">&#9680;</span>
@@ -3876,21 +3896,21 @@
       
     <div class="container">
       <div class="section-header">
-        <span class="section-label">Análisis &amp; Reportes</span>
+        <span class="section-label">Reportes &amp; News</span>
         <h2 class="section-title">Inteligencia de Mercado</h2>
-        <p class="section-sub">Reportes diarios y papers de investigación. Análisis con foco en impacto real.</p>
+        <p class="section-sub">News diarias y papers de investigación. Análisis con foco en impacto real.</p>
       </div>
 
       <!-- ââ Sub-sección 1: Biblioteca de Informes ââ -->
       <div class="inf-sub-header">
-        <span class="inf-sub-title">Biblioteca de Informes</span>
+        <span class="inf-sub-title">Biblioteca de Reportes</span>
         <div style="display:flex;align-items:center;gap:16px;">
           <span class="inf-sub-meta">Resumen semanal económico y financiero</span>
           <div class="carousel-nav">
-            <button class="carousel-btn" id="papersRailPrev" aria-label="Informes anteriores">
+            <button class="carousel-btn" id="papersRailPrev" aria-label="Reportes anteriores">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
-            <button class="carousel-btn" id="papersRailNext" aria-label="Informes siguientes">
+            <button class="carousel-btn" id="papersRailNext" aria-label="Reportes siguientes">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
             </button>
           </div>
@@ -3904,7 +3924,7 @@
 
       <!-- ââ Sub-sección 2: Reportes Diarios ââ -->
       <div class="inf-sub-header" id="reportes">
-        <span class="inf-sub-title">Reportes Diarios</span>
+        <span class="inf-sub-title">News Diarias</span>
         <span class="inf-sub-meta" id="reportLastUpdate">Actualizado · 11:01 hs</span>
       </div>
       <div class="reports-grid">
@@ -4012,12 +4032,15 @@
 
 
   <!-- ââ INVERSIONES âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="section section-inversiones member-protected locked" id="inversiones" data-tab="inversiones">
+  <section class="section section-inversiones" id="inversiones" data-tab="inversiones">
     <div class="container">
-      
+
       <div class="section-header">
-        <h2 class="section-title">Análisis institucionales</h2>
+        <h2 class="section-title">Informes</h2>
       </div>
+
+      <div class="mi-soon-wrap">
+      <div class="mi-soon-blur">
 
       <div class="inv-disclaimer">
         <span style="color:#D97706;font-size:14px;flex-shrink:0;">&#9888;</span>
@@ -4612,6 +4635,18 @@
         </div>
 
       </div>
+
+      </div><!-- /mi-soon-blur -->
+
+      <div class="mi-soon-card-wrap">
+        <div class="mi-soon-card">
+          <svg><use href="#miMark"/></svg>
+          <h3>Próximamente</h3>
+          <p>Estamos terminando de armar la sección de Informes, con tesis completas, catalysts y comparables de cada activo que seguimos. Mientras tanto, mirá los <a href="#informes" data-tab-target="informes">Reportes</a> ya disponibles.</p>
+        </div>
+      </div>
+
+      </div><!-- /mi-soon-wrap -->
     </div>
   </section>
 
@@ -8093,11 +8128,11 @@
         </div>
         <div class="footer-col">
           <h4>Plataforma</h4>
-          <a href="#informes">Informes</a>
-          <a href="#reportes">Reportes Diarios</a>
+          <a href="#informes">Reportes</a>
+          <a href="#reportes">News Diarias</a>
           <a href="#mercados">Mercados</a>
           <a href="#university">University</a>
-          <a href="#inversiones">Inversiones</a>
+          <a href="#inversiones">Informes</a>
           <a href="#" onclick="toggleWarren();return false;">Asesor IA Warren</a>
         </div>
         <div class="footer-col">
@@ -14722,7 +14757,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
     var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'portfolio', 'calculadora', 'asesoria'];
     var TAB_TITLES = {
       inicio: 'Inicio', mercados: 'Mercados', calendario: 'Calendario Economico',
-      informes: 'Informes & Reportes', university: 'University', inversiones: 'Inversiones',
+      informes: 'Reportes & News', university: 'University', inversiones: 'Informes',
       portfolio: 'Portfolio', calculadora: 'Calculadora de Objetivos', asesoria: 'Asesoria'
     };
 
