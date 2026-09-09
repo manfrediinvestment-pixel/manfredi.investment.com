@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAP — SAP SE | Manfredi Investment Research</title>
+<link rel="icon" href="/assets/img/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/assets/img/favicon-48x48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+<link rel="canonical" href="https://manfredinvestment.com/informes/sap.html">
+<meta name="description" content="Informe institucional sobre SAP SE (ADR NYSE: SAP): el líder global de software empresarial ejecuta el supérciclo de migración a S/4HANA con crecimiento de nube del 24%, backlog de nube corriente de €22.900M (+26% cc) y una expansión de margen que llevó la utilidad operativa no-IFRS a €10.400M en 2025. Pero a ~26x utilidad no-IFRS forward, con crecimiento total de ingresos de un dígito alto, el precio ya capitaliza la historia. DCF, comparables, reversión, consenso y fair value.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Manfredi Investment">
+<meta property="og:locale" content="es_AR">
+<meta property="og:url" content="https://manfredinvestment.com/informes/sap.html">
+<meta property="og:title" content="SAP — SAP SE | Manfredi Investment Research">
+<meta property="og:description" content="SAP: el opuesto exacto de Oracle. Conversión de caja impecable (margen de FCF 22%, capex ~2% de los ingresos), balance con caja neta y recompra de €10.000M. Pero el blend de cuatro métodos ($205,76) queda por debajo del mercado ($215,11): a ~26x utilidad no-IFRS forward, con crecimiento total de ingresos de ~8%, el precio ya paga la expansión de margen y la conversión perfecta del backlog. Tesis, valuación y fair value.">
+<meta property="og:image" content="https://manfredinvestment.com/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SAP — SAP SE | Manfredi Investment Research">
+<meta name="twitter:description" content="SAP SE: negocio de calidad excepcional (net cash, FCF 22%, S/4HANA migration lock-in) a precio pleno. El DCF Base ($185,97) y los comparables ($160,09) quedan por debajo del mercado; reversión y consenso, por encima. Blend $205,76.">
+<meta name="twitter:image" content="https://manfredinvestment.com/assets/img/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-dark:#0b1f3a;
+    --navy:#0e2748;
+    --navy2:#15335c;
+    --blue:#2f5f9e;
+    --blue-light:#5f8fc7;
+    --blue-pale:#eaf1f9;
+    --line:#d7e0ea;
+    --text:#161a20;
+    --muted:#69707c;
+    --green:#1a7a54;
+    --red:#a8291f;
+    --serif:'Newsreader',serif;
+    --sans:'Inter',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#fff; color:var(--text); font-family:var(--sans); font-size:15.5px; line-height:1.7;}
+  .wrap{max-width:900px; margin:0 auto; padding:0 30px 90px;}
+
+  .brandbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:26px 30px 20px; max-width:900px; margin:0 auto; border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:38px; height:38px; border:1.5px solid var(--navy-dark); display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-weight:700; color:var(--navy-dark); font-size:16px;
+  }
+  .brand-name{font-family:var(--serif); font-weight:700; font-size:17px; color:var(--text); line-height:1.15;}
+  .brand-sub{font-family:var(--sans); font-size:10px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase;}
+  .brandbar .doctype{font-family:var(--mono); font-size:11px; color:var(--muted); text-align:right;}
+
+  .frontbox{border:1px solid var(--navy-dark); margin:34px 0 8px; padding:0;}
+  .frontbox-top{display:flex; justify-content:space-between; align-items:baseline; padding:22px 28px 14px; border-bottom:1px solid var(--line);}
+  .ticker-big{font-family:var(--serif); font-size:42px; font-weight:700; color:var(--navy-dark);}
+  .exch{font-family:var(--mono); font-size:12px; color:var(--muted); margin-left:10px;}
+  .rating{font-family:var(--mono); font-size:12px; font-weight:600; color:var(--blue); text-align:right; letter-spacing:.03em;}
+  .rating small{display:block; font-family:var(--mono); font-size:10.5px; color:var(--muted); font-weight:400; margin-top:3px; letter-spacing:normal;}
+  .frontbox-body{padding:20px 28px 26px;}
+  .company-line{color:var(--muted); font-size:13.5px; margin-bottom:16px;}
+  .thesis-block{font-family:var(--serif); font-size:17.5px; line-height:1.65; color:var(--text); font-style:italic;}
+
+  .statsrow{display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line);}
+  .statcell{padding:16px 20px; border-right:1px solid var(--line);}
+  .statcell:last-child{border-right:none;}
+  .statcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:6px;}
+  .statcell .v{font-family:var(--mono); font-size:16px; font-weight:600; color:var(--text);}
+  .pos{color:var(--green);} .neg{color:var(--red);}
+
+  .secnum{font-family:var(--mono); font-size:11px; color:var(--blue-light); letter-spacing:.1em; margin:50px 0 2px;}
+  h2{font-family:var(--serif); font-size:24px; font-weight:600; color:var(--navy2); margin:2px 0 18px; padding-bottom:10px; border-bottom:1.5px solid var(--navy-dark); text-wrap:balance;}
+  h3{font-family:var(--serif); font-size:17px; font-weight:600; color:var(--navy2); margin:30px 0 10px;}
+  p{margin:0 0 15px; max-width:68ch;}
+  strong{color:var(--text);}
+
+  .table-scroll{overflow-x:auto; margin:18px 0 22px;}
+  .table-scroll table{margin:0;}
+  table{width:100%; min-width:520px; border-collapse:collapse; font-size:13.5px;}
+  th{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); text-align:left; padding:8px 10px; border-bottom:1.5px solid var(--navy-dark); white-space:nowrap;}
+  td{padding:8px 10px; border-bottom:1px solid var(--line); font-family:var(--mono); color:var(--text); font-variant-numeric:tabular-nums;}
+  td.label{font-family:var(--sans); color:var(--text);}
+  tr.total td{font-weight:600; border-top:1px solid var(--navy-dark); border-bottom:none;}
+  .right-al{text-align:right;}
+
+  .chartbox{border:1px solid var(--line); padding:20px 22px 16px; margin:22px 0;}
+  .chartbox canvas{width:100% !important; display:block;}
+  .chartcap{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:14px; text-align:center;}
+
+  .pull{border-left:2px solid var(--navy-dark); padding-left:18px; margin:22px 0; color:var(--muted); font-size:13.5px; max-width:68ch;}
+
+  .footnote{font-family:var(--mono); font-size:11px; color:var(--muted); margin:-6px 0 18px; max-width:none;}
+
+  .watermark-block{
+    position:relative; margin:60px 0; padding:26px 30px; border:1px solid var(--line); overflow:hidden;
+  }
+  .watermark-block::before{
+    content:"SAP"; position:absolute; right:10px; top:-30px; font-family:var(--serif); font-weight:700;
+    font-size:110px; color:var(--blue-pale); z-index:0; line-height:1;
+  }
+  .watermark-block > *{position:relative; z-index:1;}
+
+  .toc{border:1px solid var(--line); padding:22px 26px; margin:30px 0;}
+  .toc-title{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px;}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:30px;}
+  .toc li{font-size:13px; margin-bottom:7px; break-inside:avoid;}
+  .toc a{color:var(--navy2); text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  .toc .toc-final a{font-weight:600;}
+
+  .disclosure{margin-top:70px; padding-top:22px; border-top:1px solid var(--navy-dark); font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.8; max-width:none;}
+
+  .fv-block{text-align:right;}
+  .fv-block .fv-label{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+  .fv-block .fv-value{font-family:var(--mono); font-size:22px; font-weight:600; color:var(--navy-dark); line-height:1.3;}
+  .fv-block .fv-gap{font-family:var(--mono); font-size:12.5px; font-weight:600;}
+  .fv-block .fv-gap.neg{color:var(--red);} .fv-block .fv-gap.pos{color:var(--green);}
+  .fv-block .fv-gap.neutral{color:var(--muted);}
+
+  .verdict-bar{display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; background:var(--blue-pale); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:14px 28px;}
+  .verdict-stance{font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--navy-dark);}
+  .verdict-stance strong{color:var(--navy-dark);}
+  .verdict-note{font-family:var(--sans); font-size:11.5px; color:var(--muted); max-width:56ch; line-height:1.5;}
+
+  .sens-table td, .sens-table th{text-align:center;}
+  .sens-table td.axis{font-family:var(--mono); font-weight:600; background:#fff; color:var(--text);}
+  .sens-table td.base-cell{outline:2px solid var(--navy-dark); outline-offset:-2px;}
+
+  .govrow{display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:1px solid var(--line); margin:20px 0;}
+  .govcell{padding:16px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .govcell:nth-child(3n){border-right:none;}
+  .govcell .k{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px;}
+  .govcell .v{font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text);}
+  .govcell .sub{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.4;}
+
+  a{color:var(--blue);}
+  :focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
+
+  @media (max-width:720px){
+    .statsrow{grid-template-columns:repeat(2,1fr);}
+    .frontbox-top{flex-direction:column; gap:10px;}
+    .rating{text-align:left;}
+    .toc ol{columns:1;}
+    .verdict-bar{flex-direction:column; align-items:flex-start;}
+    .govrow{grid-template-columns:1fr;}
+    .govcell{border-right:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <div class="brand">
+    <div class="brand-mark">MI</div>
+    <div>
+      <div class="brand-name">Manfredi Investment</div>
+      <div class="brand-sub">Research &amp; Markets</div>
+    </div>
+  </div>
+  <div class="doctype">Equity Research · Informe Institucional<br>Datos al Q2 y H1 2026 (semestre cerrado 30 jun 2026, publicado 22 jul 2026) · Precio al 4 sep 2026</div>
+</div>
+
+<div class="wrap">
+
+  <div class="frontbox">
+    <div class="frontbox-top">
+      <div><span class="ticker-big">SAP</span><span class="exch">NYSE (ADR) · SAP SE · Xetra: SAP</span></div>
+      <div class="fv-block">
+        <div class="fv-label">Fair value (blend propio)</div>
+        <div class="fv-value">$205.76</div>
+        <div class="fv-gap neg">vs. $215.11 mercado · &minus;4.4%</div>
+      </div>
+    </div>
+    <div class="verdict-bar">
+      <div class="verdict-stance">POSTURA DEL ANÁLISIS: <strong>NEUTRAL — NEGOCIO DE CALIDAD EXCEPCIONAL A PRECIO PLENO. SAP ES EL OPUESTO EXACTO DE ORACLE EN ESTA COBERTURA: CONVERSIÓN DE CAJA IMPECABLE (MARGEN DE FLUJO DE CAJA LIBRE DEL 22%, CAPEX DE APENAS ~2% DE LOS INGRESOS), BALANCE CON CAJA NETA, RECOMPRA DE €10.000 MILLONES EN CURSO Y UN SÚPERCICLO DE MIGRACIÓN A S/4HANA CON FECHA LÍMITE REGULATORIA (FIN DE SOPORTE DE ECC EN 2027/2030). PERO A ~26x UTILIDAD NO-IFRS FORWARD, CON CRECIMIENTO TOTAL DE INGRESOS DE ~8% (LA NUBE CRECE 24% PERO EL SOPORTE DE LICENCIAS SE RUNEA), EL PRECIO YA CAPITALIZA LA EXPANSIÓN DE MARGEN Y LA CONVERSIÓN COMPLETA DEL BACKLOG. EL DCF BASE ($185.97) Y LOS COMPARABLES ($160.09) QUEDAN 14%–26% POR DEBAJO DEL MERCADO; LA REVERSIÓN HISTÓRICA ($229.74) Y EL CONSENSO WALL STREET ($247) QUEDAN POR ENCIMA. EL BLEND DE CUATRO MÉTODOS ($205.76) QUEDA 4.4% POR DEBAJO DEL PRECIO. EL DCF INVERSO EXIGE UN CRECIMIENTO DE INGRESOS DE ~11,6% ANUAL DURANTE CINCO AÑOS PARA JUSTIFICAR $215 — ALCANZABLE SI TODO SALE BIEN, PERO POR ENCIMA DE LO QUE LA PROPIA GUÍA DE LA COMPAÑÍA IMPLICA</strong> — SAP es una de las mejores franquicias de software del mundo; a este precio, es una buena compañía comprada a valuación justa-a-exigente, no una ganga</div>
+      <div class="verdict-note">Este documento es análisis independiente con fines informativos y educativos. El autor no es un asesor financiero registrado (no CFA / no matriculado ante la CNV/SEC/BaFin) y este contenido no constituye una recomendación de compra, venta o mantenimiento para ningún lector en particular. Ver disclosure completo al pie.</div>
+    </div>
+    <div class="frontbox-body">
+      <div class="company-line">SAP S/4HANA (ERP: on-premise y Cloud) · RISE with SAP / GROW with SAP (migración y adopción de nube) · SAP Business Technology Platform (BTP), SAP HANA (base de datos in-memory), Datasphere / Databricks OEM · SuccessFactors (HCM) · SAP Ariba / Business Network (compras) · SAP Concur (viajes y gastos) · SAP Business AI / Joule (copiloto y agentes) · soporte de licencias on-premise (renta de mantenimiento en runoff) · servicios de consultoría</div>
+      <div class="thesis-block">
+        SAP llega a este informe como el contrapunto casi perfecto de Oracle. Donde Oracle es "barata sobre utilidad, cara sobre caja" y financia con deuda la infraestructura más intensiva en capital de su historia, SAP es "cara sobre caja, justa sobre utilidad": convierte cada euro de utilidad operativa en flujo de caja libre casi sin fricción —capex de apenas <strong>€739 millones en 2025, el 2,0% de los ingresos</strong>—, cerró el año fiscal 2025 con <strong>caja neta</strong>, y está devolviendo casi todo su flujo de caja libre vía dividendo (~€2.700 millones) más una recompra de <strong>€10.000 millones</strong> que corre hasta fin de 2027. El motor de crecimiento es genuino y con un reloj regulatorio a favor: SAP terminará el soporte mainstream de su ERP legado (SAP ECC / Business Suite 7) en 2027 —extensible con pago hasta 2030—, y eso obliga a decenas de miles de clientes a migrar a <strong>S/4HANA en la nube</strong> vía RISE y GROW. Esa ola llevó los ingresos de nube a <strong>€21.020 millones en 2025 (+23%, +26% a tipos constantes)</strong>, el backlog de nube corriente (CCB) a <strong>€22.929 millones al 30-jun-2026 (+26% a tipos constantes)</strong>, y la utilidad operativa no-IFRS a €10.420 millones (margen del 28,3%, +4,5 puntos en un año, tras el programa de reestructuración de 2024 que eliminó ~10.000 puestos). Y sin embargo: en enero de 2026, cuando SAP guió un crecimiento de CCB "que se desacelera levemente" para el año, la acción tuvo su <strong>peor día desde octubre de 2020 (&minus;15%)</strong>, y entre el máximo de mediados de 2025 (~$310 el ADR) y el mínimo de la primavera de 2026 ($144.97) llegó a perder cerca de la mitad de su valor —empujada por la disputa regulatoria UE–EE.UU., los aranceles de Trump que golpean la línea de licencias, y la duda de fondo sobre cuánto se puede desacelerar el backlog a medida que la base instalada más fácil de migrar se agota—. Al 4 de septiembre de 2026 el ADR cotiza a <strong>$215.11</strong>, recuperado ~48% desde el mínimo tras la reaceleración del CCB en el Q2. Este informe recorre el negocio completo —los 54 años desde R/1 hasta S/4HANA y la Business AI, la ola de adquisiciones de nube (SuccessFactors, Ariba, Concur, Qualtrics —vendida en 2023—, WalkMe), el modelo de renta de mantenimiento en runoff contra la nube en ascenso, el balance con caja neta, el gobierno de una <em>SE</em> alemana con cogestión de empleados al 50% y sin accionista de control, y los riesgos— antes de llegar, en la Sección 13, a cuatro métodos de valuación que esta vez <strong>no se contradicen tanto como en Oracle</strong>: el DCF Base ($185.97) y los comparables ($160.09) dicen que a ~26x utilidad forward y ~8% de crecimiento total el precio está adelantado; la reversión histórica ($229.74) y el consenso ($247) dicen que hay upside. El blend ($205.76) queda apenas por debajo del mercado. La conclusión honesta no es "vender": es que SAP es de las mejores franquicias de software del planeta, y que a $215.11 se está pagando por ella un precio que ya descuenta que la ejecución siga siendo tan buena como en 2025.
+      </div>
+    </div>
+    <div class="statsrow">
+      <div class="statcell"><div class="k">Ingresos FY2025</div><div class="v">€36.80B</div></div>
+      <div class="statcell"><div class="k">Ingresos de nube FY2025</div><div class="v pos">+23% / +26% cc</div></div>
+      <div class="statcell"><div class="k">Margen de FCF TTM</div><div class="v pos">~22.4%</div></div>
+      <div class="statcell"><div class="k">CCB (backlog de nube corriente)</div><div class="v">€22.9B</div></div>
+    </div>
+  </div>
+  <p class="footnote">Cifras fundamentales: SEC EDGAR XBRL (Form 20-F FY2025 y Form 6-K de los trimestres Q1 y Q2 2026, CIK 0001000184) y comunicados oficiales de SAP del 28-ene-2026 (Q4/FY2025), 22-abr-2026 (Q1 2026) y 22-jul-2026 (Q2/H1 2026). SAP reporta en <strong>euros bajo IFRS</strong>; su año fiscal es el año calendario (cierre 31 de diciembre). El fair value y el precio de mercado se expresan en <strong>dólares por ADR</strong> (NYSE: SAP), con 1 ADR = 1 acción ordinaria, y el tipo de cambio EUR/USD usado es 1,1633 (cierre del 4-sep-2026). Los múltiplos de utilidad se calculan sobre EPS no-IFRS salvo aclaración expresa. SAP publicará su Q3 2026 alrededor del 21–23 de octubre de 2026; este informe no incorpora ese resultado. Este documento es 100% analítico — no constituye una recomendación de compra, venta ni mantenimiento. Ver disclosure completo al pie.</p>
+
+  <div class="toc">
+    <div class="toc-title">Contenido</div>
+    <ol>
+      <li><a href="#s01">Resumen Ejecutivo</a></li>
+      <li><a href="#s02">Historia y Evolución</a></li>
+      <li><a href="#s03">Modelo de Negocio y Segmentos</a></li>
+      <li><a href="#s04">Desarrollos Recientes y Perspectiva</a></li>
+      <li><a href="#s05">Estados Financieros</a></li>
+      <li><a href="#s06">Deuda y Balance</a></li>
+      <li><a href="#s07">Flujo de Caja y Capital Allocation</a></li>
+      <li><a href="#s08">Comparables de Industria</a></li>
+      <li><a href="#s09">Gobierno Corporativo y Estructura Accionaria</a></li>
+      <li><a href="#s10">Registro de Riesgos</a></li>
+      <li><a href="#s11">Catalizadores</a></li>
+      <li><a href="#s12">Modelo Financiero Proyectado y Momentum de Estimados</a></li>
+      <li class="toc-final"><a href="#s13">Valuación: Cuatro Métodos y el Fair Value</a></li>
+      <li><a href="#s14">Limitaciones del Modelo</a></li>
+    </ol>
+  </div>
+
+  <!-- 01 -->
+  <p class="secnum" id="s01">01 — Resumen Ejecutivo</p>
+  <h2>El mejor negocio de software de Europa, ejecutando bien, comprado a valuación plena</h2>
+  <p>
+    SAP es la contracara de casi todo lo que hace difícil a Oracle en esta cobertura. En el año fiscal cerrado el 31 de
+    diciembre de 2025 facturó <strong>€36.800 millones (+8% reportado, +11% a tipos de cambio constantes)</strong>, con
+    ingresos de nube de <strong>€21.020 millones (+23%; +26% cc)</strong>, una utilidad operativa IFRS de €9.830 millones
+    (margen del 26,7%), una utilidad operativa <strong>no-IFRS de €10.420 millones (margen del 28,3%, +4,5 puntos
+    interanuales)</strong>, un EPS no-IFRS básico de €6.15 (+36%) y un flujo de caja libre de <strong>€8.240 millones
+    (+95%)</strong>. El capex del año fue de €739 millones —el <strong>2,0% de los ingresos</strong>—; SAP no construye
+    infraestructura, la alquila a los hiperescaladores. El backlog de nube corriente (CCB, la porción del backlog de nube
+    que se espera reconocer en los próximos 12 meses) cerró 2025 en <strong>€21.050 millones (+25% cc)</strong> y siguió
+    subiendo hasta <strong>€22.929 millones al 30-jun-2026 (+27% reportado, +26% cc)</strong>.
+  </p>
+  <p>
+    El reloj que hace única a esta historia es regulatorio-comercial: SAP terminará el <strong>soporte mainstream de su
+    ERP legado</strong> (SAP ECC / Business Suite 7) en 2027, extensible con pago hasta 2030. Eso obliga a una base
+    instalada de decenas de miles de clientes —el sistema donde se registran las transacciones críticas de buena parte de
+    las mayores empresas del mundo— a migrar a <strong>S/4HANA en la nube</strong> a través de las ofertas empaquetadas
+    RISE with SAP (clientes existentes) y GROW with SAP (clientes nuevos y mid-market). Es una ola de conversión de
+    ingresos con fecha de vencimiento, y es lo que sostiene el crecimiento de nube del ~24% y la re-valorización del
+    múltiplo de SAP entre 2023 y 2025.
+  </p>
+  <p>
+    A eso se suma un <strong>capital allocation de manual</strong>: dividendo anual de ~€2,25 por acción (~€2.700 millones,
+    yield ~1,2%), una recompra de <strong>€10.000 millones</strong> anunciada el 29-ene-2026 y en ejecución hasta fin de
+    2027 (primer tramo de ~€2.600 millones ya completado), y un balance que cerró 2025 con <strong>caja neta</strong>
+    (efectivo €8.220 millones contra deuda financiera de €6.150 millones). En conjunto, SAP devuelve alrededor del 90% de
+    su flujo de caja libre a los accionistas — lo contrario de Oracle, que congeló las recompras y anunció dilución para
+    financiar capex.
+  </p>
+  <p>
+    <strong>Y aun así, la acción castigó a los tenedores durante casi todo 2026.</strong> El 28 de enero de 2026, al
+    reportar el Q4/FY2025, SAP guió un crecimiento de CCB "que se desacelera levemente" en 2026 y una desaceleración del
+    crecimiento de ingresos de nube; el ADR tuvo su <strong>peor día desde octubre de 2020 (&minus;15%)</strong>. Entre el
+    máximo de mediados de 2025 (el ADR llegó a ~$310, y SAP fue brevemente la empresa cotizante más valiosa de Europa) y
+    el mínimo de la primavera de 2026 (<strong>$144.97</strong>), la acción perdió cerca de la mitad de su valor. Los
+    culpables: la disputa regulatoria UE–EE.UU. (SAP fue mencionada como posible objetivo de represalias), los aranceles
+    de la administración Trump que golpean directamente la línea —ya pequeña— de licencias, gobiernos y clientes en modo
+    "apagar incendios" por el contexto geopolítico, y la duda estructural de cuánto puede desacelerarse el backlog cuando
+    la parte más fácil de migrar de la base instalada ya migró. Tras la <strong>reaceleración del CCB en el Q2 2026</strong>
+    (a +26% cc, un cambio de tendencia), el ADR recuperó ~48% desde el mínimo, hasta <strong>$215.11 al 4-sep-2026</strong>.
+  </p>
+  <p>
+    La valuación de la Sección 13 refleja esa tensión sin resolverla a la fuerza. A $215.11 SAP cotiza a
+    <strong>~26x utilidad no-IFRS forward</strong> (consenso FY2026 de ~€7.00) — por encima de Microsoft (~25x), de Oracle
+    (19,7x), de Salesforce (17,7x) y de Workday (16,3x) en los informes equivalentes de este desk. Sobre <em>utilidad</em>,
+    SAP es el nombre <em>caro</em> del grupo, y por buenas razones: margen en expansión, caja neta, recompra grande, y la
+    menor ciclicidad de todo el panel gracias a la renta de mantenimiento. El DCF Base ($185.97) y los comparables
+    ($160.09) quedan 14%–26% por debajo del mercado; la reversión histórica ($229.74, aunque inflada por el régimen de
+    optimismo de 2024–2025) y el consenso de Wall Street ($247) quedan por encima. El promedio simple de los cuatro da
+    <strong>$205.76</strong>, un 4,4% por debajo del precio. El DCF inverso —qué tiene que creer el mercado— pide un
+    crecimiento de ingresos <em>totales</em> de ~11,6% anual sostenido cinco años; la propia guía de SAP para 2026 implica
+    ~+9% total. <strong>La postura es neutral</strong>: SAP es una de las mejores franquicias de software del mundo, y a
+    $215.11 se paga por ella un precio que ya descuenta que la ejecución de 2025 continúe sin tropiezos.
+  </p>
+
+  <!-- 02 -->
+  <p class="secnum" id="s02">02 — Historia y Evolución</p>
+  <h2>De cinco ingenieros que dejaron IBM en 1972 al sistema de registro de la economía global</h2>
+  <p>
+    <strong>SAP</strong> fue fundada en 1972 en Weinheim (Alemania) por cinco ex-ingenieros de IBM —<strong>Dietmar
+    Hopp</strong>, <strong>Hasso Plattner</strong>, <strong>Klaus Tschira</strong>, <strong>Claus Wellenreuther</strong> y
+    <strong>Hans-Werner Hector</strong>— bajo el nombre <em>Systemanalyse Programmentwicklung</em>. La idea: software
+    estándar de gestión empresarial que procesara los datos <em>en tiempo real</em>, en vez de por lotes nocturnos. En
+    1973 lanzaron <strong>SAP R/1</strong> (contabilidad financiera), en 1979 <strong>R/2</strong> (para mainframe,
+    integrando finanzas, materiales y producción), y en 1992 —el salto que definió a la compañía— <strong>R/3</strong>, la
+    arquitectura cliente-servidor que convirtió a SAP en el estándar global de los sistemas de planificación de recursos
+    empresariales (ERP). SAP salió a bolsa en Frankfurt en 1988 y listó ADRs en Nueva York en 1998.
+  </p>
+  <p>
+    A partir de 2007 SAP ejecutó su propia <strong>ola de adquisiciones</strong> para pasar de licencias on-premise a nube:
+    <strong>Business Objects</strong> (inteligencia de negocios, 2007), <strong>Sybase</strong> (base de datos y movilidad,
+    ~$5.800 millones, 2010), <strong>SuccessFactors</strong> (recursos humanos en la nube, ~$3.400 millones, 2012),
+    <strong>Ariba</strong> (compras y red de proveedores, ~$4.300 millones, 2012), <strong>Concur</strong> (viajes y
+    gastos, ~$8.300 millones, 2014, la mayor de su historia hasta entonces), <strong>Qualtrics</strong> (gestión de
+    experiencia, ~$8.000 millones, 2018 — sacada a bolsa en 2021 y <em>vendida</em> a Silver Lake en 2023 por un valor de
+    empresa de ~$12.500 millones) y, más recientemente, <strong>LeanIX</strong> (arquitectura empresarial, 2023) y
+    <strong>WalkMe</strong> (adopción digital, ~$1.500 millones, 2024). El costo de esa estrategia es un balance con
+    <strong>goodwill de ~€29.000 millones</strong>; el beneficio es una suite de nube que hoy cubre finanzas, cadena de
+    suministro, RR.HH., compras y gastos.
+  </p>
+  <div class="chartbox">
+    <canvas id="historyChart" height="320"></canvas>
+    <p class="chartcap">Ingresos anuales reportados, FY2018–FY2025, más la guía implícita para FY2026 (€ miles de millones; año fiscal = año calendario). El crecimiento reportado luce moderado (~8% anual) porque combina una nube que crece &gt;20% con una renta de soporte de licencias que se runea y un efecto de tipo de cambio adverso en 2025–2026 (euro fuerte). A tipos constantes el crecimiento es 3–4 puntos más alto. Fuente: SEC EDGAR XBRL / comunicados de resultados de SAP.</p>
+  </div>
+  <p>
+    El pivote tecnológico central es <strong>SAP HANA</strong>, la base de datos <em>in-memory</em> propia lanzada en
+    2010–2011, y sobre ella <strong>S/4HANA</strong> (2015), la reescritura de la suite ERP. La estrategia comercial que
+    monetiza esa reescritura llegó después: <strong>RISE with SAP</strong> (2021), un contrato único que empaqueta la
+    licencia de S/4HANA Cloud, la infraestructura (corriendo sobre AWS, Azure o Google Cloud), las herramientas de
+    migración y el soporte; y <strong>GROW with SAP</strong> (2023), la versión para clientes nuevos y mid-market. En 2023
+    SAP añadió <strong>Joule</strong>, su copiloto de IA generativa, y a lo largo de 2024–2026 fue integrando
+    <strong>SAP Business AI</strong> —casos de uso y agentes embebidos en los procesos— hasta el punto de que, según la
+    compañía, la IA estuvo presente en <strong>dos tercios del ingreso de órdenes de nube del Q4 2025</strong>.
+  </p>
+  <p>
+    En 2024 SAP ejecutó un <strong>programa de transformación</strong> que eliminó ~10.000 puestos (sobre todo por
+    recompra de antigüedad y jubilaciones anticipadas), con un cargo de reestructuración superior a €2.000 millones que
+    deprimió la utilidad operativa IFRS de ese año a €4.665 millones. El programa cumplió su objetivo: la plantilla se
+    reorientó hacia nube e IA, y en 2025 el margen operativo no-IFRS saltó 4,5 puntos. Para mediados de 2026 la plantilla
+    volvía a crecer (<strong>112.019 empleados al 30-jun-2026</strong>, desde ~109.000 un año antes). En la primera mitad
+    de 2025, con la narrativa de "el ganador europeo de la IA", SAP superó a Novo Nordisk y a LVMH y fue por unos meses la
+    <strong>empresa cotizante más valiosa de Europa</strong> (~€340.000 millones de capitalización).
+  </p>
+  <p class="pull">
+    El patrón de 54 años de SAP: identificar un sistema empresarial crítico —primero la contabilidad, luego el ERP
+    integrado, luego cada función adyacente vía adquisición—, volverlo el estándar, y cobrar una renta de soporte
+    recurrente de altísimo margen. La etapa actual <em>no</em> rompe ese patrón como sí lo hace la de Oracle: SAP está
+    haciendo lo de siempre —convertir su base instalada a un formato nuevo, esta vez la nube— con la ventaja añadida de
+    una fecha límite de soporte que empuja a los clientes, y sin tener que financiar infraestructura física. El riesgo no
+    es el modelo; es el precio al que el mercado lo compra.
+  </p>
+
+  <!-- 03 -->
+  <p class="secnum" id="s03">03 — Modelo de Negocio y Segmentos</p>
+  <h2>Una renta de mantenimiento que se apaga, una nube que la reemplaza a mayor valor de por vida, y márgenes que suben</h2>
+  <p>
+    SAP reporta sus ingresos en cuatro líneas. La dinámica que define el negocio es la <strong>sustitución</strong> de las
+    dos líneas viejas por la nueva:
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Línea de ingreso (FY2025)</th><th class="right-al">Ingresos aprox.</th><th class="right-al">% del total</th><th class="right-al">Dinámica</th></tr>
+    <tr><td class="label">Nube (Cloud) — de la cual ~88% es "Cloud ERP Suite"</td><td class="right-al">€21.02B</td><td class="right-al">~57%</td><td class="right-al">+23% (+26% cc)</td></tr>
+    <tr><td class="label">Soporte de licencias (mantenimiento on-premise)</td><td class="right-al">~€10.5B</td><td class="right-al">~29%</td><td class="right-al">En declive (~&minus;5%, acelerando)</td></tr>
+    <tr><td class="label">Licencias nuevas de software</td><td class="right-al">~€1.0B</td><td class="right-al">~3%</td><td class="right-al">Declive estructural (~&minus;25%)</td></tr>
+    <tr><td class="label">Servicios (consultoría)</td><td class="right-al">~€4.3B</td><td class="right-al">~12%</td><td class="right-al">Plano / bajo margen</td></tr>
+    <tr class="total"><td class="label">Total ingresos FY2025</td><td class="right-al">€36.80B</td><td class="right-al">100%</td><td class="right-al">+8% (+11% cc)</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL para el total de ingresos FY2025 (€36.800M) y para ingresos de nube (€21.020M). La desagregación de las líneas de software y servicios es una aproximación a partir de la métrica "cloud and software revenue" reportada por SAP (€32.540M en FY2025) y de la estructura histórica de reporte; las sumas pueden no cerrar exactamente por redondeo. SAP dejó de reportar segmentos operativos múltiples y hoy funciona esencialmente como un único segmento ("Applications, Technology &amp; Support").</p>
+  <p>
+    La <strong>renta de soporte de licencias</strong> (~€10.500 millones, con margen bruto que supera el 90%) es el
+    contrato anual de mantenimiento —típicamente ~22% del valor de licencia— que pagan los clientes que todavía corren SAP
+    ECC on-premise. Es una anualidad extraordinariamente estable, pero <strong>está en declive por diseño</strong>: cada
+    cliente que migra a S/4HANA Cloud deja de pagar mantenimiento y empieza a pagar una suscripción de nube. SAP guió que
+    ese declive se <em>acelera</em> en 2026 a medida que las migraciones ganan ritmo. El intercambio es económicamente
+    favorable —el valor de contrato de por vida de un cliente en RISE es varias veces el del mantenimiento que reemplaza,
+    porque incluye infraestructura, más módulos y la IA— pero es un cambio de perfil: de una renta ~plana y de máximo
+    margen a una suscripción que crece pero con margen bruto (75% no-IFRS en 2025) algo menor porque incluye el costo de
+    la infraestructura de los hiperescaladores.
+  </p>
+  <div class="chartbox">
+    <canvas id="cloudChart" height="240"></canvas>
+    <p class="chartcap">Ingresos de nube anuales, FY2022–FY2025, más la guía para FY2026 (~€26.000M a tipos constantes). En cinco años los ingresos de nube pasaron de €12.600M a más del doble; la "Cloud ERP Suite" (S/4HANA Cloud, RISE, GROW y las suites de SuccessFactors, Ariba y Concur) representa ~88% del total y crece más rápido (~27–32% cc). Fuente: comunicados de resultados de SAP (28-ene-2026, 22-jul-2026).</p>
+  </div>
+  <h3>El backlog de nube corriente (CCB): la métrica que mueve la acción</h3>
+  <p>
+    La métrica que SAP destaca y que el mercado usa como termómetro es el <strong>Current Cloud Backlog (CCB)</strong>: el
+    valor contratado de nube que la compañía espera reconocer como ingreso en los <strong>próximos 12 meses</strong>. Al
+    30-jun-2026 el CCB fue de <strong>€22.929 millones, +27% reportado y +26% a tipos constantes</strong>. Su primo, el
+    <strong>backlog total de nube</strong> (todo el valor contratado, sin límite de 12 meses), cerró 2025 en
+    <strong>€77.290 millones (+30% cc)</strong>. El CCB es una guía adelantada casi perfecta del crecimiento de ingresos de
+    nube del año siguiente; por eso, cuando en enero de 2026 SAP dijo que su crecimiento "se desaceleraría levemente", la
+    acción se desplomó, y cuando en el Q2 2026 reaceleró, rebotó.
+  </p>
+  <div class="chartbox">
+    <canvas id="backlogChart" height="240"></canvas>
+    <p class="chartcap">Backlog de nube corriente (CCB), nivel absoluto en € miles de millones, en cuatro fechas: cierre 2024, cierre 2025, Q1 2026 y Q2 2026. El crecimiento interanual a tipos constantes se desaceleró de ~+32% (cierre 2024) a ~+25% (cierre 2025 y Q1 2026) y volvió a ~+26% en el Q2 2026 — la "leve desaceleración" que provocó la caída del 15% en enero de 2026, y la reaceleración que impulsó el rebote posterior. Fuente: comunicados de resultados de SAP.</p>
+  </div>
+  <h3>Las métricas que el mercado mira</h3>
+  <p>
+    Cuatro números concentran la atención: (1) el <strong>crecimiento de ingresos de nube a tipos constantes</strong>
+    (+26% en 2025, guía de +23%–25% para 2026); (2) el <strong>crecimiento del CCB cc</strong> (la señal adelantada);
+    (3) el <strong>margen operativo no-IFRS</strong> (28,3% en 2025, con la compañía apuntando a superar el 30% en el
+    mediano plazo); y (4) el <strong>flujo de caja libre</strong> (€8.240 millones en 2025, guía de ~€10.000 millones para
+    2026). A diferencia de Oracle, ninguna de las cuatro tiene un asterisco de capex o de deuda.
+  </p>
+
+  <!-- 04 -->
+  <p class="secnum" id="s04">04 — Desarrollos Recientes y Perspectiva</p>
+  <h2>El susto de enero, la reaceleración de julio, y una guía de margen recortada por dos compras de IA</h2>
+  <h3>Q4 y FY2025 (publicado el 28-ene-2026): resultados buenos, guía que decepcionó</h3>
+  <p>
+    SAP cerró 2025 <strong>cumpliendo su guía de ingresos y superando la de utilidad y flujo de caja</strong>: ingresos
+    €36.800 millones (+11% cc), nube €21.020 millones (+26% cc), utilidad operativa no-IFRS €10.420 millones (+31% cc,
+    margen 28,3%), EPS no-IFRS €6.15 (+36%), flujo de caja libre €8.240 millones (+95%, tras el año 2024 golpeado por el
+    efectivo de reestructuración y la multa por FCPA). El backlog total de nube saltó 30% cc a un récord de €77.290
+    millones. Y sin embargo la acción cayó ~15% en el día: la guía 2026 preveía que el <strong>crecimiento del CCB a
+    tipos constantes se desaceleraría</strong> desde el ~25% de 2025, y el CFO Dominik Asam lo describió como una
+    desaceleración "mayor de lo anticipado". SAP anunció, junto con los resultados, una <strong>recompra de €10.000
+    millones</strong> a ejecutar entre febrero de 2026 y diciembre de 2027.
+  </p>
+  <h3>Q1 2026 (22-abr-2026): el backlog todavía flojo, el contexto geopolítico pesando</h3>
+  <p>
+    Ingresos €9.555 millones (+12% cc), nube €5.962 millones (+27% cc), CCB €21.932 millones (+25% cc), utilidad
+    operativa +17%. El CFO reiteró la desaceleración esperada del CCB y la vinculó en parte al conflicto en Medio Oriente
+    (algunos gobiernos y clientes "pasaron a apagar incendios") y a las tensiones comerciales EE.UU.–China y los aranceles,
+    que golpean directamente la línea —ya chica— de licencias nuevas. La acción tocó su mínimo del año en la primavera de
+    2026 (ADR $144.97).
+  </p>
+  <h3>Q2 y H1 2026 (publicado el 22-jul-2026): reaceleración del CCB, margen bajo presión por M&amp;A</h3>
+  <p>
+    El Q2 fue el punto de inflexión de la narrativa: <strong>CCB de €22.929 millones, +27% reportado y +26% a tipos
+    constantes</strong> — una reaceleración y un cambio de tendencia tras dos trimestres en que el backlog había ido por
+    detrás del ingreso de nube. Ingresos del trimestre €9.878 millones (+11% cc), nube €6.281 millones (+24% cc), utilidad
+    operativa no-IFRS €2.743 millones (+9% cc). El <strong>margen operativo no-IFRS del trimestre bajó 0,7 puntos a 27,8%</strong>,
+    por la dilución de las adquisiciones (Reltio, cerrada en el trimestre, restó ~€13 millones de utilidad IFRS) y la
+    inversión en Business AI. Para el H1: ingresos €19.432 millones, nube €12.244 millones, utilidad operativa no-IFRS
+    €5.609 millones (+16% cc, margen 28,9%), flujo de caja operativo €6.666 millones, flujo de caja libre €6.250 millones.
+  </p>
+  <p>
+    Junto con el Q2, SAP <strong>recortó levemente su guía de utilidad</strong>: el rango de utilidad operativa no-IFRS
+    2026 pasó de €11.900–12.300 millones a <strong>€11.800–12.200 millones (a tipos constantes)</strong>, para reflejar
+    la dilución —superior a €100 millones— de las adquisiciones de <strong>Dremio</strong> (lakehouse de datos / IA
+    agéntica, cerrada el 6-jul-2026) y <strong>Prior Labs</strong> (modelos fundacionales para datos tabulares, cerrada el
+    16-jul-2026). El resto de la guía 2026 quedó igual:
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Guía FY2026 (a tipos constantes salvo FCF)</th><th class="right-al">Rango</th><th class="right-al">vs. 2025</th></tr>
+    <tr><td class="label">Ingresos de nube</td><td class="right-al">€25.8B – €26.2B</td><td class="right-al pos">+23% a +25%</td></tr>
+    <tr><td class="label">Ingresos de nube y software</td><td class="right-al">€36.3B – €36.8B</td><td class="right-al pos">+12% a +13%</td></tr>
+    <tr><td class="label">Utilidad operativa no-IFRS</td><td class="right-al">€11.8B – €12.2B</td><td class="right-al pos">+13% a +17%</td></tr>
+    <tr><td class="label">Flujo de caja libre (a tipos actuales)</td><td class="right-al">~€10B</td><td class="right-al pos">+21% (2025: €8.24B)</td></tr>
+    <tr><td class="label">Tasa impositiva no-IFRS</td><td class="right-al">~29%</td><td class="right-al">(2025: 30,5%)</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: comunicado de resultados de SAP del 22-jul-2026 (Q2/H1 2026). El recorte de la guía de utilidad operativa (de €11,9–12,3B a €11,8–12,2B) es explícitamente por la dilución de Dremio y Prior Labs; SAP mantuvo la guía de ingresos de nube y de flujo de caja libre.</p>
+
+  <!-- 05 -->
+  <p class="secnum" id="s05">05 — Estados Financieros</p>
+  <h2>Los últimos dos trimestres y el año fiscal 2025 — utilidad y caja creciendo juntas, sin asteriscos</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica (€, IFRS salvo aclaración)</th><th class="right-al">Q1 FY26 (mar-26)</th><th class="right-al">Q2 FY26 (jun-26)</th><th class="right-al">FY2025 (12 meses)</th></tr>
+    <tr><td class="label">Ingresos totales</td><td class="right-al">€9.56B</td><td class="right-al">€9.88B</td><td class="right-al">€36.80B</td></tr>
+    <tr><td class="label">Var. interanual (cc)</td><td class="right-al pos">+12%</td><td class="right-al pos">+11%</td><td class="right-al pos">+11%</td></tr>
+    <tr><td class="label">Ingresos de nube</td><td class="right-al">€5.96B</td><td class="right-al">€6.28B</td><td class="right-al">€21.02B</td></tr>
+    <tr><td class="label">Var. nube interanual (cc)</td><td class="right-al pos">+27%</td><td class="right-al pos">+24%</td><td class="right-al pos">+26%</td></tr>
+    <tr><td class="label">Utilidad operativa (IFRS)</td><td class="right-al">€2.74B</td><td class="right-al">€2.64B</td><td class="right-al">€9.83B</td></tr>
+    <tr><td class="label">Utilidad operativa (no-IFRS)</td><td class="right-al">€2.87B</td><td class="right-al">€2.74B</td><td class="right-al">€10.42B</td></tr>
+    <tr><td class="label">Margen operativo (no-IFRS)</td><td class="right-al">30.0%</td><td class="right-al">27.8%</td><td class="right-al">28.3%</td></tr>
+    <tr><td class="label">EPS diluido (IFRS, básico)</td><td class="right-al">€1.66</td><td class="right-al">€1.89</td><td class="right-al">€6.28</td></tr>
+    <tr><td class="label">EPS (no-IFRS, básico)</td><td class="right-al">€1.72</td><td class="right-al">€1.59</td><td class="right-al">€6.15</td></tr>
+    <tr><td class="label">Flujo de caja operativo (H1 acum.)</td><td class="right-al" colspan="2" style="text-align:right;">€6.67B (H1 2026)</td><td class="right-al">€9.16B</td></tr>
+    <tr><td class="label">Capex</td><td class="right-al" colspan="2" style="text-align:right;">~€0.4B (H1 2026)</td><td class="right-al neg">€0.74B</td></tr>
+    <tr class="total"><td class="label">Flujo de caja libre (H1 acum. / año)</td><td class="right-al" colspan="2" style="text-align:right;">€6.25B (H1 2026)</td><td class="right-al pos">€8.24B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL companyfacts API (CIK 0001000184, Form 20-F FY2025) y comunicados de resultados de SAP del 22-abr-2026 y 22-jul-2026. SAP reporta flujo de caja operativo y capex de forma acumulada (YTD); las cifras de flujo de caja de la columna de trimestres son el acumulado del H1 2026 (semestre), no el trimestre aislado. La "utilidad operativa IFRS" es la métrica reportada por SAP; la línea estatutaria "profit from operating activities" del XBRL para FY2025 es €9.617M, y la diferencia (~€213M) es de clasificación de partidas de reestructuración. El EPS del Q1 2026 (IFRS €1.66) se obtiene restando el Q2 del semestre.</p>
+  <p>
+    La tabla no tiene la doble cara que sí tiene la de Oracle. Del lado <strong>IFRS, SAP luce sana</strong>: margen
+    operativo del 26,7%, utilidad neta atribuible a los accionistas de €7.161 millones en 2025, EPS creciendo a doble
+    dígito. El puente IFRS → no-IFRS es <strong>chico</strong>: la compensación en acciones fue de €1.695 millones en 2025
+    (~4,6% de los ingresos, muy por debajo del 15%–30% de una SaaS de hipercrecimiento), y el resto de los ajustes es
+    amortización de intangibles adquiridos (SuccessFactors, Ariba, Concur) y partidas de reestructuración. La brecha de
+    €0.13 entre EPS no-IFRS (€6.15) e IFRS (€6.28) en 2025 fue, de hecho, negativa —el IFRS quedó <em>arriba</em>— por
+    ganancias no operativas (revaluación de participaciones, principalmente la venta parcial de Sapient/Qualtrics y
+    ajustes de valor razonable). Ese ítem no operativo también explica por qué el EPS IFRS del Q2 2026 (€1.89) creció 30%
+    mientras el no-IFRS creció solo 6%.
+  </p>
+  <p>
+    Del lado del <strong>flujo de caja, el cuadro es igual de bueno</strong>: el flujo de caja operativo de 2025
+    (€9.160 millones) equivale al 24,9% de los ingresos, y como el capex es de apenas €739 millones, el flujo de caja
+    libre (€8.240 millones) es el 22,4% de los ingresos. No hay estacionalidad de prepagos que distorsione, no hay una
+    normalización de capex pendiente, no hay deuda neta que reste. El margen de flujo de caja libre de SAP y su margen
+    operativo no-IFRS convergen razonablemente —a diferencia de Oracle, donde divergen 80 puntos—.
+  </p>
+  <div class="chartbox">
+    <canvas id="marginChart" height="260"></canvas>
+    <p class="chartcap">Margen operativo no-IFRS vs. margen de flujo de caja libre, por año fiscal FY2022–FY2025. El margen operativo se inflexionó al alza con fuerza en FY2025 (+4,5 puntos) a medida que el programa de reestructuración de 2024 dio sus frutos; el margen de FCF se recuperó del pozo de FY2024 (deprimido por el efectivo de reestructuración y la multa de $220M por FCPA) a 22,4%. Las dos líneas suben — el espejo invertido del gráfico equivalente de Oracle, donde el margen de FCF se derrumbó a &minus;35%. Fuente: SEC EDGAR XBRL / comunicados de SAP.</p>
+  </div>
+
+  <!-- 06 -->
+  <p class="secnum" id="s06">06 — Deuda y Balance</p>
+  <h2>Caja neta, goodwill grande pero estable, y un balance que financia la recompra sin pedir prestado</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica (al 31 dic 2025, salvo aclaración)</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Efectivo y equivalentes</td><td class="right-al">€8.22B</td></tr>
+    <tr><td class="label">Deuda financiera total (bonos + préstamos)</td><td class="right-al">€6.15B</td></tr>
+    <tr><td class="label">— de la cual, porción corriente</td><td class="right-al">€1.60B</td></tr>
+    <tr class="total"><td class="label">Posición de caja neta (efectivo &minus; deuda financiera)</td><td class="right-al pos">+€2.07B</td></tr>
+    <tr><td class="label">Pasivos por arrendamiento (IFRS 16)</td><td class="right-al">€1.68B</td></tr>
+    <tr><td class="label">Efectivo al 30-jun-2026</td><td class="right-al">€10.51B</td></tr>
+    <tr><td class="label">Pasivos financieros totales al 30-jun-2026</td><td class="right-al">€10.51B</td></tr>
+    <tr><td class="label">Patrimonio neto (equity)</td><td class="right-al">€45.07B</td></tr>
+    <tr><td class="label">Goodwill</td><td class="right-al">€29.01B</td></tr>
+    <tr><td class="label">Activos totales</td><td class="right-al">€70.36B</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL (CashAndCashEquivalents €8.220M; Borrowings €6.150M —LongtermBorrowings €4.550M + porción corriente €1.600M—; Equity €45.073M; Goodwill €29.014M; Assets €70.362M), Form 20-F FY2025, más el Form 6-K del Q2 2026 para las cifras al 30-jun-2026. La "posición de caja neta" de este informe usa solo efectivo y equivalentes contra deuda financiera, sin netear inversiones financieras de corto plazo ni sumar pasivos por arrendamiento. Al 30-jun-2026 el efectivo subió a €10.510M pero SAP también emitió deuda (~€2.400M) para financiar el primer tramo de recompra y las adquisiciones; la posición pro forma tras el cierre de Dremio y Prior Labs (julio) es aproximadamente neutral.</p>
+  <p>
+    El balance de SAP es el <strong>opuesto polar</strong> del de Oracle en esta cobertura. Donde Oracle resta ~$98.000
+    millones de deuda neta para pasar de valor de empresa a valor por acción, en SAP esa conversión suma (o resta) una
+    cifra cercana a cero: el equity <strong>no está apalancado</strong>. Eso tiene una consecuencia directa en la Sección
+    13: el rango entre el DCF Bear ($124.51) y el DCF Bull ($264.99) es de solo <strong>2,1x</strong>, frente a las 6,4x
+    de Oracle — porque acá el equity no es un residuo chico sobre una base grande financiada con deuda, sino que absorbe
+    los cambios operativos entre escenarios de forma casi lineal.
+  </p>
+  <p>
+    El único ítem "grande" del balance es el <strong>goodwill de €29.000 millones</strong>, acumulado en dos décadas de
+    adquisiciones de nube. Es ~41% de los activos totales y ~64% del patrimonio neto. No genera flujo de caja de salida
+    (no se amortiza bajo IFRS, solo se testea por deterioro), y SAP no ha registrado deterioros materiales; pero es un
+    recordatorio de que buena parte del crecimiento de nube de la última década se <em>compró</em>, y de que una
+    adquisición fallida futura tendría un impacto contable visible. La recompra de €10.000 millones se financia con flujo
+    de caja libre —no con deuda nueva salvo puentes de corto plazo—, lo que la hace sostenible aun si el flujo de caja
+    libre creciera menos que lo guiado.
+  </p>
+
+  <!-- 07 -->
+  <p class="secnum" id="s07">07 — Flujo de Caja y Capital Allocation</p>
+  <h2>€8.240 millones de flujo de caja libre, ~90% devuelto: dividendo estable más una recompra de €10.000 millones</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">FY2024</th><th class="right-al">FY2025</th></tr>
+    <tr><td class="label">Flujo de caja operativo (OCF)</td><td class="right-al">€5.21B</td><td class="right-al">€9.16B</td></tr>
+    <tr><td class="label">Margen de OCF</td><td class="right-al">15.3%</td><td class="right-al">24.9%</td></tr>
+    <tr><td class="label">Capex (PP&amp;E + intangibles)</td><td class="right-al neg">€0.80B</td><td class="right-al neg">€0.74B</td></tr>
+    <tr><td class="label">Capex / Ingresos</td><td class="right-al">2.3%</td><td class="right-al">2.0%</td></tr>
+    <tr class="total"><td class="label">Flujo de caja libre (FCF)</td><td class="right-al pos">€4.11B</td><td class="right-al pos">€8.24B</td></tr>
+    <tr><td class="label">Margen de FCF sobre ingresos</td><td class="right-al">12.0%</td><td class="right-al">22.4%</td></tr>
+    <tr><td class="label">Dividendos pagados</td><td class="right-al neg">€2.57B</td><td class="right-al neg">€2.74B</td></tr>
+    <tr><td class="label">Recompras netas de acciones</td><td class="right-al">~nulas</td><td class="right-al neg">~€2.6B (primer tramo del programa de €10B)</td></tr>
+    <tr><td class="label">Acciones en circulación (var. interanual)</td><td class="right-al">~plana</td><td class="right-al pos">bajando (recompra &gt; dilución por SBC)</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: SEC EDGAR XBRL companyfacts API (CashFlowsFromUsedInOperatingActivities, PurchaseOfPropertyPlantAndEquipment..., DividendsRecognisedAsDistributionsToOwnersOfParent), Form 20-F. El año 2024 tuvo un OCF y un FCF deprimidos por ~€2.000M+ de pagos de reestructuración y por la multa de $220M por FCPA (South Africa, Indonesia) acordada en enero de 2024. El dividendo es anual (se paga en mayo tras la asamblea); ~€2,25 por acción con cargo a 2025, yield ~1,2% al precio actual. La recompra de €10.000M corre de febrero de 2026 a diciembre de 2027.</p>
+  <p>
+    El flujo de caja es, otra vez, la contracara de Oracle. El margen de OCF de SAP en 2025 (24,9%) <strong>no está
+    inflado por prepagos</strong> —SAP tiene algo de estacionalidad en los cobros diferidos, pero es estable de un año a
+    otro—, así que el DCF de la Sección 13 puede anclar el margen de OCF del Año 1 del caso Base directamente en el nivel
+    real reciente (<strong>25,0%</strong>, prácticamente el reportado de 2025 y el del TTM). El capex del Año 1 se fija en
+    <strong>2,0% de los ingresos</strong> —el nivel real de 2025—, y se lo deja subir muy levemente hacia 2,5% hacia el
+    Año 5 por la inversión incremental en centros de datos propios para cargas de IA; incluso así, SAP sigue siendo un
+    negocio esencialmente <em>asset-light</em>.
+  </p>
+  <p>
+    Sobre capital allocation: SAP <strong>sube el dividendo</strong> de forma modesta y consistente (política de payout de
+    ~40% de la utilidad IFRS), y <strong>reactivó la recompra a gran escala</strong> —€10.000 millones en dos años, sobre
+    una capitalización de ~$249.000 millones, es ~4% del capital—. Sumando dividendo (~€2.700 millones) y recompra
+    (~€5.000 millones al año en régimen), SAP devuelve del orden del <strong>90% de su flujo de caja libre</strong> a los
+    accionistas, y aun así el balance queda con caja neta. Es un perfil de asignación de capital de "compounder maduro":
+    poca reinversión de capital físico, crecimiento orgánico financiado con el P&amp;L, y el excedente devuelto.
+  </p>
+  <div class="chartbox">
+    <canvas id="capexChart" height="260"></canvas>
+    <p class="chartcap">Flujo de caja operativo vs. capex, por año fiscal FY2022–FY2025 (€ miles de millones). El capex de SAP es una línea casi plana en ~€0,8B —el 2% de los ingresos— mientras el OCF creció de €5,6B a €9,2B. La brecha entre ambas líneas <em>es</em> el flujo de caja libre, y se ensancha a favor del accionista. Comparar con el gráfico equivalente de Oracle, donde el capex superó al OCF y lo duplicó. Fuente: SEC EDGAR XBRL.</p>
+  </div>
+
+  <!-- 08 -->
+  <p class="secnum" id="s08">08 — Comparables de Industria</p>
+  <h2>SAP frente a cuatro pares de software empresarial — el más caro del panel sobre utilidad, y con razones para serlo</h2>
+  <p>
+    SAP compite en aplicaciones empresariales con un puñado de nombres de gran capitalización, todos cubiertos por este
+    desk. Elegimos cuatro comparables: <strong>Microsoft</strong> (MSFT — Dynamics 365 en ERP/CRM, más la plataforma
+    Azure; el estándar de "software + nube a escala"), <strong>Oracle</strong> (ORCL — el rival histórico en ERP y bases
+    de datos, hoy en su apuesta de infraestructura de IA), <strong>Salesforce</strong> (CRM — aplicaciones SaaS de
+    front-office, el competidor directo en CRM y adyacencias) y <strong>Workday</strong> (WDAY — HCM y finanzas en la
+    nube, competidor directo de SuccessFactors y de S/4HANA en mid-market). Es un panel razonablemente homogéneo — todos
+    venden suites de software crítico con renta recurrente.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Ticker</th><th class="right-al">P/E Forward</th><th class="right-al">Crec. ingresos</th><th class="right-al">Margen FCF</th><th class="right-al">Market cap</th><th class="right-al">Balance</th></tr>
+    <tr class="total"><td class="label">SAP (SAP SE)</td><td class="right-al">~26.4x</td><td class="right-al">+8% (nube +24%)</td><td class="right-al">~22%</td><td class="right-al">$249B</td><td class="right-al">Caja neta</td></tr>
+    <tr><td class="label">MSFT (Microsoft)</td><td class="right-al">~25.0x</td><td class="right-al">~+15%</td><td class="right-al">~25%</td><td class="right-al">$3.71T</td><td class="right-al">Caja neta</td></tr>
+    <tr><td class="label">ORCL (Oracle)</td><td class="right-al">19.7x</td><td class="right-al">+17% FY26</td><td class="right-al neg">&minus;35%</td><td class="right-al">$447B</td><td class="right-al neg">Deuda neta ~$98B</td></tr>
+    <tr><td class="label">CRM (Salesforce)</td><td class="right-al">17.7x</td><td class="right-al">~+9%</td><td class="right-al">~30%</td><td class="right-al">$247B</td><td class="right-al">Caja neta</td></tr>
+    <tr><td class="label">WDAY (Workday)</td><td class="right-al">16.3x</td><td class="right-al">~+13%</td><td class="right-al">~25%</td><td class="right-al">$52B</td><td class="right-al">Caja neta</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: stockanalysis.com, cierre del 4-sep-2026, para P/E forward de SAP (~26,4x sobre consenso no-IFRS FY2026 de ~€7.00, convertido a USD por ADR), de CRM (17,68x) y de WDAY (16,26x). El P/E forward de ORCL (19,7x) y de MSFT (~25x) proviene de los informes equivalentes de este desk. Crecimiento de ingresos: FY2025 real / guía FY2026 para SAP; consenso aproximado a un año para los peers. Margen de FCF: TTM. Los múltiplos de los peers distintos de CRM y WDAY son <strong>aproximaciones de mercado referenciales, no verificadas en tiempo real</strong>.</p>
+  <div class="chartbox">
+    <canvas id="compsChart" height="220"></canvas>
+    <p class="chartcap">P/E forward comparado. SAP cotiza al múltiplo forward <em>más alto</em> del panel — por encima de Microsoft, y muy por encima de Oracle, Salesforce y Workday. Sobre utilidad, SAP es el nombre "caro" del grupo. La tabla también muestra por qué: es el único junto con Microsoft y Workday con margen de FCF de doble dígito alto y balance de caja neta, y el que tiene menor ciclicidad gracias a la renta de mantenimiento.</p>
+  </div>
+  <h3>Microsoft (MSFT) — el estándar de comparación, a otra escala</h3>
+  <p>
+    Microsoft cotiza a ~25x forward y es el punto de referencia de "software + nube a escala hecho bien". La comparación
+    relevante: SAP cotiza con una <em>leve prima</em> sobre Microsoft pese a crecer la mitad en ingresos totales (~8% vs
+    ~15%). Lo que el mercado le paga a SAP por encima de esa diferencia de crecimiento es la <strong>visibilidad</strong>
+    de la migración forzada a S/4HANA y la expansión de margen que todavía tiene por delante.
+  </p>
+  <h3>Oracle (ORCL) — el rival histórico, hoy la contracara del flujo de caja</h3>
+  <p>
+    Oracle cotiza a 19,7x forward — 7 puntos de P/E por debajo de SAP. En el informe de este desk sobre Oracle, la
+    conclusión fue "barata sobre utilidad, cara sobre caja": flujo de caja libre de &minus;35% de los ingresos, deuda neta
+    de ~$98.000 millones, capex del 82% de los ingresos. SAP es la imagen especular: <strong>cara sobre utilidad, sana
+    sobre caja</strong>. El mercado paga una prima de ~7 puntos de P/E por un balance que se autofinancia y por no tener
+    que adivinar cuándo se normaliza el capex.
+  </p>
+  <h3>Salesforce (CRM) y Workday (WDAY) — las SaaS puras, re-rateadas a la baja</h3>
+  <p>
+    Salesforce (17,7x) y Workday (16,3x) son el ancla de "cuánto vale hoy una franquicia de aplicaciones SaaS madura y
+    generadora de caja": ~16–18x utilidad forward. Ambas se de-ratearon con fuerza en 2025–2026 a medida que su
+    crecimiento se moderó a un dígito alto y el mercado dejó de pagar múltiplos de hipercrecimiento por SaaS. SAP crece a
+    un ritmo total parecido (~8%) pero cotiza 9–10 puntos de P/E por encima — la diferencia es el mix (la nube de SAP crece
+    24%, el resto se runea) y, sobre todo, la expansión de margen que SAP todavía tiene "en el tanque" y que CRM y WDAY
+    ya realizaron.
+  </p>
+  <p class="pull">
+    El patrón del panel: sobre utilidad no-IFRS forward, SAP (~26x) es el <em>más caro</em> — por encima de Microsoft, y
+    muy por encima de Oracle, Salesforce y Workday. Aplicar el múltiplo <em>promedio</em> del panel (19,7x) a la utilidad
+    de SAP —lo que hace el Método 2 de la Sección 13— produce un número muy por debajo del mercado, no porque el método
+    sea ciego a algo (como pasaba con el capex de Oracle) sino porque SAP <em>genuinamente</em> cotiza con prima, y la
+    pregunta de la valuación es si esa prima está justificada.
+  </p>
+
+  <!-- 09 -->
+  <p class="secnum" id="s09">09 — Gobierno Corporativo y Estructura Accionaria</p>
+  <h2>Una <em>SE</em> alemana sin accionista de control, con cogestión de empleados al 50% y un fundador que ya soltó la presidencia</h2>
+  <p>
+    SAP es una <strong>Societas Europaea</strong> (SE) con domicilio en Alemania y estructura de <strong>dos órganos</strong>:
+    un <em>Vorstand</em> (Directorio Ejecutivo, que gestiona) y un <em>Aufsichtsrat</em> (Consejo de Supervisión, que
+    nombra y controla al Directorio). El Consejo de Supervisión tiene <strong>18 miembros: 9 representantes de los
+    accionistas y 9 representantes de los empleados europeos del grupo</strong> — cogestión al 50%, una diferencia
+    estructural con cualquier compañía estadounidense de esta cobertura: las decisiones de mayor consecuencia (fusiones,
+    reestructuraciones grandes, contratos de los ejecutivos) requieren pasar por un órgano donde la mitad de los votos son
+    de los trabajadores.
+  </p>
+  <div class="govrow">
+    <div class="govcell"><div class="k">CEO (Directorio Ejecutivo)</div><div class="v">Christian Klein</div><div class="sub">CEO único desde abr-2020 (fue el CEO más joven del DAX). Contrato extendido en may-2025. Compensación 2025: €16,24M (~90% variable / ligada a la acción; 2024: ~€19M, entonces el ejecutivo mejor pago del DAX).</div></div>
+    <div class="govcell"><div class="k">CFO</div><div class="v">Dominik Asam</div><div class="sub">Desde mar-2023, procedente de Airbus (antes Infineon). Contrato extendido en may-2025. Voz pública del mensaje de márgenes y de la desaceleración del backlog.</div></div>
+    <div class="govcell"><div class="k">Presidente del Consejo de Supervisión</div><div class="v">Punit Renjen</div><div class="sub">Ex-CEO global de Deloitte. Asumió en may-2024 como sucesor de Hasso Plattner. Presidencia independiente del fundador por primera vez en la historia de SAP.</div></div>
+    <div class="govcell"><div class="k">Fundador / mayor accionista individual</div><div class="v">Hasso Plattner</div><div class="sub">Cofundador (1972), presidente del Consejo 2003–2024. Tenencia ~6,2% (≈3,0% directa + ≈3,2% vía la Hasso Plattner Foundation). Ya sin cargo ejecutivo ni de presidencia.</div></div>
+    <div class="govcell"><div class="k">Otros bloques relevantes</div><div class="v">Hopp / BlackRock</div><div class="sub">Dietmar Hopp y su fundación ~5,1–5,4% (el otro cofundador). BlackRock ~6,4%, Vanguard ~3,6%. Ningún accionista supera el ~6,5%.</div></div>
+    <div class="govcell"><div class="k">Free float</div><div class="v">84.0%</div><div class="sub">Al 31-dic-2025 (definición de la Bolsa de Frankfurt, excluye autocartera). ~1.158M de acciones en circulación (1.229M emitidas menos autocartera). Sin acciones de voto múltiple.</div></div>
+  </div>
+  <p class="footnote">Fuentes: SAP Integrated Report 2025 y sección de "Shareholder Structure" de SAP Investor Relations; reportes de compensación de SAP y cobertura de MarketScreener y Bloomberg sobre la remuneración del CEO; comunicados de SAP y cobertura de prensa sobre la sucesión en la presidencia del Consejo (Renjen por Plattner, mayo de 2024); agregadores de tenencias para BlackRock, Vanguard y las participaciones de los fundadores. Los porcentajes de tenencia varían levemente según la fecha de corte de cada 13-F / notificación de voz.</p>
+  <p>
+    Dos puntos de gobierno merecen atención, y ambos son <strong>favorables</strong> respecto de Oracle. El primero es la
+    <strong>ausencia de un accionista de control</strong>: ningún tenedor supera el ~6,5%, el free float es del 84%, y ni
+    los fundadores ni un bloque institucional pueden imponer una estrategia contra el resto. Combinado con la
+    presidencia independiente de Renjen desde 2024 y la cogestión de empleados, SAP tiene contrapesos reales — lo opuesto
+    al 40,6% y la presidencia ejecutiva de Larry Ellison en Oracle. El segundo es la <strong>compensación del CEO</strong>:
+    €16,24 millones en 2025 es una cifra alta para Europa (Klein fue el ejecutivo mejor pago del DAX en 2024 con ~€19
+    millones), pero está ~90% ligada a métricas de desempeño y al precio de la acción, y pasa por un Consejo con votos de
+    empleados. No hay concesiones de opciones de nueve cifras como las que Oracle otorgó a sus co-CEOs entrantes.
+  </p>
+  <p>
+    El antecedente que sí hay que descontar es de <strong>compliance</strong>: en enero de 2024 SAP acordó pagar
+    <strong>~$220 millones</strong> al Departamento de Justicia y a la SEC de Estados Unidos para cerrar investigaciones
+    por esquemas de soborno a funcionarios en Sudáfrica e Indonesia (violaciones de la Foreign Corrupt Practices Act),
+    sobre hechos de 2014–2022. SAP reforzó sus controles y no ha tenido incidentes materiales posteriores, pero es un
+    recordatorio de que su modelo de ventas —contratos grandes con gobiernos y grandes empresas en decenas de
+    jurisdicciones— tiene un riesgo de corrupción inherente.
+  </p>
+
+  <!-- 10 -->
+  <p class="secnum" id="s10">10 — Registro de Riesgos</p>
+  <h2>Qué podría cambiar esta lectura</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Riesgo</th><th>Descripción</th><th class="right-al">Severidad</th></tr>
+    <tr><td class="label">Valuación: el precio ya descuenta ejecución perfecta</td><td class="label">A ~26x utilidad no-IFRS forward con ~8% de crecimiento total de ingresos, SAP cotiza con la prima más alta del panel de comparables. El DCF Base ($185.97) y los comparables ($160.09) quedan 14%–26% por debajo del mercado, y el DCF inverso exige ~11,6% de crecimiento anual de ingresos totales durante cinco años — por encima del ~9% que implica la propia guía 2026. Cualquier trimestre que confirme la desaceleración del backlog, o que decepcione en margen, comprime el múltiplo (ya pasó: &minus;15% en un día en enero de 2026).</td><td class="right-al">Alta</td></tr>
+    <tr><td class="label">Desaceleración estructural del backlog de nube</td><td class="label">El crecimiento del CCB a tipos constantes bajó de ~+32% (cierre 2024) a ~+25% (2025). La preocupación de fondo: a medida que migra la parte más grande y más fácil de convertir de la base instalada de ECC, el crecimiento incremental depende de clientes más chicos, más lentos o más reticentes. La reaceleración del Q2 2026 (+26% cc) alivió el temor pero no lo elimina — la fecha límite de soporte de 2027/2030 ayuda, pero también significa que buena parte de la conversión "obligada" ocurre en una ventana finita.</td><td class="right-al">Alta</td></tr>
+    <tr><td class="label">Aranceles, disputa regulatoria UE–EE.UU. y gasto de TI de clientes</td><td class="label">La administración Trump mencionó a SAP como posible objetivo de represalias en la disputa por la regulación tecnológica europea. Los aranceles golpean directamente la línea —ya pequeña— de licencias nuevas y, de forma indirecta, el apetito de inversión de los grandes clientes industriales de SAP. El CFO citó gobiernos y clientes "en modo apagar incendios" por el contexto geopolítico como causa de la desaceleración del backlog en el Q1 2026.</td><td class="right-al">Media-Alta</td></tr>
+    <tr><td class="label">La IA como sustituto, no como venta incremental</td><td class="label">SAP vende Business AI como un <em>uplift</em> de precio sobre los contratos de nube. El riesgo opuesto: que los clientes prioricen proyectos de IA generativa propios (o de terceros) por encima de la migración a S/4HANA, retrasando la conversión del backlog; o que la IA agéntica reduzca a futuro el número de asientos (usuarios nombrados) que un cliente necesita, erosionando la base de facturación por usuario.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Tipo de cambio (euro fuerte)</td><td class="label">SAP reporta en euros y factura ~55% en dólares y otras monedas. El fortalecimiento del euro en 2025–2026 (EUR/USD ~1,16) recortó 3–4 puntos del crecimiento reportado y comprime la utilidad reportada. Para el tenedor del ADR el efecto es mixto: el euro fuerte sube el valor en dólares de las acciones, pero baja el crecimiento reportado que mira el mercado.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Ejecución de la expansión de margen</td><td class="label">La tesis alcista de SAP asume que el margen operativo no-IFRS pasa del 28,3% (2025) a &gt;30% en el mediano plazo, apalancando la escala de la nube y el runoff del negocio de servicios de bajo margen. El Q2 2026 mostró el margen <em>bajando</em> 0,7 puntos por dilución de M&amp;A e inversión en IA. Si la expansión de margen se estanca en ~28%, buena parte del DCF Bull deja de tener sentido.</td><td class="right-al">Media</td></tr>
+    <tr><td class="label">Competencia en el mid-market y en front-office</td><td class="label">En HCM y finanzas de mid-market, Workday compite de frente con SuccessFactors y con GROW; en CRM y datos, Salesforce y Microsoft Dynamics; en la capa de datos/analytics, Databricks y Snowflake. SAP defiende su núcleo de ERP (donde el switching cost es enorme) pero cede terreno en las adyacencias que compró para crecer.</td><td class="right-al">Media-Baja</td></tr>
+    <tr><td class="label">Goodwill y riesgo de M&amp;A</td><td class="label">€29.000M de goodwill (~64% del equity) de dos décadas de adquisiciones. Sin deterioros materiales hasta la fecha, pero una compra grande fallida —o un deterioro de una unidad adquirida (Qualtrics ya fue vendida con pérdida de valor relativo)— tendría impacto contable visible. Las compras recientes (WalkMe, Dremio, Prior Labs) son chicas y de tuck-in; el riesgo sería un cambio a M&amp;A transformacional.</td><td class="right-al">Baja</td></tr>
+  </table></div>
+
+  <!-- 11 -->
+  <p class="secnum" id="s11">11 — Catalizadores</p>
+  <h2>Agenda de eventos relevantes</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Fecha</th><th>Evento</th></tr>
+    <tr><td class="label">1972 / 1992</td><td class="label">Fundación en Weinheim por cinco ex-ingenieros de IBM. Lanzamiento de SAP R/3 (cliente-servidor), que vuelve a SAP el estándar global de ERP.</td></tr>
+    <tr><td class="label">1988 / 1998</td><td class="label">IPO en Frankfurt. Listado de ADRs en la Bolsa de Nueva York.</td></tr>
+    <tr><td class="label">2010–2018</td><td class="label">Ola de adquisiciones de nube: Sybase, SuccessFactors, Ariba, Concur ($8,3B), Qualtrics ($8B). Lanzamiento de SAP HANA (2010–11) y de S/4HANA (2015).</td></tr>
+    <tr><td class="label">2021</td><td class="label">Lanzamiento de RISE with SAP. Christian Klein, CEO único desde 2020, consolida la estrategia "cloud-first". Qualtrics sale a bolsa.</td></tr>
+    <tr><td class="label">Ene 2024</td><td class="label">Acuerdo de ~$220M con el DoJ / SEC de EE.UU. por casos de FCPA (Sudáfrica, Indonesia). Anuncio del programa de transformación (~10.000 puestos).</td></tr>
+    <tr><td class="label">May 2024</td><td class="label">Punit Renjen sucede a Hasso Plattner como presidente del Consejo de Supervisión — primera presidencia independiente del fundador.</td></tr>
+    <tr><td class="label">1H 2025</td><td class="label">SAP supera a Novo Nordisk y LVMH y es brevemente la empresa cotizante más valiosa de Europa (~€340.000M). El ADR toca ~$310.</td></tr>
+    <tr><td class="label">28 Ene 2026</td><td class="label">Reporte Q4/FY2025: ingresos €36.800M (+11% cc), nube +26% cc, utilidad operativa no-IFRS €10.420M, backlog total de nube €77.290M. Guía 2026 de CCB "que se desacelera levemente" → la acción cae ~15% en el día (peor sesión desde oct-2020). Se anuncia recompra de €10.000M.</td></tr>
+    <tr><td class="label">1H 2026</td><td class="label">El ADR toca su mínimo de 52 semanas ($144.97) por la disputa arancelaria UE–EE.UU., el contexto geopolítico y la duda sobre el backlog.</td></tr>
+    <tr><td class="label">22 Abr 2026</td><td class="label">Reporte Q1 2026: nube +27% cc, CCB €21.932M (+25% cc). Primer tramo de recompra (~€2.600M) en marcha.</td></tr>
+    <tr><td class="label">Jul 2026</td><td class="label">Cierre de las adquisiciones de Dremio y Prior Labs (IA agéntica / modelos de datos tabulares). Guía de utilidad 2026 recortada ~€100M por su dilución.</td></tr>
+    <tr><td class="label">22 Jul 2026</td><td class="label">Reporte Q2/H1 2026: CCB €22.929M, <strong>+26% cc — reaceleración</strong> y cambio de tendencia. El ADR sube desde los mínimos.</td></tr>
+    <tr><td class="label">~21–23 Oct 2026 (estimado)</td><td class="label">Reporte Q3 2026 — confirmación (o no) de que la reaceleración del backlog se sostiene, y lectura del margen tras la dilución de M&amp;A.</td></tr>
+    <tr><td class="label">2027 / 2030</td><td class="label">Fin del soporte mainstream de SAP ECC (2027), extensible con pago hasta 2030 — la fecha límite que fuerza la migración a S/4HANA y sostiene el crecimiento de nube.</td></tr>
+    <tr><td class="label">2026–2027</td><td class="label">Ejecución de la recompra de €10.000M. Cualquier movimiento en la disputa arancelaria UE–EE.UU. Evolución del margen operativo no-IFRS hacia el objetivo de &gt;30%.</td></tr>
+  </table></div>
+
+  <!-- 12 -->
+  <p class="secnum" id="s12">12 — Modelo Financiero Proyectado y Momentum de Estimados</p>
+  <h2>Un consenso comprador cuyo precio objetivo ($247) implica upside, pero cuyas estimaciones se revisaron a la baja durante 2026</h2>
+  <p>
+    El consenso de analistas sobre el ADR (stockanalysis.com, 16 analistas al 4-sep-2026) proyecta <strong>ingresos
+    FY2026 de ~€40.000 millones (+9% reportado)</strong> y un <strong>EPS no-IFRS FY2026 de ~€7.00</strong> (+14% sobre
+    €6.15), en línea con la guía propia de SAP. La cobertura europea más amplia (~30–40 analistas sobre la acción de
+    Xetra) tiene precios objetivo equivalentes en un rango de ~$242–$260 por ADR. Para FY2027 en adelante no hay consenso
+    público gratuito detallado; para esos años este informe remite explícitamente a los supuestos del DCF de la Sección 13
+    en lugar de fabricar una proyección línea por línea. La guía de mediano plazo de la compañía —crecimiento de nube
+    sostenido de doble dígito medio-alto y margen operativo no-IFRS por encima del 30%— es la referencia alcista, pero es
+    guía, no consenso.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">FY2025 (real)</th><th class="right-al">FY2026 (guía propia / consenso)</th></tr>
+    <tr><td class="label">Ingresos totales</td><td class="right-al">€36.80B</td><td class="right-al">~€40B (guía, +9% reportado / +12% cc)</td></tr>
+    <tr><td class="label">Ingresos de nube</td><td class="right-al">€21.02B (+26% cc)</td><td class="right-al">€25.8–26.2B (guía, +23–25% cc)</td></tr>
+    <tr><td class="label">CCB (fin de período)</td><td class="right-al">€21.05B (+25% cc)</td><td class="right-al">— (SAP no guía CCB puntual; "leve desaceleración" cc)</td></tr>
+    <tr><td class="label">Utilidad operativa no-IFRS</td><td class="right-al">€10.42B (margen 28,3%)</td><td class="right-al">€11.8–12.2B (guía, +13–17% cc)</td></tr>
+    <tr><td class="label">EPS no-IFRS (básico)</td><td class="right-al">€6.15 (+36%)</td><td class="right-al">~€7.00 (consenso, +14%)</td></tr>
+    <tr><td class="label">Flujo de caja libre</td><td class="right-al pos">€8.24B</td><td class="right-al pos">~€10B (guía, a tipos actuales)</td></tr>
+  </table></div>
+  <p class="footnote">FY2025: SEC EDGAR XBRL y comunicado de resultados de SAP del 28-ene-2026. Consenso de analistas: stockanalysis.com, 4-sep-2026, 16 analistas sobre el ADR; el consenso europeo sobre la acción de Xetra es más amplio. Guía oficial de SAP: comunicado Q2/FY2026 del 22-jul-2026. El EPS no-IFRS FY2026 de ~€7.00 es una estimación de consenso; SAP guía utilidad operativa, no EPS.</p>
+  <div class="chartbox">
+    <canvas id="revisionChart" height="200"></canvas>
+    <p class="chartcap">Consenso de ingresos totales FY2026: a diferencia de Oracle —donde el consenso se revisó con fuerza al alza tras el salto de RPO—, en SAP las estimaciones se movieron <em>levemente a la baja</em> a lo largo de 2026 (de ~€40,5B tras la guía de enero a ~€40,0B tras el Q2), incorporando la desaceleración del backlog y el efecto de tipo de cambio. El momentum de estimados de SAP es neutro-a-negativo, y eso es parte de por qué el múltiplo se comprimió de ~35x forward (mediados de 2025) a ~26x. Fuente: stockanalysis.com / comunicados de SAP.</p>
+  </div>
+  <p>
+    El patrón de revisión es la diferencia clave con Oracle. La calificación de consenso sobre SAP es mayoritariamente
+    compradora (del orden de 10 "Strong Buy", 3 "Buy", 3 "Hold" sobre el ADR), y el <strong>precio objetivo promedio a 12
+    meses es de ~$247, un 14,9% por encima del precio de mercado</strong>, con un rango de $177 a $319. Pero las
+    estimaciones de ingresos y de EPS para 2026–2027 se revisaron a la <em>baja</em> durante el año, no al alza — el
+    mercado no está incorporando aceleración, está descontando una desaceleración ordenada. El consenso entra al blend de
+    la Sección 13 como información de mercado legítima, pero conviene leerlo sabiendo que su optimismo de precio objetivo
+    convive con un recorte silencioso de las estimaciones de fondo.
+  </p>
+
+  <!-- 13 -->
+  <p class="secnum" id="s13">13 — Valuación: Cuatro Métodos y el Fair Value</p>
+  <h2>Cuánto vale la acción, con la misma vara que este desk aplicó a Oracle, Salesforce, ServiceNow o CrowdStrike</h2>
+  <p>
+    Llegamos a la valuación tras recorrer el negocio completo a propósito. Calculamos el valor razonable con cuatro
+    enfoques independientes —flujo de caja descontado, múltiplos de comparables, reversión a la media histórica propia de
+    P/E, y el consenso de analistas de Wall Street— y mostramos las cuatro cifras sin forzarlas a converger. Sumamos
+    además un DCF inverso como diagnóstico no promediado. A diferencia de Oracle —donde los métodos apuntaban en
+    direcciones opuestas—, en SAP la dispersión es más contenida: <strong>el DCF Base ($185.97) y los comparables
+    ($160.09) quedan por debajo del mercado; la reversión histórica ($229.74) y el consenso ($247) quedan por encima</strong>.
+    Todos los valores se expresan en <strong>dólares por ADR</strong> (1 ADR = 1 acción ordinaria), convirtiendo el valor
+    en euros por acción al tipo EUR/USD de 1,1633.
+  </p>
+
+  <h3>Método 1 — Flujo de caja descontado (DCF), tres escenarios</h3>
+  <p>
+    Modelo de dos etapas (cinco años explícitos más valor terminal por crecimiento perpetuo), partiendo de los ingresos
+    FY2025 (€36.800 millones). El caso Base asume un crecimiento de ingresos <em>totales</em> que arranca en
+    <strong>+9,0% en el Año 1</strong> (la guía reportada de la compañía para FY2026) y desacelera hasta <strong>+7,0% en
+    el Año 5</strong> — un CAGR de ~8,0%. Ese ritmo es deliberadamente inferior al crecimiento de <em>nube</em> (~24%)
+    porque el total combina la nube en ascenso con la renta de soporte de licencias que se runea (~&minus;5% y
+    acelerando) y una línea de servicios plana; el "mix drag" es real y estructural.
+  </p>
+  <p>
+    <strong>Margen de flujo de caja operativo:</strong> lo anclamos en el Año 1 del caso Base en <strong>25,0%</strong>,
+    prácticamente el margen de OCF real reportado de FY2025 (24,9%) y del TTM (~24,8%). No hay componente de prepago que
+    descontar como en Oracle: el OCF de SAP es una función estable de su utilidad IFRS más D&amp;A (~€1.300 millones) más
+    compensación en acciones (~€1.700 millones) menos impuestos en efectivo, sin distorsiones no recurrentes grandes. Lo
+    dejamos expandir hasta <strong>28,0% en el Año 5</strong> a medida que la escala de la nube y el runoff del negocio de
+    servicios de bajo margen apalancan la estructura — una trayectoria consistente con el objetivo público de SAP de
+    superar el 30% de margen operativo no-IFRS (el margen de OCF corre unos puntos por debajo del operativo por los
+    impuestos en efectivo).
+  </p>
+  <p>
+    <strong>Capex:</strong> el Año 1 se fija en <strong>2,0% de los ingresos</strong> —el nivel real de FY2025—, y se lo
+    deja subir muy levemente hacia <strong>2,5% en el Año 5</strong> por inversión incremental en centros de datos propios
+    para cargas de IA. Aun así, SAP es un negocio <em>asset-light</em>: no hay una normalización de capex pendiente ni una
+    apuesta de infraestructura que modelar. El escenario Bull mantiene el capex en 2,0%; el Bear lo lleva a 2,5%.
+  </p>
+  <p>
+    <strong>WACC:</strong> SAP cerró FY2025 con caja neta, así que el WACC es esencialmente igual al costo de equity. Como
+    SAP genera y reporta en euros, anclamos la tasa libre de riesgo en el <em>Bund</em> alemán a 10 años (~2,75%) + beta
+    × premio de riesgo accionario europeo (~5,5%). El beta de SAP es genuinamente bajo (~1,0–1,1 a 5 años); usamos 1,05
+    → costo de equity ~8,5%, y redondeamos el <strong>WACC Base a 9,0%</strong> (9,75% Bear, 8,25% Bull). Un lector que
+    prefiera una tasa libre de riesgo en dólares (Treasury 10Y ~4,75%), argumentando que el ADR cotiza en dólares,
+    llegaría a un WACC de ~10,0% — la grilla de sensibilidad de más abajo cubre ese caso, y en él el fair value Base baja
+    a ~$160.
+  </p>
+  <p>
+    <strong>Nota de proceso — chequeo de sesgo obligatorio:</strong> el escenario Base da $185.97, un <em>13,5% por debajo
+    </em> del mercado; el Bear da $124.51 (&minus;42,1%), positivo y lejos de cero. Ninguno cae en la zona que este desk
+    marca como revisión forzada (Bear en cero/negativo, o Base a más del 60–70% por debajo del mercado). Revisamos igual
+    los tres puntos del chequeo: <strong>(1)</strong> el margen de OCF del Año 1 (25,0%) está anclado en el OCF <em>real</em>
+    de FY2025 y del TTM, no en una analogía al margen operativo. <strong>(2)</strong> El capex del Año 1 (2,0%) es el nivel
+    real reportado, no un supuesto. <strong>(3)</strong> El ingreso base es el FY2025 real. <strong>Conclusión del chequeo:</strong>
+    el resultado es un hallazgo genuino — el DCF dice que, con supuestos anclados en datos reales, SAP vale ~$186 en el
+    caso Base, y el mercado paga $215. La diferencia <em>no</em> es un error de calibración ni un método ciego a algo (SAP
+    no tiene problema de capex ni de deuda); es que a ~26x utilidad forward con ~8% de crecimiento total, el precio
+    incorpora una expansión de margen y una durabilidad de crecimiento que el DCF Base, honestamente, no puede dar por
+    hechas. Una salvedad de transparencia: entre el <strong>70% y el 81% del valor de empresa</strong> de cada escenario
+    proviene del valor terminal —por encima del umbral de 65–70% de este desk—; es lo normal en un compounder que crece
+    por encima de la inflación, pero significa que el DCF es sensible a los supuestos de WACC y crecimiento terminal (ver
+    grilla).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Supuesto</th><th class="right-al">Bear</th><th class="right-al">Base</th><th class="right-al">Bull</th></tr>
+    <tr><td class="label">Crecimiento de ingresos (año 1 → año 5)</td><td class="right-al">7.0% → 3.0%</td><td class="right-al">9.0% → 7.0%</td><td class="right-al">11.0% → 8.0%</td></tr>
+    <tr><td class="label">Margen de OCF (año 1 → año 5)</td><td class="right-al">24.0% → 25.0%</td><td class="right-al">25.0% → 28.0%</td><td class="right-al">25.5% → 30.0%</td></tr>
+    <tr><td class="label">Capex / Ingresos (año 1 → año 5)</td><td class="right-al">2.0% → 2.5%</td><td class="right-al">2.0% → 2.5%</td><td class="right-al">2.0% → 2.0%</td></tr>
+    <tr><td class="label">Beta / WACC</td><td class="right-al">1.20 / 9.75%</td><td class="right-al">1.05 / 9.00%</td><td class="right-al">0.95 / 8.25%</td></tr>
+    <tr><td class="label">Crecimiento terminal</td><td class="right-al">2.0%</td><td class="right-al">2.5%</td><td class="right-al">3.0%</td></tr>
+    <tr><td class="label">% del EV desde valor terminal</td><td class="right-al">~70%</td><td class="right-al">~76%</td><td class="right-al">~81%</td></tr>
+    <tr class="total"><td class="label">Fair value por ADR</td><td class="right-al">$124.51</td><td class="right-al">$185.97</td><td class="right-al">$264.99</td></tr>
+  </table></div>
+  <p class="footnote">Valor de empresa convertido a valor por acción sumando una posición de caja neta ≈ €0 (Sección 06) y dividiendo por ~1.158M de acciones en circulación (netas de autocartera). Modelo de dos etapas, cinco años explícitos con glide-path lineal de crecimiento, margen de OCF y capex entre el Año 1 y el Año 5. Valor en euros por acción convertido a dólares por ADR al tipo EUR/USD de 1,1633. El escenario Bear asume que la mejora de margen <em>se estanca</em> cerca del nivel ya alcanzado (25%), no que retrocede — un Bear defendible por ancla, no un colapso.</p>
+  <p>
+    Ponderado por probabilidad (25% Bear / 50% Base / 25% Bull) el valor esperado es <strong>$190.36 por ADR</strong>; el
+    promedio simple de los tres escenarios es <strong>$191.82</strong>. Ambos ~11–12% por debajo del precio de mercado.
+    El caso Bull ($264.99) es el único escenario del DCF que supera el precio con holgura, y requiere que SAP sostenga un
+    crecimiento total del 11%→8% con el margen de OCF expandiendo a 30% hacia el Año 5 — es decir, que cumpla su objetivo
+    de margen de mediano plazo <em>y</em> que la nube compense por completo el runoff del soporte, sin ayuda de
+    adquisiciones.
+  </p>
+  <h3>Sensibilidad del caso Base: WACC × crecimiento terminal</h3>
+  <p>
+    Dado que ~76% del valor de empresa del caso Base proviene del valor terminal, mostramos cómo se mueve el fair value
+    variando únicamente WACC y crecimiento terminal, con el resto de los inputs fijos. La celda marcada es el caso Base
+    reportado ($185.97, WACC 9,00%, g 2,5%).
+  </p>
+  <div class="table-scroll"><table class="sens-table">
+    <tr><th>WACC \ g terminal</th><th class="right-al">1.5%</th><th class="right-al">2.0%</th><th class="right-al">2.5%</th><th class="right-al">3.0%</th><th class="right-al">3.5%</th></tr>
+    <tr><td class="axis">8.00%</td><td class="right-al">$192</td><td class="right-al">$206</td><td class="right-al">$221</td><td class="right-al">$239</td><td class="right-al">$262</td></tr>
+    <tr><td class="axis">8.50%</td><td class="right-al">$178</td><td class="right-al">$189</td><td class="right-al">$202</td><td class="right-al">$217</td><td class="right-al">$235</td></tr>
+    <tr><td class="axis">9.00%</td><td class="right-al">$166</td><td class="right-al">$175</td><td class="right-al base-cell">$186</td><td class="right-al">$199</td><td class="right-al">$213</td></tr>
+    <tr><td class="axis">9.50%</td><td class="right-al">$155</td><td class="right-al">$163</td><td class="right-al">$172</td><td class="right-al">$183</td><td class="right-al">$195</td></tr>
+    <tr><td class="axis">10.00%</td><td class="right-al">$146</td><td class="right-al">$152</td><td class="right-al">$160</td><td class="right-al">$169</td><td class="right-al">$180</td></tr>
+  </table></div>
+  <p class="footnote">Grilla propia, recalculando el modelo de dos etapas del caso Base (mismo crecimiento, margen de OCF y capex por año declarados arriba) para cada combinación WACC/g. La celda base ($186) corresponde a WACC 9,00% y g 2,5%. El precio de mercado ($215.11) solo se alcanza en la esquina superior de la grilla —WACC de 8,0%–8,5% combinado con crecimiento terminal de 2,5%–3,5%—; bajo el WACC del caso central (9,0%) el DCF Base no llega al precio de mercado ni con un crecimiento terminal del 3,5%.</p>
+
+  <h3>Método 2 — Múltiplos de comparables</h3>
+  <p>
+    Aplicamos el P/E forward promedio del panel de cuatro pares de software empresarial de la Sección 08 (Microsoft
+    ~25,0x; Oracle 19,7x; Salesforce 17,68x; Workday 16,26x; promedio <strong>19,66x</strong>) al EPS no-IFRS forward de
+    consenso de SAP para FY2026 (~€7.00, equivalente a ~$8.14 por ADR).
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Múltiplo P/E forward aplicado</th><th class="right-al">Precio implícito (ADR)</th></tr>
+    <tr><td class="label">16.26x (WDAY, piso del panel)</td><td class="right-al">$132.41</td></tr>
+    <tr><td class="label">19.66x (promedio de los 4 comparables)</td><td class="right-al">$160.09</td></tr>
+    <tr><td class="label">25.00x (MSFT, techo del panel)</td><td class="right-al">$203.58</td></tr>
+    <tr class="total"><td class="label">26.4x (múltiplo actual de SAP)</td><td class="right-al">$215.11 (= mercado)</td></tr>
+  </table></div>
+  <p>
+    Tomamos <strong>$160.09</strong> (el promedio de los cuatro) como el resultado formal de este método. El hallazgo —y
+    su límite— es directo: sobre <em>utilidad no-IFRS forward</em>, SAP cotiza con la prima más alta del panel (~26,4x vs
+    un promedio de 19,66x), y aplicar el promedio del grupo da un precio implícito muy por debajo del mercado. A diferencia
+    de Oracle, este método <strong>no es ciego a nada</strong> — SAP no tiene un capex ni una deuda oculta que el P/E no
+    capture—; el resultado por debajo del mercado refleja, simplemente, que <strong>SAP genuinamente cotiza caro respecto
+    de sus pares</strong>. La pregunta es si la prima está justificada, y hay argumentos legítimos para una parte de ella:
+    (a) SAP tiene expansión de margen todavía por realizar que CRM y WDAY ya realizaron; (b) la fecha límite de soporte de
+    2027/2030 le da una visibilidad de conversión de ingresos que ningún par tiene; (c) menor ciclicidad por la renta de
+    mantenimiento; (d) caja neta y recompra grande. Un múltiplo "justo" para SAP probablemente esté entre el promedio del
+    panel (19,7x → $160) y el de Microsoft (25x → $204) — es decir, el rango honesto de este método es
+    <strong>~$160–$204</strong>, con el punto medio (~$182) todavía por debajo del mercado.
+  </p>
+
+  <h3>Método 3 — Reversión a la media histórica propia (P/E)</h3>
+  <p>
+    SAP tiene utilidad no-IFRS positiva y estable, así que el P/E histórico <em>es</em> utilizable — pero su dispersión de
+    los últimos años es extrema, y por una razón <strong>real, no contable</strong>: SAP vivió un cambio de régimen de
+    valuación entre 2023 y 2025 (de "compounder europeo aburrido" a "ganador de la IA", con el múltiplo forward pasando
+    de ~20x a ~35x) y una corrección brusca en 2026. No hay trimestres con utilidad contaminada por cargos puntuales; el
+    problema es que el múltiplo estuvo en movimiento violento. Siguiendo la metodología de este desk, reconstruimos una
+    <strong>ventana reciente</strong>: el P/E de la acción en los últimos cuatro cierres de trimestre fiscal, cada uno
+    calculado con el precio real de esa fecha (convertido a euros) sobre el EPS TTM no-IFRS vigente entonces.
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Cierre de trimestre fiscal</th><th class="right-al">Precio (EUR equiv.)</th><th class="right-al">EPS TTM no-IFRS</th><th class="right-al">P/E</th></tr>
+    <tr><td class="label">Q3 FY2025 (sep-2025)</td><td class="right-al">€231.2</td><td class="right-al">~€5.74</td><td class="right-al">40.3x</td></tr>
+    <tr><td class="label">Q4 FY2025 (dic-2025)</td><td class="right-al">€217.4</td><td class="right-al">€6.15</td><td class="right-al">35.3x</td></tr>
+    <tr><td class="label">Q1 FY2026 (mar-2026)</td><td class="right-al">€153.4</td><td class="right-al">~€6.43</td><td class="right-al">23.9x</td></tr>
+    <tr class="total"><td class="label">Q2 FY2026 (jun-2026)</td><td class="right-al">€141.4</td><td class="right-al">~€6.52</td><td class="right-al">21.7x</td></tr>
+  </table></div>
+  <p class="footnote">Precios: Yahoo Finance (chart API del ADR), cierre en cada fecha de cierre de trimestre fiscal, convertidos a euros al tipo de cambio de esa fecha (aprox. 1,17 / 1,09 / 1,12 / 1,15). EPS TTM no-IFRS: dato oficial para el cierre de FY2025 (€6.15) y estimación propia de la suma de los 4 trimestres standalone previos para las demás fechas. Promedio de los 4 múltiplos: 30,3x. El promedio está fuertemente sesgado al alza por los dos primeros datos (40x y 35x), que son la cola del régimen de optimismo de 2025.</p>
+  <p>
+    El promedio de la ventana (30,3x) aplicado al EPS TTM no-IFRS actual (€6.52) da <strong>$229.74 por ADR</strong> — el
+    resultado formal de este método, y el tercero más alto de los cuatro. Tres salvedades importantes, todas en la misma
+    dirección: (a) <strong>la ventana es un múltiplo en movimiento</strong>, no una media a la que la acción "reversiona":
+    osciló de 40x a 22x en nueve meses siguiendo al precio; (b) <strong>30x es alto para SAP</strong>: antes del re-rating
+    de 2023–2025 la acción cotizaba de forma rutinaria a 18x–24x utilidad forward, y su promedio de 10 años sobre EPS es
+    de ~22x; (c) como referencia alternativa, ese promedio histórico de 10 años (~22x) aplicado al EPS TTM no-IFRS actual
+    (€6.52) da <strong>$166.86</strong>, un 22% por debajo del mercado. Es decir: si uno cree que SAP "reversiona" al
+    múltiplo de su última década, la acción está cara <em>ahora</em>; si cree que reversiona al múltiplo de su nuevo
+    régimen (2024–2025), vale ~$230. Usamos $229.74 en el blend por consistencia metodológica con el resto de la cobertura
+    (ventana reciente), pero con esta advertencia explícita: si se sustituyera por la reversión a 10 años ($166.86), el
+    blend final bajaría de $205.76 a <strong>$190.04</strong> (&minus;11,7% vs. mercado).
+  </p>
+
+  <h3>Método 4 — Consenso de Wall Street</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Métrica</th><th class="right-al">Valor</th></tr>
+    <tr><td class="label">Analistas cubriendo el ADR (stockanalysis.com)</td><td class="right-al">16</td></tr>
+    <tr><td class="label">Calificación consenso</td><td class="right-al">Buy (≈10 Strong Buy, 3 Buy, 3 Hold, 0 Sell)</td></tr>
+    <tr class="total"><td class="label">Precio objetivo promedio (12 meses)</td><td class="right-al">$247.25</td></tr>
+    <tr><td class="label">Rango de precios objetivo</td><td class="right-al">$177.00 – $319.00</td></tr>
+    <tr><td class="label">Upside implícito vs. mercado</td><td class="right-al pos">+14.9%</td></tr>
+  </table></div>
+  <p class="footnote">Fuente: stockanalysis.com, consenso al 4-sep-2026, sobre el ADR de NYSE. La cobertura europea sobre la acción de Xetra es más amplia (~30–40 analistas) y arroja precios objetivo promedio equivalentes de ~$242–$260 por ADR — consistente con la cifra del ADR usada acá.</p>
+  <p>
+    El consenso ($247.25) es el método más alcista de los cuatro e implica un 14,9% de upside a doce meses. Entra al
+    blend como información de mercado legítima y sin descuento. Su rango ($177 a $319, un factor de 1,8x entre extremos)
+    es <strong>mucho más estrecho que el de Oracle</strong> ($110–$400) — reflejo de que sobre SAP hay bastante más
+    consenso de fondo sobre qué tipo de compañía es y cuánto vale, y de que la disputa acá es de valuación fina (¿26x es
+    demasiado?), no de tesis. Conviene recordar, no obstante, que ese optimismo de precio objetivo convive con
+    estimaciones de ingresos y EPS 2026–2027 que se revisaron a la <em>baja</em> durante el año (Sección 12).
+  </p>
+
+  <h3>Método adicional (diagnóstico, no promediado) — DCF inverso: qué tiene que creer el mercado para que $215.11 tenga sentido</h3>
+  <p>
+    Un DCF inverso parte del precio de mercado y resuelve qué trayectoria sería necesaria para justificarlo, dentro del
+    mismo marco de WACC (9,0%) y crecimiento terminal (2,5%) del caso Base, y con la misma trayectoria de margen de OCF y
+    capex. Manteniendo el crecimiento de ingresos <em>plano</em> durante los cinco años, el resultado es:
+  </p>
+  <div class="table-scroll"><table>
+    <tr><th>Crecimiento de ingresos plano (5 años)</th><th class="right-al">Fair value (ADR)</th><th class="right-al">vs. mercado</th><th class="right-al">Ingresos FY2030 implícitos</th></tr>
+    <tr><td class="label">+4% anual</td><td class="right-al">$156.51</td><td class="right-al neg">&minus;27.2%</td><td class="right-al">€44.8B</td></tr>
+    <tr><td class="label">+6% anual</td><td class="right-al">$170.52</td><td class="right-al neg">&minus;20.7%</td><td class="right-al">€49.2B</td></tr>
+    <tr><td class="label">+8% anual (≈ el caso Base)</td><td class="right-al">$185.58</td><td class="right-al neg">&minus;13.7%</td><td class="right-al">€54.1B</td></tr>
+    <tr><td class="label">+10% anual</td><td class="right-al">$201.73</td><td class="right-al neg">&minus;6.2%</td><td class="right-al">€59.3B</td></tr>
+    <tr class="total"><td class="label">~+11.6% anual (implícito en el precio)</td><td class="right-al">~$215.11</td><td class="right-al">~0%</td><td class="right-al">~€63.6B</td></tr>
+    <tr><td class="label">+12% anual</td><td class="right-al">$219.04</td><td class="right-al pos">+1.8%</td><td class="right-al">€64.9B</td></tr>
+  </table></div>
+  <p class="footnote">Grilla propia, mismo modelo de dos etapas del caso Base, variando solo el crecimiento de ingresos (fijo durante los 5 años) y despejando el que iguala el precio de mercado. Los ingresos FY2030 implícitos son el resultado de aplicar ese crecimiento a la base FY2025 de €36.800M.</p>
+  <p class="pull">
+    La lectura del DCF inverso: para justificar $215.11, el mercado necesita que SAP sostenga un crecimiento de ingresos
+    <em>totales</em> de <strong>~11,6% anual durante cinco años seguidos</strong> —llevando la facturación a ~€63.600
+    millones en FY2030, ~1,7x la actual—, con el margen de OCF y la disciplina de capex del caso Base. Eso es un par de
+    puntos por encima de lo que implica la propia guía de SAP para FY2026 (~+9% reportado, y la línea de soporte se runea
+    <em>más rápido</em> en los años siguientes, no más lento). No es una cifra imposible —la nube crece 24% y la fecha
+    límite de 2027/2030 empuja—, pero requiere que la conversión del backlog no solo continúe sino que <em>compense por
+    completo</em> el runoff acelerado del mantenimiento, y que el efecto de tipo de cambio deje de restar. La diferencia
+    entre el DCF Base ($186) y el mercado ($215) <em>es</em>, casi exactamente, la diferencia entre "la nube compensa el
+    runoff con algo de margen" (8% total, $186) y "la nube compensa el runoff con holgura durante cinco años" (~11,6%
+    total, $215).
+  </p>
+
+  <h3>Síntesis: los cuatro métodos, uno al lado del otro</h3>
+  <div class="chartbox">
+    <canvas id="footballChart" height="280"></canvas>
+    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado ($215.11); la línea azul marca el blend propio ($205.76). El precio de mercado cae dentro del rango de tres de las cuatro metodologías, y por encima de todo el DCF salvo el caso Bull. La dispersión total es más contenida que en Oracle. Fuente: elaboración propia.</p>
+  </div>
+  <div class="table-scroll"><table>
+    <tr><th>Método</th><th class="right-al">Fair value (ADR)</th></tr>
+    <tr><td class="label">DCF — Bear</td><td class="right-al">$124.51</td></tr>
+    <tr class="total"><td class="label">DCF — Base</td><td class="right-al">$185.97</td></tr>
+    <tr><td class="label">DCF — Bull</td><td class="right-al">$264.99</td></tr>
+    <tr><td class="label">DCF — valor esperado ponderado (25% Bear / 50% Base / 25% Bull)</td><td class="right-al">$190.36</td></tr>
+    <tr><td class="label">Comparables (P/E forward promedio del panel de 4)</td><td class="right-al">$160.09</td></tr>
+    <tr><td class="label">Reversión histórica (P/E no-IFRS, ventana reciente de 4 cierres de trimestre)</td><td class="right-al">$229.74</td></tr>
+    <tr><td class="label">Consenso Wall Street (precio objetivo promedio)</td><td class="right-al">$247.25</td></tr>
+    <tr class="total"><td class="label">Promedio simple — DCF Base, Comparables, Reversión histórica, Consenso Wall Street</td><td class="right-al">$205.76</td></tr>
+  </table></div>
+  <p>
+    El promedio simple de las cuatro metodologías da <strong>$205.76 por ADR</strong>, un 4,4% por debajo del precio de
+    mercado de $215.11. Dos de los cuatro métodos —el DCF Base ($185.97) y los comparables ($160.09)— quedan
+    materialmente por debajo del mercado, y comparten un mismo mensaje: a ~26x utilidad no-IFRS forward con ~8% de
+    crecimiento total de ingresos, SAP cotiza adelantada respecto de su generación de caja y de sus pares. Los otros dos
+    —reversión histórica ($229.74) y consenso ($247.25)— quedan por encima, pero el primero está inflado por el régimen
+    de optimismo de 2024–2025 (a 10 años el múltiplo da $166.86) y el segundo convive con estimaciones de fondo que se
+    revisan a la baja. <strong>Leído con la misma vara que este desk aplicó a Oracle, Salesforce o ServiceNow, el
+    resultado no es una recomendación de venta:</strong> SAP es una franquicia de calidad excepcional —líder indiscutido
+    de ERP, con un switching cost enorme, un catalizador de migración con fecha, expansión de margen real, caja neta y una
+    recompra de €10.000 millones—. Pero a $215.11 la acción ya paga por esa calidad: el blend queda por debajo del precio,
+    el DCF solo lo alcanza en el caso Bull, y el DCF inverso pide un crecimiento total sostenido de ~11,6% que está por
+    encima de lo que la propia compañía guía. La postura es <strong>neutral, con sesgo cauteloso</strong>: buen negocio,
+    precio pleno, y poco margen de error incorporado.
+  </p>
+
+  <!-- 14 -->
+  <p class="secnum" id="s14">14 — Limitaciones del Modelo</p>
+  <h2>Qué asume este análisis, y dónde puede fallar</h2>
+  <div class="watermark-block">
+    <p style="margin-bottom:0;">
+      Este informe tiene menos fragilidad estructural que el de Oracle —SAP no tiene un DCF dominado por un flujo terminal
+      lejano, ni un equity apalancado, ni una variable exógena binaria como la conversión del RPO de OpenAI— pero conserva
+      varias. <strong>Primero: la elección de moneda del descuento mueve el resultado.</strong> El caso Base usa un WACC de
+      9,0% construido con tasa libre de riesgo en euros (Bund a 10 años). Un lector que argumente que, como el ADR cotiza
+      en dólares, corresponde una tasa libre de riesgo en dólares (~4,75%), llegaría a un WACC de ~10,0% y a un fair value
+      Base de ~$160 — la grilla de sensibilidad muestra todo ese rango. La conversión EUR/USD a 1,1633 es la de una fecha;
+      un dólar más débil sube el ADR sin cambiar el negocio. <strong>Segundo: el DCF es sensible al valor terminal.</strong>
+      Entre el 70% y el 81% del valor de empresa de cada escenario proviene del período post-Año-5; es lo esperable en un
+      compounder, pero implica que el fair value depende de supuestos de largo plazo (margen de OCF de estado estable,
+      crecimiento perpetuo) que ninguna cifra actual puede verificar. <strong>Tercero: la expansión de margen del caso
+      Base y Bull es un supuesto, no un hecho.</strong> SAP apunta a &gt;30% de margen operativo no-IFRS, y en 2025 avanzó
+      4,5 puntos de golpe; pero el Q2 2026 mostró el margen <em>bajando</em> por dilución de M&amp;A e inversión en IA. Si
+      el margen se estanca en ~28%, el DCF Bull deja de tener sentido y el Base baja. <strong>Cuarto: el "mix drag" podría
+      ser peor de lo modelado.</strong> El caso Base asume que la nube (+24%) compensa el runoff del soporte (~&minus;5%)
+      con un neto de +8–9% total. Si el soporte se runea más rápido —SAP dijo que <em>acelera</em> en 2026— y la nube se
+      desacelera hacia el rango bajo de la guía, el crecimiento total podría caer hacia +5–6%, y el fair value hacia el
+      Bear. <strong>Quinto: el método de reversión histórica es poco informativo acá.</strong> El P/E de SAP osciló de 40x
+      a 22x en nueve meses; el "promedio de la ventana" (30,3x) no describe una media estable, y usarlo o no en el blend
+      cambia el fair value en ~$16 por ADR. <strong>Sexto:</strong> el análisis no incorpora un cambio de política de
+      capital (una recompra mayor, o su interrupción), ni una adquisición transformacional, ni un desenlace adverso de la
+      disputa arancelaria UE–EE.UU. que golpee el gasto de TI de los clientes industriales de SAP más de lo supuesto, ni
+      un deterioro del goodwill de €29.000 millones. Todas las cifras deben leerse como estimaciones sujetas a los
+      supuestos declarados, no como una medición precisa.
+    </p>
+  </div>
+
+  <div class="disclosure">
+    Documento elaborado a partir de fuentes públicas: SEC EDGAR (Form 20-F FY2025, Form 6-K de los trimestres Q1 y Q2
+    2026, XBRL companyfacts API, CIK 0001000184), comunicados de resultados y quarterly statements de SAP del 28-ene-2026
+    (Q4/FY2025), 22-abr-2026 (Q1 2026) y 22-jul-2026 (Q2/H1 2026), SAP Integrated Report 2025, material de resultados de
+    Microsoft, Oracle, Salesforce y Workday, stockanalysis.com, MarketScreener, Bloomberg, y cobertura de Reuters, CNBC,
+    Yahoo Finance, Investing.com, ERP Today, SAPinsider y Futurum sobre los resultados trimestrales, la guía de la
+    compañía, el backlog de nube, el programa de recompra de €10.000 millones, la sucesión en la presidencia del Consejo
+    de Supervisión (Renjen por Plattner), el acuerdo de FCPA de enero de 2024, las adquisiciones de Dremio y Prior Labs, y
+    el impacto de la disputa arancelaria UE–EE.UU. Cifras fundamentales con fecha de corte en el Form 20-F de SAP
+    correspondiente al año fiscal cerrado el 31 de diciembre de 2025 y en el Form 6-K del semestre cerrado el 30 de junio
+    de 2026 (publicado el 22 de julio de 2026); precio de mercado y múltiplos de comparables al cierre del 4 de septiembre
+    de 2026. SAP reporta en euros bajo IFRS; el fair value y el precio se expresan en dólares por ADR (1 ADR = 1 acción
+    ordinaria) al tipo EUR/USD de 1,1633. SAP publicará su Q3 2026 alrededor del 21–23 de octubre de 2026 y este informe
+    no incorpora ese resultado.
+    <br><br>
+    <strong>Sobre el autor y la naturaleza de este documento:</strong> este informe es un análisis independiente
+    elaborado por Manfredi Investment Research &amp; Markets con fines exclusivamente informativos y educativos. El autor
+    no es un asesor de inversión registrado, no está matriculado ante la Comisión Nacional de Valores (CNV), la SEC, la
+    BaFin, ni ningún otro organismo regulador equivalente, y no mantiene una relación de asesoramiento financiero
+    personalizado con el lector. Ninguna cifra de este documento —incluido el "fair value" de portada, los escenarios de
+    DCF, ni la síntesis de la Sección 13— constituye una recomendación de compra, venta o mantenimiento para ningún
+    lector en particular, ni considera la situación financiera, los objetivos o el perfil de riesgo individual de quien lo
+    lee. Los escenarios de DCF son estimaciones propias sujetas a los supuestos declarados explícitamente en la Sección
+    13, y no representan guidance oficial de ninguna de las compañías mencionadas salvo donde se cita de forma directa y
+    atribuida. Verificar cifras contra el 20-F / 6-K / quarterly statement más reciente de cada compañía, y consultar a un
+    asesor financiero matriculado, antes de tomar cualquier decisión de inversión.
+  </div>
+
+</div>
+
+<script>
+/* ---- Motor de gráficos propio, sin dependencias externas (Canvas 2D) ---- */
+(function(){
+  var PALETTE = {ink:'#161a20', muted:'#69707c', line:'#e3e9f0', navy:'#0b1f3a', navy2:'#15335c', blue:'#2f5f9e', blueLight:'#5f8fc7', pale:'#c7d9ec', red:'#a8291f', green:'#1a7a54', gold:'#c99a3c'};
+
+  function setupCanvas(canvas, cssHeight){
+    var dpr = window.devicePixelRatio || 1;
+    var cssWidth = canvas.parentElement.clientWidth - 44;
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = Math.max(1, Math.round(cssWidth * dpr));
+    canvas.height = Math.max(1, Math.round(cssHeight * dpr));
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return {ctx: ctx, w: cssWidth, h: cssHeight};
+  }
+
+  function drawVBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+    ctx.font = '11px "IBM Plex Mono", monospace';
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var padL = 46, padR = 10, padT = 16, padB = 46;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var maxV = Math.max.apply(null, values);
+    var minV = Math.min(0, Math.min.apply(null, values));
+    function scaleY(v){
+      return padT + plotH - ((v - minV) / (maxV*1.15 - minV)) * plotH;
+    }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    var gridSteps = 4;
+    for(var g=0; g<=gridSteps; g++){
+      var yy = padT + (plotH/gridSteps)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    var yZero = scaleY(0);
+    ctx.strokeStyle = PALETTE.navy; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(padL, yZero); ctx.lineTo(W-padR, yZero); ctx.stroke();
+
+    var n = values.length;
+    var slot = plotW / n;
+    var barW = Math.min(slot * 0.56, 64);
+
+    for(var i=0;i<n;i++){
+      var cx = padL + slot*i + slot/2;
+      var y0 = scaleY(values[i]);
+      ctx.fillStyle = colors[i % colors.length];
+      var bw = barW;
+      if(values[i] >= 0){ ctx.fillRect(cx - bw/2, y0, bw, yZero - y0); }
+      else { ctx.fillRect(cx - bw/2, yZero, bw, y0 - yZero); }
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'center';
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, cx, (values[i] >= 0 ? y0 - 6 : y0 + 14));
+
+      ctx.fillStyle = PALETTE.muted;
+      ctx.font = '10px "Inter", sans-serif';
+      wrapLabel(ctx, labels[i], cx, padT + plotH + 16, slot + 6);
+    }
+  }
+
+  function wrapLabel(ctx, text, cx, y, maxW, align){
+    var words = String(text).split(' ');
+    var lines = [];
+    var cur = '';
+    for(var i=0;i<words.length;i++){
+      var test = cur ? cur + ' ' + words[i] : words[i];
+      if(ctx.measureText(test).width > maxW && cur){ lines.push(cur); cur = words[i]; }
+      else cur = test;
+    }
+    if(cur) lines.push(cur);
+    lines = lines.slice(0,2);
+    ctx.textAlign = align || 'center';
+    for(var j=0;j<lines.length;j++){
+      ctx.fillText(lines[j], cx, y + j*11);
+    }
+  }
+
+  function drawHBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, values = opts.values, colors = opts.colors;
+    var padL = opts.padL || 128, padR = 54, padT = 10, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var maxV = Math.max.apply(null, values) * 1.12;
+
+    var n = values.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.5, 30);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, padT+plotH); ctx.stroke();
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = padL;
+      var w = (values[i]/maxV) * plotW;
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, w, barH);
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      wrapLabel(ctx, labels[i], padL - 10, cy - 4, padL - 20, 'right');
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '600 11px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'left';
+      var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
+      ctx.fillText(vLabel, x0 + w + 8, cy + 4);
+    }
+  }
+
+  function drawRangeBars(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, ranges = opts.ranges, colors = opts.colors, refLines = opts.refLines || [];
+    var padL = opts.padL || 168, padR = 16, padT = 34, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    ranges.forEach(function(r){ allVals.push(r[0], r[1]); });
+    refLines.forEach(function(r){ allVals.push(r.value); });
+    var rawMin = Math.min.apply(null, allVals), rawMax = Math.max.apply(null, allVals);
+    var rawRange = rawMax - rawMin;
+    var domMin = rawMin - rawRange * 0.15;
+    var domMax = rawMax + rawRange * 0.04;
+    function scaleX(v){ return padL + ((v - domMin)/(domMax - domMin)) * plotW; }
+
+    var n = ranges.length;
+    var slot = plotH / n;
+    var barH = Math.min(slot * 0.42, 22);
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var xx = padL + (plotW/4)*g;
+      ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT+plotH); ctx.stroke();
+    }
+
+    for(var i=0;i<n;i++){
+      var cy = padT + slot*i + slot/2;
+      var x0 = scaleX(ranges[i][0]), x1 = scaleX(ranges[i][1]);
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillRect(x0, cy - barH/2, Math.max(x1-x0,2), barH);
+      ctx.beginPath(); ctx.arc(x0, cy, barH/2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x1, cy, barH/2, 0, Math.PI*2); ctx.fill();
+
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'right';
+      wrapLabel(ctx, labels[i], padL - 12, cy - 4, padL - 20, 'right');
+
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      var vf = opts.valueFmt || function(v){ return '$'+v.toFixed(0); };
+      ctx.textAlign = 'right';
+      ctx.fillText(vf(ranges[i][0]), x0 - 8, cy + 4);
+      ctx.textAlign = 'left';
+      ctx.fillText(vf(ranges[i][1]), x1 + 8, cy + 4);
+    }
+
+    var refX = refLines.map(function(r){ return scaleX(r.value); });
+    refLines.forEach(function(r, ri){
+      var x = refX[ri];
+      ctx.strokeStyle = r.color; ctx.lineWidth = 1.6; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x, padT-6); ctx.lineTo(x, padT+plotH); ctx.stroke();
+      ctx.setLineDash([]);
+      var stacked = false;
+      for(var pj=0; pj<ri; pj++){ if(Math.abs(refX[pj]-x) < 60){ stacked = true; } }
+      ctx.fillStyle = r.color;
+      ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(r.label, x, stacked ? padT - 24 : padT - 12);
+    });
+  }
+
+  function drawLines(canvas, opts){
+    var cssH = parseInt(canvas.getAttribute('height'), 10) || 260;
+    var setup = setupCanvas(canvas, cssH);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+
+    var labels = opts.labels, series = opts.series;
+    var padL = 44, padR = 14, padT = 16, padB = 54;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var allVals = [];
+    series.forEach(function(s){ allVals = allVals.concat(s.values); });
+    var maxV = Math.max.apply(null, allVals);
+    var minV = Math.min.apply(null, allVals);
+    var pad = (maxV - minV) * 0.12 || 1;
+    maxV += pad; minV -= pad;
+
+    function scaleX(i){ return padL + (plotW/(labels.length-1)) * i; }
+    function scaleY(v){ return padT + plotH - ((v - minV)/(maxV-minV)) * plotH; }
+
+    ctx.strokeStyle = PALETTE.line; ctx.lineWidth = 1;
+    for(var g=0; g<=4; g++){
+      var yy = padT + (plotH/4)*g;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+    }
+    ctx.strokeStyle = PALETTE.navy;
+    var zeroY = scaleY(0);
+    if(minV < 0 && maxV > 0){
+      ctx.beginPath(); ctx.moveTo(padL, zeroY); ctx.lineTo(W-padR, zeroY); ctx.stroke();
+      ctx.fillStyle = PALETTE.muted;
+      ctx.font = '9px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('0%', padL + 2, zeroY - 4);
+    } else {
+      ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
+    }
+
+    series.forEach(function(s){
+      ctx.strokeStyle = s.color; ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        ctx.fillStyle = s.color;
+        ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
+      });
+    });
+
+    ctx.fillStyle = PALETTE.muted;
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    labels.forEach(function(l,i){ ctx.fillText(l, scaleX(i), padT+plotH+16); });
+
+    var lx = padL, ly = H - 12;
+    ctx.font = '11px "Inter", sans-serif';
+    series.forEach(function(s){
+      ctx.fillStyle = s.color;
+      ctx.fillRect(lx, ly-8, 10, 10);
+      ctx.fillStyle = PALETTE.ink;
+      ctx.textAlign = 'left';
+      ctx.fillText(s.name, lx+14, ly);
+      lx += 14 + ctx.measureText(s.name).width + 22;
+    });
+  }
+
+  function renderAll(){
+    drawVBars(document.getElementById('historyChart'), {
+      labels:['FY18','FY19','FY20','FY21','FY22','FY23','FY24','FY25','FY26e'],
+      values:[24.7,27.6,27.3,27.8,30.9,31.2,34.2,36.8,40.0],
+      colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.navy,PALETTE.gold],
+      valueFmt:function(v){ return '€'+v.toFixed(0); }
+    });
+
+    drawVBars(document.getElementById('cloudChart'), {
+      labels:['Nube FY22','Nube FY23','Nube FY24','Nube FY25','Nube FY26g'],
+      values:[12.6,13.7,17.1,21.0,26.0],
+      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.navy,PALETTE.gold],
+      valueFmt:function(v){ return '€'+v.toFixed(1)+'B'; }
+    });
+
+    drawVBars(document.getElementById('backlogChart'), {
+      labels:['CCB dic-24','CCB dic-25','CCB Q1-26','CCB Q2-26'],
+      values:[18.1,21.05,21.93,22.93],
+      colors:[PALETTE.blueLight,PALETTE.blue,PALETTE.blue,PALETTE.navy],
+      valueFmt:function(v){ return '€'+v.toFixed(1)+'B'; }
+    });
+
+    drawLines(document.getElementById('marginChart'), {
+      labels:['FY22','FY23','FY24','FY25'],
+      series:[
+        {name:'Margen operativo (no-IFRS)', color:PALETTE.navy, values:[24.3,23.6,23.9,28.3]},
+        {name:'Margen de flujo de caja libre', color:PALETTE.green, values:[14.1,20.0,12.0,22.4]}
+      ]
+    });
+
+    drawLines(document.getElementById('capexChart'), {
+      labels:['FY22','FY23','FY24','FY25'],
+      series:[
+        {name:'Flujo de caja operativo (€B)', color:PALETTE.navy, values:[5.6,6.2,5.2,9.2]},
+        {name:'Capex (€B)', color:PALETTE.red, values:[0.9,0.8,0.8,0.7]}
+      ]
+    });
+
+    drawHBars(document.getElementById('compsChart'), {
+      labels:['SAP','MSFT','ORCL','CRM','WDAY'],
+      values:[26.4,25.0,19.7,17.7,16.3],
+      colors:[PALETTE.navy,PALETTE.blueLight,PALETTE.pale,PALETTE.pale,PALETTE.pale],
+      padL:72,
+      valueFmt:function(v){ return v.toFixed(1)+'x'; }
+    });
+
+    drawHBars(document.getElementById('revisionChart'), {
+      labels:['Consenso ingresos FY26 — tras guía de enero 2026','Consenso ingresos FY26 — tras el Q2 (julio 2026)'],
+      values:[40.5, 40.0],
+      colors:[PALETTE.pale,PALETTE.blue],
+      padL:288,
+      valueFmt:function(v){ return '€'+v.toFixed(1)+'B'; }
+    });
+
+    drawRangeBars(document.getElementById('footballChart'), {
+      labels:['DCF (Bear → Bull)','Comparables (WDAY 16.3x → MSFT 25x)','Reversión hist. P/E (10 años 22x → ventana 30x)','Consenso Wall Street'],
+      ranges:[[124.51,264.99],[132.41,203.58],[166.86,229.74],[177.00,319.00]],
+      colors:[PALETTE.blue,PALETTE.navy2,PALETTE.blueLight,PALETTE.gold],
+      padL:262,
+      refLines:[{value:215.11,color:PALETTE.red,label:'Mercado $215'},{value:205.76,color:PALETTE.navy,label:'Blend $206'}],
+      valueFmt:function(v){ return '$'+v.toFixed(0); }
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', renderAll);
+  } else {
+    renderAll();
+  }
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderAll, 150);
+  });
+})();
+</script>
+<script src="_preview-gate.js" defer></script>
+</body>
+</html>

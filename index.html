@@ -2548,6 +2548,17 @@
     }
     .mkt-map-legend .swatch { width: 60px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #EF4444, #1a1a1a, #10B981); }
 
+    /* Mapa de tu cartera (Portfolio): grilla pareja de filas/columnas, no squarify --
+       incluso peso para cada activo, así el cuadro se ve igual de prolijo con 3 que con 7. */
+    .pf-map-tile {
+      box-sizing: border-box; border: 1px solid var(--navy-1); border-radius: 3px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      overflow: hidden; cursor: pointer; transition: filter .12s ease;
+    }
+    .pf-map-tile:hover { filter: brightness(1.25); z-index: 5; }
+    .pf-map-tile .mt-sym { font-family: 'IBM Plex Mono', monospace; font-weight: 700; line-height: 1.1; white-space: nowrap; color: #fff; }
+    .pf-map-tile .mt-chg { font-family: 'IBM Plex Mono', monospace; opacity: .9; line-height: 1.1; white-space: nowrap; color: #fff; }
+
     /* Estrella de favoritos en cada fila */
     .mkt-star-btn {
       background: none; border: none; padding: 0; cursor: pointer; color: rgba(255,255,255,.18);
@@ -2615,8 +2626,16 @@
   .cal-ev-dot.ar{background:var(--gold);}
   .cal-ev-dot.us{background:#60A5FA;}
   .cal-ev-dot.hi{background:var(--red);}
+  .cal-ev-dot.earnings{background:#c084fc;}
+  .cal-ev-dot.dividend{background:#2dd4bf;}
   .cal-ev-text{font-size:10.5px;color:rgba(255,255,255,.45);line-height:1.45;}
   .cal-ev-text strong{color:rgba(255,255,255,.75);font-weight:600;display:block;}
+  .cal-ev-text strong a{color:inherit;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(255,255,255,.3);}
+  .cal-ev-text strong a:hover{text-decoration-color:var(--gold);}
+  .cal-view-tabs{display:flex;gap:6px;flex-wrap:wrap;}
+  .cal-view-tab{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.45);font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:6px 12px;cursor:pointer;transition:border-color .18s,background .18s,color .18s;}
+  .cal-view-tab:hover{border-color:rgba(242,201,76,.35);color:rgba(255,255,255,.7);}
+  .cal-view-tab.active{border-color:rgba(242,201,76,.6);background:rgba(242,201,76,.08);color:var(--gold);}
 
 </style>
 
@@ -3446,6 +3465,21 @@
   .htx-cal2__title { font-size:13px; color:var(--htx-ink); line-height:1.4; margin-bottom:5px; }
   .htx-cal2__sub { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; color:var(--htx-ink3); line-height:1.55; }
   .htx-cal2__sub b { color:var(--htx-ink2); font-weight:500; }
+  .htx-cal2__col { display:flex; flex-direction:column; }
+  .htx-cal2__evs { flex:1 0 auto; }
+  .htx-cal2__evs > .htx-cal2__ev:last-child,
+  .htx-cal2__evs > .htx-cal2__newsitem:last-child { border-bottom:0; }
+  .htx-cal2__col > .htx-tile__link { margin-top:14px; align-self:flex-start; }
+  .htx-cal2__legendbar { display:flex; flex-wrap:wrap; gap:20px; padding-top:16px; margin-top:6px; border-top:1px solid var(--htx-line); font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--htx-ink3); }
+  .htx-cal2__legendbar i { width:6px; height:6px; border-radius:50%; display:inline-block; margin-right:7px; vertical-align:middle; }
+  .htx-cal2__legend--news { justify-content:space-between; }
+  .htx-cal2__newsasof { text-transform:none; letter-spacing:.03em; color:var(--htx-ink3); }
+  .htx-cal2__newsitem { display:grid; grid-template-columns:46px 1fr; gap:18px; padding:20px 0; border-bottom:1px solid var(--htx-line-soft); text-decoration:none; }
+  .htx-cal2__newsitem:hover .htx-cal2__title { color:var(--htx-amber); }
+  .htx-cal2__newsitem .htx-cal2__title { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .htx-cal2__newsitem .htx-cal2__day .m { text-transform:uppercase; }
+  .htx-cal2__src { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:8px; letter-spacing:.08em; text-transform:uppercase; color:var(--htx-ink3); }
+  .htx-cal2__newsempty { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; color:var(--htx-ink3); padding:20px 0; }
 
   /* membresia */
   .htx-member { background:#0a0f1e; padding:56px 32px; }
@@ -3475,7 +3509,8 @@
     .htx-hero { grid-template-columns:1fr; }
     .htx-hero__lead { border-right:0; border-bottom:1px solid var(--htx-line); }
     .htx-tile--informes, .htx-tile--pf { grid-column:span 12; }
-    .htx-cal2 { grid-template-columns:1fr; gap:0; }
+    .htx-cal2 { grid-template-columns:1fr; gap:8px 0; }
+    .htx-cal2__col + .htx-cal2__col { border-top:1px solid var(--htx-line); padding-top:8px; }
     .htx-member__inner { grid-template-columns:1fr; }
   }
   @media (max-width:600px) {
@@ -3553,6 +3588,7 @@
     <div class="htx-bento">
       <div class="htx-tile htx-tile--informes">
         <div class="htx-tile__head"><span class="htx-tile__title">Informes institucionales</span></div>
+        <!-- Lista fija: los 7 primeros informes. No sumar m&aacute;s (mantiene la home compacta). -->
         <div class="htx-inf">
           <a class="htx-inf__row" href="informes/msft.html" target="_blank" rel="noopener">
             <span class="htx-inf__tk">MSFT</span>
@@ -3561,7 +3597,7 @@
           </a>
           <a class="htx-inf__row" href="informes/amd.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AMD')">
             <span class="htx-inf__tk">AMD</span>
-            <span class="htx-inf__nm">Advanced Micro Devices, Inc.<span class="htx-inf__new">Nuevo</span></span>
+            <span class="htx-inf__nm">Advanced Micro Devices, Inc.</span>
             <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
           </a>
           <a class="htx-inf__row" href="informes/pltr.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'PLTR')">
@@ -3589,11 +3625,8 @@
             <span class="htx-inf__nm">MercadoLibre, Inc.</span>
             <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
           </a>
-          <a class="htx-inf__row" href="informes/adbe.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ADBE')">
-            <span class="htx-inf__tk">ADBE</span>
-            <span class="htx-inf__nm">Adobe Inc.</span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
-          </a>
+          <!-- FIJO: 7 informes destacados en la home. NO agregar filas nuevas ac&aacute;.
+               Los informes nuevos van solo al picks-list de la secci&oacute;n #inversiones. -->
         </div>
         <a class="htx-tile__link" href="#inversiones" data-tab-target="inversiones">Ver secci&oacute;n Informes &rarr;</a>
       </div>
@@ -3623,71 +3656,74 @@
       <div class="htx-tile htx-tile--cal">
         <div class="htx-tile__head">
           <span class="htx-tile__title">Calendario econ&oacute;mico</span>
-          <span class="htx-tile__count">Semana del 1 al 5 de septiembre</span>
         </div>
         <div class="htx-cal2">
-          <div class="htx-cal2__legend">
-            <span><i style="background:var(--htx-data);"></i>Argentina</span>
-            <span><i style="background:#9fb4c9;"></i>Estados Unidos</span>
-            <span><i style="background:var(--htx-amber);"></i>Alta relevancia de mercado</span>
+          <div class="htx-cal2__col">
+            <div class="htx-cal2__legend htx-cal2__legend--news">
+              <span>Semana del 1 al 5 de septiembre</span>
+            </div>
+            <div class="htx-cal2__evs">
+
+            <div class="htx-cal2__ev">
+              <div class="htx-cal2__day"><span class="htx-cal2__hoy">HOY</span></div>
+              <div>
+                <div class="htx-cal2__meta"><span class="htx-cal2__time">15:30</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
+                <div class="htx-cal2__title">&Iacute;ndice de precios PCE &mdash; julio</div>
+              </div>
+            </div>
+
+            <div class="htx-cal2__ev">
+              <div class="htx-cal2__day"><span class="d">02</span><span class="m">SEP</span></div>
+              <div>
+                <div class="htx-cal2__meta"><span class="htx-cal2__time">16:00</span><span class="htx-cal2__tag ar">Argentina</span><span class="htx-cal2__imp">&#9679;&#9679;&#9675;</span></div>
+                <div class="htx-cal2__title">Recaudaci&oacute;n tributaria &mdash; agosto</div>
+              </div>
+            </div>
+
+            <div class="htx-cal2__ev">
+              <div class="htx-cal2__day"><span class="d">03</span><span class="m">SEP</span></div>
+              <div>
+                <div class="htx-cal2__meta"><span class="htx-cal2__time">11:00</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
+                <div class="htx-cal2__title">ISM Manufacturero &mdash; agosto</div>
+              </div>
+            </div>
+
+            <div class="htx-cal2__ev">
+              <div class="htx-cal2__day"><span class="d">04</span><span class="m">SEP</span></div>
+              <div>
+                <div class="htx-cal2__meta"><span class="htx-cal2__time">08:30</span><span class="htx-cal2__tag ar">Argentina</span><span class="htx-cal2__imp">&#9679;&#9679;&#9675;</span></div>
+                <div class="htx-cal2__title">IPC CABA &mdash; agosto</div>
+              </div>
+            </div>
+
+            <div class="htx-cal2__ev">
+              <div class="htx-cal2__day"><span class="d">05</span><span class="m">SEP</span></div>
+              <div>
+                <div class="htx-cal2__meta"><span class="htx-cal2__time">09:30</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
+                <div class="htx-cal2__title">N&oacute;minas no agr&iacute;colas &mdash; agosto</div>
+              </div>
+            </div>
+            </div>
+            <a class="htx-tile__link" href="#calendario" data-tab-target="calendario">Ver calendario completo &rarr;</a>
           </div>
 
-          <div class="htx-cal2__ev">
-            <div class="htx-cal2__day"><span class="htx-cal2__hoy">HOY</span></div>
-            <div>
-              <div class="htx-cal2__meta"><span class="htx-cal2__time">15:30</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
-              <div class="htx-cal2__title">&Iacute;ndice de precios PCE &mdash; julio</div>
-              <div class="htx-cal2__sub">La medida de inflaci&oacute;n que mira la Fed &middot; consenso <b>+0,2% m/m</b> &middot; previo +0,1%</div>
+          <div class="htx-cal2__col">
+            <div class="htx-cal2__legend htx-cal2__legend--news">
+              <span>Noticias &middot; reportes diarios</span>
+              <span class="htx-cal2__newsasof" id="htxCalNewsAsof"></span>
             </div>
-          </div>
-
-          <div class="htx-cal2__ev">
-            <div class="htx-cal2__day"><span class="d">02</span><span class="m">SEP</span></div>
-            <div>
-              <div class="htx-cal2__meta"><span class="htx-cal2__time">16:00</span><span class="htx-cal2__tag ar">Argentina</span><span class="htx-cal2__imp">&#9679;&#9679;&#9675;</span></div>
-              <div class="htx-cal2__title">Recaudaci&oacute;n tributaria &mdash; agosto</div>
-              <div class="htx-cal2__sub">ARCA &middot; term&oacute;metro fiscal del mes &middot; previo <b>$13,2 bn</b></div>
+            <div id="htxCalNewsList" class="htx-cal2__evs">
+              <div class="htx-cal2__newsempty">Cargando noticias&hellip;</div>
             </div>
-          </div>
-
-          <div class="htx-cal2__ev">
-            <div class="htx-cal2__day"><span class="d">03</span><span class="m">SEP</span></div>
-            <div>
-              <div class="htx-cal2__meta"><span class="htx-cal2__time">11:00</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
-              <div class="htx-cal2__title">ISM Manufacturero &mdash; agosto</div>
-              <div class="htx-cal2__sub">Consenso <b>48,3</b> &middot; previo 48,0 &middot; sigue en zona de contracci&oacute;n</div>
-            </div>
-          </div>
-
-          <div class="htx-cal2__ev">
-            <div class="htx-cal2__day"><span class="d">04</span><span class="m">SEP</span></div>
-            <div>
-              <div class="htx-cal2__meta"><span class="htx-cal2__time">08:30</span><span class="htx-cal2__tag ar">Argentina</span><span class="htx-cal2__imp">&#9679;&#9679;&#9675;</span></div>
-              <div class="htx-cal2__title">IPC CABA &mdash; agosto</div>
-              <div class="htx-cal2__sub">Anticipo del IPC nacional del INDEC &middot; previo <b>+2,2% m/m</b></div>
-            </div>
-          </div>
-
-          <div class="htx-cal2__ev">
-            <div class="htx-cal2__day"><span class="d">05</span><span class="m">SEP</span></div>
-            <div>
-              <div class="htx-cal2__meta"><span class="htx-cal2__time">09:30</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
-              <div class="htx-cal2__title">N&oacute;minas no agr&iacute;colas &mdash; agosto</div>
-              <div class="htx-cal2__sub">Consenso <b>+160k</b> &middot; previo +142k &middot; desempleo esperado 4,3%</div>
-            </div>
-          </div>
-
-          <div class="htx-cal2__ev">
-            <div class="htx-cal2__day"><span class="d">12</span><span class="m">SEP</span></div>
-            <div>
-              <div class="htx-cal2__meta"><span class="htx-cal2__time">16:00</span><span class="htx-cal2__tag ar">Argentina</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
-              <div class="htx-cal2__title">IPC Nacional INDEC &mdash; agosto</div>
-              <div class="htx-cal2__sub">El dato de inflaci&oacute;n de referencia del mes</div>
-            </div>
+            <a class="htx-tile__link" href="#reportes" data-tab-target="informes">Ver reportes diarios &rarr;</a>
           </div>
         </div>
-        <p class="htx-pf__note">Eventos de ejemplo &middot; el calendario en vivo est&aacute; en su pesta&ntilde;a</p>
-        <a class="htx-tile__link" href="#calendario" data-tab-target="calendario">Ver calendario completo &rarr;</a>
+        <div class="htx-cal2__legendbar">
+          <span><i style="background:var(--htx-data);"></i>Argentina</span>
+          <span><i style="background:#9fb4c9;"></i>Estados Unidos</span>
+          <span><i style="background:var(--htx-amber);"></i>Alta relevancia de mercado</span>
+        </div>
+        <p class="htx-pf__note">Eventos de ejemplo &middot; noticias en vivo de los reportes diarios</p>
       </div>
     </div>
 
@@ -3875,7 +3911,14 @@
       <div><div id="calDetailTitle" style="font-size:11px;font-weight:600;color:var(--gold);letter-spacing:.04em;margin-bottom:4px;">Seleccioná un indicador</div><div id="calDetailText" style="font-size:12.5px;color:rgba(255,255,255,.45);line-height:1.6;">Tocá cualquier cuadro para ver el contexto, la tendencia y qué significa para los mercados.</div></div>
     </div>
     <div data-aos="fade-up">
-      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px;">Eventos de la semana — <span id="calSemanaLabel">cargando...</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);">Eventos de la semana — <span id="calSemanaLabel">cargando...</span></div>
+        <div class="cal-view-tabs" role="tablist" aria-label="Tipo de calendario">
+          <button type="button" class="cal-view-tab active" data-cal-view="economico" onclick="calSetView('economico')">Económico</button>
+          <button type="button" class="cal-view-tab" data-cal-view="earnings" onclick="calSetView('earnings')">Earnings</button>
+          <button type="button" class="cal-view-tab" data-cal-view="dividendos" onclick="calSetView('dividendos')">Dividendos</button>
+        </div>
+      </div>
       <div id="calWeekGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
         <div class="cal-day"><div class="cal-day-head"><span class="cal-day-name">Lun</span></div></div>
         <div class="cal-day"><div class="cal-day-head"><span class="cal-day-name">Mar</span></div></div>
@@ -3883,7 +3926,7 @@
         <div class="cal-day"><div class="cal-day-head"><span class="cal-day-name">Jue</span></div></div>
         <div class="cal-day"><div class="cal-day-head"><span class="cal-day-name">Vie</span></div></div>
       </div>
-      <div style="display:flex;gap:18px;margin-top:12px;">
+      <div id="calLegend" style="display:flex;gap:18px;margin-top:12px;flex-wrap:wrap;">
         <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.3);"><div style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;"></div>Argentina</div>
         <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.3);"><div style="width:6px;height:6px;border-radius:50%;background:#60A5FA;flex-shrink:0;"></div>EE.UU.</div>
         <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.3);"><div style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>Alta relevancia</div>
@@ -4059,7 +4102,7 @@
       <div class="picks-list" style="display:block;">
 
         <div class="inv-panel" data-sector-panel="semis">
-          <div class="inv-panel-progress">5 de 10 con informe completo</div>
+          <div class="inv-panel-progress">8 de 10 con informe completo</div>
           <div class="sector-cards">
             <div class="pick-card" data-aos="fade-up">
               <div class="pick-accent neutral"></div>
@@ -4079,14 +4122,14 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,34 15,30 30,22 45,12 60,6 75,4 90,14" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/amd.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AMD')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="120">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card" data-aos="fade-up" data-aos-delay="120">
+              <div class="pick-accent neutral"></div>
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">TSM</span><span class="pick-tag pick-tag-us">USA &middot; Semis</span></div>
                 <div class="pick-name">Taiwan Semiconductor Mfg. Co.</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,32 15,26 30,18 45,10 60,4 75,8 90,13" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/tsm.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'TSM')">Ver análisis &rarr;</a></div>
             </div>
             <div class="pick-card" data-aos="fade-up" data-aos-delay="180">
               <div class="pick-accent neutral"></div>
@@ -4097,14 +4140,14 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,14 15,20 30,32 45,30 60,24 75,22 90,10" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/avgo.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AVGO')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="240">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card" data-aos="fade-up" data-aos-delay="240">
+              <div class="pick-accent down"></div>
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">ARM</span><span class="pick-tag pick-tag-us">USA &middot; Semis</span></div>
                 <div class="pick-name">Arm Holdings plc</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,20 30,8 45,4 60,16 75,26 90,22" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/arm.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ARM')">Ver análisis &rarr;</a></div>
             </div>
             <div class="pick-card" data-aos="fade-up">
               <div class="pick-accent neutral"></div>
@@ -4115,14 +4158,14 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,34 15,28 30,24 45,20 60,14 75,10 90,8" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/mu.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MU')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="60">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card" data-aos="fade-up" data-aos-delay="60">
+              <div class="pick-accent neutral"></div>
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">QCOM</span><span class="pick-tag pick-tag-us">USA &middot; Semis</span></div>
                 <div class="pick-name">Qualcomm Incorporated</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,14 15,12 30,10 45,34 60,6 75,20 90,24" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/qcom.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'QCOM')">Ver análisis &rarr;</a></div>
             </div>
             <div class="pick-card" data-aos="fade-up" data-aos-delay="120">
               <div class="pick-accent down"></div>
@@ -4347,7 +4390,7 @@
         </div>
 
         <div class="inv-panel active" data-sector-panel="software">
-          <div class="inv-panel-progress">3 de 10 con informe completo</div>
+          <div class="inv-panel-progress">7 de 10 con informe completo</div>
           <div class="sector-cards">
             <div class="pick-card" data-aos="fade-up">
               <div class="pick-accent neutral"></div>
@@ -4376,68 +4419,68 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,10 15,18 30,28 45,34 60,30 75,8 90,14" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/pltr.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'PLTR')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="200">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card" data-aos="fade-up" data-aos-delay="200">
+              <div class="pick-accent neutral"></div>
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">CRM</span><span class="pick-tag pick-tag-us">USA &middot; Software</span></div>
                 <div class="pick-name">Salesforce, Inc.</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,34 30,26 45,14 60,20 75,10 90,8" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/crm.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'CRM')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card" data-aos="fade-up">
+              <div class="pick-accent neutral"></div>
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">NOW</span><span class="pick-tag pick-tag-us">USA &middot; Software</span></div>
                 <div class="pick-name">ServiceNow, Inc.</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,8 15,20 30,32 45,36 60,26 75,20 90,18" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/now.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'NOW')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="60">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card" data-aos="fade-up" data-aos-delay="60">
+              <div class="pick-accent neutral"></div>
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">SNOW</span><span class="pick-tag pick-tag-us">USA &middot; Software</span></div>
                 <div class="pick-name">Snowflake Inc.</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,34 30,36 45,24 60,14 75,8 90,6" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/snow.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'SNOW')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="120">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card" data-aos="fade-up" data-aos-delay="120">
+              <div class="pick-accent neutral"></div>
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">CRWD</span><span class="pick-tag pick-tag-us">USA &middot; Software</span></div>
                 <div class="pick-name">CrowdStrike Holdings, Inc.</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,18 15,28 30,34 45,32 60,22 75,8 90,12" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/crwd.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'CRWD')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="180">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card" data-aos="fade-up" data-aos-delay="180">
+              <div class="pick-accent neutral"></div>
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">ORCL</span><span class="pick-tag pick-tag-us">USA &middot; Software</span></div>
                 <div class="pick-name">Oracle Corporation</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,22 15,26 30,6 45,12 60,24 75,32 90,30" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/orcl.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ORCL')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="240">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card" data-aos="fade-up" data-aos-delay="240">
+              <div class="pick-accent neutral"></div>
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">INTU</span><span class="pick-tag pick-tag-us">USA &middot; Software</span></div>
                 <div class="pick-name">Intuit Inc.</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,6 15,9 30,18 45,30 60,34 75,29 90,31" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/intu.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'INTU')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card" data-aos="fade-up" data-aos-delay="240">
+              <div class="pick-accent neutral"></div>
               <div class="pick-info">
-                <div class="pick-row1"><span class="pick-ticker">SAP</span><span class="pick-tag pick-tag-us">USA &middot; Software</span></div>
+                <div class="pick-row1"><span class="pick-ticker">SAP</span><span class="pick-tag pick-tag-us">ADR &middot; Software</span></div>
                 <div class="pick-name">SAP SE</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,12 15,6 30,16 45,34 60,30 75,20 90,15" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/sap.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'SAP')">Ver análisis &rarr;</a></div>
             </div>
           </div>
         </div>
@@ -4691,6 +4734,40 @@
     .pf-empty-row td { color: rgba(255,255,255,.35); font-style: italic; padding: 16px 6px; }
     .pf-add-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; color: rgba(255,255,255,.4); font-size: 13px; cursor: pointer; padding: 10px 6px; border: 1px dashed rgba(255,255,255,.18); border-radius: 6px; }
     .pf-add-row:hover { color: var(--gold); border-color: var(--gold-dark,#B8943F); }
+    .pf-add-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .pf-add-actions .pf-add-row { margin-top: 12px; }
+    .pf-import-row { flex-direction: column; gap: 3px; }
+    .pf-import-row .pf-import-hint { font-size: 10.5px; color: rgba(255,255,255,.3); font-family: 'IBM Plex Mono', monospace; }
+    @media (max-width: 640px) { .pf-add-actions { grid-template-columns: 1fr; } }
+    /* ---- Revisión de importación de PDF ---- */
+    .pf-import-box { margin-top: 12px; background: var(--navy-5); border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 14px; }
+    .pf-import-box h4 { margin: 0 0 4px; font-size: 14px; color: var(--white); }
+    .pf-import-box .pf-imp-sub { font-size: 12px; color: rgba(255,255,255,.5); margin: 0 0 12px; }
+    .pf-imp-status { font-size: 13px; color: rgba(255,255,255,.6); display: flex; align-items: center; gap: 9px; padding: 6px 0; }
+    .pf-imp-spin { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.2); border-top-color: var(--gold); border-radius: 50%; animation: pfImpSpin .7s linear infinite; flex-shrink: 0; }
+    @keyframes pfImpSpin { to { transform: rotate(360deg); } }
+    .pf-imp-err { color: var(--red); font-size: 12.5px; line-height: 1.45; }
+    .pf-imp-avisos { list-style: none; margin: 0 0 12px; padding: 10px 12px; background: rgba(242,201,76,.08); border: 1px solid rgba(242,201,76,.25); border-radius: 6px; }
+    .pf-imp-avisos li { font-size: 11.5px; color: rgba(255,255,255,.7); line-height: 1.5; padding-left: 14px; position: relative; }
+    .pf-imp-avisos li::before { content: '·'; position: absolute; left: 4px; color: var(--gold); }
+    .pf-imp-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .pf-imp-table th { text-align: left; font-weight: 600; color: rgba(255,255,255,.4); font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,.12); }
+    .pf-imp-table td { padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .pf-imp-table tr.pf-imp-flag td { background: rgba(242,201,76,.06); }
+    .pf-imp-table tr.pf-imp-off { opacity: .4; }
+    .pf-imp-table input, .pf-imp-table select { width: 100%; background: var(--navy-1); border: 1px solid rgba(255,255,255,.15); border-radius: 4px; color: var(--white); padding: 5px 6px; font-size: 12px; font-family: inherit; }
+    .pf-imp-table input.pf-imp-warnfield { border-color: rgba(242,201,76,.6); }
+    .pf-imp-tk { width: 84px; }
+    .pf-imp-qty { width: 78px; text-align: right; }
+    .pf-imp-px { width: 92px; text-align: right; }
+    .pf-imp-badge { display: inline-block; font-size: 9.5px; padding: 1px 5px; border-radius: 3px; margin-left: 5px; vertical-align: middle; }
+    .pf-imp-badge.baja { background: rgba(224,90,90,.18); color: #E9A0A0; }
+    .pf-imp-badge.media { background: rgba(242,201,76,.16); color: #E7CB74; }
+    .pf-imp-badge.nuevo { background: rgba(255,255,255,.1); color: rgba(255,255,255,.55); }
+    .pf-imp-chk { width: auto; }
+    .pf-imp-actions { display: flex; gap: 8px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+    .pf-imp-cuota { font-size: 11px; color: rgba(255,255,255,.4); margin-left: auto; }
+    .pf-imp-scroll { overflow-x: auto; }
     .pf-add-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; background: var(--navy-5); border-radius: 8px; padding: 12px; }
     .pf-add-form input[type="text"], .pf-add-form input[type="number"], .pf-add-form select, .pf-ticker-wrap input[type="text"] {
       background: var(--navy-1); border: 1px solid rgba(255,255,255,.15); border-radius: 5px; color: var(--white);
@@ -4903,6 +4980,18 @@
     .pf-metric-val { position:relative; font-family: 'IBM Plex Mono', monospace; font-size: 27px; font-weight: 700; color: var(--white); line-height: 1.1; letter-spacing: -.01em; }
     .pf-metric-note { position:relative; font-size: 11.5px; color: rgba(255,255,255,.42); margin-top: 8px; line-height: 1.5; }
 
+    /* Bloque de membresía: estructura visible, sin dato; el "cartel" para comprar vive en Warren */
+    .pf-metric-card.pf-locked { opacity: .92; }
+    .pf-metric-card.pf-locked .pf-metric-val { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: .02em; color: rgba(255,255,255,.4); display: inline-flex; align-items: center; gap: 6px; }
+    .pf-metric-card.pf-locked .pf-metric-val svg { width: 12px; height: 12px; flex: none; opacity: .8; }
+    .pf-mini-warren.pf-mini-warren--lock { background: rgba(242,201,76,.16); border-color: rgba(242,201,76,.5); }
+    .pf-mini-warren.pf-mini-warren--lock:hover { background: rgba(242,201,76,.3); }
+    .pf-lock-cta { margin-top: 2px; display: inline-flex; align-items: center; gap: 7px; background: rgba(242,201,76,.12); border: 1px solid rgba(242,201,76,.4); color: var(--gold); border-radius: 8px; padding: 8px 13px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; transition: background .15s ease; }
+    .pf-lock-cta:hover { background: rgba(242,201,76,.24); }
+    .pf-lock-warren { display: flex; gap: 10px; align-items: flex-start; }
+    .pf-lock-warren .pf-lw-av { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--gold); color: var(--gold); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 12px; }
+    .pf-lock-warren p { margin: 0 0 10px; font-size: 12px; line-height: 1.55; color: rgba(255,255,255,.7); }
+
     .pf-metric-top-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     .pf-mini-warren {
       width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0; padding: 0;
@@ -4981,7 +5070,7 @@
 
     .pf-row-split, .pf-row-align { display: grid; gap: 0; }
     .pf-row-split { grid-template-columns: 1.7fr 1fr; }
-    .pf-row-align { grid-template-columns: 2fr 1fr; }
+    .pf-row-align { grid-template-columns: 1.7fr 1fr; }
     .pf-row-split > .pf-card:first-child,
     .pf-row-align > .pf-card:first-child {
       padding-right: 26px;
@@ -5092,20 +5181,15 @@
             <thead><tr><th>Activo</th><th style="text-align:right;">Cant.</th><th style="text-align:right;">Compra</th><th style="text-align:right;">Actual</th><th style="text-align:right;">Resultado</th><th style="text-align:right;">% cartera</th><th></th></tr></thead>
             <tbody id="pfPositionsBody"></tbody>
           </table>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div class="pf-add-row" id="pfAddRowBtn" onclick="pfShowAddForm()" style="flex:1;">+ Agregar posición</div>
-            <div class="pf-add-row" id="pfImportPdfBtn" onclick="document.getElementById('pfPdfFileInput').click()" style="flex:1;">📄 Importar PDF del broker</div>
-          </div>
-          <input type="file" id="pfPdfFileInput" accept="application/pdf" style="display:none;" onchange="pfImportPdfFile(this.files[0])">
-          <div id="pfPdfImportStatus" style="display:none;margin-top:12px;font-size:12.5px;color:rgba(255,255,255,.5);"></div>
-          <div id="pfPdfReviewCard" style="display:none;margin-top:12px;background:var(--navy-1);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:16px;">
-            <div style="font-size:12.5px;color:rgba(255,255,255,.6);margin-bottom:12px;">Revisá lo que se detectó antes de importar — desmarcá lo que no corresponda o esté mal, después podés editarlo a mano.</div>
-            <div id="pfPdfReviewRows"></div>
-            <div style="display:flex;gap:10px;margin-top:14px;">
-              <button class="pf-btn-gold" onclick="pfConfirmPdfImport()">Importar seleccionadas</button>
-              <button class="pf-btn-ghost" onclick="pfCancelPdfImport()">Cancelar</button>
+          <div class="pf-add-actions">
+            <div class="pf-add-row" id="pfAddRowBtn" onclick="pfShowAddForm()">+ Agregar posición</div>
+            <div class="pf-add-row pf-import-row" id="pfImportRowBtn" onclick="pfImportPdfClick()">
+              <span>&#128196; Importar PDF del broker</span>
+              <span class="pf-import-hint">IOL &middot; Balanz &middot; Cocos &middot; PPI &middot; Bull Market</span>
             </div>
           </div>
+          <input type="file" id="pfPdfInput" accept="application/pdf,.pdf" style="display:none;" onchange="pfPdfSelected(this)">
+          <div class="pf-import-box" id="pfImportBox" style="display:none;"></div>
           <div class="pf-add-form" id="pfAddForm" style="display:none;">
             <div class="pf-ticker-wrap">
               <input type="text" id="pfInputTicker" placeholder="Ticker o nombre (ej: AAPL, Apple)" autocomplete="off">
@@ -5141,6 +5225,7 @@
         </div>
         <div class="pf-card" id="pfSectorMiniWrapper" style="position:relative;">
           <div id="pfSectorMini"></div>
+          <div id="pfAssetMap"></div>
         </div>
         </div>
 
@@ -6540,6 +6625,7 @@
   function pfMoney(n){ return '$'+ (n||0).toLocaleString('es-AR',{maximumFractionDigits: Math.abs(n)<1000?2:0}); }
 
   function pfShowAddForm(){
+    if(typeof pfImportCancel === 'function') pfImportCancel();
     document.getElementById('pfAddForm').style.display = 'flex';
     document.getElementById('pfAddRowBtn').style.display = 'none';
     pfFetchMarketData(false); // precarga la lista de activos para el buscador
@@ -6577,141 +6663,6 @@
     window._pfPositions.push({ id: pfIdSeq++, ticker: ticker, cantidad: cantidad, precioCompra: precio, moneda: moneda, notas: notas, isCash: isCash });
     pfHideAddForm();
     pfRenderPositions();
-  }
-
-  // ─── Importar posiciones desde el PDF de tenencias de un broker ─────────
-  // pdf.js (ya cargado en la pagina para el visor de papers) extrae el TEXTO
-  // del PDF en el navegador -- nunca se manda el archivo a ningun lado, solo
-  // el texto plano al worker de Warren, que lo procesa con Haiku 4.5 y
-  // devuelve las posiciones detectadas. El usuario siempre revisa y confirma
-  // antes de que se agregue nada a su portafolio real.
-  var pfPdfExtracted = null;
-
-  async function pfExtractPdfText(file){
-    var buf = await file.arrayBuffer();
-    var pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-    var text = '';
-    for (var i = 1; i <= pdf.numPages; i++) {
-      var page = await pdf.getPage(i);
-      var content = await page.getTextContent();
-      text += content.items.map(function(it){ return it.str; }).join(' ') + '\n';
-    }
-    return text;
-  }
-
-  async function pfImportPdfFile(file){
-    if (!file) return;
-    var statusEl = document.getElementById('pfPdfImportStatus');
-    statusEl.style.display = '';
-    statusEl.textContent = 'Leyendo el PDF...';
-    document.getElementById('pfPdfReviewCard').style.display = 'none';
-    try {
-      if (typeof pdfjsLib === 'undefined') throw new Error('pdfjs no disponible');
-      var text = await pfExtractPdfText(file);
-      if (!text.trim()) throw new Error('sin texto');
-
-      statusEl.textContent = 'Identificando posiciones...';
-      var res = await fetch('https://warren.nachito2502.workers.dev/extract-portfolio-pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text.slice(0, 6000) })
-      });
-      var body = await res.json();
-      if (!res.ok || !body.ok) {
-        var msg = body && body.error === 'limite_diario'
-          ? 'Llegaste al límite de importaciones de hoy. Probá de nuevo mañana, o cargá la posición a mano.'
-          : 'No pudimos leer ese PDF. Probá con otro archivo o cargá la posición a mano.';
-        statusEl.textContent = msg;
-        return;
-      }
-      pfPdfExtracted = body.data;
-      pfRenderPdfReview(body.data);
-      statusEl.style.display = 'none';
-    } catch (e) {
-      statusEl.textContent = 'No pudimos procesar ese PDF. Probá con otro archivo o cargá la posición a mano.';
-    } finally {
-      document.getElementById('pfPdfFileInput').value = '';
-    }
-  }
-
-  function pfRenderPdfReview(data){
-    var card = document.getElementById('pfPdfReviewCard');
-    var rowsEl = document.getElementById('pfPdfReviewRows');
-    var posiciones = (data.posiciones || []).filter(function(p){ return p.tipo !== 'fci'; });
-    var omitidos = (data.posiciones || []).length - posiciones.length;
-    var efectivo = data.efectivo || [];
-
-    if (!posiciones.length && !efectivo.length) {
-      rowsEl.innerHTML = '<div class="pf-metric-note">No detectamos posiciones en ese PDF. Probá con otro archivo o cargá a mano.</div>';
-      card.style.display = '';
-      return;
-    }
-
-    var rows = posiciones.map(function(p, i){
-      return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;">'
-        + '<input type="checkbox" id="pfPdfChk_' + i + '" checked>'
-        + '<span style="width:70px;font-family:monospace;color:var(--gold);">' + pfEsc(p.ticker || '—') + '</span>'
-        + '<span style="width:80px;color:rgba(255,255,255,.6);">' + (p.cantidad != null ? p.cantidad : '—') + ' u.</span>'
-        + '<span style="width:110px;color:rgba(255,255,255,.6);">' + (p.precioActual != null ? pfMoney(p.precioActual) : 'sin precio') + '</span>'
-        + '<span style="width:50px;color:rgba(255,255,255,.4);">' + pfEsc(p.moneda || 'USD') + '</span>'
-        + '</div>';
-    }).join('');
-
-    var cashRows = efectivo.map(function(c, i){
-      return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;">'
-        + '<input type="checkbox" id="pfPdfChkCash_' + i + '" checked>'
-        + '<span>&#128176; Efectivo</span>'
-        + '<span style="color:rgba(255,255,255,.6);">' + pfMoney(c.monto) + ' ' + pfEsc(c.moneda || 'ARS') + '</span>'
-        + '</div>';
-    }).join('');
-
-    rowsEl.innerHTML = rows + cashRows
-      + (omitidos > 0 ? '<div class="pf-metric-note" style="margin-top:8px;">' + omitidos + ' fondo(s) común(es) de inversión detectado(s) — todavía no se importan automáticamente, cargalos a mano si querés incluirlos.</div>' : '');
-    card.style.display = '';
-  }
-
-  function pfConfirmPdfImport(){
-    if (!pfPdfExtracted) return;
-    var posiciones = (pfPdfExtracted.posiciones || []).filter(function(p){ return p.tipo !== 'fci'; });
-    var efectivo = pfPdfExtracted.efectivo || [];
-    var added = 0;
-
-    posiciones.forEach(function(p, i){
-      var chk = document.getElementById('pfPdfChk_' + i);
-      if (!chk || !chk.checked) return;
-      if (!p.ticker || !(p.cantidad > 0)) return;
-      var precio = p.precioCompra != null ? p.precioCompra : p.precioActual;
-      if (!(precio > 0)) return; // sin precio de referencia no se puede cargar la posicion
-      window._pfPositions.push({
-        id: pfIdSeq++, ticker: String(p.ticker).toUpperCase(), cantidad: p.cantidad,
-        precioCompra: precio, moneda: p.moneda === 'ARS' ? 'ARS' : 'USD',
-        notas: 'Importado de PDF', isCash: false
-      });
-      added++;
-    });
-
-    efectivo.forEach(function(c, i){
-      var chk = document.getElementById('pfPdfChkCash_' + i);
-      if (!chk || !chk.checked) return;
-      if (!(c.monto > 0)) return;
-      window._pfPositions.push({
-        id: pfIdSeq++, ticker: 'Efectivo', cantidad: c.monto, precioCompra: 1,
-        moneda: c.moneda === 'USD' ? 'USD' : 'ARS', notas: 'Importado de PDF', isCash: true
-      });
-      added++;
-    });
-
-    pfCancelPdfImport();
-    pfRenderPositions();
-    var statusEl = document.getElementById('pfPdfImportStatus');
-    statusEl.style.display = '';
-    statusEl.textContent = added > 0 ? ('Se importaron ' + added + ' posición(es). Revisalas en la tabla.') : 'No se importó nada — desmarcaste todo o faltaban datos.';
-    setTimeout(function(){ statusEl.style.display = 'none'; }, 5000);
-  }
-
-  function pfCancelPdfImport(){
-    pfPdfExtracted = null;
-    document.getElementById('pfPdfReviewCard').style.display = 'none';
   }
 
   function pfRemovePosition(id){
@@ -6877,6 +6828,12 @@
     var entry = hit && hit[moneda === 'ARS' ? 'ARS' : 'USD'];
     return entry ? entry.category : null;
   }
+  function pfGetCurrentChange(ticker, moneda){
+    var idx = window._pfMarketData || {};
+    var hit = idx[(ticker||'').toUpperCase()];
+    var entry = hit && hit[moneda === 'ARS' ? 'ARS' : 'USD'];
+    return entry ? entry.change : null;
+  }
   // Dolar CCL: viaja en el mismo payload (categoria "dolares", simbolo CONTADOCONLIQUI) y ya
   // queda indexado por el mecanismo de arriba -- cero fetch nuevo.
   function pfGetCclRate(){ return pfGetCurrentPrice('CONTADOCONLIQUI', 'ARS'); }
@@ -7006,6 +6963,7 @@
     if(saveBtn) saveBtn.style.display = (window._miIsMember && window._miIsMember()) ? '' : 'none';
     pfRenderAlignment();
     pfRenderSectorMini();
+    pfRenderAssetMiniMap();
     pfRenderMetrics();
     pfRenderAdvancedMetrics();
   }
@@ -7019,6 +6977,279 @@
     btn.disabled = false; btn.textContent = 'Guardar mi portafolio';
     status.textContent = ok ? 'Guardado ✓' : 'No se pudo guardar, probá de nuevo.';
     setTimeout(function(){ status.textContent=''; }, 4000);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  //  Importar tenencias desde el PDF del broker
+  //  El PDF se lee 100% en el navegador (PDF.js). Al Worker solo viaja el
+  //  texto extraido, nunca el archivo. Warren lo pasa por Claude y devuelve
+  //  las posiciones normalizadas -> tabla de revision editable -> _pfPositions.
+  // ─────────────────────────────────────────────────────────────────────────
+  var PF_WARREN_PARSE_URL = 'https://warren.nachito2502.workers.dev/portfolio/parse';
+  var PF_PDFJS_VER = '3.11.174';
+  var pfPdfJsLoading = null;
+  var pfImportParsed = null; // ultima respuesta del Worker, para el confirm
+
+  function pfImportBoxEl(){ return document.getElementById('pfImportBox'); }
+  function pfImportShow(html){
+    var box = pfImportBoxEl();
+    if(!box) return;
+    // no mostrar el formulario manual y la revision del PDF a la vez
+    var addForm = document.getElementById('pfAddForm');
+    if(addForm && addForm.style.display !== 'none' && typeof pfHideAddForm === 'function') pfHideAddForm();
+    box.innerHTML = html;
+    box.style.display = 'block';
+  }
+  function pfImportCancel(){
+    var box = pfImportBoxEl();
+    if(box){ box.style.display = 'none'; box.innerHTML = ''; }
+    pfImportParsed = null;
+    var inp = document.getElementById('pfPdfInput');
+    if(inp) inp.value = '';
+  }
+
+  function pfImportPdfClick(){
+    if(!(window._currentUser && window._currentUser.email)){
+      pfImportShow('<h4>Importar PDF del broker</h4>'
+        + '<p class="pf-imp-sub">Necesitás iniciar sesión con tu cuenta de Google para usar la importación.</p>'
+        + '<div class="pf-imp-actions"><button class="pf-btn-gold" onclick="window.signInWithGoogle && window.signInWithGoogle()">Iniciar sesión con Google</button>'
+        + '<button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    var inp = document.getElementById('pfPdfInput');
+    if(inp) inp.click();
+  }
+
+  function pfPdfSelected(input){
+    var file = input && input.files && input.files[0];
+    if(!file) return;
+    if(file.type && file.type.indexOf('pdf') === -1 && !/\.pdf$/i.test(file.name)){
+      pfImportShow('<h4>Importar PDF del broker</h4><p class="pf-imp-err">Ese archivo no parece un PDF. Subí el PDF de tenencias que te da el broker.</p><div class="pf-imp-actions"><button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    if(file.size > 12 * 1024 * 1024){
+      pfImportShow('<h4>Importar PDF del broker</h4><p class="pf-imp-err">El archivo pesa más de 12 MB. Suele ser un PDF escaneado (imagen); por ahora solo soportamos PDF con texto real.</p><div class="pf-imp-actions"><button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    pfImportShow('<h4>Importar PDF del broker</h4><div class="pf-imp-status"><span class="pf-imp-spin"></span> Leyendo el PDF en tu navegador…</div>');
+    pfProcessPdfFile(file);
+  }
+
+  function pfLoadPdfJs(){
+    if(window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    if(pfPdfJsLoading) return pfPdfJsLoading;
+    pfPdfJsLoading = new Promise(function(resolve, reject){
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/' + PF_PDFJS_VER + '/pdf.min.js';
+      s.onload = function(){
+        if(!window.pdfjsLib){ reject(new Error('pdfjs no expuso pdfjsLib')); return; }
+        try {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/' + PF_PDFJS_VER + '/pdf.worker.min.js';
+        } catch(e){}
+        resolve(window.pdfjsLib);
+      };
+      s.onerror = function(){ reject(new Error('no se pudo cargar pdf.js')); };
+      document.head.appendChild(s);
+    });
+    return pfPdfJsLoading;
+  }
+
+  // Reconstruye filas y columnas a partir de la posicion (transform x/y + width)
+  // de cada fragmento que devuelve PDF.js. Sin esto las columnas de un resumen
+  // de tenencias salen entreveradas y el parser lee mal (cantidad/PPC de una
+  // fila terminan pegadas a otra). Probado contra un resumen real de Balanz:
+  // el join naive daba filas cruzadas, este metodo las alinea bien.
+  function pfLayoutTextItems(items){
+    var frags = [];
+    (items || []).forEach(function(it){
+      if(!it || !it.str || !it.str.trim()) return;
+      var tr = it.transform || [1,0,0,1,0,0];
+      frags.push({ x: tr[4], y: tr[5], w: it.width || (it.str.length * 4), str: it.str });
+    });
+    if(!frags.length) return '';
+    frags.sort(function(a,b){ return (b.y - a.y) || (a.x - b.x); });
+    var lines = [], cur = null;
+    frags.forEach(function(f){
+      if(cur && Math.abs(f.y - cur.y) <= 3){ cur.items.push(f); }
+      else { cur = { y: f.y, items: [f] }; lines.push(cur); }
+    });
+    var totW = 0, totC = 0;
+    frags.forEach(function(f){ totW += f.w; totC += f.str.length; });
+    var charW = totC ? (totW / totC) : 4;
+    if(!(charW > 0)) charW = 4;
+    return lines.map(function(ln){
+      ln.items.sort(function(a,b){ return a.x - b.x; });
+      var out = '', prevEnd = null;
+      ln.items.forEach(function(f){
+        if(prevEnd != null){
+          var gap = f.x - prevEnd;
+          var sp = gap > charW * 0.6 ? Math.max(1, Math.round(gap / charW)) : (gap > 0 ? 1 : 0);
+          out += new Array(Math.min(sp, 14) + 1).join(' ');
+        }
+        out += f.str;
+        prevEnd = f.x + f.w;
+      });
+      return out.replace(/\s+$/, '');
+    }).join('\n');
+  }
+
+  async function pfExtractPdfText(arrayBuffer){
+    var pdfjsLib = await pfLoadPdfJs();
+    var pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    var maxPages = Math.min(pdf.numPages, 20);
+    var out = [];
+    for(var i = 1; i <= maxPages; i++){
+      var page = await pdf.getPage(i);
+      var tc = await page.getTextContent();
+      out.push(pfLayoutTextItems(tc.items));
+    }
+    return out.join('\n\n');
+  }
+
+  async function pfProcessPdfFile(file){
+    var text;
+    try {
+      var buf = await file.arrayBuffer();
+      text = await pfExtractPdfText(buf);
+    } catch(e){
+      console.warn('pdf extract failed:', e);
+      pfImportShow('<h4>Importar PDF del broker</h4><p class="pf-imp-err">No se pudo leer el PDF. Si es un PDF escaneado (una foto/imagen), por ahora solo soportamos PDF con texto real. Probá descargar de nuevo el resumen desde el broker.</p><div class="pf-imp-actions"><button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    if(!text || text.replace(/\s/g,'').length < 30){
+      pfImportShow('<h4>Importar PDF del broker</h4><p class="pf-imp-err">El PDF no tiene texto seleccionable (parece escaneado). Por ahora solo soportamos PDF con texto real.</p><div class="pf-imp-actions"><button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    pfImportShow('<h4>Importar PDF del broker</h4><div class="pf-imp-status"><span class="pf-imp-spin"></span> Interpretando tus tenencias…</div>');
+    var resp, data;
+    try {
+      resp = await fetch(PF_WARREN_PARSE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: window._currentUser.email, text: text })
+      });
+      data = await resp.json();
+    } catch(e){
+      pfImportShow('<h4>Importar PDF del broker</h4><p class="pf-imp-err">No se pudo conectar con el servidor. Probá de nuevo en un rato.</p><div class="pf-imp-actions"><button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    if(!resp.ok || data.error){
+      var msg = data && data.message ? data.message : 'No se pudo procesar el PDF.';
+      pfImportShow('<h4>Importar PDF del broker</h4><p class="pf-imp-err">'+ pfEsc(msg) +'</p><div class="pf-imp-actions"><button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    if(!data.positions || !data.positions.length){
+      var av = (data.avisos && data.avisos.length) ? (' ' + data.avisos.join(' ')) : '';
+      pfImportShow('<h4>Importar PDF del broker</h4><p class="pf-imp-err">No encontré posiciones en este PDF.'+ pfEsc(av) +'</p><div class="pf-imp-actions"><button class="pf-btn-ghost" onclick="pfImportCancel()">Cerrar</button></div>');
+      return;
+    }
+    try { await pfFetchMarketData(false); } catch(e){}
+    pfImportParsed = data;
+    pfRenderImportReview(data);
+  }
+
+  function pfKnownTicker(sym){
+    var list = window._pfTickerList || [];
+    sym = (sym || '').toUpperCase();
+    for(var i = 0; i < list.length; i++){ if(list[i].symbol === sym) return true; }
+    return false;
+  }
+
+  function pfRenderImportReview(data){
+    var TIPO_LABEL = { accion:'Acción', cedear:'CEDEAR', bono:'Bono', cripto:'Cripto', fci:'FCI', efectivo:'Efectivo', otro:'Otro' };
+    var rowsHtml = data.positions.map(function(p, i){
+      var isCash = p.tipo === 'efectivo';
+      var unknown = !isCash && !pfKnownTicker(p.ticker);
+      var noPx = !isCash && (p.precioCompra == null);
+      var flag = unknown || noPx || p.confianza === 'baja' || p.confianza === 'media';
+      var badge = '';
+      if(unknown) badge = '<span class="pf-imp-badge nuevo">sin match</span>';
+      else if(p.confianza === 'baja') badge = '<span class="pf-imp-badge baja">revisar</span>';
+      else if(p.confianza === 'media') badge = '<span class="pf-imp-badge media">chequear</span>';
+      return '<tr data-i="'+ i +'" class="'+ (flag ? 'pf-imp-flag' : '') +'">'
+        + '<td><input type="checkbox" class="pf-imp-chk" checked onchange="pfImpToggleRow(this)"></td>'
+        + '<td><input class="pf-imp-tk'+ (unknown ? ' pf-imp-warnfield' : '') +'" value="'+ pfEsc(p.ticker) +'" maxlength="20">'+ badge +'</td>'
+        + '<td><input class="pf-imp-qty" type="number" step="any" value="'+ (p.cantidad != null ? p.cantidad : '') +'"></td>'
+        + '<td><input class="pf-imp-px'+ (noPx ? ' pf-imp-warnfield' : '') +'" type="number" step="any" value="'+ (p.precioCompra != null ? p.precioCompra : '') +'" placeholder="'+ (isCash ? '1' : 's/d') +'"></td>'
+        + '<td><select class="pf-imp-mon"><option value="ARS"'+ (p.moneda !== 'USD' ? ' selected' : '') +'>ARS</option><option value="USD"'+ (p.moneda === 'USD' ? ' selected' : '') +'>USD</option></select></td>'
+        + '<td style="color:rgba(255,255,255,.5);white-space:nowrap;">'+ pfEsc(TIPO_LABEL[p.tipo] || 'Otro') +'</td>'
+        + '</tr>';
+    }).join('');
+
+    var avisosHtml = (data.avisos && data.avisos.length)
+      ? '<ul class="pf-imp-avisos">' + data.avisos.map(function(a){ return '<li>'+ pfEsc(a) +'</li>'; }).join('') + '</ul>'
+      : '';
+
+    var cuota = data.cuota || {};
+    var cuotaHtml = cuota.ilimitado
+      ? '<span class="pf-imp-cuota">Importaciones ilimitadas (miembro)</span>'
+      : '<span class="pf-imp-cuota">'+ (cuota.usados || 0) +' de '+ (cuota.limite || 3) +' importaciones usadas este mes</span>';
+
+    var brokerTxt = data.broker ? (' · ' + data.broker) : '';
+
+    pfImportShow(
+      '<h4>Revisá lo que leímos'+ pfEsc(brokerTxt) +'</h4>'
+      + '<p class="pf-imp-sub">Corregí ticker, cantidad, precio de compra (PPC) o moneda antes de importar. Las filas marcadas necesitan una mirada. Los precios que figuran como «s/d» no venían en el PDF — completalos o se importan sin resultado.</p>'
+      + avisosHtml
+      + '<div class="pf-imp-scroll"><table class="pf-imp-table">'
+      + '<thead><tr><th></th><th>Ticker</th><th>Cantidad</th><th>PPC</th><th>Moneda</th><th>Tipo</th></tr></thead>'
+      + '<tbody id="pfImpBody">'+ rowsHtml +'</tbody></table></div>'
+      + '<div class="pf-imp-actions">'
+      + '<button class="pf-btn-gold" onclick="pfConfirmImport()">Importar seleccionadas</button>'
+      + '<button class="pf-btn-ghost" onclick="pfImportCancel()">Descartar</button>'
+      + cuotaHtml
+      + '</div>'
+    );
+  }
+
+  function pfImpToggleRow(chk){
+    var tr = chk.closest('tr');
+    if(tr) tr.classList.toggle('pf-imp-off', !chk.checked);
+  }
+
+  function pfConfirmImport(){
+    var body = document.getElementById('pfImpBody');
+    if(!body || !pfImportParsed) return;
+    var trs = body.querySelectorAll('tr');
+    var added = 0;
+    trs.forEach(function(tr){
+      var chk = tr.querySelector('.pf-imp-chk');
+      if(!chk || !chk.checked) return;
+      var i = parseInt(tr.getAttribute('data-i'), 10);
+      var orig = pfImportParsed.positions[i] || {};
+      var ticker = (tr.querySelector('.pf-imp-tk').value || '').trim().toUpperCase();
+      var cantidad = parseFloat(tr.querySelector('.pf-imp-qty').value);
+      var moneda = tr.querySelector('.pf-imp-mon').value === 'USD' ? 'USD' : 'ARS';
+      var isCash = orig.tipo === 'efectivo';
+      var pxRaw = tr.querySelector('.pf-imp-px').value;
+      var precio = isCash ? 1 : (pxRaw === '' ? null : parseFloat(pxRaw));
+      if(!ticker || !(cantidad > 0)) return;
+      if(!isCash && precio != null && !(precio > 0)) precio = null;
+      window._pfPositions.push({
+        id: pfIdSeq++,
+        ticker: ticker,
+        cantidad: cantidad,
+        precioCompra: isCash ? 1 : precio,
+        moneda: moneda,
+        notas: 'Importado del PDF' + (pfImportParsed.broker ? (' · ' + pfImportParsed.broker) : ''),
+        isCash: isCash
+      });
+      added++;
+    });
+    pfImportCancel();
+    if(added){
+      pfRenderPositions();
+      var st = document.getElementById('pfSaveStatus');
+      if(st){
+        st.textContent = added + (added === 1 ? ' posición importada ✓' : ' posiciones importadas ✓');
+        setTimeout(function(){ st.textContent = ''; }, 5000);
+      }
+      var saveBtn = document.getElementById('pfSaveBtn');
+      if(saveBtn && window._miIsMember && window._miIsMember()){
+        saveBtn.style.display = '';
+      }
+    }
   }
 
   function pfRenderQuizStatus(){
@@ -7243,6 +7474,107 @@
   }
   window._pfRenderSectorMini = pfRenderSectorMini;
 
+  // ---- Mapa de tu cartera (grilla pareja, NO el squarify de Mercados > Mapas):
+  // como todos los activos pesan igual, un treemap proporcional por área queda
+  // irregular según la cantidad de posiciones (3 vs 7 arman formas distintas).
+  // Se arma una grilla fija de filas x columnas -- mismo contenedor (mismo
+  // ancho/alto) sea cual sea N, así el cuadro siempre se ve parejo y prolijo.
+  function pfMapGridDims(n){
+    var rows = n <= 8 ? 1 : (n <= 16 ? 2 : 3);
+    var cols = Math.ceil(n / rows);
+    return { rows: rows, cols: cols };
+  }
+  function pfRenderAssetTreemap(containerId, items){
+    var container = document.getElementById(containerId);
+    if(!container) return;
+    container.innerHTML = '';
+    if(!items.length) return;
+    var dims = pfMapGridDims(items.length);
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = 'repeat('+ dims.cols +', 1fr)';
+    container.style.gridTemplateRows = 'repeat('+ dims.rows +', 1fr)';
+    container.style.gap = '2px';
+    var rowH = container.clientHeight / dims.rows || 55;
+    items.forEach(function(item){
+      var tile = document.createElement('div');
+      tile.className = 'pf-map-tile';
+      tile.style.background = mktMapColorFor(item.change);
+      var symSize = Math.max(9, Math.min(13, rowH / 4));
+      var chg = item.change;
+      var html = '<div class="mt-sym" style="font-size:'+ symSize +'px">'+ pfEsc(item.symbol) +'</div>';
+      if(rowH >= 40) html += '<div class="mt-chg" style="font-size:'+ Math.max(8, symSize - 3) +'px">'+ (chg != null ? ((chg>=0?'+':'') + chg.toFixed(1) + '%') : 's/d') +'</div>';
+      tile.innerHTML = html;
+      tile.title = item.symbol + (chg != null ? ' · ' + (chg>=0?'+':'') + chg.toFixed(2) + '%' : ' · variación no disponible hoy');
+      if(item.category && item.price != null){
+        tile.addEventListener('click', function(){ openAssetModal(item, item.category, item.currency); });
+      }
+      container.appendChild(tile);
+    });
+  }
+  function pfRenderAssetMiniMap(){
+    var el = document.getElementById('pfAssetMap');
+    if(!el) return;
+    var rows = pfBuildRows();
+    var grouped = pfGroupByTicker(rows).filter(function(g){ return !g.isCash; });
+    if(!grouped.length){
+      el.innerHTML = '<div class="pf-metrics-label" style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);">Mapa de tu cartera</div>'
+        + '<div class="pf-metrics-empty">Cargá al menos una posición para ver el mapa.</div>';
+      return;
+    }
+    var items = grouped.map(function(g){
+      return {
+        symbol: g.tickerRaw,
+        price: pfGetCurrentPrice(g.tickerRaw, g.moneda),
+        change: pfGetCurrentChange(g.tickerRaw, g.moneda),
+        category: pfGetCurrentCategory(g.tickerRaw, g.moneda),
+        currency: g.moneda,
+        size: 1
+      };
+    });
+    el.innerHTML = '<div class="pf-metrics-label" style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);">Mapa de tu cartera</div>'
+      + '<div class="mkt-treemap" id="pfAssetMapTreemap" style="height:110px;margin-top:8px;"></div>'
+      + '<div class="mkt-map-legend" style="margin-top:6px;"><span>-5%</span><span class="swatch" style="width:36px;"></span><span>+5%</span></div>';
+    pfRenderAssetTreemap('pfAssetMapTreemap', items);
+  }
+  window._pfRenderAssetMiniMap = pfRenderAssetMiniMap;
+
+  // ---- Bloques de membresía: se ve la estructura, no el dato. El "cartel" para
+  // ---- comprar la membresía aparece dentro de Warren (mini-círculo de cada card). --
+  var PF_LOCK_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 1 1 6 0v3H9z"/></svg>';
+  var PF_SPARK_SVG = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2L12 2z"/></svg>';
+  function pfLockedMetricCard(key, name){
+    return '<div class="pf-metric-card status-neutral pf-locked">'
+      + '<div class="pf-metric-top"><span class="name">'+ name +'</span>'
+      + '<span class="pf-metric-top-right">'
+      + '<button type="button" class="pf-mini-warren pf-mini-warren--lock" onclick="pfMetricUpsell(event)" title="Desbloqueá esto con la membresía" aria-label="Desbloqueá esto con la membresía">'+ PF_SPARK_SVG +'</button>'
+      + '</span></div>'
+      + '<div class="pf-metric-val">'+ PF_LOCK_SVG +' Solo con membresía</div>'
+      + '<div class="pf-metric-note">Se calcula sobre tu cartera con la membresía activa.</div>'
+      + '<div class="pf-mini-warren-answer" id="pfMWA-'+ key +'"></div></div>';
+  }
+  function pfLockedWarrenPanel(){
+    return '<div class="pf-warren-panel"><div class="pf-warren-avatar">W</div><div class="pf-warren-body">'
+      + '<div class="pf-w-name">Warren &middot; IA</div>'
+      + '<div class="pf-w-headline">Te leo la cartera entera.</div>'
+      + '<div class="pf-w-sub">Con la membresía, Warren calcula tu concentración y tus ratios, te los explica en criollo y responde lo que le preguntes sobre tus posiciones.</div>'
+      + '<button class="pf-warren-cta" onclick="if(typeof openPaymentModal===\'function\')openPaymentModal()">'+ PF_SPARK_SVG +' Ver la membresía</button>'
+      + '</div></div>';
+  }
+  function pfMetricUpsell(evt){
+    if(evt) evt.stopPropagation();
+    var btn = evt && (evt.currentTarget || evt.target);
+    var card = btn && btn.closest ? btn.closest('.pf-metric-card') : null;
+    var box = card && card.querySelector('.pf-mini-warren-answer');
+    if(!box) return;
+    var open = box.classList.toggle('expanded');
+    if(!open) return;
+    box.innerHTML = '<div class="pf-lock-warren"><span class="pf-lw-av">W</span><div>'
+      + '<p>Con la membresía te calculo esta métrica sobre tu cartera y te la explico en criollo &mdash; además de responder cualquier consulta sobre tus posiciones.</p>'
+      + '<button type="button" class="pf-lock-cta" onclick="if(typeof openPaymentModal===\'function\')openPaymentModal()">Ver la membresía &rarr;</button>'
+      + '</div></div>';
+  }
+  window.pfMetricUpsell = pfMetricUpsell;
+
   async function pfRenderMetrics(){
     var wrapper = document.getElementById('pfMetricsWrapper');
     var grid = document.getElementById('pfMetricsGrid');
@@ -7256,6 +7588,17 @@
       grid.innerHTML = '<div class="pf-metrics-empty">Cargá al menos una posición para ver la concentración sectorial y geográfica.</div>';
       return;
     }
+
+    if(!(window._miIsMember && window._miIsMember())){
+      grid.innerHTML = '<div class="pf-metrics-label">Resultados del chequeo</div>'
+        + '<div class="pf-metric-grid pf-metric-grid-2col">'
+        + pfLockedMetricCard('sect', 'Concentración sectorial')
+        + pfLockedMetricCard('geo', 'Concentración geográfica')
+        + '</div>'
+        + pfLockedWarrenPanel();
+      return;
+    }
+
     grid.innerHTML = '<div class="pf-metrics-label">Resultados del chequeo</div><div class="pf-metrics-empty">Calculando sector y país de cada posición…</div>';
 
     var sg = await pfComputeSectorGeo(rows);
@@ -7284,10 +7627,6 @@
       + '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2L12 2z"/></svg>'
       + 'Preguntale a Warren</button>'
       + '<div id="pfWarrenBubble"></div></div></div>';
-
-    if(!(window._miIsMember && window._miIsMember())){
-      if(window._miApplyPaywall) window._miApplyPaywall('#pfMetricsGrid', '#pfMetricsWrapper');
-    }
   }
 
   function pfBuildNarrationPrompt(sg, profileEntry){
@@ -7543,6 +7882,20 @@
       return;
     }
 
+    if(!(window._miIsMember && window._miIsMember())){
+      var locked = [
+        ['beta','Beta vs S&amp;P 500'], ['vol','Volatilidad anual'], ['sharpe','Sharpe Ratio'],
+        ['dd','Máximo drawdown'], ['corr','Correlación promedio'], ['var','VaR diario (95%)'],
+        ['roe','ROE ponderado'], ['pe','P/E ponderado'], ['div','Dividend yield ponderado']
+      ];
+      grid.innerHTML = '<div class="pf-metrics-label">Métricas de cartera</div>'
+        + '<div class="pf-metric-grid">'
+        + locked.map(function(x){ return pfLockedMetricCard(x[0], x[1]); }).join('')
+        + '</div>'
+        + '<div class="pf-metric-note">Beta, volatilidad, Sharpe, drawdown, VaR y fundamentales ponderados de tu cartera. Tocá el &#10022; de cualquiera para verlo con la membresía.</div>';
+      return;
+    }
+
     grid.innerHTML = '<div class="pf-metrics-label">Métricas de cartera</div><div class="pf-metrics-empty">Calculando con datos históricos...</div>';
     var reqId = ++pfAdvReqSeq;
     var m = await pfBuildAdvancedMetrics();
@@ -7608,10 +7961,6 @@
              'Promedio histórico S&amp;P 500: <b>~1,3%</b> (referencia aproximada, no en vivo).')
       + '</div>'
       + '<div class="pf-metric-note">Calculado con los últimos '+ m.daysUsed +' cierres diarios disponibles de cada activo. La tasa libre de riesgo y los promedios de referencia son aproximaciones fijas, no datos en vivo.</div>';
-
-    if(!(window._miIsMember && window._miIsMember())){
-      if(window._miApplyPaywall) window._miApplyPaywall('#pfAdvGrid', '#pfAdvWrapper');
-    }
   }
   var pfAdvReqSeq = 0;
   // Datos crudos de cada una de las 9 tarjetas de "Metricas de cartera", para que el
@@ -8580,6 +8929,45 @@
   }
 
   loadDailyReports();
+
+  // Panel "Noticias" del cuadro Calendario en la home (htx-tile--cal): mismas noticias
+  // que los reportes diarios (worker manfredi-noticias, fallback a reports/*.json). 5 ítems.
+  async function loadHtxCalNews() {
+    var box = document.getElementById('htxCalNewsList');
+    if (!box) return;
+    function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+    function shortAgo(iso){var t=(typeof timeAgo==='function'?timeAgo(iso):'')||'';return t.replace(/^hace\s+/,'').toUpperCase();}
+    function tagFor(o){return o==='ar'?'<span class="htx-cal2__tag ar">Argentina</span>':'<span class="htx-cal2__tag us">Wall Street</span>';}
+    function merge(ar,ws){
+      var a=(ar||[]).map(function(n){var o={};for(var k in n)o[k]=n[k];o._o='ar';return o;});
+      var w=(ws||[]).map(function(n){var o={};for(var k in n)o[k]=n[k];o._o='us';return o;});
+      return a.concat(w).sort(function(x,y){return new Date(y.fecha||0)-new Date(x.fecha||0);});
+    }
+    function render(items){
+      if(!items||!items.length){box.innerHTML='<div class="htx-cal2__newsempty">Sin noticias disponibles.</div>';return;}
+      box.innerHTML=items.slice(0,5).map(function(n){
+        var inner='<div class="htx-cal2__day"><span class="m">'+esc(shortAgo(n.fecha)||'&mdash;')+'</span></div>'+
+          '<div><div class="htx-cal2__meta">'+tagFor(n._o)+(n.fuente?'<span class="htx-cal2__src">'+esc(n.fuente)+'</span>':'')+'</div>'+
+          '<div class="htx-cal2__title">'+esc(n.titulo||'')+'</div></div>';
+        return n.link
+          ? '<a class="htx-cal2__newsitem" href="'+esc(n.link)+'" target="_blank" rel="noopener noreferrer">'+inner+'</a>'
+          : '<div class="htx-cal2__newsitem">'+inner+'</div>';
+      }).join('');
+      var asof=document.getElementById('htxCalNewsAsof');
+      if(asof&&items[0]&&items[0].fecha){var a=shortAgo(items[0].fecha);asof.textContent=a?('hace '+a.toLowerCase()):'';}
+    }
+    try{
+      var r=await fetch('https://manfredi-noticias.nachito2502.workers.dev/noticias',{signal:AbortSignal.timeout(8000)});
+      if(r.ok){var d=await r.json();var m=merge(d.argentina,d.wallstreet);if(m.length){render(m);return;}}
+    }catch(e){console.warn('[MI] htxCalNews worker:',e.message);}
+    try{
+      var res=await Promise.all([fetch('reports/argentina.json?t='+Date.now()),fetch('reports/wallstreet.json?t='+Date.now())]);
+      var aj=await res[0].json(); var wj=await res[1].json();
+      render(merge(aj.noticias,wj.noticias));
+    }catch(e){console.warn('[MI] htxCalNews json:',e.message);render([]);}
+  }
+  loadHtxCalNews();
+  setInterval(loadHtxCalNews, 600000);
   </script>
 
   <script>
@@ -9321,7 +9709,26 @@
   setInterval(initMercados, MKT_REFRESH_MS);
 
   const CAL_DETAILS={'ar-pbi':{icon:'📈',title:'PBI Argentina',text:'La economía retomó el crecimiento liderada por agro, construcción y servicios. <strong>Para los mercados:</strong> positivo para acciones del Merval y bonos soberanos.'},'ar-inf':{icon:'🔥',title:'Inflación Argentina',text:'La inflación mensual continúa desacelerando. Crawling peg y ancla cambiaria son los drivers. <strong>Próximo dato:</strong> IPC INDEC el 12 de cada mes.'},'ar-desemp':{icon:'👷',title:'Desempleo Argentina',text:'Resiliencia pese al ajuste del sector público. <strong>Publicación:</strong> trimestral por EPH-INDEC.'},'ar-riesgo':{icon:'🌡',title:'Riesgo País EMBI+',text:'Compresión por acuerdo FMI y disciplina fiscal. <strong>Para los mercados:</strong> cada 100 bps de caída impulsa GD30/AL30 un ~8-12%.'},'us-pbi':{icon:'📉',title:'PBI Estados Unidos',text:'Contracción leve por caída de exportaciones ante aranceles. Consumo privado resisó.'},'us-inf':{icon:'📊',title:'Inflación EE.UU. CPI',text:'Desacelerando hacia el target del 2%. <strong>Dato más importante para la Fed:</strong> PCE Core, último jueves de cada mes.'},'us-desemp':{icon:'💼',title:'Desempleo EE.UU.',text:'Mercado laboral resiliente. <strong>Próximo dato clave:</strong> Nonfarm Payrolls el primer viernes de cada mes.'},'us-treasury':{icon:'🏦',title:'Treasury 10Y Yield',text:'Yields altos comprimen valuaciones tech. <strong>Para los mercados:</strong> impacta en CEDEARs y bonos argentinos en USD.'}}; function calShowDetail(key,el){var d=CAL_DETAILS[key];if(!d)return;document.querySelectorAll('.cal-kpi').forEach(function(k){k.classList.remove('active');});el.classList.add('active');var box=document.getElementById('calDetailBox');box.children[0].textContent=d.icon;document.getElementById('calDetailTitle').textContent=d.title;document.getElementById('calDetailText').innerHTML=d.text;box.style.borderColor='rgba(242,201,76,.4)';box.style.background='rgba(242,201,76,.04)';} async function loadMacroAR(){try{var infR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/inflacion').catch(function(){return null;});var riesgoR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais').catch(function(){return null;});if(infR&&infR.ok){var infD=await infR.json();if(Array.isArray(infD)&&infD.length){var last=infD[infD.length-1];var val=last.valor!=null?last.valor:last.value;if(val!=null){document.getElementById('ar-inf-val').textContent=val.toFixed(1)+'%';document.getElementById('ar-inf-sub').textContent='Mensual · '+(last.fecha||'');}}}if(riesgoR&&riesgoR.ok){var riesgoD=await riesgoR.json();if(Array.isArray(riesgoD)&&riesgoD.length){var rLast=riesgoD[riesgoD.length-1];var rVal=rLast.valor!=null?rLast.valor:rLast.value;if(rVal!=null){document.getElementById('ar-riesgo-val').textContent=Math.round(rVal)+' bps';document.getElementById('ar-riesgo-sub').textContent='EMBI+ · '+(rLast.fecha||'');}}}}catch(e){console.warn('[MI] MacroAR:',e.message);}} async function loadMacroUS(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/macro-us',{signal:AbortSignal.timeout(5000)});if(r.ok){var d=await r.json();if(d.gdp!=null){var v=parseFloat(d.gdp);document.getElementById('us-pbi-val').textContent=(v>=0?'+':'')+v.toFixed(1)+'%';document.getElementById('us-pbi-val').className='cal-kpi-main '+(v>=0?'cal-up':'cal-down');}if(d.cpi!=null)document.getElementById('us-inf-val').textContent=parseFloat(d.cpi).toFixed(1)+'%';if(d.unemp!=null)document.getElementById('us-desemp-val').textContent=parseFloat(d.unemp).toFixed(1)+'%';if(d.treasury!=null)document.getElementById('us-treasury-val').textContent=parseFloat(d.treasury).toFixed(2)+'%';}}catch(e){console.warn('[MI] MacroUS:',e.message);}} function renderHeroCalToday(dia){var dateEl=document.getElementById('heroCalDate');var evEl=document.getElementById('heroCalEvents');if(!dateEl||!evEl)return;var hoyStr=new Date().toLocaleDateString('es-AR',{weekday:'long',day:'2-digit',month:'2-digit'});hoyStr=hoyStr.charAt(0).toUpperCase()+hoyStr.slice(1);dateEl.textContent=hoyStr;if(dia&&dia.eventos&&dia.eventos.length){evEl.innerHTML=dia.eventos.map(function(ev){return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+ev.titulo+'</strong>'+ev.descripcion+'</div></div>';}).join('');}else{evEl.innerHTML='<span style="font-size:11px;color:rgba(255,255,255,.3);font-style:italic;">Sin eventos relevantes hoy</span>';}}
-  async function loadCalSemana(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/calendario',{signal:AbortSignal.timeout(8000)});if(r.ok){var d=await r.json();if(d.dias&&d.dias.length){document.getElementById('calSemanaLabel').textContent=d.semana||'';var dow=new Date().getDay();var grid=document.getElementById('calWeekGrid');grid.innerHTML=d.dias.map(function(dia,i){var isToday=(i+1)===dow;var evs=dia.eventos&&dia.eventos.length?dia.eventos.map(function(ev){return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+ev.titulo+'</strong>'+ev.descripcion+'</div></div>';}).join(''):'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Sin eventos</span>';return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+dia.nombre+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+dia.fecha+'</span></div>'+evs+'</div>';}).join('');var todayDia=(dow>=1&&dow<=5)?d.dias[dow-1]:null;renderHeroCalToday(todayDia);return;}}}catch(e){console.warn('[MI] CalSemana:',e.message);renderHeroCalToday(null);}var hoy=new Date();var dow=hoy.getDay();var lun=new Date(hoy);lun.setDate(hoy.getDate()-(dow===0?6:dow-1));var nombres=['Lun','Mar','Mié','Jue','Vie'];var fmt=function(d){return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});};var fin=new Date(lun);fin.setDate(lun.getDate()+4);document.getElementById('calSemanaLabel').textContent=fmt(lun)+' al '+fmt(fin);document.getElementById('calWeekGrid').innerHTML=nombres.map(function(n,i){var d=new Date(lun);d.setDate(lun.getDate()+i);var isToday=(i+1)===dow;return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+n+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+fmt(d)+'</span></div>'+'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Cargando...</span></div>';}).join('');renderHeroCalToday(null);} loadMacroAR(); loadMacroUS(); loadCalSemana(); setInterval(loadMacroAR,300000); setInterval(loadMacroUS,300000);
+  function calRenderDayGrid(dias){var dow=new Date().getDay();var grid=document.getElementById('calWeekGrid');grid.innerHTML=dias.map(function(dia,i){var isToday=(i+1)===dow;var evs=dia.eventos&&dia.eventos.length?dia.eventos.map(function(ev){var titleHtml=ev.ticker?'<a href="informes/'+ev.ticker+'.html">'+ev.titulo+'</a>':ev.titulo;return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+titleHtml+'</strong>'+ev.descripcion+'</div></div>';}).join(''):'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Sin eventos</span>';return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+dia.nombre+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+dia.fecha+'</span></div>'+evs+'</div>';}).join('');}
+
+  function calRenderEmptyGrid(msg){var hoy=new Date();var dow=hoy.getDay();var lun=new Date(hoy);lun.setDate(hoy.getDate()-(dow===0?6:dow-1));var nombres=['Lun','Mar','Mié','Jue','Vie'];var fmt=function(d){return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});};document.getElementById('calWeekGrid').innerHTML=nombres.map(function(n,i){var d=new Date(lun);d.setDate(lun.getDate()+i);var isToday=(i+1)===dow;return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+n+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+fmt(d)+'</span></div>'+'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">'+msg+'</span></div>';}).join('');}
+
+  var CAL_ENDPOINTS={economico:'calendario',earnings:'earnings',dividendos:'dividends'};
+  var CAL_LEGENDS={
+    economico:'<div style="display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.3);"><div style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;"></div>Argentina</div><div style="display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.3);"><div style="width:6px;height:6px;border-radius:50%;background:#60A5FA;flex-shrink:0;"></div>EE.UU.</div><div style="display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.3);"><div style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>Alta relevancia</div>',
+    earnings:'<div style="display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.3);"><div style="width:6px;height:6px;border-radius:50%;background:#c084fc;flex-shrink:0;"></div>Presenta resultados · empresas de Inversiones</div>',
+    dividendos:'<div style="display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.3);"><div style="width:6px;height:6px;border-radius:50%;background:#2dd4bf;flex-shrink:0;"></div>Pago / fecha ex-dividendo · empresas de Inversiones</div>'
+  };
+  var CAL_CACHE={};
+  var CAL_ACTIVE_VIEW='economico';
+
+  async function calFetchView(view){if(CAL_CACHE[view])return CAL_CACHE[view];var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/'+CAL_ENDPOINTS[view],{signal:AbortSignal.timeout(8000)});if(!r.ok)throw new Error('status '+r.status);var d=await r.json();if(!d.dias||!d.dias.length)throw new Error('sin datos');CAL_CACHE[view]=d;return d;}
+
+  async function calSetView(view){CAL_ACTIVE_VIEW=view;document.querySelectorAll('.cal-view-tab').forEach(function(t){t.classList.toggle('active',t.getAttribute('data-cal-view')===view);});var legendEl=document.getElementById('calLegend');if(legendEl)legendEl.innerHTML=CAL_LEGENDS[view]||'';calRenderEmptyGrid('Cargando...');try{var d=await calFetchView(view);if(CAL_ACTIVE_VIEW!==view)return;document.getElementById('calSemanaLabel').textContent=d.semana||'';calRenderDayGrid(d.dias);}catch(e){console.warn('[MI] Cal '+view+':',e.message);if(CAL_ACTIVE_VIEW===view)calRenderEmptyGrid('Sin datos disponibles');}}
+
+  async function loadCalSemana(){try{var d=await calFetchView('economico');document.getElementById('calSemanaLabel').textContent=d.semana||'';if(CAL_ACTIVE_VIEW==='economico')calRenderDayGrid(d.dias);var dow=new Date().getDay();var todayDia=(dow>=1&&dow<=5)?d.dias[dow-1]:null;renderHeroCalToday(todayDia);}catch(e){console.warn('[MI] CalSemana:',e.message);renderHeroCalToday(null);if(CAL_ACTIVE_VIEW==='economico')calRenderEmptyGrid('Cargando...');}}
+
+  loadMacroAR(); loadMacroUS(); loadCalSemana(); setInterval(loadMacroAR,300000); setInterval(loadMacroUS,300000);
 
 
 
