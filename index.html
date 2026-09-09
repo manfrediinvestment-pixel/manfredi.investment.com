@@ -4745,6 +4745,15 @@
     .calc-goal-card { cursor: pointer; transition: transform .15s, box-shadow .15s; }
     .calc-goal-card:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,0,0,.4); }
     .calc-goal-tap-hint { font-size: 10.5px; color: rgba(242,201,76,.6); margin-top: 8px; }
+    .calc-goal-vinculo { font-size: 10.5px; font-weight: 400; color: rgba(242,201,76,.7); }
+    .calc-scenario-select { display: flex; gap: 8px; flex-wrap: wrap; }
+    .gasto-currency-toggle { display: flex; gap: 3px; background: var(--navy-1); border-radius: 20px; padding: 2px; flex-shrink: 0; }
+    .gasto-cur-opt { padding: 3px 10px; border-radius: 16px; font-size: 10.5px; font-weight: 700; letter-spacing: .02em; color: rgba(255,255,255,.4); cursor: pointer; transition: background .15s, color .15s; }
+    .gasto-cur-opt:hover { color: rgba(255,255,255,.7); }
+    .gasto-cur-opt.active { background: var(--gold); color: var(--primary); }
+    .gasto-obj-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 5px 0; border-top: 1px solid rgba(255,255,255,.06); font-size: 12.5px; }
+    .gasto-obj-row:first-child { border-top: none; }
+    .gasto-obj-name { color: rgba(255,255,255,.75); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     .calc-goal-modal-overlay {
       position: fixed; inset: 0; background: rgba(5,10,20,.88); backdrop-filter: blur(6px);
@@ -5197,7 +5206,13 @@
           <div class="pf-card">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
               <h2 class="pf-metrics-label" style="margin:0;">Patrimonio neto</h2>
-              <span class="gasto-add-btn" onclick="gastosAbrirIngreso()" title="Agregar ingreso">+</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="gasto-currency-toggle" id="gastosCurrencyToggle">
+                  <span class="gasto-cur-opt" data-cur="ARS" onclick="gastosSetMoneda('ARS')">ARS</span>
+                  <span class="gasto-cur-opt" data-cur="USD" onclick="gastosSetMoneda('USD')">USD</span>
+                </div>
+                <span class="gasto-add-btn" onclick="gastosAbrirIngreso()" title="Agregar ingreso">+</span>
+              </div>
             </div>
             <div id="gastosPatrimonioValor" class="mono" style="font-size:23px;font-weight:600;color:var(--gold);">Calculando...</div>
 
@@ -5227,8 +5242,8 @@
             <div id="gastosTotalMesValor" class="mono" style="font-size:23px;font-weight:600;color:var(--red);">USD 0</div>
           </div>
           <div class="pf-card">
-            <h2 class="pf-metrics-label" style="margin-bottom:10px;">Último movimiento</h2>
-            <div id="gastosUltimoMov" class="mono" style="font-size:15px;font-weight:600;color:var(--white);">&mdash;</div>
+            <h2 class="pf-metrics-label" style="margin-bottom:10px;">Objetivos este mes</h2>
+            <div id="gastosObjetivosWrap">&mdash;</div>
           </div>
         </div>
 
@@ -5338,6 +5353,7 @@
     function calcRequiredMonthly(goal, initial, months){
       return Math.max(0, (goal - initial) / months);
     }
+    window.calcRequiredMonthly = calcRequiredMonthly;
 
     // Serie mes a mes de saldo acumulado, con aporte fijo `monthly` y tasa mensual `rate`.
     function calcBuildSeries(months, initial, monthly, rateMonthly){
@@ -5381,6 +5397,7 @@
       var annuityFactor = (Math.pow(1 + monthlyRate, months) - 1) / monthlyRate;
       return Math.max(0, (goal - growthInitial) / annuityFactor);
     }
+    window.calcRequiredMonthlyAtRate = calcRequiredMonthlyAtRate;
 
     var calcScenarios = { own: null, manfredi: null };
     var CALC_SCENARIO_META = {
@@ -5396,7 +5413,7 @@
       if (!(goal > 0)) { return; }
 
       var monthly = calcRequiredMonthly(goal, initial, months);
-      calcState = { nombre: nombre, goal: goal, initial: initial, months: months, monthly: monthly };
+      calcState = { nombre: nombre, goal: goal, initial: initial, months: months, monthly: monthly, scenario: 'none' };
       calcScenarios = { own: null, manfredi: null };
 
       document.getElementById('calcResultCard').style.display = '';
@@ -5411,6 +5428,15 @@
           '<button class="calc-scenario-btn" id="calcBtnMf" onclick="calcToggleScenario(\'manfredi\')">Ver con Manfredi Portfolio</button>' +
         '</div>' +
         '<div id="calcCompareRows"></div>' +
+        '<div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);">' +
+          '<div class="pf-metrics-label" style="margin-bottom:8px;">Vincular este objetivo a</div>' +
+          '<div class="calc-scenario-select" id="calcVinculoSelect">' +
+            '<span class="calc-scenario-btn calc-vinculo-btn active" data-vinculo="none" onclick="calcSetVinculo(\'none\')">Ninguno</span>' +
+            '<span class="calc-scenario-btn calc-vinculo-btn" data-vinculo="own" onclick="calcSetVinculo(\'own\')">Tu Portafolio</span>' +
+            '<span class="calc-scenario-btn calc-vinculo-btn" data-vinculo="manfredi" onclick="calcSetVinculo(\'manfredi\')">Manfredi Portfolio</span>' +
+          '</div>' +
+          '<div class="pf-metric-note" style="margin-top:8px;">Si vinculás un portfolio, en Gastos vas a ver todos los meses cuánto te falta aportar, actualizado según su rendimiento real.</div>' +
+        '</div>' +
         '<div style="text-align:center;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);">' +
           '<button class="pf-btn-ghost" id="calcSaveGoalBtn" onclick="calcSaveGoal()">&#128190; Guardar este objetivo</button>' +
         '</div>';
@@ -5491,6 +5517,7 @@
       if (m.dataUnavailable || typeof m.retAnual !== 'number') return { error: true };
       return { annualRate: Math.max(-0.5, Math.min(1.0, m.retAnual)), days: m.daysUsed || 90 };
     }
+    window.calcComputeOwnRate = calcComputeOwnRate;
 
     // Rendimiento REAL del Manfredi Portfolio (ventana "1 año", Dietz Modificado).
     async function calcComputeManfrediRate(){
@@ -5502,6 +5529,18 @@
       var annualRate = Math.pow(1 + m.totalReturn / 100, 365 / days) - 1;
       return { annualRate: Math.max(-0.5, Math.min(1.0, annualRate)), days: days };
     }
+    window.calcComputeManfrediRate = calcComputeManfrediRate;
+
+    // A qué portfolio queda vinculado el objetivo al guardarlo -- decide con
+    // qué rendimiento se va a recalcular el aporte mensual mes a mes en la
+    // tarjeta "Objetivos" de Gastos (independiente de los botones "Ver con..."
+    // de más arriba, que son solo para previsualizar/comparar).
+    window.calcSetVinculo = function(kind){
+      calcState.scenario = kind;
+      document.querySelectorAll('.calc-vinculo-btn').forEach(function(b){
+        b.classList.toggle('active', b.getAttribute('data-vinculo') === kind);
+      });
+    };
 
     window.calcToggleScenario = async function(kind){
       var meta = CALC_SCENARIO_META[kind];
@@ -5617,6 +5656,7 @@
       try { var arr = JSON.parse(localStorage.getItem('mi_calc_goals') || '[]'); return Array.isArray(arr) ? arr : []; }
       catch (e) { return []; }
     }
+    window.calcLoadGoals = calcLoadGoals;
     function calcSaveGoals(goals){
       try { localStorage.setItem('mi_calc_goals', JSON.stringify(goals)); } catch (e) {}
     }
@@ -5629,6 +5669,7 @@
         nombre: calcState.nombre || 'Mi objetivo',
         foto: calcPendingFoto,
         goal: calcState.goal, months: calcState.months, initial: calcState.initial, monthly: calcState.monthly,
+        scenario: (calcState.scenario && calcState.scenario !== 'none') ? calcState.scenario : null,
         savedAt: new Date().toISOString()
       });
       calcSaveGoals(goals);
@@ -5653,6 +5694,7 @@
       months += (now.getDate() - then.getDate()) / 30.44;
       return Math.max(0, months);
     }
+    window.calcMonthsElapsed = calcMonthsElapsed;
 
     // Cuanto llevás REALMENTE ahorrado: el ahorro inicial declarado al crear
     // el objetivo + cada aporte que la persona fue registrando a mano. Esto
@@ -5662,6 +5704,7 @@
       var aportes = (g.aportes || []).reduce(function(s, a){ return s + (a.monto || 0); }, 0);
       return (g.initial || 0) + aportes;
     }
+    window.calcGoalTotalReal = calcGoalTotalReal;
 
     window.calcRegistrarAporte = function(id){
       var input = document.getElementById('calcAporteInput_' + id);
@@ -5705,7 +5748,7 @@
           return '<div class="calc-goal-card" onclick="calcOpenGoalModal(' + g.id + ')">' +
             (g.foto ? '<div class="calc-goal-photo" style="background-image:url(\'' + g.foto + '\');"></div>' : '<div class="calc-goal-photo calc-goal-photo-empty">&#127919;</div>') +
             '<div class="calc-goal-body">' +
-              '<div class="calc-goal-name">' + pfEsc(g.nombre) + '</div>' +
+              '<div class="calc-goal-name">' + pfEsc(g.nombre) + (g.scenario ? ' <span class="calc-goal-vinculo">&middot; ' + (g.scenario === 'own' ? 'Tu Portafolio' : 'Manfredi Portfolio') + '</span>' : '') + '</div>' +
               '<div class="calc-goal-months">' + (remaining > 0 ? ('Faltan <b>' + remaining + '</b> meses') : '<b>Plazo cumplido</b>') + '</div>' +
               '<div class="calc-goal-bar"><div class="calc-goal-bar-fill" style="width:' + pctReal.toFixed(0) + '%;"></div></div>' +
               '<div class="calc-goal-amount">Llevás ahorrado: <b>' + calcFmtMoney(totalReal) + '</b> de ' + calcFmtMoney(g.goal) + ' (' + pctReal.toFixed(0) + '%)</div>' +
@@ -5811,8 +5854,26 @@
     var GASTOS_CUSTOM_PALETTE = ['#EAB308', '#F472B6', '#84CC16', '#38BDF8', '#FB7185', '#C084FC', '#2DD4BF'];
 
     var gastosQuickCat = null;
-    var gastosRetriedCcl = false;
+    var gastosCclRetries = 0; // tope de reintentos mientras el dolar CCL todavia no cargo
     var gastosFiltroCategoria = null; // categoria activa para el desglose (null = todas)
+
+    // Moneda de visualizacion de Gastos (todo se guarda/suma internamente en
+    // USD via gastosToUsd -- esto solo cambia como se MUESTRA). Por defecto
+    // en pesos porque es como la gente piensa sus gastos del dia a dia.
+    var gastosMoneda = (function(){
+      try { var m = localStorage.getItem('mi_calc_gastos_moneda'); return (m === 'USD') ? 'USD' : 'ARS'; }
+      catch (e) { return 'ARS'; }
+    })();
+    window.gastosSetMoneda = function(m){
+      gastosMoneda = (m === 'USD') ? 'USD' : 'ARS';
+      try { localStorage.setItem('mi_calc_gastos_moneda', gastosMoneda); } catch (e) {}
+      gastosRenderAll();
+    };
+    function gastosRenderCurrencyToggle(){
+      document.querySelectorAll('.gasto-cur-opt').forEach(function(el){
+        el.classList.toggle('active', el.getAttribute('data-cur') === gastosMoneda);
+      });
+    }
 
     var gastosView = new Date();
     gastosView.setDate(1);
@@ -5832,7 +5893,18 @@
       try { localStorage.setItem('mi_calc_gastos_cats', JSON.stringify(arr)); } catch (e) {}
     }
     function gastosAllCats(){ return GASTOS_CATS_BASE.concat(gastosLoadCats()); }
-    function gastosFmt(n){ return 'USD ' + Math.round(n).toLocaleString('es-AR'); }
+    // Recibe SIEMPRE un monto en USD (la moneda interna comun) y lo muestra
+    // en la moneda que la persona eligio en el toggle. Si eligio ARS pero el
+    // CCL todavia no cargo, cae a USD como respaldo -- gastosRenderAll ya
+    // reintenta solo una vez a los 2s cuando pasa esto.
+    function gastosFmt(n){
+      if (n == null || isNaN(n)) return '—';
+      if (gastosMoneda === 'ARS') {
+        var ccl = (typeof pfGetCclRate === 'function') ? pfGetCclRate() : null;
+        if (ccl) return '$ ' + Math.round(n * ccl).toLocaleString('es-AR');
+      }
+      return 'USD ' + Math.round(n).toLocaleString('es-AR');
+    }
     function gastosCatMeta(id){
       var all = gastosAllCats();
       for (var i = 0; i < all.length; i++) { if (all[i].id === id) return all[i]; }
@@ -5866,6 +5938,10 @@
     }
 
     window.gastosAbrirQuick = function(catId){
+      // Tocar la categoria que ya esta activa es la forma de "salir" de ese
+      // filtro y volver al desglose general -- antes solo se podia recargando
+      // la pagina.
+      if (gastosFiltroCategoria === catId) { gastosCancelarQuick(); return; }
       gastosQuickCat = catId;
       gastosFiltroCategoria = catId;
       var cat = gastosCatMeta(catId);
@@ -5978,6 +6054,7 @@
 
     window.gastosRenderAll = function(){
       gastosRenderTiles();
+      gastosRenderCurrencyToggle();
 
       var mesLabelEl = document.getElementById('gastosMesLabel');
       if (mesLabelEl) mesLabelEl.textContent = gastosMesLabel();
@@ -5995,30 +6072,26 @@
         porCategoria[g.categoria] = (porCategoria[g.categoria] || 0) + usd;
       });
       ingresos.forEach(function(g){ if (gastosToUsd(g.monto, g.moneda) == null) sinCcl = true; });
+      // Aunque no haya nada que convertir todavia (mes sin gastos), si la
+      // vista esta en ARS y el CCL no cargo, gastosFmt cae a mostrar USD por
+      // las dudas -- hay que reintentar igual para que se vea en pesos.
+      if (gastosMoneda === 'ARS' && (typeof pfGetCclRate !== 'function' || !pfGetCclRate())) sinCcl = true;
 
       var totalEl = document.getElementById('gastosTotalMesValor');
       if (totalEl) totalEl.textContent = gastosFmt(totalUsd);
 
       // El dólar CCL se carga de forma asincrónica al abrir la página y puede
       // no estar listo todavía en el primer render (Gastos es la pestaña por
-      // defecto) -- un solo reintento a los 2s alcanza.
-      if (sinCcl && !gastosRetriedCcl) {
-        gastosRetriedCcl = true;
-        setTimeout(gastosRenderAll, 2000);
+      // defecto). Antes reintentaba una sola vez a los 2s, pero si la carga
+      // tarda más que eso (pasa seguido) los montos en ARS quedaban pegados
+      // en USD para siempre -- ahora reintenta hasta 6 veces (~9s) y para
+      // en cuanto el CCL esta disponible.
+      if (sinCcl && gastosCclRetries < 6) {
+        gastosCclRetries++;
+        setTimeout(gastosRenderAll, 1500);
       }
 
-      var ultimoEl = document.getElementById('gastosUltimoMov');
-      if (ultimoEl) {
-        var todos = gastosLoad().sort(function(a, b){ return b.id - a.id; });
-        if (!todos.length) {
-          ultimoEl.textContent = '—';
-        } else {
-          var u = todos[0];
-          var esIngresoU = u.tipo === 'ingreso';
-          var etiquetaU = esIngresoU ? u.nombre : (u.nota || gastosCatMeta(u.categoria).label);
-          ultimoEl.innerHTML = pfEsc(etiquetaU) + ' <span class="' + (esIngresoU ? 'gasto-mov-ingreso' : 'gasto-mov-gasto') + '">' + (esIngresoU ? '+' : '−') + pfEsc(u.moneda) + ' ' + u.monto.toLocaleString('es-AR') + '</span>';
-        }
-      }
+      gastosRenderObjetivos();
 
       var listaWrap = document.getElementById('gastosListaWrap');
       if (listaWrap) {
@@ -6167,6 +6240,56 @@
       } catch (e) {
         el.textContent = '—';
       }
+    };
+
+    // Conecta con la Calculadora de Objetivos: por cada objetivo guardado que
+    // todavia no se cumplio, calcula cuanto falta aportar ESTE mes. Si el
+    // objetivo esta vinculado a un portfolio (Tu Portafolio o Manfredi
+    // Portfolio), el monto se recalcula con el rendimiento REAL mas reciente
+    // de ese portfolio en vez del reparto lineal -- por eso queda "actualizado
+    // todos los meses" como pidio el usuario, no un numero fijo del dia que
+    // se creo el objetivo.
+    var gastosObjToken = null;
+    window.gastosRenderObjetivos = async function(){
+      var wrap = document.getElementById('gastosObjetivosWrap');
+      if (!wrap) return;
+      if (typeof window.calcLoadGoals !== 'function') { wrap.innerHTML = '&mdash;'; return; }
+      var goals = window.calcLoadGoals();
+      if (!goals.length) {
+        wrap.innerHTML = '<div class="pf-metric-note" style="margin:0;">Todavía no guardaste objetivos. <a href="#" onclick="document.querySelector(\'[data-finview=calculadora]\').click();return false;" style="color:var(--gold);">Crear uno &rarr;</a></div>';
+        return;
+      }
+      var myToken = (gastosObjToken = {});
+      wrap.innerHTML = '<div class="pf-metric-note" style="margin:0;">Calculando aportes del mes...</div>';
+      var rows = [];
+      for (var i = 0; i < goals.length; i++) {
+        var g = goals[i];
+        var elapsed = window.calcMonthsElapsed(g.savedAt);
+        var remainingMonths = Math.max(1, Math.round(g.months - elapsed));
+        var totalReal = window.calcGoalTotalReal(g);
+        if (totalReal >= g.goal) { rows.push({ nombre: g.nombre, done: true }); continue; }
+
+        var monto = null, rateInfo = null;
+        if (g.scenario === 'own' || g.scenario === 'manfredi') {
+          try { rateInfo = g.scenario === 'own' ? await window.calcComputeOwnRate() : await window.calcComputeManfrediRate(); }
+          catch (e) { rateInfo = null; }
+        }
+        if (myToken !== gastosObjToken) return; // se re-abrio Objetivos mientras esperabamos (otro mes, etc.)
+        if (rateInfo && typeof rateInfo.annualRate === 'number') {
+          var monthlyRate = Math.pow(1 + rateInfo.annualRate, 1 / 12) - 1;
+          monto = window.calcRequiredMonthlyAtRate(g.goal, totalReal, remainingMonths, monthlyRate);
+        } else {
+          monto = window.calcRequiredMonthly(g.goal, totalReal, remainingMonths);
+        }
+        rows.push({ nombre: g.nombre, monto: monto, vinculo: g.scenario === 'own' ? 'Tu Portafolio' : (g.scenario === 'manfredi' ? 'Manfredi' : null) });
+      }
+      if (myToken !== gastosObjToken) return;
+      wrap.innerHTML = rows.map(function(r){
+        if (r.done) {
+          return '<div class="gasto-obj-row"><span class="gasto-obj-name">' + pfEsc(r.nombre) + '</span><span class="gasto-mov-ingreso">Cumplido &#10003;</span></div>';
+        }
+        return '<div class="gasto-obj-row"><span class="gasto-obj-name">' + pfEsc(r.nombre) + (r.vinculo ? ' <span style="color:rgba(255,255,255,.35);font-size:10px;">(' + r.vinculo + ')</span>' : '') + '</span><span class="gasto-mov-gasto" style="flex-shrink:0;">&minus;' + gastosFmt(r.monto) + '</span></div>';
+      }).join('');
     };
 
     // Gastos es la pestaña que se ve primero al entrar a la sección -- hay
