@@ -4754,6 +4754,25 @@
     .gasto-obj-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 5px 0; border-top: 1px solid rgba(255,255,255,.06); font-size: 12.5px; }
     .gasto-obj-row:first-child { border-top: none; }
     .gasto-obj-name { color: rgba(255,255,255,.75); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .gasto-obj-item { padding: 9px 0; border-top: 1px solid rgba(255,255,255,.06); }
+    .gasto-obj-item:first-child { border-top: none; padding-top: 0; }
+    .gasto-obj-item-name { font-size: 12.5px; color: rgba(255,255,255,.8); font-weight: 600; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .gasto-obj-sub-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; color: rgba(255,255,255,.45); padding: 2px 0; }
+    .gasto-obj-sub-row.linked { color: var(--gold); font-weight: 600; }
+    .calc-goal-montos-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid rgba(255,255,255,.06); font-size: 13px; color: rgba(255,255,255,.9); }
+    .calc-goal-montos-row:first-child { border-top: none; }
+    .calc-goal-montos-row.linked { color: var(--gold); }
+    .calc-goal-montos-label { color: rgba(255,255,255,.55); }
+    .calc-goal-montos-row.linked .calc-goal-montos-label { color: var(--gold); }
+    .gasto-emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; margin-top: 4px; }
+    .gasto-emoji-opt {
+      display: flex; align-items: center; justify-content: center; height: 34px; border-radius: 8px;
+      background: var(--navy-1); border: 1.5px solid rgba(255,255,255,.08); font-size: 16px; cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .gasto-emoji-opt:hover { border-color: rgba(242,201,76,.4); }
+    .gasto-emoji-opt.active { border-color: var(--gold); background: rgba(242,201,76,.12); }
+    @media (max-width: 480px) { .gasto-emoji-grid { grid-template-columns: repeat(6, 1fr); } }
 
     .calc-goal-modal-overlay {
       position: fixed; inset: 0; background: rgba(5,10,20,.88); backdrop-filter: blur(6px);
@@ -5287,6 +5306,9 @@
                 <label>Nombre de la categoría
                   <input type="text" id="nuevaCategoriaNombre" placeholder="Ej: Mascotas, Regalos..." maxlength="24">
                 </label>
+                <label>Elegí un ícono
+                  <div id="gastoNuevaCategoriaEmojis" class="gasto-emoji-grid"></div>
+                </label>
                 <div style="display:flex;gap:10px;">
                   <button class="pf-btn-gold" onclick="gastosConfirmarNuevaCategoria()" style="flex:1;">Crear categoría</button>
                   <button class="pf-btn-ghost" onclick="gastosCancelarNuevaCategoria()">Cancelar</button>
@@ -5535,6 +5557,33 @@
     // qué rendimiento se va a recalcular el aporte mensual mes a mes en la
     // tarjeta "Objetivos" de Gastos (independiente de los botones "Ver con..."
     // de más arriba, que son solo para previsualizar/comparar).
+    // Aporte mensual necesario para un objetivo bajo los 3 supuestos a la vez:
+    // ahorro puro (sin rendimiento), con el rendimiento reciente de Tu
+    // Portafolio, y con el de Manfredi Portfolio. Se usa tanto en el modal de
+    // detalle del objetivo como en la tarjeta "Objetivos este mes" de Gastos
+    // -- una sola cuenta, no dos versiones que se puedan desincronizar.
+    window.calcObjetivoTresMontos = async function(g){
+      var elapsed = calcMonthsElapsed(g.savedAt);
+      var remainingMonths = Math.max(1, Math.round(g.months - elapsed));
+      var totalReal = calcGoalTotalReal(g);
+      var result = { remainingMonths: remainingMonths, totalReal: totalReal, done: totalReal >= g.goal, puro: null, own: null, manfredi: null, ownError: false, manfrediError: false };
+      if (result.done) return result;
+      result.puro = calcRequiredMonthly(g.goal, totalReal, remainingMonths);
+      try {
+        var rOwn = await calcComputeOwnRate();
+        if (rOwn && typeof rOwn.annualRate === 'number') {
+          result.own = calcRequiredMonthlyAtRate(g.goal, totalReal, remainingMonths, Math.pow(1 + rOwn.annualRate, 1 / 12) - 1);
+        } else { result.ownError = true; }
+      } catch (e) { result.ownError = true; }
+      try {
+        var rMf = await calcComputeManfrediRate();
+        if (rMf && typeof rMf.annualRate === 'number') {
+          result.manfredi = calcRequiredMonthlyAtRate(g.goal, totalReal, remainingMonths, Math.pow(1 + rMf.annualRate, 1 / 12) - 1);
+        } else { result.manfrediError = true; }
+      } catch (e) { result.manfrediError = true; }
+      return result;
+    };
+
     window.calcSetVinculo = function(kind){
       calcState.scenario = kind;
       document.querySelectorAll('.calc-vinculo-btn').forEach(function(b){
@@ -5760,6 +5809,7 @@
     }
 
     // ─── Detalle del objetivo: pasos mes a mes + registrar aportes ─────────
+    var calcGoalModalToken = null;
     window.calcOpenGoalModal = function(id){
       var g = null;
       var goals = calcLoadGoals();
@@ -5804,6 +5854,9 @@
           '<button class="pf-btn-gold" onclick="calcRegistrarAporte(' + g.id + ')">+ Registrar aporte</button>' +
         '</div>' +
 
+        '<h2 class="pf-metrics-label" style="margin-bottom:10px;">Cuánto te conviene aportar este mes</h2>' +
+        '<div id="calcGoalMontosWrap" style="margin-bottom:18px;"><div class="pf-metric-note" style="margin:0;">Calculando con el rendimiento reciente de cada portfolio...</div></div>' +
+
         '<h2 class="pf-metrics-label" style="margin-bottom:10px;">Pasos del plan, mes a mes</h2>' +
         '<div class="calc-goal-steps">' + stepsHtml + '</div>' +
 
@@ -5812,6 +5865,33 @@
 
       document.getElementById('calcGoalModal').classList.add('open');
       document.body.style.overflow = 'hidden';
+
+      // Los 3 montos (ahorro puro / Tu Portafolio / Manfredi) tardan porque
+      // dependen de datos de mercado -- se calculan aparte y solo pisan el
+      // placeholder si el modal sigue abierto en ESTE objetivo (si la persona
+      // ya cerro o abrio otro objetivo mientras tanto, el resultado se descarta).
+      var myToken = (calcGoalModalToken = {});
+      calcObjetivoTresMontos(g).then(function(r){
+        if (myToken !== calcGoalModalToken) return;
+        var wrap = document.getElementById('calcGoalMontosWrap');
+        if (!wrap) return;
+        if (r.done) { wrap.innerHTML = '<div class="pf-metric-note" style="margin:0;">Ya llegaste al objetivo &#127881;</div>'; return; }
+        function fila(label, kind, valor, error){
+          var linked = g.scenario === kind;
+          var valorHtml = error
+            ? '<span style="color:rgba(255,255,255,.35);font-size:12px;">' + (kind === 'own' ? 'Necesitás más posiciones cargadas' : 'No pudimos calcularlo ahora') + '</span>'
+            : '<b>' + calcFmtMoney(valor) + '<small style="font-weight:400;"> /mes</small></b>';
+          return '<div class="calc-goal-montos-row' + (linked ? ' linked' : '') + '">' +
+            '<span class="calc-goal-montos-label">' + label + (linked ? ' &#9733;' : '') + '</span>' +
+            valorHtml +
+          '</div>';
+        }
+        wrap.innerHTML =
+          fila('Ahorro puro (sin invertir)', 'none', r.puro, false) +
+          fila('Con Tu Portafolio', 'own', r.own, r.ownError) +
+          fila('Con Manfredi Portfolio', 'manfredi', r.manfredi, r.manfrediError) +
+          '<div class="pf-metric-note" style="margin-top:8px;">Proyección matemática basada en rendimiento pasado/reciente. No garantiza resultados futuros.</div>';
+      });
     };
 
     window.calcCloseGoalModal = function(){
@@ -5852,6 +5932,14 @@
     // Paleta para categorias creadas a mano -- rota en orden fijo para que
     // dos categorias custom no se pisen de color.
     var GASTOS_CUSTOM_PALETTE = ['#EAB308', '#F472B6', '#84CC16', '#38BDF8', '#FB7185', '#C084FC', '#2DD4BF'];
+    // Set fijo de iconos para que la gente elija al crear su propia
+    // categoria, en vez de que todas queden con la misma estrellita.
+    var GASTOS_EMOJI_OPTIONS = [
+      '⭐','🐾','🐶','🐱','🎮','🎲','💇','💅','🏋️','⚽','🚴','✈️',
+      '🎁','📱','💻','🍺','☕','🍕','👶','👕','🏠','🔧','🚗','⛽',
+      '🚬','🎨','🎵','📚','🎬','💼','🛒','💊','🌱','🧴','🎂','❤️'
+    ];
+    var gastosNuevaCategoriaEmoji = GASTOS_EMOJI_OPTIONS[0];
 
     var gastosQuickCat = null;
     var gastosCclRetries = 0; // tope de reintentos mientras el dolar CCL todavia no cargo
@@ -5982,11 +6070,26 @@
       gastosRenderAll();
     };
 
+    function gastosRenderEmojiPicker(){
+      var wrap = document.getElementById('gastoNuevaCategoriaEmojis');
+      if (!wrap) return;
+      wrap.innerHTML = GASTOS_EMOJI_OPTIONS.map(function(e){
+        return '<span class="gasto-emoji-opt' + (e === gastosNuevaCategoriaEmoji ? ' active' : '') + '" onclick="gastosElegirEmoji(\'' + e + '\')">' + e + '</span>';
+      }).join('');
+    }
+    window.gastosElegirEmoji = function(e){
+      gastosNuevaCategoriaEmoji = e;
+      document.querySelectorAll('.gasto-emoji-opt').forEach(function(el){
+        el.classList.toggle('active', el.textContent === e);
+      });
+    };
     window.gastosAbrirNuevaCategoria = function(){
       document.getElementById('gastoQuickAdd').style.display = 'none';
       document.getElementById('gastoNuevaCategoriaForm').style.display = '';
       var input = document.getElementById('nuevaCategoriaNombre');
       input.value = '';
+      gastosNuevaCategoriaEmoji = GASTOS_EMOJI_OPTIONS[0];
+      gastosRenderEmojiPicker();
       input.focus();
     };
     window.gastosCancelarNuevaCategoria = function(){
@@ -5997,7 +6100,7 @@
       if (!nombre) return;
       var custom = gastosLoadCats();
       var color = GASTOS_CUSTOM_PALETTE[custom.length % GASTOS_CUSTOM_PALETTE.length];
-      custom.push({ id: 'custom_' + Date.now(), label: nombre, color: color, icon: '⭐' });
+      custom.push({ id: 'custom_' + Date.now(), label: nombre, color: color, icon: gastosNuevaCategoriaEmoji || '⭐' });
       gastosSaveCats(custom);
       gastosCancelarNuevaCategoria();
       gastosRenderTiles();
@@ -6243,12 +6346,9 @@
     };
 
     // Conecta con la Calculadora de Objetivos: por cada objetivo guardado que
-    // todavia no se cumplio, calcula cuanto falta aportar ESTE mes. Si el
-    // objetivo esta vinculado a un portfolio (Tu Portafolio o Manfredi
-    // Portfolio), el monto se recalcula con el rendimiento REAL mas reciente
-    // de ese portfolio en vez del reparto lineal -- por eso queda "actualizado
-    // todos los meses" como pidio el usuario, no un numero fijo del dia que
-    // se creo el objetivo.
+    // todavia no se cumplio, muestra cuanto falta aportar ESTE mes bajo los
+    // 3 supuestos (ahorro puro, Tu Portafolio, Manfredi Portfolio) -- misma
+    // cuenta que el modal de detalle del objetivo, via calcObjetivoTresMontos.
     var gastosObjToken = null;
     window.gastosRenderObjetivos = async function(){
       var wrap = document.getElementById('gastosObjetivosWrap');
@@ -6264,31 +6364,29 @@
       var rows = [];
       for (var i = 0; i < goals.length; i++) {
         var g = goals[i];
-        var elapsed = window.calcMonthsElapsed(g.savedAt);
-        var remainingMonths = Math.max(1, Math.round(g.months - elapsed));
-        var totalReal = window.calcGoalTotalReal(g);
-        if (totalReal >= g.goal) { rows.push({ nombre: g.nombre, done: true }); continue; }
-
-        var monto = null, rateInfo = null;
-        if (g.scenario === 'own' || g.scenario === 'manfredi') {
-          try { rateInfo = g.scenario === 'own' ? await window.calcComputeOwnRate() : await window.calcComputeManfrediRate(); }
-          catch (e) { rateInfo = null; }
-        }
+        var r = await window.calcObjetivoTresMontos(g);
         if (myToken !== gastosObjToken) return; // se re-abrio Objetivos mientras esperabamos (otro mes, etc.)
-        if (rateInfo && typeof rateInfo.annualRate === 'number') {
-          var monthlyRate = Math.pow(1 + rateInfo.annualRate, 1 / 12) - 1;
-          monto = window.calcRequiredMonthlyAtRate(g.goal, totalReal, remainingMonths, monthlyRate);
-        } else {
-          monto = window.calcRequiredMonthly(g.goal, totalReal, remainingMonths);
-        }
-        rows.push({ nombre: g.nombre, monto: monto, vinculo: g.scenario === 'own' ? 'Tu Portafolio' : (g.scenario === 'manfredi' ? 'Manfredi' : null) });
+        rows.push({ g: g, r: r });
       }
       if (myToken !== gastosObjToken) return;
-      wrap.innerHTML = rows.map(function(r){
+      wrap.innerHTML = rows.map(function(item){
+        var g = item.g, r = item.r;
         if (r.done) {
-          return '<div class="gasto-obj-row"><span class="gasto-obj-name">' + pfEsc(r.nombre) + '</span><span class="gasto-mov-ingreso">Cumplido &#10003;</span></div>';
+          return '<div class="gasto-obj-item"><div class="gasto-obj-item-name">' + pfEsc(g.nombre) + '</div><span class="gasto-mov-ingreso">Cumplido &#10003;</span></div>';
         }
-        return '<div class="gasto-obj-row"><span class="gasto-obj-name">' + pfEsc(r.nombre) + (r.vinculo ? ' <span style="color:rgba(255,255,255,.35);font-size:10px;">(' + r.vinculo + ')</span>' : '') + '</span><span class="gasto-mov-gasto" style="flex-shrink:0;">&minus;' + gastosFmt(r.monto) + '</span></div>';
+        function sub(label, kind, valor, error){
+          var linked = g.scenario === kind;
+          var val = error
+            ? '<span style="color:rgba(255,255,255,.35);">—</span>'
+            : '&minus;' + gastosFmt(valor);
+          return '<div class="gasto-obj-sub-row' + (linked ? ' linked' : '') + '"><span>' + label + (linked ? ' &#9733;' : '') + '</span><span>' + val + '</span></div>';
+        }
+        return '<div class="gasto-obj-item">' +
+          '<div class="gasto-obj-item-name">' + pfEsc(g.nombre) + '</div>' +
+          sub('Ahorro puro', 'none', r.puro, false) +
+          sub('Tu Portafolio', 'own', r.own, r.ownError) +
+          sub('Manfredi Portfolio', 'manfredi', r.manfredi, r.manfrediError) +
+        '</div>';
       }).join('');
     };
 
