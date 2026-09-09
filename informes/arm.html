@@ -971,10 +971,43 @@
     de ingresos a FY2031 se cumple— el resultado llega a ~US$163, todavía muy por debajo de US$261.
   </p>
 
+  <h3>Por qué este informe y Wall Street llegan a números tan distintos</h3>
+  <p>
+    La brecha entre el blend de este informe (US$151) y el precio objetivo promedio del sell-side (~US$290) es de
+    ~US$140. No viene de un error de aritmética de ningún lado; viene de tres decisiones de modelado concretas, y vale
+    la pena hacerlas explícitas.
+  </p>
+  <p>
+    <strong>1. Compensación en acciones.</strong> Es el factor individual más grande. La convención del sell-side es
+    valuar a Arm sobre utilidad y EBITDA <em>no-GAAP</em>, que suman de vuelta los ~US$1.150 millones anuales de
+    compensación en acciones (22% de los ingresos) como si no costaran nada. Este informe la trata como el costo real
+    que es —dilución de ~1,5% de las acciones por año—: el DCF no la suma de vuelta entera, y por eso da US$39 en vez
+    de los ~US$150–200 que daría un DCF construido sobre el flujo de caja "ajustado". Sólo ese ajuste explica buena
+    parte de la distancia entre el DCF de este informe y donde caen los modelos que usan la métrica no-GAAP.
+    <strong>2. Horizonte de crecimiento.</strong> El caso Base de este informe asume que el crecimiento se desacelera
+    de 23% a 11% en cinco años. El caso base del sell-side modela la guía de la propia compañía —regalías al 20%
+    compuesto hasta FY2031 <em>más</em> el CPU AGI escalando a US$15 mil millones— como el escenario central, es decir
+    ~30%+ de composición durante una década. Esa trayectoria, en este informe, es el escenario <em>Bull</em>, no el
+    Base. <strong>3. La opción de plataforma.</strong> Este informe le pone al negocio de silicio ~US$8 mil millones
+    (anclado al backlog de ~US$2 mil millones); el sell-side lo capitaliza más cerca de la meta completa de US$15 mil
+    millones y le agrega una prima de escasez por el rol de Arm como "peaje" de la infraestructura de IA.
+  </p>
+  <p>
+    A eso se suma que un precio objetivo de sell-side es una estimación <em>táctica a 12 meses</em> con un sesgo
+    alcista bien documentado —responde "dónde puede cotizar la acción el año que viene si la historia sigue
+    funcionando"—, no una estimación de valor intrínseco hoy. Lo que este informe pesa y el consenso pesa poco:
+    la compensación en acciones como costo, el riesgo de gobernanza y de overhang (beta 1,4), la regresión en la
+    calidad de divulgación, la competencia con los propios licenciatarios, y una normalización del crecimiento. Lo que
+    el consenso pesa y este informe deliberadamente <em>no</em> pone en el caso Base: una década de hipercrecimiento
+    sostenido y un precio generoso por la plataforma. Ninguno de los dos está "equivocado" —responden preguntas
+    distintas—, y por eso el consenso entra al blend en vez de descartarse: US$290 es el recordatorio de que un
+    escenario en el que casi todo sale bien es plausible, sólo que no es el que el flujo de caja descontado respalda.
+  </p>
+
   <h3>Síntesis: los cinco métodos, uno al lado del otro</h3>
   <div class="chartbox">
     <canvas id="footballChart" height="300"></canvas>
-    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado (US$261,53); la línea azul marca el blend propio (US$151,00), promedio simple de los cinco métodos.</p>
+    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado (US$261,53); la línea azul, el blend propio (US$151,00, promedio simple de los cinco métodos); la línea celeste, el precio objetivo promedio de Wall Street (~US$290). El bar de "Consenso Wall St." muestra el rango completo de los precios objetivo de los 42 analistas (US$125–US$500), no un cluster estrecho: la propia comunidad de sell-side tiene una dispersión de 4x entre su estimación más baja y la más alta, y ese rango cruza tanto el precio de mercado como el blend.</p>
   </div>
   <div class="table-scroll"><table>
     <tr><th>Método</th><th class="right-al">Fair value por acción</th><th class="right-al">vs. mercado</th></tr>
@@ -1390,9 +1423,9 @@
 
     drawRangeBars(document.getElementById('footballChart'), {
       labels:['DCF (Bear→Bull)','Comparables software','Reversión (ventana limpia)','Suma de partes','Consenso Wall St.'],
-      ranges:[[20.63,64.63],[78,224],[116,187],[91,163],[285,300]],
+      ranges:[[20.63,64.63],[78,224],[116,187],[91,163],[125,500]],
       colors:[PALETTE.blue,PALETTE.navy2,PALETTE.gold,PALETTE.blueLight,PALETTE.pale],
-      refLines:[{value:261.53,color:PALETTE.red,label:'Mercado $262'},{value:151.00,color:PALETTE.navy,label:'Blend $151'}],
+      refLines:[{value:261.53,color:PALETTE.red,label:'Mercado $262'},{value:151.00,color:PALETTE.navy,label:'Blend $151'},{value:290,color:PALETTE.blueLight,label:'Consenso $290'}],
       valueFmt:function(v){ return '$'+v.toFixed(0); }
     });
   }
