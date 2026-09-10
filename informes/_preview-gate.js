@@ -28,9 +28,16 @@
 
   function run() {
     var wrap = document.querySelector(".wrap");
-    var start = document.getElementById("s02");
+    // La vista previa gratuita llega hasta la Sección 03 (Modelo de Negocio y
+    // Segmentos) inclusive: las Secciones 02 y 03 siempre traen gráficos, así
+    // que el no-miembro ve contenido visual antes del muro. El blur arranca en
+    // la Sección 04. Fallback a s03/s02 por si algún informe viejo no la tiene.
+    var start = document.getElementById("s04") ||
+                document.getElementById("s03") ||
+                document.getElementById("s02");
     var disclosure = document.querySelector(".disclosure");
     if (!wrap || !start) return; // estructura inesperada: dejamos el informe abierto
+    var FREE = parseInt(start.id.slice(1), 10) - 1; // secciones visibles sin membresía
 
     // --- estilos -------------------------------------------------------------
     var css = document.createElement("style");
@@ -92,8 +99,10 @@
     var notice = document.createElement("div");
     notice.className = "mig-notice";
     notice.innerHTML =
-      "<strong>Vista previa gratuita.</strong> Estás viendo la portada y la Secci&oacute;n 01 (Resumen Ejecutivo). " +
-      "Las " + (total - 1) + " secciones restantes &mdash; incluida la valuaci&oacute;n con el fair value &mdash; requieren membres&iacute;a.";
+      "<strong>Vista previa gratuita.</strong> Est&aacute;s viendo la portada y las primeras " + FREE +
+      " secciones, con gr&aacute;ficos. " +
+      "Las " + (total - FREE) + " secciones restantes &mdash; estados financieros, flujo de caja, comparables, " +
+      "el modelo proyectado y la valuaci&oacute;n con el fair value &mdash; requieren membres&iacute;a.";
     if (toc) wrap.insertBefore(notice, toc);
     else wrap.insertBefore(notice, start);
 
@@ -122,7 +131,7 @@
       if (sign !== "neutral") verdictBar.classList.add("mig-verdlock--" + sign);
     }
 
-    // --- difuminar de la Sección 02 en adelante ----------------------------
+    // --- difuminar desde la primera sección bloqueada en adelante ---------
     var lock = document.createElement("div");
     lock.className = "mig-lock";
     lock.setAttribute("aria-hidden", "true");
@@ -144,7 +153,7 @@
       '<div class="mig-cta__mark">MI</div>' +
       '<div class="mig-cta__kicker">Manfredi Investment &middot; Membres&iacute;a</div>' +
       '<h3 class="mig-cta__title">El resto del informe es para miembros</h3>' +
-      '<p class="mig-cta__text">Segu&iacute; leyendo las ' + (total - 1) + ' secciones restantes: estados financieros l&iacute;nea por l&iacute;nea, ' +
+      '<p class="mig-cta__text">Segu&iacute; leyendo las ' + (total - FREE) + ' secciones restantes: estados financieros l&iacute;nea por l&iacute;nea, ' +
       'deuda y balance, flujo de caja, comparables de industria, registro de riesgos, catalizadores, el modelo ' +
       'proyectado y la valuaci&oacute;n &mdash; cuatro metodolog&iacute;as y el fair value.</p>' +
       '<div class="mig-cta__price"><span class="mig-cta__amt">USD 15</span><span class="mig-cta__per">/ mes &middot; cancel&aacute;s cuando quieras</span></div>' +
