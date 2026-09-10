@@ -74,6 +74,15 @@ el mismo rigor de una nota de mesa de research bulge-bracket. Usá como plantill
 `informes/aapl.html` o `informes/msft.html` (mismo CSS embebido, misma estructura, mismo motor de
 gráficos). Estructura obligatoria (14 secciones):
 
+**Gate de vista previa (obligatorio):** el informe debe terminar con
+`<script src="_preview-gate.js" defer></script>` (justo antes de `</body>`, después del `<script>`
+de los charts) — es el script compartido que, para no-miembros, difumina el monto del fair value y
+la barra de veredicto de la portada (dejando visible solo el chip de señal verde/rojo) y muestra
+gratis hasta la Sección 03 (Historia + Modelo de Negocio, siempre con gráficos), difuminando de la
+Sección 04 en adelante. Copiándolo de la plantilla ya viene; si armás el HTML de cero, agregalo a
+mano. El gate depende de la estructura estándar (`.wrap`, `.frontbox`, `.fv-block`, `.fv-gap` con
+clase `pos`/`neg`, `.verdict-bar`, `<p class="secnum" id="sNN">`, `.disclosure`) — no la cambies.
+
 1. **Portada** — ticker, Fair Value blend propio vs. precio de mercado (`fv-block`), y un banner de
    veredicto (`verdict-bar`) con la postura del análisis en lenguaje descriptivo (nunca "Buy/Sell" —
    ver regla de disclaimer abajo) + nota de que no es recomendación de inversión, visible en la
@@ -356,6 +365,8 @@ con: *"hacé el informe institucional de [TICKER], nivel AAPL"*.
 ## Al terminar un ticker
 
 1. Generá `informes/<ticker>.html` completo (14 secciones) siguiendo la estructura de arriba.
+   Confirmá que el archivo incluye `<script src="_preview-gate.js" defer></script>` al final (gate
+   de vista previa para no-miembros — ver arriba).
 2. Corré el grep de lenguaje relativo a fechas (ver regla no-negociable) y limpiá cualquier
    coincidencia antes de seguir.
 3. Agregá la card en el picks-list de `#inversiones` y la entrada al principio de
