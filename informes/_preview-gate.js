@@ -68,7 +68,21 @@
       ".mig-cta__login{font-family:var(--mono);font-size:11px;color:var(--muted);",
       "margin:16px 0 0;}",
       ".mig-cta__login a{color:var(--blue);}",
-      "@media(max-width:720px){.mig-cta{padding:32px 20px 28px;}.mig-cta__title{font-size:20px;}}"
+      "@media(max-width:720px){.mig-cta{padding:32px 20px 28px;}.mig-cta__title{font-size:20px;}}",
+
+      /* --- fair value + barra de veredicto difuminados en la portada --- */
+      ".mig-fvlock .fv-value{filter:blur(7px);-webkit-user-select:none;user-select:none;pointer-events:none;}",
+      ".mig-fvlock .fv-gap{filter:blur(6px);-webkit-user-select:none;user-select:none;pointer-events:none;}",
+      ".mig-verdlock .verdict-stance{filter:blur(4.5px);-webkit-user-select:none;user-select:none;pointer-events:none;}",
+      ".mig-verdlock{border-left:4px solid var(--line);}",
+      ".mig-verdlock.mig-verdlock--pos{border-left-color:var(--green);}",
+      ".mig-verdlock.mig-verdlock--neg{border-left-color:var(--red);}",
+
+      ".mig-sig{display:inline-block;margin-top:9px;font-family:var(--mono);font-size:9.5px;",
+      "letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border:1px solid var(--line);}",
+      ".mig-sig--pos{color:var(--green);border-color:var(--green);background:rgba(26,122,84,.08);}",
+      ".mig-sig--neg{color:var(--red);border-color:var(--red);background:rgba(168,41,31,.09);}",
+      ".mig-sig--neutral{color:var(--muted);background:#f4f6f9;}"
     ].join("");
     document.head.appendChild(css);
 
@@ -82,6 +96,31 @@
       "Las " + (total - 1) + " secciones restantes &mdash; incluida la valuaci&oacute;n con el fair value &mdash; requieren membres&iacute;a.";
     if (toc) wrap.insertBefore(notice, toc);
     else wrap.insertBefore(notice, start);
+
+    // --- difuminar el fair value y la barra de veredicto de la portada -----
+    // El monto exacto queda ilegible; el color de la señal (verde = fair
+    // value por encima del precio, rojo = por debajo) sigue a la vista.
+    var fvBlock = wrap.querySelector(".fv-block");
+    var verdictBar = wrap.querySelector(".verdict-bar");
+    var gapEl = wrap.querySelector(".fv-gap");
+    var sign = "neutral";
+    if (gapEl && gapEl.classList.contains("pos")) sign = "pos";
+    else if (gapEl && gapEl.classList.contains("neg")) sign = "neg";
+
+    if (fvBlock) {
+      fvBlock.classList.add("mig-fvlock");
+      var sig = document.createElement("div");
+      sig.className = "mig-sig mig-sig--" + sign;
+      sig.textContent =
+        sign === "pos" ? "Fair value ▲ por encima del precio · monto con membresía" :
+        sign === "neg" ? "Fair value ▼ por debajo del precio · monto con membresía" :
+                         "Fair value en revisión · monto con membresía";
+      (gapEl && gapEl.parentNode === fvBlock ? gapEl : fvBlock.lastChild).after(sig);
+    }
+    if (verdictBar) {
+      verdictBar.classList.add("mig-verdlock");
+      if (sign !== "neutral") verdictBar.classList.add("mig-verdlock--" + sign);
+    }
 
     // --- difuminar de la Sección 02 en adelante ----------------------------
     var lock = document.createElement("div");
