@@ -8408,8 +8408,16 @@
   }
 
   async function pfBuildPerfSeries(windowKey){
-    var lots = (window._pfPositions||[]).filter(function(p){ return !p.isCash && p.cantidad > 0; });
+    var all = (window._pfPositions||[]).filter(function(p){ return p.cantidad > 0; });
+    var lots = all.filter(function(p){ return !p.isCash; });
     if(!lots.length) return { empty:true };
+    // Efectivo: entra igual en valor y en costo todos los dias (rinde 0), asi el
+    // titular "Historico" coincide con la columna Resultado de la tabla, que
+    // tambien mete el cash en el capital invertido.
+    var cashUSD = all.filter(function(p){ return p.isCash; }).reduce(function(s, p){
+      var u = p.moneda === 'ARS' ? (pfGetCclRate() ? p.cantidad / pfGetCclRate() : 0) : p.cantidad;
+      return s + u;
+    }, 0);
 
     var today = new Date(); today.setHours(0,0,0,0);
     var wins = pfPerfWindows();
@@ -8479,7 +8487,7 @@
         var pc = p.moneda === 'ARS' ? (ccl ? p.precioCompra / ccl : null) : p.precioCompra;
         if(pc != null) cost += p.cantidad * pc;
       });
-      valSeries.push(val); costSeries.push(cost);
+      valSeries.push(val + cashUSD); costSeries.push(cost + cashUSD);
     }
 
     var retSeries = valSeries.map(function(v, i){ return costSeries[i] > 0 ? (v / costSeries[i] - 1) * 100 : 0; });
