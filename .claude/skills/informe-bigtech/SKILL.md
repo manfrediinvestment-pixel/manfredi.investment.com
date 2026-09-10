@@ -78,8 +78,9 @@ gráficos). Estructura obligatoria (14 secciones):
 `<script src="_preview-gate.js" defer></script>` (justo antes de `</body>`, después del `<script>`
 de los charts) — es el script compartido que, para no-miembros, difumina el monto del fair value y
 la barra de veredicto de la portada (dejando visible solo el chip de señal verde/rojo) y muestra
-gratis hasta la Sección 03 (Historia + Modelo de Negocio, siempre con gráficos), difuminando de la
-Sección 04 en adelante. Copiándolo de la plantilla ya viene; si armás el HTML de cero, agregalo a
+gratis UNA sola sección completa — la Sección 03 ("Modelo de Negocio y Segmentos"), que siempre
+trae al menos un gráfico —, ocultando las Secciones 01-02 y difuminando de la Sección 04 en
+adelante. Copiándolo de la plantilla ya viene; si armás el HTML de cero, agregalo a
 mano. El gate depende de la estructura estándar (`.wrap`, `.frontbox`, `.fv-block`, `.fv-gap` con
 clase `pos`/`neg`, `.verdict-bar`, `<p class="secnum" id="sNN">`, `.disclosure`) — no la cambies.
 **Única excepción:** `informes/msft.html` va a propósito SIN el script — es la muestra completa
