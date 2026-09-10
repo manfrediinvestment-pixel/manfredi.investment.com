@@ -82,6 +82,8 @@ gratis hasta la Sección 03 (Historia + Modelo de Negocio, siempre con gráficos
 Sección 04 en adelante. Copiándolo de la plantilla ya viene; si armás el HTML de cero, agregalo a
 mano. El gate depende de la estructura estándar (`.wrap`, `.frontbox`, `.fv-block`, `.fv-gap` con
 clase `pos`/`neg`, `.verdict-bar`, `<p class="secnum" id="sNN">`, `.disclosure`) — no la cambies.
+**Única excepción:** `informes/msft.html` va a propósito SIN el script — es la muestra completa
+gratis del panel. Cualquier ticker nuevo lleva el gate.
 
 1. **Portada** — ticker, Fair Value blend propio vs. precio de mercado (`fv-block`), y un banner de
    veredicto (`verdict-bar`) con la postura del análisis en lenguaje descriptivo (nunca "Buy/Sell" —
