@@ -2,9 +2,11 @@
    Vista previa de informes para no-miembros
    ----------------------------------------------------------------------------
    Los informes de la sección Inversiones dejan de estar bloqueados: cualquiera
-   puede abrirlos y leer la portada + el Resumen Ejecutivo (Sección 01). Desde
-   la Sección 02 en adelante el contenido se difumina y aparece una tarjeta de
-   membresía.
+   puede abrir la portada + UNA sección completa del informe: la Sección 03
+   ("Modelo de Negocio y Segmentos"), que en todos los informes trae al menos
+   un gráfico. Las Secciones 01 y 02 se ocultan; de la Sección 04 en adelante
+   el contenido se difumina y aparece una tarjeta de membresía.
+   (Para mostrar otra sección, cambiar SHOW_ID abajo.)
 
    Miembro = localStorage['mi_member_token'] presente (mismo criterio que la
    home). Un miembro ve el informe completo, sin cambios.
@@ -26,18 +28,20 @@
 
   if (isMember()) return;
 
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+
   function run() {
     var wrap = document.querySelector(".wrap");
-    // La vista previa gratuita llega hasta la Sección 03 (Modelo de Negocio y
-    // Segmentos) inclusive: las Secciones 02 y 03 siempre traen gráficos, así
-    // que el no-miembro ve contenido visual antes del muro. El blur arranca en
-    // la Sección 04. Fallback a s03/s02 por si algún informe viejo no la tiene.
-    var start = document.getElementById("s04") ||
-                document.getElementById("s03") ||
-                document.getElementById("s02");
     var disclosure = document.querySelector(".disclosure");
-    if (!wrap || !start) return; // estructura inesperada: dejamos el informe abierto
-    var FREE = parseInt(start.id.slice(1), 10) - 1; // secciones visibles sin membresía
+
+    // Única sección visible sin membresía. La 03 ("Modelo de Negocio y
+    // Segmentos") siempre trae al menos un gráfico; cambiar acá para mostrar otra.
+    var SHOW_ID = "s03";
+    var showSec = document.getElementById(SHOW_ID);
+    var firstSec = document.getElementById("s01");
+    if (!wrap || !disclosure || !showSec || !firstSec) return; // estructura inesperada: informe abierto
+    var showNum = parseInt(SHOW_ID.slice(1), 10);
+    var afterSec = document.getElementById("s" + pad2(showNum + 1)); // primera sección difuminada
 
     // --- estilos -------------------------------------------------------------
     var css = document.createElement("style");
@@ -95,16 +99,17 @@
 
     // --- aviso de vista previa (arriba, antes del índice) -------------------
     var total = document.querySelectorAll(".secnum").length || 14;
+    var showTitle = showSec.textContent.replace(/^\s*\d+\s*[—–-]\s*/, "").trim();
     var toc = wrap.querySelector(".toc");
     var notice = document.createElement("div");
     notice.className = "mig-notice";
     notice.innerHTML =
-      "<strong>Vista previa gratuita.</strong> Est&aacute;s viendo la portada y las primeras " + FREE +
-      " secciones, con gr&aacute;ficos. " +
-      "Las " + (total - FREE) + " secciones restantes &mdash; estados financieros, flujo de caja, comparables, " +
-      "el modelo proyectado y la valuaci&oacute;n con el fair value &mdash; requieren membres&iacute;a.";
+      "<strong>Vista previa gratuita.</strong> Est&aacute;s viendo la portada y una secci&oacute;n " +
+      "completa del informe &mdash; " + showTitle + ", con gr&aacute;ficos. Las otras " + (total - 1) +
+      " secciones &mdash; estados financieros, flujo de caja, comparables, el modelo proyectado y la " +
+      "valuaci&oacute;n con el fair value &mdash; requieren membres&iacute;a.";
     if (toc) wrap.insertBefore(notice, toc);
-    else wrap.insertBefore(notice, start);
+    else wrap.insertBefore(notice, firstSec);
 
     // --- difuminar el fair value y la barra de veredicto de la portada -----
     // El monto exacto queda ilegible; el color de la señal (verde = fair
@@ -131,17 +136,30 @@
       if (sign !== "neutral") verdictBar.classList.add("mig-verdlock--" + sign);
     }
 
-    // --- difuminar desde la primera sección bloqueada en adelante ---------
-    var lock = document.createElement("div");
-    lock.className = "mig-lock";
-    lock.setAttribute("aria-hidden", "true");
-    start.parentNode.insertBefore(lock, start);
+    // --- ocultar las secciones previas a la elegida (01 y 02) ------------
+    var hidePre = document.createElement("div");
+    hidePre.hidden = true;
+    hidePre.setAttribute("aria-hidden", "true");
+    firstSec.parentNode.insertBefore(hidePre, firstSec);
+    var p = firstSec;
+    while (p && p !== showSec) {
+      var pnext = p.nextSibling;
+      hidePre.appendChild(p);
+      p = pnext;
+    }
 
-    var node = start;
-    while (node && node !== disclosure) {
-      var next = node.nextSibling;
-      lock.appendChild(node);
-      node = next;
+    // --- difuminar desde la sección siguiente hasta el disclosure -------
+    if (afterSec) {
+      var lock = document.createElement("div");
+      lock.className = "mig-lock";
+      lock.setAttribute("aria-hidden", "true");
+      afterSec.parentNode.insertBefore(lock, afterSec);
+      var node = afterSec;
+      while (node && node !== disclosure) {
+        var next = node.nextSibling;
+        lock.appendChild(node);
+        node = next;
+      }
     }
 
     // --- tarjeta de membresía --------------------------------------------------
@@ -153,15 +171,14 @@
       '<div class="mig-cta__mark">MI</div>' +
       '<div class="mig-cta__kicker">Manfredi Investment &middot; Membres&iacute;a</div>' +
       '<h3 class="mig-cta__title">El resto del informe es para miembros</h3>' +
-      '<p class="mig-cta__text">Segu&iacute; leyendo las ' + (total - FREE) + ' secciones restantes: estados financieros l&iacute;nea por l&iacute;nea, ' +
+      '<p class="mig-cta__text">Segu&iacute; leyendo las ' + (total - 1) + ' secciones restantes: estados financieros l&iacute;nea por l&iacute;nea, ' +
       'deuda y balance, flujo de caja, comparables de industria, registro de riesgos, catalizadores, el modelo ' +
       'proyectado y la valuaci&oacute;n &mdash; cuatro metodolog&iacute;as y el fair value.</p>' +
       '<div class="mig-cta__price"><span class="mig-cta__amt">USD 15</span><span class="mig-cta__per">/ mes &middot; cancel&aacute;s cuando quieras</span></div>' +
       '<a class="mig-cta__btn" href="/#membresia">Hacerme miembro &rarr;</a>' +
       '<p class="mig-cta__login">&iquest;Ya sos miembro? <a href="/">Inici&aacute; sesi&oacute;n en el inicio</a></p>';
 
-    if (disclosure) disclosure.parentNode.insertBefore(cta, disclosure);
-    else lock.parentNode.appendChild(cta);
+    disclosure.parentNode.insertBefore(cta, disclosure);
   }
 
   if (document.readyState === "loading") {
