@@ -4939,6 +4939,9 @@
     .pf-align-marker.bad { background: var(--red); }
     .pf-align-note { font-size: 11.5px; color: rgba(255,255,255,.4); line-height: 1.5; }
     .pf-align-note b { color: rgba(255,255,255,.65); font-weight: 600; }
+    .pf-align-row.pf-align-empty { opacity: .55; }
+    .pf-align-marker.empty { background: rgba(255,255,255,.22); box-shadow: 0 0 0 1px rgba(255,255,255,.12); }
+    .pf-align-quiz-btn { margin-top: 20px; }
     @media (prefers-reduced-motion: reduce) { .pf-align-marker { transition: none; } }
 
     .pf-metric-card {
@@ -7372,7 +7375,16 @@
     }
     if(!profileEntry){
       grid.innerHTML = '<div class="pf-metrics-label">Composición vs. tu perfil</div>'
-        + '<div class="pf-metrics-empty">Completá el quiz de perfil para ver si tu cartera está alineada.</div>';
+        + '<div class="pf-align-profile">Cuando completes el quiz de perfil, cada categoría de tu cartera se compara contra el rango recomendado para tu tolerancia al riesgo. Así se vería:</div>'
+        + '<div class="pf-align-list pf-align-preview">'
+        + PF_ALIGN_ORDER.map(function(cat){
+            return '<div class="pf-align-row pf-align-empty"><div class="pf-align-top"><span class="pf-align-name">'+ cat +'</span>'
+              + '<span class="pf-align-right"><span class="pf-align-val">0%</span></span></div>'
+              + '<div class="pf-align-track"><div class="pf-align-marker empty" style="left:0%;"></div></div>'
+              + '<div class="pf-align-note">Sin perfil todavía — completá el quiz para ver tu rango.</div></div>';
+          }).join('')
+        + '</div>'
+        + '<button type="button" class="pf-btn-gold pf-align-quiz-btn" onclick="openQuiz()">Completar quiz &rarr;</button>';
       return;
     }
     var profile = QZProfiles[profileEntry.tier] || {};
