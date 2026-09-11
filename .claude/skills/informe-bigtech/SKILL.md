@@ -360,10 +360,12 @@ Cada informe de este nivel implica varias búsquedas web + un DCF recalculado + 
 — es intensivo en tokens. Ritmo sugerido: **2-3 tickers por día**, no todos de una. AAPL y MSFT ya
 están completos en el formato nuevo (`informes/aapl.html`, `informes/msft.html`). Orden sugerido
 para seguir sumando cobertura: GOOGL → AMZN → META (mega-caps que se retroalimentan con AAPL/MSFT
-en la sección de comparables) → JPM → BAC (financieras, requieren ajustar el DCF a un modelo de
-descuento de dividendos o residual income en vez de FCF-to-firm estándar) → MELI → UBER → ADBE →
-TSLA → NVDA, y de ahí en más cualquier activo que se pida explícitamente. Para pedir uno, alcanza
-con: *"hacé el informe institucional de [TICKER], nivel AAPL"*.
+en la sección de comparables) → MELI → UBER → ADBE → TSLA → NVDA, y de ahí en más cualquier activo
+que se pida explícitamente. Para pedir uno, alcanza con: *"hacé el informe institucional de
+[TICKER], nivel AAPL"*. **Bancos y financieras (JPM, BAC, WFC, C, GS, MS, etc.) NO usan esta skill**
+— el balance es la materia prima del negocio, no apalancamiento a valuar con DCF-FCF, y necesitan un
+marco de valuación distinto (DDM, residual income, P/TBV vs. ROTCE). Usá `informe-bancos` para esos
+tickers.
 
 ## Al terminar un ticker
 
