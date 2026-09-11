@@ -315,7 +315,18 @@ sistemáticamente por debajo del mercado en 7 de 9 casos):**
   - **El múltiplo actual es alto porque el crecimiento cambió de escalón de forma real** (la empresa
     entró en un régimen de crecimiento estructuralmente más alto, no una burbuja): esto NO es motivo
     para excluir la reversión ni para forzarla a la baja hacia un promedio viejo que describe "otra
-    empresa" — se resuelve igual con la ventana limpia/reciente, no con una exclusión total.
+    empresa" — se resuelve igual con la ventana limpia/reciente, no con una exclusión total. Cuando el
+    cambio de régimen es plurianual (no un solo trimestre bueno), la "ventana limpia" no tiene que
+    limitarse a 4 trimestres — extendela a los últimos 2-3 años fiscales completos si esos años ya
+    muestran el nuevo régimen de forma consistente (mismo criterio de "2-3 años fiscales completos,
+    no 1 trimestre" que usa `informe-bancos` para el ROTCE sostenible de un banco — caso JPM,
+    11-sep-2026: promediar contra el régimen de tasas bajas de 2021-2022 seguía contaminando el
+    resultado igual que un cargo puntual, aunque no fuera un cargo puntual). Esta misma revisión de
+    ventana aplica al margen/crecimiento base del DCF, no solo a la reversión — **reponderar el blend
+    (regla de "Ponderación del blend" de abajo) no alcanza si el DCF Base y la reversión están anclados
+    en un promedio que mezcla el régimen viejo con el nuevo**: antes de aceptar que el DCF quedó muy
+    por debajo del mercado como hallazgo genuino, confirmá que el margen/crecimiento del año 1 no está
+    empatado con un promedio de 5 años que ya no describe cómo opera la compañía hoy.
   - Solo excluí el método del todo, como referencia aislada no incluida en el blend, si ni siquiera la
     ventana limpia da un número utilizable (ej. sigue incluyendo trimestres de ganancia negativa).
   - Reemplazar reversión por SOTP en el blend (en vez de reconstruir la ventana limpia) sigue siendo
