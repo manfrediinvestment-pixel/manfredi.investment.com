@@ -136,10 +136,51 @@ gratis del panel. Cualquier ticker nuevo lleva el gate.
 - Si el valor terminal es más del ~65-70% del EV, decilo explícitamente: el modelo es sensible y hay
   que leerlo con cautela (es normal en growth stocks, pero hay que ser honesto sobre ello).
 - Comps: aplicá el múltiplo promedio de peers al EBITDA/EPS proyectado a 1 año (forward), no al TTM.
-- Fair value final = blend explícito y declarado, promedio simple de DCF Base + comparables +
-  reversión histórica + consenso Wall Street (+ SOTP cuando aplique) — nunca un número "de ojo", y
-  nunca dejando reversión o consenso afuera del promedio sin pasar primero por la regla de "ventana
-  limpia" de más abajo.
+- Fair value final = blend explícito y declarado, **promedio PONDERADO** (no simple) de DCF Base +
+  comparables + reversión histórica + consenso Wall Street (+ SOTP cuando aplique) — nunca un número
+  "de ojo", y nunca dejando reversión o consenso afuera del promedio sin pasar primero por la regla de
+  "ventana limpia" de más abajo. Ver pesos exactos y la razón de por qué no es un promedio simple en la
+  regla de "Ponderación del blend" más abajo.
+
+**Regla de ponderación del blend (agregada 11-sep-2026, tras auditar los 26 informes del panel con
+datos comparables entre sí — el usuario notó que el blend venía quedando sistemáticamente atrás del
+mercado y pidió el análisis):** promediar los cuatro métodos en pie de igualdad (25% cada uno)
+estaba sesgando el blend hacia abajo de forma sistemática, no porque el mercado esté siempre caro. La
+auditoría mostró:
+
+| Método | Gap promedio vs. mercado (26 informes) | Por debajo del mercado |
+|---|---|---|
+| DCF Base | −19.8% | 20 de 26 (77%) |
+| Comparables | +0.7% | 13 de 24 |
+| Reversión histórica | +11.4% | 10 de 24 |
+| Consenso Wall Street | +24.8% | 1 de 23 |
+
+El DCF Base es, con diferencia, el método más conservador del panel — no por error de cálculo, sino
+porque entre 65% y 85%+ de su valor viene sistemáticamente del valor terminal (ver "% del EV desde
+terminal" de cada informe), acotado por el techo de crecimiento terminal de la regla de arriba
+(2.5%-4%), mientras el mercado suele pagar por una duración de crecimiento más larga que el horizonte
+explícito de 5 años + ese terminal capturan. Promediarlo 1:1 con métodos que en promedio quedan
+neutros o arriba (comparables, reversión, consenso) arrastra el blend hacia abajo cada vez que el
+consenso no alcanza a compensar por sí solo esa brecha — es lo que pasó, por ejemplo, en CRWD, INTC y
+ARM, donde el DCF solo ya quedaba 65-85 puntos por debajo del mercado.
+
+Por eso el blend usa estos pesos, no 25%/25%/25%/25%:
+
+- **DCF Base: 15%**
+- **Comparables: 25%**
+- **Reversión histórica (ventana limpia): 35%** — el método al que más peso se le da, porque en la
+  auditoría es el que mejor equilibra ser propio de la compañía (no depende de peers ni de supuestos
+  de largo plazo) con no estar sistemáticamente sesgado ni para arriba ni para abajo.
+- **Consenso Wall Street: 25%**
+
+Si el informe suma un quinto/sexto método por las reglas de "apuesta de plataforma" o "segmentos de
+rentabilidad muy distinta" de abajo (SOTP propio), tratalo con el mismo criterio que el DCF —
+depende igual de supuestos de largo plazo/terminal— y repartí ese 15% entre el DCF y el SOTP (ej.
+7.5% cada uno) en vez de agregarlo como una quinta porción nueva; no le restes peso a
+comparables/reversión/consenso por sumar un método más. Esta ponderación reemplaza al promedio
+simple en el fair value de portada — el valor esperado ponderado por probabilidad de los tres
+escenarios del DCF (25/45/30 Bear/Base/Bull) sigue siendo un dato adicional que se reporta aparte,
+no el que define el blend.
 
 **Regla no-negociable: el margen de OCF del DCF tiene que estar anclado en el OCF real reportado, no
 en una analogía al margen operativo (regla agregada 05-ago-2026, tras un caso real en INTC donde el

@@ -173,6 +173,34 @@ Blend final = promedio de estos métodos (misma regla que informe-bigtech de que
 
 6. **Consenso Wall Street** — igual que informe-bigtech, siempre entra al blend.
 
+**Ponderación del blend (no promedio simple — misma regla y misma fecha que informe-bigtech,
+11-sep-2026, primer caso real JPM):** por la misma razón que en tech, los métodos "intrínsecos" que
+dependen de un supuesto de largo plazo/terminal (DDM, RIM, y P/TBV justificado, que usa el mismo
+ROTCE sostenible de largo plazo que el RIM) pesan menos que los métodos que no proyectan hacia
+adelante. Pesos:
+
+- **DDM: 10%**
+- **RIM: 10%**
+- **P/TBV justificado por ROTCE: 10%**
+- **Comparables: 20%**
+- **Reversión histórica (P/TBV propio): 30%** — el de más peso, misma lógica que en informe-bigtech.
+- **Consenso Wall Street: 20%**
+
+**Matiz específico de bancos, documentado en el caso JPM (primer informe de esta skill):** a
+diferencia de tech, donde comparables y reversión históricamente promedian neutros o arriba del
+mercado, en un banco cuyo ROTCE actual es genuinamente superior al de sus peers y al de su propia
+historia reciente, **comparables y reversión pueden quedar igual de bajos que los métodos
+intrínsecos** — no porque compartan el mismo supuesto de largo plazo, sino porque comparables aplica
+el múltiplo *promedio* de peers con ROTCE más bajo (sin premio por ser el mejor del grupo), y
+reversión ancla contra la propia historia del banco antes de que su ROTCE diera el salto reciente. En
+JPM, reponderar el blend movió el fair value de $233.63 a solo $247.64 (de −34.5% a −30.6% vs.
+mercado) — una mejora mucho más chica que en tech, porque ahí comparables ($245.08) y reversión
+histórica ($226.70) también estaban entre 31% y 36% por debajo del mercado, no solo el DDM/RIM. No
+fuerces el blend a acercarse más al mercado inflando el peso de comparables/reversión cuando el
+propio dato de esos métodos ya está deprimido por la misma razón de fondo (ROTCE reciente
+estructuralmente más alto que el histórico propio y que el de los pares) — repórtalo como hallazgo,
+con la misma honestidad de la regla de oro.
+
 **Grilla de sensibilidad** (reemplaza la de WACC×crecimiento terminal): Costo de Equity × crecimiento
 terminal (5×5), recalculando el DDM/RIM real para cada combinación, calibrada para que la celda del
 caso Base reproduzca el fair value ya publicado — misma exigencia que informe-bigtech.
