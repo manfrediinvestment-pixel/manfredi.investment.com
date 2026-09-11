@@ -173,7 +173,7 @@
       '<h3 class="mig-cta__title">El resto del informe es para miembros</h3>' +
       '<p class="mig-cta__text">Segu&iacute; leyendo las ' + (total - 1) + ' secciones restantes: estados financieros l&iacute;nea por l&iacute;nea, ' +
       'deuda y balance, flujo de caja, comparables de industria, registro de riesgos, catalizadores, el modelo ' +
-      'proyectado y la valuaci&oacute;n &mdash; cuatro metodolog&iacute;as y el fair value.</p>' +
+      'proyectado y la valuaci&oacute;n con el fair value.</p>' +
       '<div class="mig-cta__price"><span class="mig-cta__amt">USD 15</span><span class="mig-cta__per">/ mes &middot; cancel&aacute;s cuando quieras</span></div>' +
       '<a class="mig-cta__btn" href="/#membresia">Hacerme miembro &rarr;</a>' +
       '<p class="mig-cta__login">&iquest;Ya sos miembro? <a href="/">Inici&aacute; sesi&oacute;n en el inicio</a></p>';
