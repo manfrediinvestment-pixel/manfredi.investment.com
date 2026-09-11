@@ -137,10 +137,19 @@ distinto:
 Blend final = promedio de estos métodos (misma regla que informe-bigtech de que reversión y consenso
 **siempre** entran, nunca se dejan afuera ad hoc):
 
-1. **Dividend Discount Model (DDM)** — horizonte explícito de 5 años, 3 escenarios (bear/base/bull),
-   payout ratio evolucionando de forma creíble (no constante si el banco viene de reconstruir capital
-   post-stress-test), terminal growth 2.5%-4% (misma cota que informe-bigtech). Reportá también el
-   valor esperado ponderado por probabilidad, igual que el DCF de informe-bigtech.
+1. **Dividend Discount Model de PAYOUT TOTAL (dividendo + recompras), nunca de dividendo puro**
+   (regla agregada 11-sep-2026, tras el caso JPM: descontar solo el dividendo en efectivo dio $108.98
+   —un outlier bajista aislado— mientras JPMorgan devuelve dos tercios de su exceso de capital vía
+   recompras, no vía dividendo; corregido a payout total el mismo método dio $243.91, en línea con el
+   resto del blend). Un banco que devuelve la mayoría de su capital vía buybacks (chequeá el payout
+   total LTM divulgado por la compañía, dividendo+recompras/utilidad neta, contra el payout de
+   dividendo puro — si la brecha entre ambos supera ~15-20 puntos, el banco es "buyback-heavy" y un DDM
+   de dividendo puro no es una versión conservadora del método, es la versión equivocada) necesita
+   descontar el **payout total como % del EPS**, no el dividendo por acción como % de nada. Horizonte
+   explícito de 5 años, 3 escenarios (bear/base/bull), payout total evolucionando de forma creíble
+   (ancla el año 1 en el payout total LTM real divulgado por la compañía, no en un promedio genérico),
+   terminal growth 2.5%-4% (misma cota que informe-bigtech). Reportá también el valor esperado
+   ponderado por probabilidad, igual que el DCF de informe-bigtech.
 
 2. **Residual Income Model / Excess Return Model** — el método que Wall Street de hecho prefiere para
    bancos, porque ancla la mayor parte del valor en un número real del balance (book value) en vez de
@@ -148,13 +157,27 @@ Blend final = promedio de estos métodos (misma regla que informe-bigtech de que
    excess return. **Regla de anclaje (equivalente a la regla de margen de OCF de informe-bigtech):**
    el ROE proyectado año 1 tiene que anclarse en el ROTCE real de los últimos 4-8 trimestres,
    ajustado explícitamente por el escenario de tasas y de ciclo de crédito del caso — nunca un ROE
-   "de tabla" copiado de un peer o de memoria.
+   "de tabla" copiado de un peer o de memoria. **Ventana del ROTCE "sostenible" del caso Base
+   (agregada 11-sep-2026, caso JPM):** antes de promediar 5 años completos de ROTCE anual para fijar el
+   nivel de largo plazo, revisá si hubo un cambio de régimen real (de tasas, de mezcla de negocio, de
+   ciclo de crédito) en algún punto de esa ventana — si los últimos 2-3 años fiscales completos
+   muestran un piso de ROTCE consistentemente más alto que los 2-3 años anteriores (no un solo
+   trimestre bueno), anclá el caso Base en esa ventana reciente, no en el promedio de los 5 años
+   completos: promediar contra un régimen que ya no describe cómo opera el banco hoy no es prudencia,
+   es usar un dato viejo. En JPM esto movió el ROTCE Base de 17% (promedio 2021-2025 completo,
+   contaminado por el régimen de tasas bajas de 2021-2022) a 19% (promedio real 2023-2025) y el fair
+   value de $233.31 a $274.91. Documentá explícitamente en el texto y en Limitaciones el costo de esta
+   decisión: una ventana corta es más sensible a estar ella misma en la parte alta de un ciclo — no la
+   uses para forzar el fair value hacia el precio de mercado, solo cuando el cambio de régimen esté
+   respaldado por datos reales de 2-3 años, no de 1 trimestre.
 
 3. **P/TBV justificado por ROTCE** — el ancla central de la industria para bancos:
    `P/TBV justificado = (ROTCE − g) / (Costo de Equity − g)`, donde `g` ≈ ROTCE × (1 − payout ratio).
    Aplicalo al TBV per share actual y compará el resultado contra el P/TBV real de mercado —
    cuantificar la brecha (¿el mercado paga de más o de menos por el ROTCE que el banco efectivamente
-   genera?) es más útil que aceptar o rechazar el múltiplo de mercado sin más.
+   genera?) es más útil que aceptar o rechazar el múltiplo de mercado sin más. Usá el mismo ROTCE
+   sostenible de largo plazo (y la misma ventana de anclaje, ver regla del Método 2 arriba) que el RIM
+   — los dos métodos tienen que ser internamente consistentes entre sí.
 
 4. **Comparables** — P/E forward y P/TBV de 3-4 peers reales, **nunca EV/EBITDA** (un banco no tiene
    "enterprise value" en el sentido convencional: la deuda/depósitos no es algo que se sume para
@@ -169,7 +192,14 @@ Blend final = promedio de estos métodos (misma regla que informe-bigtech de que
    que informe-bigtech para descontaminar trimestres con distorsión — en bancos, los eventos de
    contaminación típicos son el day-1 CECL (adopción 2020), builds/releases grandes y puntuales de
    reserva (COVID 2020, crisis de bancos regionales de marzo 2023), o cargos de litigio/regulatorios
-   puntuales.
+   puntuales. **Ventana de años, no solo de trimestres (agregada 11-sep-2026, caso JPM):** además de
+   limpiar trimestres contaminados por partidas puntuales, revisá si la ventana de años que estás
+   promediando mezcla dos regímenes de negocio distintos (mismo criterio que la regla de ROTCE del
+   Método 2) — si el P/TBV o P/E de cierre de cada uno de los últimos 3 años fiscales muestra una
+   trayectoria ascendente clara y sostenida (no un solo salto puntual), usá el promedio de esa ventana
+   de 3 años en vez de la mediana de 10 años completa, y mostrá la de 10 años solo como referencia. En
+   JPM: P/TBV de cierre 2023/2024/2025 = 1.99x/2.46x/3.05x (trayectoria clara) → promedio 3 años 2.50x
+   ($283.75) en vez de mediana 10 años 2.00x ($226.70).
 
 6. **Consenso Wall Street** — igual que informe-bigtech, siempre entra al blend.
 
@@ -186,20 +216,36 @@ adelante. Pesos:
 - **Reversión histórica (P/TBV propio): 30%** — el de más peso, misma lógica que en informe-bigtech.
 - **Consenso Wall Street: 20%**
 
-**Matiz específico de bancos, documentado en el caso JPM (primer informe de esta skill):** a
-diferencia de tech, donde comparables y reversión históricamente promedian neutros o arriba del
-mercado, en un banco cuyo ROTCE actual es genuinamente superior al de sus peers y al de su propia
-historia reciente, **comparables y reversión pueden quedar igual de bajos que los métodos
-intrínsecos** — no porque compartan el mismo supuesto de largo plazo, sino porque comparables aplica
-el múltiplo *promedio* de peers con ROTCE más bajo (sin premio por ser el mejor del grupo), y
-reversión ancla contra la propia historia del banco antes de que su ROTCE diera el salto reciente. En
-JPM, reponderar el blend movió el fair value de $233.63 a solo $247.64 (de −34.5% a −30.6% vs.
-mercado) — una mejora mucho más chica que en tech, porque ahí comparables ($245.08) y reversión
-histórica ($226.70) también estaban entre 31% y 36% por debajo del mercado, no solo el DDM/RIM. No
-fuerces el blend a acercarse más al mercado inflando el peso de comparables/reversión cuando el
-propio dato de esos métodos ya está deprimido por la misma razón de fondo (ROTCE reciente
-estructuralmente más alto que el histórico propio y que el de los pares) — repórtalo como hallazgo,
-con la misma honestidad de la regla de oro.
+**Matiz específico de bancos, documentado en el caso JPM (primer informe de esta skill) — historial
+completo de la corrección:** a diferencia de tech, donde comparables y reversión históricamente
+promedian neutros o arriba del mercado, en un banco cuyo ROTCE actual es genuinamente superior al de
+sus peers y al de su propia historia reciente, comparables y reversión pueden arrancar igual de bajos
+que los métodos intrínsecos — no por compartir el mismo supuesto de largo plazo, sino porque
+comparables aplica el múltiplo *promedio* de peers con ROTCE más bajo (sin premio por ser el mejor del
+grupo) y reversión, si se usa la ventana completa de 10 años, ancla contra la propia historia del
+banco de antes de su salto de ROTCE. En JPM esto pasó en tres pasos, y hay que documentar los tres
+igual de explícitamente porque **solo el primero es "peso" — los otros dos son corregir errores
+reales de los métodos, no maquillaje**:
+
+1. Reponderar el blend (DCF/DDM/RIM al 10% en vez de 16.7%, reversión al 30%): $233.63 → $247.64
+   (−34.5% → −30.6%). Mejora chica, porque en JPM comparables y reversión (con la ventana vieja de 10
+   años) también estaban deprimidos, no solo el DDM/RIM — reponderar no alcanza cuando el problema no
+   es solo de pesos.
+2. Corregir el DDM a payout total (Método 1 arriba) y re-anclar el ROTCE del RIM/P-TBV justificado a
+   la ventana real de 2023-2025 en vez del promedio 2021-2025 (Método 2 arriba): $247.64 → algo más
+   alto solo en los tres métodos corregidos.
+3. Corregir la ventana de reversión histórica a 3 años en vez de 10 (Método 5 arriba), que en JPM era
+   el tercer método deprimido por la misma causa de fondo (multiple todavía no reflejaba el re-rating
+   real 2023-2025).
+
+Con los tres pasos, JPM terminó en $285.79 (−19.9%). La lección para el próximo banco de este panel
+(BAC, WFC, C, GS, MS): si el blend sigue muy por debajo del mercado después de reponderar, **no
+subas más el peso de comparables/reversión para forzarlo a acercarse** — revisá primero si el ROTCE
+"sostenible" y la ventana de reversión de esos métodos están anclados en un régimen de negocio viejo
+que ya no describe al banco (mismo chequeo que las reglas de los Métodos 1, 2 y 5 arriba). Si después
+de ese chequeo el banco genuinamente no sostuvo nunca, ni en los últimos 2-3 años, el nivel de ROTCE
+que el precio exige, ESE es el hallazgo real — repórtalo con la misma honestidad de la regla de oro,
+no lo sigas corrigiendo hasta que desaparezca.
 
 **Grilla de sensibilidad** (reemplaza la de WACC×crecimiento terminal): Costo de Equity × crecimiento
 terminal (5×5), recalculando el DDM/RIM real para cada combinación, calibrada para que la celda del
