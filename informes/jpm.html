@@ -175,8 +175,8 @@
       <div><span class="ticker-big">JPM</span><span class="exch">NYSE · JPMorgan Chase &amp; Co.</span></div>
       <div class="fv-block">
         <div class="fv-label">Fair value (blend propio)</div>
-        <div class="fv-value">$233.63</div>
-        <div class="fv-gap neg">vs. $356.66 mercado · &minus;34.5%</div>
+        <div class="fv-value">$247.64</div>
+        <div class="fv-gap neg">vs. $356.66 mercado · &minus;30.6%</div>
       </div>
     </div>
     <div class="verdict-bar">
@@ -674,7 +674,8 @@
     ancla la mayor parte del valor en el balance real en vez de en flujos proyectados, el múltiplo de P/TBV justificado
     por el ROTCE de la propia compañía, comparables directos, reversión histórica del propio múltiplo, y el consenso de
     Wall Street. No hay WACC: solo un costo de equity (CAPM), porque la deuda/depósitos no se pondera como fuente de
-    financiamiento externa.
+    financiamiento externa. El blend final no promedia los seis métodos en pie de igualdad — los pondera, por la razón
+    que se explica al cierre de esta sección.
   </p>
   <p class="footnote">Costo de equity (CAPM): Rf ≈ 4.95% (yield vigente del Treasury 10Y) + beta × ERP (~5.0%), con beta aproximado de 1.10 (no verificado en tiempo real, aproximación de mercado). Costo de equity Base ≈ 10.5%; Bear 11.5%; Bull 9.5%.</p>
 
@@ -816,29 +817,43 @@
   <h3>Síntesis: los seis métodos, uno al lado del otro</h3>
   <div class="chartbox">
     <canvas id="footballChart" height="300"></canvas>
-    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado ($356.66); la línea azul marca el blend propio ($233.63). Solo el consenso Wall Street supera el precio de mercado.</p>
+    <p class="chartcap">"Football field" de valuación — rango bajo/alto de cada metodología. La línea roja marca el precio de mercado ($356.66); la línea azul marca el blend propio ($247.64). Solo el consenso Wall Street supera el precio de mercado.</p>
   </div>
+  <p>
+    El blend final <strong>no promedia los seis métodos en pie de igualdad</strong>. Una auditoría propia sobre el
+    panel completo de informes de este desk (26 tickers con datos comparables, sep-2026) mostró que los métodos que
+    dependen de un supuesto de largo plazo/terminal —el equivalente bancario del DCF: DDM, Residual Income Model y
+    P/TBV justificado, que comparten el mismo ROTCE sostenible de largo plazo— quedan sistemáticamente más
+    conservadores que comparables, reversión histórica y consenso, y promediarlos 1:1 arrastraba el fair value final
+    hacia abajo de forma no deliberada. Por eso el blend pondera así, no 16.7% cada uno:
+  </p>
   <div class="table-scroll"><table>
-    <tr><th>Método</th><th class="right-al">Fair value (caso Base)</th></tr>
-    <tr><td class="label">Dividend Discount Model — Base</td><td class="right-al">$108.98</td></tr>
-    <tr><td class="label">Residual Income Model — Base</td><td class="right-al">$233.31</td></tr>
-    <tr><td class="label">P/TBV justificado por ROTCE — Base</td><td class="right-al">$211.59</td></tr>
-    <tr><td class="label">Comparables (BAC/WFC/C)</td><td class="right-al">$245.08</td></tr>
-    <tr><td class="label">Reversión histórica (P/TBV mediana 10 años)</td><td class="right-al">$226.70</td></tr>
-    <tr><td class="label">Consenso Wall Street (precio objetivo promedio)</td><td class="right-al">$376.14</td></tr>
-    <tr class="total"><td class="label">Promedio simple de los seis métodos</td><td class="right-al">$233.63</td></tr>
+    <tr><th>Método</th><th class="right-al">Fair value (caso Base)</th><th class="right-al">Peso</th></tr>
+    <tr><td class="label">Dividend Discount Model — Base</td><td class="right-al">$108.98</td><td class="right-al">10%</td></tr>
+    <tr><td class="label">Residual Income Model — Base</td><td class="right-al">$233.31</td><td class="right-al">10%</td></tr>
+    <tr><td class="label">P/TBV justificado por ROTCE — Base</td><td class="right-al">$211.59</td><td class="right-al">10%</td></tr>
+    <tr><td class="label">Comparables (BAC/WFC/C)</td><td class="right-al">$245.08</td><td class="right-al">20%</td></tr>
+    <tr><td class="label">Reversión histórica (P/TBV mediana 10 años)</td><td class="right-al">$226.70</td><td class="right-al">30%</td></tr>
+    <tr><td class="label">Consenso Wall Street (precio objetivo promedio)</td><td class="right-al">$376.14</td><td class="right-al">20%</td></tr>
+    <tr class="total"><td class="label">Blend ponderado</td><td class="right-al">$247.64</td><td class="right-al">100%</td></tr>
   </table></div>
   <p>
-    El promedio simple de los seis métodos da <strong>$233.63 por acción</strong>, un 34.5% por debajo del precio de
-    mercado ($356.66). Además del promedio simple, un valor esperado ponderado por probabilidad explícita sobre los
-    tres escenarios de los dos métodos intrínsecos (DDM y RIM promediados por escenario, ponderados 25% Bear / 45% Base
-    / 30% Bull) da $179.26 por acción — todavía más bajo, reflejo de que el escenario Bull recibe menos peso relativo
-    que el Base. Lo importante no es el número aislado sino el patrón que se repite en los seis métodos: cinco de seis
-    quedan por debajo del precio de mercado, y el único que lo supera (consenso) lo hace por un margen moderado
-    (+5.5%). La dispersión es amplia —de $108.98 en el DDM Base a $376.14 en el consenso—, reflejo genuino de cuánta
-    incertidumbre real hay sobre si la rentabilidad récord de este trimestre es el nuevo nivel estructural de
-    JPMorgan o el pico de un ciclo de mercados de capitales particularmente favorable — no una falla de cálculo que
-    debería resolverse en una única cifra falsamente precisa.
+    El blend ponderado da <strong>$247.64 por acción</strong>, un 30.6% por debajo del precio de mercado ($356.66) —
+    una mejora modesta frente al promedio simple que hubiera dado $233.63 (−34.5%), y hay que ser honestos sobre por
+    qué la mejora es chica: a diferencia del patrón típico en tech (donde comparables y reversión suelen promediar
+    neutros o arriba del mercado), en JPM <strong>comparables ($245.08, −31.3%) y reversión histórica ($226.70,
+    −36.4%) quedan casi tan bajos como los métodos intrínsecos</strong>. No es la misma causa: comparables aplica el
+    múltiplo <em>promedio</em> de BAC/WFC/C —bancos con ROTCE más bajo— sin premio por ser el mejor del panel
+    (Sección 08), y la reversión histórica ancla contra el propio P/TBV de JPMorgan de antes de que su ROTCE diera el
+    salto reciente (Sección 02). Los seis métodos, ordenados, muestran el mismo patrón que antes: solo el consenso
+    Wall Street supera el precio de mercado (+5.5%), y los cinco restantes quedan entre 31% y 69% por debajo. Además
+    del blend ponderado, un valor esperado por probabilidad explícita sobre los tres escenarios de los dos métodos
+    intrínsecos (DDM y RIM promediados por escenario, ponderados 25% Bear / 45% Base / 30% Bull) da $179.26 por
+    acción — todavía más bajo, reflejo de que el escenario Bull recibe menos peso relativo que el Base. La dispersión
+    sigue siendo amplia —de $108.98 en el DDM Base a $376.14 en el consenso—, reflejo genuino de cuánta incertidumbre
+    real hay sobre si la rentabilidad récord de este trimestre es el nuevo nivel estructural de JPMorgan o el pico de
+    un ciclo de mercados de capitales particularmente favorable — no una falla de cálculo que debería resolverse en
+    una única cifra falsamente precisa.
   </p>
 
   <!-- 14 -->
@@ -1204,7 +1219,7 @@
       labels:['DDM (Bear → Bull)','Residual Income Model (Bear → Bull)','P/TBV justificado (Bear → Bull)','Comparables (piso → techo P/TBV peers)','Reversión histórica (rango 10 años)','Consenso Wall Street (rango objetivo)'],
       ranges:[[73.62,155.26],[136.44,351.34],[132.24,292.82],[156.01,242.87],[147.35,354.79],[305,452]],
       colors:[PALETTE.blue,PALETTE.navy2,PALETTE.blueLight,PALETTE.gold,PALETTE.pale,PALETTE.navy],
-      refLines:[{value:356.66,color:PALETTE.red,label:'Mercado $357'},{value:233.63,color:PALETTE.navy,label:'Blend $234'}],
+      refLines:[{value:356.66,color:PALETTE.red,label:'Mercado $357'},{value:247.64,color:PALETTE.navy,label:'Blend $248'}],
       valueFmt:function(v){ return '$'+v.toFixed(0); }
     });
   }
