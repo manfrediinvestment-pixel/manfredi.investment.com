@@ -9280,6 +9280,29 @@
       var mes = HTX_CAL_MESES[(parseInt(partes[1],10)||1) - 1] || '';
       return '<span class="d">'+esc(d)+'</span><span class="m">'+esc(mes)+'</span>';
     }
+    // Eventos de alto impacto (Fed, inflación, empleo, PBI, etc.) priman sobre el resto;
+    // si ningún evento del día matchea, alterna AR/US para no mostrar siempre Argentina.
+    var HTX_CAL_SCORES = [
+      { re: /decisi[oó]n de tasas|fomc rate decision|\brate decision\b|\bpowell\b/i, score: 3 },
+      { re: /\bfed\b|fomc|nonfarm|n[oó]minas|\bpce\b|\bcpi\b|\bipc\b|inflaci[oó]n|\bpbi\b|\bgdp\b|desempleo|unemployment/i, score: 2 },
+      { re: /retail sales|ventas minoristas|riesgo pa[ií]s|tasas de inter/i, score: 1 }
+    ];
+    function pickDayEvent(eventos, dayIndex){
+      if (!eventos || !eventos.length) return null;
+      var best = null, bestScore = -1;
+      eventos.forEach(function(ev){
+        var titulo = ev.titulo || '';
+        var score = 0;
+        for (var i = 0; i < HTX_CAL_SCORES.length; i++) {
+          if (HTX_CAL_SCORES[i].re.test(titulo)) { score = HTX_CAL_SCORES[i].score; break; }
+        }
+        if (score > bestScore) { bestScore = score; best = ev; }
+      });
+      if (bestScore > 0) return best;
+      var preferido = (dayIndex % 2 === 0) ? 'us' : 'ar';
+      var alt = eventos.filter(function(ev){ return ev.tipo === preferido; })[0];
+      return alt || eventos[0];
+    }
     try{
       var r = await fetch('https://manfredi-calendario.nachito2502.workers.dev/calendario', {signal: AbortSignal.timeout(8000)});
       if (!r.ok) throw new Error('status '+r.status);
@@ -9288,8 +9311,8 @@
       if (weekEl) weekEl.textContent = 'Semana del ' + (d.semana || '');
       var hoy = new Date();
       var hoyDM = hoy.getDate() + '/' + (hoy.getMonth() + 1);
-      box.innerHTML = d.dias.slice(0, 5).map(function(dia){
-        var ev = dia.eventos && dia.eventos[0];
+      box.innerHTML = d.dias.slice(0, 5).map(function(dia, i){
+        var ev = pickDayEvent(dia.eventos, i);
         if (!ev) return '';
         var isToday = dia.fecha === hoyDM;
         return '<div class="htx-cal2__ev">'+
