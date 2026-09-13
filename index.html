@@ -3660,49 +3660,10 @@
         <div class="htx-cal2">
           <div class="htx-cal2__col">
             <div class="htx-cal2__legend htx-cal2__legend--news">
-              <span>Semana del 1 al 5 de septiembre</span>
+              <span id="htxCalEcoWeek">Cargando semana&hellip;</span>
             </div>
-            <div class="htx-cal2__evs">
-
-            <div class="htx-cal2__ev">
-              <div class="htx-cal2__day"><span class="htx-cal2__hoy">HOY</span></div>
-              <div>
-                <div class="htx-cal2__meta"><span class="htx-cal2__time">15:30</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
-                <div class="htx-cal2__title">&Iacute;ndice de precios PCE &mdash; julio</div>
-              </div>
-            </div>
-
-            <div class="htx-cal2__ev">
-              <div class="htx-cal2__day"><span class="d">02</span><span class="m">SEP</span></div>
-              <div>
-                <div class="htx-cal2__meta"><span class="htx-cal2__time">16:00</span><span class="htx-cal2__tag ar">Argentina</span><span class="htx-cal2__imp">&#9679;&#9679;&#9675;</span></div>
-                <div class="htx-cal2__title">Recaudaci&oacute;n tributaria &mdash; agosto</div>
-              </div>
-            </div>
-
-            <div class="htx-cal2__ev">
-              <div class="htx-cal2__day"><span class="d">03</span><span class="m">SEP</span></div>
-              <div>
-                <div class="htx-cal2__meta"><span class="htx-cal2__time">11:00</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
-                <div class="htx-cal2__title">ISM Manufacturero &mdash; agosto</div>
-              </div>
-            </div>
-
-            <div class="htx-cal2__ev">
-              <div class="htx-cal2__day"><span class="d">04</span><span class="m">SEP</span></div>
-              <div>
-                <div class="htx-cal2__meta"><span class="htx-cal2__time">08:30</span><span class="htx-cal2__tag ar">Argentina</span><span class="htx-cal2__imp">&#9679;&#9679;&#9675;</span></div>
-                <div class="htx-cal2__title">IPC CABA &mdash; agosto</div>
-              </div>
-            </div>
-
-            <div class="htx-cal2__ev">
-              <div class="htx-cal2__day"><span class="d">05</span><span class="m">SEP</span></div>
-              <div>
-                <div class="htx-cal2__meta"><span class="htx-cal2__time">09:30</span><span class="htx-cal2__tag us">EE.UU.</span><span class="htx-cal2__imp high">&#9679;&#9679;&#9679;</span></div>
-                <div class="htx-cal2__title">N&oacute;minas no agr&iacute;colas &mdash; agosto</div>
-              </div>
-            </div>
+            <div id="htxCalEcoList" class="htx-cal2__evs">
+              <div class="htx-cal2__newsempty">Cargando agenda&hellip;</div>
             </div>
             <a class="htx-tile__link" href="#calendario" data-tab-target="calendario">Ver calendario completo &rarr;</a>
           </div>
@@ -3723,7 +3684,7 @@
           <span><i style="background:#9fb4c9;"></i>Estados Unidos</span>
           <span><i style="background:var(--htx-amber);"></i>Alta relevancia de mercado</span>
         </div>
-        <p class="htx-pf__note">Eventos de ejemplo &middot; noticias en vivo de los reportes diarios</p>
+        <p class="htx-pf__note">Agenda econ&oacute;mica y noticias en vivo &middot; se actualiza junto con el calendario completo</p>
       </div>
     </div>
 
@@ -9301,6 +9262,50 @@
   }
   loadHtxCalNews();
   setInterval(loadHtxCalNews, 600000);
+
+  // Panel "Calendario económico" del cuadro Calendario en la home (htx-tile--cal):
+  // mismo worker/endpoint que la pestaña Calendario completa (#calendario), un evento
+  // por día de la semana. Antes esto era HTML fijo con fecha vieja (1-5 de septiembre).
+  var HTX_CAL_MESES = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+  async function loadHtxCalEconomico() {
+    var box = document.getElementById('htxCalEcoList');
+    var weekEl = document.getElementById('htxCalEcoWeek');
+    if (!box) return;
+    function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+    function tagFor(t){return t==='ar'?'<span class="htx-cal2__tag ar">Argentina</span>':'<span class="htx-cal2__tag us">EE.UU.</span>';}
+    function dayBadge(fecha, isToday){
+      if (isToday) return '<span class="htx-cal2__hoy">HOY</span>';
+      var partes = String(fecha||'').split('/');
+      var d = partes[0] || '';
+      var mes = HTX_CAL_MESES[(parseInt(partes[1],10)||1) - 1] || '';
+      return '<span class="d">'+esc(d)+'</span><span class="m">'+esc(mes)+'</span>';
+    }
+    try{
+      var r = await fetch('https://manfredi-calendario.nachito2502.workers.dev/calendario', {signal: AbortSignal.timeout(8000)});
+      if (!r.ok) throw new Error('status '+r.status);
+      var d = await r.json();
+      if (!d.dias || !d.dias.length) throw new Error('sin datos');
+      if (weekEl) weekEl.textContent = 'Semana del ' + (d.semana || '');
+      var hoy = new Date();
+      var hoyDM = hoy.getDate() + '/' + (hoy.getMonth() + 1);
+      box.innerHTML = d.dias.slice(0, 5).map(function(dia){
+        var ev = dia.eventos && dia.eventos[0];
+        if (!ev) return '';
+        var isToday = dia.fecha === hoyDM;
+        return '<div class="htx-cal2__ev">'+
+          '<div class="htx-cal2__day">'+dayBadge(dia.fecha, isToday)+'</div>'+
+          '<div><div class="htx-cal2__meta">'+tagFor(ev.tipo)+'</div>'+
+          '<div class="htx-cal2__title">'+esc(ev.titulo)+'</div></div>'+
+        '</div>';
+      }).join('') || '<div class="htx-cal2__newsempty">Sin eventos esta semana.</div>';
+    } catch(e) {
+      console.warn('[MI] htxCalEconomico:', e.message);
+      if (weekEl) weekEl.textContent = 'Semana económica';
+      box.innerHTML = '<div class="htx-cal2__newsempty">No se pudo cargar la agenda.</div>';
+    }
+  }
+  loadHtxCalEconomico();
+  setInterval(loadHtxCalEconomico, 600000);
   </script>
 
   <script>
