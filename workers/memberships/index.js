@@ -104,7 +104,18 @@ return new Response(
     }
 };
 
+// Meses prepagos permitidos y códigos de descuento activos (% off sobre el
+// total del plan). Todo pago único -- sin recurrencia -- así que el
+// descuento nunca se "arrastra" a un cobro futuro.
+const PLANES_MESES_VALIDOS = [1, 3, 6, 12];
+const CODIGOS_DESCUENTO = {
+    'MANFREDI30': 0.30,
+};
+
 // ─── RUTA 1: POST /crear-preferencia ─────────────────────────────────────────
+// Pago único (no recurrente) por un bloque prepago de N meses de membresía.
+// Usada para planes de 3/6/12 meses y para aplicar códigos de descuento --
+// la suscripción mensual con auto-renovación sigue yendo por /crear-suscripcion.
 async function crearPreferencia(request, env) {
     const MP_ACCESS_TOKEN = env.MP_ACCESS_TOKEN;
     const SITE_URL = env.SITE_URL;
@@ -116,6 +127,35 @@ async function crearPreferencia(request, env) {
               );
   }
 
+  let email, meses, codigo;
+    try {
+          const body = await request.json();
+          email = body.email;
+          meses = parseInt(body.meses, 10) || 1;
+          codigo = (body.codigo || '').trim().toUpperCase();
+    } catch { /* body vacío o inválido */ }
+
+  if (!email) {
+        return new Response(JSON.stringify({ error: 'Email requerido -- hay que iniciar sesión antes de pagar' }), { status: 400, headers: CORS_HEADERS });
+  }
+  if (!PLANES_MESES_VALIDOS.includes(meses)) {
+        return new Response(JSON.stringify({ error: 'Plan inválido' }), { status: 400, headers: CORS_HEADERS });
+  }
+
+  // El % de descuento SIEMPRE se resuelve acá adentro a partir del código
+  // recibido -- nunca se confía en un monto o porcentaje mandado por el
+  // cliente.
+  let descuento = 0;
+    if (codigo) {
+          if (!CODIGOS_DESCUENTO[codigo]) {
+                  return new Response(JSON.stringify({ error: 'Código de descuento inválido' }), { status: 400, headers: CORS_HEADERS });
+          }
+          descuento = CODIGOS_DESCUENTO[codigo];
+    }
+
+  const precioUsdBase = 15 * meses;
+    const precioUsdFinal = Math.round(precioUsdBase * (1 - descuento) * 100) / 100;
+
   // 1. Obtener cotización del dólar blue desde DolarAPI
   let precioPesos;
     try {
@@ -123,8 +163,7 @@ async function crearPreferencia(request, env) {
           if (!dolarResp.ok) throw new Error('Error al consultar DolarAPI');
           const dolarData = await dolarResp.json();
           const cotizacionVenta = dolarData.venta;
-          // $15 USD al tipo de cambio blue
-      precioPesos = Math.round(15 * cotizacionVenta);
+      precioPesos = Math.round(precioUsdFinal * cotizacionVenta);
     } catch (err) {
           console.error('DolarAPI error:', err);
           return new Response(
@@ -133,17 +172,23 @@ async function crearPreferencia(request, env) {
                 );
     }
 
+  const tituloMeses = meses === 1 ? '1 mes' : `${meses} meses`;
+
   // 2. Crear preferencia de pago en Mercado Pago Checkout Pro
   const preferencia = {
         items: [
           {
-                    title: 'Membresía Manfredi Investment',
-                    description: 'Acceso completo a reportes y Warren IA',
+                    title: `Membresía Manfredi Investment · ${tituloMeses}`,
+                    description: codigo
+                        ? `Acceso completo a reportes y Warren IA -- código ${codigo} aplicado`
+                        : 'Acceso completo a reportes y Warren IA',
                     quantity: 1,
                     currency_id: 'ARS',
                     unit_price: precioPesos,
           }
               ],
+        payer: { email },
+        metadata: { email: email.toLowerCase(), meses, codigo: codigo || null },
         back_urls: {
                 success: `${SITE_URL}?pago=exitoso`,
                 failure: `${SITE_URL}?pago=fallido`,
@@ -190,7 +235,10 @@ async function crearPreferencia(request, env) {
         JSON.stringify({
                 init_point: mpData.init_point,
                 precio_pesos: precioPesos,
-                cotizacion_blue: Math.round(precioPesos / 15),
+                precio_usd: precioUsdFinal,
+                meses,
+                descuento_aplicado: descuento,
+                cotizacion_blue: Math.round(precioPesos / precioUsdFinal),
         }),
     { status: 200, headers: CORS_HEADERS }
       );
@@ -343,9 +391,12 @@ async function miSuscripcion(request, env) {
 // los cobros mensuales sigan aprobándose el acceso nunca llega a vencer).
 // esNueva=true dispara el mail de bienvenida completo; en una renovación
 // mensual normal no lo mandamos de nuevo para no ser spam.
-async function activarMembresia(email, env, { esNueva, monto, preapprovalId } = {}) {
+async function activarMembresia(email, env, { esNueva, monto, preapprovalId, meses } = {}) {
     email = email.toLowerCase();
-    await env.MEMBERS.put(email, 'true', { expirationTtl: 2678400 });
+    // 31 días por mes pagado -- un prepago de 6 meses, por ejemplo, extiende
+    // el TTL a 186 días en vez de los 31 días de una renovación mensual.
+    const ttlDias = 31 * (meses && meses > 0 ? meses : 1);
+    await env.MEMBERS.put(email, 'true', { expirationTtl: ttlDias * 86400 });
     if (preapprovalId) await env.MEMBERS.put(email + ':preapproval_id', preapprovalId);
 
     env.LOGUSER.fetch('https://log-user/marcar-miembro', {
@@ -469,8 +520,10 @@ async function procesarWebhook(request, env) {
         return new Response(JSON.stringify({ ok: true, estado: pagoData.status }), { status: 200, headers: CORS_HEADERS });
   }
 
-  // Obtener el email del pagador
-  const email = pagoData.payer?.email;
+  // Obtener el email del pagador -- preferimos el que mandamos nosotros en
+  // metadata al crear la preferencia (payer.email a veces no vuelve completo
+  // según el método de pago usado, ej. algunos medios en efectivo).
+  const email = pagoData.metadata?.email || pagoData.payer?.email;
     if (!email) {
           console.error('Pago aprobado sin email de pagador:', notifId);
           return new Response(
@@ -479,7 +532,9 @@ async function procesarWebhook(request, env) {
                 );
     }
 
-  await activarMembresia(email, env, { esNueva: true, monto: pagoData.transaction_amount });
+  const meses = pagoData.metadata?.meses || 1;
+    const yaEraMiembro = (await env.MEMBERS.get(email.toLowerCase())) === 'true';
+    await activarMembresia(email, env, { esNueva: !yaEraMiembro, monto: pagoData.transaction_amount, meses });
 
   return new Response(
         JSON.stringify({ ok: true, email: email.toLowerCase() }),
