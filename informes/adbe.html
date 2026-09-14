@@ -1106,10 +1106,11 @@
 
       ctx.font = '600 10.5px "IBM Plex Mono", monospace';
       var vf = opts.valueFmt || function(v){ return '$'+v.toFixed(0); };
+      var capGap = barH/2 + 5;
       ctx.textAlign = 'right';
-      ctx.fillText(vf(ranges[i][0]), x0 - 8, cy + 4);
+      ctx.fillText(vf(ranges[i][0]), x0 - capGap, cy + 4);
       ctx.textAlign = 'left';
-      ctx.fillText(vf(ranges[i][1]), x1 + 8, cy + 4);
+      ctx.fillText(vf(ranges[i][1]), x1 + capGap, cy + 4);
     }
 
     refLines.forEach(function(r){
