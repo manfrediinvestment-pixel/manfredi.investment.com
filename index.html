@@ -3242,7 +3242,7 @@
         <li><a href="#university" class="nav-link" data-tab-target="university">University</a></li>
         <li><a href="#inversiones" class="nav-link" data-tab-target="inversiones">Informes</a></li>
         <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
-        <li><a href="#calculadora" class="nav-link" data-tab-target="calculadora">Finanzas Personales</a></li>
+        <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio" onclick="var b=document.querySelector('[data-pfview=finanzas]');if(b)b.click();">Finanzas Personales</a></li>
         <li>
           <span class="nav-link" data-member-required="true" onclick="toggleWarren()" style="cursor:pointer;">
             Asesor IA <span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;margin-left:4px;vertical-align:middle;"></span>
@@ -4657,9 +4657,6 @@
     .section-portfolio { background: var(--navy-1); position: relative; }
     .section-portfolio .section-title { color: var(--white); }
     .section-portfolio .section-sub   { color: rgba(255,255,255,.38); }
-    .section-calculadora { background: var(--navy-1); position: relative; }
-    .section-calculadora .section-title { color: var(--white); }
-    .section-calculadora .section-sub   { color: rgba(255,255,255,.38); }
     .pf-card { background: var(--navy-4); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 20px 22px; margin-bottom: 20px; }
     .pf-quiz-cta { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
     .pf-quiz-cta h3 { font-family: var(--font-display); font-weight: 400; font-size: 18px; margin: 0 0 6px; color: var(--white); }
@@ -5133,6 +5130,7 @@
       <div class="mkt-tabs" id="pfViewTabs" role="tablist">
         <button type="button" class="mkt-tab active" data-pfview="tuyo">Tu Portafolio</button>
         <button type="button" class="mkt-tab" data-pfview="manfredi">Portafolio de Manfredi</button>
+        <button type="button" class="mkt-tab" data-pfview="finanzas">Finanzas Personales</button>
       </div>
 
       <div class="pf-view-panel active pf-compact" data-pfview-panel="tuyo">
@@ -5242,17 +5240,7 @@
         </div>
       </div>
 
-    </div>
-  </section>
-
-  <!-- ── CALCULADORA DE OBJETIVOS ─────────────────────────────────────── -->
-  <section class="section section-calculadora" id="calculadora" data-tab="calculadora">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-label">Finanzas Personales</span>
-        <h2 class="section-title">Tu plata, en un solo lugar</h2>
-        <p class="section-sub">Objetivos y gastos, conectados con tu portafolio real.</p>
-      </div>
+      <div class="pf-view-panel" data-pfview-panel="finanzas">
 
       <div class="mkt-tabs" id="finViewTabs" role="tablist">
         <button type="button" class="mkt-tab active" data-finview="gastos">Gastos</button>
@@ -5446,13 +5434,15 @@
 
       </div><!-- /panel gastos -->
 
+      </div><!-- /panel finanzas -->
+
     </div>
   </section>
 
   <script>
   (function(){
     var finTabs = document.querySelectorAll('#finViewTabs .mkt-tab');
-    var finPanels = document.querySelectorAll('#calculadora .pf-view-panel');
+    var finPanels = document.querySelectorAll('[data-pfview-panel="finanzas"] .pf-view-panel');
     finTabs.forEach(function(btn){
       btn.addEventListener('click', function(){
         finTabs.forEach(function(b){ b.classList.toggle('active', b === btn); });
@@ -6533,7 +6523,7 @@
   <script>
   (function(){
     var tabs = document.querySelectorAll('#pfViewTabs .mkt-tab');
-    var panels = document.querySelectorAll('#portfolio .pf-view-panel');
+    var panels = document.querySelectorAll('#portfolio > .container > .pf-view-panel');
     tabs.forEach(function(btn){
       btn.addEventListener('click', function(){
         tabs.forEach(function(b){ b.classList.toggle('active', b === btn); });
@@ -15644,11 +15634,11 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
 <script>
   // ââ Navegacion por pestanas: una sola seccion visible a la vez âââââââââââ
   (function() {
-    var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'portfolio', 'calculadora', 'asesoria'];
+    var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'portfolio', 'asesoria'];
     var TAB_TITLES = {
       inicio: 'Inicio', mercados: 'Mercados', calendario: 'Calendario Economico',
       informes: 'Reportes & News', university: 'University', inversiones: 'Informes',
-      portfolio: 'Portfolio', calculadora: 'Calculadora de Objetivos', asesoria: 'Asesoria'
+      portfolio: 'Portfolio', asesoria: 'Asesoria'
     };
 
     function resolveTab(hash) {
