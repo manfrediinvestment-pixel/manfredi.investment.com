@@ -3480,29 +3480,10 @@
   .htx-cal2__src { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:8px; letter-spacing:.08em; text-transform:uppercase; color:var(--htx-ink3); }
   .htx-cal2__newsempty { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; color:var(--htx-ink3); padding:20px 0; }
 
-  /* membresia */
-  .htx-member { background:#0a0f1e; padding:56px 32px; }
-  .htx-member__inner {
-    max-width:1280px; margin:0 auto;
-    display:grid; grid-template-columns:1.2fr 1fr; gap:44px; align-items:center;
-    border:1px solid rgba(242,201,76,.28);
-    background:linear-gradient(135deg,rgba(242,201,76,.08),rgba(242,201,76,0) 58%);
-    padding:40px 44px;
-  }
-  .htx-member__eyebrow { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--htx-amber); margin:0 0 16px; }
-  .htx-member h2 { margin:0 0 12px; font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:clamp(20px,2.3vw,28px); font-weight:600; letter-spacing:-.01em; line-height:1.25; color:var(--htx-ink); max-width:22ch; }
-  .htx-member p { margin:0 0 22px; font-size:13.5px; line-height:1.6; color:var(--htx-ink2); max-width:46ch; }
-  .htx-member__price { display:flex; align-items:baseline; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
-  .htx-member__amt { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums; font-size:30px; font-weight:600; color:var(--htx-amber); }
-  .htx-member__per { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:12px; color:var(--htx-ink3); }
-  .htx-member__note { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10.5px; color:var(--htx-ink3); }
-  .htx-feat { display:flex; flex-direction:column; }
-  .htx-feat__row { display:grid; grid-template-columns:34px 1fr; gap:14px; padding:15px 0; border-bottom:1px solid var(--htx-line-soft); }
-  .htx-feat__row:last-child { border-bottom:0; }
-  .htx-feat__ic { width:30px; height:30px; display:grid; place-items:center; border:1px solid rgba(242,201,76,.3); color:var(--htx-amber); font-family:'DM Serif Display',Georgia,serif; font-size:14px; }
-  .htx-feat__row strong { display:block; font-size:12.5px; font-weight:600; color:var(--htx-ink); margin-bottom:3px; }
-  .htx-feat__row span { font-size:11.5px; color:var(--htx-ink3); line-height:1.5; }
-  .htx-badge-new { display:inline-block; font-size:8.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#07101e; background:var(--htx-amber); padding:2px 6px; margin-left:8px; }
+  /* membresia: el cartel (carrusel de 3 secciones) vive en assets/cartel/cartel.js, dentro de un Shadow DOM */
+  .htx-member { background:#0a0f1e; padding:40px 32px 48px; }
+  #mcHost { display:block; min-height:520px; }
+  @media (max-width:1040px) { .htx-member { padding:24px 14px 36px; } #mcHost { min-height:0; } }
 
   @media (max-width:1040px) {
     .htx-hero { grid-template-columns:1fr; }
@@ -3510,7 +3491,6 @@
     .htx-tile--informes, .htx-tile--pf { grid-column:span 12; }
     .htx-cal2 { grid-template-columns:1fr; gap:8px 0; }
     .htx-cal2__col + .htx-cal2__col { border-top:1px solid var(--htx-line); padding-top:8px; }
-    .htx-member__inner { grid-template-columns:1fr; }
   }
   @media (max-width:600px) {
     .htx-mk { flex:1 1 100%; max-width:none; border-right:0; border-bottom:1px solid var(--htx-line-soft); padding-left:0; }
@@ -3687,38 +3667,18 @@
       </div>
     </div>
 
-    <!-- membresia -->
+    <!-- membresia: carrusel Warren IA / Informes / Portfolio (assets/cartel/cartel.js) -->
     <div class="htx-member" id="membresia">
-      <div class="htx-member__inner">
-        <div>
-          <p class="htx-member__eyebrow">Membres&iacute;a Manfredi Investment</p>
-          <h2>Un asesor IA, el an&aacute;lisis completo de cada activo y tu portfolio, sin l&iacute;mites.</h2>
-          <p>Consult&aacute; a Warren cuando quieras, acced&eacute; a la tesis completa de cada pick &mdash; catalysts, comparables y proyecciones &mdash; y arm&aacute; tu portafolio compar&aacute;ndolo con el nuestro.</p>
-          <div class="htx-member__price">
-            <span class="htx-member__amt">USD 15</span>
-            <span class="htx-member__per">/ mes</span>
-            <span class="htx-member__note">Cancel&aacute;s cuando quieras</span>
-          </div>
-          <button type="button" class="htx-btn" onclick="openPaymentModal()">Suscribirme &rarr;</button>
-        </div>
-        <div class="htx-feat">
-          <div class="htx-feat__row">
-            <span class="htx-feat__ic">W</span>
-            <span><strong>Warren, Asesor IA</strong><span>100 consultas por mes sobre tu cartera y el mercado, 24/7</span></span>
-          </div>
-          <div class="htx-feat__row">
-            <span class="htx-feat__ic">&#8599;</span>
-            <span><strong>Informes</strong><span>Tesis completas, catalysts y comparables de cada activo que seguimos</span></span>
-          </div>
-          <div class="htx-feat__row">
-            <span class="htx-feat__ic">&#9680;</span>
-            <span><strong>Manfredi Investment Portfolio<span class="htx-badge-new">Nuevo</span></strong><span>Arm&aacute; tu cartera, compar&aacute; su rendimiento con el nuestro y el S&amp;P 500, y mir&aacute; tus m&eacute;tricas de riesgo &mdash; beta, VaR, drawdown</span></span>
-          </div>
-        </div>
+      <div id="mcHost">
+        <!-- Contenido de respaldo (se ve solo si el JS no carga; el componente lo reemplaza) -->
+        <h2 style="font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:24px;font-weight:600;color:var(--htx-ink);margin:0 0 10px">Membres&iacute;a Manfredi Investment</h2>
+        <p style="font-size:13.5px;line-height:1.6;color:var(--htx-ink2);max-width:60ch;margin:0 0 16px">Warren IA, nuestro asesor de inversiones con inteligencia artificial; los informes institucionales de cada acci&oacute;n, con cuatro m&eacute;todos de valuaci&oacute;n y fair value; y Manfredi Investment Portfolio, para armar tu cartera y ver sus ratios de riesgo. USD 15 por mes, cancel&aacute;s cuando quieras.</p>
+        <button type="button" class="htx-btn" onclick="openPaymentModal()">Suscribirme &rarr;</button>
       </div>
     </div>
 
   </section>
+  <script src="assets/cartel/cartel.js" defer></script>
 
   <script>
   /* Home Terminal: S&P 500 / Nasdaq / UST 10Y del reporte diario (reports/wallstreet.json).
