@@ -3373,7 +3373,7 @@
   .htx-markets__head a:hover { color:var(--htx-amber); }
   .htx-markets__grid { max-width:1280px; margin:0 auto; padding:0 32px; display:flex; flex-wrap:wrap; border-top:1px solid var(--htx-line); }
   .htx-asof { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--htx-ink3); }
-  .htx-mk { flex:0 0 auto; min-width:190px; max-width:260px; padding:20px 34px 24px; border-right:1px solid var(--htx-line-soft); }
+  .htx-mk { flex:1 1 0; min-width:190px; padding:20px 34px 24px; border-right:1px solid var(--htx-line-soft); }
   .htx-mk:first-child { padding-left:0; }
   .htx-mk:last-child { border-right:0; }
   .htx-mk__top { display:flex; align-items:baseline; gap:8px; margin-bottom:12px; }
@@ -3481,7 +3481,7 @@
   .htx-cal2__newsempty { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; color:var(--htx-ink3); padding:20px 0; }
 
   /* membresia: el cartel (carrusel de 3 secciones) vive en assets/cartel/cartel.js, dentro de un Shadow DOM */
-  .htx-member { background:#0a0f1e; padding:28px 32px 32px; border-bottom:1px solid var(--htx-line); }
+  .htx-member { background:#0a0f1e; padding:36px 32px 40px; border-bottom:1px solid var(--htx-line); }
   #mcHost { display:block; min-height:520px; }
   @media (max-width:1040px) { .htx-member { padding:24px 14px 36px; } #mcHost { min-height:0; } }
 
@@ -3498,16 +3498,6 @@
   </style>
 
   <section class="htx" data-tab="inicio">
-
-    <!-- membresia: carrusel Warren IA / Informes / Portfolio (assets/cartel/cartel.js) -->
-    <div class="htx-member" id="membresia">
-      <div id="mcHost">
-        <!-- Contenido de respaldo (se ve solo si el JS no carga; el componente lo reemplaza) -->
-        <h2 style="font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:24px;font-weight:600;color:var(--htx-ink);margin:0 0 10px">Membres&iacute;a Manfredi Investment</h2>
-        <p style="font-size:13.5px;line-height:1.6;color:var(--htx-ink2);max-width:60ch;margin:0 0 16px">Warren IA, nuestro asesor de inversiones con inteligencia artificial; los informes institucionales de cada acci&oacute;n, con cuatro m&eacute;todos de valuaci&oacute;n y fair value; y Manfredi Investment Portfolio, para armar tu cartera y ver sus ratios de riesgo. USD 15 por mes, cancel&aacute;s cuando quieras.</p>
-        <button type="button" class="htx-btn" onclick="openPaymentModal()">Suscribirme &rarr;</button>
-      </div>
-    </div>
 
     <!-- hero -->
     <div class="htx-hero">
@@ -3536,6 +3526,16 @@
           <polyline points="0,64 120,60 240,58 360,56 480,54" fill="none" stroke="rgba(232,238,246,.18)" stroke-width="1.5" />
         </svg>
         <p class="htx-metric__foot">Movimiento de la jornada (S&amp;P 500 &middot; ^GSPC) &middot; nivel de cierre del reporte diario</p>
+      </div>
+    </div>
+
+    <!-- membresia: carrusel Warren IA / Informes / Portfolio (assets/cartel/cartel.js) -->
+    <div class="htx-member" id="membresia">
+      <div id="mcHost">
+        <!-- Contenido de respaldo (se ve solo si el JS no carga; el componente lo reemplaza) -->
+        <h2 style="font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:24px;font-weight:600;color:var(--htx-ink);margin:0 0 10px">Membres&iacute;a Manfredi Investment</h2>
+        <p style="font-size:13.5px;line-height:1.6;color:var(--htx-ink2);max-width:60ch;margin:0 0 16px">Warren IA, nuestro asesor de inversiones con inteligencia artificial; los informes institucionales de cada acci&oacute;n, con cuatro m&eacute;todos de valuaci&oacute;n y fair value; y Manfredi Investment Portfolio, para armar tu cartera y ver sus ratios de riesgo. USD 15 por mes, cancel&aacute;s cuando quieras.</p>
+        <button type="button" class="htx-btn" onclick="openPaymentModal()">Suscribirme &rarr;</button>
       </div>
     </div>
 
@@ -3569,6 +3569,12 @@
           <div class="htx-mk__val htx-num" id="htx-ust10-price">&mdash;</div>
           <div class="htx-mk__chg"><span id="htx-ust10-note">Rendimiento a 10 a&ntilde;os</span></div>
           <svg class="htx-mk__spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,10 25,12 50,9 75,14 100,13 125,18 150,16 175,20 200,19" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+        </div>
+        <div class="htx-mk">
+          <div class="htx-mk__top"><span class="htx-mk__tk">ORO</span><span class="htx-mk__nm">XAU &middot; onza troy</span></div>
+          <div class="htx-mk__val htx-num" id="hspot-oro-price">&mdash;</div>
+          <div class="htx-mk__chg"><span id="hspot-oro-chg">&mdash;</span></div>
+          <svg class="htx-mk__spark" id="hspot-oro-spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,26 25,24 50,20 75,22 100,16 125,14 150,15 175,9 200,7" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
         </div>
       </div>
     </div>
@@ -9971,7 +9977,7 @@
   // que ya trajo fetchMercadosData().
   function renderHeroSpot() {
     if (!MERCADOS) return;
-    const map = { merval: 'merv', sp500: 'spx', btc: 'btc' };
+    const map = { merval: 'merv', sp500: 'spx', btc: 'btc', oro: 'oro' };
     MERCADOS.featured.forEach(item => {
       const spotId = map[item.id];
       if (!spotId) return;
@@ -9983,6 +9989,14 @@
         const { text, cls } = mktFmtChange(item.change);
         chgEl.textContent = text.replace(/&#9650; \+/, '+').replace(/&#9660; /, '-').replace(/&mdash;/, '—');
         chgEl.className = 'spot-chg ' + (cls === 'pos' ? 'up' : cls === 'neg' ? 'down' : '');
+      }
+      if (item.id === 'oro' && Array.isArray(item.spark) && item.spark.length >= 2) {
+        // Grafico real del oro (ultimos cierres diarios), no la linea decorativa.
+        const sk = document.getElementById('hspot-oro-spark'), pl = sk && sk.querySelector('polyline');
+        if (pl) {
+          const v = item.spark, mn = Math.min.apply(null, v), mx = Math.max.apply(null, v), rg = (mx - mn) || 1;
+          pl.setAttribute('points', v.map(function (y, i) { return (i * 200 / (v.length - 1)).toFixed(1) + ',' + (30 - (y - mn) / rg * 26).toFixed(1); }).join(' '));
+        }
       }
     });
   }
