@@ -32,6 +32,17 @@ def fetch_rss(url, max_items=4):
             return []
         root = ET.fromstring(text)
         items = root.findall(".//item")
+        # Imagen de cada nota: se busca sobre el XML crudo (ElementTree no resuelve bien
+        # los namespaces media:*). Se indexa por link para asociarla a cada item.
+        images = {}
+        for block in re.findall(r"<item[\s\S]*?</item>", text):
+            lm = re.search(r"<link>\s*(?:<!\[CDATA\[)?\s*([^<\]\s]+)", block)
+            im = (re.search(r"<media:content[^>]*?url=[\"']([^\"']+)[\"']", block)
+                  or re.search(r"<media:thumbnail[^>]*?url=[\"']([^\"']+)[\"']", block)
+                  or re.search(r"<enclosure[^>]*?url=[\"']([^\"']+)[\"'][^>]*?type=[\"']image/", block)
+                  or re.search(r"<img[^>]*?src=[\"']([^\"']+)[\"']", block))
+            if lm and im and im.group(1).startswith("http"):
+                images[lm.group(1).strip()] = im.group(1).replace("&amp;", "&")
         results = []
         for item in items[:max_items]:
             title_el = item.find("title")
@@ -50,7 +61,7 @@ def fetch_rss(url, max_items=4):
                 except Exception:
                     fecha = None
             if title:
-                results.append({"titulo": title, "link": link, "resumen": desc, "fecha": fecha})
+                results.append({"titulo": title, "link": link, "resumen": desc, "fecha": fecha, "imagen": images.get(link, "")})
         return results
     except Exception as e:
         print(f"Error RSS {url}: {e}")

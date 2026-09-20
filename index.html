@@ -919,6 +919,20 @@
       margin-left: 6px;
       vertical-align: middle;
     }
+    /* Noticias con imagen: la primera va destacada, el resto en filas con miniatura */
+    .rpt-news-hero { display: block; position: relative; text-decoration: none; color: inherit; border-bottom: 1px solid rgba(255,255,255,.04); }
+    .rpt-news-hero-img { aspect-ratio: 16 / 9; background: #0b1a30; overflow: hidden; }
+    .rpt-news-hero-img img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+    .rpt-news-hero:hover .rpt-news-hero-img img { transform: scale(1.03); }
+    .rpt-news-hero-body { padding: 14px 0 18px; }
+    .rpt-news-hero-body .rpt-news-title { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 17px; line-height: 1.3; color: var(--white); margin: 6px 0 0; }
+    .rpt-news-meta { font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; }
+    .rpt-news-row { display: flex; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.04); text-decoration: none; color: inherit; transition: background var(--transition); }
+    .rpt-news-row:last-child { border-bottom: none; }
+    .rpt-news-row:hover .rpt-news-title { color: var(--gold); }
+    .rpt-news-thumb { flex: 0 0 96px; height: 64px; border-radius: 4px; overflow: hidden; background: #0b1a30; }
+    .rpt-news-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .rpt-news-row .rpt-news-title { margin: 3px 0 0; font-size: 12.5px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .rpt-news-badge.alta  { color: var(--gold); border-color: rgba(242,201,76,.3); }
     .rpt-news-badge.media { color: rgba(255,255,255,.3); border-color: rgba(255,255,255,.15); }
 
@@ -1059,6 +1073,32 @@
       background: var(--gold);
       color: var(--primary);
     }
+    /* Portada de cada informe semanal (primera página del PDF) en lugar del texto */
+    .papers-grid .paper-card.paper-card--cover { flex-basis: 236px; padding: 10px; gap: 10px; }
+    .paper-cover {
+      position: relative;
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1.414;
+      padding: 0;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--navy-2, #0b1a30);
+      cursor: pointer;
+      box-shadow: 0 10px 26px rgba(0,0,0,.35);
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    }
+    .paper-cover img { display: block; width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 1; }
+    .paper-cover-fallback {
+      position: absolute; inset: 0; display: flex; align-items: center; padding: 22px;
+      font-family: 'DM Serif Display', Georgia, serif; font-size: 17px; line-height: 1.3; color: var(--white); text-align: left;
+    }
+    .paper-card--cover:hover .paper-cover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(0,0,0,.5); border-color: rgba(242,201,76,.4); }
+    .paper-tag--float { position: absolute; top: 10px; left: 10px; z-index: 2; background: rgba(7,16,30,.78); backdrop-filter: blur(4px); }
+    .paper-card--cover .paper-footer { padding: 2px 4px 0; border-top: none; }
+    .paper-card--cover .paper-meta { font-size: 10.5px; line-height: 1.35; }
+    .paper-card--cover .paper-download { white-space: nowrap; background: transparent; cursor: pointer; }
     .paper-card-placeholder .paper-title { color: rgba(255,255,255,.3); }
     .paper-card-placeholder .paper-abstract { color: rgba(255,255,255,.18); }
     .paper-card-placeholder .paper-download {
@@ -8836,13 +8876,12 @@
       const list = await res.json();
       const grid = document.getElementById('papersGrid');
       grid.innerHTML = list.map(p => `
-        <div class="paper-card">
-          <div class="paper-card-top">
-            <span class="paper-tag">${p.tag}</span>
-            <span class="paper-num">#${p.num}</span>
-          </div>
-          <div class="paper-title">${p.title}</div>
-          <div class="paper-abstract">${p.abstract}</div>
+        <div class="paper-card paper-card--cover">
+          <button type="button" class="paper-cover" aria-label="Abrir: ${p.title.replace(/"/g,'&quot;')}" onclick="openPdf('${'papers/' + encodeURIComponent(p.file)}','${p.title.replace(/'/g,"\\'")}')">
+            <span class="paper-cover-fallback">${p.title}</span>
+            <img src="${p.cover || 'papers/covers/' + p.num + '.jpg'}" alt="Portada: ${p.title.replace(/"/g,'&quot;')}" loading="lazy" onerror="this.remove()">
+            <span class="paper-tag paper-tag--float">${p.tag}</span>
+          </button>
           <div class="paper-footer">
             <span class="paper-meta">${p.date}</span>
             <button class="paper-download" onclick="openPdf('${'papers/' + encodeURIComponent(p.file)}','${p.title.replace(/'/g,"\\'")}')">&#8595; PDF</button>
@@ -9025,9 +9064,27 @@
   }
   setInterval(updateNewsTimestamps, 60000);
 
+  // Noticias con imagen (el worker y update_reports.py agregan `imagen`). La primera con
+  // imagen va grande; las demás en filas con miniatura y sin el párrafo de resumen.
+  // Las notas sin imagen conservan el formato de texto de siempre.
   function renderNoticias(noticias, badgeKey) {
     if (!noticias || !noticias.length) return '';
-    return noticias.map(n => {
+    const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+    const conImagen = noticias.filter(n => n.imagen);
+    if (conImagen.length >= 3) noticias = conImagen.slice(0, 6); // hero + 5 filas; las sin imagen se omiten para no romper el ritmo visual
+    const heroIdx = noticias.findIndex(n => n.imagen);
+    return noticias.map((n, i) => {
+      if (n.imagen) {
+        const isHero = i === heroIdx;
+        const tiempo = timeAgo(n.fecha);
+        const meta = `${n.fuente ? `<span class="rpt-news-source rpt-news-meta">${esc(n.fuente)}</span>` : ''}${tiempo ? `<span class="rpt-news-time rpt-news-meta" data-ts="${n.fecha}">${tiempo}</span>` : ''}`;
+        const tag = n.link ? 'a' : 'div';
+        const href = n.link ? ` href="${esc(n.link)}" target="_blank" rel="noopener noreferrer"` : '';
+        const img = `<img src="${esc(n.imagen)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.style.display='none'">`;
+        return isHero
+          ? `<${tag} class="rpt-news-hero"${href}><div class="rpt-news-hero-img">${img}</div><div class="rpt-news-hero-body">${meta}<div class="rpt-news-title">${n.titulo || ''}</div></div></${tag}>`
+          : `<${tag} class="rpt-news-row"${href}><div class="rpt-news-thumb">${img}</div><div>${meta}<div class="rpt-news-title">${n.titulo || ''}</div></div></${tag}>`;
+      }
       const badge = n[badgeKey] || '';
       const dotCls = impactoDot(badge);
       const badgeCls = badge.toLowerCase() === 'alta' ? 'alta' : 'media';

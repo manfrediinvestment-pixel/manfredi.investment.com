@@ -94,7 +94,12 @@ async function fetchFeed(url, max, fuente) {
     });
     if (!resp.ok) return [];
     const xml = await resp.text();
-    return parseRSS(xml, max).map(item => ({ ...item, fuente }));
+    const items = parseRSS(xml, max).map(item => ({ ...item, fuente }));
+    // Las notas cuyo RSS no trae imagen la toman del og:image de la página.
+    await Promise.all(items.map(async item => {
+      if (!item.imagen && item.link) item.imagen = await fetchOgImage(item.link);
+    }));
+    return items;
   } catch (e) {
     console.warn(`[noticias] ${fuente}:`, e.message);
     return [];
@@ -114,7 +119,7 @@ function parseRSS(xml, maxItems) {
     const pubDateRaw = extractTag(block, 'pubDate') || extractTag(block, 'dc:date') || extractTag(block, 'published');
     const parsed = pubDateRaw ? new Date(pubDateRaw) : null;
     const fecha = parsed && !isNaN(parsed.getTime()) ? parsed.toISOString() : null;
-    items.push({ titulo: titulo.trim(), link: link.trim(), resumen, fecha });
+    items.push({ titulo: titulo.trim(), link: link.trim(), resumen, fecha, imagen: extractImage(block) });
   }
   return items;
 }
@@ -124,4 +129,43 @@ function extractTag(block, tag) {
   if (cdataMatch) return cdataMatch[1];
   const plainMatch = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
   return plainMatch ? plainMatch[1] : '';
+}
+
+// Imagen de la nota: media:content / media:thumbnail / enclosure de imagen, o la
+// primera <img> embebida en description/content:encoded. Devuelve '' si no hay.
+function extractImage(block) {
+  const patterns = [
+    /<media:content[^>]*?url=["']([^"']+)["'][^>]*>/i,
+    /<media:thumbnail[^>]*?url=["']([^"']+)["'][^>]*>/i,
+    /<enclosure[^>]*?url=["']([^"']+)["'][^>]*?type=["']image\/[^"']*["']/i,
+    /<enclosure[^>]*?type=["']image\/[^"']*["'][^>]*?url=["']([^"']+)["']/i,
+    /<img[^>]*?src=["']([^"']+)["']/i,
+  ];
+  for (const re of patterns) {
+    const m = block.match(re);
+    if (!m) continue;
+    const url = m[1].replace(/&amp;/g, '&').trim();
+    if (/^https?:\/\//i.test(url) && !/\.(mp4|mov|webm)(\?|$)/i.test(url)) return url;
+  }
+  return '';
+}
+
+// og:image de la nota (best-effort, 5 s). Se descartan las imágenes genéricas del
+// sitio (logo compartido por todas las notas), que no aportan nada como portada.
+async function fetchOgImage(link) {
+  try {
+    const resp = await fetch(link, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ManfrediInvestment/1.0)', 'Accept': 'text/html' },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!resp.ok) return '';
+    const html = (await resp.text()).slice(0, 200000);
+    const m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+           || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+    const url = m ? m[1].replace(/&amp;/g, '&').trim() : '';
+    if (!/^https?:\/\//i.test(url) || /og_image|default[-_]?share|logo/i.test(url)) return '';
+    return url;
+  } catch (e) {
+    return '';
+  }
 }
