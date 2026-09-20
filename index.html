@@ -2632,6 +2632,7 @@
   .cal-ev-text strong{color:rgba(255,255,255,.75);font-weight:600;display:block;}
   .cal-ev-text strong a{color:inherit;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(255,255,255,.3);}
   .cal-ev-text strong a:hover{text-decoration-color:var(--gold);}
+  .cal-ev-src{display:block;margin-top:3px;font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:8px;letter-spacing:.08em;color:rgba(255,255,255,.28);}
   .cal-view-tabs{display:flex;gap:6px;flex-wrap:wrap;}
   .cal-view-tab{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.45);font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:6px 12px;cursor:pointer;transition:border-color .18s,background .18s,color .18s;}
   .cal-view-tab:hover{border-color:rgba(242,201,76,.35);color:rgba(255,255,255,.7);}
@@ -9221,6 +9222,84 @@
   // Panel "Calendario económico" del cuadro Calendario en la home (htx-tile--cal):
   // mismo worker/endpoint que la pestaña Calendario completa (#calendario), un evento
   // por día de la semana. Antes esto era HTML fijo con fecha vieja (1-5 de septiembre).
+  // Fuentes oficiales de cada dato del calendario economico. El worker manfredi-calendario
+  // manda los eventos sin link (solo titulo + descripcion), asi que la fuente se resuelve
+  // aca por titulo: el evento queda clickeable igual que un titular de noticias.
+  // La tabla vive en el sitio y no en el worker a proposito: el worker se reescribe a mano
+  // cada semana desde el panel de Cloudflare y se llevaria puesta la tabla.
+  // Si un evento llega con `link` propio desde el worker, ese gana y la tabla no se usa.
+  // Gana la primera regla que matchea, por eso las especificas van arriba de las genericas.
+  var CAL_SOURCES = [
+    /* Argentina */
+    { tipo:'ar', re:/\bemae\b|actividad econ/i,                          fuente:'INDEC', url:'https://www.indec.gob.ar/indec/web/Nivel4-Tema-3-9-47' },
+    { tipo:'ar', re:/\bipc\b|inflaci|precios al consumidor/i,             fuente:'INDEC', url:'https://www.indec.gob.ar/indec/web/Nivel4-Tema-3-5-31' },
+    { tipo:'ar', re:/intercambio comercial|balanza comercial|exportacion/i, fuente:'INDEC', url:'https://www.indec.gob.ar/indec/web/Nivel4-Tema-3-2-40' },
+    { tipo:'ar', re:/\beph\b|desempleo|mercado de trabajo|empleo/i,        fuente:'INDEC', url:'https://www.indec.gob.ar/indec/web/Nivel4-Tema-4-31-58' },
+    { tipo:'ar', re:/pobreza|indigencia|canasta b/i,                       fuente:'INDEC', url:'https://www.indec.gob.ar/indec/web/Nivel4-Tema-4-46-152' },
+    { tipo:'ar', re:/salarios/i,                                           fuente:'INDEC', url:'https://www.indec.gob.ar/indec/web/Nivel4-Tema-4-31-61' },
+    { tipo:'ar', re:/\bpbi\b|cuentas nacionales/i,                        fuente:'INDEC', url:'https://www.indec.gob.ar/indec/web/Nivel3-Tema-3-9' },
+    { tipo:'ar', re:/\brem\b|relevamiento de expectativas/i,              fuente:'BCRA',  url:'https://www.bcra.gob.ar/PublicacionesEstadisticas/Relevamiento_Expectativas_de_Mercado.asp' },
+    { tipo:'ar', re:/licitaci|tesoro|vencimiento|canje de deuda/i,          fuente:'FINANZAS', url:'https://www.argentina.gob.ar/economia/finanzas' },
+    { tipo:'ar', re:/bcra|pol[ií]tica monetaria|reservas|leliq|base monetaria|tasa/i, fuente:'BCRA', url:'https://www.bcra.gob.ar/PublicacionesEstadisticas/Principales_variables.asp' },
+    /* Estados Unidos */
+    { tipo:'us', re:/\bpce\b/i,                                           fuente:'BEA',   url:'https://www.bea.gov/data/personal-consumption-expenditures-price-index' },
+    { tipo:'us', re:/\badp\b/i,                                           fuente:'ADP',   url:'https://adpemploymentreport.com/' },
+    { tipo:'us', re:/jobless|(initial|unemployment) claims|solicitudes de desempleo/i, fuente:'DOL', url:'https://oui.doleta.gov/unemploy/claims.asp' },
+    { tipo:'us', re:/\bjolts\b|ofertas de empleo/i,                       fuente:'BLS',   url:'https://www.bls.gov/jlt/' },
+    { tipo:'us', re:/\bcpi\b|\bipc\b|inflaci|precios al consumidor/i,     fuente:'BLS',   url:'https://www.bls.gov/news.release/cpi.nr0.htm' },
+    { tipo:'us', re:/\bppi\b|precios al productor/i,                      fuente:'BLS',   url:'https://www.bls.gov/news.release/ppi.nr0.htm' },
+    { tipo:'us', re:/n[oó]minas|nonfarm|non-farm|payroll|desempleo|unemployment|salarios por hora|average hourly/i, fuente:'BLS', url:'https://www.bls.gov/news.release/empsit.nr0.htm' },
+    { tipo:'us', re:/philadelphia fed|philly fed/i,                        fuente:'FED PHL',url:'https://www.philadelphiafed.org/surveys-and-data/regional-economic-analysis/manufacturing-business-outlook-survey' },
+    { tipo:'us', re:/beige book|libro beige/i,                             fuente:'FED',   url:'https://www.federalreserve.gov/monetarypolicy/beige-book-default.htm' },
+    { tipo:'us', re:/fomc|\bfed\b|federal funds|powell|tasas/i,           fuente:'FED',   url:'https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm' },
+    { tipo:'us', re:/\bpbi\b|\bgdp\b|producto bruto/i,                    fuente:'BEA',   url:'https://www.bea.gov/data/gdp/gross-domestic-product' },
+    { tipo:'us', re:/ventas minoristas|retail sales/i,                     fuente:'CENSUS',url:'https://www.census.gov/retail/index.html' },
+    { tipo:'us', re:/\bism\b|\bpmi\b/i,                                   fuente:'ISM',   url:'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/' },
+    { tipo:'us', re:/michigan|sentimiento del consumidor/i,                fuente:'U. MICHIGAN', url:'https://www.sca.isr.umich.edu/' },
+    { tipo:'us', re:/confianza del consumidor|consumer confidence/i,       fuente:'CONF. BOARD', url:'https://www.conference-board.org/topics/consumer-confidence' },
+    { tipo:'us', re:/balanza comercial|trade balance/i,                    fuente:'CENSUS',url:'https://www.census.gov/foreign-trade/index.html' },
+    { tipo:'us', re:/bienes duraderos|durable goods/i,                     fuente:'CENSUS',url:'https://www.census.gov/manufacturing/m3/index.html' },
+    { tipo:'us', re:/viviendas nuevas|new home sales/i,                    fuente:'CENSUS',url:'https://www.census.gov/construction/nrs/index.html' },
+    { tipo:'us', re:/housing starts|permisos de construcci|inicio de viviendas/i, fuente:'CENSUS', url:'https://www.census.gov/construction/nrc/index.html' },
+    { tipo:'us', re:/viviendas existentes|existing home/i,                 fuente:'NAR',   url:'https://www.nar.realtor/research-and-statistics/housing-statistics/existing-home-sales' },
+    { tipo:'us', re:/empire state|manufacturero ny/i,                      fuente:'FED NY',url:'https://www.newyorkfed.org/survey/empire/empiresurvey_overview' },
+    { tipo:'us', re:/producci[oó]n industrial|industrial production|capacity utilization/i, fuente:'FED', url:'https://www.federalreserve.gov/releases/g17/current/default.htm' },
+    { tipo:'us', re:/precios de importaci|import prices|export prices/i,    fuente:'BLS',   url:'https://www.bls.gov/mxp/' },
+    { tipo:'us', re:/inventarios de negocios|business inventories/i,        fuente:'CENSUS',url:'https://www.census.gov/mtis/index.html' },
+    { tipo:'us', re:/nahb|mercado de vivienda/i,                        fuente:'NAHB',  url:'https://www.nahb.org/news-and-economics/housing-economics/indices/housing-market-index' },
+    { tipo:'us', re:/indicadores l[ií]deres|leading (economic )?index|lei/i, fuente:'CONF. BOARD', url:'https://www.conference-board.org/topics/us-leading-indicators' },
+    { tipo:'us', re:/cuenta corriente|current account/i,                    fuente:'BEA',   url:'https://www.bea.gov/data/intl-trade-investment/international-transactions' },
+    { tipo:'us', re:/natural gas|gas natural/i,                            fuente:'EIA',   url:'https://www.eia.gov/naturalgas/weekly/' },
+    { tipo:'us', re:/crude oil|inventarios de petr[oó]leo|petr[oó]leo/i,    fuente:'EIA',   url:'https://www.eia.gov/petroleum/supply/weekly/' },
+    /* Ultimo recurso: un dato del INDEC que no matchee ninguna regla va al calendario
+       de publicaciones. Cualquier otro evento sin regla queda sin link (texto plano). */
+    { tipo:'ar', re:/indec/i,                                              fuente:'INDEC', url:'https://www.indec.gob.ar/indec/web/Calendario-Fecha-0' }
+  ];
+
+  // Devuelve {url, fuente} para un evento del calendario, o null si no hay fuente conocida.
+  // Los eventos de earnings/dividendos ya linkean al informe del ticker, no pasan por aca.
+  function calSourceFor(ev) {
+    if (!ev || ev.ticker) return null;
+    if (ev.link) return { url: ev.link, fuente: ev.fuente || '' };
+    var esAR = ev.tipo === 'ar', esUS = ev.tipo === 'us';
+    // Primera pasada por titulo (mas preciso); si no matchea, se prueba con la descripcion.
+    var campos = [ev.titulo || '', ev.descripcion || ''];
+    for (var c = 0; c < campos.length; c++) {
+      if (!campos[c]) continue;
+      for (var i = 0; i < CAL_SOURCES.length; i++) {
+        var s = CAL_SOURCES[i];
+        if (s.tipo && (esAR || esUS) && s.tipo !== ev.tipo) continue;
+        if (s.re.test(campos[c])) return { url: s.url, fuente: s.fuente };
+      }
+    }
+    return null;
+  }
+
+  // Chip chico con el nombre de la fuente, para la grilla de la pestana Calendario.
+  function calSourceTag(src) {
+    return (src && src.fuente) ? '<span class="cal-ev-src">' + src.fuente + ' \u2197</span>' : '';
+  }
+
   var HTX_CAL_MESES = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
   async function loadHtxCalEconomico() {
     var box = document.getElementById('htxCalEcoList');
@@ -9270,11 +9349,13 @@
         var ev = pickDayEvent(dia.eventos, i);
         if (!ev) return '';
         var isToday = dia.fecha === hoyDM;
-        return '<div class="htx-cal2__ev">'+
-          '<div class="htx-cal2__day">'+dayBadge(dia.fecha, isToday)+'</div>'+
-          '<div><div class="htx-cal2__meta">'+tagFor(ev.tipo)+'</div>'+
-          '<div class="htx-cal2__title">'+esc(ev.titulo)+'</div></div>'+
-        '</div>';
+        var src = calSourceFor(ev);
+        var inner = '<div class="htx-cal2__day">'+dayBadge(dia.fecha, isToday)+'</div>'+
+          '<div><div class="htx-cal2__meta">'+tagFor(ev.tipo)+(src && src.fuente ? '<span class="htx-cal2__src">'+esc(src.fuente)+'</span>' : '')+'</div>'+
+          '<div class="htx-cal2__title">'+esc(ev.titulo)+'</div></div>';
+        return src
+          ? '<a class="htx-cal2__newsitem" href="'+esc(src.url)+'" target="_blank" rel="noopener noreferrer">'+inner+'</a>'
+          : '<div class="htx-cal2__ev">'+inner+'</div>';
       }).join('') || '<div class="htx-cal2__newsempty">Sin eventos esta semana.</div>';
     } catch(e) {
       console.warn('[MI] htxCalEconomico:', e.message);
@@ -10032,8 +10113,8 @@
   initMercados();
   setInterval(initMercados, MKT_REFRESH_MS);
 
-  const CAL_DETAILS={'ar-pbi':{icon:'📈',title:'PBI Argentina',text:'La economía retomó el crecimiento liderada por agro, construcción y servicios. <strong>Para los mercados:</strong> positivo para acciones del Merval y bonos soberanos.'},'ar-inf':{icon:'🔥',title:'Inflación Argentina',text:'La inflación mensual continúa desacelerando. Crawling peg y ancla cambiaria son los drivers. <strong>Próximo dato:</strong> IPC INDEC el 12 de cada mes.'},'ar-desemp':{icon:'👷',title:'Desempleo Argentina',text:'Resiliencia pese al ajuste del sector público. <strong>Publicación:</strong> trimestral por EPH-INDEC.'},'ar-riesgo':{icon:'🌡',title:'Riesgo País EMBI+',text:'Compresión por acuerdo FMI y disciplina fiscal. <strong>Para los mercados:</strong> cada 100 bps de caída impulsa GD30/AL30 un ~8-12%.'},'us-pbi':{icon:'📉',title:'PBI Estados Unidos',text:'Contracción leve por caída de exportaciones ante aranceles. Consumo privado resisó.'},'us-inf':{icon:'📊',title:'Inflación EE.UU. CPI',text:'Desacelerando hacia el target del 2%. <strong>Dato más importante para la Fed:</strong> PCE Core, último jueves de cada mes.'},'us-desemp':{icon:'💼',title:'Desempleo EE.UU.',text:'Mercado laboral resiliente. <strong>Próximo dato clave:</strong> Nonfarm Payrolls el primer viernes de cada mes.'},'us-treasury':{icon:'🏦',title:'Treasury 10Y Yield',text:'Yields altos comprimen valuaciones tech. <strong>Para los mercados:</strong> impacta en CEDEARs y bonos argentinos en USD.'}}; function calShowDetail(key,el){var d=CAL_DETAILS[key];if(!d)return;document.querySelectorAll('.cal-kpi').forEach(function(k){k.classList.remove('active');});el.classList.add('active');var box=document.getElementById('calDetailBox');box.children[0].textContent=d.icon;document.getElementById('calDetailTitle').textContent=d.title;document.getElementById('calDetailText').innerHTML=d.text;box.style.borderColor='rgba(242,201,76,.4)';box.style.background='rgba(242,201,76,.04)';} async function loadMacroAR(){try{var infR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/inflacion').catch(function(){return null;});var riesgoR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais').catch(function(){return null;});if(infR&&infR.ok){var infD=await infR.json();if(Array.isArray(infD)&&infD.length){var last=infD[infD.length-1];var val=last.valor!=null?last.valor:last.value;if(val!=null){document.getElementById('ar-inf-val').textContent=val.toFixed(1)+'%';document.getElementById('ar-inf-sub').textContent='Mensual · '+(last.fecha||'');}}}if(riesgoR&&riesgoR.ok){var riesgoD=await riesgoR.json();if(Array.isArray(riesgoD)&&riesgoD.length){var rLast=riesgoD[riesgoD.length-1];var rVal=rLast.valor!=null?rLast.valor:rLast.value;if(rVal!=null){document.getElementById('ar-riesgo-val').textContent=Math.round(rVal)+' bps';document.getElementById('ar-riesgo-sub').textContent='EMBI+ · '+(rLast.fecha||'');}}}}catch(e){console.warn('[MI] MacroAR:',e.message);}} async function loadMacroUS(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/macro-us',{signal:AbortSignal.timeout(5000)});if(r.ok){var d=await r.json();if(d.gdp!=null){var v=parseFloat(d.gdp);document.getElementById('us-pbi-val').textContent=(v>=0?'+':'')+v.toFixed(1)+'%';document.getElementById('us-pbi-val').className='cal-kpi-main '+(v>=0?'cal-up':'cal-down');}if(d.cpi!=null)document.getElementById('us-inf-val').textContent=parseFloat(d.cpi).toFixed(1)+'%';if(d.unemp!=null)document.getElementById('us-desemp-val').textContent=parseFloat(d.unemp).toFixed(1)+'%';if(d.treasury!=null)document.getElementById('us-treasury-val').textContent=parseFloat(d.treasury).toFixed(2)+'%';}}catch(e){console.warn('[MI] MacroUS:',e.message);}} function renderHeroCalToday(dia){var dateEl=document.getElementById('heroCalDate');var evEl=document.getElementById('heroCalEvents');if(!dateEl||!evEl)return;var hoyStr=new Date().toLocaleDateString('es-AR',{weekday:'long',day:'2-digit',month:'2-digit'});hoyStr=hoyStr.charAt(0).toUpperCase()+hoyStr.slice(1);dateEl.textContent=hoyStr;if(dia&&dia.eventos&&dia.eventos.length){evEl.innerHTML=dia.eventos.map(function(ev){return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+ev.titulo+'</strong>'+ev.descripcion+'</div></div>';}).join('');}else{evEl.innerHTML='<span style="font-size:11px;color:rgba(255,255,255,.3);font-style:italic;">Sin eventos relevantes hoy</span>';}}
-  function calRenderDayGrid(dias){var dow=new Date().getDay();var grid=document.getElementById('calWeekGrid');grid.innerHTML=dias.map(function(dia,i){var isToday=(i+1)===dow;var evs=dia.eventos&&dia.eventos.length?dia.eventos.map(function(ev){var titleHtml=ev.ticker?'<a href="informes/'+ev.ticker+'.html">'+ev.titulo+'</a>':ev.titulo;return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+titleHtml+'</strong>'+ev.descripcion+'</div></div>';}).join(''):'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Sin eventos</span>';return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+dia.nombre+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+dia.fecha+'</span></div>'+evs+'</div>';}).join('');}
+  const CAL_DETAILS={'ar-pbi':{icon:'📈',title:'PBI Argentina',text:'La economía retomó el crecimiento liderada por agro, construcción y servicios. <strong>Para los mercados:</strong> positivo para acciones del Merval y bonos soberanos.'},'ar-inf':{icon:'🔥',title:'Inflación Argentina',text:'La inflación mensual continúa desacelerando. Crawling peg y ancla cambiaria son los drivers. <strong>Próximo dato:</strong> IPC INDEC el 12 de cada mes.'},'ar-desemp':{icon:'👷',title:'Desempleo Argentina',text:'Resiliencia pese al ajuste del sector público. <strong>Publicación:</strong> trimestral por EPH-INDEC.'},'ar-riesgo':{icon:'🌡',title:'Riesgo País EMBI+',text:'Compresión por acuerdo FMI y disciplina fiscal. <strong>Para los mercados:</strong> cada 100 bps de caída impulsa GD30/AL30 un ~8-12%.'},'us-pbi':{icon:'📉',title:'PBI Estados Unidos',text:'Contracción leve por caída de exportaciones ante aranceles. Consumo privado resisó.'},'us-inf':{icon:'📊',title:'Inflación EE.UU. CPI',text:'Desacelerando hacia el target del 2%. <strong>Dato más importante para la Fed:</strong> PCE Core, último jueves de cada mes.'},'us-desemp':{icon:'💼',title:'Desempleo EE.UU.',text:'Mercado laboral resiliente. <strong>Próximo dato clave:</strong> Nonfarm Payrolls el primer viernes de cada mes.'},'us-treasury':{icon:'🏦',title:'Treasury 10Y Yield',text:'Yields altos comprimen valuaciones tech. <strong>Para los mercados:</strong> impacta en CEDEARs y bonos argentinos en USD.'}}; function calShowDetail(key,el){var d=CAL_DETAILS[key];if(!d)return;document.querySelectorAll('.cal-kpi').forEach(function(k){k.classList.remove('active');});el.classList.add('active');var box=document.getElementById('calDetailBox');box.children[0].textContent=d.icon;document.getElementById('calDetailTitle').textContent=d.title;document.getElementById('calDetailText').innerHTML=d.text;box.style.borderColor='rgba(242,201,76,.4)';box.style.background='rgba(242,201,76,.04)';} async function loadMacroAR(){try{var infR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/inflacion').catch(function(){return null;});var riesgoR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais').catch(function(){return null;});if(infR&&infR.ok){var infD=await infR.json();if(Array.isArray(infD)&&infD.length){var last=infD[infD.length-1];var val=last.valor!=null?last.valor:last.value;if(val!=null){document.getElementById('ar-inf-val').textContent=val.toFixed(1)+'%';document.getElementById('ar-inf-sub').textContent='Mensual · '+(last.fecha||'');}}}if(riesgoR&&riesgoR.ok){var riesgoD=await riesgoR.json();if(Array.isArray(riesgoD)&&riesgoD.length){var rLast=riesgoD[riesgoD.length-1];var rVal=rLast.valor!=null?rLast.valor:rLast.value;if(rVal!=null){document.getElementById('ar-riesgo-val').textContent=Math.round(rVal)+' bps';document.getElementById('ar-riesgo-sub').textContent='EMBI+ · '+(rLast.fecha||'');}}}}catch(e){console.warn('[MI] MacroAR:',e.message);}} async function loadMacroUS(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/macro-us',{signal:AbortSignal.timeout(5000)});if(r.ok){var d=await r.json();if(d.gdp!=null){var v=parseFloat(d.gdp);document.getElementById('us-pbi-val').textContent=(v>=0?'+':'')+v.toFixed(1)+'%';document.getElementById('us-pbi-val').className='cal-kpi-main '+(v>=0?'cal-up':'cal-down');}if(d.cpi!=null)document.getElementById('us-inf-val').textContent=parseFloat(d.cpi).toFixed(1)+'%';if(d.unemp!=null)document.getElementById('us-desemp-val').textContent=parseFloat(d.unemp).toFixed(1)+'%';if(d.treasury!=null)document.getElementById('us-treasury-val').textContent=parseFloat(d.treasury).toFixed(2)+'%';}}catch(e){console.warn('[MI] MacroUS:',e.message);}} function renderHeroCalToday(dia){var dateEl=document.getElementById('heroCalDate');var evEl=document.getElementById('heroCalEvents');if(!dateEl||!evEl)return;var hoyStr=new Date().toLocaleDateString('es-AR',{weekday:'long',day:'2-digit',month:'2-digit'});hoyStr=hoyStr.charAt(0).toUpperCase()+hoyStr.slice(1);dateEl.textContent=hoyStr;if(dia&&dia.eventos&&dia.eventos.length){evEl.innerHTML=dia.eventos.map(function(ev){var src=calSourceFor(ev);var titleHtml=src?'<a href="'+src.url+'" target="_blank" rel="noopener noreferrer">'+ev.titulo+'</a>':ev.titulo;return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+titleHtml+'</strong>'+ev.descripcion+calSourceTag(src)+'</div></div>';}).join('');}else{evEl.innerHTML='<span style="font-size:11px;color:rgba(255,255,255,.3);font-style:italic;">Sin eventos relevantes hoy</span>';}}
+  function calRenderDayGrid(dias){var dow=new Date().getDay();var grid=document.getElementById('calWeekGrid');grid.innerHTML=dias.map(function(dia,i){var isToday=(i+1)===dow;var evs=dia.eventos&&dia.eventos.length?dia.eventos.map(function(ev){var src=calSourceFor(ev);var titleHtml=ev.ticker?'<a href="informes/'+ev.ticker+'.html">'+ev.titulo+'</a>':(src?'<a href="'+src.url+'" target="_blank" rel="noopener noreferrer" title="Ver el dato en la fuente original">'+ev.titulo+'</a>':ev.titulo);return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+titleHtml+'</strong>'+ev.descripcion+calSourceTag(src)+'</div></div>';}).join(''):'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">Sin eventos</span>';return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+dia.nombre+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+dia.fecha+'</span></div>'+evs+'</div>';}).join('');}
 
   function calRenderEmptyGrid(msg){var hoy=new Date();var dow=hoy.getDay();var lun=new Date(hoy);lun.setDate(hoy.getDate()-(dow===0?6:dow-1));var nombres=['Lun','Mar','Mié','Jue','Vie'];var fmt=function(d){return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});};document.getElementById('calWeekGrid').innerHTML=nombres.map(function(n,i){var d=new Date(lun);d.setDate(lun.getDate()+i);var isToday=(i+1)===dow;return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+n+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+fmt(d)+'</span></div>'+'<span style="font-size:10px;color:rgba(255,255,255,.2);font-style:italic;">'+msg+'</span></div>';}).join('');}
 
