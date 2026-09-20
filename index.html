@@ -812,46 +812,63 @@
       color: rgba(255,255,255,.25);
       margin-bottom: 12px;
     }
-    .rpt-tiles {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-      gap: 12px;
+    /* Cotizaciones: una sola tabla por bloque (dato principal + columnas alineadas) */
+    .qt {
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 6px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.008));
+      overflow: hidden;
     }
-    .rpt-tile {
+    .qt-hero {
       display: flex;
-      flex-direction: column;
-      gap: 7px;
-      padding: 14px;
-      background: rgba(255,255,255,.02);
-      border: 1px solid rgba(255,255,255,.05);
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
     }
-    .rpt-tile-label {
+    .qt-hero + .qt-grid { border-top: 1px solid rgba(255,255,255,.07); }
+    .qt-hero-l, .qt-hero-r { display: flex; flex-direction: column; gap: 6px; }
+    .qt-hero-r { align-items: flex-end; }
+    .qt-label {
       font-size: 9.5px;
       font-weight: 600;
-      letter-spacing: .07em;
+      letter-spacing: .09em;
       text-transform: uppercase;
-      color: rgba(255,255,255,.35);
+      color: rgba(255,255,255,.42);
     }
-    .rpt-tile-value {
+    .qt-hero .qt-label { color: rgba(242,201,76,.85); }
+    .qt-sub { font-size: 11px; color: rgba(255,255,255,.36); }
+    .qt-value {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 20px;
+      font-size: 17px;
       font-weight: 600;
-      color: rgba(255,255,255,.85);
+      color: rgba(255,255,255,.92);
       font-variant-numeric: tabular-nums;
       letter-spacing: -.01em;
+      white-space: nowrap;
     }
-    .rpt-tile-value small { font-size: 11px; font-weight: 500; opacity: .8; }
-    .rpt-tile-value.up   { color: var(--green); }
-    .rpt-tile-value.down { color: var(--red); }
-    .rpt-tile-value.neut { color: var(--yellow); }
-    .rpt-tile-featured {
-      grid-column: span 2;
-      padding: 16px 18px;
-      background: linear-gradient(135deg, rgba(242,201,76,.09), rgba(242,201,76,.02));
-      border-color: rgba(242,201,76,.2);
+    .qt-value--xl { font-size: 30px; letter-spacing: -.02em; }
+    .qt-grid { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); }
+    .qt-cell { display: flex; flex-direction: column; gap: 7px; padding: 13px 14px; min-width: 0; }
+    .qt-cell + .qt-cell { border-left: 1px solid rgba(255,255,255,.07); }
+    .qt-chip {
+      align-self: flex-start;
+      font-size: 10.5px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .01em;
+      padding: 2px 7px;
+      border-radius: 3px;
+      white-space: nowrap;
     }
-    .rpt-tile-featured .rpt-tile-label { color: rgba(242,201,76,.75); }
-    .rpt-tile-featured .rpt-tile-value { font-size: 28px; }
+    .qt-hero-r .qt-chip { align-self: flex-end; }
+    .qt-chip.up   { color: var(--green);  background: rgba(16,185,129,.13); }
+    .qt-chip.down { color: var(--red);    background: rgba(239,68,68,.13); }
+    .qt-chip.neut { color: var(--yellow); background: rgba(245,158,11,.13); }
+    @media (max-width: 420px) {
+      .qt-value { font-size: 15px; }
+      .qt-value--xl { font-size: 26px; }
+    }
     .rpt-tile-note {
       font-size: 11px;
       color: rgba(255,255,255,.35);
@@ -921,8 +938,12 @@
     }
     /* Noticias con imagen: la primera va destacada, el resto en filas con miniatura */
     .rpt-news-hero { display: block; position: relative; text-decoration: none; color: inherit; border-bottom: 1px solid rgba(255,255,255,.04); }
-    .rpt-news-hero-img { aspect-ratio: 16 / 9; background: #0b1a30; overflow: hidden; }
+    .rpt-news-hero-img, .rpt-news-thumb { position: relative; background: radial-gradient(120% 120% at 30% 0%, #16294f 0%, #0a1428 60%, #070f1f 100%); }
+    .rpt-news-hero-img { aspect-ratio: 16 / 9; overflow: hidden; }
     .rpt-news-hero-img img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+    .rpt-news-ph { position: absolute; top: 50%; left: 50%; width: 30%; max-width: 92px; aspect-ratio: 1; transform: translate(-50%, -50%); opacity: .92; }
+    .rpt-news-thumb .rpt-news-ph { width: 38%; }
+    .rpt-news-hero-img img, .rpt-news-thumb img { position: relative; z-index: 1; }
     .rpt-news-hero:hover .rpt-news-hero-img img { transform: scale(1.03); }
     .rpt-news-hero-body { padding: 14px 0 18px; }
     .rpt-news-hero-body .rpt-news-title { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 17px; line-height: 1.3; color: var(--white); margin: 6px 0 0; }
@@ -930,7 +951,7 @@
     .rpt-news-row { display: flex; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.04); text-decoration: none; color: inherit; transition: background var(--transition); }
     .rpt-news-row:last-child { border-bottom: none; }
     .rpt-news-row:hover .rpt-news-title { color: var(--gold); }
-    .rpt-news-thumb { flex: 0 0 96px; height: 64px; border-radius: 4px; overflow: hidden; background: #0b1a30; }
+    .rpt-news-thumb { flex: 0 0 96px; height: 64px; border-radius: 4px; overflow: hidden; }
     .rpt-news-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
     .rpt-news-row .rpt-news-title { margin: 3px 0 0; font-size: 12.5px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .rpt-news-badge.alta  { color: var(--gold); border-color: rgba(242,201,76,.3); }
@@ -9028,6 +9049,18 @@
   // Á¢ÂÂÁ¢ÂÂ Carga reportes diarios desde JSON Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
   const EMPTY_MSG = '<div class="report-loading">Sin datos aún. Próxima actualización: 11:01 hs.</div>';
 
+  // Chip de variación (▲/▼ + porcentaje). `txt` es la variación ("+0.17%"); `cls` fuerza la clase.
+  function qtChip(txt, cls) {
+    if (!txt) return '';
+    const c = cls || varClass(txt);
+    const arrow = c === 'up' ? '&#9650;' : c === 'down' ? '&#9660;' : '&#9679;';
+    const label = /^[+-]?[\d.,]+%?$/.test(String(txt)) ? String(txt).replace(/^[+-]/, '') : String(txt);
+    return `<span class="qt-chip ${c || 'neut'}">${arrow} ${label}</span>`;
+  }
+  function qtCell(label, value, chip) {
+    return `<div class="qt-cell"><span class="qt-label">${label}</span><span class="qt-value">${value}</span>${chip || ''}</div>`;
+  }
+
   function varClass(v) {
     if (!v) return '';
     const s = String(v);
@@ -9070,33 +9103,19 @@
   function renderNoticias(noticias, badgeKey) {
     if (!noticias || !noticias.length) return '';
     const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
-    const conImagen = noticias.filter(n => n.imagen);
-    if (conImagen.length >= 3) noticias = conImagen.slice(0, 6); // hero + 5 filas; las sin imagen se omiten para no romper el ritmo visual
-    const heroIdx = noticias.findIndex(n => n.imagen);
+    noticias = noticias.slice(0, 6); // 1 destacada + 5 filas
     return noticias.map((n, i) => {
-      if (n.imagen) {
-        const isHero = i === heroIdx;
-        const tiempo = timeAgo(n.fecha);
-        const meta = `${n.fuente ? `<span class="rpt-news-source rpt-news-meta">${esc(n.fuente)}</span>` : ''}${tiempo ? `<span class="rpt-news-time rpt-news-meta" data-ts="${n.fecha}">${tiempo}</span>` : ''}`;
-        const tag = n.link ? 'a' : 'div';
-        const href = n.link ? ` href="${esc(n.link)}" target="_blank" rel="noopener noreferrer"` : '';
-        const img = `<img src="${esc(n.imagen)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.style.display='none'">`;
-        return isHero
-          ? `<${tag} class="rpt-news-hero"${href}><div class="rpt-news-hero-img">${img}</div><div class="rpt-news-hero-body">${meta}<div class="rpt-news-title">${n.titulo || ''}</div></div></${tag}>`
-          : `<${tag} class="rpt-news-row"${href}><div class="rpt-news-thumb">${img}</div><div>${meta}<div class="rpt-news-title">${n.titulo || ''}</div></div></${tag}>`;
-      }
-      const badge = n[badgeKey] || '';
-      const dotCls = impactoDot(badge);
-      const badgeCls = badge.toLowerCase() === 'alta' ? 'alta' : 'media';
+      const isHero = i === 0;
       const tiempo = timeAgo(n.fecha);
-      return `
-        <div class="rpt-news-item">
-          <div class="rpt-news-dot ${dotCls}"></div>
-          <div>
-            <div class="rpt-news-title">${n.fuente ? `<span class="rpt-news-source">${n.fuente}</span>` : ''}${tiempo ? `<span class="rpt-news-time" data-ts="${n.fecha}">${tiempo}</span>` : ''}${n.link ? `<a href="${n.link}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none; border-bottom: 1px solid rgba(184,148,63,0.4);">${n.titulo}</a>` : (n.titulo || '')}${badge ? `<span class="rpt-news-badge ${badgeCls}">${badge}</span>` : ''}</div>
-            <div class="rpt-news-text">${n.resumen || ''}</div>
-          </div>
-        </div>`;
+      const meta = `${n.fuente ? `<span class="rpt-news-source rpt-news-meta">${esc(n.fuente)}</span>` : ''}${tiempo ? `<span class="rpt-news-time rpt-news-meta" data-ts="${n.fecha}">${tiempo}</span>` : ''}`;
+      const tag = n.link ? 'a' : 'div';
+      const href = n.link ? ` href="${esc(n.link)}" target="_blank" rel="noopener noreferrer"` : '';
+      // El emblema de Manfredi va detrás: si la nota no trae imagen, o la imagen falla, queda ese.
+      const ph = '<svg class="rpt-news-ph" viewBox="0 0 100 100" aria-hidden="true"><use href="#miMark"/></svg>';
+      const img = ph + (n.imagen ? `<img src="${esc(n.imagen)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : '');
+      return isHero
+        ? `<${tag} class="rpt-news-hero"${href}><div class="rpt-news-hero-img">${img}</div><div class="rpt-news-hero-body">${meta}<div class="rpt-news-title">${n.titulo || ''}</div></div></${tag}>`
+        : `<${tag} class="rpt-news-row"${href}><div class="rpt-news-thumb">${img}</div><div>${meta}<div class="rpt-news-title">${n.titulo || ''}</div></div></${tag}>`;
     }).join('');
   }
 
@@ -9109,23 +9128,28 @@
     return `
       <div class="rpt-body">
         <div class="rpt-section">
-          <div class="rpt-section-label" style="color: var(--gold-dark);">Tipo de cambio</div>
-          <div class="rpt-tiles">
-            <div class="rpt-tile rpt-tile-featured"><span class="rpt-tile-label">Blue</span><span class="rpt-tile-value">${dolar.blue || '&mdash;'}</span></div>
-            <div class="rpt-tile"><span class="rpt-tile-label">Oficial</span><span class="rpt-tile-value">${dolar.oficial || '&mdash;'}</span></div>
-            <div class="rpt-tile"><span class="rpt-tile-label">MEP</span><span class="rpt-tile-value">${dolar.mep || '&mdash;'}</span></div>
-            <div class="rpt-tile"><span class="rpt-tile-label">CCL</span><span class="rpt-tile-value">${dolar.ccl || '&mdash;'}</span></div>
+          <div class="rpt-section-label">Tipo de cambio</div>
+          <div class="qt">
+            <div class="qt-hero">
+              <div class="qt-hero-l"><span class="qt-label">D&oacute;lar Blue</span>${dolar.brecha ? `<span class="qt-sub">Brecha con el oficial ${dolar.brecha}</span>` : ''}</div>
+              <div class="qt-hero-r"><span class="qt-value qt-value--xl">${dolar.blue || '&mdash;'}</span></div>
+            </div>
+            <div class="qt-grid" style="--n:3">
+              ${qtCell('Oficial', dolar.oficial || '&mdash;')}
+              ${qtCell('MEP', dolar.mep || '&mdash;')}
+              ${qtCell('CCL', dolar.ccl || '&mdash;')}
+            </div>
           </div>
-          ${dolar.brecha ? `<div class="rpt-tile-note">Brecha blue/oficial: <strong>${dolar.brecha}</strong></div>` : ''}
         </div>
 
         <div class="rpt-section">
-          <div class="rpt-section-label" style="color: var(--gold-dark);">Merval</div>
-          <div class="rpt-tiles">
-            <div class="rpt-tile"><span class="rpt-tile-label">Valor</span><span class="rpt-tile-value">${merval.valor ? Number(merval.valor).toLocaleString('es-AR') : '&mdash;'}</span></div>
-            <div class="rpt-tile"><span class="rpt-tile-label">Variación</span><span class="rpt-tile-value ${varMerval}">${merval.variacion || '&mdash;'}</span></div>
+          <div class="rpt-section-label">Merval</div>
+          <div class="qt">
+            <div class="qt-hero">
+              <div class="qt-hero-l"><span class="qt-label">&Iacute;ndice Merval</span>${merval.tendencia ? `<span class="qt-sub">Tendencia ${merval.tendencia}</span>` : ''}</div>
+              <div class="qt-hero-r"><span class="qt-value qt-value--xl">${merval.valor ? Number(merval.valor).toLocaleString('es-AR') : '&mdash;'}</span>${qtChip(merval.variacion)}</div>
+            </div>
           </div>
-          ${merval.tendencia ? `<div class="rpt-tile-note">${tendIcon} Tendencia ${merval.tendencia}</div>` : ''}
         </div>
 
         <div class="rpt-section" style="border-bottom:none">
@@ -9146,24 +9170,32 @@
     return `
       <div class="rpt-body">
         <div class="rpt-section">
-          <div class="rpt-section-label" style="color: var(--gold-dark);">Índices</div>
-          <div class="rpt-tiles">
-            <div class="rpt-tile rpt-tile-featured"><span class="rpt-tile-label">S&amp;P 500</span><span class="rpt-tile-value ${varClass(sp.variacion)}">${sp.valor ? Number(sp.valor).toLocaleString('en-US') : '&mdash;'} <small>${sp.variacion || ''}</small></span></div>
-            <div class="rpt-tile"><span class="rpt-tile-label">Dow Jones</span><span class="rpt-tile-value ${varClass(dw.variacion)}">${dw.valor ? Number(dw.valor).toLocaleString('en-US') : '&mdash;'} <small>${dw.variacion || ''}</small></span></div>
-            <div class="rpt-tile"><span class="rpt-tile-label">Nasdaq</span><span class="rpt-tile-value ${varClass(nq.variacion)}">${nq.valor ? Number(nq.valor).toLocaleString('en-US') : '&mdash;'} <small>${nq.variacion || ''}</small></span></div>
-            <div class="rpt-tile"><span class="rpt-tile-label">T10 Yield</span><span class="rpt-tile-value ${varClass(bonos.lectura === 'subiendo' ? '+' : bonos.lectura === 'bajando' ? '-' : '')}">${bonos.t10_yield || '&mdash;'}</span></div>
+          <div class="rpt-section-label">&Iacute;ndices</div>
+          <div class="qt">
+            <div class="qt-hero">
+              <div class="qt-hero-l"><span class="qt-label">S&amp;P 500</span></div>
+              <div class="qt-hero-r"><span class="qt-value qt-value--xl">${sp.valor ? Number(sp.valor).toLocaleString('en-US') : '&mdash;'}</span>${qtChip(sp.variacion)}</div>
+            </div>
+            <div class="qt-grid" style="--n:3">
+              ${qtCell('Dow Jones', dw.valor ? Number(dw.valor).toLocaleString('en-US') : '&mdash;', qtChip(dw.variacion))}
+              ${qtCell('Nasdaq', nq.valor ? Number(nq.valor).toLocaleString('en-US') : '&mdash;', qtChip(nq.variacion))}
+              ${qtCell('T10 Yield', bonos.t10_yield || '&mdash;', qtChip(bonos.lectura === 'subiendo' ? 'subiendo' : bonos.lectura === 'bajando' ? 'bajando' : '', bonos.lectura === 'subiendo' ? 'up' : bonos.lectura === 'bajando' ? 'down' : ''))}
+            </div>
           </div>
           ${bonos.nota ? `<div class="rpt-tile-note">${bonos.nota}</div>` : ''}
         </div>
 
+        ${(comm.soja || comm.wti || comm.oro) ? `
         <div class="rpt-section">
-          <div class="rpt-section-label" style="color: var(--gold-dark);">Commodities</div>
-          <div class="rpt-tiles">
-            ${comm.soja ? `<div class="rpt-tile"><span class="rpt-tile-label">Soja</span><span class="rpt-tile-value ${varClass(comm.soja.variacion)}">${comm.soja.precio || '&mdash;'} <small>${comm.soja.variacion || ''}</small></span></div>` : ''}
-            ${comm.wti  ? `<div class="rpt-tile"><span class="rpt-tile-label">WTI</span><span class="rpt-tile-value ${varClass(comm.wti.variacion)}">${comm.wti.precio || '&mdash;'} <small>${comm.wti.variacion || ''}</small></span></div>` : ''}
-            ${comm.oro  ? `<div class="rpt-tile"><span class="rpt-tile-label">Oro</span><span class="rpt-tile-value ${varClass(comm.oro.variacion)}">${comm.oro.precio || '&mdash;'} <small>${comm.oro.variacion || ''}</small></span></div>` : ''}
+          <div class="rpt-section-label">Commodities</div>
+          <div class="qt">
+            <div class="qt-grid" style="--n:${[comm.soja, comm.wti, comm.oro].filter(Boolean).length}">
+              ${comm.soja ? qtCell('Soja', comm.soja.precio || '&mdash;', qtChip(comm.soja.variacion)) : ''}
+              ${comm.wti  ? qtCell('WTI',  comm.wti.precio  || '&mdash;', qtChip(comm.wti.variacion))  : ''}
+              ${comm.oro  ? qtCell('Oro',  comm.oro.precio  || '&mdash;', qtChip(comm.oro.variacion))  : ''}
+            </div>
           </div>
-        </div>
+        </div>` : ''}
 
         ${d.impacto_argentina ? `
         <div class="rpt-section" style="border-bottom:none">
