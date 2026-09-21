@@ -1136,7 +1136,7 @@
     ctx.clearRect(0,0,W,H);
 
     var labels = opts.labels, ranges = opts.ranges, colors = opts.colors, refLines = opts.refLines || [];
-    var padL = opts.padL || 168, padR = 16, padT = 34, padB = 10;
+    var padL = opts.padL || 168, padR = 40, padT = 34, padB = 10;
     var plotW = W - padL - padR, plotH = H - padT - padB;
 
     var allVals = [];
@@ -1169,14 +1169,14 @@
       ctx.fillStyle = PALETTE.ink;
       ctx.font = '12px "Inter", sans-serif';
       ctx.textAlign = 'right';
-      wrapLabel(ctx, labels[i], padL - 12, cy - 4, padL - 20, 'right');
+      wrapLabel(ctx, labels[i], padL - 12, cy - 11, padL - 20, 'right');
 
       ctx.font = '600 10.5px "IBM Plex Mono", monospace';
       var vf = opts.valueFmt || function(v){ return '$'+v.toFixed(0); };
       ctx.textAlign = 'right';
-      ctx.fillText(vf(ranges[i][0]), x0 - 8, cy + 4);
+      ctx.fillText(vf(ranges[i][0]), x0 - barH/2 - 4, cy + 12);
       ctx.textAlign = 'left';
-      ctx.fillText(vf(ranges[i][1]), x1 + 8, cy + 4);
+      ctx.fillText(vf(ranges[i][1]), x1 + barH/2 + 4, cy + 12);
     }
 
     var refX = refLines.map(function(r){ return scaleX(r.value); });

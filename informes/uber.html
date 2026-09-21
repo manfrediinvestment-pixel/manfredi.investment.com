@@ -1009,7 +1009,7 @@
     }
   }
 
-  function wrapLabel(ctx, text, cx, y, maxW){
+  function wrapLabel(ctx, text, cx, y, maxW, align){
     var words = String(text).split(' ');
     var lines = [];
     var cur = '';
@@ -1020,7 +1020,7 @@
     }
     if(cur) lines.push(cur);
     lines = lines.slice(0,2);
-    ctx.textAlign = 'center';
+    ctx.textAlign = align || 'center';
     for(var j=0;j<lines.length;j++){
       ctx.fillText(lines[j], cx, y + j*11);
     }
@@ -1076,7 +1076,7 @@
     ctx.clearRect(0,0,W,H);
 
     var labels = opts.labels, ranges = opts.ranges, colors = opts.colors, refLines = opts.refLines || [];
-    var padL = 168, padR = 16, padT = 38, padB = 10;
+    var padL = 168, padR = 40, padT = 38, padB = 10;
     var plotW = W - padL - padR, plotH = H - padT - padB;
 
     var allVals = [];
@@ -1109,14 +1109,14 @@
       ctx.fillStyle = PALETTE.ink;
       ctx.font = '12px "Inter", sans-serif';
       ctx.textAlign = 'right';
-      wrapLabel(ctx, labels[i], padL - 12, cy - 4, padL - 20);
+      wrapLabel(ctx, labels[i], padL - 12, cy - 11, padL - 20, 'right');
 
       ctx.font = '600 10.5px "IBM Plex Mono", monospace';
       var vf = opts.valueFmt || function(v){ return '$'+v.toFixed(0); };
       ctx.textAlign = 'right';
-      ctx.fillText(vf(ranges[i][0]), x0 - 8, cy + 4);
+      ctx.fillText(vf(ranges[i][0]), x0 - barH/2 - 4, cy + 12);
       ctx.textAlign = 'left';
-      ctx.fillText(vf(ranges[i][1]), x1 + 8, cy + 4);
+      ctx.fillText(vf(ranges[i][1]), x1 + barH/2 + 4, cy + 12);
     }
 
     ctx.font = '600 10.5px "IBM Plex Mono", monospace';
