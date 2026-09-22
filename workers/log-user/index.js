@@ -6,6 +6,11 @@ export default {
                               'Access-Control-Allow-Methods': 'POST, OPTIONS'
                   };
 
+          // Panel de creador: lectura de las hojas Usuarios + Miembros (GET con ID token de Firebase)
+          if (new URL(request.url).pathname === '/creador/usuarios') {
+              return await creadorUsuarios(request, env);
+          }
+
           if (request.method === 'OPTIONS') return new Response('', { headers });
                   if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers });
                   const pathname = new URL(request.url).pathname;
@@ -713,4 +718,78 @@ function htmlDiplomaCompletado({ name, course, certificateId, score, total }) {
 </table>
 </td></tr></table>
 </body></html>`;
+}
+
+// ─── GET /creador/usuarios ───────────────────────────────────────────────────
+// Devuelve las filas de las hojas "Usuarios" y "Miembros" para el Panel de
+// creador. La identidad sale del ID token de Firebase (igual que en el worker
+// memberships): solo las cuentas de CREADORES pueden leer esto.
+const CREADORES = ['nachito2502@gmail.com'];
+const FIREBASE_PROJECT = 'manfrediinvestment-989c8';
+const CREADOR_CORS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Content-Type': 'application/json'
+};
+let _jwksCache = { keys: null, exp: 0 };
+function b64urlBytes(s) {
+    s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '=';
+    return Uint8Array.from(atob(s), c => c.charCodeAt(0));
+}
+async function usuarioDelToken(request) {
+    const auth = request.headers.get('Authorization') || '';
+    const parts = (auth.startsWith('Bearer ') ? auth.slice(7) : '').split('.');
+    if (parts.length !== 3) return null;
+    try {
+        const header = JSON.parse(new TextDecoder().decode(b64urlBytes(parts[0])));
+        const p = JSON.parse(new TextDecoder().decode(b64urlBytes(parts[1])));
+        if (header.alg !== 'RS256' || p.aud !== FIREBASE_PROJECT || p.iss !== 'https://securetoken.google.com/' + FIREBASE_PROJECT) return null;
+        if (!p.exp || p.exp < Math.floor(Date.now() / 1000) || !p.email || p.email_verified === false) return null;
+        if (!_jwksCache.keys || Date.now() > _jwksCache.exp) {
+            const r = await fetch('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com');
+            _jwksCache = { keys: (await r.json()).keys, exp: Date.now() + 3600e3 };
+        }
+        const jwk = _jwksCache.keys.find(k => k.kid === header.kid);
+        if (!jwk) return null;
+        const key = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+        const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64urlBytes(parts[2]), new TextEncoder().encode(parts[0] + '.' + parts[1]));
+        return ok ? { email: String(p.email).toLowerCase() } : null;
+    } catch (e) { return null; }
+}
+async function googleAccessToken(env, scope) {
+    const privateKey = env.GOOGLE_PRIVATE_KEY.replace(/\n/g, '\n');
+    const now = Math.floor(Date.now() / 1000);
+    const b64 = o => btoa(JSON.stringify(o)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    const unsigned = b64({ alg: 'RS256', typ: 'JWT' }) + '.' + b64({ iss: env.GOOGLE_SERVICE_ACCOUNT_EMAIL, scope, aud: 'https://oauth2.googleapis.com/token', exp: now + 3600, iat: now });
+    const pem = privateKey.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\n/g, '');
+    const key = await crypto.subtle.importKey('pkcs8', Uint8Array.from(atob(pem), c => c.charCodeAt(0)).buffer, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
+    const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, new TextEncoder().encode(unsigned));
+    const jwt = unsigned + '.' + btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    const r = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}` });
+    const d = await r.json();
+    if (!d.access_token) throw new Error('Google auth: ' + (d.error_description || d.error || r.status));
+    return d.access_token;
+}
+async function creadorUsuarios(request, env) {
+    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CREADOR_CORS });
+    const out = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: CREADOR_CORS });
+    const u = await usuarioDelToken(request);
+    if (!u) return out({ error: 'No autenticado' }, 401);
+    if (!CREADORES.includes(u.email)) return out({ error: 'Solo para creadores' }, 403);
+    if (!env.GOOGLE_PRIVATE_KEY || !env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !env.GOOGLE_SHEETS_ID) return out({ error: 'Faltan los secretos de Google Sheets en el worker log-user' }, 503);
+    try {
+        const token = await googleAccessToken(env, 'https://www.googleapis.com/auth/spreadsheets.readonly');
+        const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${env.GOOGLE_SHEETS_ID}/values:batchGet?ranges=Usuarios!A:F&ranges=Miembros!A:F&valueRenderOption=FORMATTED_VALUE`, { headers: { Authorization: 'Bearer ' + token } });
+        const d = await r.json();
+        if (!r.ok) return out({ error: 'Sheets: ' + ((d.error && d.error.message) || r.status) }, 502);
+        const [usu, miem] = (d.valueRanges || []).map(v => v.values || []);
+        // Usuarios: Fecha | Email | Nombre | UID | Fuente | Miembro   (fila 1 = encabezado)
+        const usuarios = (usu || []).slice(1).filter(f => f[1]).map(f => ({ fecha: f[0] || '', email: f[1], nombre: f[2] || '', fuente: f[4] || '', miembro: (f[5] || '').toLowerCase() === 'miembro' }));
+        // Miembros: Fecha alta | Email | Monto ARS | Ultima renovacion | Vence | Estado
+        const miembros = (miem || []).slice(1).filter(f => f[1]).map(f => ({ alta: f[0] || '', email: f[1], monto: f[2] || '', renovacion: f[3] || '', vence: f[4] || '', estado: f[5] || '' }));
+        return out({ usuarios, miembros });
+    } catch (e) {
+        return out({ error: e.message }, 500);
+    }
 }

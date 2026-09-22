@@ -2033,6 +2033,83 @@
     @keyframes crIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
     @media (max-width: 640px) { .cr-toast { left: 16px; right: 16px; top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); flex-wrap: wrap; } }
     @media (prefers-reduced-motion: reduce) { .cr-toast { animation: none; } }
+
+    /* ===== Panel de creador ===== */
+    .section-panel { background: var(--navy-1); }
+    .section-panel .section-title { color: var(--white); margin: 10px 0 6px; }
+    .nav-link-panel { color: var(--gold) !important; font-weight: 600; }
+    #navPanelItem[hidden] { display: none; }
+    .pn-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+    .pn-lead { margin: 0; font-size: 14px; color: rgba(255,255,255,.5); max-width: 60ch; }
+    .pn-head-r { display: flex; align-items: center; gap: 12px; }
+    .pn-refresh { font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding: 8px 14px; border-radius: 6px; border: 1px solid rgba(242,201,76,.45); background: transparent; color: var(--gold); cursor: pointer; }
+    .pn-refresh:hover { background: rgba(242,201,76,.08); }
+    .pn-gate { padding: 28px; border: 1px dashed rgba(255,255,255,.15); border-radius: 14px; color: rgba(255,255,255,.55); font-size: 14px; }
+    .pn-muted { color: rgba(255,255,255,.4); font-size: 12px; }
+    .pn-bad { color: #F87171; }
+    .pn-kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; overflow: hidden; margin-bottom: 18px; }
+    .pn-kpi { background: var(--navy-4); padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .pn-kpi-l { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.45); }
+    .pn-kpi-v { font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600; color: #F5F7FA; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pn-kpi-s { font-size: 11.5px; color: rgba(255,255,255,.42); }
+    .pn-kpi.warn .pn-kpi-v { color: #F87171; }
+    @media (max-width: 1100px) { .pn-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 560px) { .pn-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pn-kpi-v { font-size: 20px; } }
+    .pn-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .pn-card { background: var(--navy-4); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; min-width: 0; }
+    .pn-wide { grid-column: 1 / -1; }
+    @media (max-width: 900px) { .pn-grid { grid-template-columns: 1fr; } }
+    .pn-card > header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 16px 20px 0; }
+    .pn-card h3 { margin: 0; font-size: 15px; font-weight: 600; color: #F5F7FA; }
+    .pn-src { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.32); white-space: nowrap; }
+    .pn-body { padding: 14px 20px 20px; }
+    .pn-loading { font-size: 12.5px; color: rgba(255,255,255,.35); padding: 18px 0; }
+    .pn-empty { font-size: 13px; color: rgba(255,255,255,.4); margin: 6px 0; }
+    .pn-err { font-size: 13px; color: #FCA5A5; margin: 6px 0; }
+    .pn-sub { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.7); margin: 14px 0 8px; }
+    .pn-sub:first-child { margin-top: 0; }
+    .pn-chart { width: 100%; height: auto; display: block; overflow: visible; }
+    .pn-chart .pn-grid { stroke: rgba(255,255,255,.07); stroke-width: 1; }
+    .pn-chart .pn-base { stroke: rgba(255,255,255,.2); stroke-width: 1; }
+    .pn-chart .pn-axis { fill: rgba(255,255,255,.45); font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+    .pn-chart .pn-bar { fill: var(--gold); opacity: .85; }
+    .pn-chart .pn-mark:hover .pn-bar { opacity: 1; }
+    .pn-chart .pn-line { fill: none; stroke: var(--gold); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+    .pn-chart .pn-dot { fill: var(--gold); stroke: var(--navy-4); stroke-width: 2; }
+    .pn-chart .pn-hit .pn-cross, .pn-chart .pn-hit .pn-dot { opacity: 0; }
+    .pn-chart .pn-hit:hover .pn-cross { opacity: 1; stroke: rgba(255,255,255,.25); stroke-width: 1; }
+    .pn-chart .pn-hit:hover .pn-dot { opacity: 1; }
+    .pn-cols3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin-top: 6px; }
+    @media (max-width: 900px) { .pn-cols3 { grid-template-columns: 1fr; } }
+    .pn-rank { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+    .pn-rank li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; font-size: 12.5px; }
+    .pn-rank-l { color: rgba(255,255,255,.75); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pn-rank-v { font-family: 'IBM Plex Mono', monospace; color: #F5F7FA; font-variant-numeric: tabular-nums; }
+    .pn-rank-b { grid-column: 1 / -1; height: 4px; border-radius: 2px; background: rgba(255,255,255,.06); overflow: hidden; }
+    .pn-rank-b i { display: block; height: 100%; background: var(--gold-dark); border-radius: 2px; }
+    .pn-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
+    .pn-chip { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: .04em; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,.07); color: rgba(255,255,255,.7); white-space: nowrap; }
+    .pn-chip.ok { background: rgba(16,185,129,.12); color: #6EE7B7; }
+    .pn-chip.bad { background: rgba(239,68,68,.12); color: #FCA5A5; }
+    .pn-chip.gold { background: rgba(242,201,76,.12); color: var(--gold); }
+    .pn-table-wrap { overflow-x: auto; }
+    .pn-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .pn-table th { text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.38); padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.1); white-space: nowrap; }
+    .pn-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,.05); color: rgba(255,255,255,.8); white-space: nowrap; }
+    .pn-table .n { text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
+    .pn-health { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+    .pn-hc { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 10px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); }
+    .pn-hc div { display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: #F5F7FA; min-width: 0; }
+    .pn-hc div span { font-size: 11.5px; color: rgba(255,255,255,.45); }
+    .pn-hc-dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; background: rgba(255,255,255,.25); }
+    .pn-hc.ok .pn-hc-dot { background: var(--green); box-shadow: 0 0 0 3px rgba(16,185,129,.15); }
+    .pn-hc.warn .pn-hc-dot { background: var(--gold); }
+    .pn-hc.bad .pn-hc-dot { background: var(--red); }
+    .pn-setup { font-size: 13.5px; color: rgba(255,255,255,.7); line-height: 1.6; }
+    .pn-setup ol { margin: 8px 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+    .pn-setup code { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; background: var(--navy-1); padding: 2px 6px; border-radius: 4px; color: var(--gold-light); word-break: break-all; }
+    .pn-link { color: var(--gold); font-size: 13px; text-decoration: none; }
+    .pn-link:hover { text-decoration: underline; }
     .inv-panel { display: none; }
     .inv-panel.active { display: block; }
     .inv-panel-progress {
@@ -3455,6 +3532,7 @@
         <li><a href="#calendario" class="nav-link" data-tab-target="calendario">Calendario</a></li>
         <li><a href="#university" class="nav-link" data-tab-target="university">University</a></li>
         <li><a href="#inversiones" class="nav-link" data-tab-target="inversiones">Informes<span class="mi-nav-count" id="navPedidosCount" hidden></span></a></li>
+        <li id="navPanelItem" hidden><a href="#panel" class="nav-link nav-link-panel" data-tab-target="panel">&#10022; Panel</a></li>
         <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
         <li>
           <span class="nav-link" data-member-required="true" onclick="toggleWarren()" style="cursor:pointer;">
@@ -5163,6 +5241,42 @@
     };
     if (window._currentUser) window._miOnAuth(window._currentUser);
     setInterval(function(){ if (miEsCreador() && !document.hidden) cargarPedidos(); }, 5 * 60 * 1000);
+  })();
+  </script>
+
+  <!-- Panel de creador: solo cuentas en MI_CREADORES. El JS (assets/panel/panel.js) se descarga
+       recien cuando un creador abre la pestana; los datos los validan los workers con el ID token. -->
+  <section class="section section-panel" id="panel" data-tab="panel">
+    <div class="container">
+      <div class="pn-head">
+        <div>
+          <span class="mi-creator-badge">Solo creador</span>
+          <h2 class="section-title">Panel</h2>
+          <p class="pn-lead">Todo el sitio en una pantalla: tráfico, socios, ingresos, usuarios, pedidos y estado técnico.</p>
+        </div>
+        <div class="pn-head-r"><span id="panelUpdated" class="pn-muted"></span><button type="button" class="pn-refresh" id="panelRefresh">&#8635; Actualizar</button></div>
+      </div>
+      <div id="panelRoot"><p class="pn-gate">Esta sección es solo para la cuenta creadora. Iniciá sesión con esa cuenta para verla.</p></div>
+    </div>
+  </section>
+  <script>
+  (function(){
+    var cargado = false;
+    function cargarPanel(){
+      if (cargado || !window.miEsCreador || !window.miEsCreador()) return;
+      cargado = true;
+      var s = document.createElement('script'); s.src = 'assets/panel/panel.js?v=2'; document.body.appendChild(s);
+    }
+    function enPanel(){ return location.hash === '#panel'; }
+    var prev = window._miOnAuth;
+    window._miOnAuth = function(user){
+      if (prev) prev(user);
+      var cr = window.miEsCreador && window.miEsCreador(user);
+      var li = document.getElementById('navPanelItem'); if (li) li.hidden = !cr;
+      if (cr && enPanel()) cargarPanel();
+    };
+    window.addEventListener('hashchange', function(){ if (enPanel()) cargarPanel(); });
+    if (window._currentUser) window._miOnAuth(window._currentUser);
   })();
   </script>
 
@@ -16485,11 +16599,11 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
 <script>
   // ââ Navegacion por pestanas: una sola seccion visible a la vez âââââââââââ
   (function() {
-    var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'portfolio', 'asesoria'];
+    var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'portfolio', 'asesoria', 'panel'];
     var TAB_TITLES = {
       inicio: 'Inicio', mercados: 'Mercados', calendario: 'Calendario Economico',
       informes: 'Reportes & News', university: 'University', inversiones: 'Informes',
-      portfolio: 'Portfolio', asesoria: 'Asesoria'
+      portfolio: 'Portfolio', asesoria: 'Asesoria', panel: 'Panel de creador'
     };
 
     function resolveTab(hash) {

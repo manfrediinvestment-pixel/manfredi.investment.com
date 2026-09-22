@@ -55,6 +55,9 @@ export default {
             if (path === '/creador/pedido' && request.method === 'POST') {
                       return await creadorActualizar(request, env, ctx);
             }
+            if (path === '/creador/resumen' && request.method === 'GET') {
+                      return await creadorResumen(request, env);
+            }
 
                         // GET /consultas?email=xxx — devuelve consultas restantes del mes
             if (url.pathname === '/consultas' && request.method === 'GET') {
@@ -828,4 +831,67 @@ async function creadorActualizar(request, env, ctx) {
         if (ctx && ctx.waitUntil) ctx.waitUntil(envio);
     }
     return json({ ok: true, pedido: p });
+}
+
+// GET /creador/resumen -- datos del negocio para el Panel de creador (solo creadores).
+// Todo sale de lo que este worker ya maneja: KV de socios + API de Mercado Pago.
+async function creadorResumen(request, env) {
+    const u = await usuarioDelToken(request);
+    if (!u) return json({ error: 'No autenticado' }, 401);
+    if (!esCreador(u.email)) return json({ error: 'Solo para creadores' }, 403);
+
+    const keys = [];
+    let cursor;
+    do {
+        const r = await env.MEMBERS.list({ cursor });
+        keys.push(...r.keys);
+        cursor = r.list_complete ? null : r.cursor;
+    } while (cursor);
+
+    // Socio activo = clave `email` (sin ':'); su TTL es el vencimiento del periodo pago.
+    const conRecurrente = new Set(keys.filter(k => k.name.endsWith(':preapproval_id')).map(k => k.name.slice(0, -15)));
+    const socios = keys.filter(k => !k.name.includes(':') && k.name.includes('@')).map(k => ({
+        email: k.name,
+        vence: k.expiration ? new Date(k.expiration * 1000).toISOString() : null,
+        recurrente: conRecurrente.has(k.name)
+    }));
+    const pedidos = keys.filter(k => k.name.startsWith('pedido:') && k.metadata).map(k => k.metadata);
+
+    // Warren: `email:consultas` guarda las RESTANTES del mes (arranca en 100) y `email:reset` el mes.
+    const mesWarren = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0');
+    const emailsWarren = keys.filter(k => k.name.endsWith(':consultas')).map(k => k.name.slice(0, -10)).slice(0, 400);
+    const warren = (await Promise.all(emailsWarren.map(async email => {
+        const [rest, mes] = await Promise.all([env.MEMBERS.get(email + ':consultas'), env.MEMBERS.get(email + ':reset')]);
+        return { email, usadas: mes === mesWarren ? Math.max(0, 100 - parseInt(rest || '100', 10)) : 0, mes };
+    }))).filter(w => w.usadas > 0).sort((a, b) => b.usadas - a.usadas);
+
+    const errores = {};
+    let pagos = [], suscripciones = [];
+    if (env.MP_ACCESS_TOKEN) {
+        const mp = path => fetch('https://api.mercadopago.com' + path, { headers: { Authorization: 'Bearer ' + env.MP_ACCESS_TOKEN } }).then(r => r.ok ? r.json() : Promise.reject(new Error('MP ' + r.status)));
+        try {
+            for (let offset = 0; offset < 500; offset += 100) {
+                const d = await mp(`/v1/payments/search?sort=date_created&criteria=desc&range=date_created&begin_date=NOW-180DAYS&end_date=NOW&limit=100&offset=${offset}`);
+                (d.results || []).forEach(p => pagos.push({
+                    fecha: p.date_approved || p.date_created, estado: p.status, detalle: p.status_detail,
+                    monto: p.transaction_amount, moneda: p.currency_id,
+                    email: (p.metadata && p.metadata.email) || p.external_reference || (p.payer && p.payer.email) || '',
+                    concepto: p.description || '', meses: p.metadata && p.metadata.meses, codigo: p.metadata && p.metadata.codigo
+                }));
+                if (!d.results || d.results.length < 100) break;
+            }
+        } catch (e) { errores.pagos = e.message; }
+        try {
+            const d = await mp('/preapproval/search?limit=100&offset=0');
+            suscripciones = (d.results || []).map(s => ({
+                email: s.external_reference || s.payer_email || '', estado: s.status,
+                monto: s.auto_recurring && s.auto_recurring.transaction_amount, moneda: s.auto_recurring && s.auto_recurring.currency_id,
+                creado: s.date_created, proximo: s.next_payment_date
+            }));
+        } catch (e) { errores.suscripciones = e.message; }
+    } else {
+        errores.pagos = errores.suscripciones = 'MP_ACCESS_TOKEN no configurado';
+    }
+
+    return json({ generado: new Date().toISOString(), socios, pedidos, warren, pagos, suscripciones, errores });
 }
