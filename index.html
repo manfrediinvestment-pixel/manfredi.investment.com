@@ -5106,6 +5106,27 @@
     .mf-chart-wrap { position: relative; height: 320px; margin-bottom: 6px; }
     .mf-chart-wrap canvas { display: block; width: 100% !important; }
 
+    /* ---- Grafico estilo broker + mapa de calor mensual (Tu Portafolio y Manfredi) ---- */
+    .brk-head { display: flex; flex-direction: column; gap: 6px; }
+    .brk-big { font-family: var(--font-display); font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+    .brk-big.pos { color: var(--green); } .brk-big.neg { color: var(--red); } .brk-big.na { color: rgba(255,255,255,.4); }
+    .brk-sub { display: flex; flex-wrap: wrap; gap: 4px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: rgba(255,255,255,.55); font-variant-numeric: tabular-nums; }
+    .brk-sub .up { color: var(--green); } .brk-sub .dn { color: var(--red); }
+    .brk-sub .dim { color: rgba(255,255,255,.36); }
+    .brk-sw { display: inline-block; width: 12px; height: 2px; background: rgba(232,238,246,.4); vertical-align: middle; margin-right: 6px; }
+    .brk-heat { margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.07); }
+    .brk-heat:empty { display: none; }
+    .brk-heat-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 10px; }
+    .brk-heat-scroll { overflow-x: auto; }
+    .brk-heat table { border-collapse: separate; border-spacing: 3px; width: 100%; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+    .brk-heat th { font-weight: 400; color: rgba(255,255,255,.38); text-align: center; padding: 2px 0; white-space: nowrap; }
+    .brk-heat th small { display: block; opacity: .6; font-size: 10px; }
+    .brk-heat th.row { text-align: left; color: rgba(255,255,255,.6); padding-right: 8px; }
+    .brk-heat th.row.diff { color: var(--gold); }
+    .brk-heat td { text-align: center; padding: 9px 4px; border-radius: 4px; color: #e8eef6; min-width: 52px; }
+    .brk-heat td.na { color: rgba(255,255,255,.25); background: rgba(255,255,255,.03); }
+    .brk-heat-foot { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: rgba(255,255,255,.34); margin-top: 8px; }
+
     /* ---- Rendimiento de tu cartera (curva estilo broker) ---- */
     .pf-lot-date { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,.4); margin-top: 2px; }
     .pf-lot-nodate { color: var(--yellow); opacity: .7; }
@@ -5225,6 +5246,7 @@
           <div id="pfPerfSummary" class="mf-summary pf-perf-summary" style="margin-top:14px;">Reconstruyendo con precios históricos…</div>
           <div class="mf-chart-wrap"><canvas id="pfPerfCanvas" aria-label="Curva de rendimiento de tu cartera contra el S&amp;P 500"></canvas></div>
           <div class="pf-perf-foot"><span class="pf-perf-flow"><i></i> Aporte de capital (compra o ingreso de efectivo)</span></div>
+          <div class="brk-heat" id="pfHeat"></div>
           <p class="pf-metric-note" id="pfPerfNote"></p>
         </div>
 
@@ -5259,6 +5281,7 @@
           </div>
           <div id="mfSummary" class="mf-summary">Calculando con datos históricos...</div>
           <div class="mf-chart-wrap"><canvas id="mfChartCanvas"></canvas></div>
+          <div class="brk-heat" id="mfHeat"></div>
           <div class="pf-metric-note">Incluye únicamente las posiciones en acciones y CEDEARs de mi cartera personal &mdash; no incluye el fondo común de inversión ni el efectivo. En YTD y 1 año, el % de "Mi cartera" es proyectado: no es lo que la cartera rindió en ese período completo (todavía no existía desde el inicio), sino el ritmo de rendimiento actual llevado a esa ventana.</div>
         </div>
 
@@ -8252,42 +8275,185 @@
     };
   }
 
-  var mfCharts = {};
-  function mfRenderChart(m, canvasId){
-    canvasId = canvasId || 'mfChartCanvas';
-    var canvas = document.getElementById(canvasId);
-    if(!canvas || typeof Chart === 'undefined') return;
-    var granularity = m.granularity || 'week';
-    var tickEvery = granularity === 'day' ? 1 : (granularity === 'week' ? 5 : 21);
-    var labels = m.dates.map(function(d){ return mfFormatDate(d, granularity); });
-    var lastIdx = labels.length - 1;
-    if(mfCharts[canvasId]) mfCharts[canvasId].destroy();
-    mfCharts[canvasId] = new Chart(canvas, {
-      type: 'line',
-      data: { labels: labels, datasets: [
-        { label: 'Mi cartera', data: m.portfolioPct, borderColor: '#F2C94C', backgroundColor: 'rgba(242,201,76,.08)', borderWidth: 2, pointRadius: 0, tension: .15, fill: true, spanGaps: false },
-        { label: 'S&P 500', data: m.benchPct, borderColor: '#60A5FA', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0, tension: .15, borderDash: [4,3], spanGaps: false }
-      ] },
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  Grafico de rendimiento "estilo broker" + mapa de calor mensual
+  //  Compartido por "Tu Portafolio" y "Portafolio de Manfredi". El numero grande
+  //  de arriba muestra el resultado de la ventana y, al recorrer la curva, el
+  //  valor de ese dia. La linea va verde o roja segun el resultado; el S&P 500
+  //  queda tenue de fondo.
+  // ═══════════════════════════════════════════════════════════════════════════
+  function brkFmt(v, dec){ return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(dec == null ? 2 : dec).replace('.', ',') + '%'; }
+  function brkPp(v, dec){ return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(dec == null ? 2 : dec).replace('.', ',') + ' pp'; }
+  function brkDate(d){ return d.getDate() + ' ' + MF_MONTHS[d.getMonth()] + " '" + String(d.getFullYear()).slice(-2); }
+  function brkHeadHtml(pv, bv, label, extra){
+    var big = pv == null ? '<div class="brk-big na">—</div>'
+      : '<div class="brk-big ' + (pv >= 0 ? 'pos' : 'neg') + '">' + brkFmt(pv) + '</div>';
+    var sub = '<span>' + label + '</span>';
+    if(bv != null) sub += '<span><i class="brk-sw"></i>S&amp;P 500 ' + brkFmt(bv) + '</span>';
+    if(pv != null && bv != null){ var d = pv - bv; sub += '<span class="' + (d >= 0 ? 'up' : 'dn') + '">' + brkPp(d) + ' vs S&amp;P</span>'; }
+    if(extra) sub += extra;
+    return '<div class="brk-head">' + big + '<div class="brk-sub">' + sub + '</div></div>';
+  }
+  // Linea punteada en 0% (debajo de las curvas) + cruz vertical y punto en el dia activo.
+  var brkPlugin = {
+    id: 'brkCrosshair',
+    beforeDatasetsDraw: function(chart){
+      var a = chart.chartArea, y0 = chart.scales.y.getPixelForValue(0), ctx = chart.ctx;
+      if(!(y0 >= a.top && y0 <= a.bottom)) return;
+      ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.2)'; ctx.lineWidth = 1; ctx.setLineDash([2, 4]);
+      ctx.beginPath(); ctx.moveTo(a.left, y0); ctx.lineTo(a.right, y0); ctx.stroke(); ctx.restore();
+    },
+    afterDatasetsDraw: function(chart){
+      var i = chart.$brkIdx; if(i == null) return;
+      var pt = chart.getDatasetMeta(0).data[i]; if(!pt) return;
+      var a = chart.chartArea, ctx = chart.ctx, ds = chart.data.datasets[0];
+      ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.28)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pt.x, a.top); ctx.lineTo(pt.x, a.bottom); ctx.stroke();
+      if(ds.data[i] != null){
+        ctx.fillStyle = ds.borderColor; ctx.strokeStyle = '#0C1828'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      }
+      ctx.restore();
+    }
+  };
+  // o = { dates, main, bench, positive, flows (indices, opcional), onHover(i|null) }
+  function brkChart(canvas, prev, o){
+    if(prev) prev.destroy();
+    var col = o.positive ? '#10B981' : '#EF4444';
+    var n = o.dates.length, tickEvery = Math.max(1, Math.round(n / 6)), longSpan = n > 70;
+    var labels = o.dates.map(function(d){ return d.getDate() + ' ' + MF_MONTHS[d.getMonth()]; });
+    var ds = [{
+      label: 'Cartera', data: o.main, borderColor: col, borderWidth: 2.2, pointRadius: 0, pointHoverRadius: 0,
+      tension: .15, spanGaps: false, fill: 'start', order: 2,
+      backgroundColor: function(c){
+        var a = c.chart.chartArea; if(!a) return 'transparent';
+        var g = c.chart.ctx.createLinearGradient(0, a.top, 0, a.bottom);
+        g.addColorStop(0, o.positive ? 'rgba(16,185,129,.26)' : 'rgba(239,68,68,.26)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        return g;
+      }
+    }, {
+      label: 'S&P 500', data: o.bench, borderColor: 'rgba(232,238,246,.3)', borderWidth: 1.4, pointRadius: 0, pointHoverRadius: 0,
+      tension: .15, spanGaps: false, fill: false, order: 3
+    }];
+    if(o.flows && o.flows.length){
+      ds.push({
+        label: 'Aporte', data: o.main.map(function(v, i){ return o.flows.indexOf(i) >= 0 ? v : null; }),
+        pointStyle: 'rectRot', pointRadius: 5, pointHoverRadius: 5, backgroundColor: '#F2C94C', borderColor: '#0C1828',
+        borderWidth: 1.5, showLine: false, fill: false, order: 1
+      });
+    }
+    var chart = new Chart(canvas, {
+      type: 'line', data: { labels: labels, datasets: ds }, plugins: [brkPlugin],
       options: {
         responsive: true, maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
+        layout: { padding: { top: 8 } },
         scales: {
-          x: {
-            display: true,
-            grid: { display: false },
-            ticks: {
-              color: 'rgba(255,255,255,.45)', font: { size: 10.5 }, autoSkip: false, maxRotation: 0, minRotation: 0,
-              callback: function(val, idx){ return (lastIdx-idx) % tickEvery === 0 ? labels[idx] : ''; }
-            }
-          },
-          y: { ticks: { color: 'rgba(255,255,255,.5)', callback: function(v){ return v.toFixed(0)+'%'; } }, grid: { color: 'rgba(255,255,255,.06)' } }
+          x: { type: 'category', grid: { display: false }, border: { display: false }, ticks: {
+            color: 'rgba(255,255,255,.4)', font: { family: "'IBM Plex Mono',monospace", size: 10 },
+            autoSkip: false, maxRotation: 0, minRotation: 0,
+            callback: function(val, idx){
+              if((n - 1 - idx) % tickEvery) return '';
+              var d = o.dates[idx];
+              return longSpan ? MF_MONTHS[d.getMonth()] + " '" + String(d.getFullYear()).slice(-2) : labels[idx];
+            } } },
+          y: { display: false, grace: '8%' }
         },
-        plugins: {
-          legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,.65)', font: { size: 11.5 }, boxWidth: 12, padding: 14 } },
-          tooltip: { callbacks: { label: function(ctx){ if(ctx.parsed.y == null) return null; return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%'; } } }
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        onHover: function(e, els, c){
+          var i = els && els.length ? els[0].index : null;
+          if(c.$brkIdx === i) return;
+          c.$brkIdx = i; c.draw(); o.onHover(i);
         }
       }
     });
+    o.onHover(null);
+    requestAnimationFrame(function(){ try{ chart.resize(); }catch(e){} });
+    return chart;
+  }
+
+  // Rendimiento por mes a partir de un indice diario (1 = inicio; null = sin dato).
+  // Solo devuelve meses en que la cartera ya existia; el primero cuenta desde su primer
+  // dia con dato, y el S&P de ese mes se mide desde el mismo dia para que sean comparables.
+  function brkMonthly(dates, pLv, bLv){
+    var out = [], pBase = null, bBase = null, firstIdx = null, last = dates.length - 1;
+    for(var i = 0; i <= last; i++){
+      if(pBase == null && pLv[i] != null){ pBase = pLv[i]; firstIdx = i; }
+      if(bBase == null && bLv[i] != null) bBase = bLv[i];
+      var monthEnd = i === last || dates[i + 1].getMonth() !== dates[i].getMonth();
+      if(!monthEnd) continue;
+      var isFirst = firstIdx != null && !out.length;
+      var bb = isFirst ? bLv[firstIdx] : bBase;
+      if(pBase != null && pLv[i] != null){
+        out.push({
+          d: dates[i], mtd: i === last,
+          partial: isFirst && (firstIdx > 0 ? dates[firstIdx - 1].getMonth() === dates[firstIdx].getMonth() : dates[0].getDate() > 7),
+          p: (pLv[i] / pBase - 1) * 100,
+          s: (bb != null && bLv[i] != null) ? (bLv[i] / bb - 1) * 100 : null
+        });
+        pBase = pLv[i];
+      }
+      if(bLv[i] != null) bBase = bLv[i];
+    }
+    return out.slice(-12);
+  }
+  function brkRenderHeatmap(elId, dates, pLv, bLv){
+    var el = document.getElementById(elId);
+    if(!el) return;
+    var ms = brkMonthly(dates, pLv, bLv);
+    if(!ms.length){ el.innerHTML = ''; return; }
+    function bg(v){ var a = Math.min(1, Math.abs(v) / 8); return (v >= 0 ? 'rgba(16,185,129,' : 'rgba(239,68,68,') + (.1 + a * .6).toFixed(2) + ')'; }
+    function cell(v){ return v == null ? '<td class="na">—</td>' : '<td style="background:' + bg(v) + ';">' + brkFmt(v, 1) + '</td>'; }
+    var h = '<div class="brk-heat-title">Mes a mes</div><div class="brk-heat-scroll"><table><thead><tr><th></th>'
+      + ms.map(function(m){ return '<th>' + MF_MONTHS[m.d.getMonth()] + (m.mtd ? '*' : '') + '<small>' + String(m.d.getFullYear()).slice(-2) + '</small></th>'; }).join('')
+      + '</tr></thead><tbody>'
+      + '<tr><th class="row">Cartera</th>' + ms.map(function(m){ return cell(m.p); }).join('') + '</tr>'
+      + '<tr><th class="row">S&amp;P 500</th>' + ms.map(function(m){ return cell(m.s); }).join('') + '</tr>'
+      + '<tr><th class="row diff">Diferencia</th>' + ms.map(function(m){
+          if(m.s == null) return '<td class="na">—</td>';
+          var d = m.p - m.s, c = d >= 0 ? '16,185,129' : '239,68,68';
+          return '<td style="border:1px solid rgba(' + c + ',.5);color:rgb(' + c + ');">' + brkPp(d, 1).replace(' pp', '') + '</td>';
+        }).join('') + '</tr></tbody></table></div>';
+    var foot = [];
+    if(ms[ms.length - 1].mtd) foot.push('* mes en curso');
+    if(ms[0].partial) foot.push('el primer mes está incompleto (cuenta desde el primer día con datos)');
+    foot.push('diferencia en puntos porcentuales');
+    el.innerHTML = h + '<div class="brk-heat-foot">' + foot.join(' · ') + '</div>';
+  }
+  function brkLevels(pctArr){ return pctArr.map(function(v){ return v == null ? null : 1 + v / 100; }); }
+
+  var mfCharts = {};
+  function mfRenderChart(m, canvasId, headId, winLabel){
+    canvasId = canvasId || 'mfChartCanvas';
+    var canvas = document.getElementById(canvasId);
+    if(!canvas || typeof Chart === 'undefined') return;
+    var head = document.getElementById(headId || 'mfSummary');
+    var projected = m.daysUsedPortfolio !== m.daysUsedBench;
+    mfCharts[canvasId] = brkChart(canvas, mfCharts[canvasId], {
+      dates: m.dates, main: m.portfolioPct, bench: m.benchPct, positive: m.totalReturn >= 0,
+      onHover: function(i){
+        if(!head) return;
+        // En reposo: numero de la ventana (Dietz Modificado); al recorrer: el punto de la curva.
+        if(i == null) head.innerHTML = brkHeadHtml(m.totalReturn, m.benchTotalReturn, pfEsc(winLabel || '') + (projected ? ' · proyectado' : ''));
+        else head.innerHTML = brkHeadHtml(m.portfolioPct[i], m.benchPct[i], brkDate(m.dates[i]));
+      }
+    });
+  }
+
+  // Mapa de calor: usa la serie de 1 año (desde el inicio de la cartera), independiente de la ventana elegida.
+  var mfHeatPromise = null;
+  function mfRenderHeatmap(){
+    if(mfHeatPromise) return mfHeatPromise;
+    mfHeatPromise = (async function(){
+      var w = mfGetWindows().filter(function(x){ return x.key === '1y'; })[0];
+      var key = w.key + '_' + w.portfolioDays + '_' + w.benchDays;
+      var m = mfSeriesCache[key];
+      if(!m){ m = await mfBuildPerformanceSeries(w.portfolioDays, w.benchDays, w.granularity); mfSeriesCache[key] = m; }
+      if(!m || m.dataUnavailable){ mfHeatPromise = null; return; }
+      brkRenderHeatmap('mfHeat', m.dates, brkLevels(m.portfolioPct), brkLevels(m.benchPct));
+    })().catch(function(){ mfHeatPromise = null; });
+    return mfHeatPromise;
   }
 
   function mfRenderComposition(m){
@@ -8363,18 +8529,12 @@
       summary.textContent = 'No se pudo traer suficiente historial todavía.';
       return;
     }
-    var sign1 = m.totalReturn>=0?'+':'−', sign2 = m.benchTotalReturn>=0?'+':'−';
-    var sameWindow = m.daysUsedPortfolio === m.daysUsedBench;
-    summary.innerHTML = '<span>Mi cartera: <b style="color:'+(m.totalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign1 + Math.abs(m.totalReturn).toFixed(1) +'%</b>'
-        + (sameWindow ? '' : ' <small style="color:rgba(255,255,255,.4);">(proyectado)</small>') + '</span>'
-      + '<span>S&amp;P 500: <b style="color:'+(m.benchTotalReturn>=0?'var(--green)':'var(--red)')+';">'+ sign2 + Math.abs(m.benchTotalReturn).toFixed(1) +'%</b></span>'
-      + '<span>'+ pfEsc(win.label) +'</span>';
-    mfRenderChart(m, canvasId);
+    mfRenderChart(m, canvasId, summaryId, win.label);
     // La tabla de composicion (#mfCompGrid) es unica en la pagina, vive solo dentro de la tab
     // "Portafolio de Manfredi" -- el widget del hero (canvasId distinto) no la tiene y no debe
     // tocarla, porque su fetch corre en paralelo y si termina despues puede pisar/cerrar una
     // fila que el usuario ya habia abierto en la tab real.
-    if(canvasId === 'mfChartCanvas') mfRenderComposition(m);
+    if(canvasId === 'mfChartCanvas'){ mfRenderComposition(m); mfRenderHeatmap(); }
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -8432,7 +8592,9 @@
       { key:'1m',  label:'1 mes',     days:30 },
       { key:'ytd', label:'YTD',       days:ytdDays },
       { key:'1y',  label:'1 año',     days:365 },
-      { key:'all', label:'Histórico', days: inc ? Math.max(7, Math.round((today - inc) / 86400000)) : 365 }
+      { key:'all', label:'Histórico', days: inc ? Math.max(7, Math.round((today - inc) / 86400000)) : 365 },
+      // sin tab: respaldo del mapa de calor, entra en el tope de 180 ruedas del worker (sin Yahoo)
+      { key:'8m',  label:'8 meses',   days:245 }
     ];
   }
 
@@ -8542,7 +8704,8 @@
       dates: dates, curve: curve, benchPct: benchPct,
       headline: headline, benchHeadline: benchHeadline,
       label: win.label, windowKey: windowKey, clamped: clamped, inception: inc,
-      startDate: dates[0], flows: flows, arsLimited: arsLimited
+      startDate: dates[0], flows: flows, arsLimited: arsLimited,
+      valSeries: valSeries, costSeries: costSeries
     };
   }
 
@@ -8551,55 +8714,51 @@
   function pfDrawPerfChart(m){
     var canvas = document.getElementById('pfPerfCanvas');
     if(!canvas || typeof Chart === 'undefined') return;
-    var labels = m.dates.map(function(d){ return d.getDate() + ' ' + PF_PERF_MONTHS[d.getMonth()]; });
-    var lastIdx = labels.length - 1;
-    var tickEvery = Math.max(1, Math.round(labels.length / 6));
-    var flowData = m.curve.map(function(v, i){ return m.flows.indexOf(i) >= 0 ? v : null; });
-    var pos = m.headline >= 0;
-    var lineCol = pos ? '#10B981' : '#EF4444';
-
-    var ds = [{
-      label: 'Tu cartera', data: m.curve, borderColor: '#F2C94C',
-      backgroundColor: 'rgba(242,201,76,.08)', borderWidth: 2, pointRadius: 0, tension: .15, fill: true, order: 2
-    }, {
-      label: 'S&P 500', data: m.benchPct, borderColor: '#60A5FA', backgroundColor: 'transparent',
-      borderWidth: 2, pointRadius: 0, tension: .15, borderDash: [4, 3], order: 3
-    }];
-    if(m.flows.length){
-      ds.push({
-        label: 'Aporte', data: flowData, pointStyle: 'rectRot', pointRadius: 5, pointHoverRadius: 6,
-        backgroundColor: '#F2C94C', borderColor: '#0C1828', borderWidth: 1.5, showLine: false, fill: false, order: 1
-      });
-    }
-    if(pfPerfChart) pfPerfChart.destroy();
-    pfPerfChart = new Chart(canvas, {
-      type: 'line',
-      data: { labels: labels, datasets: ds },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        scales: {
-          x: { type: 'category', grid: { display: false }, ticks: {
-            color: 'rgba(255,255,255,.45)', font: { family: "'IBM Plex Mono',monospace", size: 10 },
-            autoSkip: false, maxRotation: 0, minRotation: 0,
-            callback: function(val, idx){ return (lastIdx - idx) % tickEvery === 0 ? labels[idx] : ''; } } },
-          y: { grid: { color: 'rgba(255,255,255,.06)' }, ticks: {
-            color: 'rgba(255,255,255,.5)', font: { family: "'IBM Plex Mono',monospace", size: 10 },
-            callback: function(v){ return (v > 0 ? '+' : '') + v.toFixed(0) + '%'; } } }
-        },
-        plugins: {
-          legend: { position: 'bottom', labels: {
-            color: 'rgba(255,255,255,.6)', font: { size: 11.5 }, boxWidth: 12, padding: 14,
-            filter: function(it){ return it.text !== 'Aporte'; } } },
-          tooltip: { callbacks: { label: function(ctx){
-            if(ctx.dataset.label === 'Aporte') return 'Aporte de capital';
-            if(ctx.parsed.y == null) return null;
-            return ctx.dataset.label + ': ' + pfPerfNum(ctx.parsed.y) + '%';
-          } } }
-        }
+    var head = document.getElementById('pfPerfSummary');
+    var hlLabel = m.windowKey === 'all' ? 'Resultado sobre el costo' : ('Rendimiento · ' + m.label);
+    pfPerfChart = brkChart(canvas, pfPerfChart, {
+      dates: m.dates, main: m.curve, bench: m.benchPct, positive: m.headline >= 0, flows: m.flows,
+      onHover: function(i){
+        if(!head) return;
+        if(i == null){ head.innerHTML = brkHeadHtml(m.headline, m.benchHeadline, hlLabel, '<span class="dim">desde ' + pfPerfFmtDate(m.startDate) + '</span>'); return; }
+        head.innerHTML = brkHeadHtml(m.curve[i], m.benchPct[i], brkDate(m.dates[i]),
+          m.flows.indexOf(i) >= 0 ? '<span style="color:var(--gold);">◆ Aporte</span>' : '');
       }
     });
-    requestAnimationFrame(function(){ try{ pfPerfChart.resize(); }catch(e){} });
+  }
+
+  function pfPerfKey(windowKey, lots){
+    return windowKey + '::' + lots.map(function(p){ return [p.id, p.ticker, p.moneda, p.cantidad, p.precioCompra, p.fecha].join('~'); }).join('|');
+  }
+
+  // Mapa de calor mensual de "Tu Portafolio": serie de 1 año (topeada a la primera compra),
+  // rendimiento encadenado dia a dia neteando aportes (una compra nueva no es ganancia).
+  async function pfRenderHeat(lots){
+    var el = document.getElementById('pfHeat');
+    if(!el) return;
+    var ck = pfPerfKey('1y', lots);
+    if(el.getAttribute('data-key') === ck) return;
+    el.setAttribute('data-key', ck);
+    // 1 año necesita Yahoo para tickers USD; si falla, cae a ~8 meses (worker)
+    var m = null, tries = ['1y', '8m'];
+    for(var t = 0; t < tries.length; t++){
+      var k = pfPerfKey(tries[t], lots);
+      m = pfPerfCache[k];
+      if(!m){
+        try{ m = await pfBuildPerfSeries(tries[t]); }
+        catch(e){ m = { unavailable:true }; }
+        pfPerfCache[k] = m;
+      }
+      if(m && !m.unavailable) break;
+    }
+    if(el.getAttribute('data-key') !== ck) return;
+    if(!m || m.empty || m.unavailable || !m.valSeries){ el.innerHTML = ''; el.removeAttribute('data-key'); return; }
+    var v = m.valSeries, c = m.costSeries, lv = [1];
+    for(var i = 1; i < v.length; i++){
+      var flow = c[i] - c[i - 1];
+      lv.push(v[i - 1] > 0 ? lv[i - 1] * (v[i] - flow) / v[i - 1] : lv[i - 1]);
+    }
+    brkRenderHeatmap('pfHeat', m.dates, lv, brkLevels(m.benchPct));
   }
 
   async function pfRenderPerf(windowKey){
@@ -8614,7 +8773,7 @@
     var note = document.getElementById('pfPerfNote');
     summary.innerHTML = '<span style="color:rgba(255,255,255,.4);">Reconstruyendo con precios históricos…</span>';
 
-    var ck = windowKey + '::' + lots.map(function(p){ return [p.id, p.ticker, p.moneda, p.cantidad, p.precioCompra, p.fecha].join('~'); }).join('|');
+    var ck = pfPerfKey(windowKey, lots);
     var m = pfPerfCache[ck];
     if(!m){
       try{ m = await pfBuildPerfSeries(windowKey); }
@@ -8632,13 +8791,6 @@
       return;
     }
 
-    var hlLabel = windowKey === 'all' ? 'Resultado sobre el costo' : ('Rendimiento · ' + m.label);
-    summary.innerHTML =
-      '<div class="pf-perf-stat lead"><span class="k">' + hlLabel + '</span>'
-        + '<span class="v" style="color:' + (m.headline >= 0 ? 'var(--green)' : 'var(--red)') + ';">' + pfPerfNum(m.headline) + '%</span></div>'
-      + '<div class="pf-perf-stat"><span class="k">S&amp;P 500</span>'
-        + '<span class="v" style="color:' + (m.benchHeadline >= 0 ? 'var(--green)' : 'var(--red)') + ';">' + pfPerfNum(m.benchHeadline) + '%</span></div>'
-      + '<div class="pf-perf-stat"><span class="k">Desde</span><span class="v">' + pfPerfFmtDate(m.startDate) + '</span></div>';
 
     var bits = [];
     if(m.clamped) bits.push('La ventana arranca en tu primera compra (' + pfPerfFmtDate(m.inception) + '): la cartera todavía no tiene ' + m.label.toLowerCase() + ' de historia, así que no se proyecta nada.');
@@ -8649,6 +8801,7 @@
     if(note) note.textContent = bits.join(' ');
 
     pfDrawPerfChart(m);
+    pfRenderHeat(lots);
   }
   window._pfRenderPerf = pfRenderPerf;
 
