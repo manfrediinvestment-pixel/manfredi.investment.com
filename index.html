@@ -1977,6 +1977,62 @@
     .pi-msg.ok { background: rgba(16,185,129,.1); color: #6EE7B7; border: 1px solid rgba(16,185,129,.25); }
     .pi-msg.warn { background: rgba(242,201,76,.08); color: var(--gold-light); border: 1px solid rgba(242,201,76,.25); }
     .pi-msg a { color: inherit; font-weight: 600; }
+
+    /* Rol creador: insignia, contador en la barra, panel de pedidos y aviso */
+    .mi-creator-badge { display: inline-flex; align-items: center; gap: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--primary); background: linear-gradient(135deg, var(--gold-light), var(--gold)); padding: 3px 8px; border-radius: 4px; margin-left: 8px; vertical-align: middle; white-space: nowrap; }
+    .mi-creator-badge::before { content: "✦"; font-size: 9px; }
+    .cr-panel .mi-creator-badge, .cr-toast .mi-creator-badge { margin-left: 0; }
+    .mi-nav-count { display: inline-grid; place-items: center; min-width: 17px; height: 17px; padding: 0 5px; margin-left: 6px; border-radius: 9px; background: var(--red); color: #fff; font-size: 10px; font-weight: 700; line-height: 1; vertical-align: 1px; }
+    .mi-nav-count[hidden] { display: none; }
+
+    .cr-panel { scroll-margin-top: 96px; margin-bottom: 28px; border: 1px solid rgba(242,201,76,.35); border-radius: 16px; background: linear-gradient(180deg, rgba(242,201,76,.07), rgba(242,201,76,0) 140px), var(--navy-4); overflow: hidden; }
+    .cr-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; padding: 20px 22px 16px; border-bottom: 1px solid rgba(255,255,255,.07); }
+    .cr-title { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 22px; color: #F5F7FA; margin: 10px 0 4px; }
+    .cr-sub { margin: 0; font-size: 12.5px; color: rgba(255,255,255,.55); }
+    .cr-sub b { color: var(--gold); }
+    .cr-late { color: #F87171; font-weight: 600; }
+    .cr-filters { display: flex; gap: 6px; align-items: center; }
+    .cr-filter, .cr-refresh { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; padding: 6px 11px; border-radius: 5px; border: 1px solid rgba(255,255,255,.15); background: transparent; color: rgba(255,255,255,.55); cursor: pointer; }
+    .cr-filter.active { background: var(--gold); border-color: var(--gold); color: var(--primary); }
+    .cr-refresh { font-size: 14px; padding: 3px 9px; }
+    .cr-list { display: flex; flex-direction: column; }
+    .cr-row { display: grid; grid-template-columns: 76px 1fr auto; grid-template-areas: "tk info st" "tk actions actions" "done done done"; gap: 6px 14px; align-items: center; padding: 14px 22px; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .cr-row:last-child { border-bottom: 0; }
+    .cr-tk { grid-area: tk; font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 17px; color: var(--gold); letter-spacing: .03em; align-self: start; padding-top: 2px; }
+    .cr-info { grid-area: info; min-width: 0; }
+    .cr-who { font-size: 13.5px; color: #F5F7FA; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cr-who span { color: rgba(255,255,255,.4); font-weight: 400; font-size: 12px; margin-left: 4px; }
+    .cr-when { font-size: 12px; color: rgba(255,255,255,.45); margin-top: 2px; }
+    .cr-left { font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+    .cr-left.ok { color: var(--green); } .cr-left.soon { color: var(--gold); } .cr-left.late { color: #F87171; }
+    .cr-st { grid-area: st; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+    .cr-st.pendiente { color: var(--gold); background: rgba(242,201,76,.12); }
+    .cr-st.en_proceso { color: #60A5FA; background: rgba(96,165,250,.12); }
+    .cr-st.hecho { color: var(--green); background: rgba(16,185,129,.12); }
+    .cr-st.rechazado { color: rgba(255,255,255,.5); background: rgba(255,255,255,.07); }
+    .cr-actions { grid-area: actions; display: flex; flex-wrap: wrap; gap: 6px; }
+    .cr-actions button, .cr-actions a, .cr-done button { font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12px; font-weight: 600; padding: 6px 11px; border-radius: 7px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.04); color: #F5F7FA; cursor: pointer; text-decoration: none; }
+    .cr-actions button.pri, .cr-done button.pri { background: var(--gold); border-color: var(--gold); color: var(--primary); }
+    .cr-actions button.ghost { background: transparent; color: rgba(255,255,255,.5); }
+    .cr-actions a { color: var(--green); border-color: rgba(16,185,129,.35); }
+    .cr-actions button:disabled, .cr-done button:disabled { opacity: .5; cursor: wait; }
+    .cr-done { grid-area: done; display: flex; gap: 8px; }
+    .cr-done[hidden] { display: none; }
+    .cr-done input { flex: 1; min-width: 0; background: var(--navy-1); border: 1px solid rgba(255,255,255,.14); border-radius: 8px; padding: 8px 12px; color: #F5F7FA; font-size: 12.5px; font-family: 'IBM Plex Mono', monospace; }
+    .cr-empty { padding: 22px; font-size: 13px; color: rgba(255,255,255,.45); }
+    @media (max-width: 640px) {
+      .cr-row { grid-template-columns: 1fr auto; grid-template-areas: "tk st" "info info" "actions actions" "done done"; padding: 14px 16px; }
+      .cr-head { padding: 18px 16px 14px; }
+      .cr-done { flex-direction: column; }
+    }
+    .cr-toast { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 84px); right: 20px; z-index: 2400; display: flex; align-items: center; gap: 12px; max-width: min(460px, calc(100vw - 32px)); padding: 14px 14px 14px 16px; background: var(--navy-4); border: 1px solid rgba(242,201,76,.45); border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,.5); color: #F5F7FA; animation: crIn .35s cubic-bezier(.2,.8,.2,1); }
+    .cr-toast div { display: flex; flex-direction: column; min-width: 0; font-size: 13px; }
+    .cr-toast div span { font-size: 12px; color: rgba(255,255,255,.5); font-family: 'IBM Plex Mono', monospace; }
+    .cr-toast .pri { border: 0; border-radius: 8px; background: var(--gold); color: var(--primary); font-weight: 700; font-size: 12.5px; padding: 8px 12px; cursor: pointer; white-space: nowrap; }
+    .cr-toast .x { border: 0; background: transparent; color: rgba(255,255,255,.45); cursor: pointer; font-size: 13px; }
+    @keyframes crIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+    @media (max-width: 640px) { .cr-toast { left: 16px; right: 16px; top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); flex-wrap: wrap; } }
+    @media (prefers-reduced-motion: reduce) { .cr-toast { animation: none; } }
     .inv-panel { display: none; }
     .inv-panel.active { display: block; }
     .inv-panel-progress {
@@ -2900,6 +2956,7 @@
                 window._authChecked = true;
                 window._currentUser = user;
             if (typeof window._miCheckMembership === 'function') window._miCheckMembership();
+            if (typeof window._miOnAuth === 'function') window._miOnAuth(user);
         // Registrar login en Google Sheets
       } else {
         window._isMiembro = false;
@@ -2917,6 +2974,7 @@
         });
         document.querySelectorAll('.mi-paywall-overlay').forEach(function(el) { el.remove(); });
         if (typeof window._miCheckMembership === 'function') window._miCheckMembership();
+        if (typeof window._miOnAuth === 'function') window._miOnAuth(null);
         setupGuestMode();
       }
     });
@@ -3044,7 +3102,8 @@
       const cancelBtn = window._tieneSuscripcion
         ? '<button onclick="window.cancelarMiSuscripcion()" style="font-size:11.5px;padding:4px 10px;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:var(--bg-alt);color:var(--text-sec);margin-left:6px">Cancelar membresía</button>'
         : '';
-      el.innerHTML = '<span style="font-size:12.5px;color:var(--text-sec)">' + (user.displayName || user.email) + '</span>'
+      const creadorBadge = (window.miEsCreador && window.miEsCreador(user)) ? '<span class="mi-creator-badge" title="Cuenta de creador">Creador</span>' : '';
+      el.innerHTML = '<span style="font-size:12.5px;color:var(--text-sec)">' + (user.displayName || user.email) + '</span>' + creadorBadge
         + cancelBtn
         + '<button onclick="window.signOutUser()" style="font-size:11.5px;padding:4px 10px;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:var(--bg-alt);color:var(--text-sec);margin-left:6px">Salir</button>';
     }
@@ -3395,7 +3454,7 @@
         <li><a href="#mercados" class="nav-link" data-tab-target="mercados">Mercados</a></li>
         <li><a href="#calendario" class="nav-link" data-tab-target="calendario">Calendario</a></li>
         <li><a href="#university" class="nav-link" data-tab-target="university">University</a></li>
-        <li><a href="#inversiones" class="nav-link" data-tab-target="inversiones">Informes</a></li>
+        <li><a href="#inversiones" class="nav-link" data-tab-target="inversiones">Informes<span class="mi-nav-count" id="navPedidosCount" hidden></span></a></li>
         <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
         <li>
           <span class="nav-link" data-member-required="true" onclick="toggleWarren()" style="cursor:pointer;">
@@ -4176,6 +4235,24 @@
         <span>Posiciones con fines exclusivamente ilustrativos. No constituyen recomendación ni asesoramiento financiero. Toda decisión de inversión es responsabilidad exclusiva del inversor.</span>
       </div>
 
+      <!-- Panel de creador: solo lo ve una cuenta en MI_CREADORES (el worker lo vuelve a validar con el token) -->
+      <div class="cr-panel" id="crPanel" hidden>
+        <div class="cr-head">
+          <div>
+            <span class="mi-creator-badge">Panel de creador</span>
+            <h3 class="cr-title">Pedidos de informes de los socios</h3>
+            <p class="cr-sub" id="crSub">Cargando pedidos…</p>
+          </div>
+          <div class="cr-filters" role="tablist">
+            <button type="button" class="cr-filter active" data-f="abiertos">Abiertos</button>
+            <button type="button" class="cr-filter" data-f="hechos">Hechos</button>
+            <button type="button" class="cr-filter" data-f="todos">Todos</button>
+            <button type="button" class="cr-refresh" id="crRefresh" aria-label="Actualizar">&#8635;</button>
+          </div>
+        </div>
+        <div class="cr-list" id="crList"></div>
+      </div>
+
       <div class="inv-tabs-row">
       <div class="mkt-tabs inv-tabs" id="invTabs" role="tablist">
         <button type="button" class="mkt-tab active" data-sector="software">Software</button>
@@ -4794,7 +4871,7 @@
       <div class="pi-modal-top">
         <span class="pi-eyebrow">Exclusivo socios</span>
         <h3 class="pi-title" id="piTitle">Vos elegís la acción. Nosotros hacemos el informe.</h3>
-        <p class="pi-lead">¿Hay una empresa que te interesa y todavía no está en la lista? Con la membresía podés pedirnos <b>1 informe institucional por mes</b>, de la acción que quieras, hecho con el mismo nivel que el resto de nuestros informes.</p>
+        <p class="pi-lead">¿Hay una empresa que te interesa y todavía no está en la lista? Con la membresía podés pedirnos <b>1 informe institucional por mes</b>, de la acción que quieras, hecho con el mismo nivel que el resto de nuestros informes. <b>Te lo entregamos en un máximo de 48 hs.</b></p>
       </div>
       <div class="pi-body">
         <div>
@@ -4805,7 +4882,7 @@
             <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Valuación DCF + comparables</li>
             <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Fair value con precio objetivo</li>
             <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Posición frente a la competencia</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Aviso por mail cuando se publica</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Listo en 48 hs, con aviso por mail</li>
           </ul>
         </div>
         <div id="piAction"></div>
@@ -4815,7 +4892,23 @@
 
   <script>
   (function(){
-    var API = 'https://manfredi-memberships.nachito2502.workers.dev';
+    // En localhost los pedidos van al worker de `wrangler dev` (KV local) para probar sin tocar produccion.
+    var API = location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://manfredi-memberships.nachito2502.workers.dev';
+
+    // Rol "creador": cuentas que gestionan contenido a pedido (hoy pedidos de
+    // informes; a futuro la seccion Asesoria). Esto solo decide que se MUESTRA:
+    // el worker vuelve a validar el rol con el ID token de Firebase.
+    window.MI_CREADORES = ['nachito2502@gmail.com'];
+    window.miEsCreador = function(user){ user = user || window._currentUser; return !!(user && user.email && window.MI_CREADORES.indexOf(user.email.toLowerCase()) > -1); };
+    var miEsCreador = window.miEsCreador;
+    function api(method, path, body){
+      var user = window._currentUser;
+      if (!user || !user.getIdToken) return Promise.reject(new Error('sin sesión'));
+      return user.getIdToken().then(function(tok){
+        return fetch(API + path, { method: method, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok }, body: body ? JSON.stringify(body) : undefined });
+      }).then(function(r){ return r.json().then(function(d){ return { st: r.status, d: d }; }); });
+    }
+    function fecha(iso){ return new Date(iso).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }) + ' hs'; }
 
     // Indice de acciones a partir de las pick-card (una sola fuente de verdad: lo que se ve en la lista)
     var INDEX = [];
@@ -4892,7 +4985,7 @@
     // ---------- Modal pedir informe ----------
     var overlay = document.getElementById('piOverlay'), action = document.getElementById('piAction');
     function renderAction(prefill){
-      var user = window._currentUser, member = window._isMiembro === true && user && user.email;
+      var user = window._currentUser, member = user && user.email && (window._isMiembro === true || miEsCreador(user));
       if (!member) {
         action.innerHTML =
           '<button type="button" class="pi-cta pi-cta-full" id="piJoin">Hacerme socio y pedir mi informe &rarr;</button>' +
@@ -4905,30 +4998,46 @@
       }
       action.innerHTML =
         '<p class="pi-list-h">Tu pedido de este mes</p>' +
+        '<div id="piMine"></div>' +
         '<form class="pi-form" id="piForm"><input id="piTicker" maxlength="12" placeholder="Ticker o empresa (ej. MELI)" value="' + esc(prefill || '') + '" aria-label="Acción a pedir" />' +
         '<button type="submit" class="pi-submit" id="piSend">Pedir informe</button></form>' +
         '<div id="piResult" style="margin-top:10px"></div>';
       var form = document.getElementById('piForm'), tIn = document.getElementById('piTicker'), res = document.getElementById('piResult'), send = document.getElementById('piSend');
       setTimeout(function(){ tIn.focus(); }, 50);
+      // Si ya pidio este mes, mostramos el estado de su pedido en lugar del formulario
+      if (!miEsCreador(user)) {
+        api('GET', '/mi-pedido').then(function(x){
+          if (x.st === 200 && x.d.pedido && document.body.contains(form)) { form.remove(); res.innerHTML = estadoPedidoHtml(x.d.pedido); }
+        }).catch(function(){});
+      }
       form.onsubmit = function(e){
         e.preventDefault();
         var tk = tIn.value.trim().toUpperCase(); if (!tk) return;
         var cov = findCovered(tk);
         if (cov && cov.href) { res.innerHTML = '<p class="pi-msg warn"><b>' + esc(cov.t) + '</b> ya tiene informe publicado. <a href="' + esc(cov.href) + '" target="_blank" rel="noopener">Leerlo ahora &rarr;</a> y guardá tu pedido para otra acción.</p>'; return; }
         send.disabled = true; send.textContent = 'Enviando…';
-        fetch(API + '/pedir-informe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: user.email, ticker: tk }) })
-          .then(function(r){ return r.json().then(function(d){ return { st: r.status, d: d }; }); })
+        api('POST', '/pedir-informe', { ticker: tk })
           .then(function(x){
             if (x.st === 200 && x.d.ok) {
               form.remove();
-              res.innerHTML = '<p class="pi-msg ok">¡Listo! Recibimos tu pedido de <b>' + esc(tk) + '</b>. Te avisamos por mail a ' + esc(user.email) + ' cuando esté publicado.</p>';
+              res.innerHTML = '<p class="pi-msg ok">¡Listo! Recibimos tu pedido de <b>' + esc(tk) + '</b>. Lo vas a tener en un <b>máximo de 48 hs</b> (antes del ' + fecha(x.d.pedido.vence) + ') y te avisamos por mail a ' + esc(user.email) + '.</p>';
+              if (miEsCreador(user)) cargarPedidos();
             } else if (x.st === 429) {
               form.remove();
-              res.innerHTML = '<p class="pi-msg warn">Ya usaste tu pedido de este mes' + (x.d.ticker ? ' (pediste <b>' + esc(x.d.ticker) + '</b>)' : '') + '. Se renueva el 1° del mes que viene.</p>';
+              res.innerHTML = x.d.pedido && x.d.pedido.ticker ? estadoPedidoHtml(x.d.pedido) : '<p class="pi-msg warn">Ya usaste tu pedido de este mes. Se renueva el 1° del mes que viene.</p>';
             } else { throw new Error(x.d && x.d.error); }
           })
           .catch(function(){ send.disabled = false; send.textContent = 'Pedir informe'; res.innerHTML = '<p class="pi-msg warn">No pudimos enviar el pedido. Probá de nuevo en un rato.</p>'; });
       };
+    }
+    function estadoPedidoHtml(p){
+      var txt = {
+        pendiente: 'está en la cola. Lo tenés antes del <b>' + fecha(p.vence) + '</b> (máximo 48 hs).',
+        en_proceso: 'ya lo estamos haciendo. Lo tenés antes del <b>' + fecha(p.vence) + '</b>.',
+        hecho: 'ya está publicado.' + (p.url ? ' <a href="' + esc(p.url) + '" target="_blank" rel="noopener">Leerlo &rarr;</a>' : ''),
+        rechazado: 'no lo pudimos hacer. Escribinos y lo vemos.'
+      }[p.estado] || '';
+      return '<p class="pi-msg ' + (p.estado === 'hecho' ? 'ok' : 'warn') + '">Tu pedido de <b>' + esc(p.ticker) + '</b> ' + txt + '<br><span style="opacity:.7">Tu próximo pedido se habilita el 1° del mes que viene.</span></p>';
     }
     window.miOpenPedirInforme = function(prefill){
       renderAction(prefill);
@@ -4941,6 +5050,119 @@
     };
     overlay.addEventListener('click', function(e){ if (e.target === overlay) window.miClosePedirInforme(); });
     document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && overlay.classList.contains('open')) window.miClosePedirInforme(); });
+
+    // ---------- Panel de creador ----------
+    var crPanel = document.getElementById('crPanel'), crList = document.getElementById('crList'), crSub = document.getElementById('crSub');
+    var navCount = document.getElementById('navPedidosCount');
+    var PEDIDOS = [], filtro = 'abiertos', avisado = false;
+    var ESTADOS = { pendiente: 'Pendiente', en_proceso: 'En proceso', hecho: 'Publicado', rechazado: 'Rechazado' };
+    function abierto(p){ return p.estado === 'pendiente' || p.estado === 'en_proceso'; }
+    function restante(p){
+      var ms = new Date(p.vence) - Date.now(), h = Math.floor(Math.abs(ms) / 3600e3), m = Math.floor(Math.abs(ms) % 3600e3 / 60e3);
+      if (ms < 0) return { txt: 'Vencido hace ' + h + ' h', cls: 'late' };
+      return { txt: 'Quedan ' + h + ' h ' + m + ' min', cls: h < 6 ? 'late' : h < 24 ? 'soon' : 'ok' };
+    }
+    function renderPedidos(){
+      var abiertos = PEDIDOS.filter(abierto), vencidos = abiertos.filter(function(p){ return new Date(p.vence) < Date.now(); });
+      crSub.innerHTML = abiertos.length
+        ? '<b>' + abiertos.length + '</b> ' + (abiertos.length === 1 ? 'pedido abierto' : 'pedidos abiertos') + (vencidos.length ? ' · <span class="cr-late">' + vencidos.length + ' fuera de plazo</span>' : '') + ' · plazo máximo 48 hs'
+        : 'No hay pedidos abiertos. Todo al día.';
+      if (navCount) { navCount.hidden = !abiertos.length; navCount.textContent = abiertos.length; }
+      var lista = PEDIDOS.filter(function(p){ return filtro === 'todos' ? true : filtro === 'hechos' ? !abierto(p) : abierto(p); });
+      if (!lista.length) { crList.innerHTML = '<div class="cr-empty">' + (filtro === 'abiertos' ? 'Sin pedidos abiertos. Cuando un socio pida un informe aparece acá y te llega un mail.' : 'Nada por acá todavía.') + '</div>'; return; }
+      crList.innerHTML = lista.map(function(p){
+        var r = restante(p), cov = findCovered(p.ticker);
+        return '<div class="cr-row" data-id="' + esc(p.id) + '">' +
+          '<div class="cr-tk">' + esc(p.ticker) + '</div>' +
+          '<div class="cr-info"><div class="cr-who">' + esc(p.nombre || p.email) + ' <span>' + esc(p.email) + '</span></div>' +
+            '<div class="cr-when">Pedido el ' + fecha(p.creado) + (abierto(p) ? ' · <span class="cr-left ' + r.cls + '">' + r.txt + '</span>' : (p.hecho ? ' · publicado el ' + fecha(p.hecho) : '')) + '</div></div>' +
+          '<span class="cr-st ' + p.estado + '">' + ESTADOS[p.estado] + '</span>' +
+          '<div class="cr-actions">' +
+            (abierto(p)
+              ? (p.estado === 'pendiente' ? '<button type="button" data-act="en_proceso">Empezar</button>' : '') +
+                '<button type="button" class="pri" data-act="hecho">Marcar publicado</button>' +
+                '<button type="button" data-act="copiar" title="Copia la orden para pedírselo a Claude">Copiar orden</button>' +
+                '<button type="button" class="ghost" data-act="rechazado">Rechazar</button>'
+              : (p.url ? '<a href="' + esc(p.url) + '" target="_blank" rel="noopener">Ver informe</a>' : '') + '<button type="button" class="ghost" data-act="pendiente">Reabrir</button><button type="button" class="ghost" data-act="borrar">Borrar</button>') +
+          '</div>' +
+          '<form class="cr-done" hidden><input type="url" placeholder="Link del informe publicado" value="' + esc(p.url || (cov && cov.href ? 'https://manfredinvestment.com/' + cov.href : 'https://manfredinvestment.com/informes/' + p.ticker.toLowerCase().replace(/[^a-z0-9]/g, '') + '.html')) + '" /><button type="submit" class="pri">Publicar y avisar al socio</button></form>' +
+        '</div>';
+      }).join('');
+    }
+    function cargarPedidos(){
+      if (!miEsCreador()) return;
+      api('GET', '/creador/pedidos').then(function(x){
+        if (x.st !== 200) { crSub.textContent = 'No se pudieron cargar los pedidos (' + (x.d.error || x.st) + ').'; return; }
+        PEDIDOS = x.d.pedidos || []; renderPedidos();
+        var nuevos = PEDIDOS.filter(function(p){ return p.estado === 'pendiente'; });
+        if (!avisado && nuevos.length) { avisado = true; toast(nuevos); }
+      }).catch(function(){ crSub.textContent = 'No se pudieron cargar los pedidos. Probá actualizar.'; });
+    }
+    window.miCargarPedidos = cargarPedidos;
+    function actualizar(id, estado, url){
+      return api('POST', '/creador/pedido', { id: id, estado: estado, url: url }).then(function(x){
+        if (x.st !== 200) throw new Error(x.d.error || 'Error');
+        if (estado === 'borrar') PEDIDOS = PEDIDOS.filter(function(p){ return p.id !== id; });
+        else PEDIDOS = PEDIDOS.map(function(p){ return p.id === id ? x.d.pedido : p; });
+        renderPedidos();
+      });
+    }
+    crList.addEventListener('click', function(e){
+      var b = e.target.closest('button[data-act]'); if (!b) return;
+      var row = b.closest('.cr-row'), id = row.getAttribute('data-id'), act = b.getAttribute('data-act');
+      var p = PEDIDOS.filter(function(x){ return x.id === id; })[0];
+      if (act === 'hecho') { var f = row.querySelector('.cr-done'); f.hidden = !f.hidden; if (!f.hidden) f.querySelector('input').focus(); return; }
+      if (act === 'copiar') {
+        var orden = 'informe de ' + p.ticker;
+        var done = function(){ b.textContent = '¡Copiado!'; setTimeout(function(){ b.textContent = 'Copiar orden'; }, 1500); };
+        if (navigator.clipboard) navigator.clipboard.writeText(orden).then(done, function(){ b.textContent = orden; }); else b.textContent = orden;
+        return;
+      }
+      if ((act === 'borrar' || act === 'rechazado') && b.getAttribute('data-confirm') !== '1') {
+        b.setAttribute('data-confirm', '1'); b.textContent = '¿Seguro? Tocá de nuevo'; return;
+      }
+      b.disabled = true;
+      actualizar(id, act).catch(function(err){ b.disabled = false; crSub.textContent = 'Error: ' + err.message; });
+    });
+    crList.addEventListener('submit', function(e){
+      e.preventDefault();
+      var row = e.target.closest('.cr-row'), url = e.target.querySelector('input').value.trim(), btn = e.target.querySelector('button');
+      btn.disabled = true; btn.textContent = 'Publicando…';
+      actualizar(row.getAttribute('data-id'), 'hecho', url).catch(function(err){ btn.disabled = false; btn.textContent = 'Publicar y avisar al socio'; crSub.textContent = 'Error: ' + err.message; });
+    });
+    document.querySelectorAll('.cr-filter').forEach(function(b){
+      b.addEventListener('click', function(){
+        filtro = b.getAttribute('data-f');
+        document.querySelectorAll('.cr-filter').forEach(function(x){ x.classList.toggle('active', x === b); });
+        renderPedidos();
+      });
+    });
+    document.getElementById('crRefresh').addEventListener('click', cargarPedidos);
+
+    // Aviso al entrar: "tenes N pedidos nuevos"
+    function toast(nuevos){
+      var t = document.createElement('div');
+      t.className = 'cr-toast'; t.setAttribute('role', 'status');
+      var tks = nuevos.slice(0, 3).map(function(p){ return esc(p.ticker); }).join(', ') + (nuevos.length > 3 ? '…' : '');
+      t.innerHTML = '<span class="mi-creator-badge">Creador</span><div><b>' + (nuevos.length === 1 ? '1 pedido de informe nuevo' : nuevos.length + ' pedidos de informe nuevos') + '</b><span>' + tks + ' · plazo 48 hs</span></div>' +
+        '<button type="button" class="pri">Ver pedidos</button><button type="button" class="x" aria-label="Cerrar">&#10005;</button>';
+      document.body.appendChild(t);
+      t.querySelector('.pri').onclick = function(){
+        var link = document.querySelector('.nav-link[data-tab-target="inversiones"]'); if (link) link.click();
+        setTimeout(function(){ crPanel.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 250);
+        t.remove();
+      };
+      t.querySelector('.x').onclick = function(){ t.remove(); };
+    }
+
+    window._miOnAuth = function(user){
+      var cr = miEsCreador(user);
+      crPanel.hidden = !cr;
+      if (!cr) { PEDIDOS = []; if (navCount) navCount.hidden = true; return; }
+      cargarPedidos();
+    };
+    if (window._currentUser) window._miOnAuth(window._currentUser);
+    setInterval(function(){ if (miEsCreador() && !document.hidden) cargarPedidos(); }, 5 * 60 * 1000);
   })();
   </script>
 

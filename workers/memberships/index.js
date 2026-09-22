@@ -3,13 +3,13 @@
 
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Content-Type': 'application/json',
 };
 
 export default {
-    async fetch(request, env) {
+    async fetch(request, env, ctx) {
           const url = new URL(request.url);
           const path = url.pathname;
 
@@ -44,7 +44,16 @@ export default {
             }
 
             if (path === '/pedir-informe' && request.method === 'POST') {
-                      return await pedirInforme(request, env);
+                      return await pedirInforme(request, env, ctx);
+            }
+            if (path === '/mi-pedido' && request.method === 'GET') {
+                      return await miPedido(request, env);
+            }
+            if (path === '/creador/pedidos' && request.method === 'GET') {
+                      return await creadorPedidos(request, env);
+            }
+            if (path === '/creador/pedido' && request.method === 'POST') {
+                      return await creadorActualizar(request, env, ctx);
             }
 
                         // GET /consultas?email=xxx — devuelve consultas restantes del mes
@@ -664,40 +673,159 @@ async function verificarMembresia(request, env) {
       );
 }
 
-// ─── POST /pedir-informe ──────────────────────────────────────────────────────
-// Cada socio puede pedir 1 informe institucional por mes calendario (ART).
-// Guarda el pedido en KV (`email:pedido:YYYY-MM`) y avisa a Nacho por mail.
-async function pedirInforme(request, env) {
+// ─── Rol "creador" + pedidos de informes ──────────────────────────────────────
+// Los creadores (hoy solo Nacho) ven y gestionan los pedidos de los socios.
+// La identidad sale SIEMPRE del ID token de Firebase (header Authorization),
+// nunca de un email mandado en el body -- si no, cualquiera podria leer los
+// pedidos o gastar el cupo de otro socio.
+const CREADORES = ['nachito2502@gmail.com'];
+const FIREBASE_PROJECT = 'manfrediinvestment-989c8';
+const PLAZO_HORAS = 48;
+const json = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: CORS_HEADERS });
+
+let _jwksCache = { keys: null, exp: 0 };
+async function firebaseKeys() {
+    if (_jwksCache.keys && Date.now() < _jwksCache.exp) return _jwksCache.keys;
+    const r = await fetch('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com');
+    const { keys } = await r.json();
+    const m = /max-age=(\d+)/.exec(r.headers.get('cache-control') || '');
+    _jwksCache = { keys, exp: Date.now() + (m ? +m[1] : 3600) * 1000 };
+    return keys;
+}
+function b64urlBytes(s) {
+    s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '=';
+    return Uint8Array.from(atob(s), c => c.charCodeAt(0));
+}
+// Devuelve { email, nombre } si el token es valido; null si no.
+async function usuarioDelToken(request) {
+    const auth = request.headers.get('Authorization') || '';
+    const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    try {
+        const header = JSON.parse(new TextDecoder().decode(b64urlBytes(parts[0])));
+        const p = JSON.parse(new TextDecoder().decode(b64urlBytes(parts[1])));
+        const now = Math.floor(Date.now() / 1000);
+        if (header.alg !== 'RS256' || p.aud !== FIREBASE_PROJECT || p.iss !== 'https://securetoken.google.com/' + FIREBASE_PROJECT) return null;
+        if (!p.exp || p.exp < now || !p.email || p.email_verified === false) return null;
+        const jwk = (await firebaseKeys()).find(k => k.kid === header.kid);
+        if (!jwk) return null;
+        const key = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+        const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64urlBytes(parts[2]), new TextEncoder().encode(parts[0] + '.' + parts[1]));
+        return ok ? { email: String(p.email).toLowerCase(), nombre: p.name || '' } : null;
+    } catch (e) { return null; }
+}
+const esCreador = email => CREADORES.includes(email);
+const mesART = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).slice(0, 7);
+const fechaART = iso => new Date(iso).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }) + ' hs';
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+async function mail(env, to, subject, html, extra = {}) {
+    try {
+        await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from: 'Manfredi Investment <hola@manfredinvestment.com>', to, subject, html, ...extra })
+        });
+    } catch (err) { console.error('Error enviando email:', err); }
+}
+// Cada pedido vive en `pedido:<id>` (valor JSON + el mismo objeto como metadata,
+// asi el listado del creador sale de un solo list() sin N lecturas). El cupo
+// mensual del socio es `email:pedido:YYYY-MM` -> id del pedido.
+async function guardarPedido(env, p) {
+    await env.MEMBERS.put('pedido:' + p.id, JSON.stringify(p), { metadata: p });
+}
+
+// POST /pedir-informe  { ticker }  -- socio (o creador) logueado
+async function pedirInforme(request, env, ctx) {
+    const u = await usuarioDelToken(request);
+    if (!u) return json({ error: 'Iniciá sesión para pedir un informe' }, 401);
     const body = await request.json().catch(() => ({}));
-    const email = String(body.email || '').trim().toLowerCase();
     const ticker = String(body.ticker || '').trim().toUpperCase().slice(0, 12);
+    if (!ticker || !/^[A-Z0-9.\- ]+$/.test(ticker)) return json({ error: 'Ticker inválido' }, 400);
 
-    if (!email || !ticker || !/^[A-Z0-9.\- ]+$/.test(ticker)) {
-        return new Response(JSON.stringify({ error: 'Email y ticker requeridos' }), { status: 400, headers: CORS_HEADERS });
+    const creador = esCreador(u.email);
+    if (!creador && (await env.MEMBERS.get(u.email)) !== 'true') return json({ error: 'Solo para socios' }, 403);
+
+    const cupoKey = `${u.email}:pedido:${mesART()}`;
+    const previoId = await env.MEMBERS.get(cupoKey);
+    if (previoId && !creador) {
+        const previo = JSON.parse((await env.MEMBERS.get('pedido:' + previoId)) || '{}');
+        return json({ error: 'Ya usaste tu pedido de este mes', pedido: previo }, 429);
     }
-    if ((await env.MEMBERS.get(email)) !== 'true') {
-        return new Response(JSON.stringify({ error: 'Solo para socios' }), { status: 403, headers: CORS_HEADERS });
+
+    const ahora = new Date();
+    const p = {
+        id: ahora.getTime().toString(36) + Math.random().toString(36).slice(2, 6),
+        ticker, email: u.email, nombre: u.nombre.slice(0, 60),
+        creado: ahora.toISOString(),
+        vence: new Date(ahora.getTime() + PLAZO_HORAS * 3600e3).toISOString(),
+        estado: 'pendiente', url: ''
+    };
+    await guardarPedido(env, p);
+    if (!creador) await env.MEMBERS.put(cupoKey, p.id, { expirationTtl: 60 * 60 * 24 * 45 });
+
+    const aviso = mail(env, CREADORES, `📊 Pedido de informe: ${ticker} (vence ${fechaART(p.vence)})`,
+        `<h2>Nuevo pedido de informe</h2><p><strong>Ticker:</strong> ${esc(ticker)}</p><p><strong>Socio:</strong> ${esc(u.nombre)} &lt;${esc(u.email)}&gt;</p><p><strong>Plazo máximo:</strong> ${fechaART(p.vence)} (${PLAZO_HORAS} hs)</p><p>Lo gestionás desde el Panel de creador en la sección Informes.</p>`,
+        { reply_to: u.email });
+    if (ctx && ctx.waitUntil) ctx.waitUntil(aviso);
+    return json({ ok: true, pedido: p, plazoHoras: PLAZO_HORAS });
+}
+
+// GET /mi-pedido -- el pedido del mes del socio logueado (para mostrar su estado)
+async function miPedido(request, env) {
+    const u = await usuarioDelToken(request);
+    if (!u) return json({ error: 'No autenticado' }, 401);
+    const id = await env.MEMBERS.get(`${u.email}:pedido:${mesART()}`);
+    const p = id ? JSON.parse((await env.MEMBERS.get('pedido:' + id)) || 'null') : null;
+    return json({ pedido: p, creador: esCreador(u.email), plazoHoras: PLAZO_HORAS });
+}
+
+// GET /creador/pedidos -- todos los pedidos (solo creadores)
+async function creadorPedidos(request, env) {
+    const u = await usuarioDelToken(request);
+    if (!u) return json({ error: 'No autenticado' }, 401);
+    if (!esCreador(u.email)) return json({ error: 'Solo para creadores' }, 403);
+    const pedidos = [];
+    let cursor;
+    do {
+        const r = await env.MEMBERS.list({ prefix: 'pedido:', cursor });
+        r.keys.forEach(k => { if (k.metadata) pedidos.push(k.metadata); });
+        cursor = r.list_complete ? null : r.cursor;
+    } while (cursor);
+    pedidos.sort((a, b) => b.creado.localeCompare(a.creado));
+    return json({ pedidos, plazoHoras: PLAZO_HORAS });
+}
+
+// POST /creador/pedido  { id, estado, url? } -- cambia el estado; 'hecho' avisa al socio
+async function creadorActualizar(request, env, ctx) {
+    const u = await usuarioDelToken(request);
+    if (!u) return json({ error: 'No autenticado' }, 401);
+    if (!esCreador(u.email)) return json({ error: 'Solo para creadores' }, 403);
+    const body = await request.json().catch(() => ({}));
+    const raw = await env.MEMBERS.get('pedido:' + String(body.id || ''));
+    if (!raw) return json({ error: 'Pedido no encontrado' }, 404);
+    const p = JSON.parse(raw);
+
+    if (body.estado === 'borrar') {
+        await env.MEMBERS.delete('pedido:' + p.id);
+        return json({ ok: true, borrado: p.id });
     }
+    if (!['pendiente', 'en_proceso', 'hecho', 'rechazado'].includes(body.estado)) return json({ error: 'Estado inválido' }, 400);
+    const url = String(body.url || '').trim();
+    if (body.estado === 'hecho' && url && !/^https:\/\/(www\.)?manfredinvestment\.com\//.test(url)) return json({ error: 'El link tiene que ser de manfredinvestment.com' }, 400);
 
-    const mes = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).slice(0, 7);
-    const key = `${email}:pedido:${mes}`;
-    const previo = await env.MEMBERS.get(key);
-    if (previo) {
-        return new Response(JSON.stringify({ error: 'Ya usaste tu pedido de este mes', ticker: previo }), { status: 429, headers: CORS_HEADERS });
+    const avisar = body.estado === 'hecho' && p.estado !== 'hecho' && p.email !== u.email;
+    p.estado = body.estado;
+    if (url) p.url = url;
+    p.actualizado = new Date().toISOString();
+    if (p.estado === 'hecho') p.hecho = p.actualizado;
+    await guardarPedido(env, p);
+
+    if (avisar) {
+        const link = p.url || 'https://manfredinvestment.com/#inversiones';
+        const envio = mail(env, p.email, `Tu informe de ${p.ticker} ya está publicado`,
+            `<div style="font-family:Arial,sans-serif;background:#0a0e1a;padding:32px"><div style="max-width:560px;margin:0 auto;background:#111827;border:1px solid #B8943F;border-radius:8px;padding:32px"><p style="color:#B8943F;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:0 0 12px">Tu pedido de informe</p><h1 style="color:#fff;font-size:22px;margin:0 0 14px">El informe de ${esc(p.ticker)} ya está online</h1><p style="color:#9ca3af;font-size:15px;line-height:1.6;margin:0 0 24px">Hola${p.nombre ? ' ' + esc(p.nombre.split(' ')[0]) : ''}, terminamos el informe institucional que pediste: tesis, estados financieros, valuación y fair value.</p><a href="${esc(link)}" style="display:inline-block;background:#B8943F;color:#0a0e1a;font-weight:700;text-decoration:none;padding:13px 26px;border-radius:4px">Leer el informe</a><p style="color:#6b7280;font-size:12px;margin:28px 0 0">Tu próximo pedido se habilita el 1° del mes que viene.</p></div></div>`);
+        if (ctx && ctx.waitUntil) ctx.waitUntil(envio);
     }
-    await env.MEMBERS.put(key, ticker, { expirationTtl: 60 * 60 * 24 * 45 });
-
-    fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            from: 'Manfredi Investment <hola@manfredinvestment.com>',
-            to: 'nachito2502@gmail.com',
-            reply_to: email,
-            subject: `📊 Pedido de informe: ${ticker}`,
-            html: `<h2>Nuevo pedido de informe</h2><p><strong>Ticker:</strong> ${ticker}</p><p><strong>Socio:</strong> ${email}</p><p><strong>Fecha:</strong> ${new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })}</p>`
-        })
-    }).catch(err => console.error('Error enviando email pedido informe:', err));
-
-    return new Response(JSON.stringify({ ok: true, ticker, mes }), { status: 200, headers: CORS_HEADERS });
+    return json({ ok: true, pedido: p });
 }
