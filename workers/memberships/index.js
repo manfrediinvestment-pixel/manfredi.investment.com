@@ -43,6 +43,10 @@ export default {
                       return await verificarMembresia(request, env);
             }
 
+            if (path === '/pedir-informe' && request.method === 'POST') {
+                      return await pedirInforme(request, env);
+            }
+
                         // GET /consultas?email=xxx — devuelve consultas restantes del mes
             if (url.pathname === '/consultas' && request.method === 'GET') {
                 const email = url.searchParams.get('email');
@@ -658,4 +662,42 @@ async function verificarMembresia(request, env) {
         JSON.stringify({ miembro: esMiembro }),
     { status: 200, headers: CORS_HEADERS }
       );
+}
+
+// ─── POST /pedir-informe ──────────────────────────────────────────────────────
+// Cada socio puede pedir 1 informe institucional por mes calendario (ART).
+// Guarda el pedido en KV (`email:pedido:YYYY-MM`) y avisa a Nacho por mail.
+async function pedirInforme(request, env) {
+    const body = await request.json().catch(() => ({}));
+    const email = String(body.email || '').trim().toLowerCase();
+    const ticker = String(body.ticker || '').trim().toUpperCase().slice(0, 12);
+
+    if (!email || !ticker || !/^[A-Z0-9.\- ]+$/.test(ticker)) {
+        return new Response(JSON.stringify({ error: 'Email y ticker requeridos' }), { status: 400, headers: CORS_HEADERS });
+    }
+    if ((await env.MEMBERS.get(email)) !== 'true') {
+        return new Response(JSON.stringify({ error: 'Solo para socios' }), { status: 403, headers: CORS_HEADERS });
+    }
+
+    const mes = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).slice(0, 7);
+    const key = `${email}:pedido:${mes}`;
+    const previo = await env.MEMBERS.get(key);
+    if (previo) {
+        return new Response(JSON.stringify({ error: 'Ya usaste tu pedido de este mes', ticker: previo }), { status: 429, headers: CORS_HEADERS });
+    }
+    await env.MEMBERS.put(key, ticker, { expirationTtl: 60 * 60 * 24 * 45 });
+
+    fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            from: 'Manfredi Investment <hola@manfredinvestment.com>',
+            to: 'nachito2502@gmail.com',
+            reply_to: email,
+            subject: `📊 Pedido de informe: ${ticker}`,
+            html: `<h2>Nuevo pedido de informe</h2><p><strong>Ticker:</strong> ${ticker}</p><p><strong>Socio:</strong> ${email}</p><p><strong>Fecha:</strong> ${new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })}</p>`
+        })
+    }).catch(err => console.error('Error enviando email pedido informe:', err));
+
+    return new Response(JSON.stringify({ ok: true, ticker, mes }), { status: 200, headers: CORS_HEADERS });
 }

@@ -1883,7 +1883,100 @@
       color: rgba(255,255,255,.4);
       border: 1px solid rgba(255,255,255,.15);
     }
-    .inv-tabs { margin-bottom: 28px; }
+    .inv-tabs { margin-bottom: 0; }
+    .inv-tabs-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 28px; }
+    .inv-tabs-row .mkt-tabs { margin-bottom: 0; }
+
+    /* Boton "Pedi tu propio informe" (a la derecha de los sectores) */
+    .pi-cta {
+      position: relative; overflow: hidden; flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border: 0; border-radius: 999px; cursor: pointer;
+      font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 13.5px; font-weight: 700; letter-spacing: .01em;
+      color: var(--primary);
+      background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 55%, #E0B43A 100%);
+      box-shadow: 0 0 0 1px rgba(242,201,76,.35), 0 8px 24px -8px rgba(242,201,76,.55);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .pi-cta::after {
+      content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
+      transform: skewX(-20deg); animation: piShine 4.5s ease-in-out infinite;
+    }
+    @keyframes piShine { 0%, 70% { left: -60%; } 100% { left: 130%; } }
+    .pi-cta:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px rgba(242,201,76,.5), 0 12px 30px -8px rgba(242,201,76,.7); }
+    .pi-cta:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 3px; }
+    @media (prefers-reduced-motion: reduce) { .pi-cta::after { animation: none; display: none; } }
+    @media (max-width: 640px) { .pi-cta { width: 100%; justify-content: center; } }
+
+    /* Buscador de acciones bajo el titulo */
+    .inv-header { margin-bottom: 28px; }
+    .inv-search { position: relative; max-width: 520px; margin-top: 16px; }
+    .inv-search-box {
+      display: flex; align-items: center; gap: 10px; padding: 0 16px;
+      background: var(--navy-4); border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
+      color: rgba(255,255,255,.4); transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .inv-search-box:focus-within { border-color: rgba(242,201,76,.55); box-shadow: 0 0 0 3px rgba(242,201,76,.1); color: var(--gold); }
+    .inv-search-box input {
+      flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; padding: 13px 0;
+      font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; color: #F5F7FA;
+    }
+    .inv-search-box input::placeholder { color: rgba(255,255,255,.35); }
+    .inv-search-box input::-webkit-search-cancel-button { filter: invert(1) opacity(.5); }
+    .inv-search-results {
+      position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 50;
+      background: var(--navy-4); border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.45); overflow: hidden;
+    }
+    .inv-sr-item {
+      display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 16px;
+      background: transparent; border: 0; border-bottom: 1px solid rgba(255,255,255,.06);
+      text-align: left; cursor: pointer; color: #F5F7FA; font: inherit;
+    }
+    .inv-sr-item:last-child { border-bottom: 0; }
+    .inv-sr-item:hover, .inv-sr-item.is-active { background: #0F1E32; }
+    .inv-sr-tk { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 13.5px; min-width: 56px; }
+    .inv-sr-nm { flex: 1; min-width: 0; font-size: 12.5px; color: rgba(255,255,255,.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .inv-sr-st { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+    .inv-sr-st.ok { color: var(--green); background: rgba(16,185,129,.12); }
+    .inv-sr-st.soon { color: rgba(255,255,255,.5); background: rgba(255,255,255,.07); }
+    .inv-sr-empty { padding: 16px; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: rgba(255,255,255,.6); }
+    .inv-sr-empty strong { color: #F5F7FA; font-family: 'IBM Plex Mono', monospace; }
+    .inv-sr-empty .pi-cta { align-self: flex-start; font-size: 12.5px; padding: 8px 14px; }
+    .inv-sr-empty .pi-cta::after { display: none; }
+
+    /* Modal "Pedi tu propio informe" */
+    .pi-overlay { position: fixed; inset: 0; z-index: 2500; background: rgba(5,8,16,.8); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); display: none; align-items: flex-start; justify-content: center; padding: 7vh 16px 16px; overflow-y: auto; }
+    .pi-overlay.open { display: flex; }
+    .pi-modal { position: relative; width: 100%; max-width: 500px; background: var(--navy-4); border: 1px solid rgba(242,201,76,.28); border-radius: 18px; box-shadow: 0 30px 80px rgba(0,0,0,.55); overflow: hidden; }
+    .pi-modal-top { padding: 26px 26px 20px; background: radial-gradient(120% 90% at 100% 0%, rgba(242,201,76,.16), transparent 60%); border-bottom: 1px solid rgba(255,255,255,.07); }
+    .pi-close { position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: rgba(255,255,255,.06); color: rgba(255,255,255,.6); font-size: 15px; cursor: pointer; }
+    .pi-close:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .pi-eyebrow { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--primary); background: var(--gold); padding: 3px 8px; border-radius: 4px; }
+    .pi-title { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 28px; line-height: 1.15; color: #F5F7FA; margin: 14px 0 10px; text-wrap: balance; }
+    .pi-lead { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,.62); margin: 0; }
+    .pi-lead b { color: var(--gold); font-weight: 600; }
+    .pi-body { padding: 20px 26px 26px; display: flex; flex-direction: column; gap: 18px; }
+    .pi-list-h { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.4); margin: 0 0 10px; }
+    .pi-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 9px 16px; }
+    .pi-list li { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; line-height: 1.4; color: rgba(255,255,255,.8); }
+    .pi-list li svg { flex-shrink: 0; margin-top: 2px; }
+    @media (max-width: 480px) { .pi-list { grid-template-columns: 1fr; } .pi-title { font-size: 24px; } }
+    .pi-form { display: flex; gap: 8px; }
+    .pi-form input { flex: 1; min-width: 0; background: var(--navy-1); border: 1px solid rgba(255,255,255,.14); border-radius: 10px; padding: 12px 14px; color: #F5F7FA; font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; outline: 0; }
+    .pi-form input::placeholder { text-transform: none; letter-spacing: 0; font-weight: 400; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 13.5px; color: rgba(255,255,255,.35); }
+    .pi-form input:focus { border-color: rgba(242,201,76,.6); }
+    .pi-submit { border: 0; border-radius: 10px; padding: 0 18px; background: var(--gold); color: var(--primary); font-weight: 700; font-size: 14px; cursor: pointer; white-space: nowrap; }
+    .pi-submit:disabled { opacity: .55; cursor: wait; }
+    .pi-cta-full { width: 100%; justify-content: center; padding: 14px 18px; font-size: 15px; border-radius: 12px; }
+    .pi-price { text-align: center; font-size: 12.5px; color: rgba(255,255,255,.45); margin: -6px 0 0; }
+    .pi-price b { color: #F5F7FA; }
+    .pi-price a { color: var(--gold); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+    .pi-msg { font-size: 13px; line-height: 1.5; border-radius: 10px; padding: 11px 14px; margin: 0; }
+    .pi-msg.ok { background: rgba(16,185,129,.1); color: #6EE7B7; border: 1px solid rgba(16,185,129,.25); }
+    .pi-msg.warn { background: rgba(242,201,76,.08); color: var(--gold-light); border: 1px solid rgba(242,201,76,.25); }
+    .pi-msg a { color: inherit; font-weight: 600; }
     .inv-panel { display: none; }
     .inv-panel.active { display: block; }
     .inv-panel-progress {
@@ -4066,8 +4159,16 @@
   <section class="section section-inversiones" id="inversiones" data-tab="inversiones">
     <div class="container">
 
-      <div class="section-header">
-        <h2 class="section-title">Informes</h2>
+      <div class="section-header inv-header">
+        <h2 class="section-title">Informes Institucionales</h2>
+        <!-- Buscador: indexa las pick-card de abajo (ticker + nombre) y dice si la accion ya tiene informe -->
+        <div class="inv-search" id="invSearch">
+          <div class="inv-search-box">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="search" id="invSearchInput" placeholder="Buscá una acción: ticker o empresa (ej. NVDA, Galicia)" autocomplete="off" spellcheck="false" aria-label="Buscar acción" aria-controls="invSearchResults" />
+          </div>
+          <div class="inv-search-results" id="invSearchResults" role="listbox" hidden></div>
+        </div>
       </div>
 
       <div class="inv-disclaimer">
@@ -4075,6 +4176,7 @@
         <span>Posiciones con fines exclusivamente ilustrativos. No constituyen recomendación ni asesoramiento financiero. Toda decisión de inversión es responsabilidad exclusiva del inversor.</span>
       </div>
 
+      <div class="inv-tabs-row">
       <div class="mkt-tabs inv-tabs" id="invTabs" role="tablist">
         <button type="button" class="mkt-tab active" data-sector="software">Software</button>
         <button type="button" class="mkt-tab" data-sector="semis">Semiconductores</button>
@@ -4082,6 +4184,11 @@
         <button type="button" class="mkt-tab" data-sector="bigtech">Big Tech</button>
         <button type="button" class="mkt-tab" data-sector="bancos">Bancos</button>
         <button type="button" class="mkt-tab" data-sector="defensivos">Defensivos</button>
+      </div>
+        <button type="button" class="pi-cta" id="piOpenBtn" onclick="miOpenPedirInforme()">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z"/></svg>
+          Pedí tu propio informe
+        </button>
       </div>
 
       <div class="picks-list" style="display:block;">
@@ -4677,6 +4784,163 @@
         panels.forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-sector-panel') === sec); });
       });
     });
+  })();
+  </script>
+
+  <!-- Modal "Pedi tu propio informe": explica el beneficio; el socio logueado pide 1 por mes (worker memberships /pedir-informe) -->
+  <div class="pi-overlay" id="piOverlay" aria-hidden="true">
+    <div class="pi-modal" role="dialog" aria-modal="true" aria-labelledby="piTitle">
+      <button type="button" class="pi-close" onclick="miClosePedirInforme()" aria-label="Cerrar">&#10005;</button>
+      <div class="pi-modal-top">
+        <span class="pi-eyebrow">Exclusivo socios</span>
+        <h3 class="pi-title" id="piTitle">Vos elegís la acción. Nosotros hacemos el informe.</h3>
+        <p class="pi-lead">¿Hay una empresa que te interesa y todavía no está en la lista? Con la membresía podés pedirnos <b>1 informe institucional por mes</b>, de la acción que quieras, hecho con el mismo nivel que el resto de nuestros informes.</p>
+      </div>
+      <div class="pi-body">
+        <div>
+          <p class="pi-list-h">Qué incluye tu informe</p>
+          <ul class="pi-list">
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Tesis de inversión y riesgos</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Análisis de estados financieros</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Valuación DCF + comparables</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Fair value con precio objetivo</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Posición frente a la competencia</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Aviso por mail cuando se publica</li>
+          </ul>
+        </div>
+        <div id="piAction"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    var API = 'https://manfredi-memberships.nachito2502.workers.dev';
+
+    // Indice de acciones a partir de las pick-card (una sola fuente de verdad: lo que se ve en la lista)
+    var INDEX = [];
+    document.querySelectorAll('#inversiones .inv-panel').forEach(function(panel){
+      var sector = panel.getAttribute('data-sector-panel');
+      panel.querySelectorAll('.pick-card').forEach(function(card){
+        var tk = card.querySelector('.pick-ticker'), nm = card.querySelector('.pick-name'), a = card.querySelector('a.pick-btn');
+        if (!tk) return;
+        INDEX.push({ t: tk.textContent.trim(), n: nm ? nm.textContent.trim() : '', sector: sector, href: a ? a.getAttribute('href') : null });
+      });
+    });
+    function norm(s){ return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9.]/g, ''); }
+    function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+    function search(q){
+      var k = norm(q); if (!k) return [];
+      var out = [];
+      INDEX.forEach(function(it){
+        var t = norm(it.t), n = norm(it.n), score = -1;
+        if (t === k) score = 0; else if (t.indexOf(k) === 0) score = 1; else if (n.indexOf(k) === 0) score = 2; else if (k.length > 2 && n.indexOf(k) > -1) score = 3;
+        if (score > -1) out.push({ it: it, s: score });
+      });
+      out.sort(function(a, b){ return a.s - b.s || a.it.t.localeCompare(b.it.t); });
+      return out.slice(0, 6).map(function(o){ return o.it; });
+    }
+    function findCovered(tk){ var k = norm(tk); return INDEX.filter(function(it){ return norm(it.t) === k; })[0] || null; }
+
+    // ---------- Buscador ----------
+    var input = document.getElementById('invSearchInput'), box = document.getElementById('invSearchResults'), active = -1, current = [];
+    function openItem(it){
+      if (it.href) { window.open(it.href, '_blank', 'noopener'); return; }
+      miOpenPedirInforme(it.t);
+    }
+    function render(){
+      var q = input.value.trim();
+      if (!q) { box.hidden = true; box.innerHTML = ''; return; }
+      current = search(q); active = current.length ? 0 : -1;
+      if (!current.length) {
+        box.innerHTML = '<div class="inv-sr-empty"><span>Todavía no tenemos informe de <strong>' + esc(q.toUpperCase()) + '</strong>.</span>' +
+          '<button type="button" class="pi-cta" data-pedir="' + esc(q) + '">Pedilo con tu membresía &rarr;</button></div>';
+      } else {
+        box.innerHTML = current.map(function(it, i){
+          return '<button type="button" class="inv-sr-item' + (i === active ? ' is-active' : '') + '" role="option" data-i="' + i + '">' +
+            '<span class="inv-sr-tk">' + esc(it.t) + '</span><span class="inv-sr-nm">' + esc(it.n) + '</span>' +
+            (it.href ? '<span class="inv-sr-st ok">Informe disponible &rarr;</span>' : '<span class="inv-sr-st soon">Próximamente · Pedilo</span>') + '</button>';
+        }).join('');
+      }
+      box.hidden = false;
+    }
+    function setActive(i){
+      var items = box.querySelectorAll('.inv-sr-item'); if (!items.length) return;
+      active = (i + items.length) % items.length;
+      items.forEach(function(el, j){ el.classList.toggle('is-active', j === active); });
+    }
+    if (input) {
+      input.addEventListener('input', render);
+      input.addEventListener('focus', render);
+      input.addEventListener('keydown', function(e){
+        if (e.key === 'ArrowDown') { e.preventDefault(); setActive(active + 1); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(active - 1); }
+        else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (current[active]) openItem(current[active]); else if (input.value.trim()) miOpenPedirInforme(input.value.trim());
+        } else if (e.key === 'Escape') { input.value = ''; render(); }
+      });
+      box.addEventListener('mousedown', function(e){ e.preventDefault(); }); // no perder el foco antes del click
+      box.addEventListener('click', function(e){
+        var item = e.target.closest('.inv-sr-item'), ped = e.target.closest('[data-pedir]');
+        if (item) openItem(current[+item.getAttribute('data-i')]);
+        else if (ped) miOpenPedirInforme(ped.getAttribute('data-pedir'));
+      });
+      document.addEventListener('click', function(e){ if (!e.target.closest('#invSearch')) box.hidden = true; });
+    }
+
+    // ---------- Modal pedir informe ----------
+    var overlay = document.getElementById('piOverlay'), action = document.getElementById('piAction');
+    function renderAction(prefill){
+      var user = window._currentUser, member = window._isMiembro === true && user && user.email;
+      if (!member) {
+        action.innerHTML =
+          '<button type="button" class="pi-cta pi-cta-full" id="piJoin">Hacerme socio y pedir mi informe &rarr;</button>' +
+          '<p class="pi-price" style="margin-top:10px"><b>USD 15/mes</b> · incluye Warren IA, todos los informes y Portfolio' +
+          (user ? '' : '<br>¿Ya sos socio? <a id="piLogin">Ingresá a tu cuenta</a>') + '</p>';
+        document.getElementById('piJoin').onclick = function(){ miClosePedirInforme(); if (window.openPaymentModal) window.openPaymentModal(); };
+        var lg = document.getElementById('piLogin');
+        if (lg) lg.onclick = function(){ miClosePedirInforme(); if (window.showLoginOverlay) window.showLoginOverlay(); };
+        return;
+      }
+      action.innerHTML =
+        '<p class="pi-list-h">Tu pedido de este mes</p>' +
+        '<form class="pi-form" id="piForm"><input id="piTicker" maxlength="12" placeholder="Ticker o empresa (ej. MELI)" value="' + esc(prefill || '') + '" aria-label="Acción a pedir" />' +
+        '<button type="submit" class="pi-submit" id="piSend">Pedir informe</button></form>' +
+        '<div id="piResult" style="margin-top:10px"></div>';
+      var form = document.getElementById('piForm'), tIn = document.getElementById('piTicker'), res = document.getElementById('piResult'), send = document.getElementById('piSend');
+      setTimeout(function(){ tIn.focus(); }, 50);
+      form.onsubmit = function(e){
+        e.preventDefault();
+        var tk = tIn.value.trim().toUpperCase(); if (!tk) return;
+        var cov = findCovered(tk);
+        if (cov && cov.href) { res.innerHTML = '<p class="pi-msg warn"><b>' + esc(cov.t) + '</b> ya tiene informe publicado. <a href="' + esc(cov.href) + '" target="_blank" rel="noopener">Leerlo ahora &rarr;</a> y guardá tu pedido para otra acción.</p>'; return; }
+        send.disabled = true; send.textContent = 'Enviando…';
+        fetch(API + '/pedir-informe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: user.email, ticker: tk }) })
+          .then(function(r){ return r.json().then(function(d){ return { st: r.status, d: d }; }); })
+          .then(function(x){
+            if (x.st === 200 && x.d.ok) {
+              form.remove();
+              res.innerHTML = '<p class="pi-msg ok">¡Listo! Recibimos tu pedido de <b>' + esc(tk) + '</b>. Te avisamos por mail a ' + esc(user.email) + ' cuando esté publicado.</p>';
+            } else if (x.st === 429) {
+              form.remove();
+              res.innerHTML = '<p class="pi-msg warn">Ya usaste tu pedido de este mes' + (x.d.ticker ? ' (pediste <b>' + esc(x.d.ticker) + '</b>)' : '') + '. Se renueva el 1° del mes que viene.</p>';
+            } else { throw new Error(x.d && x.d.error); }
+          })
+          .catch(function(){ send.disabled = false; send.textContent = 'Pedir informe'; res.innerHTML = '<p class="pi-msg warn">No pudimos enviar el pedido. Probá de nuevo en un rato.</p>'; });
+      };
+    }
+    window.miOpenPedirInforme = function(prefill){
+      renderAction(prefill);
+      overlay.classList.add('open'); overlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+    window.miClosePedirInforme = function(){
+      overlay.classList.remove('open'); overlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    };
+    overlay.addEventListener('click', function(e){ if (e.target === overlay) window.miClosePedirInforme(); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && overlay.classList.contains('open')) window.miClosePedirInforme(); });
   })();
   </script>
 
