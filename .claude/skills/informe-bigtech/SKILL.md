@@ -89,7 +89,10 @@ gratis del panel. Cualquier ticker nuevo lleva el gate.
 1. **Portada** — ticker, Fair Value blend propio vs. precio de mercado (`fv-block`), y un banner de
    veredicto (`verdict-bar`) con la postura del análisis en lenguaje descriptivo (nunca "Buy/Sell" —
    ver regla de disclaimer abajo) + nota de que no es recomendación de inversión, visible en la
-   portada, no solo al pie.
+   portada, no solo al pie. **Logo de la empresa** al lado del ticker: el `ticker-big` va dentro de
+   `<div class="tk-id"><img class="tk-logo" src="../assets/logos/<ticker>.png" alt="Logo de <TICKER>"
+   width="48" height="48" onerror="this.onerror=null;this.src='../assets/img/logo-mark-512.png'">…`,
+   con las reglas CSS `.tk-id` / `.tk-logo` (copiarlas de cualquier informe existente, ej. `nvda.html`).
 2. Resumen Ejecutivo
 3. Historia y Evolución
 4. Modelo de Negocio y Segmentos
@@ -376,7 +379,10 @@ Una vez que `informes/<ticker>.html` está listo, hay que enlazarlo desde **dos*
    plantilla) con ticker, tag, nombre, sentimiento y sparkline. El botón va con
    `href="informes/<ticker>.html" class="pick-btn" target="_blank" rel="noopener"` — **sin**
    `data-ticker` (ese atributo dispara el modal viejo vía JS, que ya no queremos para tickers
-   nuevos).
+   nuevos). Entre `pick-accent` y `pick-info` va `<img class="pick-logo" src="assets/logos/<ticker>.png" …>`
+   (copiar la línea de otra card). Si el ticker no tiene todavía su PNG en `assets/logos/`, crearlo:
+   128x128, logo oficial actual (verificar contra el sitio de la empresa o Wikimedia Commons — ojo con
+   homónimos, ej. el club Loma Negra ≠ la empresa), fondo blanco con el logo al ~70% o recuadro de marca.
 2. **Cartel de "nuevo informe"** (`informes/manifest.json`, en la raíz de `informes/`): agregar una
    entrada nueva **al principio** de la lista (el manifest va ordenado del más nuevo al más viejo,
    `list[0]` es siempre el último publicado) con este formato:

@@ -83,8 +83,8 @@ completa gratis" si en algún momento se decide para un ticker bancario). Usar c
 estructura HTML/CSS `informes/aapl.html`, pero el contenido de las secciones marcadas abajo es
 distinto:
 
-1. Portada — Fair Value blend vs. precio de mercado, verdict-bar, disclaimer. Igual que
-   informe-bigtech.
+1. Portada — Fair Value blend vs. precio de mercado, verdict-bar, disclaimer, logo de la empresa al
+   lado del ticker (`.tk-id` / `.tk-logo`, `assets/logos/<ticker>.png`). Igual que informe-bigtech.
 2. Resumen Ejecutivo — igual.
 3. Historia y Evolución — igual.
 4. **Modelo de Negocio y Segmentos** — la segmentación real del banco universal, no segmentos de
