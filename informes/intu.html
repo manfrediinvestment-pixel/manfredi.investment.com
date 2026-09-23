@@ -150,7 +150,11 @@
     .govrow{grid-template-columns:1fr;}
     .govcell{border-right:none;}
   }
-  .tk-id{display:flex; align-items:center; flex-wrap:wrap; row-gap:6px;}
+  .tk-id{display:grid; grid-template-columns:auto 1fr; column-gap:16px; align-items:center; flex:1 1 auto; min-width:280px; margin-right:24px;}
+  .tk-id .tk-logo{grid-row:1 / span 2; width:56px; height:56px; border-radius:14px; margin:0;}
+  .tk-id .ticker-big{line-height:1; grid-column:2;}
+  .tk-id .exch{grid-column:2; margin:6px 0 0; min-width:0; line-height:1.45;}
+  @media (max-width:720px){ .tk-id{min-width:0; margin-right:0; width:100%;} .tk-id .tk-logo{width:48px; height:48px; border-radius:12px;} }
   .tk-logo{width:48px; height:48px; border-radius:12px; margin-right:14px; flex-shrink:0; background:#fff; box-shadow:0 0 0 1px var(--line), 0 2px 6px rgba(11,31,58,.08);}
 </style>
 </head>
