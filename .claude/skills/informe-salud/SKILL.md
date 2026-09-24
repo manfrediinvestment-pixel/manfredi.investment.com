@@ -103,9 +103,27 @@ el **SOTP producto por producto hasta la LOE + rNPV del pipeline**.
 **Valuación del Módulo A** (pesos del blend):
 
 1. **SOTP por producto + rNPV del pipeline — 15%** (reemplaza al DCF):
+   - **I+D como línea corporativa, no dentro de cada producto** (regla agregada 24-sep-2026, caso LLY):
+     cada producto y cada activo del pipeline aportan su **margen de contribución** (OCF + I+D después
+     de impuestos, menos capex, sobre ingresos — anclado en el semestre o TTM real, y si un trimestre
+     es atípico por capital de trabajo, explicá qué ventana usás) y la I+D total de la compañía se
+     resta una sola vez como línea negativa del SOTP. Cargar el margen después de I+D a cada producto
+     y además valuar el pipeline cuenta el costo de investigar dos veces.
+   - **Fechas de patente desde el Orange Book, no solo del 10-K**: bajá el archivo de datos de la FDA
+     (`https://www.fda.gov/media/76860/download?attachment` → `patent.txt`, `exclusivity.txt`,
+     `products.txt`; buscá por número de NDA). El 10-K da la patente de compuesto; el Orange Book
+     muestra además patentes de sustancia/producto y de uso más tardías (en LLY: compuesto 2036, pero
+     sustancia/producto 2039 y uso 2041) y la exclusividad regulatoria (NCE). Usá la del 10-K en el
+     Base y la más tardía en el Bull. Si un activo del pipeline no tiene patentes listadas, decilo y
+     declaralo como supuesto.
+   - **Escenario de "renovación" obligatorio como referencia** (no entra al blend): el mismo Base con la
+     franquicia principal sin erosión después de su LOE, creciendo ~2% con valor terminal. Muestra
+     cuánto de la brecha contra el precio viene de las fechas de patente y cuánto de expectativas de
+     crecimiento.
    - **Productos comercializados**: flujo de cada producto relevante (ventas × margen de contribución
-     estimado — usá el margen operativo core de la compañía como proxy si no hay dato por producto,
-     declarándolo) hasta la LOE, y **curva de erosión post-LOE**: molécula pequeña en EE.UU. ~−80-90%
+     estimado — usá el margen de la compañía como proxy si no hay dato por producto, declarándolo, y
+     si asignás una prima al producto principal, justificala con lo que diga la compañía sobre mezcla)
+     hasta la LOE, y **curva de erosión post-LOE**: molécula pequeña en EE.UU. ~−80-90%
      en 12-24 meses; biológico ante biosimilares, erosión más lenta y gradual (IQVIA documenta que
      los biológicos son "mucho más durables" y que la erosión hoy depende cada vez más de decisiones
      de formulario de pagadores). Si hay un análogo real reciente (ej. Humira en EE.UU. 2023-2024 para
@@ -125,16 +143,34 @@ el **SOTP producto por producto hasta la LOE + rNPV del pipeline**.
      sobre los productos actuales**; el valor de "plataforma" (capacidad de I+D de seguir
      descubriendo) se incluye, si se incluye, como línea separada, chica y explícita (ej. I+D
      recurrente × productividad histórica), nunca escondida en un terminal genérico.
-2. **Comparables — 25%**: P/E forward (múltiplo principal del sector) y EV/EBITDA de 3-4 peers de
-   perfil similar **de LOE y crecimiento** — no compares LLY/NVO (crecimiento de obesidad) con PFE/BMY
-   (precipicio de patentes) sin ajustar; si el peer set mezcla perfiles, usá P/E ajustado por
-   crecimiento (PEG) y declaralo.
-3. **Reversión histórica — 35%**: P/E forward propio en ventana limpia (excluir años con cargos
-   grandes de IPR&D o litigios). **Chequeo de LOE**: si el ticker está entrando a un precipicio de
+2. **Comparables — 25%**: P/E forward (múltiplo principal del sector) de un grupo amplio de pharmas
+   grandes (10-15 nombres, no 3-4, para que el percentil sea estable). **Regla anti-circularidad
+   (agregada 24-sep-2026, caso LLY):** el método no puede usar el precio ni el múltiplo del propio
+   ticker en ningún paso. En LLY, la primera versión aplicaba el PEG de AbbVie (1.30), casi idéntico al
+   de Lilly (1.28): la cuenta era "precio × 1.30/1.28" y el método devolvía el precio de mercado. **No
+   ajustes por PEG salvo que los datos del grupo lo sostengan:** antes de usarlo, corré la regresión
+   P/E forward vs. crecimiento esperado del grupo; en LLY dio R² de 0.05-0.16 (en pharma el mercado
+   paga duración de patentes, no crecimiento de corto plazo), y además las PEG de stockanalysis
+   mezclan definiciones (algunas usan P/E trailing). Si el R² es bajo, usá el **P/E del cuartil
+   superior del grupo aplicado al EPS de consenso del año siguiente, descontado un año al costo de
+   equity**, con la mediana (sobre EPS de los próximos 12 meses) como piso del rango y el par más caro
+   como techo. Declará el criterio.
+3. **Reversión histórica — 35%**: P/E propio en ventana limpia sobre el **EPS ajustado tal como lo
+   reporta la compañía**. **No sumes de vuelta la IPR&D adquirida si la compañía compra pipeline todos
+   los años** (regla agregada 24-sep-2026, caso LLY): Lilly gasta ~$3-5 mil millones por año en eso y lo
+   deja dentro de su EPS no-GAAP; sumarlo de vuelta inflaba la reversión ($1,204 vs. $1,169) y además
+   contaba dos veces, porque el SOTP ya valúa esas compras. Solo excluí un cargo de IPR&D si es
+   genuinamente extraordinario para esa compañía (una compra única fuera de su patrón). **Chequeo de LOE**: si el ticker está entrando a un precipicio de
    patentes, el P/E histórico describe una compañía con más años de exclusividad por delante —
    decilo explícitamente y, si el revenue gap es >25-30% de las ventas, usá la ventana de años en que
    la compañía tenía un perfil de LOE comparable, o documentá por qué no hay una.
 4. **Consenso Wall Street — 25%**.
+
+**Transparencia del blend (obligatoria, agregada 24-sep-2026):** en la síntesis de la Sección 13
+etiquetá cada método como "independiente del precio" (SOTP, comparables) o "anclado al mercado"
+(reversión, consenso: 60% del peso) y reportá el promedio ponderado de cada grupo por separado. Con los
+pesos fijos de la casa el blend tiende a quedar cerca del precio; el lector tiene que poder ver qué dice
+cada grupo. En LLY: independientes $614.23, anclados $1,233.89, blend $986.03.
 
 **Sensibilidad**: WACC × probabilidad de éxito del activo #1 del pipeline (5×5) en vez de WACC ×
 terminal. **Chequeo de sesgo**: si el SOTP da muy por debajo del precio, revisá (1) si tomaste la LOE
