@@ -423,7 +423,12 @@ que se pida explícitamente. Para pedir uno, alcanza con: *"hacé el informe ins
 [TICKER], nivel AAPL"*. **Bancos y financieras (JPM, BAC, WFC, C, GS, MS, etc.) NO usan esta skill**
 — el balance es la materia prima del negocio, no apalancamiento a valuar con DCF-FCF, y necesitan un
 marco de valuación distinto (DDM, residual income, P/TBV vs. ROTCE). Usá `informe-bancos` para esos
-tickers.
+tickers. Lo mismo para los sectores defensivos, cada uno con su skill:
+- **Consumo masivo** (KO, PEP, PG, PM, MO, WMT, COST, MDLZ, CL…) → `informe-consumo-masivo`
+- **Salud** (pharma, biotech comercial, medtech, managed care, herramientas: LLY, JNJ, UNH, ABBV,
+  ISRG, TMO…) → `informe-salud`
+- **Energía** (integradas, E&P, midstream, refinación: XOM, CVX, COP, EPD, VIST, YPF…) → `informe-energia`
+- **Utilities** (reguladas e IPPs: NEE, DUK, SO, CEG, VST…) → `informe-utilities`
 
 ## Al terminar un ticker
 
