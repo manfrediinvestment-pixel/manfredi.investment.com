@@ -8602,11 +8602,20 @@
   // ---- metricas de cartera estilo fondo (beta, volatilidad, Sharpe, alpha, ----
   // ---- drawdown, correlacion, VaR) a partir de historico de precios ----------
   var pfHistoricoCache = {};
+  // Algunos CEDEARs no tienen historico en la fuente ARS (el worker responde 404) y el
+  // codigo cae al historico USD de la accion. Se recuerda ese "no hay" 7 dias por
+  // navegador para no repetir el pedido fallido (y el error en consola) en cada carga.
+  var PF_HIST_MISS_KEY = 'mi_hist_missing_v1', PF_HIST_MISS_TTL = 7*24*60*60*1000;
+  function pfHistMissing(){ try{ return JSON.parse(localStorage.getItem(PF_HIST_MISS_KEY) || '{}'); }catch(e){ return {}; } }
+  function pfHistMarkMissing(id){ try{ var m = pfHistMissing(); m[id] = Date.now(); localStorage.setItem(PF_HIST_MISS_KEY, JSON.stringify(m)); }catch(e){} }
   async function pfFetchHistorico(category, symbol, n){
     var key = category+':'+symbol+':'+n;
     if(pfHistoricoCache[key]) return pfHistoricoCache[key];
+    var missId = category+':'+symbol, miss = pfHistMissing()[missId];
+    if(miss && (Date.now() - miss) < PF_HIST_MISS_TTL) return null;
     try{
       var res = await fetch(PF_MERCADOS_BASE + '/historico?category='+encodeURIComponent(category)+'&symbol='+encodeURIComponent(symbol)+'&n='+n);
+      if(res.status === 404){ pfHistMarkMissing(missId); return null; }
       var data = await res.json();
       if(!data || !data.closes || !data.closes.length) return null;
       pfHistoricoCache[key] = data.closes;
@@ -9416,8 +9425,8 @@
   //    - Titular "Historico"       = (valor actual - costo) / costo  (== columna Resultado)
   //    - Titular ventanas cortas   = variacion de ese rendimiento dentro de la ventana
   //  Backend: /historico del worker tope 180 ruedas (~8 meses). Ventanas mas
-  //  largas: para tickers USD se pega directo a Yahoo (htxYahooCloses); para
-  //  CEDEARs (ARS) se queda en el tope del worker y se avisa en la nota.
+  //  largas: se queda en el tope del worker y se avisa en la nota (Yahoo directo
+  //  desde el navegador no sirve: CORS lo bloquea siempre).
   // ═══════════════════════════════════════════════════════════════════════════
   var pfPerfChart = null;
   var pfPerfCache = {};
@@ -9489,7 +9498,6 @@
     var bizNeeded = mfBizDaysBetween(winStart, today) + 2;
     var nFetch = Math.min(180, Math.max(8, bizNeeded));
     var useYahoo = bizNeeded > 178; // ventana mas larga que el tope del worker
-    var yahooRange = bizNeeded > 500 ? '5y' : (bizNeeded > 250 ? '2y' : '1y');
 
     await pfFetchMarketData(false);
 
@@ -9505,8 +9513,11 @@
         closesByKey[k] = await pfFetchUsdClosesForArs(p.ticker, catA, nFetch);
         if(useYahoo) arsLimited = true;
       } else if(useYahoo){
-        var y = await htxYahooCloses(p.ticker, yahooRange, '1d');
-        closesByKey[k] = y && y.closes && y.closes.length ? y.closes : null;
+        // Antes iba directo a Yahoo, pero Yahoo bloquea los pedidos del navegador (CORS)
+        // y estas ventanas largas quedaban siempre "sin datos". Se usa el worker con su tope.
+        var catL = pfGetCurrentCategory(p.ticker, 'USD') || 'usa_stocks';
+        closesByKey[k] = await pfFetchHistorico(catL, p.ticker, nFetch);
+        arsLimited = true;
       } else {
         var catU = pfGetCurrentCategory(p.ticker, 'USD') || 'usa_stocks';
         closesByKey[k] = await pfFetchHistorico(catU, p.ticker, nFetch);
@@ -9514,12 +9525,7 @@
     }));
 
     var benchCloses;
-    if(useYahoo){
-      var yb = await htxYahooCloses('^GSPC', yahooRange, '1d');
-      benchCloses = yb && yb.closes ? yb.closes : null;
-    } else {
-      benchCloses = await pfFetchHistorico('usa_stocks', 'SPY', nFetch);
-    }
+    benchCloses = await pfFetchHistorico('usa_stocks', 'SPY', nFetch);
 
     var lens = Object.keys(closesByKey)
       .map(function(k){ return closesByKey[k] ? closesByKey[k].length : 0; })
@@ -9662,7 +9668,7 @@
     var bits = [];
     if(m.clamped) bits.push('La ventana arranca en tu primera compra (' + pfPerfFmtDate(m.inception) + '): la cartera todavía no tiene ' + m.label.toLowerCase() + ' de historia, así que no se proyecta nada.');
     bits.push('El rendimiento se mide sobre el costo invertido y netea los aportes — sumar un activo nuevo no cuenta como ganancia. En «Histórico» el número es el resultado total sobre el costo, igual que la columna Resultado de la tabla.');
-    if(m.arsLimited) bits.push('Para los CEDEARs de tu cartera el histórico llega hasta ~8 meses por ahora.');
+    if(m.arsLimited) bits.push('El histórico de precios llega hasta ~8 meses por ahora: la curva muestra ese tramo.');
     var anyNoDate = lots.some(function(p){ return !pfPerfParseDate(p.fecha); });
     if(anyNoDate) bits.push('Hay posiciones sin fecha de compra: se asumen previas a la ventana. Borralas y volvé a cargarlas con fecha para el histórico exacto.');
     if(note) note.textContent = bits.join(' ');
@@ -9756,24 +9762,7 @@
       (pl ? '<circle cx="'+pl[0]+'" cy="'+pl[1]+'" r="3.2" fill="'+ pCol +'" />' : '') +
       (bl ? '<circle cx="'+bl[0]+'" cy="'+bl[1]+'" r="2.6" fill="rgba(232,238,246,.4)" />' : '');
   }
-  async function htxYahooCloses(ticker, range, interval){
-    for(var i=0;i<2;i++){
-      var host = i===0 ? 'query1' : 'query2';
-      try{
-        var r = await fetch('https://'+host+'.finance.yahoo.com/v8/finance/chart/'+encodeURIComponent(ticker)+'?interval='+interval+'&range='+range, { signal: AbortSignal.timeout(6000) });
-        if(!r.ok) continue;
-        var d = await r.json();
-        var res = d && d.chart && d.chart.result && d.chart.result[0];
-        if(!res) continue;
-        var q = res.indicators && res.indicators.quote && res.indicators.quote[0];
-        var closes = (q && q.close ? q.close : []).filter(function(v){ return v != null; });
-        if(closes.length < 3) continue;
-        var prev = (res.meta && (res.meta.chartPreviousClose || res.meta.previousClose)) || closes[0];
-        return { closes: closes, prevClose: prev };
-      }catch(e){ /* probar el otro host */ }
-    }
-    return null;
-  }
+
   async function htxRenderSpxSpark(){
     var svg = document.getElementById('htxSpxSpark');
     if(!svg) return;
@@ -9783,13 +9772,10 @@
       var chgTxt = chgEl ? chgEl.textContent.trim() : '';
       var daySign = /^[\-−▼]/.test(chgTxt) ? -1 : (/^[+▲\d]/.test(chgTxt) ? 1 : 0);
 
-      var data = await htxYahooCloses('^GSPC', '1d', '5m');
-      if(!data) data = await htxYahooCloses('^GSPC', '5d', '30m');
+      // Yahoo Finance no permite pedidos desde el navegador (CORS): siempre fallaba y
+      // llenaba la consola de errores. Se usa directo el historico del worker propio.
       var closes, refUp;
-      if(data){
-        closes = data.closes;
-        refUp = closes[closes.length-1] >= data.prevClose;
-      } else if(typeof pfFetchHistorico === 'function'){
+      if(typeof pfFetchHistorico === 'function'){
         closes = await pfFetchHistorico('usa_stocks', 'SPY', 30);
         if(!closes || closes.length < 4) return;
         refUp = closes[closes.length-1] >= closes[0];
@@ -10187,7 +10173,9 @@
       const href = n.link ? ` href="${esc(n.link)}" target="_blank" rel="noopener noreferrer"` : '';
       // El emblema de Manfredi va detrás: si la nota no trae imagen, o la imagen falla, queda ese.
       const ph = '<svg class="rpt-news-ph" viewBox="0 0 100 100" aria-hidden="true"><use href="#miMark"/></svg>';
-      const img = ph + (n.imagen ? `<img src="${esc(n.imagen)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : '');
+      // Investing.com bloquea (403) toda imagen pedida desde otro sitio: ni se intenta, queda el placeholder.
+      const imgOk = n.imagen && !/(^|\.)investing\.com\//.test(String(n.imagen).replace(/^https?:\/\//, '').split('?')[0].replace(/^([^/]+).*/, '$1/'));
+      const img = ph + (imgOk ? `<img src="${esc(n.imagen)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : '');
       return isHero
         ? `<${tag} class="rpt-news-hero"${href}><div class="rpt-news-hero-img">${img}</div><div class="rpt-news-hero-body">${meta}<div class="rpt-news-title">${n.titulo || ''}</div></div></${tag}>`
         : `<${tag} class="rpt-news-row"${href}><div class="rpt-news-thumb">${img}</div><div>${meta}<div class="rpt-news-title">${n.titulo || ''}</div></div></${tag}>`;
@@ -16599,14 +16587,15 @@ async function miLoadPrice(ticker){
     }
   }catch(e){}
   try{
-    for(var host of['query1','query2']){
+    // Yahoo no acepta pedidos desde el navegador (CORS); se usa el historico del worker propio.
+    for(var cat of['usa_stocks','usa_adrs']){
       try{
-        var r2=await fetch('https://'+host+'.finance.yahoo.com/v8/finance/chart/'+ticker+'?interval=1d&range=5d');
+        var r2=await fetch('https://manfredi-mercados.nachito2502.workers.dev/historico?category='+cat+'&symbol='+encodeURIComponent(ticker)+'&n=2');
         if(!r2.ok)continue;
         var d2=await r2.json();
-        var meta=d2.chart.result[0].meta;
-        var price=meta.regularMarketPrice||meta.regularMarketPreviousClose;
-        var pct=meta.regularMarketChangePercent||0;
+        var c=d2&&d2.closes;
+        if(!c||c.length<2)continue;
+        var price=c[c.length-1], pct=(c[c.length-1]/c[c.length-2]-1)*100;
         miRenderPrice(price.toFixed(2),(pct>=0?'+':'')+pct.toFixed(2)+'%');
         return;
       }catch(e2){continue;}
