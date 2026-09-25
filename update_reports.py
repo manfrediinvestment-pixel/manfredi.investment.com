@@ -68,8 +68,16 @@ def fetch_rss(url, max_items=4):
         return []
 
 def yahoo(ticker, nombre):
+    """Ultimo CIERRE completo y su variacion contra el cierre anterior.
+
+    El reporte corre a las 8:00 ART, antes de la apertura: a esa hora el
+    "regularMarketChangePercent" de Yahoo no corresponde a ningun cierre (salia,
+    por ejemplo, +0.04% igual para S&P 500 y Nasdaq). Por eso se usan las velas
+    diarias ya terminadas: si hay una vela de "hoy" y el mercado todavia no
+    cerro (antes de las 16:15 hora de la bolsa), se descarta.
+    """
     for host in ["query1", "query2"]:
-        url = f"https://{host}.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=5d"
+        url = f"https://{host}.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=10d"
         try:
             req = urllib.request.Request(url, headers={
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
@@ -77,31 +85,32 @@ def yahoo(ticker, nombre):
             })
             with urllib.request.urlopen(req, timeout=12) as r:
                 data = json.loads(r.read())
-            meta = data["chart"]["result"][0]["meta"]
+            res = data["chart"]["result"][0]
+            meta = res["meta"]
+            off = timedelta(seconds=meta.get("gmtoffset") or -4 * 3600)
+            ahora_local = datetime.now(timezone.utc) + off
+            velas = []
+            for ts, c in zip(res.get("timestamp") or [], res["indicators"]["quote"][0].get("close") or []):
+                if c is None:
+                    continue
+                dia = (datetime.fromtimestamp(ts, timezone.utc) + off).date()
+                velas.append((dia, c))
+            if velas and velas[-1][0] == ahora_local.date() and (ahora_local.hour, ahora_local.minute) < (16, 15):
+                velas = velas[:-1]  # vela de hoy sin cerrar
+            if len(velas) >= 2:
+                (d_prev, c_prev), (d_last, c_last) = velas[-2], velas[-1]
+                var = round((c_last - c_prev) / c_prev * 100, 2)
+                sign = "+" if var >= 0 else ""
+                return {"valor": round(c_last, 2), "variacion": f"{sign}{var}%",
+                        "cierre_fecha": d_last.strftime("%d/%m/%Y")}
+            # respaldo: comportamiento anterior
             precio = meta.get("regularMarketPrice") or meta.get("regularMarketPreviousClose", 0)
-            pct = meta.get("regularMarketChangePercent")
-            if pct is not None and abs(pct) > 0.001:
-                sign = "+" if pct >= 0 else ""
-                var_str = f"{sign}{round(pct, 2)}%"
-            else:
-                try:
-                    closes = data["chart"]["result"][0]["indicators"]["quote"][0]["close"]
-                    closes = [c for c in closes if c is not None]
-                    if len(closes) >= 2:
-                        var = round(((closes[-1] - closes[-2]) / closes[-2]) * 100, 2)
-                        sign = "+" if var >= 0 else ""
-                        var_str = f"{sign}{var}%"
-                    else:
-                        anterior = meta.get("chartPreviousClose") or meta.get("previousClose", 0)
-                        if anterior and anterior != precio:
-                            var = round(((precio - anterior) / anterior) * 100, 2)
-                            sign = "+" if var >= 0 else ""
-                            var_str = f"{sign}{var}%"
-                        else:
-                            var_str = "N/D"
-                except Exception:
-                    var_str = "N/D"
-            return {"valor": round(precio, 2), "variacion": var_str}
+            anterior = meta.get("chartPreviousClose") or meta.get("previousClose", 0)
+            if precio and anterior and anterior != precio:
+                var = round((precio - anterior) / anterior * 100, 2)
+                sign = "+" if var >= 0 else ""
+                return {"valor": round(precio, 2), "variacion": f"{sign}{var}%"}
+            return {"valor": round(precio, 2) if precio else None, "variacion": "N/D"}
         except Exception as e:
             print(f"Error parseando {ticker}: {e}")
             continue
@@ -210,6 +219,7 @@ wallstreet = {
     "hora": hora,
     "horario_datos": "Datos al cierre - " + fecha,
     "resumen": "Wall Street al " + fecha + ". S&P 500: " + str(sp_v) + " (" + str(sp_var) + "). Oro: $" + str(oro_v) + ".",
+    "indices_fecha": sp.get("cierre_fecha") or fecha,
     "indices": {
         "sp500":  {"valor": sp_v,  "variacion": sp_var},
         "dow":    {"valor": dj_v,  "variacion": dj_var},

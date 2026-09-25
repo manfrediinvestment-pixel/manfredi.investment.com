@@ -4114,7 +4114,7 @@
           var idx = d.indices || {};
           setPair(idx.sp500, 'htx-spx-price', 'htx-spx-chg');
           setPair(idx.nasdaq, 'htx-ndx-price', 'htx-ndx-chg');
-          var when = d.fecha || d.updated_at;
+          var when = d.indices_fecha || d.fecha || d.updated_at; // fecha real del cierre de los índices
           var we = document.getElementById('htx-us-asof');
           if (we && when) we.textContent = String(when).replace(/ hs$/, '');
           // el delta ya está seteado: re-pintar la sparkline del S&P según el signo del día
