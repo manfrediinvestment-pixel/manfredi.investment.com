@@ -3592,7 +3592,7 @@
   .htx {
     --htx-bg:#07101e; --htx-raised:#0c1828; --htx-raised2:#11223a;
     --htx-line:rgba(232,238,246,.10); --htx-line-soft:rgba(232,238,246,.06);
-    --htx-ink:#eef2f7; --htx-ink2:rgba(238,242,247,.70); --htx-ink3:rgba(238,242,247,.52);
+    --htx-ink:#eef2f7; --htx-ink2:rgba(238,242,247,.84); --htx-ink3:rgba(238,242,247,.66);
     --htx-amber:#f2c94c; --htx-amber-ink:#f5d67a;
     --htx-pos:#5cc08e; --htx-neg:#e8675f; --htx-data:#6fb1e8;
     --htx-r:6px;
@@ -3635,15 +3635,33 @@
     display:grid; grid-template-columns:1.25fr .75fr; gap:56px; align-items:end;
     padding:96px 32px 80px;
   }
-  .htx-hero__lead { padding:0; }
+  .htx-hero__lead { padding:0; min-width:0; }
+  .htx-metric { min-width:0; }
   .htx-h1 {
     margin:0 0 26px; font-family:var(--htx-serif); font-weight:400;
     font-size:clamp(40px,4.5vw,64px); line-height:1.04; letter-spacing:-.012em;
-    color:var(--htx-ink); max-width:18ch; text-wrap:balance;
+    color:var(--htx-ink); max-width:none; text-wrap:balance;
   }
-  .htx-h1 em { font-style:normal; color:var(--htx-amber-ink); }
-  .htx-deck { margin:0 0 34px; font-size:17px; line-height:1.6; color:var(--htx-ink2); max-width:50ch; }
+  .htx-h1 em { font-style:normal; color:var(--htx-amber-ink); display:block; }
+  .htx-deck { margin:0 0 28px; font-size:18px; line-height:1.55; color:var(--htx-ink); max-width:46ch; }
   .htx-cta { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  /* mapa del producto: sin grises, verbo en dorado */
+  .htx-map { display:flex; flex-direction:column; gap:12px; margin:0 0 36px; }
+  .htx-map__row { display:flex; flex-wrap:wrap; align-items:center; gap:8px 8px; }
+  .htx-map__verb { width:74px; flex:none; font-family:var(--htx-serif); font-size:22px; line-height:1; color:var(--htx-amber-ink); }
+  .htx-map a {
+    font-size:14px; font-weight:500; color:var(--htx-ink); padding:7px 13px; border-radius:999px;
+    background:rgba(238,242,247,.07); border:1px solid rgba(238,242,247,.12);
+    transition:background-color .15s ease, border-color .15s ease, color .15s ease, transform .16s var(--htx-ease);
+  }
+  .htx-map a:hover { background:rgba(242,201,76,.12); border-color:rgba(242,201,76,.5); color:#fff; }
+  .htx-map a:active { transform:scale(.97); }
+  @media (max-width:600px) {
+    .htx-map__row { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; margin:0 -20px; padding:0 20px; gap:6px; }
+    .htx-map__row::-webkit-scrollbar { display:none; }
+    .htx-map__verb { width:auto; font-size:19px; margin-right:6px; }
+    .htx-map a { white-space:nowrap; font-size:13px; padding:6px 11px; }
+  }
   .htx-metric { padding:0 0 6px; display:flex; flex-direction:column; border-left:1px solid var(--htx-line); padding-left:36px; }
   .htx-metric__id { display:flex; flex-direction:column; gap:3px; margin-bottom:14px; }
   .htx-metric__name { font-size:15px; font-weight:600; color:var(--htx-ink); display:flex; align-items:center; gap:10px; }
@@ -3808,6 +3826,7 @@
     .htx--intro .htx-hero__lead > * { animation:htx-rise 620ms var(--htx-ease) both; }
     .htx--intro .htx-hero__lead > :nth-child(2) { animation-delay:70ms; }
     .htx--intro .htx-hero__lead > :nth-child(3) { animation-delay:140ms; }
+    .htx--intro .htx-hero__lead > :nth-child(4) { animation-delay:210ms; }
     .htx--intro .htx-metric { animation:htx-fade 700ms ease-out 200ms both; }
     .htx--intro .htx-metric__spark { animation:htx-draw 900ms cubic-bezier(.77,0,.175,1) 320ms both; }
   }
@@ -3845,8 +3864,23 @@
     <!-- hero -->
     <div class="htx-hero">
       <div class="htx-hero__lead">
-        <h1 class="htx-h1">Wall Street y la Bolsa argentina, <em>analizadas desde Buenos Aires.</em></h1>
-        <p class="htx-deck">Informes institucionales de las empresas que mueven el mercado, cotizaciones de Argentina y el mundo, y herramientas para armar y seguir tu cartera. Con un asesor de IA que la conoce.</p>
+        <h1 class="htx-h1">Tu mundo financiero, <em>en un solo lugar.</em></h1>
+        <p class="htx-deck">Todo el mercado y tu portafolio en vivo, sin saltar entre diez p&aacute;ginas. Y las herramientas para invertir mejor.</p>
+        <!-- Mapa del producto: los dos objetivos del sitio en dos verbos -->
+        <div class="htx-map">
+          <div class="htx-map__row">
+            <span class="htx-map__verb">Segu&iacute;</span>
+            <a href="#mercados" data-tab-target="mercados">Cotizaciones y mercados</a>
+            <a href="#calendario" data-tab-target="calendario">Calendario econ&oacute;mico</a>
+            <a href="#portfolio" data-tab-target="portfolio">Tu portafolio en tiempo real</a>
+          </div>
+          <div class="htx-map__row">
+            <span class="htx-map__verb">Mejor&aacute;</span>
+            <a href="#inversiones" data-tab-target="inversiones">Informes con valuaci&oacute;n propia</a>
+            <a href="#" onclick="if(typeof toggleWarren==='function'){toggleWarren();}return false;">Warren, tu analista IA</a>
+            <a href="#portfolio" data-tab-target="portfolio">Los ratios de tu cartera</a>
+          </div>
+        </div>
         <div class="htx-cta">
           <a class="htx-btn" href="#inversiones" data-tab-target="inversiones">Ver los informes</a>
           <a class="htx-ghost" href="#portfolio" data-tab-target="portfolio">Probar el Portfolio</a>
