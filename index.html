@@ -25,6 +25,7 @@
   <meta name="twitter:title" content="Manfredi Investment | Análisis &amp; Mercados" />
   <meta name="twitter:description" content="Inteligencia financiera institucional para el inversor: análisis semanales, reportes diarios automatizados y educación financiera gratuita sobre Argentina y EE.UU." />
   <meta name="twitter:image" content="https://manfredinvestment.com/assets/img/og-image.png" />
+  <meta name="theme-color" content="#0A0F1E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -1532,7 +1533,7 @@
       transform: translateY(24px) scale(.98);
       opacity: 0;
       pointer-events: none;
-      transition: transform .4s cubic-bezier(.2,.8,.2,1), opacity .4s;
+      transition: transform 300ms cubic-bezier(.23,1,.32,1), opacity 200ms ease;
     }
     .report-banner.show { transform: none; opacity: 1; pointer-events: auto; }
     .report-banner-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
@@ -2203,7 +2204,7 @@
     .warren-chart-box canvas{max-height:150px!important;height:150px!important}
     .warren-disclaimer{font-size:9px;color:rgba(255,255,255,.25);margin-top:8px;border-top:1px solid rgba(255,255,255,.06);padding-top:6px;font-style:italic}
     .warren-suggestions{padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--primary)}
-    .warren-suggestion{display:flex;flex-direction:column;align-items:flex-start;gap:8px;font-size:11px;padding:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);cursor:pointer;color:var(--white);transition:all .15s;font-family:'IBM Plex Sans',sans-serif;border-radius:10px;text-align:left}
+    .warren-suggestion{display:flex;flex-direction:column;align-items:flex-start;gap:8px;font-size:11px;padding:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);cursor:pointer;color:var(--white);transition:background-color .15s, border-color .15s, color .15s, opacity .15s, transform .15s, box-shadow .15s;font-family:'IBM Plex Sans',sans-serif;border-radius:10px;text-align:left}
     .warren-suggestion:hover{background:rgba(255,255,255,.05);border-color:var(--acc,rgba(242,201,76,.5));transform:translateY(-1px)}
     .warren-suggestion .wsug-ic{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;background:var(--chip,rgba(242,201,76,.12))}
     .warren-suggestion .wsug-lbl{font-weight:700;font-size:11px;color:var(--white)}
@@ -2216,7 +2217,7 @@
     .warren-input{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:8px 12px;font-size:12px;font-family:'IBM Plex Sans',sans-serif;resize:none;outline:none;max-height:90px;line-height:1.4;color:#c8d8e8;border-radius:4px;-webkit-appearance:none;appearance:none}
     .warren-input:focus{border-color:rgba(242,201,76,.35)}
     .warren-input::placeholder{color:rgba(255,255,255,.25)}
-    .warren-send-btn{background:linear-gradient(155deg,#F7CE4E,#F2784B);border:none;color:#0A0F1E;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;border-radius:8px;transition:all .2s;box-shadow:0 4px 14px -4px rgba(242,148,78,.6)}
+    .warren-send-btn{background:linear-gradient(155deg,#F7CE4E,#F2784B);border:none;color:#0A0F1E;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;border-radius:8px;transition:background-color .2s, border-color .2s, color .2s, opacity .2s, transform .2s, box-shadow .2s;box-shadow:0 4px 14px -4px rgba(242,148,78,.6)}
     .warren-send-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px -3px rgba(242,148,78,.75)}
     .warren-send-btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
     .warren-send-btn svg{fill:#0A0F1E;width:14px;height:14px}
@@ -2606,7 +2607,6 @@
     }
     @media (prefers-reduced-motion: reduce) {
       .spot-feature-value.flash-up, .spot-feature-value.flash-down { animation: none; }
-      #heroCta { transform: none !important; }
     }
     /* PPP FILTER TABS PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP */
     .filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -2619,7 +2619,7 @@
       font-weight: 500;
       color: var(--text-sec);
       cursor: pointer;
-      transition: all var(--transition);
+      transition: background-color var(--transition), border-color var(--transition), color var(--transition), opacity var(--transition), transform var(--transition), box-shadow var(--transition);
       font-family: 'IBM Plex Sans', sans-serif;
     }
     .f-tab:hover { border-color: var(--primary); color: var(--primary); }
@@ -3268,13 +3268,18 @@
     // ── Notify Overlay: avisos de informes nuevos / cambios / novedades ──────
     function showNotifyOverlay() {
       const overlay = document.getElementById('notifyOverlay');
-      if (overlay) overlay.style.display = 'flex';
+      if (!overlay) return;
+      window._notifyReturnFocus = document.activeElement;
+      overlay.style.display = 'flex';
+      const first = overlay.querySelector('button, input');
+      if (first) setTimeout(function(){ first.focus(); }, 30);
     }
 
     function hideNotifyOverlay(remember) {
       const overlay = document.getElementById('notifyOverlay');
       if (overlay) overlay.style.display = 'none';
       if (remember) localStorage.setItem('mi_notify_dismissed_at', String(Date.now()));
+      if (window._notifyReturnFocus && window._notifyReturnFocus.focus) { try { window._notifyReturnFocus.focus(); } catch (e) {} }
     }
 
     function shouldOfferNotify() {
@@ -3326,7 +3331,7 @@
         if (errorEl) { errorEl.style.color = '#e74c3c'; errorEl.textContent = 'Ingresá un email válido.'; errorEl.style.display = 'block'; }
         return;
       }
-      if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+      if (btn) { btn.disabled = true; btn.textContent = 'Enviando…'; }
       try {
         await fetch('https://log-user.nachito2502.workers.dev', {
           method: 'POST',
@@ -3394,7 +3399,6 @@
       }
     };
   </script>
-<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 <style>
   #notifyOverlay{position:fixed;inset:0;background:rgba(10,15,30,.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;}
   .notify-card{position:relative;background:var(--white);border-radius:14px;padding:40px 36px 32px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35);}
@@ -3461,20 +3465,20 @@
   <!-- ââ Login Overlay ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
   <div id="loginOverlay" style="display:none" onclick="if(event.target===this) window.hideLoginOverlay && window.hideLoginOverlay()">
     <div class="login-card">
-      <button class="login-close" onclick="window.hideLoginOverlay && window.hideLoginOverlay()" aria-label="Cerrar">&times;</button>
+      <button type="button" class="login-close" onclick="window.hideLoginOverlay && window.hideLoginOverlay()" aria-label="Cerrar">&times;</button>
       <div class="login-logo-mark"><svg class="mi-mark"><use href="#miMark"/></svg></div>
       <h1 class="login-title">Manfredi Investment</h1>
       <p class="login-sub">Ingresá con tu cuenta de Google o con tu email y contraseña.</p>
-      <button id="loginBtn" onclick="window.signInWithGoogle && window.signInWithGoogle()">
+      <button type="button" id="loginBtn" onclick="window.signInWithGoogle && window.signInWithGoogle()">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google" style="vertical-align:middle">
         Continuar con Google
       </button>
       <div class="login-divider">o</div>
       <input id="loginEmailInput" class="login-input" type="email" placeholder="Correo electrónico" autocomplete="email">
       <input id="loginPassInput" class="login-input" type="password" placeholder="Contraseña" autocomplete="current-password">
-      <button id="loginEmailBtn" onclick="window.signInWithEmail && window.signInWithEmail()">Ingresar con email</button>
-      <button id="loginModeToggle" class="login-forgot" style="text-align:center;width:100%" onclick="window.toggleAuthMode && window.toggleAuthMode()">¿No tenés cuenta? Registrate</button>
-      <button class="login-forgot" onclick="window.resetPassword && window.resetPassword()">¿Olvidaste tu contraseña?</button>
+      <button type="button" id="loginEmailBtn" onclick="window.signInWithEmail && window.signInWithEmail()">Ingresar con email</button>
+      <button type="button" id="loginModeToggle" class="login-forgot" style="text-align:center;width:100%" onclick="window.toggleAuthMode && window.toggleAuthMode()">¿No tenés cuenta? Registrate</button>
+      <button type="button" class="login-forgot" onclick="window.resetPassword && window.resetPassword()">¿Olvidaste tu contraseña?</button>
       <p id="loginError" class="login-error"></p>
       <p class="login-footer">Al acceder aceptás los Términos de Uso.</p>
     </div>
@@ -3485,12 +3489,12 @@
   </div>
 
   <!-- ââ Main Content (hidden until auth) ââââââââââââââââââââââââââââââââââââââ -->
-  <div id="notifyOverlay" style="display:none" onclick="if(event.target===this) window.hideNotifyOverlay && window.hideNotifyOverlay(true)">
+  <div id="notifyOverlay" role="dialog" aria-modal="true" aria-labelledby="notifyTitle" style="display:none" onclick="if(event.target===this) window.hideNotifyOverlay && window.hideNotifyOverlay(true)">
     <div class="notify-card">
-      <button class="notify-close" onclick="window.hideNotifyOverlay && window.hideNotifyOverlay(true)" aria-label="Cerrar">&times;</button>
+      <button type="button" class="notify-close" onclick="window.hideNotifyOverlay && window.hideNotifyOverlay(true)" aria-label="Cerrar">&times;</button>
       <div class="notify-logo-mark"><svg class="mi-mark"><use href="#miMark"/></svg></div>
       <span class="notify-eyebrow">Alertas de Manfredi Investment</span>
-      <h2 class="notify-title">No te pierdas el próximo informe</h2>
+      <h2 class="notify-title" id="notifyTitle">No te pierdas el próximo informe</h2>
       <p class="notify-sub">Sumate para recibir un aviso apenas publicamos algo nuevo.</p>
       <ul class="notify-list">
         <li>
@@ -3506,15 +3510,15 @@
           <span class="notify-text"><strong>Novedades de la plataforma</strong><span>Secciones nuevas y mejoras, sin tener que andar buscando.</span></span>
         </li>
       </ul>
-      <button class="notify-btn-google" id="notifyGoogleBtn" onclick="window.notifyWithGoogle && window.notifyWithGoogle()">
+      <button type="button" class="notify-btn-google" id="notifyGoogleBtn" onclick="window.notifyWithGoogle && window.notifyWithGoogle()">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google" style="vertical-align:middle">
         Continuar con Google
       </button>
       <div class="notify-divider">o</div>
-      <input id="notifyEmailInput" class="notify-input" type="email" placeholder="Tu email" autocomplete="email">
-      <button id="notifyEmailBtn" class="notify-btn-submit" onclick="window.subscribeNotifyEmail && window.subscribeNotifyEmail()">Notificarme por email</button>
-      <button class="notify-skip" onclick="window.hideNotifyOverlay && window.hideNotifyOverlay(true)">Ahora no</button>
-      <p id="notifyError" class="notify-error"></p>
+      <input id="notifyEmailInput" class="notify-input" type="email" name="email" placeholder="nombre@mail.com" autocomplete="email" spellcheck="false" aria-label="Tu email">
+      <button type="button" id="notifyEmailBtn" class="notify-btn-submit" onclick="window.subscribeNotifyEmail && window.subscribeNotifyEmail()">Notificarme por email</button>
+      <button type="button" class="notify-skip" onclick="window.hideNotifyOverlay && window.hideNotifyOverlay(true)">Ahora no</button>
+      <p id="notifyError" class="notify-error" role="alert"></p>
       <p class="notify-fine">Sin spam. Cancelás cuando quieras desde tu perfil.</p>
     </div>
   </div>
@@ -3532,7 +3536,7 @@
   <!-- ââ NAVBAR ââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
   <header class="navbar">
     <div class="nav-inner">
-      <a href="#" class="logo" data-tab-target="inicio">
+      <a href="#" class="logo" data-tab-target="inicio" aria-label="Manfredi Investment, inicio">
         <div class="logo-mark"><svg class="mi-mark"><use href="#miMark"/></svg></div>
         <div class="logo-text">
           <span class="logo-name">Manfredi Investment</span>
@@ -3557,7 +3561,7 @@
 
 
       <div id="navUserArea"></div>
-      <button class="nav-notify-btn" id="notifyNavBtn" onclick="window.showNotifyOverlay && window.showNotifyOverlay()">
+      <button type="button" class="nav-notify-btn" id="notifyNavBtn" aria-label="Notificate de todo" onclick="window.showNotifyOverlay && window.showNotifyOverlay()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         Notificate de todo
         <span class="nav-notify-dot"></span>
@@ -3852,7 +3856,7 @@
     .htx--intro .htx-hero__lead > :nth-child(2) { animation-delay:70ms; }
     .htx--intro .htx-hero__lead > :nth-child(3) { animation-delay:140ms; }
     .htx--intro .htx-hero__lead > :nth-child(4) { animation-delay:210ms; }
-    .htx--intro .htx-panel { animation:htx-fade 700ms ease-out 200ms both; }
+    .htx--intro .htx-panel { animation:htx-rise 500ms var(--htx-ease) 200ms both; }
     .htx--intro .htx-panel__spark { animation:htx-draw 900ms cubic-bezier(.77,0,.175,1) 320ms both; }
   }
   @keyframes htx-rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
@@ -4042,7 +4046,7 @@
           <polyline points="0,66 115,64 230,62 345,60 460,58" fill="none" stroke="rgba(232,238,246,.18)" stroke-width="1.5" />
         </svg>
         <div class="htx-pf__legend">
-          <span><i style="background:var(--htx-pos);"></i>Manfredi</span>
+          <span><i style="background:#f2c94c;"></i>Manfredi</span>
           <span><i style="background:rgba(232,238,246,.4);"></i>S&amp;P 500</span>
         </div>
         <div class="htx-pf__links">
@@ -4095,10 +4099,10 @@
   (function () {
     function setPair(o, priceId, chgId, loc) {
       var pe = document.getElementById(priceId), ce = document.getElementById(chgId);
-      if (pe && o && o.valor != null) pe.textContent = Number(o.valor).toLocaleString(loc || 'en-US');
+      if (pe && o && o.valor != null) pe.textContent = Number(o.valor).toLocaleString(loc || 'es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       if (ce && o && o.variacion) {
         var up = String(o.variacion).trim().charAt(0) !== '-';
-        ce.textContent = o.variacion;
+        ce.textContent = String(o.variacion).replace('.', ',');
         ce.className = (ce.className.replace(/\b(up|down)\b/g, '').trim() + ' ' + (up ? 'up' : 'down')).trim();
       }
     }
@@ -4228,24 +4232,24 @@
       </div>
 
       <div class="mkt-search-wrap">
-        <svg class="mkt-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="text" id="mktSearchInput" class="mkt-search-input" placeholder="Buscar activo &mdash; &quot;GGAL&quot;, &quot;Apple&quot;, &quot;AL30&quot;&hellip;" autocomplete="off">
+        <svg class="mkt-search-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="mktSearchInput" name="q" spellcheck="false" aria-label="Buscar activo" aria-controls="mktSearchResults" class="mkt-search-input" placeholder="Buscar activo &mdash; &quot;GGAL&quot;, &quot;Apple&quot;, &quot;AL30&quot;&hellip;" autocomplete="off">
         <button type="button" id="mktSearchClear" class="mkt-search-clear" hidden aria-label="Limpiar b&uacute;squeda">&times;</button>
       </div>
       <div id="mktSearchResults" class="mkt-search-results" hidden></div>
 
-      <div class="mkt-body" id="mktBody" data-aos="fade-up">
+      <div class="mkt-body" id="mktBody">
         <aside class="mkt-hero-col" id="mktHeroCol">
           <div class="mkt-hero-skeleton">Cargando cotizaciones&hellip;</div>
         </aside>
         <div class="mkt-main">
-          <div class="mkt-tabs" id="mktTabs" role="tablist"></div>
+          <div class="mkt-tabs" id="mktTabs"></div>
           <div class="mkt-table-wrap" id="mktTableWrap">
             <div class="mkt-table-head" id="mktTableHead">
               <span></span><span>Activo</span><span style="text-align:right;">Precio</span><span style="text-align:right;">Var%</span>
             </div>
             <div id="mktTableBody" class="mkt-table-body">
-              <div class="mkt-row-msg">Cargando...</div>
+              <div class="mkt-row-msg">Cargando…</div>
             </div>
             <button type="button" id="mktShowAllBtn" class="mkt-show-all" hidden>Ver los <span id="mktShowAllCount">&mdash;</span> restantes &rarr;</button>
           </div>
@@ -4291,7 +4295,7 @@
       <h2 class="section-title" style="color:var(--white);">Calendario Económico</h2>
       <p class="section-sub" style="color:rgba(255,255,255,.4);">Variables clave Argentina &amp; EE.UU. · Tocá cualquier indicador para ver el detalle. Eventos actualizados cada lunes.</p>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;" data-aos="fade-up">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
       <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:22px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06);">
           <div style="display:flex;align-items:center;gap:9px;font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.45);"><span style="font-size:18px;">🇦🇷</span>Argentina</div>
@@ -4317,14 +4321,14 @@
         </div>
       </div>
     </div>
-    <div id="calDetailBox" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:18px 22px;margin-bottom:28px;display:flex;align-items:center;gap:16px;min-height:68px;transition:border-color .2s,background .2s;" data-aos="fade-up">
+    <div id="calDetailBox" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:18px 22px;margin-bottom:28px;display:flex;align-items:center;gap:16px;min-height:68px;transition:border-color .2s,background .2s;">
       <div style="width:36px;height:36px;background:rgba(242,201,76,.1);border:1px solid rgba(242,201,76,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📊</div>
       <div><div id="calDetailTitle" style="font-size:11px;font-weight:600;color:var(--gold);letter-spacing:.04em;margin-bottom:4px;">Seleccioná un indicador</div><div id="calDetailText" style="font-size:12.5px;color:rgba(255,255,255,.45);line-height:1.6;">Tocá cualquier cuadro para ver el contexto, la tendencia y qué significa para los mercados.</div></div>
     </div>
-    <div data-aos="fade-up">
+    <div>
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
         <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);">Eventos de la semana — <span id="calSemanaLabel">cargando...</span></div>
-        <div class="cal-view-tabs" role="tablist" aria-label="Tipo de calendario">
+        <div class="cal-view-tabs" aria-label="Tipo de calendario">
           <button type="button" class="cal-view-tab active" data-cal-view="economico" onclick="calSetView('economico')">Económico</button>
           <button type="button" class="cal-view-tab" data-cal-view="earnings" onclick="calSetView('earnings')">Earnings</button>
           <button type="button" class="cal-view-tab" data-cal-view="dividendos" onclick="calSetView('dividendos')">Dividendos</button>
@@ -4361,10 +4365,10 @@
         <div style="display:flex;align-items:center;gap:16px;">
           <span class="inf-sub-meta">Resumen semanal económico y financiero</span>
           <div class="carousel-nav">
-            <button class="carousel-btn" id="papersRailPrev" aria-label="Reportes anteriores">
+            <button type="button" class="carousel-btn" id="papersRailPrev" aria-label="Reportes anteriores">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
-            <button class="carousel-btn" id="papersRailNext" aria-label="Reportes siguientes">
+            <button type="button" class="carousel-btn" id="papersRailNext" aria-label="Reportes siguientes">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
             </button>
           </div>
@@ -4384,7 +4388,7 @@
       <div class="reports-grid">
 
         <!-- Card Argentina -->
-        <div class="report-card-daily" data-aos="fade-up">
+        <div class="report-card-daily">
           <div class="rpt-header">
             <span class="rpt-header-title"><span class="report-country-flag">&#127462;&#127479;</span>Argentina</span>
             <span class="rpt-header-meta">Agente IA</span>
@@ -4400,7 +4404,7 @@
         </div>
 
         <!-- Card Wall Street -->
-        <div class="report-card-daily" data-aos="fade-up">
+        <div class="report-card-daily">
           <div class="rpt-header">
             <span class="rpt-header-title"><span class="report-country-flag">&#127482;&#127480;</span>Wall Street</span>
             <span class="rpt-header-meta">Agente IA</span>
@@ -4437,44 +4441,44 @@
               <span>9 preguntas · 3 min</span>
               <span class="course-badge free">GRATIS</span>
             </div>
-            <button class="course-btn" style="background:var(--gold);color:var(--primary);border-color:var(--gold);">Hacer el quiz →</button>
+            <button type="button" class="course-btn" style="background:var(--gold);color:var(--primary);border-color:var(--gold);">Hacer el quiz →</button>
           </div>
         </div>
-        <div class="course-card" data-aos="fade-up">
+        <div class="course-card">
           <div class="course-icon">I</div>
           <h4>Finanzas Personales Básicas</h4>
           <p>Presupuesto, ahorro, deudas, fondo de emergencia e inversión inicial.</p>
           <div class="course-meta"><span>8 lecciones &middot; 3h</span><span class="free-badge">Gratis</span></div>
-          <button class="course-btn" onclick="openCourse('FP')">Comenzar curso &rarr;</button>
+          <button type="button" class="course-btn" onclick="openCourse('FP')">Comenzar curso &rarr;</button>
         </div>
-        <div class="course-card" data-aos="fade-up" data-aos-delay="80">
+        <div class="course-card">
           <div class="course-icon">II</div>
           <h4>Introducción a la Bolsa</h4>
           <p>Acciones, bonos, ETFs, riesgo y retorno. Todo lo que necesitás para invertir con criterio propio.</p>
           <div class="course-meta"><span>8 lecciones &middot; 3.5h</span><span class="free-badge">Gratis</span></div>
-          <button class="course-btn" onclick="openCourse('IB')">Comenzar curso &rarr;</button>
+          <button type="button" class="course-btn" onclick="openCourse('IB')">Comenzar curso &rarr;</button>
         </div>
-        <div class="course-card" data-aos="fade-up" data-aos-delay="160">
+        <div class="course-card">
           <div class="course-icon">III</div>
           <h4>Análisis Fundamental</h4>
           <p>Valor intrínseco, PER, EV/FCF y flujo de caja. Valuá empresas como un profesional.</p>
           <div class="course-meta"><span>8 lecciones &middot; 4h</span><span class="free-badge">Gratis</span></div>
-          <button class="course-btn" onclick="openCourse('AF')">Comenzar curso &rarr;</button>
+          <button type="button" class="course-btn" onclick="openCourse('AF')">Comenzar curso &rarr;</button>
         </div>
-        <div class="course-card" data-aos="fade-up" data-aos-delay="240">
+        <div class="course-card">
           <div class="course-icon">IV</div>
           <h4>El Mercado Argentino</h4>
           <p>CEDEARs, ONs, tipos de cambio y estrategias para el contexto local.</p>
           <div class="course-meta"><span>8 lecciones &middot; 4h</span><span class="free-badge">Gratis</span></div>
-          <button class="course-btn" onclick="openCourse('MA')">Comenzar curso &rarr;</button>
+          <button type="button" class="course-btn" onclick="openCourse('MA')">Comenzar curso &rarr;</button>
         </div>
-        <div class="course-card" data-aos="fade-up" data-aos-delay="320">
+        <div class="course-card">
           <div class="course-icon">V</div>
           <h4>Próximamente</h4>
           <p>Análisis Técnico &mdash; Velas japonesas, soportes e indicadores para traders.</p>
           <div class="course-meta"><span>En desarrollo</span><span class="free-badge">Gratis</span></div>
         </div>
-        <div class="course-card" data-aos="fade-up" data-aos-delay="400">
+        <div class="course-card">
           <div class="course-icon">VI</div>
           <h4>Próximamente</h4>
           <p>Gestión de Riesgo &mdash; Position sizing, stop-loss y protección del capital.</p>
@@ -4514,7 +4518,7 @@
             <h3 class="cr-title">Pedidos de informes de los socios</h3>
             <p class="cr-sub" id="crSub">Cargando pedidos…</p>
           </div>
-          <div class="cr-filters" role="tablist">
+          <div class="cr-filters">
             <button type="button" class="cr-filter active" data-f="abiertos">Abiertos</button>
             <button type="button" class="cr-filter" data-f="hechos">Hechos</button>
             <button type="button" class="cr-filter" data-f="todos">Todos</button>
@@ -4525,7 +4529,7 @@
       </div>
 
       <div class="inv-tabs-row">
-      <div class="mkt-tabs inv-tabs" id="invTabs" role="tablist">
+      <div class="mkt-tabs inv-tabs" id="invTabs">
         <button type="button" class="mkt-tab active" data-sector="software">Software</button>
         <button type="button" class="mkt-tab" data-sector="semis">Semiconductores</button>
         <button type="button" class="mkt-tab" data-sector="argentina">Argentina</button>
@@ -4544,7 +4548,7 @@
         <div class="inv-panel" data-sector-panel="semis">
           <div class="inv-panel-progress">10 de 10 con informe completo</div>
           <div class="sector-cards">
-            <div class="pick-card" data-aos="fade-up">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/nvda.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4554,7 +4558,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,26 15,22 30,24 45,18 60,20 75,14 90,10" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/nvda.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'NVDA')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="60">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/amd.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4564,7 +4568,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,34 15,30 30,22 45,12 60,6 75,4 90,14" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/amd.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AMD')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="120">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/tsm.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4574,7 +4578,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,32 15,26 30,18 45,10 60,4 75,8 90,13" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/tsm.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'TSM')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="180">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/avgo.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4584,7 +4588,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,14 15,20 30,32 45,30 60,24 75,22 90,10" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/avgo.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AVGO')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="240">
+            <div class="pick-card">
               <div class="pick-accent down"></div>
               <img class="pick-logo" src="assets/logos/arm.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4594,7 +4598,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,20 30,8 45,4 60,16 75,26 90,22" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/arm.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ARM')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/mu.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4604,7 +4608,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,34 15,28 30,24 45,20 60,14 75,10 90,8" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/mu.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MU')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="60">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/qcom.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4614,7 +4618,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,14 15,12 30,10 45,34 60,6 75,20 90,24" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/qcom.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'QCOM')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="120">
+            <div class="pick-card">
               <div class="pick-accent down"></div>
               <img class="pick-logo" src="assets/logos/intc.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4624,7 +4628,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,10 30,22 45,32 60,18 75,14 90,10" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/intc.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'INTC')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="180">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/asml.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4634,7 +4638,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,28 15,24 30,20 45,16 60,10 75,14 90,12" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/asml.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ASML')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="240">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/txn.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4650,7 +4654,7 @@
         <div class="inv-panel" data-sector-panel="argentina">
           <div class="inv-panel-progress">1 de 10 con informe completo</div>
           <div class="sector-cards">
-            <div class="pick-card pick-card--soon" data-aos="fade-up">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/ypf.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4660,7 +4664,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="60">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/vist.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4670,7 +4674,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="120">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/ggal.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4680,7 +4684,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="180">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/meli.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4690,7 +4694,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,24 30,20 45,14 60,10 75,16 90,22" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/meli.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MELI')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="240">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/bma.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4700,7 +4704,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/pam.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4710,7 +4714,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="60">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/cepu.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4720,7 +4724,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="120">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/supv.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4730,7 +4734,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="180">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/cresy.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4740,7 +4744,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="240">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/loma.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4756,7 +4760,7 @@
         <div class="inv-panel" data-sector-panel="bigtech">
           <div class="inv-panel-progress">10 de 10 con informe completo</div>
           <div class="sector-cards">
-            <div class="pick-card" data-aos="fade-up">
+            <div class="pick-card">
               <div class="pick-accent down"></div>
               <img class="pick-logo" src="assets/logos/aapl.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4766,7 +4770,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,10 15,14 30,18 45,22 60,26 75,30 90,33" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/aapl.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AAPL')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="80">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/meta.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4776,7 +4780,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,20 15,18 30,16 45,14 60,12 75,30 90,34" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/meta.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'META')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="120">
+            <div class="pick-card">
               <div class="pick-accent down"></div>
               <img class="pick-logo" src="assets/logos/googl.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4786,7 +4790,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,8 15,12 30,10 45,16 60,20 75,26 90,30" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/googl.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'GOOGL')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="180">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/amzn.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4796,7 +4800,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,18 15,14 30,20 45,16 60,24 75,20 90,22" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/amzn.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AMZN')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="240">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/tsla.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4806,7 +4810,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,14 15,10 30,20 45,30 60,26 75,22 90,20" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/tsla.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'TSLA')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/nflx.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4816,7 +4820,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,6 15,10 30,16 45,20 60,26 75,30 90,32" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/nflx.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'NFLX')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="60">
+            <div class="pick-card">
               <div class="pick-accent up"></div>
               <img class="pick-logo" src="assets/logos/uber.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4826,7 +4830,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,8 15,14 30,26 45,34 60,30 75,26 90,24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/uber.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'UBER')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="120">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/dis.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4836,7 +4840,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,14 15,10 30,16 45,20 60,6 75,18 90,22" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/dis.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'DIS')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="180">
+            <div class="pick-card">
               <div class="pick-accent down"></div>
               <img class="pick-logo" src="assets/logos/spot.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4846,7 +4850,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,6 15,10 30,14 45,20 60,24 75,28 90,30" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/spot.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'SPOT')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="240">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/shop.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4862,7 +4866,7 @@
         <div class="inv-panel active" data-sector-panel="software">
           <div class="inv-panel-progress">10 de 10 con informe completo</div>
           <div class="sector-cards">
-            <div class="pick-card" data-aos="fade-up">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/msft.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4872,7 +4876,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,26 15,24 30,20 45,22 60,16 75,18 90,10" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/msft.html" class="pick-btn" target="_blank" rel="noopener">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="80">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/adbe.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4882,7 +4886,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,6 15,14 30,20 45,26 60,24 75,28 90,26" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/adbe.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ADBE')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="140">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/pltr.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4892,7 +4896,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,10 15,18 30,28 45,34 60,30 75,8 90,14" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/pltr.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'PLTR')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/crm.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4902,7 +4906,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,34 30,26 45,14 60,20 75,10 90,8" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/crm.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'CRM')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/now.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4912,7 +4916,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,8 15,20 30,32 45,36 60,26 75,20 90,18" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/now.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'NOW')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="60">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/snow.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4922,7 +4926,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,34 30,36 45,24 60,14 75,8 90,6" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/snow.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'SNOW')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="120">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/crwd.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4932,7 +4936,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,18 15,28 30,34 45,32 60,22 75,8 90,12" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/crwd.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'CRWD')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="180">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/orcl.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4942,7 +4946,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,22 15,26 30,6 45,12 60,24 75,32 90,30" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/orcl.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ORCL')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="240">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/intu.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4952,7 +4956,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,6 15,9 30,18 45,30 60,34 75,29 90,31" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/intu.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'INTU')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="240">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/sap.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4968,7 +4972,7 @@
         <div class="inv-panel" data-sector-panel="bancos">
           <div class="inv-panel-progress">10 de 10 con informe completo</div>
           <div class="sector-cards">
-            <div class="pick-card" data-aos="fade-up">
+            <div class="pick-card">
               <div class="pick-accent down"></div>
               <img class="pick-logo" src="assets/logos/jpm.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4978,7 +4982,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,32 15,28 30,24 45,20 60,14 75,16 90,8" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/jpm.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'JPM')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="80">
+            <div class="pick-card">
               <div class="pick-accent down"></div>
               <img class="pick-logo" src="assets/logos/bac.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4988,7 +4992,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,34 15,30 30,26 45,22 60,18 75,12 90,6" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/bac.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'BAC')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="140">
+            <div class="pick-card">
               <div class="pick-accent down"></div>
               <img class="pick-logo" src="assets/logos/gs.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -4998,7 +5002,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,26 30,28 45,20 60,14 75,10 90,6" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/gs.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'GS')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="pick-card">
               <div class="pick-accent down"></div>
               <img class="pick-logo" src="assets/logos/ms.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5008,7 +5012,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,34 15,30 30,26 45,22 60,16 75,10 90,4" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/ms.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MS')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="260">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/v.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5018,7 +5022,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,26 30,22 45,20 60,16 75,10 90,6" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/v.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'V')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="60">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/ma.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5028,7 +5032,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,32 15,28 30,24 45,18 60,14 75,10 90,8" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/ma.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MA')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="260">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/wfc.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5038,7 +5042,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,32 15,26 30,20 45,12 60,8 75,14 90,12" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/wfc.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'WFC')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="180">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/c.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5048,7 +5052,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,34 15,30 30,24 45,18 60,14 75,10 90,8" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/c.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'C')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="240">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/axp.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5058,7 +5062,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,34 15,17 30,27 45,12 60,6 75,12 90,26" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/axp.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AXP')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/brk-b.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5074,7 +5078,7 @@
         <div class="inv-panel" data-sector-panel="defensivos">
           <div class="inv-panel-progress">2 de 10 con informe completo</div>
           <div class="sector-cards">
-            <div class="pick-card" data-aos="fade-up">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/lly.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5084,7 +5088,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,34 15,18 30,20 45,28 60,12 75,14 90,14" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/lly.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'LLY')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card" data-aos="fade-up" data-aos-delay="60">
+            <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/jnj.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5094,7 +5098,7 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,22 15,31 30,34 45,16 60,14 75,8 90,6" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/jnj.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'JNJ')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="120">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/pg.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5104,7 +5108,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="180">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/ko.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5114,7 +5118,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="240">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/pep.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5124,7 +5128,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/wmt.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5134,7 +5138,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="60">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/cost.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5144,7 +5148,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="120">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/unh.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5154,7 +5158,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="180">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/pfe.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -5164,7 +5168,7 @@
               <div class="pick-sparkline" style="width:90px;height:40px;"></div>
               <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
             </div>
-            <div class="pick-card pick-card--soon" data-aos="fade-up" data-aos-delay="240">
+            <div class="pick-card pick-card--soon">
               <div class="pick-accent soon"></div>
               <img class="pick-logo" src="assets/logos/abbv.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
@@ -6028,7 +6032,7 @@
         <span>Herramienta educativa de autogestión. No es asesoramiento financiero ni una recomendación de inversión personalizada.</span>
       </div>
 
-      <div class="mkt-tabs" id="pfViewTabs" role="tablist">
+      <div class="mkt-tabs" id="pfViewTabs">
         <button type="button" class="mkt-tab active" data-pfview="tuyo">Tu Portafolio</button>
         <button type="button" class="mkt-tab" data-pfview="manfredi">Portafolio de Manfredi</button>
       </div>
@@ -6056,24 +6060,24 @@
           <div class="pf-import-box" id="pfImportBox" style="display:none;"></div>
           <div class="pf-add-form" id="pfAddForm" style="display:none;">
             <div class="pf-ticker-wrap">
-              <input type="text" id="pfInputTicker" placeholder="Ticker o nombre (ej: AAPL, Apple)" autocomplete="off">
+              <input type="text" id="pfInputTicker" name="ticker" placeholder="Ticker o nombre (ej: AAPL, Apple)" autocomplete="off" spellcheck="false" aria-label="Ticker o nombre del activo">
               <div class="pf-ticker-dropdown" id="pfTickerDropdown"></div>
             </div>
-            <select id="pfInputMoneda" onchange="pfToggleCashFields()">
+            <select id="pfInputMoneda" name="moneda" aria-label="Moneda" onchange="pfToggleCashFields()">
               <option value="USD" selected>USD</option>
               <option value="ARS">ARS (CEDEAR / acción local)</option>
             </select>
-            <input type="number" id="pfInputCantidad" placeholder="Cantidad" step="any">
-            <input type="number" id="pfInputPrecio" placeholder="Precio de compra (USD)" step="any">
+            <input type="number" id="pfInputCantidad" name="cantidad" placeholder="Cantidad" step="any" inputmode="decimal" aria-label="Cantidad">
+            <input type="number" id="pfInputPrecio" name="precio" placeholder="Precio de compra (USD)" step="any" inputmode="decimal" aria-label="Precio de compra">
             <input type="date" id="pfInputFecha" title="Fecha de compra" aria-label="Fecha de compra">
             <label><input type="checkbox" id="pfInputCash" onchange="pfToggleCashFields()"> Es efectivo</label>
-            <input type="text" id="pfInputNotas" placeholder="Notas (opcional)">
-            <button class="pf-btn-gold" onclick="pfAddPosition()">Agregar</button>
-            <button class="pf-btn-ghost" onclick="pfHideAddForm()">Cancelar</button>
+            <input type="text" id="pfInputNotas" name="notas" placeholder="Notas (opcional)" aria-label="Notas (opcional)">
+            <button type="button" class="pf-btn-gold" onclick="pfAddPosition()">Agregar</button>
+            <button type="button" class="pf-btn-ghost" onclick="pfHideAddForm()">Cancelar</button>
             <div style="flex-basis:100%;font-size:11px;color:rgba(255,255,255,.35);">Cargá el mismo activo con varias fechas si compraste en distintos momentos. Las posiciones en ARS se convierten a USD al dólar CCL actual (no al de la fecha de compra).</div>
           </div>
           <div class="pf-save-row">
-            <button class="pf-btn-ghost" id="pfSaveBtn" style="display:none;" onclick="pfSavePortfolio()">Guardar mi portafolio</button>
+            <button type="button" class="pf-btn-ghost" id="pfSaveBtn" style="display:none;" onclick="pfSavePortfolio()">Guardar mi portafolio</button>
             <span class="pf-save-status" id="pfSaveStatus"></span>
           </div>
         </div>
@@ -6087,7 +6091,7 @@
         <div class="pf-card" id="pfPerfCard" style="display:none;">
           <div class="pf-perf-head">
             <h2 class="pf-metrics-label" style="margin:0;">Rendimiento de tu cartera</h2>
-            <div class="mkt-tabs mf-window-tabs" id="pfPerfWindowTabs" role="tablist" aria-label="Ventana de tiempo">
+            <div class="mkt-tabs mf-window-tabs" id="pfPerfWindowTabs" aria-label="Ventana de tiempo">
               <button type="button" class="mkt-tab" data-pfwin="1w">1 semana</button>
               <button type="button" class="mkt-tab active" data-pfwin="1m">1 mes</button>
               <button type="button" class="mkt-tab" data-pfwin="ytd">YTD</button>
@@ -6180,7 +6184,7 @@
 
       <div class="pf-view-panel active" data-pfview-panel="finanzas" id="finanzas">
 
-      <div class="mkt-tabs" id="finViewTabs" role="tablist">
+      <div class="mkt-tabs" id="finViewTabs">
         <button type="button" class="mkt-tab active" data-finview="gastos">Gastos</button>
         <button type="button" class="mkt-tab" data-finview="calculadora">Calculadora de Objetivos</button>
       </div>
@@ -6196,7 +6200,7 @@
 
       <div id="calcGoalModal" class="calc-goal-modal-overlay" onclick="if(event.target===this) calcCloseGoalModal();">
         <div class="calc-goal-modal-box">
-          <button class="calc-goal-modal-close" onclick="calcCloseGoalModal()">&times;</button>
+          <button type="button" class="calc-goal-modal-close" onclick="calcCloseGoalModal()">&times;</button>
           <div id="calcGoalModalBody"></div>
         </div>
       </div>
@@ -6233,7 +6237,7 @@
             <div id="calcUsePortfolioLink" style="font-size:11.5px;color:rgba(255,255,255,.4);margin-top:-6px;">
               <a href="#" onclick="calcUsePortfolioValue();return false;" style="color:var(--gold);text-decoration:none;">Usar el valor actual de Tu Portafolio &rarr;</a>
             </div>
-            <button class="pf-btn-gold" onclick="calcCompute()" style="margin-top:4px;">Calcular aporte mensual</button>
+            <button type="button" class="pf-btn-gold" onclick="calcCompute()" style="margin-top:4px;">Calcular aporte mensual</button>
           </div>
         </div>
 
@@ -6265,7 +6269,7 @@
                 <span class="gasto-add-btn" onclick="gastosAbrirIngreso()" title="Agregar ingreso">+</span>
               </div>
             </div>
-            <div id="gastosPatrimonioValor" class="mono" style="font-size:23px;font-weight:600;color:var(--gold);">Calculando...</div>
+            <div id="gastosPatrimonioValor" class="mono" style="font-size:23px;font-weight:600;color:var(--gold);">Calculando…</div>
 
             <div id="gastoIngresoAdd" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);">
               <div class="calc-form">
@@ -6282,8 +6286,8 @@
                   </div>
                 </label>
                 <div style="display:flex;gap:10px;">
-                  <button class="pf-btn-gold" onclick="gastosConfirmarIngreso()" style="flex:1;">Guardar ingreso</button>
-                  <button class="pf-btn-ghost" onclick="gastosCancelarIngreso()">Cancelar</button>
+                  <button type="button" class="pf-btn-gold" onclick="gastosConfirmarIngreso()" style="flex:1;">Guardar ingreso</button>
+                  <button type="button" class="pf-btn-ghost" onclick="gastosCancelarIngreso()">Cancelar</button>
                 </div>
               </div>
             </div>
@@ -6300,9 +6304,9 @@
 
         <div class="pf-card">
           <div style="display:flex;align-items:center;justify-content:center;gap:18px;">
-            <button class="pf-btn-ghost" onclick="gastosPrevMonth()" aria-label="Mes anterior">&larr;</button>
+            <button type="button" class="pf-btn-ghost" onclick="gastosPrevMonth()" aria-label="Mes anterior">&larr;</button>
             <span id="gastosMesLabel" style="font-family:var(--font-display);font-size:18px;min-width:180px;text-align:center;color:var(--white);">&mdash;</span>
-            <button class="pf-btn-ghost" onclick="gastosNextMonth()" aria-label="Mes siguiente">&rarr;</button>
+            <button type="button" class="pf-btn-ghost" onclick="gastosNextMonth()" aria-label="Mes siguiente">&rarr;</button>
           </div>
         </div>
 
@@ -6327,8 +6331,8 @@
                   <input type="text" id="gastoNotaQuick" placeholder="Ej: supermercado, nafta..." maxlength="60">
                 </label>
                 <div style="display:flex;gap:10px;">
-                  <button class="pf-btn-gold" onclick="gastosConfirmarQuick()" style="flex:1;">Guardar gasto</button>
-                  <button class="pf-btn-ghost" onclick="gastosCancelarQuick()">Cancelar</button>
+                  <button type="button" class="pf-btn-gold" onclick="gastosConfirmarQuick()" style="flex:1;">Guardar gasto</button>
+                  <button type="button" class="pf-btn-ghost" onclick="gastosCancelarQuick()">Cancelar</button>
                 </div>
               </div>
             </div>
@@ -6342,8 +6346,8 @@
                   <div id="gastoNuevaCategoriaEmojis" class="gasto-emoji-grid"></div>
                 </label>
                 <div style="display:flex;gap:10px;">
-                  <button class="pf-btn-gold" onclick="gastosConfirmarNuevaCategoria()" style="flex:1;">Crear categoría</button>
-                  <button class="pf-btn-ghost" onclick="gastosCancelarNuevaCategoria()">Cancelar</button>
+                  <button type="button" class="pf-btn-gold" onclick="gastosConfirmarNuevaCategoria()" style="flex:1;">Crear categoría</button>
+                  <button type="button" class="pf-btn-ghost" onclick="gastosCancelarNuevaCategoria()">Cancelar</button>
                 </div>
               </div>
             </div>
@@ -8932,7 +8936,7 @@
     if(!entry || !box) return;
     var isOpen = box.classList.toggle('expanded');
     if(!isOpen || box.dataset.loaded === '1') return;
-    box.innerHTML = '<div class="pf-mini-warren-loading">Warren está pensando...</div>';
+    box.innerHTML = '<div class="pf-mini-warren-loading">Warren está pensando…</div>';
     try{
       var profile = window._qzLastProfile;
       var plain = function(s){ return (s||'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&'); };
@@ -9773,7 +9777,7 @@
     var W = 460, H = 132;
     var pPts = htxSvgPoints(P, W, H, lo, hi);
     var bPts = htxSvgPoints(B, W, H, lo, hi);
-    var pCol = pr>=0 ? '#5cc08e' : '#e8675f';
+    var pCol = '#f2c94c'; // color de la serie fijo; el verde/rojo lo lleva el número
     var pl = pPts[pPts.length-1] ? pPts[pPts.length-1].split(',') : null;
     var bl = bPts[bPts.length-1] ? bPts[bPts.length-1].split(',') : null;
     chart.innerHTML =
@@ -9907,7 +9911,7 @@
   <!-- ââ MODAL âââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
   <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
     <div class="modal" role="dialog" aria-modal="true">
-      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
       <div class="modal-eyebrow">Asesoría &mdash; Próximamente</div>
       <h3>Lista de espera</h3>
       <p>Estamos completando el proceso de certificación ante la CNV para brindarte asesoría financiera con el máximo respaldo legal e institucional.</p>
@@ -9934,13 +9938,13 @@
   <div class="report-banner" id="reportBanner">
     <div class="report-banner-top">
       <span class="report-banner-tag">Nuevo informe</span>
-      <button class="report-banner-close" id="reportBannerClose" aria-label="Cerrar">&times;</button>
+      <button type="button" class="report-banner-close" id="reportBannerClose" aria-label="Cerrar">&times;</button>
     </div>
     <div class="report-banner-title" id="reportBannerTitle"></div>
     <div class="report-banner-abstract" id="reportBannerAbstract"></div>
     <div class="report-banner-footer">
       <span class="report-banner-meta" id="reportBannerMeta"></span>
-      <button class="report-banner-cta" id="reportBannerCta">Ver informe &rarr;</button>
+      <button type="button" class="report-banner-cta" id="reportBannerCta">Ver informe &rarr;</button>
     </div>
   </div>
 
@@ -9954,23 +9958,24 @@
         <span class="pdf-modal-title" id="pdfModalTitle"></span>
         <div class="pdf-modal-actions">
           <a class="pdf-modal-download" id="pdfModalDownload" download>&#8595; Descargar</a>
-          <button class="pdf-modal-close" onclick="closePdf()">&#x2715;</button>
+          <button type="button" class="pdf-modal-close" onclick="closePdf()">&#x2715;</button>
         </div>
       </div>
       <div class="pdf-viewer-body" id="pdfViewerBody">
         <div class="pdf-viewer-loading" id="pdfLoading">Cargando documento&hellip;</div>
       </div>
       <div class="pdf-nav">
-        <button id="pdfPrev" style="display:none"></button>
+        <button type="button" id="pdfPrev" style="display:none"></button>
         <span id="pdfPageInfo">&mdash;</span>
-        <button id="pdfNext" style="display:none"></button>
+        <button type="button" id="pdfNext" style="display:none"></button>
       </div>
     </div>
   </div>
 
-  <script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script defer src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
   <script>
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+  // pdf.js carga diferido: se configura cuando ya está disponible
+  document.addEventListener('DOMContentLoaded', function () { if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js'; });
 
   // Á¢ÂÂÁ¢ÂÂ Carga dinámica de papers desde manifest.json Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
   async function loadPapersManifest() {
@@ -10044,7 +10049,10 @@
       dismiss();
     };
 
-    setTimeout(() => banner.classList.add('show'), 1200);
+    // En la home el panel en vivo ya muestra el último informe: el aviso solo aparece en otras pestañas
+    function showIfNotHome(){ var h=(location.hash||'').replace('#',''); if(h && h!=='inicio' && localStorage.getItem(seenKey)!==latest.num) banner.classList.add('show'); else banner.classList.remove('show'); }
+    setTimeout(showIfNotHome, 1200);
+    window.addEventListener('hashchange', showIfNotHome);
   }
 
   // -- Cartel de "nuevo informe" para informes de ticker (equity research):
@@ -10576,6 +10584,12 @@
       const res = await fetch(MERCADOS_ENDPOINT, { signal: AbortSignal.timeout(12000) });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       MERCADOS = await res.json();
+      // El worker publica el precio de los ETF (SPY / QQQ) con el nombre del índice: se rotulan
+      // como lo que son para que no choquen con el nivel del índice que muestra la home.
+      (MERCADOS.featured || []).forEach(function(f){
+        if (f.id === 'sp500' || f.name === 'S&P 500') f.name = 'SPY · S&P 500';
+        else if (f.id === 'ndx' || f.id === 'nasdaq100' || f.name === 'Nasdaq 100') f.name = 'QQQ · Nasdaq 100';
+      });
       return MERCADOS;
     } catch (e) {
       console.warn('[MI] manfredi-mercados:', e.message);
@@ -11317,9 +11331,9 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
 
   async function calFetchView(view){if(CAL_CACHE[view])return CAL_CACHE[view];var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/'+CAL_ENDPOINTS[view],{signal:AbortSignal.timeout(8000)});if(!r.ok)throw new Error('status '+r.status);var d=await r.json();if(!d.dias||!d.dias.length)throw new Error('sin datos');CAL_CACHE[view]=d;return d;}
 
-  async function calSetView(view){CAL_ACTIVE_VIEW=view;document.querySelectorAll('.cal-view-tab').forEach(function(t){t.classList.toggle('active',t.getAttribute('data-cal-view')===view);});var legendEl=document.getElementById('calLegend');if(legendEl)legendEl.innerHTML=CAL_LEGENDS[view]||'';calRenderEmptyGrid('Cargando...');try{var d=await calFetchView(view);if(CAL_ACTIVE_VIEW!==view)return;document.getElementById('calSemanaLabel').textContent=d.semana||'';calRenderDayGrid(d.dias);}catch(e){console.warn('[MI] Cal '+view+':',e.message);if(CAL_ACTIVE_VIEW===view)calRenderEmptyGrid('Sin datos disponibles');}}
+  async function calSetView(view){CAL_ACTIVE_VIEW=view;document.querySelectorAll('.cal-view-tab').forEach(function(t){t.classList.toggle('active',t.getAttribute('data-cal-view')===view);});var legendEl=document.getElementById('calLegend');if(legendEl)legendEl.innerHTML=CAL_LEGENDS[view]||'';calRenderEmptyGrid('Cargando…');try{var d=await calFetchView(view);if(CAL_ACTIVE_VIEW!==view)return;document.getElementById('calSemanaLabel').textContent=d.semana||'';calRenderDayGrid(d.dias);}catch(e){console.warn('[MI] Cal '+view+':',e.message);if(CAL_ACTIVE_VIEW===view)calRenderEmptyGrid('Sin datos disponibles');}}
 
-  async function loadCalSemana(){try{var d=await calFetchView('economico');document.getElementById('calSemanaLabel').textContent=d.semana||'';if(CAL_ACTIVE_VIEW==='economico')calRenderDayGrid(d.dias);var dow=new Date().getDay();var todayDia=(dow>=1&&dow<=5)?d.dias[dow-1]:null;renderHeroCalToday(todayDia);}catch(e){console.warn('[MI] CalSemana:',e.message);renderHeroCalToday(null);if(CAL_ACTIVE_VIEW==='economico')calRenderEmptyGrid('Cargando...');}}
+  async function loadCalSemana(){try{var d=await calFetchView('economico');document.getElementById('calSemanaLabel').textContent=d.semana||'';if(CAL_ACTIVE_VIEW==='economico')calRenderDayGrid(d.dias);var dow=new Date().getDay();var todayDia=(dow>=1&&dow<=5)?d.dias[dow-1]:null;renderHeroCalToday(todayDia);}catch(e){console.warn('[MI] CalSemana:',e.message);renderHeroCalToday(null);if(CAL_ACTIVE_VIEW==='economico')calRenderEmptyGrid('Cargando…');}}
 
   loadMacroAR(); loadMacroUS(); loadCalSemana(); setInterval(loadMacroAR,300000); setInterval(loadMacroUS,300000);
 
@@ -11328,10 +11342,10 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
   </script>
 
 <!-- COURSE STYLES -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <!-- Diploma: generación de imagen/PDF -->
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 
   .app {
@@ -11370,7 +11384,7 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
   .lesson-nav-arrow svg { width: 12px; height: 12px; }
   .lesson-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none; scroll-behavior: smooth; flex: 1 1 0; min-width: 0; }
   .lesson-nav::-webkit-scrollbar { display: none; }
-  .lesson-tab { flex-shrink: 0; padding: 8px 18px; border-radius: 30px; border: 1.5px solid var(--border); background: white; color: var(--gray); font-size: 13px; font-family: sans-serif; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .lesson-tab { flex-shrink: 0; padding: 8px 18px; border-radius: 30px; border: 1.5px solid var(--border); background: white; color: var(--gray); font-size: 13px; font-family: sans-serif; cursor: pointer; transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, transform 0.15s, box-shadow 0.15s; white-space: nowrap; }
   .lesson-tab.quiz-final-tab { border-color: #F2C94C; color: #9a7300; font-weight: 700; }
   .lesson-tab.quiz-final-tab:hover { background: #fffbeb; }
   .lesson-tab.quiz-final-tab.active { background: #F2C94C; border-color: #F2C94C; color: #1a1a1a; }
@@ -11454,9 +11468,9 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
 
   .slide-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1.5px solid var(--border); }
   .slide-dots { display: flex; gap: 6px; }
-  .sdot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: all 0.15s; }
+  .sdot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, transform 0.15s, box-shadow 0.15s; }
   .sdot.active { background: var(--blue); width: 20px; border-radius: 4px; }
-  .nav-btn { padding: 9px 20px; border-radius: 8px; border: 1.5px solid var(--border); background: white; color: #333; font-family: sans-serif; font-size: 0.85rem; cursor: pointer; transition: all 0.15s; }
+  .nav-btn { padding: 9px 20px; border-radius: 8px; border: 1.5px solid var(--border); background: white; color: #333; font-family: sans-serif; font-size: 0.85rem; cursor: pointer; transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, transform 0.15s, box-shadow 0.15s; }
   .nav-btn:hover { background: var(--gray-light); }
   .nav-btn.primary { background: var(--blue); color: white; border-color: var(--blue); }
   .nav-btn.primary:hover { background: var(--blue-dark); }
@@ -11471,7 +11485,7 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
   .quiz-q-num { font-family: sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--blue); flex-shrink: 0; padding-top: 3px; white-space: nowrap; }
   .quiz-q-text { font-family: sans-serif; font-size: 1rem; font-weight: 600; color: #181818; line-height: 1.5; }
   .quiz-opts { display: flex; flex-direction: column; gap: 8px; }
-  .quiz-opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; font-family: sans-serif; font-size: 0.9rem; padding: 12px 16px; border-radius: 10px; border: 1.5px solid var(--border); background: white; cursor: pointer; transition: all .15s; color: #333; }
+  .quiz-opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; font-family: sans-serif; font-size: 0.9rem; padding: 12px 16px; border-radius: 10px; border: 1.5px solid var(--border); background: white; cursor: pointer; transition: background-color .15s, border-color .15s, color .15s, opacity .15s, transform .15s, box-shadow .15s; color: #333; }
   .quiz-opt:hover:not(.locked) { border-color: var(--blue); background: var(--blue-light); }
   .quiz-opt-mark { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: transparent; }
   .quiz-opt.selected .quiz-opt-mark { border-color: var(--blue); background: var(--blue); color: white; }
@@ -11770,7 +11784,7 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
 </style>
 
 <!-- COURSE MODALS -->
-<div class="course-modal-overlay" id="modal-FP"><div class="course-modal"><button class="course-modal-close" onclick="closeCourse('FP')">&times;</button><div class="app">
+<div class="course-modal-overlay" id="modal-FP"><div class="course-modal"><button type="button" class="course-modal-close" onclick="closeCourse('FP')">&times;</button><div class="app">
 
   <div class="course-header">
     <div class="course-badge">Curso Gratuito · El punto de partida de todo</div>
@@ -11784,21 +11798,21 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
   </div>
 
   <div class="lesson-nav-wrap">
-    <button class="carousel-btn lesson-nav-arrow" id="LNFPPrev" aria-label="Lecciones anteriores">
+    <button type="button" class="carousel-btn lesson-nav-arrow" id="LNFPPrev" aria-label="Lecciones anteriores">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
     <div class="lesson-nav" id="LNFP">
-      <button class="lesson-tab active" onclick="GLFP(0)">1. Mentalidad financiera</button>
-      <button class="lesson-tab" onclick="GLFP(1)">2. El presupuesto</button>
-      <button class="lesson-tab" onclick="GLFP(2)">3. Fondo de emergencia</button>
-      <button class="lesson-tab" onclick="GLFP(3)">4. Deudas</button>
-      <button class="lesson-tab" onclick="GLFP(4)">5. Ahorro e inflación</button>
-      <button class="lesson-tab" onclick="GLFP(5)">6. Metas financieras</button>
-      <button class="lesson-tab" onclick="GLFP(6)">7. Primer inversión</button>
-      <button class="lesson-tab" onclick="GLFP(7)">8. Plan de acción</button>
-      <button class="lesson-tab quiz-final-tab" onclick="GLFP(8)">🎓 Quiz Final</button>
+      <button type="button" class="lesson-tab active" onclick="GLFP(0)">1. Mentalidad financiera</button>
+      <button type="button" class="lesson-tab" onclick="GLFP(1)">2. El presupuesto</button>
+      <button type="button" class="lesson-tab" onclick="GLFP(2)">3. Fondo de emergencia</button>
+      <button type="button" class="lesson-tab" onclick="GLFP(3)">4. Deudas</button>
+      <button type="button" class="lesson-tab" onclick="GLFP(4)">5. Ahorro e inflación</button>
+      <button type="button" class="lesson-tab" onclick="GLFP(5)">6. Metas financieras</button>
+      <button type="button" class="lesson-tab" onclick="GLFP(6)">7. Primer inversión</button>
+      <button type="button" class="lesson-tab" onclick="GLFP(7)">8. Plan de acción</button>
+      <button type="button" class="lesson-tab quiz-final-tab" onclick="GLFP(8)">🎓 Quiz Final</button>
     </div>
-    <button class="carousel-btn lesson-nav-arrow" id="LNFPNext" aria-label="Lecciones siguientes">
+    <button type="button" class="carousel-btn lesson-nav-arrow" id="LNFPNext" aria-label="Lecciones siguientes">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </button>
   </div>
@@ -11808,7 +11822,7 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
 
 </div></div>
 
-<div class="course-modal-overlay" id="modal-IB"><div class="course-modal"><button class="course-modal-close" onclick="closeCourse('IB')">&times;</button><div class="app">
+<div class="course-modal-overlay" id="modal-IB"><div class="course-modal"><button type="button" class="course-modal-close" onclick="closeCourse('IB')">&times;</button><div class="app">
 
   <div class="course-header">
     <div class="course-badge">Curso Gratuito · Nivel Principiante</div>
@@ -11822,21 +11836,21 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
   </div>
 
   <div class="lesson-nav-wrap">
-    <button class="carousel-btn lesson-nav-arrow" id="LNIBPrev" aria-label="Lecciones anteriores">
+    <button type="button" class="carousel-btn lesson-nav-arrow" id="LNIBPrev" aria-label="Lecciones anteriores">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
     <div class="lesson-nav" id="LNIB">
-      <button class="lesson-tab active" onclick="GLIB(0)">1. ¿Qué es la bolsa?</button>
-      <button class="lesson-tab" onclick="GLIB(1)">2. Instrumentos</button>
-      <button class="lesson-tab" onclick="GLIB(2)">3. Cómo funciona</button>
-      <button class="lesson-tab" onclick="GLIB(3)">4. Riesgo y retorno</button>
-      <button class="lesson-tab" onclick="GLIB(4)">5. ETFs e índices</button>
-      <button class="lesson-tab" onclick="GLIB(5)">6. Bolsa argentina</button>
-      <button class="lesson-tab" onclick="GLIB(6)">7. Cómo empezar</button>
-      <button class="lesson-tab" onclick="GLIB(7)">8. Errores comunes</button>
-      <button class="lesson-tab quiz-final-tab" onclick="GLIB(8)">🎓 Quiz Final</button>
+      <button type="button" class="lesson-tab active" onclick="GLIB(0)">1. ¿Qué es la bolsa?</button>
+      <button type="button" class="lesson-tab" onclick="GLIB(1)">2. Instrumentos</button>
+      <button type="button" class="lesson-tab" onclick="GLIB(2)">3. Cómo funciona</button>
+      <button type="button" class="lesson-tab" onclick="GLIB(3)">4. Riesgo y retorno</button>
+      <button type="button" class="lesson-tab" onclick="GLIB(4)">5. ETFs e índices</button>
+      <button type="button" class="lesson-tab" onclick="GLIB(5)">6. Bolsa argentina</button>
+      <button type="button" class="lesson-tab" onclick="GLIB(6)">7. Cómo empezar</button>
+      <button type="button" class="lesson-tab" onclick="GLIB(7)">8. Errores comunes</button>
+      <button type="button" class="lesson-tab quiz-final-tab" onclick="GLIB(8)">🎓 Quiz Final</button>
     </div>
-    <button class="carousel-btn lesson-nav-arrow" id="LNIBNext" aria-label="Lecciones siguientes">
+    <button type="button" class="carousel-btn lesson-nav-arrow" id="LNIBNext" aria-label="Lecciones siguientes">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </button>
   </div>
@@ -11847,7 +11861,7 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
 
 </div></div>
 
-<div class="course-modal-overlay" id="modal-AF"><div class="course-modal"><button class="course-modal-close" onclick="closeCourse('AF')">&times;</button><div class="app">
+<div class="course-modal-overlay" id="modal-AF"><div class="course-modal"><button type="button" class="course-modal-close" onclick="closeCourse('AF')">&times;</button><div class="app">
 
   <!-- HEADER -->
   <div class="course-header">
@@ -11863,21 +11877,21 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
 
   <!-- LESSON TABS -->
   <div class="lesson-nav-wrap">
-    <button class="carousel-btn lesson-nav-arrow" id="LNAFPrev" aria-label="Lecciones anteriores">
+    <button type="button" class="carousel-btn lesson-nav-arrow" id="LNAFPrev" aria-label="Lecciones anteriores">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
     <div class="lesson-nav" id="LNAF">
-      <button class="lesson-tab active" onclick="GLAF(0)">1. Introducción</button>
-      <button class="lesson-tab" onclick="GLAF(1)">2. Valor intrínseco</button>
-      <button class="lesson-tab" onclick="GLAF(2)">3. Las 5 condiciones</button>
-      <button class="lesson-tab" onclick="GLAF(3)">4. PER y PEG</button>
-      <button class="lesson-tab" onclick="GLAF(4)">5. EV/FCF y EBIT</button>
-      <button class="lesson-tab" onclick="GLAF(5)">6. Deuda financiera</button>
-      <button class="lesson-tab" onclick="GLAF(6)">7. DCF y WACC</button>
-      <button class="lesson-tab" onclick="GLAF(7)">8. Elegir una empresa</button>
-      <button class="lesson-tab quiz-final-tab" onclick="GLAF(8)">🎓 Quiz Final</button>
+      <button type="button" class="lesson-tab active" onclick="GLAF(0)">1. Introducción</button>
+      <button type="button" class="lesson-tab" onclick="GLAF(1)">2. Valor intrínseco</button>
+      <button type="button" class="lesson-tab" onclick="GLAF(2)">3. Las 5 condiciones</button>
+      <button type="button" class="lesson-tab" onclick="GLAF(3)">4. PER y PEG</button>
+      <button type="button" class="lesson-tab" onclick="GLAF(4)">5. EV/FCF y EBIT</button>
+      <button type="button" class="lesson-tab" onclick="GLAF(5)">6. Deuda financiera</button>
+      <button type="button" class="lesson-tab" onclick="GLAF(6)">7. DCF y WACC</button>
+      <button type="button" class="lesson-tab" onclick="GLAF(7)">8. Elegir una empresa</button>
+      <button type="button" class="lesson-tab quiz-final-tab" onclick="GLAF(8)">🎓 Quiz Final</button>
     </div>
-    <button class="carousel-btn lesson-nav-arrow" id="LNAFNext" aria-label="Lecciones siguientes">
+    <button type="button" class="carousel-btn lesson-nav-arrow" id="LNAFNext" aria-label="Lecciones siguientes">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </button>
   </div>
@@ -11889,7 +11903,7 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
 
 </div></div>
 
-<div class="course-modal-overlay" id="modal-MA"><div class="course-modal"><button class="course-modal-close" onclick="closeCourse('MA')">&times;</button><div class="app">
+<div class="course-modal-overlay" id="modal-MA"><div class="course-modal"><button type="button" class="course-modal-close" onclick="closeCourse('MA')">&times;</button><div class="app">
 
   <div class="course-header">
     <div class="course-badge">Curso Gratuito · Específico Argentina</div>
@@ -11903,21 +11917,21 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
   </div>
 
   <div class="lesson-nav-wrap">
-    <button class="carousel-btn lesson-nav-arrow" id="LNMAPrev" aria-label="Lecciones anteriores">
+    <button type="button" class="carousel-btn lesson-nav-arrow" id="LNMAPrev" aria-label="Lecciones anteriores">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
     <div class="lesson-nav" id="LNMA">
-      <button class="lesson-tab active" onclick="GLMA(0)">1. El sistema financiero AR</button>
-      <button class="lesson-tab" onclick="GLMA(1)">2. Los tipos de cambio</button>
-      <button class="lesson-tab" onclick="GLMA(2)">3. CEDEARs en profundidad</button>
-      <button class="lesson-tab" onclick="GLMA(3)">4. Renta fija local</button>
-      <button class="lesson-tab" onclick="GLMA(4)">5. El Merval y las acciones</button>
-      <button class="lesson-tab" onclick="GLMA(5)">6. Obligaciones Negociables</button>
-      <button class="lesson-tab" onclick="GLMA(6)">7. Brokers y operatoria</button>
-      <button class="lesson-tab" onclick="GLMA(7)">8. Estrategias para el inversor AR</button>
-      <button class="lesson-tab quiz-final-tab" onclick="GLMA(8)">🎓 Quiz Final</button>
+      <button type="button" class="lesson-tab active" onclick="GLMA(0)">1. El sistema financiero AR</button>
+      <button type="button" class="lesson-tab" onclick="GLMA(1)">2. Los tipos de cambio</button>
+      <button type="button" class="lesson-tab" onclick="GLMA(2)">3. CEDEARs en profundidad</button>
+      <button type="button" class="lesson-tab" onclick="GLMA(3)">4. Renta fija local</button>
+      <button type="button" class="lesson-tab" onclick="GLMA(4)">5. El Merval y las acciones</button>
+      <button type="button" class="lesson-tab" onclick="GLMA(5)">6. Obligaciones Negociables</button>
+      <button type="button" class="lesson-tab" onclick="GLMA(6)">7. Brokers y operatoria</button>
+      <button type="button" class="lesson-tab" onclick="GLMA(7)">8. Estrategias para el inversor AR</button>
+      <button type="button" class="lesson-tab quiz-final-tab" onclick="GLMA(8)">🎓 Quiz Final</button>
     </div>
-    <button class="carousel-btn lesson-nav-arrow" id="LNMANext" aria-label="Lecciones siguientes">
+    <button type="button" class="carousel-btn lesson-nav-arrow" id="LNMANext" aria-label="Lecciones siguientes">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </button>
   </div>
@@ -12141,7 +12155,7 @@ function quizRetry(quizKey) {
 
 <div class="diploma-overlay" id="diplomaOverlay">
   <div class="diploma-modal">
-    <button class="diploma-close" onclick="miCloseDiploma()">&times;</button>
+    <button type="button" class="diploma-close" onclick="miCloseDiploma()">&times;</button>
     <div class="diploma-stage">
       <div class="cert-editorial" id="diplomaCert">
         <div class="frame">
@@ -12166,7 +12180,7 @@ function quizRetry(quizKey) {
     </div>
     <div class="diploma-actions">
       <div class="diploma-id" id="diplomaId"></div>
-      <button class="nav-btn primary" onclick="miDownloadDiplomaPDF()" id="diplomaDownloadBtn">⭳ Descargar PDF</button>
+      <button type="button" class="nav-btn primary" onclick="miDownloadDiplomaPDF()" id="diplomaDownloadBtn">⭳ Descargar PDF</button>
     </div>
   </div>
 </div>
@@ -15077,7 +15091,7 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
 
 <!-- Warren FAB Button -->
   <div class="warren-fab-wrap">
-    <button class="warren-fab" onclick="if(typeof toggleWarren==='function'){toggleWarren();}else{document.getElementById('warrenPanel').classList.add('open');}" aria-label="Hablar con Warren, el asesor IA">
+    <button type="button" class="warren-fab" onclick="if(typeof toggleWarren==='function'){toggleWarren();}else{document.getElementById('warrenPanel').classList.add('open');}" aria-label="Hablar con Warren, el asesor IA">
       <span class="warren-badge" aria-hidden="true">W</span>
       <span class="warren-fab-text">Preguntale a Warren</span>
     </button>
@@ -15099,7 +15113,7 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
 
       <div class="warren-main">
         <div class="warren-header">
-          <button class="warren-side-toggle" onclick="warrenToggleSidebar()" title="Historial de conversaciones" aria-label="Historial de conversaciones">
+          <button type="button" class="warren-side-toggle" onclick="warrenToggleSidebar()" title="Historial de conversaciones" aria-label="Historial de conversaciones">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
           </button>
           <div class="warren-avatar">W</div>
@@ -15114,21 +15128,21 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
               <span class="warren-quota-n" id="warrenQuotaN">100/100</span>
             </div>
           </div>
-          <button class="warren-expand-btn" onclick="toggleWarrenSize()" id="warrenExpandBtn" title="Expandir"> ⤢ </button>
-          <button class="warren-close-btn" onclick="closeWarren()" title="Cerrar"> ✕ </button>
+          <button type="button" class="warren-expand-btn" onclick="toggleWarrenSize()" id="warrenExpandBtn" title="Expandir"> ⤢ </button>
+          <button type="button" class="warren-close-btn" onclick="closeWarren()" title="Cerrar"> ✕ </button>
         </div>
 
         <div class="warren-messages" id="warrenMessages"></div>
 
         <div class="warren-suggestions" id="warrenSuggestions">
-          <button class="warren-suggestion" onclick="warrenSuggest('¿Cómo está la macroeconomía argentina hoy? Dólar, inflación, tasas y riesgo país.')"><span class="wsug-ic">&#127462;&#127479;</span><div class="wsug-lbl">Macro Argentina</div><div class="wsug-desc">Dólar, inflación, tasas y riesgo país</div></button>
-          <button class="warren-suggestion" onclick="warrenAnalyzePortfolio()"><span class="wsug-ic">&#128188;</span><div class="wsug-lbl">Mi portafolio</div><div class="wsug-desc">Análisis de tu cartera real</div></button>
-          <button class="warren-suggestion" onclick="warrenSuggest('Haceme un análisis completo de Mercado Libre (MELI)')"><span class="wsug-ic">&#128722;</span><div class="wsug-lbl">Mercado Libre</div><div class="wsug-desc">Análisis completo de MELI</div></button>
-          <button class="warren-suggestion" onclick="warrenSuggest('¿Qué acciones están generando más ruido en el mercado esta semana y por qué? Dame oportunidades para investigar, no recomendaciones.')"><span class="wsug-ic">&#128293;</span><div class="wsug-lbl">Oportunidades</div><div class="wsug-desc">Lo más comentado del mercado</div></button>
+          <button type="button" class="warren-suggestion" onclick="warrenSuggest('¿Cómo está la macroeconomía argentina hoy? Dólar, inflación, tasas y riesgo país.')"><span class="wsug-ic">&#127462;&#127479;</span><div class="wsug-lbl">Macro Argentina</div><div class="wsug-desc">Dólar, inflación, tasas y riesgo país</div></button>
+          <button type="button" class="warren-suggestion" onclick="warrenAnalyzePortfolio()"><span class="wsug-ic">&#128188;</span><div class="wsug-lbl">Mi portafolio</div><div class="wsug-desc">Análisis de tu cartera real</div></button>
+          <button type="button" class="warren-suggestion" onclick="warrenSuggest('Haceme un análisis completo de Mercado Libre (MELI)')"><span class="wsug-ic">&#128722;</span><div class="wsug-lbl">Mercado Libre</div><div class="wsug-desc">Análisis completo de MELI</div></button>
+          <button type="button" class="warren-suggestion" onclick="warrenSuggest('¿Qué acciones están generando más ruido en el mercado esta semana y por qué? Dame oportunidades para investigar, no recomendaciones.')"><span class="wsug-ic">&#128293;</span><div class="wsug-lbl">Oportunidades</div><div class="wsug-desc">Lo más comentado del mercado</div></button>
         </div>
 
         <div class="warren-input-area">
-          <textarea
+          <textarea aria-label="Preguntale a Warren"
             class="warren-input"
             id="warrenInput"
             placeholder="Preguntale a Warren..."
@@ -15136,7 +15150,7 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
             onkeydown="warrenKeyDown(event)"
             oninput="warrenAutoResize(this)"
           ></textarea>
-          <button class="warren-send-btn" id="warrenSendBtn" onclick="warrenSend()">
+          <button type="button" aria-label="Enviar" class="warren-send-btn" id="warrenSendBtn" onclick="warrenSend()">
             <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
           </button>
         </div>
@@ -15990,7 +16004,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
 
   <div id="paymentOverlay" class="payment-overlay" style="display:none !important">
     <div class="payment-modal-box">
-      <button class="pay-close" onclick="closePaymentModal()" aria-label="Cerrar">&times;</button>
+      <button type="button" class="pay-close" onclick="closePaymentModal()" aria-label="Cerrar">&times;</button>
       <div class="pay-mark"><svg class="mi-mark"><use href="#miMark"/></svg></div>
       <div class="pay-eyebrow">Membresía Manfredi Investment</div>
       <h2>Todo el análisis, sin límites.</h2>
@@ -16006,7 +16020,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
         <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Manfredi Investment Portfolio &mdash; armá tu cartera y comparala con la nuestra y el S&amp;P 500</li>
         <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Cancelás cuando quieras, sin permanencia</li>
       </ul>
-      <button class="pay-cta" onclick="handlePayment('mercadopago')">Suscribirme ahora &rarr;</button>
+      <button type="button" class="pay-cta" onclick="handlePayment('mercadopago')">Suscribirme ahora &rarr;</button>
       <div class="pay-secondary">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V8a5 5 0 0 1 10 0v3"/></svg>
         Pago seguro procesado por Mercado Pago
@@ -16028,7 +16042,7 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
           <input type="text" id="payDiscountCode" placeholder="Código de descuento" maxlength="30" oninput="updateDiscountPriceDisplay()">
         </div>
         <div class="pay-discount-price" id="payDiscountPrice"></div>
-        <button class="pay-cta" id="payDiscountBtn" onclick="handleDiscountPayment()">Pagar con código &rarr;</button>
+        <button type="button" class="pay-cta" id="payDiscountBtn" onclick="handleDiscountPayment()">Pagar con código &rarr;</button>
         <div class="pay-discount-error" id="payDiscountError"></div>
         <p class="pay-note" style="margin-top:12px">Pago único, sin renovación automática. Al vencer el período elegido podés volver a suscribirte cuando quieras.</p>
       </div>
@@ -16089,32 +16103,12 @@ Solo temas financieros y económicos. No respondés sobre otros temas. Siempre t
         }
       } catch (e) { console.warn('[hero] riesgo pais:', e.message); }
     }
-    function initHeroMagneticCta() {
-      var btn = document.getElementById('heroCta');
-      if (!btn || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      btn.addEventListener('mousemove', function(e) {
-        var rect = btn.getBoundingClientRect();
-        var x = e.clientX - rect.left - rect.width / 2;
-        var y = e.clientY - rect.top - rect.height / 2;
-        btn.style.transform = 'translate(' + (x * 0.18).toFixed(1) + 'px,' + (y * 0.3).toFixed(1) + 'px)';
-      });
-      btn.addEventListener('mouseleave', function() { btn.style.transform = ''; });
-    }
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() { loadHeroRiesgo(); initHeroMagneticCta(); });
-    } else { loadHeroRiesgo(); initHeroMagneticCta(); }
+      document.addEventListener('DOMContentLoaded', loadHeroRiesgo);
+    } else { loadHeroRiesgo(); }
     setInterval(loadHeroRiesgo, 90000);
   })();
   </script>
-<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-<script>
-AOS.init({
-  duration: 600,
-  easing: 'ease-out-cubic',
-  once: true,
-  offset: 60
-});
-</script>
 <!-- âââ OVERLAY BACKDROP âââ -->
 <div id="mi-analysis-paywall-backdrop" class="mi-ap-backdrop">
   <div class="mi-ap-card">
@@ -16164,7 +16158,7 @@ AOS.init({
 
 <div id="mi-overlay-backdrop">
   <div class="mi-panel" id="mi-panel">
-    <button class="mi-close" id="mi-close-btn">✕</button>
+    <button type="button" class="mi-close" id="mi-close-btn">✕</button>
     <div class="mi-header">
       <div class="mi-ticker-block">
         <div class="mi-ticker" id="ov-ticker"></div>
@@ -16345,10 +16339,10 @@ AOS.init({
 
 <!-- âââ ESTILOS DEL OVERLAY âââ -->
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap');
+/* Inter y Plex Mono ya no se importan acá: Plex Mono carga en el <link> del <head> y el modal usa IBM Plex Sans */
 #mi-overlay-backdrop{display:none;position:fixed;inset:0;background:rgba(4,11,20,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:99999;overflow-y:auto;padding:24px 16px}
 #mi-overlay-backdrop.active{display:flex;justify-content:center;align-items:flex-start}
-.mi-panel{background:#060d18;border:1px solid var(--navy-5);border-radius:14px;width:100%;max-width:880px;overflow:hidden;margin:auto;position:relative;animation:miSlideUp .3s cubic-bezier(.16,1,.3,1);font-family:'Inter',sans-serif}
+.mi-panel{background:#060d18;border:1px solid var(--navy-5);border-radius:14px;width:100%;max-width:880px;overflow:hidden;margin:auto;position:relative;animation:miSlideUp .3s cubic-bezier(.16,1,.3,1);font-family:'IBM Plex Sans',system-ui,sans-serif}
 @keyframes miSlideUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 .mi-header{background:#040b14;border-bottom:1px solid var(--navy-5);padding:22px 28px 18px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
 .mi-ticker{font-family:'DM Serif Display',Georgia,serif;font-size:36px;font-weight:900;color:#f0f5ff;letter-spacing:-1px;line-height:1}
@@ -16366,7 +16360,7 @@ AOS.init({
 .mi-rec.alcista{background:#081a10;color:#4ade80;border:1px solid #1a5c35}
 .mi-rec.bajista{background:#1a0808;color:#f87171;border:1px solid #5c1a1a}
 .mi-rec.neutral{background:#0d1525;color:#94a3b8;border:1px solid #1e3354}
-.mi-close{position:absolute;top:18px;right:22px;background:none;border:1px solid var(--navy-5);color:#4a6a8a;width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:10}
+.mi-close{position:absolute;top:18px;right:22px;background:none;border:1px solid var(--navy-5);color:#4a6a8a;width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:background-color .2s, border-color .2s, color .2s, opacity .2s, transform .2s, box-shadow .2s;z-index:10}
 .mi-close:hover{background:var(--navy-5);color:#f0f5ff}
 .mi-nav{background:#040b14;border-bottom:1px solid var(--navy-5);display:flex;overflow-x:auto;scrollbar-width:none}
 .mi-nav::-webkit-scrollbar{display:none}
@@ -16748,7 +16742,7 @@ function miRenderTesis(ticker){
 <div id="quizModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);z-index:9999;overflow-y:auto;">
   <div style="max-width:640px;margin:40px auto;padding:0 16px 40px;">
     <div style="background:var(--primary);padding:36px 32px 40px;position:relative;">
-      <button onclick="closeQuiz()" style="position:absolute;top:16px;right:16px;background:transparent;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer;">✕</button>
+      <button type="button" onclick="closeQuiz()" style="position:absolute;top:16px;right:16px;background:transparent;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer;">✕</button>
       <div style="height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin-bottom:32px;"><div id="qzProgFill" style="height:100%;background:var(--gold);border-radius:2px;transition:width .35s ease;width:12.5%"></div></div>
       <div id="qzContent"></div>
     </div>
@@ -16901,14 +16895,14 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
         el.classList.toggle('tab-nav-active', herrGroup.indexOf(tab) !== -1);
       });
       document.title = 'Manfredi Investment' + (TAB_TITLES[tab] ? ' - ' + TAB_TITLES[tab] : '');
-      // AOS ("fade-up al hacer scroll") calcula visibilidad por posicion de
-      // scroll: como las pestanas cambian instantaneo (sin scroll real), los
-      // elementos [data-aos] de una pestana recien mostrada nunca reciben el
-      // trigger de AOS y quedan invisibles. Forzamos el estado "ya animado"
-      // al activar la pestana para que el contenido siempre se vea.
-      document.querySelectorAll('[data-tab="' + tab + '"] [data-aos]').forEach(function(el) {
-        el.classList.add('aos-animate');
-      });
+      // Fundido corto al cambiar de pestaña (solo opacidad: un transform en la
+      // <section> rompería los position:fixed de adentro). Sin fill, no deja estilo.
+      var shown = document.querySelector('section[data-tab="' + tab + '"]');
+      if (shown && activateTab._last && activateTab._last !== tab && shown.animate) {
+        if (activateTab._anim) activateTab._anim.cancel();
+        activateTab._anim = shown.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, easing: 'cubic-bezier(.23,1,.32,1)' });
+      }
+      activateTab._last = tab;
     }
 
     function route() {
@@ -16951,7 +16945,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
         moreBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
       });
       document.addEventListener('click', function(e) { if (!more.contains(e.target)) miNavMoreClose(); });
-      document.addEventListener('keydown', function(e) { if (e.key === 'Escape') miNavMoreClose(); });
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && more.classList.contains('open')) { miNavMoreClose(); moreBtn.focus(); } });
       more.querySelectorAll('[data-tab-target]').forEach(function(a) { a.addEventListener('click', miNavMoreClose); });
       window.addEventListener('hashchange', miNavMoreClose);
     }
@@ -16974,12 +16968,30 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
         sheet.classList.add('open'); sheet.setAttribute('aria-hidden', 'false');
         document.documentElement.classList.add('mi-sheet-open');
         burger.setAttribute('aria-expanded', 'true'); burger.setAttribute('aria-label', 'Cerrar menú');
+        var firstLink = sheet.querySelector('a'); if (firstLink) setTimeout(function(){ firstLink.focus({ preventScroll:true }); }, 60);
       });
       sheet.querySelectorAll('[data-tab-target]').forEach(function(a) { a.addEventListener('click', miNavSheetClose); });
-      document.addEventListener('keydown', function(e) { if (e.key === 'Escape') miNavSheetClose(); });
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && sheet.classList.contains('open')) { miNavSheetClose(); burger.focus(); } });
       window.addEventListener('hashchange', miNavSheetClose);
       window.addEventListener('resize', function() { if (window.innerWidth > 1000) miNavSheetClose(); });
     }
+
+    // <div>/<span> con onclick: se vuelven alcanzables y activables con teclado (Enter / Espacio)
+    function miA11yClickables(root) {
+      (root || document).querySelectorAll('div[onclick], span[onclick], li[onclick]').forEach(function(el) {
+        if (el.hasAttribute('role') || el.closest('[aria-hidden="true"]')) return;
+        el.setAttribute('role', 'button');
+        if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+      });
+    }
+    document.addEventListener('keydown', function(e) {
+      var el = e.target;
+      if ((e.key === 'Enter' || e.key === ' ') && el && el.getAttribute && el.getAttribute('role') === 'button' && !/^(BUTTON|A|INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) {
+        e.preventDefault(); el.click();
+      }
+    });
+    if (document.readyState !== 'loading') miA11yClickables(); else document.addEventListener('DOMContentLoaded', function(){ miA11yClickables(); });
+    new MutationObserver(function(ms) { ms.forEach(function(m) { m.addedNodes.forEach(function(n) { if (n.nodeType === 1) miA11yClickables(n.parentNode || n); }); }); }).observe(document.body, { childList:true, subtree:true });
 
     window.addEventListener('hashchange', route);
     if (document.readyState !== 'loading') route();
@@ -16996,7 +17008,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
   /* Sin loops decorativos: los estados "en vivo" quedan como punto fijo */
   .api-status.live .api-status-dot, .rpt-live-dot, .report-banner-tag::before,
   .at-live::before, .markets-v2-live::before, .pf-warren-avatar::after,
-  .warren-fab::before, .pi-cta::after, .hero-v2::after { animation:none !important; }
+  .warren-fab::before, .pi-cta::after, .hero-v2::after, .s-live, .badge-live { animation:none !important; }
   .warren-fab::before, .pi-cta::after { display:none !important; }
 
   /* Warren: un solo botón (antes etiqueta + botón redondo con un ícono de pausa) */
@@ -17031,7 +17043,9 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
 
   /* Levantes y agrandes al pasar el mouse: solo con mouse real, y más sutiles */
   @media (hover:none), (pointer:coarse) {
-    .pf-metric-card:hover, .calc-goal-card:hover, .warren-suggestion:hover, .pf-mini-warren:hover { transform:none !important; }
+    .pf-metric-card:hover, .calc-goal-card:hover, .warren-suggestion:hover, .pf-mini-warren:hover,
+    .nav-notify-btn:hover, .mp-cta:hover, .pi-cta:hover, .hero-pf-cta:hover, .mkt-fav-google-btn:hover,
+    .pay-cta:hover, .pf-warren-cta:hover, .paper-card--cover:hover .paper-cover, .rpt-news-hero:hover img { transform:none !important; }
   }
 
   /* Marca del menú en una sola línea */
@@ -17053,7 +17067,8 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
   /* Warren: dorado sólido, sin degradé naranja ni halos de color */
   .warren-avatar { background:var(--gold) !important; box-shadow:none !important; }
   .warren-send-btn { background:var(--gold) !important; box-shadow:none !important; border-radius:6px; }
-  .warren-send-btn:hover { transform:none !important; background:#f7d96c !important; }
+  .warren-send-btn:hover { background:#f7d96c !important; }
+  .warren-send-btn:active { transform:scale(.97) !important; }
   .warren-side-new { background:var(--gold) !important; box-shadow:none !important; }
 
   /* Menú: subrayado dorado que crece desde el centro; la sección activa queda marcada */
@@ -17063,8 +17078,12 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
     background:var(--gold); transform:scaleX(0); transform-origin:center;
     transition:transform .22s var(--mi-ease-out);
   }
-  .nav-link:hover, .nav-links > li:hover > .nav-link { color:var(--primary); }
-  .nav-link:hover::after, .nav-links > li:hover > .nav-link::after { transform:scaleX(1); }
+  .nav-link:focus-visible { color:var(--primary); }
+  .nav-link:focus-visible::after { transform:scaleX(1); }
+  @media (hover:hover) and (pointer:fine) {
+    .nav-link:hover, .nav-links > li:hover > .nav-link { color:var(--primary); }
+    .nav-link:hover::after, .nav-links > li:hover > .nav-link::after { transform:scaleX(1); }
+  }
   .nav-link.tab-nav-active { color:var(--primary) !important; font-weight:600; }
   .nav-link.tab-nav-active::after { transform:scaleX(1); }
   .nav-link .caret { margin-left:2px; }
@@ -17082,7 +17101,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
     background:#0a1322; border-bottom:1px solid rgba(242,201,76,.25);
     box-shadow:0 18px 40px -20px rgba(0,0,0,.6);
     opacity:0; visibility:hidden; transform:translateY(-6px);
-    transition:opacity .2s ease, transform .22s var(--mi-ease-out), visibility 0s linear .22s;
+    transition:opacity .15s ease, transform .15s var(--mi-ease-out), visibility 0s linear .15s;
   }
   .nav-mega.open { opacity:1; visibility:visible; transform:none; transition:opacity .2s ease, transform .22s var(--mi-ease-out), visibility 0s; }
   .nav-mega__inner { max-width:1200px; margin:0 auto; padding:24px 32px 28px; display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
@@ -17134,7 +17153,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
       display:block; position:fixed; left:0; right:0; top:var(--mi-nav-bottom, 101px); bottom:0; z-index:98;
       background:#0a1322; overflow-y:auto; padding:18px 20px 40px;
       opacity:0; visibility:hidden; transform:translateY(-8px);
-      transition:opacity .2s ease, transform .22s var(--mi-ease-out), visibility 0s linear .22s;
+      transition:opacity .15s ease, transform .15s var(--mi-ease-out), visibility 0s linear .15s;
     }
     .nav-sheet.open { opacity:1; visibility:visible; transform:none; transition:opacity .2s ease, transform .22s var(--mi-ease-out), visibility 0s; }
     .nav-sheet__main a { display:block; padding:14px 2px; font-family:'DM Serif Display',Georgia,serif; font-size:28px; line-height:1.1; color:#fff; border-bottom:1px solid rgba(255,255,255,.08); }
@@ -17176,6 +17195,75 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
     .pf-positions-table th, .pf-positions-table td { white-space:nowrap; }
   }
 
+  /* ── Accesibilidad: foco visible en todo, táctil sin demora, anclas debajo del menú ── */
+  :where(a, button, input, select, textarea, summary, [tabindex], [role="button"]):focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+  .mkt-search-input:focus-visible, .warren-input:focus-visible, .notify-input:focus-visible, .pf-add-form input:focus-visible, .pf-add-form select:focus-visible { outline:2px solid var(--gold); outline-offset:1px; }
+  html { -webkit-tap-highlight-color:transparent; }
+  a, button, [role="button"], input, select, label { touch-action:manipulation; }
+  [id] { scroll-margin-top:110px; }
+  h1, h2, h3 { text-wrap:balance; }
+  .notify-close { min-width:40px; min-height:40px; }
+  .nav-sheet, #notifyOverlay { overscroll-behavior:contain; }
+  .pf-add-form select, .pf-add-form option { background-color:#0c1828; color:#eef2f7; }
+  :root { color-scheme:light; }
+  .htx, .section-portfolio, #calendario, .nav-mega, .nav-sheet { color-scheme:dark; }
+
+  /* ── Contraste (auditoría): pie y aviso de informe ── */
+  .footer-brand p, .footer-col a { color:rgba(255,255,255,.66) !important; }
+  .disclaimer, .footer-copy, .footer-bottom-right { color:rgba(255,255,255,.6) !important; }
+  .report-banner-meta, .report-banner-abstract, .report-banner-close { color:rgba(255,255,255,.66) !important; }
+
+  /* ── Áreas táctiles de 44px ── */
+  .footer-col a { display:block; padding:6px 0; }
+  .report-banner-close { min-width:44px; min-height:44px; display:inline-flex; align-items:center; justify-content:center; margin:-12px -12px 0 0; }
+  .modal-close, .pdf-modal-close { min-width:44px; min-height:44px; }
+  @media (pointer:coarse) {
+    .htx-tile__link, .htx-markets__head a { padding-block:11px; margin-top:12px; }
+    .htx-pf__tabs button { min-height:44px; min-width:44px; }
+    .nav-login-btn, #notifyNavBtn, #navBurger { min-height:44px; }
+    .footer-col a { padding:11px 0; }
+  }
+
+  /* ── Pestañas internas: mismo lenguaje que la home (sin mono en mayúsculas) ── */
+  .mkt-tab {
+    font-family:'IBM Plex Sans',system-ui,sans-serif !important; font-size:13.5px !important; font-weight:500 !important;
+    text-transform:none !important; letter-spacing:0 !important; padding:9px 15px !important; border-radius:999px !important;
+    transition:background-color .15s ease, border-color .15s ease, color .15s ease, transform .16s var(--mi-ease-out);
+  }
+  .mkt-tab:active { transform:scale(.97); }
+  @media (pointer:coarse) { .mkt-tab { min-height:40px; } }
+  .mkt-map-title, .pf-metrics-label {
+    font-family:'DM Serif Display',Georgia,serif !important; font-weight:400 !important; font-size:19px !important;
+    text-transform:none !important; letter-spacing:0 !important;
+  }
+  .mkt-map-title, .pf-metrics-label { color:#eef2f7 !important; }
+  .inv-panel-progress { font-family:'IBM Plex Sans',system-ui,sans-serif !important; font-size:13px !important; letter-spacing:0 !important; text-transform:none !important; color:rgba(238,242,247,.72) !important; }
+  @media (max-width:760px) {
+    .mkt-tabs { flex-wrap:nowrap !important; overflow-x:auto; scrollbar-width:none; margin-left:-20px; margin-right:-20px; padding:0 20px 4px; }
+    .mkt-tabs::-webkit-scrollbar { display:none; }
+    .mkt-tab { flex:0 0 auto; white-space:nowrap; }
+  }
+  .pick-tag, .mkt-hero-card .mh-name, .inv-count, .api-status {
+    font-family:'IBM Plex Sans',system-ui,sans-serif !important; text-transform:none !important; letter-spacing:0 !important;
+  }
+  .api-status { border:0 !important; background:none !important; }
+
+  /* ── Bordes de color de un solo lado (marca de "hecho con IA"): 1px neutro ── */
+  .mkt-hero-card { border-left-width:1px !important; border-left-color:rgba(255,255,255,.1) !important; }
+  .inv-disclaimer {
+    background:none !important; border:0 !important; padding:0 !important; margin:4px 0 22px !important;
+    font-size:12.5px !important; color:rgba(238,242,247,.62) !important;
+  }
+  .inv-disclaimer > span:first-child { display:none; }
+
+  /* ── Mercados en celular: las tarjetas laterales pasan a una fila deslizable ── */
+  @media (max-width:760px) {
+    .mkt-hero-col { display:flex !important; flex-direction:row !important; overflow-x:auto; scroll-snap-type:x mandatory; gap:8px; padding-bottom:6px; scrollbar-width:none; }
+    .mkt-hero-col::-webkit-scrollbar { display:none; }
+    .mkt-hero-col > * { min-width:150px; flex:0 0 auto; scroll-snap-align:start; }
+    .mkt-hero-col svg, .mkt-hero-col canvas { display:none; }
+  }
+
   /* Cinta de cotizaciones: más calma */
   .ticker-track { animation-duration:50s; }
 
@@ -17194,8 +17282,9 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
   @media (prefers-reduced-motion:reduce) {
     .ticker-track { animation:none; }
     .ticker-bar { overflow-x:auto; }
-    [data-aos] { transform:none !important; transition-property:opacity !important; }
     .dropdown { transform:none !important; }
+    .nav-mega, .nav-sheet, .report-banner, .modal, .cr-toast, .mi-panel { transform:none !important; }
+    .mi-panel, .cr-toast { animation-name:htx-fade !important; }
   }
 </style>
 </body>
