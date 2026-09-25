@@ -92,7 +92,7 @@ async function runWarren(){
   if(!await c.type(b,'El blend queda <strong>16% por debajo del mercado</strong>: a 31,7x P/E forward contra 23,2x de sus pares, el precio ya exige años de crecimiento, justo con una guía de septiembre de solo +9%–11% y el primer relevo de CEO en quince años.'))return;
   await c.show(b,c.src('▤ Informe AAPL · Secciones 05, 06, 07 y 13'),0);
 }
-function stopWarren(){WS.v++; root.querySelector('#s0 .chat__body').innerHTML='';}
+function stopWarren(){WS.v++; warrenPre=false; root.querySelector('#s0 .chat__body').innerHTML='';}
 
 /* ---------- 2 · INFORMES (sin cambios) ---------- */
 var PAGES=[
@@ -194,6 +194,10 @@ function stopPortfolio(){PS.v++;}
 var DUR=8000;   // cada seccion dura 8 s y pasa a la siguiente
 var track=root.getElementById('track'), tabs=Array.prototype.slice.call(root.querySelectorAll('.tab'));
 var cur=-1, elapsed=0, hover=false, visible=false, last=0;
+// La demo de Warren arranca ya escrita (estado final, sin animación) para que nunca se vea
+// la ventana vacía; la animación de tipeo queda para cuando el carrusel vuelve a esa sección.
+var warrenPre=false;
+if(!fixed){ STATIC=true; runWarren().then(function(){ STATIC=false; if(cur<0) warrenPre=true; }); }
 function go(i){
   if(cur===0)stopWarren(); if(cur===1)deckStop(); if(cur===2)stopPortfolio();
   cur=i; elapsed=0;
@@ -201,7 +205,7 @@ function go(i){
   tabs.forEach(function(t,j){t.classList.toggle('on',j===i);t.classList.toggle('done',j<i);t.querySelector('b').style.width=j<i?'100%':'0';});
   setTimeout(function(){
     if(cur!==i)return;
-    if(i===0)runWarren(); if(i===1)deckStart(); if(i===2)runPortfolio();
+    if(i===0){ if(warrenPre){ warrenPre=false; } else runWarren(); } if(i===1)deckStart(); if(i===2)runPortfolio();
   },fixed?100:500);
 }
 tabs.forEach(function(t,i){t.addEventListener('click',function(){go(i);});});
