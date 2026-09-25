@@ -3541,6 +3541,7 @@
       </a>
 
       <ul class="nav-links">
+        <li><a href="#mercados" class="nav-link" data-tab-target="mercados">Mercados</a></li>
         <li>
           <span class="nav-link">
             Reportes &amp; News
@@ -3558,9 +3559,7 @@
             </a>
           </div>
         </li>
-        <li><a href="#mercados" class="nav-link" data-tab-target="mercados">Mercados</a></li>
         <li><a href="#calendario" class="nav-link" data-tab-target="calendario">Calendario</a></li>
-        <li><a href="#university" class="nav-link" data-tab-target="university">University</a></li>
         <li><a href="#inversiones" class="nav-link" data-tab-target="inversiones">Informes<span class="mi-nav-count" id="navPedidosCount" hidden></span></a></li>
         <li id="navPanelItem" hidden><a href="#panel" class="nav-link nav-link-panel" data-tab-target="panel">&#10022; Panel</a></li>
         <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
@@ -3569,10 +3568,28 @@
             Asesor IA <span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;margin-left:4px;vertical-align:middle;"></span>
           </span>
         </li>
-
+        <li>
+          <span class="nav-link" data-tab-group="herramientas">
+            Herramientas
+            <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 6l4 4 4-4"/></svg>
+          </span>
+          <div class="dropdown dropdown--right">
+            <a href="#finanzas" class="dropdown-item" onclick="miOpenFinView('gastos');return false;">
+              <span class="dropdown-item-text">Gastos del mes<small>En qu&eacute; se te va la plata</small></span>
+            </a>
+            <a href="#finanzas" class="dropdown-item" onclick="miOpenFinView('calculadora');return false;">
+              <span class="dropdown-item-text">Calculadora de objetivos<small>Cu&aacute;nto ahorrar para llegar a tu meta</small></span>
+            </a>
+            <a href="#university" class="dropdown-item" data-tab-target="university">
+              <span class="dropdown-item-text">University<small>Cursos para aprender a invertir</small></span>
+            </a>
+            <a href="#asesoria" class="dropdown-item" data-tab-target="asesoria">
+              <span class="dropdown-item-text">Asesor&iacute;a personalizada<small>Charla uno a uno sobre tu patrimonio</small></span>
+            </a>
+          </div>
+        </li>
       </ul>
 
-      <button class="btn-cta" onclick="openModal()">Asesoría</button>
 
       <div id="navUserArea"></div>
       <button class="nav-notify-btn" id="notifyNavBtn" onclick="window.showNotifyOverlay && window.showNotifyOverlay()">
@@ -5958,7 +5975,6 @@
       <div class="mkt-tabs" id="pfViewTabs" role="tablist">
         <button type="button" class="mkt-tab active" data-pfview="tuyo">Tu Portafolio</button>
         <button type="button" class="mkt-tab" data-pfview="manfredi">Portafolio de Manfredi</button>
-        <button type="button" class="mkt-tab" data-pfview="finanzas">Finanzas Personales</button>
       </div>
 
       <div class="pf-view-panel active pf-compact" data-pfview-panel="tuyo">
@@ -6070,7 +6086,38 @@
         </div>
       </div>
 
-      <div class="pf-view-panel" data-pfview-panel="finanzas">
+
+    </div>
+  </section>
+
+  <!-- ── HERRAMIENTAS: Finanzas personales (gastos + objetivos), University y Asesoría ── -->
+  <section class="section section-portfolio" id="herramientas" data-tab="herramientas">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Herramientas</h2>
+        <p class="section-sub">Orden&aacute; tus gastos, pon&eacute;te objetivos y aprend&eacute; a invertir.</p>
+      </div>
+
+      <div class="tools-grid">
+        <a class="tool-card" href="#finanzas" onclick="miOpenFinView('gastos');return false;">
+          <span class="tool-card__t">Gastos del mes</span>
+          <span class="tool-card__d">Carg&aacute; lo que gast&aacute;s y mir&aacute; en qu&eacute; se te va la plata.</span>
+        </a>
+        <a class="tool-card" href="#finanzas" onclick="miOpenFinView('calculadora');return false;">
+          <span class="tool-card__t">Calculadora de objetivos</span>
+          <span class="tool-card__d">Cu&aacute;nto ahorrar por mes para llegar a una meta, y c&oacute;mo vas.</span>
+        </a>
+        <a class="tool-card" href="#university" data-tab-target="university">
+          <span class="tool-card__t">University</span>
+          <span class="tool-card__d">Cursos para aprender a invertir desde cero.</span>
+        </a>
+        <a class="tool-card" href="#asesoria" data-tab-target="asesoria">
+          <span class="tool-card__t">Asesor&iacute;a personalizada</span>
+          <span class="tool-card__d">Una charla uno a uno sobre tu patrimonio.</span>
+        </a>
+      </div>
+
+      <div class="pf-view-panel active" data-pfview-panel="finanzas" id="finanzas">
 
       <div class="mkt-tabs" id="finViewTabs" role="tablist">
         <button type="button" class="mkt-tab active" data-finview="gastos">Gastos</button>
@@ -6265,7 +6312,6 @@
       </div><!-- /panel gastos -->
 
       </div><!-- /panel finanzas -->
-
     </div>
   </section>
 
@@ -16777,17 +16823,18 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
 <script>
   // ââ Navegacion por pestanas: una sola seccion visible a la vez âââââââââââ
   (function() {
-    var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'portfolio', 'asesoria', 'panel'];
+    var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'portfolio', 'herramientas', 'asesoria', 'panel'];
     var TAB_TITLES = {
       inicio: 'Inicio', mercados: 'Mercados', calendario: 'Calendario Economico',
       informes: 'Reportes & News', university: 'University', inversiones: 'Informes',
-      portfolio: 'Portfolio', asesoria: 'Asesoria', panel: 'Panel de creador'
+      portfolio: 'Portfolio', herramientas: 'Herramientas', asesoria: 'Asesoria', panel: 'Panel de creador'
     };
 
     function resolveTab(hash) {
       hash = (hash || '').replace('#', '');
       if (!hash) return 'inicio';
       if (hash === 'reportes') return 'informes';
+      if (hash === 'finanzas') return 'herramientas';
       if (TAB_IDS.indexOf(hash) !== -1) return hash;
       return 'inicio';
     }
@@ -16798,6 +16845,10 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
       });
       document.querySelectorAll('[data-tab-target]').forEach(function(el) {
         el.classList.toggle('tab-nav-active', el.getAttribute('data-tab-target') === tab);
+      });
+      var herrGroup = ['herramientas', 'university', 'asesoria'];
+      document.querySelectorAll('[data-tab-group="herramientas"]').forEach(function(el) {
+        el.classList.toggle('tab-nav-active', herrGroup.indexOf(tab) !== -1);
       });
       document.title = 'Manfredi Investment' + (TAB_TITLES[tab] ? ' - ' + TAB_TITLES[tab] : '');
       // AOS ("fade-up al hacer scroll") calcula visibilidad por posicion de
@@ -16824,6 +16875,16 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
       }
       window.scrollTo(0, 0);
     }
+
+    // Abre Herramientas en la vista pedida de Finanzas personales (gastos | calculadora)
+    window.miOpenFinView = function(view) {
+      if (location.hash !== '#herramientas') location.hash = 'herramientas';
+      else activateTab('herramientas');
+      var btn = document.querySelector('#finViewTabs [data-finview="' + view + '"]');
+      if (btn) btn.click();
+      var fin = document.getElementById('finanzas');
+      if (fin) requestAnimationFrame(function(){ fin.scrollIntoView({ block: 'start' }); });
+    };
 
     window.addEventListener('hashchange', route);
     if (document.readyState !== 'loading') route();
@@ -16899,6 +16960,36 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
   .warren-send-btn { background:var(--gold) !important; box-shadow:none !important; border-radius:6px; }
   .warren-send-btn:hover { transform:none !important; background:#f7d96c !important; }
   .warren-side-new { background:var(--gold) !important; box-shadow:none !important; }
+
+  /* Menú: subrayado dorado que crece desde el centro; la sección activa queda marcada */
+  .nav-link { position:relative; border:0 !important; border-radius:0 !important; background:none !important; color:#4b5567; }
+  .nav-link::after {
+    content:''; position:absolute; left:14px; right:14px; bottom:2px; height:2px; border-radius:2px;
+    background:var(--gold); transform:scaleX(0); transform-origin:center;
+    transition:transform .22s var(--mi-ease-out);
+  }
+  .nav-link:hover, .nav-links > li:hover > .nav-link { color:var(--primary); }
+  .nav-link:hover::after, .nav-links > li:hover > .nav-link::after { transform:scaleX(1); }
+  .nav-link.tab-nav-active { color:var(--primary) !important; font-weight:600; }
+  .nav-link.tab-nav-active::after { transform:scaleX(1); }
+  .nav-link .caret { margin-left:2px; }
+  .dropdown { border-radius:10px; padding:8px; }
+  .dropdown-item { border-radius:7px; }
+  .dropdown--right { left:auto; right:0; }
+
+  /* Herramientas: tarjetas de acceso */
+  .tools-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:8px 0 40px; }
+  .tool-card {
+    display:flex; flex-direction:column; gap:6px; padding:20px 20px 22px; border-radius:12px;
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09);
+    transition:background-color .15s ease, border-color .15s ease, transform .16s var(--mi-ease-out);
+  }
+  .tool-card:hover { background:rgba(242,201,76,.07); border-color:rgba(242,201,76,.45); }
+  .tool-card:active { transform:scale(.98); }
+  .tool-card__t { font-family:'DM Serif Display',Georgia,serif; font-size:21px; line-height:1.15; color:#fff; }
+  .tool-card__d { font-size:14px; line-height:1.5; color:rgba(238,242,247,.8); }
+  @media (max-width:900px) { .tools-grid { grid-template-columns:1fr 1fr; } }
+  @media (max-width:520px) { .tools-grid { grid-template-columns:1fr; } }
 
   /* Cinta de cotizaciones: más calma */
   .ticker-track { animation-duration:50s; }
