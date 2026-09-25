@@ -27,7 +27,7 @@
   <meta name="twitter:image" content="https://manfredinvestment.com/assets/img/og-image.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     /* âââ RESET & BASE âââââââââââââââââââââââââââââââââââââââââââ */ 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -3287,10 +3287,22 @@
       return true;
     }
 
+    // No interrumpir al llegar: se ofrece recién cuando la persona ya vio contenido
+    // (bajó más de la mitad de la página después de 15 s, o lleva 60 s en el sitio).
     function scheduleNotifyPrompt() {
-      setTimeout(function() {
+      var shown = false, t0 = Date.now();
+      function offer() {
+        if (shown) return;
+        shown = true;
+        window.removeEventListener('scroll', onScroll);
         if (shouldOfferNotify()) showNotifyOverlay();
-      }, 8000);
+      }
+      function onScroll() {
+        var h = document.documentElement;
+        if (Date.now() - t0 > 15000 && (h.scrollTop + h.clientHeight) / h.scrollHeight > 0.6) offer();
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      setTimeout(offer, 60000);
     }
 
     if (document.readyState === 'loading') {
@@ -3529,38 +3541,20 @@
       </a>
 
       <ul class="nav-links">
-        <li>
-          <span class="nav-link">
-            Reportes &amp; News
-            <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 6l4 4 4-4"/></svg>
-          </span>
-          <div class="dropdown">
-            <div class="dropdown-label">Contenido</div>
-            <a href="#informes" class="dropdown-item" data-tab-target="informes">
-              <span class="dropdown-icon">IN</span>
-              <span class="dropdown-item-text">Reportes<small>Análisis profundos semanales</small></span>
-            </a>
-            <a href="#reportes" class="dropdown-item" data-tab-target="informes">
-              <span class="dropdown-icon">IA</span>
-              <span class="dropdown-item-text">News Diarias<small>Actualizados por agente IA</small></span>
-            </a>
-          </div>
-        </li>
         <li><a href="#mercados" class="nav-link" data-tab-target="mercados">Mercados</a></li>
         <li><a href="#calendario" class="nav-link" data-tab-target="calendario">Calendario</a></li>
-        <li><a href="#university" class="nav-link" data-tab-target="university">University</a></li>
+        <li><a href="#reportes" class="nav-link" data-tab-target="informes">Noticias</a></li>
+        <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
         <li><a href="#inversiones" class="nav-link" data-tab-target="inversiones">Informes<span class="mi-nav-count" id="navPedidosCount" hidden></span></a></li>
         <li id="navPanelItem" hidden><a href="#panel" class="nav-link nav-link-panel" data-tab-target="panel">&#10022; Panel</a></li>
-        <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
         <li>
-          <span class="nav-link" data-member-required="true" onclick="toggleWarren()" style="cursor:pointer;">
-            Asesor IA <span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;margin-left:4px;vertical-align:middle;"></span>
-          </span>
+          <button type="button" class="nav-link nav-more-btn" id="navMoreBtn" data-tab-group="herramientas" aria-expanded="false" aria-controls="navMore">
+            <svg class="nav-more-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>
+            M&aacute;s
+          </button>
         </li>
-
       </ul>
 
-      <button class="btn-cta" onclick="openModal()">Asesoría</button>
 
       <div id="navUserArea"></div>
       <button class="nav-notify-btn" id="notifyNavBtn" onclick="window.showNotifyOverlay && window.showNotifyOverlay()">
@@ -3568,6 +3562,30 @@
         Notificate de todo
         <span class="nav-notify-dot"></span>
       </button>
+    </div>
+    <div class="nav-mega" id="navMore" aria-hidden="true">
+      <div class="nav-mega__inner">
+        <a class="nav-mega__card" href="#" onclick="miNavMoreClose();if(typeof toggleWarren==='function'){toggleWarren();}return false;">
+          <span class="nav-mega__t">Warren IA</span>
+          <span class="nav-mega__d">Tu analista financiero con IA. Preguntale por un activo o por tu cartera.</span>
+        </a>
+        <a class="nav-mega__card" href="#finanzas" onclick="miNavMoreClose();miOpenFinView('gastos');return false;">
+          <span class="nav-mega__t">Gastos del mes</span>
+          <span class="nav-mega__d">Carg&aacute; lo que gast&aacute;s y mir&aacute; en qu&eacute; se te va la plata.</span>
+        </a>
+        <a class="nav-mega__card" href="#finanzas" onclick="miNavMoreClose();miOpenFinView('calculadora');return false;">
+          <span class="nav-mega__t">Calculadora de objetivos</span>
+          <span class="nav-mega__d">Cu&aacute;nto ahorrar por mes para llegar a una meta.</span>
+        </a>
+        <a class="nav-mega__card" href="#university" data-tab-target="university">
+          <span class="nav-mega__t">University</span>
+          <span class="nav-mega__d">Cursos para aprender a invertir desde cero.</span>
+        </a>
+        <a class="nav-mega__card nav-mega__card--gold" href="#asesoria" data-tab-target="asesoria">
+          <span class="nav-mega__t">Asesor&iacute;a personalizada</span>
+          <span class="nav-mega__d">Una charla uno a uno sobre tu patrimonio.</span>
+        </a>
+      </div>
     </div>
   </header>
 
@@ -3578,232 +3596,271 @@
      Todo scoped bajo .htx para no chocar con el stylesheet global.
      ============================================================ */
   .htx {
-    --htx-bg:#07101e; --htx-raised:#0c1828; --htx-raised2:#0f1f34;
-    --htx-line:rgba(255,255,255,.09); --htx-line-soft:rgba(255,255,255,.05);
-    --htx-ink:#e8eef6; --htx-ink2:rgba(232,238,246,.58); --htx-ink3:rgba(232,238,246,.34);
-    --htx-amber:#f2c94c; --htx-pos:#10b981; --htx-neg:#ef4444; --htx-data:#5aa9e6;
+    --htx-bg:#07101e; --htx-raised:#0c1828; --htx-raised2:#11223a;
+    --htx-line:rgba(232,238,246,.10); --htx-line-soft:rgba(232,238,246,.06);
+    --htx-ink:#eef2f7; --htx-ink2:rgba(238,242,247,.84); --htx-ink3:rgba(238,242,247,.66);
+    --htx-amber:#f2c94c; --htx-amber-ink:#f5d67a;
+    --htx-pos:#5cc08e; --htx-neg:#e8675f; --htx-data:#6fb1e8;
+    --htx-r:6px;
+    --htx-serif:'DM Serif Display',Georgia,serif;
+    --htx-sans:'IBM Plex Sans',system-ui,sans-serif;
+    --htx-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --htx-ease:cubic-bezier(.23,1,.32,1);
     background:var(--htx-bg); color:var(--htx-ink);
-    font-family:'IBM Plex Sans',system-ui,sans-serif;
+    font-family:var(--htx-sans);
   }
   .htx *, .htx *::before, .htx *::after { box-sizing:border-box; }
   .htx a { color:inherit; text-decoration:none; }
   .htx button { font-family:inherit; cursor:pointer; }
-  .htx .mono { font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace; }
-  .htx-num { font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace; font-variant-numeric:tabular-nums; }
+  .htx .mono, .htx-num { font-family:var(--htx-mono); font-variant-numeric:tabular-nums; }
   .htx-inner { max-width:1280px; margin:0 auto; }
+  .htx ::selection { background:rgba(242,201,76,.32); color:#fff; }
 
-  .htx-eyebrow {
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
-    font-size:10.5px; letter-spacing:.2em; text-transform:uppercase;
-    color:var(--htx-amber); margin:0 0 22px;
-  }
-  .htx-live { display:inline-flex; align-items:center; gap:6px; color:var(--htx-pos); font-weight:600;
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+  /* estado "en vivo": punto fijo, sin parpadeo */
+  .htx-live { display:inline-flex; align-items:center; gap:6px; color:var(--htx-ink3); font-size:12px; font-weight:500; }
   .htx-live::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--htx-pos); }
-  @media (prefers-reduced-motion:no-preference){ .htx-live::before{ animation:htx-pulse 1.5s ease-in-out infinite; } }
-  @keyframes htx-pulse { 50%{ opacity:.25; } }
 
-  .htx-btn {
-    display:inline-block;
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
-    font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-weight:600;
-    padding:11px 20px; background:var(--htx-amber); color:#07101e; border:0;
+  /* botones: texto normal, esquinas del sello dorado del logo, respuesta al apretar */
+  .htx-btn, .htx-btn--soft, .htx-ghost {
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--htx-sans); font-size:14.5px; font-weight:600; letter-spacing:0;
+    padding:12px 22px; border-radius:var(--htx-r); border:1px solid transparent;
+    transition:background-color .15s ease, border-color .15s ease, color .15s ease, transform .16s var(--htx-ease);
   }
-  .htx-btn:hover { background:#f7dc6f; }
-  .htx-btn--soft {
-    display:inline-block;
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
-    font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-weight:600;
-    padding:11px 20px; background:transparent; color:rgba(242,201,76,.92);
-    border:1px solid rgba(242,201,76,.38);
-    transition:background .18s ease, border-color .18s ease;
-  }
-  .htx-btn--soft:hover { background:rgba(242,201,76,.09); border-color:rgba(242,201,76,.7); }
-  .htx-ghost {
-    display:inline-block;
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
-    font-size:11px; letter-spacing:.1em; text-transform:uppercase;
-    padding:11px 20px; background:transparent; color:var(--htx-ink);
-    border:1px solid var(--htx-line);
-  }
-  .htx-ghost:hover { border-color:var(--htx-amber); color:var(--htx-amber); }
+  .htx .htx-btn, .htx .htx-btn--soft { background:var(--htx-amber); color:#0a1322; }
+  .htx .htx-ghost { color:var(--htx-ink); }
+  .htx-btn:hover, .htx-btn--soft:hover { background:#f7d96c; }
+  .htx-ghost { background:transparent; color:var(--htx-ink); border-color:rgba(238,242,247,.22); }
+  .htx-ghost:hover { border-color:rgba(238,242,247,.5); }
+  .htx-btn:active, .htx-btn--soft:active, .htx-ghost:active, .htx-pf__tabs button:active { transform:scale(.97); }
+  .htx :focus-visible { outline:2px solid var(--htx-amber); outline-offset:3px; border-radius:var(--htx-r); }
 
   /* hero */
   .htx-hero {
     max-width:1280px; margin:0 auto;
-    display:grid; grid-template-columns:1.05fr .95fr;
-    border-bottom:1px solid var(--htx-line);
+    display:grid; grid-template-columns:1.15fr .85fr; gap:64px; align-items:center;
+    padding:96px 32px 80px;
   }
-  .htx-hero__lead { padding:72px 32px 64px; border-right:1px solid var(--htx-line); }
+  .htx-hero__lead { padding:0; min-width:0; }
+  .htx-metric { min-width:0; }
   .htx-h1 {
-    margin:0 0 20px; font-family:'IBM Plex Sans',system-ui,sans-serif;
-    font-size:clamp(30px,3.4vw,46px); line-height:1.12; font-weight:600;
-    letter-spacing:-.015em; color:var(--htx-ink); max-width:15ch;
+    margin:0 0 26px; font-family:var(--htx-serif); font-weight:400;
+    font-size:clamp(40px,4.5vw,64px); line-height:1.04; letter-spacing:-.012em;
+    color:var(--htx-ink); max-width:none; text-wrap:balance;
   }
-  .htx-deck { margin:0 0 30px; font-size:15.5px; line-height:1.65; color:var(--htx-ink2); max-width:52ch; }
-  .htx-cta { display:flex; gap:12px; flex-wrap:wrap; }
-  .htx-metric { padding:72px 32px 64px; display:flex; flex-direction:column; }
-  .htx-metric__id { display:flex; flex-direction:column; gap:4px; margin-bottom:20px; }
-  .htx-metric__name {
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
-    font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--htx-ink);
-    display:flex; align-items:center; gap:10px;
-  }
-  .htx-metric__sub { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--htx-ink3); }
-  .htx-metric__row { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
-  .htx-metric__badge {
-    flex:none; display:grid; place-items:center; width:44px; height:44px;
-    border:1px solid var(--htx-line); color:var(--htx-ink2);
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:12px; font-weight:600; letter-spacing:.02em;
-  }
+  .htx-h1 em { font-style:normal; color:var(--htx-amber-ink); display:block; }
+  .htx-deck { margin:0 0 28px; font-size:18px; line-height:1.55; color:var(--htx-ink); max-width:46ch; }
+  .htx-cta { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  /* panel en vivo del hero */
+  .htx-panel { min-width:0; align-self:center; border:1px solid var(--htx-line); border-radius:14px; background:rgba(12,24,40,.72); overflow:hidden; }
+  .htx-panel__row { display:flex; flex-direction:column; gap:6px; padding:16px 22px; border-top:1px solid var(--htx-line-soft); transition:background-color .15s ease; }
+  .htx-panel__row:first-child { border-top:0; padding-top:20px; }
+  .htx-panel__row:hover { background:rgba(238,242,247,.035); }
+  .htx-panel__row--split .htx-panel__val { justify-content:flex-start; }
+  .htx-panel__head { display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
+  .htx-panel__k { font-size:13.5px; font-weight:600; color:var(--htx-ink); }
+  .htx-panel__m { font-size:12.5px; color:var(--htx-ink3); }
+  .htx-panel__val { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+  .htx-panel .htx-metric__value { font-size:32px; }
+  .htx-panel__num { font-size:24px; font-weight:500; letter-spacing:-.02em; color:var(--htx-ink); }
+  .htx-panel__spark { width:100%; height:64px; display:block; margin-top:4px; }
+  .htx-panel__txt { font-size:14.5px; line-height:1.45; color:var(--htx-ink); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .htx-panel__inf { display:flex; align-items:center; gap:12px; }
+  .htx-panel__fv { color:var(--htx-amber-ink); }
+  .htx-metric { padding:0 0 6px; display:flex; flex-direction:column; border-left:1px solid var(--htx-line); padding-left:36px; }
+  .htx-metric__id { display:flex; flex-direction:column; gap:3px; margin-bottom:14px; }
+  .htx-metric__name { font-size:15px; font-weight:600; color:var(--htx-ink); display:flex; align-items:center; gap:10px; }
+  .htx-metric__sub { font-size:12.5px; color:var(--htx-ink3); }
+  .htx-metric__row { display:flex; align-items:baseline; gap:14px; margin-bottom:18px; flex-wrap:wrap; }
+  .htx-metric__badge { display:none; }
+  .htx-metric__row > div { display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
   .htx-metric__value {
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums;
-    font-size:clamp(26px,2.8vw,36px); font-weight:600; line-height:1.05; letter-spacing:-.01em;
-    color:rgba(232,238,246,.82);
+    font-family:var(--htx-mono); font-variant-numeric:tabular-nums;
+    font-size:clamp(28px,2.6vw,38px); font-weight:500; line-height:1; letter-spacing:-.02em; color:var(--htx-ink);
   }
-  .htx-metric__delta {
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums;
-    font-size:12.5px; font-weight:500; color:var(--htx-ink2); margin-top:3px;
-  }
+  .htx-metric__delta { font-family:var(--htx-mono); font-variant-numeric:tabular-nums; font-size:14px; font-weight:500; color:var(--htx-ink2); }
   .htx-metric__delta .spot-chg.up, .htx-metric__delta .up { color:var(--htx-pos); }
   .htx-metric__delta .spot-chg.down, .htx-metric__delta .down { color:var(--htx-neg); }
-  .htx-metric__spark { width:100%; height:110px; display:block; margin-top:auto; }
-  .htx-metric__foot { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; color:var(--htx-ink3); margin-top:16px; letter-spacing:.03em; }
+  .htx-metric__spark { width:100%; height:120px; display:block; }
+  .htx-metric__foot { font-size:12px; color:var(--htx-ink3); margin-top:12px; line-height:1.5; }
 
-  /* markets band */
-  .htx-markets { background:var(--htx-raised); border-bottom:1px solid var(--htx-line); }
+  /* mercados */
+  .htx-markets { background:var(--htx-raised); }
   .htx-markets__head {
     max-width:1280px; margin:0 auto;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:20px 32px 16px;
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
-    font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--htx-ink2);
+    display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    padding:40px 32px 20px;
   }
-  .htx-markets__head span { display:inline-flex; align-items:center; gap:12px; }
-  .htx-markets__head a:hover { color:var(--htx-amber); }
-  .htx-markets__grid { max-width:1280px; margin:0 auto; padding:0 32px; display:flex; flex-wrap:wrap; border-top:1px solid var(--htx-line); }
-  .htx-asof { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--htx-ink3); }
-  .htx-mk { flex:1 1 0; min-width:190px; padding:20px 34px 24px; border-right:1px solid var(--htx-line-soft); }
-  .htx-mk:first-child { padding-left:0; }
-  .htx-mk:last-child { border-right:0; }
-  .htx-mk__top { display:flex; align-items:baseline; gap:8px; margin-bottom:12px; }
-  .htx-mk__tk { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:12px; font-weight:600; letter-spacing:.04em; }
-  .htx-mk__nm { font-size:11px; color:var(--htx-ink3); }
-  .htx-mk__val { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums; font-size:22px; font-weight:600; letter-spacing:-.01em; margin-bottom:4px; }
-  .htx-mk__chg { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums; font-size:11.5px; font-weight:500; color:var(--htx-ink3); }
+  .htx-markets__head > span { display:inline-flex; align-items:baseline; gap:16px; font-family:var(--htx-serif); font-size:28px; line-height:1.1; color:var(--htx-ink); }
+  .htx-markets__head .htx-live { font-family:var(--htx-sans); }
+  .htx-markets__grid { max-width:1280px; margin:0 auto; padding:0 32px 36px; display:flex; flex-wrap:wrap; gap:0; }
+  .htx-asof { font-size:12px; color:var(--htx-ink3); }
+  .htx-mk { flex:1 1 0; min-width:190px; padding:18px 28px 6px; border-left:1px solid var(--htx-line-soft); }
+  .htx-mk:first-child { padding-left:0; border-left:0; }
+  .htx-mk__top { display:flex; align-items:baseline; gap:8px; margin-bottom:10px; }
+  .htx-mk__tk { font-family:var(--htx-mono); font-size:13px; font-weight:600; letter-spacing:.02em; }
+  .htx-mk__nm { font-size:12.5px; color:var(--htx-ink3); }
+  .htx-mk__val { font-family:var(--htx-mono); font-variant-numeric:tabular-nums; font-size:24px; font-weight:500; letter-spacing:-.02em; margin-bottom:4px; border-radius:4px; }
+  .htx-mk__chg { font-family:var(--htx-mono); font-variant-numeric:tabular-nums; font-size:13px; font-weight:500; color:var(--htx-ink3); }
   .htx-mk__chg.up, .htx-mk__chg .up { color:var(--htx-pos); }
   .htx-mk__chg.down, .htx-mk__chg .down { color:var(--htx-neg); }
-  .htx-mk__spark { width:100%; height:34px; display:block; margin-top:12px; color:var(--htx-ink3); }
+  .htx-mk__spark { width:100%; height:30px; display:block; margin-top:12px; color:var(--htx-ink3); }
+  /* destello cuando un precio cambia de verdad (lo dispara JS al refrescar) */
+  .htx-flash-up { animation:htx-flash-up 900ms ease-out; }
+  .htx-flash-down { animation:htx-flash-down 900ms ease-out; }
+  @keyframes htx-flash-up { from { background:rgba(92,192,142,.24); } to { background:transparent; } }
+  @keyframes htx-flash-down { from { background:rgba(232,103,95,.24); } to { background:transparent; } }
 
-  /* bento */
-  .htx-bento { max-width:1280px; margin:0 auto; display:grid; grid-template-columns:repeat(12,1fr); gap:1px; background:var(--htx-line); border-bottom:1px solid var(--htx-line); }
-  .htx-bento > * { background:var(--htx-bg); }
-  .htx-tile { padding:30px 32px 34px; }
+  /* bento: sin grilla de líneas, separado por aire */
+  .htx-bento { max-width:1280px; margin:0 auto; display:grid; grid-template-columns:repeat(12,1fr); column-gap:72px; padding:0 32px; }
+  .htx-bento > * { background:transparent; }
+  .htx-tile { padding:64px 0 56px; }
   .htx-tile--informes { grid-column:span 7; }
   .htx-tile--pf { grid-column:span 5; }
-  .htx-tile--cal { grid-column:span 12; }
-  .htx-tile__head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:20px; gap:16px; }
-  .htx-tile__title { font-size:15px; font-weight:600; letter-spacing:.01em; color:var(--htx-ink); }
-  .htx-tile__count { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:11px; color:var(--htx-ink3); letter-spacing:.06em; }
+  .htx-tile--cal { grid-column:span 12; border-top:1px solid var(--htx-line); }
+  .htx-tile__head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:22px; gap:16px; }
+  .htx-tile__title { font-family:var(--htx-serif); font-size:30px; font-weight:400; line-height:1.1; letter-spacing:-.005em; color:var(--htx-ink); display:inline-flex; align-items:baseline; gap:14px; }
+  .htx-tile__title .htx-live { font-family:var(--htx-sans); }
+  .htx-tile__count { font-size:12.5px; color:var(--htx-ink3); }
   .htx-tile__link {
-    display:inline-block; margin-top:18px;
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;
-    font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--htx-amber);
+    display:inline-flex; align-items:center; gap:6px; margin-top:22px;
+    font-size:14px; font-weight:600; color:var(--htx-amber-ink);
+    transition:color .15s ease;
   }
-  .htx-tile__link:hover { text-decoration:underline; }
-  .htx-pf__links { display:flex; gap:24px; flex-wrap:wrap; }
+  .htx-tile__link::after { content:'\2192'; transition:transform .18s var(--htx-ease); }
+  .htx-pf__links { display:flex; gap:28px; flex-wrap:wrap; }
+  .htx .htx-tile__link, .htx .htx-markets__head a { color:var(--htx-amber-ink); }
+  .htx #htx-ust10-note { font-family:var(--htx-sans); font-size:12.5px; }
+  .htx .htx-mk__chg .spot-chg, .htx .htx-metric__delta .spot-chg { display:inline; text-align:left; font-size:inherit; font-weight:inherit; }
 
   .htx-inf { display:flex; flex-direction:column; }
   .htx-inf__row {
-    display:grid; grid-template-columns:64px 1fr auto; align-items:center; gap:16px;
-    padding:13px 8px; margin:0 -8px; border-bottom:1px solid var(--htx-line-soft);
-    transition:background .14s ease;
+    display:grid; grid-template-columns:28px 64px 1fr auto; align-items:center; gap:14px;
+    padding:14px 12px; margin:0 -12px; border-radius:var(--htx-r);
+    border-bottom:1px solid var(--htx-line-soft);
+    transition:background-color .15s ease;
   }
-  .htx-inf__row:last-child { border-bottom:0; }
-  .htx-inf__row:hover { background:var(--htx-raised); }
-  .htx-inf__tk { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:12.5px; font-weight:600; color:var(--htx-ink); }
-  .htx-inf__nm { font-size:12.5px; color:var(--htx-ink2); }
-  .htx-inf__nm .free {
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:8.5px; letter-spacing:.1em; text-transform:uppercase;
-    color:var(--htx-pos); border:1px solid rgba(16,185,129,.4); padding:1px 5px; margin-left:8px; vertical-align:middle;
+  .htx-inf__row:last-child { border-bottom-color:transparent; }
+  .htx-inf__row:hover { background:var(--htx-raised); border-bottom-color:transparent; }
+  .htx-inf__logo { width:28px; height:28px; border-radius:7px; background:#fff; object-fit:contain; padding:3px; display:block; }
+  .htx-inf__tk { font-family:var(--htx-mono); font-size:13.5px; font-weight:600; color:var(--htx-ink); }
+  .htx-inf__nm { font-size:14.5px; color:var(--htx-ink2); }
+  .htx-inf__nm .free, .htx-inf__nm .htx-inf__new {
+    display:inline-block; font-size:11.5px; font-weight:600; letter-spacing:0; text-transform:none;
+    padding:2px 8px; margin-left:10px; border-radius:999px; vertical-align:1px; border:0;
   }
-  .htx-inf__nm .htx-inf__new {
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:8.5px; letter-spacing:.1em; text-transform:uppercase;
-    color:var(--htx-amber); border:1px solid rgba(245,158,11,.45); padding:1px 5px; margin-left:8px; vertical-align:middle;
-  }
-  .htx-inf__go { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--htx-ink3); white-space:nowrap; }
-  .htx-inf__row:hover .htx-inf__go { color:var(--htx-amber); }
+  .htx-inf__nm .free { color:#9fe3bf; background:rgba(92,192,142,.14); }
+  .htx-inf__nm .htx-inf__new { color:var(--htx-amber-ink); background:rgba(242,201,76,.14); }
+  .htx-inf__go { font-size:16px; color:var(--htx-ink3); white-space:nowrap; transition:transform .18s var(--htx-ease), color .15s ease; }
+  .htx-inf__row:hover .htx-inf__go { color:var(--htx-amber-ink); }
 
-  /* portfolio widget (visual, estilo mockup) */
-  .htx-pf__tabs { display:flex; gap:4px; margin-bottom:20px; flex-wrap:wrap; }
+  /* portfolio */
+  .htx-pf__tabs { display:inline-flex; gap:2px; margin-bottom:22px; padding:3px; border-radius:calc(var(--htx-r) + 3px); background:var(--htx-raised); }
   .htx-pf__tabs button {
-    appearance:none; cursor:pointer; background:transparent; color:var(--htx-ink3);
-    border:1px solid var(--htx-line);
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.06em; padding:6px 11px;
+    appearance:none; cursor:pointer; background:transparent; color:var(--htx-ink3); border:0; border-radius:var(--htx-r);
+    font-family:var(--htx-sans); font-size:13px; font-weight:500; padding:6px 13px;
+    transition:background-color .15s ease, color .15s ease, transform .16s var(--htx-ease);
   }
+  .htx-pf__tabs button:hover { color:var(--htx-ink); }
   .htx-pf__tabs button.on { background:var(--htx-raised2); color:var(--htx-ink); }
   .htx-pf__stat { display:flex; align-items:baseline; gap:14px; margin-bottom:4px; flex-wrap:wrap; }
-  .htx-pf__big { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums; font-size:30px; font-weight:600; color:var(--htx-pos); letter-spacing:-.01em; }
-  .htx-pf__bench { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums; font-size:12px; color:var(--htx-ink3); }
-  .htx-pf__chart { width:100%; height:132px; display:block; margin-top:14px; }
-  .htx-pf__legend { display:flex; gap:18px; margin-top:10px; font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:9.5px; letter-spacing:.06em; color:var(--htx-ink3); text-transform:uppercase; }
-  .htx-pf__legend i { display:inline-block; width:14px; height:2px; vertical-align:middle; margin-right:6px; }
-  .htx-pf__note { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:9.5px; letter-spacing:.03em; color:var(--htx-ink3); margin-top:10px; }
+  .htx-pf__big { font-family:var(--htx-mono); font-variant-numeric:tabular-nums; font-size:40px; font-weight:500; color:var(--htx-pos); letter-spacing:-.03em; line-height:1; }
+  .htx-pf__bench { font-size:13px; color:var(--htx-ink3); }
+  .htx-pf__chart { width:100%; height:140px; display:block; margin-top:18px; transition:opacity .18s ease; }
+  .htx-pf__legend { display:flex; gap:18px; margin-top:12px; font-size:12.5px; color:var(--htx-ink3); }
+  .htx-pf__legend i { display:inline-block; width:14px; height:2px; vertical-align:middle; margin-right:6px; border-radius:2px; }
+  .htx-pf__note { font-size:12px; color:var(--htx-ink3); margin-top:10px; }
 
-  /* calendario (diseño mockup) */
-  .htx-cal2 { display:grid; grid-template-columns:1fr 1fr; gap:0 48px; }
+  /* calendario + noticias */
+  .htx-cal2 { display:grid; grid-template-columns:1fr 1fr; gap:0 72px; }
   .htx-cal2__legend {
     grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:20px;
-    padding-bottom:16px; margin-bottom:2px; border-bottom:1px solid var(--htx-line);
-    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--htx-ink3);
+    padding-bottom:14px; margin-bottom:2px; border-bottom:1px solid var(--htx-line);
+    font-size:13px; font-weight:500; color:var(--htx-ink2);
   }
-  .htx-cal2__legend i { width:6px; height:6px; border-radius:50%; display:inline-block; margin-right:7px; vertical-align:middle; }
-  .htx-cal2__ev { display:grid; grid-template-columns:46px 1fr; gap:18px; padding:20px 0; border-bottom:1px solid var(--htx-line-soft); }
-  .htx-cal2__day { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; text-align:right; padding-top:1px; }
-  .htx-cal2__day .d { display:block; font-size:21px; font-weight:600; line-height:1; letter-spacing:-.02em; color:var(--htx-ink); font-variant-numeric:tabular-nums; }
-  .htx-cal2__day .m { display:block; font-size:8.5px; letter-spacing:.14em; color:var(--htx-ink3); margin-top:5px; }
-  .htx-cal2__hoy { display:inline-block; font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:8.5px; font-weight:600; letter-spacing:.1em; color:var(--htx-amber); border:1px solid rgba(242,201,76,.45); padding:4px 5px; }
-  .htx-cal2__meta { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
-  .htx-cal2__time { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums; font-size:11px; font-weight:600; color:var(--htx-ink); }
-  .htx-cal2__tag { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:var(--htx-ink2); border:1px solid var(--htx-line); padding:3px 7px; display:inline-flex; align-items:center; gap:6px; }
-  .htx-cal2__tag::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--htx-ink3); }
+  .htx-cal2__legend i { width:7px; height:7px; border-radius:50%; display:inline-block; margin-right:7px; vertical-align:middle; }
+  .htx-cal2__ev { display:grid; grid-template-columns:52px 1fr; gap:18px; padding:20px 0; border-bottom:1px solid var(--htx-line-soft); }
+  .htx-cal2__day { text-align:right; padding-top:0; }
+  .htx-cal2__day .d { display:block; font-family:var(--htx-serif); font-size:34px; font-weight:400; line-height:.9; color:var(--htx-ink); font-variant-numeric:lining-nums; }
+  .htx-cal2__day .m { display:block; font-size:11px; font-weight:500; letter-spacing:.04em; color:var(--htx-ink3); margin-top:6px; text-transform:lowercase; }
+  .htx-cal2__hoy { display:inline-block; font-size:12px; font-weight:700; color:#0a1322; background:var(--htx-amber); border-radius:var(--htx-r); padding:5px 7px; letter-spacing:0; }
+  .htx-cal2__meta { display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap; }
+  .htx-cal2__time { font-family:var(--htx-mono); font-variant-numeric:tabular-nums; font-size:12.5px; font-weight:600; color:var(--htx-ink); }
+  .htx-cal2__tag { font-size:12px; font-weight:500; letter-spacing:0; text-transform:none; color:var(--htx-ink3); border:0; padding:0; display:inline-flex; align-items:center; gap:6px; }
+  .htx-cal2__tag::before { content:''; width:7px; height:7px; border-radius:50%; background:var(--htx-ink3); }
   .htx-cal2__tag.ar::before { background:var(--htx-data); }
-  .htx-cal2__tag.us::before { background:#9fb4c9; }
-  .htx-cal2__imp { margin-left:auto; font-size:8px; letter-spacing:3px; color:var(--htx-ink3); }
+  .htx-cal2__tag.us::before { background:#a9bccf; }
+  .htx-cal2__imp { margin-left:auto; font-size:11px; letter-spacing:3px; color:var(--htx-ink3); }
   .htx-cal2__imp.high { color:var(--htx-amber); }
-  .htx-cal2__title { font-size:13px; color:var(--htx-ink); line-height:1.4; margin-bottom:5px; }
-  .htx-cal2__sub { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; color:var(--htx-ink3); line-height:1.55; }
+  .htx-cal2__title { font-size:15px; color:var(--htx-ink); line-height:1.45; margin-bottom:4px; transition:color .15s ease; }
+  .htx-cal2__sub { font-size:12.5px; color:var(--htx-ink3); line-height:1.55; }
   .htx-cal2__sub b { color:var(--htx-ink2); font-weight:500; }
   .htx-cal2__col { display:flex; flex-direction:column; }
   .htx-cal2__evs { flex:1 0 auto; }
   .htx-cal2__evs > .htx-cal2__ev:last-child,
   .htx-cal2__evs > .htx-cal2__newsitem:last-child { border-bottom:0; }
   .htx-cal2__col > .htx-tile__link { margin-top:14px; align-self:flex-start; }
-  .htx-cal2__legendbar { display:flex; flex-wrap:wrap; gap:20px; padding-top:16px; margin-top:6px; border-top:1px solid var(--htx-line); font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--htx-ink3); }
-  .htx-cal2__legendbar i { width:6px; height:6px; border-radius:50%; display:inline-block; margin-right:7px; vertical-align:middle; }
+  .htx-cal2__legendbar { display:flex; flex-wrap:wrap; gap:22px; padding-top:18px; margin-top:8px; border-top:1px solid var(--htx-line); font-size:12.5px; color:var(--htx-ink3); }
+  .htx-cal2__legendbar i { width:7px; height:7px; border-radius:50%; display:inline-block; margin-right:7px; vertical-align:middle; }
   .htx-cal2__legend--news { justify-content:space-between; }
-  .htx-cal2__newsasof { text-transform:none; letter-spacing:.03em; color:var(--htx-ink3); }
-  .htx-cal2__newsitem { display:grid; grid-template-columns:46px 1fr; gap:18px; padding:20px 0; border-bottom:1px solid var(--htx-line-soft); text-decoration:none; }
-  .htx-cal2__newsitem:hover .htx-cal2__title { color:var(--htx-amber); }
+  .htx-cal2__newsasof { font-weight:400; color:var(--htx-ink3); }
+  .htx-cal2__newsitem { display:grid; grid-template-columns:52px 1fr; gap:18px; padding:20px 0; border-bottom:1px solid var(--htx-line-soft); text-decoration:none; }
+  .htx-cal2__newsitem:hover .htx-cal2__title { color:var(--htx-amber-ink); }
   .htx-cal2__newsitem .htx-cal2__title { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .htx-cal2__newsitem .htx-cal2__day .m { text-transform:uppercase; }
-  .htx-cal2__src { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:8px; letter-spacing:.08em; text-transform:uppercase; color:var(--htx-ink3); }
-  .htx-cal2__newsempty { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10px; color:var(--htx-ink3); padding:20px 0; }
+  .htx-cal2__newsitem .htx-cal2__day .d { font-family:var(--htx-mono); font-size:15px; font-weight:500; line-height:1.2; letter-spacing:-.01em; }
+  .htx-cal2__newsitem .htx-cal2__day .m { text-transform:lowercase; }
+  .htx-cal2__src { font-size:12px; letter-spacing:0; text-transform:none; color:var(--htx-ink3); }
+  .htx-cal2__newsempty { font-size:13px; color:var(--htx-ink3); padding:20px 0; }
 
   /* membresia: el cartel (carrusel de 3 secciones) vive en assets/cartel/cartel.js, dentro de un Shadow DOM */
-  .htx-member { background:#0a0f1e; padding:36px 32px 40px; border-bottom:1px solid var(--htx-line); }
+  .htx-member { background:#0a0f1e; padding:40px 32px 44px; }
   #mcHost { display:block; min-height:520px; }
   @media (max-width:1040px) { .htx-member { padding:24px 14px 36px; } #mcHost { min-height:0; } }
 
+  /* hover con movimiento solo en dispositivos con mouse */
+  @media (hover:hover) and (pointer:fine) {
+    .htx-inf__row:hover .htx-inf__go { transform:translateX(4px); }
+    .htx-tile__link:hover::after, .htx-markets__head a:hover::after { transform:translateX(3px); }
+    .htx-tile__link:hover, .htx-markets__head a:hover { color:#fff; }
+  }
+  .htx-markets__head a { display:inline-flex; gap:6px; font-size:14px; font-weight:600; color:var(--htx-amber-ink); transition:color .15s ease; }
+  .htx-markets__head a::after { content:'\2192'; transition:transform .18s var(--htx-ease); }
+
+  /* entrada del hero: una sola vez por sesión (clase la pone JS) */
+  @media (prefers-reduced-motion:no-preference) {
+    .htx--intro .htx-hero__lead > * { animation:htx-rise 620ms var(--htx-ease) both; }
+    .htx--intro .htx-hero__lead > :nth-child(2) { animation-delay:70ms; }
+    .htx--intro .htx-hero__lead > :nth-child(3) { animation-delay:140ms; }
+    .htx--intro .htx-hero__lead > :nth-child(4) { animation-delay:210ms; }
+    .htx--intro .htx-panel { animation:htx-fade 700ms ease-out 200ms both; }
+    .htx--intro .htx-panel__spark { animation:htx-draw 900ms cubic-bezier(.77,0,.175,1) 320ms both; }
+  }
+  @keyframes htx-rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+  @keyframes htx-fade { from { opacity:0; } to { opacity:1; } }
+  @keyframes htx-draw { from { clip-path:inset(0 100% 0 0); } to { clip-path:inset(0 0 0 0); } }
+
   @media (max-width:1040px) {
-    .htx-hero { grid-template-columns:1fr; }
-    .htx-hero__lead { border-right:0; border-bottom:1px solid var(--htx-line); }
+    .htx-hero { grid-template-columns:1fr; gap:44px; padding:64px 24px 56px; }
+    .htx-panel { align-self:stretch; }
+    .htx-bento { column-gap:0; padding:0 24px; }
     .htx-tile--informes, .htx-tile--pf { grid-column:span 12; }
+    .htx-tile--pf { padding-top:0; }
     .htx-cal2 { grid-template-columns:1fr; gap:8px 0; }
-    .htx-cal2__col + .htx-cal2__col { border-top:1px solid var(--htx-line); padding-top:8px; }
+    .htx-cal2__col + .htx-cal2__col { border-top:1px solid var(--htx-line); padding-top:8px; margin-top:20px; }
+    .htx-markets__head, .htx-markets__grid { padding-left:24px; padding-right:24px; }
   }
   @media (max-width:600px) {
-    .htx-mk { flex:1 1 100%; max-width:none; border-right:0; border-bottom:1px solid var(--htx-line-soft); padding-left:0; }
+    .htx-hero { padding:48px 20px 44px; }
+    .htx-h1 { font-size:42px; }
+    .htx-deck { font-size:16px; }
+    .htx-cta > * { flex:1 1 100%; justify-content:center; }
+    .htx-bento, .htx-markets__head, .htx-markets__grid { padding-left:20px; padding-right:20px; }
+    .htx-markets__grid { display:grid; grid-template-columns:1fr 1fr; gap:0 20px; }
+    .htx-mk { min-width:0; padding:16px 0 12px; border-left:0; border-top:1px solid var(--htx-line-soft); }
+    .htx-mk__val { font-size:21px; }
+    .htx-inf__row { grid-template-columns:28px 52px 1fr auto; gap:10px; }
+    .htx-inf__nm { font-size:13.5px; }
+    .htx-tile__title { font-size:26px; }
   }
   </style>
 
@@ -3812,31 +3869,40 @@
     <!-- hero -->
     <div class="htx-hero">
       <div class="htx-hero__lead">
-        <p class="htx-eyebrow">Research institucional &middot; Mercados &middot; Portfolio</p>
-        <h1 class="htx-h1">Tu mundo financiero, en un solo lugar.</h1>
-        <p class="htx-deck">An&aacute;lisis institucional de las empresas que mueven el mercado, cotizaciones de Argentina y el mundo en tiempo real, y las herramientas para armar y seguir tu cartera &mdash; con un asesor de IA que la conoce.</p>
+        <h1 class="htx-h1">Tu mundo financiero, <em>en un solo lugar.</em></h1>
+        <p class="htx-deck">Dej&aacute; de abrir diez pesta&ntilde;as para seguir el mercado. Ac&aacute; ten&eacute;s cotizaciones, calendario, tu portafolio en vivo, informes con valuaci&oacute;n propia y un analista IA.</p>
         <div class="htx-cta">
-          <a class="htx-btn--soft" href="#informes" data-tab-target="informes">Ver reportes</a>
-          <a class="htx-ghost" href="#portfolio" data-tab-target="portfolio">Probar el portfolio</a>
+          <a class="htx-btn" href="#inversiones" data-tab-target="inversiones">Ver los informes</a>
+          <a class="htx-ghost" href="#portfolio" data-tab-target="portfolio">Probar el Portfolio</a>
         </div>
       </div>
-      <div class="htx-metric">
-        <div class="htx-metric__id">
-          <span class="htx-metric__name">S&amp;P 500 <span class="htx-live">Live</span></span>
-          <span class="htx-metric__sub">Estados Unidos &middot; &Iacute;ndice &middot; cierre <span id="htx-us-asof">&mdash;</span></span>
-        </div>
-        <div class="htx-metric__row">
-          <span class="htx-metric__badge">SPX</span>
-          <div>
-            <div class="htx-metric__value htx-num" id="htx-spx-price">&mdash;</div>
-            <div class="htx-metric__delta"><span id="htx-spx-chg">&mdash;</span></div>
-          </div>
-        </div>
-        <svg class="htx-metric__spark" id="htxSpxSpark" viewBox="0 0 480 110" preserveAspectRatio="none" aria-hidden="true">
-          <polyline points="0,64 120,60 240,58 360,56 480,54" fill="none" stroke="rgba(232,238,246,.18)" stroke-width="1.5" />
-        </svg>
-        <p class="htx-metric__foot">Movimiento de la jornada (S&amp;P 500 &middot; ^GSPC) &middot; nivel de cierre del reporte diario</p>
-      </div>
+
+      <!-- Panel en vivo: todo el sitio en una sola vista (mercado, portafolio, calendario, informe) -->
+      <aside class="htx-panel" aria-label="Resumen en vivo">
+        <a class="htx-panel__row" href="#mercados" data-tab-target="mercados">
+          <span class="htx-panel__head"><span class="htx-panel__k">S&amp;P 500</span><span class="htx-panel__m">Cierre del <span id="htx-us-asof">&mdash;</span></span></span>
+          <span class="htx-panel__val"><span class="htx-metric__value htx-num" id="htx-spx-price">&mdash;</span><span class="htx-metric__delta"><span id="htx-spx-chg">&mdash;</span></span></span>
+          <svg class="htx-panel__spark" id="htxSpxSpark" viewBox="0 0 480 110" preserveAspectRatio="none" aria-hidden="true">
+            <polyline points="0,64 120,60 240,58 360,56 480,54" fill="none" stroke="rgba(232,238,246,.18)" stroke-width="1.5" />
+          </svg>
+        </a>
+        <a class="htx-panel__row htx-panel__row--split" href="#portfolio" data-tab-target="portfolio">
+          <span class="htx-panel__head"><span class="htx-panel__k">Manfredi Portfolio</span><span class="htx-panel__m">&Uacute;ltimo mes</span></span>
+          <span class="htx-panel__val"><span class="htx-panel__num htx-num" id="htxHeroPf">&hellip;</span><span class="htx-panel__m" id="htxHeroPfBench"></span></span>
+        </a>
+        <a class="htx-panel__row" href="#calendario" data-tab-target="calendario">
+          <span class="htx-panel__head"><span class="htx-panel__k">Pr&oacute;ximo en el calendario</span><span class="htx-panel__m" id="htxHeroEvDay"></span></span>
+          <span class="htx-panel__txt" id="htxHeroEv">Cargando agenda&hellip;</span>
+        </a>
+        <a class="htx-panel__row" href="#inversiones" data-tab-target="inversiones" id="htxHeroInf">
+          <span class="htx-panel__head"><span class="htx-panel__k">&Uacute;ltimo informe</span><span class="htx-panel__m" id="htxHeroInfDate"></span></span>
+          <span class="htx-panel__inf">
+            <img class="htx-inf__logo" id="htxHeroInfLogo" src="assets/logos/msft.png" alt="" width="28" height="28" hidden>
+            <span class="htx-panel__txt" id="htxHeroInfName">Ver informes</span>
+          </span>
+          <span class="htx-panel__m htx-panel__fv" id="htxHeroInfFv"></span>
+        </a>
+      </aside>
     </div>
 
     <!-- membresia: carrusel Warren IA / Informes / Portfolio (assets/cartel/cartel.js) -->
@@ -3852,8 +3918,8 @@
     <!-- mercados ahora -->
     <div class="htx-markets">
       <div class="htx-markets__head">
-        <span>Mercados ahora <span class="htx-live">Live</span></span>
-        <a href="#mercados" data-tab-target="mercados">Ver todos los mercados &rarr;</a>
+        <span>Mercados <span class="htx-live">En vivo</span></span>
+        <a href="#mercados" data-tab-target="mercados">Ver todos los mercados</a>
       </div>
       <div class="htx-markets__grid">
         <div class="htx-mk">
@@ -3896,48 +3962,55 @@
         <!-- Lista fija: los 7 primeros informes. No sumar m&aacute;s (mantiene la home compacta). -->
         <div class="htx-inf">
           <a class="htx-inf__row" href="informes/msft.html" target="_blank" rel="noopener">
+            <img class="htx-inf__logo" src="assets/logos/msft.png" alt="" width="28" height="28">
             <span class="htx-inf__tk">MSFT</span>
             <span class="htx-inf__nm">Microsoft Corporation<span class="free">Gratis</span></span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
           </a>
           <a class="htx-inf__row" href="informes/amd.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AMD')">
+            <img class="htx-inf__logo" src="assets/logos/amd.png" alt="" width="28" height="28">
             <span class="htx-inf__tk">AMD</span>
             <span class="htx-inf__nm">Advanced Micro Devices, Inc.</span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
           </a>
           <a class="htx-inf__row" href="informes/pltr.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'PLTR')">
+            <img class="htx-inf__logo" src="assets/logos/pltr.png" alt="" width="28" height="28">
             <span class="htx-inf__tk">PLTR</span>
             <span class="htx-inf__nm">Palantir Technologies Inc.</span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
           </a>
           <a class="htx-inf__row" href="informes/uber.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'UBER')">
+            <img class="htx-inf__logo" src="assets/logos/uber.png" alt="" width="28" height="28">
             <span class="htx-inf__tk">UBER</span>
             <span class="htx-inf__nm">Uber Technologies, Inc.</span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
           </a>
           <a class="htx-inf__row" href="informes/intc.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'INTC')">
+            <img class="htx-inf__logo" src="assets/logos/intc.png" alt="" width="28" height="28">
             <span class="htx-inf__tk">INTC</span>
             <span class="htx-inf__nm">Intel Corporation</span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
           </a>
           <a class="htx-inf__row" href="informes/mu.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MU')">
+            <img class="htx-inf__logo" src="assets/logos/mu.png" alt="" width="28" height="28">
             <span class="htx-inf__tk">MU</span>
             <span class="htx-inf__nm">Micron Technology, Inc.</span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
           </a>
           <a class="htx-inf__row" href="informes/meli.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MELI')">
+            <img class="htx-inf__logo" src="assets/logos/meli.png" alt="" width="28" height="28">
             <span class="htx-inf__tk">MELI</span>
             <span class="htx-inf__nm">MercadoLibre, Inc.</span>
-            <span class="htx-inf__go">Ver an&aacute;lisis &rarr;</span>
+            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
           </a>
           <!-- FIJO: 7 informes destacados en la home. NO agregar filas nuevas ac&aacute;.
                Los informes nuevos van solo al picks-list de la secci&oacute;n #inversiones. -->
         </div>
-        <a class="htx-tile__link" href="#inversiones" data-tab-target="inversiones">Ver secci&oacute;n Informes &rarr;</a>
+        <a class="htx-tile__link" href="#inversiones" data-tab-target="inversiones">Ver todos los informes</a>
       </div>
 
       <div class="htx-tile htx-tile--pf">
-        <div class="htx-tile__head"><span class="htx-tile__title">Manfredi Portfolio <span class="htx-live">Live</span></span></div>
+        <div class="htx-tile__head"><span class="htx-tile__title">Manfredi Portfolio</span></div>
         <div class="htx-pf__tabs">
           <button type="button">1S</button><button type="button" class="on">1M</button><button type="button">YTD</button><button type="button">1A</button>
         </div>
@@ -3949,12 +4022,12 @@
           <polyline points="0,66 115,64 230,62 345,60 460,58" fill="none" stroke="rgba(232,238,246,.18)" stroke-width="1.5" />
         </svg>
         <div class="htx-pf__legend">
-          <span><i style="background:#10b981;"></i>Manfredi</span>
+          <span><i style="background:var(--htx-pos);"></i>Manfredi</span>
           <span><i style="background:rgba(232,238,246,.4);"></i>S&amp;P 500</span>
         </div>
         <div class="htx-pf__links">
-          <a class="htx-tile__link" href="#portfolio" data-tab-target="portfolio">Ver el Manfredi Portfolio &rarr;</a>
-          <a class="htx-tile__link" href="#portfolio" data-tab-target="portfolio">Armar el m&iacute;o &rarr;</a>
+          <a class="htx-tile__link" href="#portfolio" data-tab-target="portfolio">Ver el Manfredi Portfolio</a>
+          <a class="htx-tile__link" href="#portfolio" data-tab-target="portfolio">Armar el m&iacute;o</a>
         </div>
       </div>
 
@@ -3970,7 +4043,7 @@
             <div id="htxCalEcoList" class="htx-cal2__evs">
               <div class="htx-cal2__newsempty">Cargando agenda&hellip;</div>
             </div>
-            <a class="htx-tile__link" href="#calendario" data-tab-target="calendario">Ver calendario completo &rarr;</a>
+            <a class="htx-tile__link" href="#calendario" data-tab-target="calendario">Ver calendario completo</a>
           </div>
 
           <div class="htx-cal2__col">
@@ -3981,7 +4054,7 @@
             <div id="htxCalNewsList" class="htx-cal2__evs">
               <div class="htx-cal2__newsempty">Cargando noticias&hellip;</div>
             </div>
-            <a class="htx-tile__link" href="#reportes" data-tab-target="informes">Ver reportes diarios &rarr;</a>
+            <a class="htx-tile__link" href="#reportes" data-tab-target="informes">Ver reportes diarios</a>
           </div>
         </div>
         <div class="htx-cal2__legendbar">
@@ -4037,6 +4110,88 @@
     if (document.readyState !== 'loading') loadHeroUsIndices();
     else document.addEventListener('DOMContentLoaded', loadHeroUsIndices);
     setInterval(loadHeroUsIndices, 300000);
+  })();
+
+  /* Home: entrada del hero una vez por sesión + destello cuando un precio cambia de verdad. */
+  (function () {
+    var home = document.querySelector('.htx');
+    if (!home) return;
+    try {
+      if (!sessionStorage.getItem('htx_intro')) {
+        home.classList.add('htx--intro');
+        sessionStorage.setItem('htx_intro', '1');
+      }
+    } catch (e) {}
+    function num(t) {
+      var v = parseFloat(String(t).replace(/[^\d,.\-]/g, '').replace(/,(?=\d{3}\b)/g, '').replace(/\.(?=\d{3}\b)/g, '').replace(',', '.'));
+      return isNaN(v) ? null : v;
+    }
+    /* Panel en vivo del hero: refleja datos que ya carga la home (sin fetch extra salvo el manifest) */
+    function mirror(srcId, fn) {
+      var src = document.getElementById(srcId);
+      if (!src) return;
+      fn(src);
+      new MutationObserver(function () { fn(src); }).observe(src, { childList: true, characterData: true, subtree: true, attributes: true });
+    }
+    mirror('htxPfBig', function (src) {
+      var t = document.getElementById('htxHeroPf');
+      if (!t) return;
+      t.textContent = src.textContent;
+      t.style.color = src.style.color || '';
+    });
+    mirror('htxPfBench', function (src) {
+      var t = document.getElementById('htxHeroPfBench');
+      if (t) t.textContent = /S&P/.test(src.textContent) ? src.textContent.split('·')[0].trim() : '';
+    });
+    mirror('htxCalEcoList', function (src) {
+      var evs = src.querySelectorAll('.htx-cal2__ev, .htx-cal2__newsitem');
+      if (!evs.length) return;
+      var ev = null;
+      evs.forEach(function (e) { if (!ev && e.querySelector('.htx-cal2__hoy')) ev = e; });
+      if (!ev) {
+        var today = new Date().getDate();
+        evs.forEach(function (e) {
+          var d = e.querySelector('.htx-cal2__day .d');
+          if (!ev && d && parseInt(d.textContent, 10) >= today) ev = e;
+        });
+      }
+      ev = ev || evs[evs.length - 1];
+      var title = ev.querySelector('.htx-cal2__title');
+      var day = ev.querySelector('.htx-cal2__day');
+      document.getElementById('htxHeroEv').textContent = title ? title.textContent.trim() : '';
+      document.getElementById('htxHeroEvDay').textContent = ev.querySelector('.htx-cal2__hoy') ? 'Hoy' : (day ? day.textContent.replace(/\s+/g, ' ').trim() : '');
+    });
+    fetch('informes/manifest.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (list) {
+      var it = list && list[0];
+      if (!it) return;
+      var name = (it.title.match(/:\s*(.+?)\s*\(/) || [])[1] || it.ticker;
+      var bl = (it.abstract || '').match(/Blend \$?([\d.,]+) vs\. \$?([\d.,]+) \(([−\-+]?[\d.,]+%)\)/);
+      var a = document.getElementById('htxHeroInf');
+      a.href = it.href;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.removeAttribute('data-tab-target');
+      document.getElementById('htxHeroInfName').textContent = it.ticker + ' · ' + name;
+      document.getElementById('htxHeroInfDate').textContent = it.date || '';
+      var logo = document.getElementById('htxHeroInfLogo');
+      logo.src = 'assets/logos/' + it.ticker.toLowerCase().replace('.', '-') + '.png';
+      logo.onload = function () { logo.hidden = false; };
+      if (bl) document.getElementById('htxHeroInfFv').textContent = 'Fair value $' + bl[1].replace('.', ',') + ' · ' + bl[3].replace('.', ',') + ' vs. mercado';
+    }).catch(function () {});
+
+    home.querySelectorAll('.htx-mk__val, .htx-metric__value').forEach(function (el) {
+      var last = num(el.textContent);
+      new MutationObserver(function () {
+        var now = num(el.textContent);
+        if (last != null && now != null && now !== last) {
+          var cls = now > last ? 'htx-flash-up' : 'htx-flash-down';
+          el.classList.remove('htx-flash-up', 'htx-flash-down');
+          void el.offsetWidth;
+          el.classList.add(cls);
+        }
+        if (now != null) last = now;
+      }).observe(el, { childList: true, characterData: true, subtree: true });
+    });
   })();
   </script>
 
@@ -5856,7 +6011,6 @@
       <div class="mkt-tabs" id="pfViewTabs" role="tablist">
         <button type="button" class="mkt-tab active" data-pfview="tuyo">Tu Portafolio</button>
         <button type="button" class="mkt-tab" data-pfview="manfredi">Portafolio de Manfredi</button>
-        <button type="button" class="mkt-tab" data-pfview="finanzas">Finanzas Personales</button>
       </div>
 
       <div class="pf-view-panel active pf-compact" data-pfview-panel="tuyo">
@@ -5968,7 +6122,43 @@
         </div>
       </div>
 
-      <div class="pf-view-panel" data-pfview-panel="finanzas">
+
+    </div>
+  </section>
+
+  <!-- ── HERRAMIENTAS: Finanzas personales (gastos + objetivos), University y Asesoría ── -->
+  <section class="section section-portfolio" id="herramientas" data-tab="herramientas">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Herramientas</h2>
+        <p class="section-sub">Orden&aacute; tus gastos, pon&eacute;te objetivos y aprend&eacute; a invertir.</p>
+      </div>
+
+      <div class="tools-grid">
+        <a class="tool-card" href="#" onclick="if(typeof toggleWarren==='function'){toggleWarren();}return false;">
+          <span class="tool-card__t">Warren IA</span>
+          <span class="tool-card__d">Tu analista financiero con IA. Preguntale por un activo o por tu cartera.</span>
+        </a>
+        <a class="tool-card" href="#finanzas" onclick="miOpenFinView('gastos');return false;">
+          <span class="tool-card__t">Gastos del mes</span>
+          <span class="tool-card__d">Carg&aacute; lo que gast&aacute;s y mir&aacute; en qu&eacute; se te va la plata.</span>
+        </a>
+        <a class="tool-card" href="#finanzas" onclick="miOpenFinView('calculadora');return false;">
+          <span class="tool-card__t">Calculadora de objetivos</span>
+          <span class="tool-card__d">Cu&aacute;nto ahorrar por mes para llegar a una meta, y c&oacute;mo vas.</span>
+        </a>
+        <a class="tool-card" href="#university" data-tab-target="university">
+          <span class="tool-card__t">University</span>
+          <span class="tool-card__d">Cursos para aprender a invertir desde cero.</span>
+        </a>
+        <a class="tool-card tool-card--gold" href="#asesoria" data-tab-target="asesoria">
+          <span class="tool-card__t">Asesor&iacute;a personalizada</span>
+          <span class="tool-card__d">Una charla uno a uno sobre tu patrimonio.</span>
+          <span class="tool-card__cta">Consult&aacute; tu caso &rarr;</span>
+        </a>
+      </div>
+
+      <div class="pf-view-panel active" data-pfview-panel="finanzas" id="finanzas">
 
       <div class="mkt-tabs" id="finViewTabs" role="tablist">
         <button type="button" class="mkt-tab active" data-finview="gastos">Gastos</button>
@@ -6163,7 +6353,6 @@
       </div><!-- /panel gastos -->
 
       </div><!-- /panel finanzas -->
-
     </div>
   </section>
 
@@ -9558,7 +9747,7 @@
     var W = 460, H = 132;
     var pPts = htxSvgPoints(P, W, H, lo, hi);
     var bPts = htxSvgPoints(B, W, H, lo, hi);
-    var pCol = pr>=0 ? '#10b981' : '#ef4444';
+    var pCol = pr>=0 ? '#5cc08e' : '#e8675f';
     var pl = pPts[pPts.length-1] ? pPts[pPts.length-1].split(',') : null;
     var bl = bPts[bPts.length-1] ? bPts[bPts.length-1].split(',') : null;
     chart.innerHTML =
@@ -9611,11 +9800,13 @@
       if(lo === hi){ lo -= 1; hi += 1; }
       var W = 480, H = 110;
       var pts = htxSvgPoints(closes, W, H, lo, hi);
-      var col = up ? '#10b981' : '#ef4444';
-      var fill = up ? 'rgba(16,185,129,.16)' : 'rgba(239,68,68,.14)';
+      var col = up ? '#5cc08e' : '#e8675f';
+      var fill = 'url(#htxSpxFill)';
+      var gstop = up ? '92,192,142' : '232,103,95';
       var last = pts[pts.length-1].split(',');
       var poly = pts.concat([W+','+H, '0,'+H]).join(' ');
       svg.innerHTML =
+        '<defs><linearGradient id="htxSpxFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba('+gstop+',.22)"/><stop offset="1" stop-color="rgba('+gstop+',0)"/></linearGradient></defs>' +
         '<polygon points="'+ poly +'" fill="'+ fill +'" />' +
         '<polyline points="'+ pts.join(' ') +'" fill="none" stroke="'+ col +'" stroke-width="2" />' +
         '<circle cx="'+ last[0] +'" cy="'+ last[1] +'" r="3.2" fill="'+ col +'" />';
@@ -14878,13 +15069,9 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
 
 <!-- Warren FAB Button -->
   <div class="warren-fab-wrap">
-    <div class="warren-fab-label">Warren IA</div>
-    <button class="warren-fab" onclick="if(typeof toggleWarren==='function'){toggleWarren();}else{document.getElementById('warrenPanel').classList.add('open');}" title="Hablar con Warren &mdash; Asesor IA">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
-        <path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.38 5.06L2 22l4.94-1.38A9.945 9.945 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm1 17.93V18h-2v1.93C7.06 19.44 4.56 16.94 4.07 14H6v-2H4.07C4.56 9.06 7.06 6.56 10 6.07V8h2V6.07C16.94 6.56 19.44 9.06 19.93 12H18v2h1.93c-.49 2.94-2.99 5.44-5.93 5.93z" style="display:none"/>
-      </svg>
-      <div class="warren-badge">W</div>
+    <button class="warren-fab" onclick="if(typeof toggleWarren==='function'){toggleWarren();}else{document.getElementById('warrenPanel').classList.add('open');}" aria-label="Hablar con Warren, el asesor IA">
+      <span class="warren-badge" aria-hidden="true">W</span>
+      <span class="warren-fab-text">Preguntale a Warren</span>
     </button>
   </div>
 
@@ -16677,17 +16864,18 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
 <script>
   // ââ Navegacion por pestanas: una sola seccion visible a la vez âââââââââââ
   (function() {
-    var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'portfolio', 'asesoria', 'panel'];
+    var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'portfolio', 'herramientas', 'asesoria', 'panel'];
     var TAB_TITLES = {
       inicio: 'Inicio', mercados: 'Mercados', calendario: 'Calendario Economico',
       informes: 'Reportes & News', university: 'University', inversiones: 'Informes',
-      portfolio: 'Portfolio', asesoria: 'Asesoria', panel: 'Panel de creador'
+      portfolio: 'Portfolio', herramientas: 'Herramientas', asesoria: 'Asesoria', panel: 'Panel de creador'
     };
 
     function resolveTab(hash) {
       hash = (hash || '').replace('#', '');
       if (!hash) return 'inicio';
       if (hash === 'reportes') return 'informes';
+      if (hash === 'finanzas') return 'herramientas';
       if (TAB_IDS.indexOf(hash) !== -1) return hash;
       return 'inicio';
     }
@@ -16698,6 +16886,10 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
       });
       document.querySelectorAll('[data-tab-target]').forEach(function(el) {
         el.classList.toggle('tab-nav-active', el.getAttribute('data-tab-target') === tab);
+      });
+      var herrGroup = ['herramientas', 'university', 'asesoria'];
+      document.querySelectorAll('[data-tab-group="herramientas"]').forEach(function(el) {
+        el.classList.toggle('tab-nav-active', herrGroup.indexOf(tab) !== -1);
       });
       document.title = 'Manfredi Investment' + (TAB_TITLES[tab] ? ' - ' + TAB_TITLES[tab] : '');
       // AOS ("fade-up al hacer scroll") calcula visibilidad por posicion de
@@ -16725,10 +16917,193 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
       window.scrollTo(0, 0);
     }
 
+    // Abre Herramientas en la vista pedida de Finanzas personales (gastos | calculadora)
+    window.miOpenFinView = function(view) {
+      if (location.hash !== '#herramientas') location.hash = 'herramientas';
+      else activateTab('herramientas');
+      var btn = document.querySelector('#finViewTabs [data-finview="' + view + '"]');
+      if (btn) btn.click();
+      var fin = document.getElementById('finanzas');
+      if (fin) requestAnimationFrame(function(){ fin.scrollIntoView({ block: 'start' }); });
+    };
+
+    // "+ Más": panel grande que se abre al tocar (no es un desplegable al pasar el mouse)
+    var moreBtn = document.getElementById('navMoreBtn'), more = document.getElementById('navMore');
+    window.miNavMoreClose = function() {
+      if (!more) return;
+      more.classList.remove('open'); more.setAttribute('aria-hidden', 'true');
+      if (moreBtn) moreBtn.setAttribute('aria-expanded', 'false');
+    };
+    if (moreBtn && more) {
+      moreBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var open = !more.classList.contains('open');
+        more.classList.toggle('open', open); more.setAttribute('aria-hidden', open ? 'false' : 'true');
+        moreBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      document.addEventListener('click', function(e) { if (!more.contains(e.target)) miNavMoreClose(); });
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape') miNavMoreClose(); });
+      more.querySelectorAll('[data-tab-target]').forEach(function(a) { a.addEventListener('click', miNavMoreClose); });
+      window.addEventListener('hashchange', miNavMoreClose);
+    }
+
     window.addEventListener('hashchange', route);
     if (document.readyState !== 'loading') route();
     else document.addEventListener('DOMContentLoaded', route);
   })();
 </script>
+
+<!-- Pulido anti-look-IA (feat/rediseno-anti-ia): capa global, va al final para ganar la cascada -->
+<style id="mi-polish">
+  :root { --mi-ease-out:cubic-bezier(.23,1,.32,1); --transition:.18s cubic-bezier(.23,1,.32,1); }
+  ::selection { background:rgba(242,201,76,.35); }
+  html { scrollbar-color:rgba(120,135,160,.55) transparent; }
+
+  /* Sin loops decorativos: los estados "en vivo" quedan como punto fijo */
+  .api-status.live .api-status-dot, .rpt-live-dot, .report-banner-tag::before,
+  .at-live::before, .markets-v2-live::before, .pf-warren-avatar::after,
+  .warren-fab::before, .pi-cta::after, .hero-v2::after { animation:none !important; }
+  .warren-fab::before, .pi-cta::after { display:none !important; }
+
+  /* Warren: un solo botón (antes etiqueta + botón redondo con un ícono de pausa) */
+  .warren-fab-label { display:none !important; }
+  .warren-fab {
+    width:auto; height:auto; gap:10px; padding:7px 18px 7px 7px; border-radius:999px;
+    background:#0b1424; border:1px solid rgba(242,201,76,.45);
+    box-shadow:0 6px 18px -8px rgba(0,0,0,.55);
+    transition:transform .16s var(--mi-ease-out), border-color .15s ease, background-color .15s ease;
+  }
+  .warren-fab:hover { transform:none; box-shadow:0 6px 18px -8px rgba(0,0,0,.55); border-color:var(--gold); background:#0e1a2e; }
+  .warren-fab:active { transform:scale(.97); }
+  .warren-fab .warren-badge {
+    position:static; width:30px; height:30px; border:0; font-size:15px;
+    background:var(--gold); color:#0a1322; font-family:'DM Serif Display',Georgia,serif; font-weight:400;
+  }
+  .warren-fab-text { color:#f5d67a; font:600 13.5px/1 'IBM Plex Sans',system-ui,sans-serif; white-space:nowrap; }
+  @media (max-width:600px) {
+    .warren-fab { padding:6px; }
+    .warren-fab-text { display:none; }
+  }
+
+  /* Respuesta al apretar: lo que más se siente "hecho a mano" */
+  .btn-cta, .nav-notify-btn, .btn-primary, .btn-secondary, .pay-cta, .mp-cta, .pi-cta, .hero-pf-cta,
+  .warren-send-btn, .f-tab, .report-banner-cta, .mkt-show-all, .notify-btn, .mi-btn {
+    transition-property:background-color, border-color, color, box-shadow, transform;
+    transition-duration:.15s; transition-timing-function:var(--mi-ease-out);
+  }
+  .btn-cta:active, .nav-notify-btn:active, .btn-primary:active, .btn-secondary:active, .pay-cta:active,
+  .mp-cta:active, .pi-cta:active, .hero-pf-cta:active, .warren-send-btn:active, .f-tab:active,
+  .report-banner-cta:active, .mkt-show-all:active, .notify-btn:active, .mi-btn:active { transform:scale(.97); }
+
+  /* Levantes y agrandes al pasar el mouse: solo con mouse real, y más sutiles */
+  @media (hover:none), (pointer:coarse) {
+    .pf-metric-card:hover, .calc-goal-card:hover, .warren-suggestion:hover, .pf-mini-warren:hover { transform:none !important; }
+  }
+
+  /* Marca del menú en una sola línea */
+  .logo-name { white-space:nowrap; }
+  @media (max-width:1320px) { .logo-sub { display:none; } }
+
+  /* Aviso de informe nuevo: mismo lenguaje que la home */
+  .report-banner { border-radius:12px; }
+  .report-banner-tag { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:12px; font-weight:600; letter-spacing:0; text-transform:none; border-radius:999px; padding:3px 10px; }
+  .report-banner-cta { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:13.5px; font-weight:600; letter-spacing:0; text-transform:none; border-radius:6px; }
+
+  /* Pie: títulos de columna sin mayúsculas espaciadas */
+  .footer-col h4 { font-size:13px; letter-spacing:0; text-transform:none; }
+
+  /* Sin etiquetas chiquitas en mayúsculas arriba de cada título (la marca más fuerte de "hecho con IA") */
+  .section-label, .notify-eyebrow, .pay-eyebrow, .markets-v2-live { display:none !important; }
+  .section-label + .section-title, .section-label + h2 { margin-top:28px; }
+
+  /* Warren: dorado sólido, sin degradé naranja ni halos de color */
+  .warren-avatar { background:var(--gold) !important; box-shadow:none !important; }
+  .warren-send-btn { background:var(--gold) !important; box-shadow:none !important; border-radius:6px; }
+  .warren-send-btn:hover { transform:none !important; background:#f7d96c !important; }
+  .warren-side-new { background:var(--gold) !important; box-shadow:none !important; }
+
+  /* Menú: subrayado dorado que crece desde el centro; la sección activa queda marcada */
+  .nav-link { position:relative; border:0 !important; border-radius:0 !important; background:none !important; color:#4b5567; }
+  .nav-link::after {
+    content:''; position:absolute; left:14px; right:14px; bottom:2px; height:2px; border-radius:2px;
+    background:var(--gold); transform:scaleX(0); transform-origin:center;
+    transition:transform .22s var(--mi-ease-out);
+  }
+  .nav-link:hover, .nav-links > li:hover > .nav-link { color:var(--primary); }
+  .nav-link:hover::after, .nav-links > li:hover > .nav-link::after { transform:scaleX(1); }
+  .nav-link.tab-nav-active { color:var(--primary) !important; font-weight:600; }
+  .nav-link.tab-nav-active::after { transform:scaleX(1); }
+  .nav-link .caret { margin-left:2px; }
+  .dropdown { border-radius:10px; padding:8px; }
+  .dropdown-item { border-radius:7px; }
+  .dropdown--right { left:auto; right:0; }
+  button.nav-link { font:inherit; font-size:13.5px; font-weight:500; cursor:pointer; }
+  .nav-more-btn { gap:6px; }
+  .nav-more-ic { width:13px; height:13px; transition:transform .22s var(--mi-ease-out); }
+  .nav-more-btn[aria-expanded="true"] { color:var(--primary); }
+  .nav-more-btn[aria-expanded="true"] .nav-more-ic { transform:rotate(45deg); }
+  .nav-more-btn[aria-expanded="true"]::after { transform:scaleX(1); }
+  .nav-mega {
+    position:absolute; left:0; right:0; top:100%; z-index:99;
+    background:#0a1322; border-bottom:1px solid rgba(242,201,76,.25);
+    box-shadow:0 18px 40px -20px rgba(0,0,0,.6);
+    opacity:0; visibility:hidden; transform:translateY(-6px);
+    transition:opacity .2s ease, transform .22s var(--mi-ease-out), visibility 0s linear .22s;
+  }
+  .nav-mega.open { opacity:1; visibility:visible; transform:none; transition:opacity .2s ease, transform .22s var(--mi-ease-out), visibility 0s; }
+  .nav-mega__inner { max-width:1200px; margin:0 auto; padding:24px 32px 28px; display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+  .nav-mega__card {
+    display:flex; flex-direction:column; gap:6px; padding:18px 18px 20px; border-radius:12px;
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09);
+    transition:background-color .15s ease, border-color .15s ease, transform .16s var(--mi-ease-out);
+  }
+  .nav-mega__card:hover { background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.22); }
+  .nav-mega__card:active { transform:scale(.98); }
+  .nav-mega__t { font-family:'DM Serif Display',Georgia,serif; font-size:19px; line-height:1.15; color:#fff; }
+  .nav-mega__d { font-size:13.5px; line-height:1.5; color:rgba(238,242,247,.8); }
+  /* Asesoría: se distingue en dorado */
+  .nav-mega__card--gold, .tools-grid .tool-card--gold { background:linear-gradient(160deg,rgba(242,201,76,.22),rgba(242,201,76,.08)); border-color:rgba(242,201,76,.6); }
+  .nav-mega__card--gold:hover, .tools-grid .tool-card--gold:hover { background:linear-gradient(160deg,rgba(242,201,76,.3),rgba(242,201,76,.12)); border-color:var(--gold); }
+  .nav-mega__card--gold .nav-mega__t, .tool-card--gold .tool-card__t { color:#f7d777; }
+  .tool-card__cta { margin-top:auto; padding-top:10px; font-size:13.5px; font-weight:600; color:#f7d777; }
+  @media (max-width:1000px) { .nav-mega__inner { grid-template-columns:repeat(2,1fr); padding:20px; } }
+
+  /* Herramientas: tarjetas de acceso */
+  .tools-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin:8px 0 40px; }
+  @media (max-width:1200px) { .tools-grid { grid-template-columns:repeat(3,1fr); } }
+  .tool-card {
+    display:flex; flex-direction:column; gap:6px; padding:20px 20px 22px; border-radius:12px;
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09);
+    transition:background-color .15s ease, border-color .15s ease, transform .16s var(--mi-ease-out);
+  }
+  .tool-card:hover { background:rgba(242,201,76,.07); border-color:rgba(242,201,76,.45); }
+  .tool-card:active { transform:scale(.98); }
+  .tool-card__t { font-family:'DM Serif Display',Georgia,serif; font-size:21px; line-height:1.15; color:#fff; }
+  .tool-card__d { font-size:14px; line-height:1.5; color:rgba(238,242,247,.8); }
+  @media (max-width:900px) { .tools-grid { grid-template-columns:1fr 1fr; } }
+  @media (max-width:520px) { .tools-grid { grid-template-columns:1fr; } }
+
+  /* Cinta de cotizaciones: más calma */
+  .ticker-track { animation-duration:50s; }
+
+  /* Celular: el botón "Notificate de todo" empujaba la página a 492px de ancho */
+  @media (max-width:600px) {
+    .nav-notify-btn { font-size:0; gap:0; padding:9px; }
+    .nav-notify-btn svg { width:18px; height:18px; }
+    .logo-text { display:none; }
+    .btn-cta { padding:8px 12px; font-size:13px; }
+    #navUserArea .btn-login, #navUserArea button { padding:8px 12px; font-size:13px; }
+    .nav-inner { padding:0 16px; gap:8px; }
+  }
+  .modal { max-width:calc(100vw - 32px); }
+
+  /* Movimiento reducido: sin desplazamientos, se mantienen color y opacidad */
+  @media (prefers-reduced-motion:reduce) {
+    .ticker-track { animation:none; }
+    .ticker-bar { overflow-x:auto; }
+    [data-aos] { transform:none !important; transition-property:opacity !important; }
+    .dropdown { transform:none !important; }
+  }
+</style>
 </body>
 </html>
