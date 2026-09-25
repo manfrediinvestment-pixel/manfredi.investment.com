@@ -3542,51 +3542,16 @@
 
       <ul class="nav-links">
         <li><a href="#mercados" class="nav-link" data-tab-target="mercados">Mercados</a></li>
-        <li>
-          <span class="nav-link">
-            Reportes &amp; News
-            <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 6l4 4 4-4"/></svg>
-          </span>
-          <div class="dropdown">
-            <div class="dropdown-label">Contenido</div>
-            <a href="#informes" class="dropdown-item" data-tab-target="informes">
-              <span class="dropdown-icon">IN</span>
-              <span class="dropdown-item-text">Reportes<small>Análisis profundos semanales</small></span>
-            </a>
-            <a href="#reportes" class="dropdown-item" data-tab-target="informes">
-              <span class="dropdown-icon">IA</span>
-              <span class="dropdown-item-text">News Diarias<small>Actualizados por agente IA</small></span>
-            </a>
-          </div>
-        </li>
         <li><a href="#calendario" class="nav-link" data-tab-target="calendario">Calendario</a></li>
+        <li><a href="#reportes" class="nav-link" data-tab-target="informes">Noticias</a></li>
+        <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
         <li><a href="#inversiones" class="nav-link" data-tab-target="inversiones">Informes<span class="mi-nav-count" id="navPedidosCount" hidden></span></a></li>
         <li id="navPanelItem" hidden><a href="#panel" class="nav-link nav-link-panel" data-tab-target="panel">&#10022; Panel</a></li>
-        <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
         <li>
-          <span class="nav-link" data-member-required="true" onclick="toggleWarren()" style="cursor:pointer;">
-            Asesor IA <span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;margin-left:4px;vertical-align:middle;"></span>
-          </span>
-        </li>
-        <li>
-          <span class="nav-link" data-tab-group="herramientas">
-            Herramientas
-            <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 6l4 4 4-4"/></svg>
-          </span>
-          <div class="dropdown dropdown--right">
-            <a href="#finanzas" class="dropdown-item" onclick="miOpenFinView('gastos');return false;">
-              <span class="dropdown-item-text">Gastos del mes<small>En qu&eacute; se te va la plata</small></span>
-            </a>
-            <a href="#finanzas" class="dropdown-item" onclick="miOpenFinView('calculadora');return false;">
-              <span class="dropdown-item-text">Calculadora de objetivos<small>Cu&aacute;nto ahorrar para llegar a tu meta</small></span>
-            </a>
-            <a href="#university" class="dropdown-item" data-tab-target="university">
-              <span class="dropdown-item-text">University<small>Cursos para aprender a invertir</small></span>
-            </a>
-            <a href="#asesoria" class="dropdown-item" data-tab-target="asesoria">
-              <span class="dropdown-item-text">Asesor&iacute;a personalizada<small>Charla uno a uno sobre tu patrimonio</small></span>
-            </a>
-          </div>
+          <button type="button" class="nav-link nav-more-btn" id="navMoreBtn" data-tab-group="herramientas" aria-expanded="false" aria-controls="navMore">
+            <svg class="nav-more-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>
+            M&aacute;s
+          </button>
         </li>
       </ul>
 
@@ -3597,6 +3562,30 @@
         Notificate de todo
         <span class="nav-notify-dot"></span>
       </button>
+    </div>
+    <div class="nav-mega" id="navMore" aria-hidden="true">
+      <div class="nav-mega__inner">
+        <a class="nav-mega__card" href="#" onclick="miNavMoreClose();if(typeof toggleWarren==='function'){toggleWarren();}return false;">
+          <span class="nav-mega__t">Warren IA</span>
+          <span class="nav-mega__d">Tu analista financiero con IA. Preguntale por un activo o por tu cartera.</span>
+        </a>
+        <a class="nav-mega__card" href="#finanzas" onclick="miNavMoreClose();miOpenFinView('gastos');return false;">
+          <span class="nav-mega__t">Gastos del mes</span>
+          <span class="nav-mega__d">Carg&aacute; lo que gast&aacute;s y mir&aacute; en qu&eacute; se te va la plata.</span>
+        </a>
+        <a class="nav-mega__card" href="#finanzas" onclick="miNavMoreClose();miOpenFinView('calculadora');return false;">
+          <span class="nav-mega__t">Calculadora de objetivos</span>
+          <span class="nav-mega__d">Cu&aacute;nto ahorrar por mes para llegar a una meta.</span>
+        </a>
+        <a class="nav-mega__card" href="#university" data-tab-target="university">
+          <span class="nav-mega__t">University</span>
+          <span class="nav-mega__d">Cursos para aprender a invertir desde cero.</span>
+        </a>
+        <a class="nav-mega__card nav-mega__card--gold" href="#asesoria" data-tab-target="asesoria">
+          <span class="nav-mega__t">Asesor&iacute;a personalizada</span>
+          <span class="nav-mega__d">Una charla uno a uno sobre tu patrimonio.</span>
+        </a>
+      </div>
     </div>
   </header>
 
@@ -3649,7 +3638,7 @@
   /* hero */
   .htx-hero {
     max-width:1280px; margin:0 auto;
-    display:grid; grid-template-columns:1.25fr .75fr; gap:56px; align-items:end;
+    display:grid; grid-template-columns:1.15fr .85fr; gap:64px; align-items:center;
     padding:96px 32px 80px;
   }
   .htx-hero__lead { padding:0; min-width:0; }
@@ -3662,23 +3651,22 @@
   .htx-h1 em { font-style:normal; color:var(--htx-amber-ink); display:block; }
   .htx-deck { margin:0 0 28px; font-size:18px; line-height:1.55; color:var(--htx-ink); max-width:46ch; }
   .htx-cta { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
-  /* mapa del producto: sin grises, verbo en dorado */
-  .htx-map { display:flex; flex-direction:column; gap:12px; margin:0 0 36px; }
-  .htx-map__row { display:flex; flex-wrap:wrap; align-items:center; gap:8px 8px; }
-  .htx-map__verb { width:74px; flex:none; font-family:var(--htx-serif); font-size:22px; line-height:1; color:var(--htx-amber-ink); }
-  .htx-map a {
-    font-size:14px; font-weight:500; color:var(--htx-ink); padding:7px 13px; border-radius:999px;
-    background:rgba(238,242,247,.07); border:1px solid rgba(238,242,247,.12);
-    transition:background-color .15s ease, border-color .15s ease, color .15s ease, transform .16s var(--htx-ease);
-  }
-  .htx-map a:hover { background:rgba(242,201,76,.12); border-color:rgba(242,201,76,.5); color:#fff; }
-  .htx-map a:active { transform:scale(.97); }
-  @media (max-width:600px) {
-    .htx-map__row { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; margin:0 -20px; padding:0 20px; gap:6px; }
-    .htx-map__row::-webkit-scrollbar { display:none; }
-    .htx-map__verb { width:auto; font-size:19px; margin-right:6px; }
-    .htx-map a { white-space:nowrap; font-size:13px; padding:6px 11px; }
-  }
+  /* panel en vivo del hero */
+  .htx-panel { min-width:0; align-self:center; border:1px solid var(--htx-line); border-radius:14px; background:rgba(12,24,40,.72); overflow:hidden; }
+  .htx-panel__row { display:flex; flex-direction:column; gap:6px; padding:16px 22px; border-top:1px solid var(--htx-line-soft); transition:background-color .15s ease; }
+  .htx-panel__row:first-child { border-top:0; padding-top:20px; }
+  .htx-panel__row:hover { background:rgba(238,242,247,.035); }
+  .htx-panel__row--split .htx-panel__val { justify-content:flex-start; }
+  .htx-panel__head { display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
+  .htx-panel__k { font-size:13.5px; font-weight:600; color:var(--htx-ink); }
+  .htx-panel__m { font-size:12.5px; color:var(--htx-ink3); }
+  .htx-panel__val { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+  .htx-panel .htx-metric__value { font-size:32px; }
+  .htx-panel__num { font-size:24px; font-weight:500; letter-spacing:-.02em; color:var(--htx-ink); }
+  .htx-panel__spark { width:100%; height:64px; display:block; margin-top:4px; }
+  .htx-panel__txt { font-size:14.5px; line-height:1.45; color:var(--htx-ink); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .htx-panel__inf { display:flex; align-items:center; gap:12px; }
+  .htx-panel__fv { color:var(--htx-amber-ink); }
   .htx-metric { padding:0 0 6px; display:flex; flex-direction:column; border-left:1px solid var(--htx-line); padding-left:36px; }
   .htx-metric__id { display:flex; flex-direction:column; gap:3px; margin-bottom:14px; }
   .htx-metric__name { font-size:15px; font-weight:600; color:var(--htx-ink); display:flex; align-items:center; gap:10px; }
@@ -3844,8 +3832,8 @@
     .htx--intro .htx-hero__lead > :nth-child(2) { animation-delay:70ms; }
     .htx--intro .htx-hero__lead > :nth-child(3) { animation-delay:140ms; }
     .htx--intro .htx-hero__lead > :nth-child(4) { animation-delay:210ms; }
-    .htx--intro .htx-metric { animation:htx-fade 700ms ease-out 200ms both; }
-    .htx--intro .htx-metric__spark { animation:htx-draw 900ms cubic-bezier(.77,0,.175,1) 320ms both; }
+    .htx--intro .htx-panel { animation:htx-fade 700ms ease-out 200ms both; }
+    .htx--intro .htx-panel__spark { animation:htx-draw 900ms cubic-bezier(.77,0,.175,1) 320ms both; }
   }
   @keyframes htx-rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
   @keyframes htx-fade { from { opacity:0; } to { opacity:1; } }
@@ -3853,7 +3841,7 @@
 
   @media (max-width:1040px) {
     .htx-hero { grid-template-columns:1fr; gap:44px; padding:64px 24px 56px; }
-    .htx-metric { border-left:0; padding-left:0; border-top:1px solid var(--htx-line); padding-top:28px; }
+    .htx-panel { align-self:stretch; }
     .htx-bento { column-gap:0; padding:0 24px; }
     .htx-tile--informes, .htx-tile--pf { grid-column:span 12; }
     .htx-tile--pf { padding-top:0; }
@@ -3882,44 +3870,39 @@
     <div class="htx-hero">
       <div class="htx-hero__lead">
         <h1 class="htx-h1">Tu mundo financiero, <em>en un solo lugar.</em></h1>
-        <p class="htx-deck">Todo el mercado y tu portafolio en vivo, sin saltar entre diez p&aacute;ginas. Y las herramientas para invertir mejor.</p>
-        <!-- Mapa del producto: los dos objetivos del sitio en dos verbos -->
-        <div class="htx-map">
-          <div class="htx-map__row">
-            <span class="htx-map__verb">Segu&iacute;</span>
-            <a href="#mercados" data-tab-target="mercados">Cotizaciones y mercados</a>
-            <a href="#calendario" data-tab-target="calendario">Calendario econ&oacute;mico</a>
-            <a href="#portfolio" data-tab-target="portfolio">Tu portafolio en tiempo real</a>
-          </div>
-          <div class="htx-map__row">
-            <span class="htx-map__verb">Mejor&aacute;</span>
-            <a href="#inversiones" data-tab-target="inversiones">Informes con valuaci&oacute;n propia</a>
-            <a href="#" onclick="if(typeof toggleWarren==='function'){toggleWarren();}return false;">Warren, tu analista IA</a>
-            <a href="#portfolio" data-tab-target="portfolio">Los ratios de tu cartera</a>
-          </div>
-        </div>
+        <p class="htx-deck">Dej&aacute; de abrir diez pesta&ntilde;as para seguir el mercado. Ac&aacute; ten&eacute;s cotizaciones, calendario, tu portafolio en vivo, informes con valuaci&oacute;n propia y un analista IA.</p>
         <div class="htx-cta">
           <a class="htx-btn" href="#inversiones" data-tab-target="inversiones">Ver los informes</a>
           <a class="htx-ghost" href="#portfolio" data-tab-target="portfolio">Probar el Portfolio</a>
         </div>
       </div>
-      <div class="htx-metric">
-        <div class="htx-metric__id">
-          <span class="htx-metric__name">S&amp;P 500</span>
-          <span class="htx-metric__sub">Cierre del <span id="htx-us-asof">&mdash;</span></span>
-        </div>
-        <div class="htx-metric__row">
-          <span class="htx-metric__badge">SPX</span>
-          <div>
-            <div class="htx-metric__value htx-num" id="htx-spx-price">&mdash;</div>
-            <div class="htx-metric__delta"><span id="htx-spx-chg">&mdash;</span></div>
-          </div>
-        </div>
-        <svg class="htx-metric__spark" id="htxSpxSpark" viewBox="0 0 480 110" preserveAspectRatio="none" aria-hidden="true">
-          <polyline points="0,64 120,60 240,58 360,56 480,54" fill="none" stroke="rgba(232,238,246,.18)" stroke-width="1.5" />
-        </svg>
-        <p class="htx-metric__foot">Movimiento de la jornada (S&amp;P 500 &middot; ^GSPC) &middot; nivel de cierre del reporte diario</p>
-      </div>
+
+      <!-- Panel en vivo: todo el sitio en una sola vista (mercado, portafolio, calendario, informe) -->
+      <aside class="htx-panel" aria-label="Resumen en vivo">
+        <a class="htx-panel__row" href="#mercados" data-tab-target="mercados">
+          <span class="htx-panel__head"><span class="htx-panel__k">S&amp;P 500</span><span class="htx-panel__m">Cierre del <span id="htx-us-asof">&mdash;</span></span></span>
+          <span class="htx-panel__val"><span class="htx-metric__value htx-num" id="htx-spx-price">&mdash;</span><span class="htx-metric__delta"><span id="htx-spx-chg">&mdash;</span></span></span>
+          <svg class="htx-panel__spark" id="htxSpxSpark" viewBox="0 0 480 110" preserveAspectRatio="none" aria-hidden="true">
+            <polyline points="0,64 120,60 240,58 360,56 480,54" fill="none" stroke="rgba(232,238,246,.18)" stroke-width="1.5" />
+          </svg>
+        </a>
+        <a class="htx-panel__row htx-panel__row--split" href="#portfolio" data-tab-target="portfolio">
+          <span class="htx-panel__head"><span class="htx-panel__k">Manfredi Portfolio</span><span class="htx-panel__m">&Uacute;ltimo mes</span></span>
+          <span class="htx-panel__val"><span class="htx-panel__num htx-num" id="htxHeroPf">&hellip;</span><span class="htx-panel__m" id="htxHeroPfBench"></span></span>
+        </a>
+        <a class="htx-panel__row" href="#calendario" data-tab-target="calendario">
+          <span class="htx-panel__head"><span class="htx-panel__k">Pr&oacute;ximo en el calendario</span><span class="htx-panel__m" id="htxHeroEvDay"></span></span>
+          <span class="htx-panel__txt" id="htxHeroEv">Cargando agenda&hellip;</span>
+        </a>
+        <a class="htx-panel__row" href="#inversiones" data-tab-target="inversiones" id="htxHeroInf">
+          <span class="htx-panel__head"><span class="htx-panel__k">&Uacute;ltimo informe</span><span class="htx-panel__m" id="htxHeroInfDate"></span></span>
+          <span class="htx-panel__inf">
+            <img class="htx-inf__logo" id="htxHeroInfLogo" src="assets/logos/msft.png" alt="" width="28" height="28" hidden>
+            <span class="htx-panel__txt" id="htxHeroInfName">Ver informes</span>
+          </span>
+          <span class="htx-panel__m htx-panel__fv" id="htxHeroInfFv"></span>
+        </a>
+      </aside>
     </div>
 
     <!-- membresia: carrusel Warren IA / Informes / Portfolio (assets/cartel/cartel.js) -->
@@ -4143,6 +4126,59 @@
       var v = parseFloat(String(t).replace(/[^\d,.\-]/g, '').replace(/,(?=\d{3}\b)/g, '').replace(/\.(?=\d{3}\b)/g, '').replace(',', '.'));
       return isNaN(v) ? null : v;
     }
+    /* Panel en vivo del hero: refleja datos que ya carga la home (sin fetch extra salvo el manifest) */
+    function mirror(srcId, fn) {
+      var src = document.getElementById(srcId);
+      if (!src) return;
+      fn(src);
+      new MutationObserver(function () { fn(src); }).observe(src, { childList: true, characterData: true, subtree: true, attributes: true });
+    }
+    mirror('htxPfBig', function (src) {
+      var t = document.getElementById('htxHeroPf');
+      if (!t) return;
+      t.textContent = src.textContent;
+      t.style.color = src.style.color || '';
+    });
+    mirror('htxPfBench', function (src) {
+      var t = document.getElementById('htxHeroPfBench');
+      if (t) t.textContent = /S&P/.test(src.textContent) ? src.textContent.split('·')[0].trim() : '';
+    });
+    mirror('htxCalEcoList', function (src) {
+      var evs = src.querySelectorAll('.htx-cal2__ev, .htx-cal2__newsitem');
+      if (!evs.length) return;
+      var ev = null;
+      evs.forEach(function (e) { if (!ev && e.querySelector('.htx-cal2__hoy')) ev = e; });
+      if (!ev) {
+        var today = new Date().getDate();
+        evs.forEach(function (e) {
+          var d = e.querySelector('.htx-cal2__day .d');
+          if (!ev && d && parseInt(d.textContent, 10) >= today) ev = e;
+        });
+      }
+      ev = ev || evs[evs.length - 1];
+      var title = ev.querySelector('.htx-cal2__title');
+      var day = ev.querySelector('.htx-cal2__day');
+      document.getElementById('htxHeroEv').textContent = title ? title.textContent.trim() : '';
+      document.getElementById('htxHeroEvDay').textContent = ev.querySelector('.htx-cal2__hoy') ? 'Hoy' : (day ? day.textContent.replace(/\s+/g, ' ').trim() : '');
+    });
+    fetch('informes/manifest.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (list) {
+      var it = list && list[0];
+      if (!it) return;
+      var name = (it.title.match(/:\s*(.+?)\s*\(/) || [])[1] || it.ticker;
+      var bl = (it.abstract || '').match(/Blend \$?([\d.,]+) vs\. \$?([\d.,]+) \(([−\-+]?[\d.,]+%)\)/);
+      var a = document.getElementById('htxHeroInf');
+      a.href = it.href;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.removeAttribute('data-tab-target');
+      document.getElementById('htxHeroInfName').textContent = it.ticker + ' · ' + name;
+      document.getElementById('htxHeroInfDate').textContent = it.date || '';
+      var logo = document.getElementById('htxHeroInfLogo');
+      logo.src = 'assets/logos/' + it.ticker.toLowerCase().replace('.', '-') + '.png';
+      logo.onload = function () { logo.hidden = false; };
+      if (bl) document.getElementById('htxHeroInfFv').textContent = 'Fair value $' + bl[1].replace('.', ',') + ' · ' + bl[3].replace('.', ',') + ' vs. mercado';
+    }).catch(function () {});
+
     home.querySelectorAll('.htx-mk__val, .htx-metric__value').forEach(function (el) {
       var last = num(el.textContent);
       new MutationObserver(function () {
@@ -6099,6 +6135,10 @@
       </div>
 
       <div class="tools-grid">
+        <a class="tool-card" href="#" onclick="if(typeof toggleWarren==='function'){toggleWarren();}return false;">
+          <span class="tool-card__t">Warren IA</span>
+          <span class="tool-card__d">Tu analista financiero con IA. Preguntale por un activo o por tu cartera.</span>
+        </a>
         <a class="tool-card" href="#finanzas" onclick="miOpenFinView('gastos');return false;">
           <span class="tool-card__t">Gastos del mes</span>
           <span class="tool-card__d">Carg&aacute; lo que gast&aacute;s y mir&aacute; en qu&eacute; se te va la plata.</span>
@@ -6111,9 +6151,10 @@
           <span class="tool-card__t">University</span>
           <span class="tool-card__d">Cursos para aprender a invertir desde cero.</span>
         </a>
-        <a class="tool-card" href="#asesoria" data-tab-target="asesoria">
+        <a class="tool-card tool-card--gold" href="#asesoria" data-tab-target="asesoria">
           <span class="tool-card__t">Asesor&iacute;a personalizada</span>
           <span class="tool-card__d">Una charla uno a uno sobre tu patrimonio.</span>
+          <span class="tool-card__cta">Consult&aacute; tu caso &rarr;</span>
         </a>
       </div>
 
@@ -16886,6 +16927,26 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
       if (fin) requestAnimationFrame(function(){ fin.scrollIntoView({ block: 'start' }); });
     };
 
+    // "+ Más": panel grande que se abre al tocar (no es un desplegable al pasar el mouse)
+    var moreBtn = document.getElementById('navMoreBtn'), more = document.getElementById('navMore');
+    window.miNavMoreClose = function() {
+      if (!more) return;
+      more.classList.remove('open'); more.setAttribute('aria-hidden', 'true');
+      if (moreBtn) moreBtn.setAttribute('aria-expanded', 'false');
+    };
+    if (moreBtn && more) {
+      moreBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var open = !more.classList.contains('open');
+        more.classList.toggle('open', open); more.setAttribute('aria-hidden', open ? 'false' : 'true');
+        moreBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      document.addEventListener('click', function(e) { if (!more.contains(e.target)) miNavMoreClose(); });
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape') miNavMoreClose(); });
+      more.querySelectorAll('[data-tab-target]').forEach(function(a) { a.addEventListener('click', miNavMoreClose); });
+      window.addEventListener('hashchange', miNavMoreClose);
+    }
+
     window.addEventListener('hashchange', route);
     if (document.readyState !== 'loading') route();
     else document.addEventListener('DOMContentLoaded', route);
@@ -16976,9 +17037,40 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
   .dropdown { border-radius:10px; padding:8px; }
   .dropdown-item { border-radius:7px; }
   .dropdown--right { left:auto; right:0; }
+  button.nav-link { font:inherit; font-size:13.5px; font-weight:500; cursor:pointer; }
+  .nav-more-btn { gap:6px; }
+  .nav-more-ic { width:13px; height:13px; transition:transform .22s var(--mi-ease-out); }
+  .nav-more-btn[aria-expanded="true"] { color:var(--primary); }
+  .nav-more-btn[aria-expanded="true"] .nav-more-ic { transform:rotate(45deg); }
+  .nav-more-btn[aria-expanded="true"]::after { transform:scaleX(1); }
+  .nav-mega {
+    position:absolute; left:0; right:0; top:100%; z-index:99;
+    background:#0a1322; border-bottom:1px solid rgba(242,201,76,.25);
+    box-shadow:0 18px 40px -20px rgba(0,0,0,.6);
+    opacity:0; visibility:hidden; transform:translateY(-6px);
+    transition:opacity .2s ease, transform .22s var(--mi-ease-out), visibility 0s linear .22s;
+  }
+  .nav-mega.open { opacity:1; visibility:visible; transform:none; transition:opacity .2s ease, transform .22s var(--mi-ease-out), visibility 0s; }
+  .nav-mega__inner { max-width:1200px; margin:0 auto; padding:24px 32px 28px; display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+  .nav-mega__card {
+    display:flex; flex-direction:column; gap:6px; padding:18px 18px 20px; border-radius:12px;
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09);
+    transition:background-color .15s ease, border-color .15s ease, transform .16s var(--mi-ease-out);
+  }
+  .nav-mega__card:hover { background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.22); }
+  .nav-mega__card:active { transform:scale(.98); }
+  .nav-mega__t { font-family:'DM Serif Display',Georgia,serif; font-size:19px; line-height:1.15; color:#fff; }
+  .nav-mega__d { font-size:13.5px; line-height:1.5; color:rgba(238,242,247,.8); }
+  /* Asesoría: se distingue en dorado */
+  .nav-mega__card--gold, .tools-grid .tool-card--gold { background:linear-gradient(160deg,rgba(242,201,76,.22),rgba(242,201,76,.08)); border-color:rgba(242,201,76,.6); }
+  .nav-mega__card--gold:hover, .tools-grid .tool-card--gold:hover { background:linear-gradient(160deg,rgba(242,201,76,.3),rgba(242,201,76,.12)); border-color:var(--gold); }
+  .nav-mega__card--gold .nav-mega__t, .tool-card--gold .tool-card__t { color:#f7d777; }
+  .tool-card__cta { margin-top:auto; padding-top:10px; font-size:13.5px; font-weight:600; color:#f7d777; }
+  @media (max-width:1000px) { .nav-mega__inner { grid-template-columns:repeat(2,1fr); padding:20px; } }
 
   /* Herramientas: tarjetas de acceso */
-  .tools-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:8px 0 40px; }
+  .tools-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin:8px 0 40px; }
+  @media (max-width:1200px) { .tools-grid { grid-template-columns:repeat(3,1fr); } }
   .tool-card {
     display:flex; flex-direction:column; gap:6px; padding:20px 20px 22px; border-radius:12px;
     background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09);
