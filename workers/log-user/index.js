@@ -758,11 +758,11 @@ async function usuarioDelToken(request) {
     } catch (e) { return null; }
 }
 async function googleAccessToken(env, scope) {
-    const privateKey = env.GOOGLE_PRIVATE_KEY.replace(/\n/g, '\n');
+    const privateKey = env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
     const now = Math.floor(Date.now() / 1000);
     const b64 = o => btoa(JSON.stringify(o)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
     const unsigned = b64({ alg: 'RS256', typ: 'JWT' }) + '.' + b64({ iss: env.GOOGLE_SERVICE_ACCOUNT_EMAIL, scope, aud: 'https://oauth2.googleapis.com/token', exp: now + 3600, iat: now });
-    const pem = privateKey.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\n/g, '');
+    const pem = privateKey.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g, '');
     const key = await crypto.subtle.importKey('pkcs8', Uint8Array.from(atob(pem), c => c.charCodeAt(0)).buffer, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
     const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, new TextEncoder().encode(unsigned));
     const jwt = unsigned + '.' + btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
