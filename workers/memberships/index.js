@@ -43,6 +43,10 @@ export default {
                       return await verificarMembresia(request, env);
             }
 
+            if (path === '/consulta-ayuda' && request.method === 'POST') {
+                      return await consultaAyuda(request, env, ctx);
+            }
+
             if (path === '/pedir-informe' && request.method === 'POST') {
                       return await pedirInforme(request, env, ctx);
             }
@@ -772,6 +776,40 @@ async function pedirInforme(request, env, ctx) {
         { reply_to: u.email });
     if (ctx && ctx.waitUntil) ctx.waitUntil(aviso);
     return json({ ok: true, pedido: p, plazoHoras: PLAZO_HORAS });
+}
+
+// POST /consulta-ayuda  { email, pregunta, pagina, website }  -- cualquier visitante
+// La ayuda del sitio (assets/ayuda/ayuda.js) manda aca las preguntas que no estan en
+// las frecuentes. Llega un mail a los creadores con reply_to al visitante, y el
+// visitante recibe una copia. `website` es un campo trampa: si viene lleno es un bot.
+// Tope de 5 consultas por dia por IP para que no se use para spamear.
+const AYUDA_TOPE_DIA = 5;
+async function consultaAyuda(request, env, ctx) {
+    const body = await request.json().catch(() => ({}));
+    if (body.website) return json({ ok: true });
+    const email = String(body.email || '').trim().toLowerCase().slice(0, 120);
+    const pregunta = String(body.pregunta || '').trim().slice(0, 1000);
+    const pagina = String(body.pagina || '').trim().slice(0, 60);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json({ error: 'Mail inválido' }, 400);
+    if (pregunta.length < 5) return json({ error: 'Pregunta vacía' }, 400);
+
+    const ip = request.headers.get('CF-Connecting-IP') || 'sin-ip';
+    const dia = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' });
+    const topeKey = `ayuda:${ip}:${dia}`;
+    const usadas = parseInt((await env.MEMBERS.get(topeKey)) || '0', 10);
+    if (usadas >= AYUDA_TOPE_DIA) return json({ error: 'limite diario' }, 429);
+    await env.MEMBERS.put(topeKey, String(usadas + 1), { expirationTtl: 60 * 60 * 26 });
+
+    const html = esc(pregunta).replace(/\n/g, '<br>');
+    const envio = Promise.all([
+        mail(env, CREADORES, `❓ Consulta de la ayuda: ${pregunta.slice(0, 60)}${pregunta.length > 60 ? '…' : ''}`,
+            `<h2>Nueva consulta desde la ayuda del sitio</h2><p><strong>De:</strong> ${esc(email)}</p><p><strong>Sección:</strong> ${esc(pagina || '#inicio')}</p><blockquote style="border-left:3px solid #F2C94C;margin:16px 0;padding:4px 14px">${html}</blockquote><p>Respondé este mail y le llega directo.</p>`,
+            { reply_to: email }),
+        mail(env, email, 'Recibimos tu consulta — Manfredi Investment',
+            `<p>¡Hola! Recibimos tu consulta y te vamos a responder a este mail.</p><blockquote style="border-left:3px solid #F2C94C;margin:16px 0;padding:4px 14px;color:#444">${html}</blockquote><p>— Equipo de Manfredi Investment</p>`)
+    ]);
+    if (ctx && ctx.waitUntil) ctx.waitUntil(envio); else await envio;
+    return json({ ok: true });
 }
 
 // GET /mi-pedido -- el pedido del mes del socio logueado (para mostrar su estado)
