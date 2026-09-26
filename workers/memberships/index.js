@@ -833,6 +833,12 @@ async function creadorActualizar(request, env, ctx) {
     return json({ ok: true, pedido: p });
 }
 
+function esPagoDeMembresia(p) {
+    if (/membres[ií]a manfredi/i.test(p.description || '')) return true;
+    if (p.metadata && p.metadata.email) return true;
+    return p.operation_type === 'recurring_payment' && /@/.test(p.external_reference || '');
+}
+
 // GET /creador/resumen -- datos del negocio para el Panel de creador (solo creadores).
 // Todo sale de lo que este worker ya maneja: KV de socios + API de Mercado Pago.
 async function creadorResumen(request, env) {
@@ -872,7 +878,9 @@ async function creadorResumen(request, env) {
         try {
             for (let offset = 0; offset < 500; offset += 100) {
                 const d = await mp(`/v1/payments/search?sort=date_created&criteria=desc&range=date_created&begin_date=NOW-180DAYS&end_date=NOW&limit=100&offset=${offset}`);
-                (d.results || []).forEach(p => pagos.push({
+                // payments/search trae TODO lo que cobra la cuenta de MP (transferencias, ventas, etc.):
+                // solo cuentan los pagos de la membresia (Checkout Pro con nuestra metadata o cuota de la suscripcion).
+                (d.results || []).filter(esPagoDeMembresia).forEach(p => pagos.push({
                     fecha: p.date_approved || p.date_created, estado: p.status, detalle: p.status_detail,
                     monto: p.transaction_amount, moneda: p.currency_id,
                     email: (p.metadata && p.metadata.email) || p.external_reference || (p.payer && p.payer.email) || '',
