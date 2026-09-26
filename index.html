@@ -3047,7 +3047,9 @@
         }
         const userData = snap.exists() ? snap.data() : {};
         if (userData.portfolioManfredi && Array.isArray(userData.portfolioManfredi.positions)) {
-          window._pfPositions = userData.portfolioManfredi.positions;
+          window._pfPositions = (typeof window._pfNormalizePositions === 'function')
+            ? window._pfNormalizePositions(userData.portfolioManfredi.positions)
+            : userData.portfolioManfredi.positions;
           if (typeof window._pfRenderPositions === 'function') window._pfRenderPositions();
         }
         window._miFavoritos = Array.isArray(userData.favoritos) ? userData.favoritos : [];
@@ -5922,6 +5924,11 @@
     .pf-hero-big { font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; font-size: 30px; font-weight: 600; color: var(--white); line-height: 1; letter-spacing: -.01em; }
     .pf-hero-big::after { content: ''; display: block; width: 52px; height: 2px; background: var(--gold); margin-top: 10px; }
     .pf-hero-ctx { text-align: right; font-size: 11.5px; color: rgba(255,255,255,.55); line-height: 1.9; }
+    .pf-hero-foot { font-size: 11px; color: rgba(255,255,255,.35); margin: 10px 0 0; line-height: 1.5; }
+    .pf-form-hint { flex-basis: 100%; font-size: 11.5px; color: rgba(255,255,255,.5); min-height: 0; }
+    .pf-form-hint:empty { display: none; }
+    .pf-form-hint.warn { color: var(--yellow); }
+    .pf-form-hint.err { color: var(--red); }
     .pf-hero-ctx b { font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; color: var(--white); font-weight: 500; }
 
     .pf-compact #pfPieWrap { max-width: none !important; margin: 0 !important; }
@@ -6072,13 +6079,14 @@
               <option value="USD" selected>USD</option>
               <option value="ARS">ARS (CEDEAR / acción local)</option>
             </select>
-            <input type="number" id="pfInputCantidad" name="cantidad" placeholder="Cantidad" step="any" inputmode="decimal" aria-label="Cantidad">
-            <input type="number" id="pfInputPrecio" name="precio" placeholder="Precio de compra (USD)" step="any" inputmode="decimal" aria-label="Precio de compra">
+            <input type="text" id="pfInputCantidad" name="cantidad" placeholder="Cantidad" inputmode="decimal" autocomplete="off" aria-label="Cantidad" oninput="pfUpdateFormHint()">
+            <input type="text" id="pfInputPrecio" name="precio" placeholder="Precio de compra (USD)" inputmode="decimal" autocomplete="off" aria-label="Precio de compra" oninput="pfUpdateFormHint()">
             <input type="date" id="pfInputFecha" title="Fecha de compra" aria-label="Fecha de compra">
             <label><input type="checkbox" id="pfInputCash" onchange="pfToggleCashFields()"> Es efectivo</label>
             <input type="text" id="pfInputNotas" name="notas" placeholder="Notas (opcional)" aria-label="Notas (opcional)">
-            <button type="button" class="pf-btn-gold" onclick="pfAddPosition()">Agregar</button>
+            <button type="button" class="pf-btn-gold" id="pfAddBtn" onclick="pfAddPosition()">Agregar</button>
             <button type="button" class="pf-btn-ghost" onclick="pfHideAddForm()">Cancelar</button>
+            <div class="pf-form-hint" id="pfFormHint" role="status" aria-live="polite"></div>
             <div style="flex-basis:100%;font-size:11px;color:rgba(255,255,255,.35);">Cargá el mismo activo con varias fechas si compraste en distintos momentos. Las posiciones en ARS se convierten a USD al dólar CCL actual (no al de la fecha de compra).</div>
           </div>
           <div class="pf-save-row">
@@ -7553,8 +7561,91 @@
     { ticker:'IBIT', fecha:'2026-09-16', cantidad:43,  precio:6815, total:294392.42 }
   ];
 
-  function pfEsc(s){ return (s||'').replace(/</g,'&lt;'); }
-  function pfMoney(n){ return '$'+ (n||0).toLocaleString('es-AR',{maximumFractionDigits: Math.abs(n)<1000?2:0}); }
+  function pfEsc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+  function pfMoney(n){ var d = Math.abs(n||0) < 1000 ? 2 : 0; return '$'+ (n||0).toLocaleString('es-AR',{minimumFractionDigits: d, maximumFractionDigits: d}); }
+  // precio de un papel: los de centavos (bonos en USD, letras) necesitan mas decimales que pfMoney
+  function pfPrice(n){ if(n == null) return '—'; var a = Math.abs(n); return '$'+ n.toLocaleString('es-AR',{maximumFractionDigits: a < 1 ? 4 : (a < 1000 ? 2 : 0)}); }
+  function pfQty(n){ return (n||0).toLocaleString('es-AR',{maximumFractionDigits: 8}); }
+
+  // Numeros tipeados a la argentina o a la yanqui. Antes los inputs eran type="number" +
+  // parseFloat: "20.140" (veinte mil ciento cuarenta, como lo muestra el broker) se leia
+  // como 20,14 -- mil veces menos -- y "1.234,5" directamente quedaba vacio y el boton
+  // Agregar no hacia nada. Reglas: con punto Y coma, el ultimo es el decimal; solo coma =>
+  // decimal; solo puntos => miles si tiene forma de miles (1.500 / 20.140 / 1.234.567), si no
+  // decimal (0.005, 12.5, 1234.56).
+  function pfParseNum(raw){
+    if(typeof raw === 'number') return isFinite(raw) ? raw : NaN;
+    var s = String(raw == null ? '' : raw).trim().replace(/[\s$]/g, '').replace(/^US(D|\$)?/i, '');
+    if(!s) return NaN;
+    var hasDot = s.indexOf('.') !== -1, hasComma = s.indexOf(',') !== -1;
+    if(hasDot && hasComma){
+      if(s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\./g, '').replace(',', '.');
+      else s = s.replace(/,/g, '');
+    } else if(hasComma){
+      if(/^-?[1-9]\d{0,2}(,\d{3}){2,}$/.test(s)) s = s.replace(/,/g, ''); // 1,234,567
+      else if((s.match(/,/g) || []).length > 1) return NaN;
+      else s = s.replace(',', '.');
+    } else if(hasDot){
+      if(/^-?[1-9]\d{0,2}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+      else if((s.match(/\./g) || []).length > 1) return NaN;
+    }
+    if(!/^-?\d*\.?\d+$/.test(s)) return NaN;
+    return parseFloat(s);
+  }
+  // Para prellenar inputs de texto de forma que pfParseNum lo vuelva a leer igual (coma decimal, sin miles)
+  function pfNumToInput(n){ return (n == null || !isFinite(n)) ? '' : String(n).replace('.', ','); }
+
+  // Bonos y letras argentinos cotizan cada 100 nominales (AL30 = $84.130 por 100 VN) y los
+  // brokers muestran la tenencia en nominales y el PPC tambien cada 100. Sin este factor un
+  // bono valia 100 veces mas de lo real y aplastaba el resto de la cartera.
+  function pfUnitFactor(p){
+    if(!p || p.isCash) return 1;
+    var cat = pfGetCurrentCategory(p.ticker, p.moneda);
+    if(cat === 'arg_bonds') return 0.01;
+    return 1;
+  }
+  function pfUnits(p){ return (p.cantidad || 0) * pfUnitFactor(p); }
+
+  // Deja las posiciones en un estado sano sin importar de donde vengan (localStorage viejo,
+  // Firestore, import): numeros como numeros, moneda valida e ids UNICOS. El contador de
+  // ids arrancaba siempre en 1 aunque ya hubiera posiciones guardadas con id 1, 2, 3... ->
+  // una posicion nueva repetia id y la × de borrar se llevaba puestas las dos.
+  function pfNormalizePositions(arr){
+    var used = {}, maxId = 0, out = [];
+    (Array.isArray(arr) ? arr : []).forEach(function(p){
+      if(!p || !p.ticker) return;
+      var cant = pfParseNum(p.cantidad);
+      if(!(cant > 0)) return;
+      var isCash = !!p.isCash;
+      var px = isCash ? 1 : pfParseNum(p.precioCompra);
+      out.push({
+        id: p.id, ticker: String(p.ticker).trim().toUpperCase(), cantidad: cant,
+        precioCompra: (px > 0) ? px : null, moneda: p.moneda === 'ARS' ? 'ARS' : 'USD',
+        notas: p.notas || '', isCash: isCash,
+        fecha: (p.fecha && /^\d{4}-\d{2}-\d{2}$/.test(p.fecha)) ? p.fecha : null
+      });
+    });
+    out.forEach(function(p){ var n = Number(p.id); if(n > 0 && n % 1 === 0 && !used[n]){ used[n] = 1; p.id = n; if(n > maxId) maxId = n; } else p.id = null; });
+    out.forEach(function(p){ if(p.id == null){ p.id = ++maxId; } });
+    pfIdSeq = maxId + 1;
+    return out;
+  }
+  window._pfNormalizePositions = pfNormalizePositions;
+  window._pfPositions = pfNormalizePositions(window._pfPositions);
+
+  // Socios: cada cambio se guarda solo en Firestore. Antes habia que acordarse de tocar
+  // "Guardar"; si no, al recargar la version vieja de Firestore pisaba lo cargado.
+  var pfAutoSaveTimer = null;
+  function pfPersist(){
+    pfSaveLocalBackup();
+    if(!(window._miIsMember && window._miIsMember()) || !window._miSavePortfolio) return;
+    clearTimeout(pfAutoSaveTimer);
+    pfAutoSaveTimer = setTimeout(async function(){
+      var ok = await window._miSavePortfolio();
+      var st = document.getElementById('pfSaveStatus');
+      if(st && !ok){ st.textContent = 'No se pudo guardar en tu cuenta, tocá «Guardar mi portafolio».'; }
+    }, 800);
+  }
 
   function pfShowAddForm(){
     if(typeof pfImportCancel === 'function') pfImportCancel();
@@ -7571,8 +7662,74 @@
     var precio = document.getElementById('pfInputPrecio');
     var cant = document.getElementById('pfInputCantidad');
     precio.style.display = isCash ? 'none' : '';
-    precio.placeholder = 'Precio de compra (' + moneda + ')';
-    cant.placeholder = isCash ? ('Monto (' + moneda + ')') : 'Cantidad';
+    var ticker = document.getElementById('pfInputTicker').value.trim().toUpperCase();
+    var isBond = !isCash && ticker && pfGetCurrentCategory(ticker, moneda) === 'arg_bonds';
+    precio.placeholder = isBond ? ('Precio cada 100 VN (' + moneda + ')') : ('Precio de compra (' + moneda + ')');
+    cant.placeholder = isCash ? ('Monto (' + moneda + ')') : (isBond ? 'Nominales (VN)' : 'Cantidad');
+    pfUpdateFormHint();
+  }
+
+  // Valida el formulario mientras se tipea: muestra como se interpreto cada numero y avisa
+  // si el precio no se parece a la cotizacion actual (tipico: precio en pesos con moneda USD,
+  // o un cero de mas/de menos). pfAddConfirmKey guarda el aviso ya mostrado: el 2do click en
+  // "Agregar igual" lo acepta.
+  var pfAddConfirmKey = null;
+  function pfFormState(){
+    var ticker = document.getElementById('pfInputTicker').value.trim().toUpperCase();
+    var moneda = document.getElementById('pfInputMoneda').value === 'ARS' ? 'ARS' : 'USD';
+    var isCash = document.getElementById('pfInputCash').checked;
+    var cantRaw = document.getElementById('pfInputCantidad').value;
+    var pxRaw = document.getElementById('pfInputPrecio').value;
+    var cantidad = pfParseNum(cantRaw);
+    var precio = isCash ? 1 : pfParseNum(pxRaw);
+    var st = { ticker:ticker, moneda:moneda, isCash:isCash, cantidad:cantidad, precio:precio, cantRaw:cantRaw, pxRaw:pxRaw, errors:[], warn:null, info:[] };
+    if(cantRaw.trim() && !(cantidad > 0)) st.errors.push('No entendimos ' + (isCash ? 'el monto' : 'la cantidad') + ' «' + cantRaw.trim() + '».');
+    if(!isCash && pxRaw.trim() && !(precio > 0)) st.errors.push('No entendimos el precio «' + pxRaw.trim() + '».');
+    // mostrar la interpretacion solo cuando habia separadores (ahi es donde se confunde)
+    if(cantidad > 0 && /[.,]/.test(cantRaw)) st.info.push((isCash ? 'Monto: ' : 'Cantidad: ') + pfQty(cantidad));
+    if(!isCash && precio > 0 && /[.,]/.test(pxRaw)) st.info.push('Precio: ' + pfPrice(precio) + ' ' + moneda);
+    if(!isCash && ticker && precio > 0 && window._pfMarketData && Object.keys(window._pfMarketData).length){
+      var now = pfGetCurrentPrice(ticker, moneda);
+      var other = moneda === 'ARS' ? 'USD' : 'ARS';
+      var nowOther = pfGetCurrentPrice(ticker, other);
+      if(now == null && nowOther == null){
+        st.warn = { key: ticker+'|nf', msg: 'No encontramos «' + ticker + '» en nuestras cotizaciones: se va a cargar sin precio actual. Elegilo de la lista si aparece.' };
+      } else if(now == null){
+        st.warn = { key: ticker+'|'+moneda+'|cur', switchTo: other, msg: ticker + ' no cotiza en ' + moneda + ' en nuestro feed, sí en ' + other + '.' };
+      } else {
+        var ratio = precio / now;
+        if(ratio > 4 || ratio < 0.25){
+          var fitsOther = nowOther != null && (precio / nowOther) <= 4 && (precio / nowOther) >= 0.25;
+          st.warn = { key: [ticker, moneda, precio].join('|'), switchTo: fitsOther ? other : null,
+            msg: 'Ojo: ' + pfPrice(precio) + ' ' + moneda + ' está muy lejos de la cotización actual de ' + ticker + ' (' + pfPrice(now) + ' ' + moneda + ').'
+              + (fitsOther ? ' Parece un precio en ' + other + '.' : ' Revisá que no sobre o falte un cero.') };
+        }
+      }
+    }
+    return st;
+  }
+  function pfUpdateFormHint(){
+    var el = document.getElementById('pfFormHint');
+    var btn = document.getElementById('pfAddBtn');
+    if(!el) return;
+    var st = pfFormState();
+    if(!st.warn || pfAddConfirmKey !== st.warn.key) pfAddConfirmKey = null;
+    if(btn) btn.textContent = pfAddConfirmKey ? 'Agregar igual' : 'Agregar';
+    var html = '', cls = 'pf-form-hint';
+    if(st.errors.length){ html = pfEsc(st.errors.join(' ')); cls += ' err'; }
+    else if(st.warn){
+      html = pfEsc(st.warn.msg) + (st.warn.switchTo ? ' <a href="#" onclick="pfSwitchFormCurrency(\'' + st.warn.switchTo + '\');return false;" style="color:var(--gold);">Cambiar a ' + st.warn.switchTo + '</a>' : '');
+      if(st.info.length) html = pfEsc(st.info.join(' · ')) + ' — ' + html;
+      if(pfAddConfirmKey) html += ' <span style="color:rgba(255,255,255,.5);">Si está bien, tocá «Agregar igual».</span>';
+      cls += ' warn';
+    } else if(st.info.length){ html = pfEsc(st.info.join(' · ')); }
+    el.className = cls;
+    el.innerHTML = html;
+  }
+  function pfSwitchFormCurrency(m){
+    document.getElementById('pfInputMoneda').value = m === 'ARS' ? 'ARS' : 'USD';
+    pfAddConfirmKey = null;
+    pfToggleCashFields();
   }
   function pfHideAddForm(){
     document.getElementById('pfAddForm').style.display = 'none';
@@ -7584,46 +7741,90 @@
     document.getElementById('pfInputPrecio').value = '';
     var fEl = document.getElementById('pfInputFecha'); if(fEl) fEl.value = '';
     document.getElementById('pfInputNotas').value = '';
+    var hEl = document.getElementById('pfFormHint'); if(hEl){ hEl.textContent = ''; hEl.className = 'pf-form-hint'; }
     document.getElementById('pfInputCash').checked = false;
+    pfAddConfirmKey = null;
     pfToggleCashFields();
   }
   function pfAddPosition(){
-    var ticker = document.getElementById('pfInputTicker').value.trim().toUpperCase();
-    var moneda = document.getElementById('pfInputMoneda').value === 'ARS' ? 'ARS' : 'USD';
-    var isCash = document.getElementById('pfInputCash').checked;
-    var cantidad = parseFloat(document.getElementById('pfInputCantidad').value);
-    var precio = isCash ? 1 : parseFloat(document.getElementById('pfInputPrecio').value);
+    var st = pfFormState();
+    var hint = document.getElementById('pfFormHint');
     var notas = document.getElementById('pfInputNotas').value.trim();
     var fecha = (document.getElementById('pfInputFecha') || {}).value || null;
+    var errs = st.errors.slice();
+    if(!st.ticker) errs.push(st.isCash ? 'Poné un nombre para el efectivo (ej: EFECTIVO).' : 'Falta el ticker.');
+    if(!st.cantRaw.trim()) errs.push(st.isCash ? 'Falta el monto.' : 'Falta la cantidad.');
+    if(!st.isCash && !st.pxRaw.trim()) errs.push('Falta el precio de compra.');
     if(fecha){
       var fd = new Date(fecha + 'T00:00:00');
-      if(isNaN(fd) || fd > new Date()) fecha = null; // fecha inválida o futura => se ignora
+      if(isNaN(fd)) fecha = null;
+      else if(fd > new Date()) errs.push('La fecha de compra no puede ser futura.');
     }
-    if(!ticker || !(cantidad > 0) || !(precio > 0)) return;
-    window._pfPositions.push({ id: pfIdSeq++, ticker: ticker, cantidad: cantidad, precioCompra: precio, moneda: moneda, notas: notas, isCash: isCash, fecha: fecha });
+    if(errs.length){
+      // antes el boton no hacia nada y no decia por que
+      if(hint){ hint.className = 'pf-form-hint err'; hint.textContent = errs.join(' '); }
+      return;
+    }
+    if(st.warn && pfAddConfirmKey !== st.warn.key){
+      pfAddConfirmKey = st.warn.key;
+      pfUpdateFormHint();
+      return;
+    }
+    window._pfPositions.push({ id: pfIdSeq++, ticker: st.ticker, cantidad: st.cantidad, precioCompra: st.precio, moneda: st.moneda, notas: notas, isCash: st.isCash, fecha: fecha });
     pfHideAddForm();
     pfRenderPositions();
+    pfPersist();
   }
 
   function pfRemovePosition(id){
     window._pfPositions = window._pfPositions.filter(function(p){ return p.id !== id; });
     pfRenderPositions();
+    pfPersist();
   }
 
   // ---- precios en vivo (reusa el Worker manfredi-mercados que ya sirve la pestaña Mercados) ----
   // Importante: CEDEARs (ARS) y acciones USA (USD) comparten el mismo ticker a proposito
   // (ej. MSFT existe en arg_cedears Y en usa_stocks). Por eso NUNCA hay que indexar por
   // simbolo solo -- se guardan ambas monedas por separado y quien pida el precio elige cual.
+  // En las categorias argentinas (acciones, CEDEARs, bonos) el worker marca todo como ARS,
+  // pero las especies terminadas en D (MEP) o C (cable) cotizan en DOLARES: AL30D = 54,19
+  // USD, MSFTD = 17,92 USD. Tratadas como pesos, una tenencia de AL30D valia ~1.600 veces
+  // menos. Se detectan comparando contra la especie en pesos: si D/C * CCL ~ precio en pesos,
+  // es la version en dolares. (Ojo: BBD es Bradesco en pesos, no "BB en dolares" -- por eso
+  // se compara el precio y no alcanza con mirar la letra final.)
+  function pfUsdVariantSet(payload){
+    var out = {};
+    var ccl = null;
+    try {
+      (payload.categorias.dolares.items || []).forEach(function(it){ if(it.symbol === 'CONTADOCONLIQUI') ccl = it.price; });
+    } catch(e){}
+    if(!ccl) return out;
+    ['arg_stocks','arg_cedears','arg_bonds'].forEach(function(cat){
+      var items = (payload.categorias[cat] || {}).items || [];
+      var bySym = {};
+      items.forEach(function(it){ if(it.symbol && it.price != null) bySym[it.symbol.toUpperCase()] = it.price; });
+      Object.keys(bySym).forEach(function(sym){
+        if(!/^[A-Z0-9]{2,}[DC]$/.test(sym)) return;
+        var base = bySym[sym.slice(0, -1)];
+        if(!(base > 0) || !(bySym[sym] > 0)) return;
+        var ratio = bySym[sym] * ccl / base;
+        if(ratio > 0.6 && ratio < 1.6) out[cat + ':' + sym] = 1;
+      });
+    });
+    return out;
+  }
   function pfIndexMarketPayload(payload){
     var idx = {};
     if(payload && payload.categorias){
+      var usdVar = pfUsdVariantSet(payload);
       Object.keys(payload.categorias).forEach(function(cat){
         var catObj = payload.categorias[cat] || {};
-        var currency = catObj.currency === 'USD' ? 'USD' : 'ARS';
+        var catCurrency = catObj.currency === 'USD' ? 'USD' : 'ARS';
         var items = catObj.items || [];
         items.forEach(function(it){
           if(!it.symbol || it.price == null) return;
           var sym = it.symbol.toUpperCase();
+          var currency = usdVar[cat + ':' + sym] ? 'USD' : catCurrency;
           if(!idx[sym]) idx[sym] = {};
           // si el mismo simbolo aparece en 2 categorias de la misma moneda (raro), gana la de mayor volumen/la primera ya indexada
           if(!idx[sym][currency]) idx[sym][currency] = { price: it.price, change: it.change, category: cat };
@@ -7653,14 +7854,17 @@
   function pfBuildTickerList(payload){
     var list = [];
     if(payload && payload.categorias){
+      var usdVar = pfUsdVariantSet(payload);
       Object.keys(payload.categorias).forEach(function(cat){
         if(cat === 'dolares') return; // no son posiciones que se puedan cargar
         var catObj = payload.categorias[cat] || {};
-        var currency = catObj.currency === 'USD' ? 'USD' : 'ARS';
+        var catCurrency = catObj.currency === 'USD' ? 'USD' : 'ARS';
         var items = catObj.items || [];
         items.forEach(function(it){
           if(!it.symbol) return;
-          list.push({ symbol: it.symbol.toUpperCase(), name: it.name || '', currency: currency, category: cat });
+          var sym = it.symbol.toUpperCase();
+          var currency = usdVar[cat + ':' + sym] ? 'USD' : catCurrency;
+          list.push({ symbol: sym, name: it.name || '', currency: currency, category: cat });
         });
       });
     }
@@ -7735,7 +7939,7 @@
   }
   (function(){
     var tickerInput = document.getElementById('pfInputTicker');
-    tickerInput.addEventListener('input', pfRenderTickerDropdown);
+    tickerInput.addEventListener('input', function(){ pfRenderTickerDropdown(); pfToggleCashFields(); });
     tickerInput.addEventListener('focus', function(){ if(tickerInput.value.trim()) pfRenderTickerDropdown(); });
     tickerInput.addEventListener('blur', function(){ setTimeout(pfHideTickerDropdown, 150); });
     tickerInput.addEventListener('keydown', function(e){
@@ -7790,18 +7994,31 @@
   }
 
   // rows: cada posicion + precio actual (USD, moneda base), valor invertido/actual y resultado
+  // Valores (invertido, actual, resultado) en USD, la moneda base. precioCompraNativo /
+  // precioActualNativo quedan en la moneda en la que se cargo la posicion (lo que muestra el
+  // broker), solo para la tabla.
   function pfBuildRows(){
+    var ccl = pfGetCclRate();
     return (window._pfPositions||[]).map(function(p){
+      var units = pfUnits(p);
       var currentPrice = pfGetCurrentPriceUSD(p);
       var priceKnown = currentPrice != null;
-      var priceForValue = currentPrice != null ? currentPrice : (p.moneda === 'ARS' ? null : p.precioCompra);
-      var precioCompraUSD = p.moneda === 'ARS' ? (pfGetCclRate() ? p.precioCompra/pfGetCclRate() : null) : p.precioCompra;
-      var invertido = precioCompraUSD != null ? p.cantidad * precioCompraUSD : 0;
-      var valorActual = priceForValue != null ? p.cantidad * priceForValue : 0;
-      var gain = valorActual - invertido;
-      var gainPct = invertido > 0 ? (gain/invertido*100) : 0;
+      var hasCost = p.isCash || p.precioCompra != null;
+      // sin cotizacion: una posicion en USD se valua a su costo (resultado 0); una en ARS no se puede convertir
+      var priceForValue = currentPrice != null ? currentPrice : ((p.moneda === 'ARS' || !hasCost) ? null : p.precioCompra);
+      var precioCompraUSD = !hasCost ? null : (p.moneda === 'ARS' ? (ccl ? p.precioCompra/ccl : null) : p.precioCompra);
+      var invertido = precioCompraUSD != null ? units * precioCompraUSD : 0;
+      var valorActual = priceForValue != null ? units * priceForValue : 0;
+      // el resultado solo tiene sentido si se conocen costo Y precio actual; si falta el costo
+      // (PDF sin PPC) antes contaba todo el valor como ganancia
+      var gainKnown = p.isCash ? true : (priceKnown && precioCompraUSD != null);
+      var gain = gainKnown ? valorActual - invertido : 0;
+      var gainPct = (gainKnown && invertido > 0) ? (gain/invertido*100) : 0;
+      var nativeNow = p.isCash ? null : pfGetCurrentPrice(p.ticker, p.moneda);
       return { id:p.id, ticker:p.ticker, moneda:p.moneda||'USD', cantidad:p.cantidad, precioCompra:precioCompraUSD, isCash:p.isCash, fecha:p.fecha||null,
-        currentPrice:priceForValue, priceKnown:priceKnown, invertido:invertido, valorActual:valorActual, gain:gain, gainPct:gainPct };
+        precioCompraNativo: p.isCash ? null : p.precioCompra, precioActualNativo: nativeNow, isBond: pfUnitFactor(p) !== 1,
+        currentPrice:priceForValue, priceKnown:priceKnown, hasCost:hasCost, gainKnown:gainKnown,
+        invertido:invertido, valorActual:valorActual, gain:gain, gainPct:gainPct };
     });
   }
   // Clave por ticker+moneda (no solo ticker): una posicion en CEDEAR (ARS) y una en acciones
@@ -7865,7 +8082,11 @@
     if((window._pfPositions||[]).length) await pfFetchMarketData(false);
     var rows = pfBuildRows();
     var total = rows.reduce(function(s,r){ return s + r.valorActual; }, 0);
-    var totalInv = rows.reduce(function(s,r){ return s + r.invertido; }, 0);
+    // el resultado total solo suma posiciones con costo y precio conocidos (si no, una
+    // posicion sin PPC inflaba la ganancia con todo su valor)
+    var totalInv = rows.reduce(function(s,r){ return s + (r.gainKnown ? r.invertido : 0); }, 0);
+    var totalValKnown = rows.reduce(function(s,r){ return s + (r.gainKnown ? r.valorActual : 0); }, 0);
+    var nUnknown = rows.filter(function(r){ return !r.gainKnown; }).length;
 
     if(!rows.length){
       body.innerHTML = '<tr class="pf-empty-row"><td colspan="7">Todavía no cargaste posiciones.</td></tr>';
@@ -7875,20 +8096,21 @@
         var pct = total > 0 ? (r.valorActual/total*100) : 0;
         var gainColor = r.gain > 0 ? 'var(--green)' : (r.gain < 0 ? 'var(--red)' : 'rgba(255,255,255,.5)');
         var sign = r.gain >= 0 ? '+' : '−';
-        var note = !r.priceKnown ? ' <span style="color:var(--yellow);font-size:11px;">sin cotización</span>' : '';
+        var note = !r.priceKnown ? ' <span style="color:var(--yellow);font-size:11px;">sin cotización</span>'
+          : (!r.isCash && !r.hasCost ? ' <span style="color:var(--yellow);font-size:11px;">sin precio de compra</span>' : '');
         var arsTag = (!r.isCash && r.moneda==='ARS') ? ' <span style="color:rgba(255,255,255,.4);font-size:11px;border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:1px 5px;">ARS</span>' : '';
         var fechaSub = r.isCash ? '' : (r.fecha
             ? '<div class="pf-lot-date">'+ pfPerfFmtDate(pfPerfParseDate(r.fecha)) +'</div>'
             : '<div class="pf-lot-date pf-lot-nodate">sin fecha de compra</div>');
         return '<tr><td>'+ (r.isCash ? '&#128176; ' : '') + pfEsc(r.ticker) + arsTag + note + fechaSub +'</td>'
-          + '<td class="num">'+ (r.isCash ? '—' : r.cantidad) +'</td>'
-          + '<td class="num">'+ (r.isCash || r.precioCompra==null ? '—' : pfMoney(r.precioCompra)) +'</td>'
-          + '<td class="num">'+ (r.isCash || r.currentPrice==null ? '—' : pfMoney(r.currentPrice)) +'</td>'
-          + '<td class="num" style="color:'+ gainColor +';">'+ (r.isCash || !r.priceKnown ? '—' : sign + pfMoney(Math.abs(r.gain)) + ' (' + sign + Math.abs(r.gainPct).toFixed(1) + '%)') +'</td>'
+          + '<td class="num">'+ (r.isCash ? pfMoney(r.cantidad) + ' ' + r.moneda : pfQty(r.cantidad) + (r.isBond ? '<div class="pf-lot-date">VN</div>' : '')) +'</td>'
+          + '<td class="num">'+ (r.isCash || r.precioCompraNativo==null ? '—' : pfPrice(r.precioCompraNativo)) +'</td>'
+          + '<td class="num">'+ (r.isCash || r.precioActualNativo==null ? '—' : pfPrice(r.precioActualNativo)) +'</td>'
+          + '<td class="num" style="color:'+ gainColor +';">'+ (r.isCash || !r.gainKnown ? '—' : sign + pfMoney(Math.abs(r.gain)) + ' (' + sign + Math.abs(r.gainPct).toFixed(1) + '%)') +'</td>'
           + '<td class="num">'+ pct.toFixed(1) +'%</td>'
           + '<td style="text-align:right;"><span class="pf-rm" onclick="pfRemovePosition('+ r.id +')">&times;</span></td></tr>';
       }).join('');
-      var totGain = total - totalInv;
+      var totGain = totalValKnown - totalInv;
       var totGainPct = totalInv > 0 ? (totGain/totalInv*100) : 0;
       var totColor = totGain > 0 ? 'var(--green)' : (totGain < 0 ? 'var(--red)' : 'rgba(255,255,255,.7)');
       var incDate = pfInceptionDate();
@@ -7899,7 +8121,11 @@
         +   '<div>Resultado <b style="color:'+ totColor +';">'+ (totGain>=0?'+':'−') + pfMoney(Math.abs(totGain)) +' ('+ (totGain>=0?'+':'−') + Math.abs(totGainPct).toFixed(1) +'%)</b></div>'
         +   '<div>Invertido <b>'+ pfMoney(totalInv) +'</b></div>'
         +   (incDate ? '<div>Cartera desde <b>'+ pfPerfFmtDate(incDate) +'</b></div>' : '')
-        + '</div></div>';
+        + '</div></div>'
+        + '<div class="pf-hero-foot">Valores en USD (las posiciones en pesos, al CCL de hoy). Compra y Actual, en la moneda de cada posición'
+        + (rows.some(function(r){ return r.isBond; }) ? '; bonos y letras, cada 100 nominales' : '') + '.'
+        + (nUnknown ? ' ' + nUnknown + (nUnknown === 1 ? ' posición queda' : ' posiciones quedan') + ' fuera del resultado por no tener precio de compra o cotización.' : '')
+        + '</div>';
     }
 
     pfPerfCache = {};
@@ -8117,8 +8343,8 @@
       return '<tr data-i="'+ i +'" class="'+ (flag ? 'pf-imp-flag' : '') +'">'
         + '<td><input type="checkbox" class="pf-imp-chk" checked onchange="pfImpToggleRow(this)"></td>'
         + '<td><input class="pf-imp-tk'+ (unknown ? ' pf-imp-warnfield' : '') +'" value="'+ pfEsc(p.ticker) +'" maxlength="20">'+ badge +'</td>'
-        + '<td><input class="pf-imp-qty" type="number" step="any" value="'+ (p.cantidad != null ? p.cantidad : '') +'"></td>'
-        + '<td><input class="pf-imp-px'+ (noPx ? ' pf-imp-warnfield' : '') +'" type="number" step="any" value="'+ (p.precioCompra != null ? p.precioCompra : '') +'" placeholder="'+ (isCash ? '1' : 's/d') +'"></td>'
+        + '<td><input class="pf-imp-qty" type="text" inputmode="decimal" value="'+ pfNumToInput(p.cantidad) +'"></td>'
+        + '<td><input class="pf-imp-px'+ (noPx ? ' pf-imp-warnfield' : '') +'" type="text" inputmode="decimal" value="'+ (p.precioCompra != null ? pfNumToInput(p.precioCompra) : '') +'" placeholder="'+ (isCash ? '1' : 's/d') +'"></td>'
         + '<td><select class="pf-imp-mon"><option value="ARS"'+ (p.moneda !== 'USD' ? ' selected' : '') +'>ARS</option><option value="USD"'+ (p.moneda === 'USD' ? ' selected' : '') +'>USD</option></select></td>'
         + '<td style="color:rgba(255,255,255,.5);white-space:nowrap;">'+ pfEsc(TIPO_LABEL[p.tipo] || 'Otro') +'</td>'
         + '</tr>';
@@ -8137,7 +8363,7 @@
 
     pfImportShow(
       '<h4>Revisá lo que leímos'+ pfEsc(brokerTxt) +'</h4>'
-      + '<p class="pf-imp-sub">Corregí ticker, cantidad, precio de compra (PPC) o moneda antes de importar. Las filas marcadas necesitan una mirada. Los precios que figuran como «s/d» no venían en el PDF — completalos o se importan sin resultado.</p>'
+      + '<p class="pf-imp-sub">Corregí ticker, cantidad, precio de compra (PPC) o moneda antes de importar. Bonos: nominales y PPC cada 100 VN, como en el broker. Las filas marcadas necesitan una mirada. Los precios que figuran como «s/d» no venían en el PDF — completalos o se importan sin resultado.</p>'
       + avisosHtml
       + '<div class="pf-imp-scroll"><table class="pf-imp-table">'
       + '<thead><tr><th></th><th>Ticker</th><th>Cantidad</th><th>PPC</th><th>Moneda</th><th>Tipo</th></tr></thead>'
@@ -8159,18 +8385,19 @@
     var body = document.getElementById('pfImpBody');
     if(!body || !pfImportParsed) return;
     var trs = body.querySelectorAll('tr');
-    var added = 0;
+    var added = 0, skipped = 0;
     trs.forEach(function(tr){
       var chk = tr.querySelector('.pf-imp-chk');
       if(!chk || !chk.checked) return;
       var i = parseInt(tr.getAttribute('data-i'), 10);
       var orig = pfImportParsed.positions[i] || {};
       var ticker = (tr.querySelector('.pf-imp-tk').value || '').trim().toUpperCase();
-      var cantidad = parseFloat(tr.querySelector('.pf-imp-qty').value);
+      var cantidad = pfParseNum(tr.querySelector('.pf-imp-qty').value);
       var moneda = tr.querySelector('.pf-imp-mon').value === 'USD' ? 'USD' : 'ARS';
       var isCash = orig.tipo === 'efectivo';
       var pxRaw = tr.querySelector('.pf-imp-px').value;
-      var precio = isCash ? 1 : (pxRaw === '' ? null : parseFloat(pxRaw));
+      var precio = isCash ? 1 : (pxRaw.trim() === '' ? null : pfParseNum(pxRaw));
+      if(ticker && !(cantidad > 0)) skipped++;
       if(!ticker || !(cantidad > 0)) return;
       if(!isCash && precio != null && !(precio > 0)) precio = null;
       window._pfPositions.push({
@@ -8188,9 +8415,11 @@
     pfImportCancel();
     if(added){
       pfRenderPositions();
+      pfPersist();
       var st = document.getElementById('pfSaveStatus');
       if(st){
-        st.textContent = added + (added === 1 ? ' posición importada ✓' : ' posiciones importadas ✓');
+        st.textContent = added + (added === 1 ? ' posición importada ✓' : ' posiciones importadas ✓')
+          + (skipped ? ' · ' + skipped + ' sin cantidad válida, no se importaron' : '');
         setTimeout(function(){ st.textContent = ''; }, 5000);
       }
       var saveBtn = document.getElementById('pfSaveBtn');
@@ -8720,13 +8949,35 @@
     return usdCloses.map(function(v){ return v*scale; });
   }
 
+  // Serie de cierres en USD para una posicion, sea CEDEAR/accion local (ARS), accion USA o
+  // especie argentina en dolares (MSFTD, AL30D). Las D/C no tienen historico propio en la
+  // fuente: se arma con la especie en pesos / CCL, calibrada al precio en dolares de hoy.
+  async function pfFetchUsdClosesFor(ticker, moneda, n){
+    if(moneda === 'ARS'){
+      return pfFetchUsdClosesForArs(ticker, pfGetCurrentCategory(ticker, 'ARS') || 'arg_cedears', n);
+    }
+    var cat = pfGetCurrentCategory(ticker, 'USD') || 'usa_stocks';
+    var closes = await pfFetchHistorico(cat, ticker, n);
+    if(closes && closes.length) return closes;
+    if(/^arg_/.test(cat) && /[DC]$/.test(ticker)){
+      var base = ticker.slice(0, -1);
+      var conv = await pfFetchUsdClosesForArs(base, cat, n);
+      var live = pfGetCurrentPrice(ticker, 'USD');
+      if(conv && conv.length && live){
+        var sc = live / conv[conv.length - 1];
+        return conv.map(function(v){ return v * sc; });
+      }
+    }
+    return null;
+  }
+
   async function pfBuildAdvancedMetrics(){
     var positions = (window._pfPositions||[]).filter(function(p){ return !p.isCash; });
     var grouped = {}; // assetKey -> {ticker, moneda, cantidad}
     positions.forEach(function(p){
       var key = pfAssetKey(p);
       if(!grouped[key]) grouped[key] = { ticker:p.ticker, moneda:p.moneda||'USD', cantidad:0 };
-      grouped[key].cantidad += p.cantidad;
+      grouped[key].cantidad += pfUnits(p); // bonos: nominales/100, igual que el precio
     });
     var tickers = Object.keys(grouped);
     if(tickers.length < 2) return { insufficientData:true };
@@ -8735,13 +8986,7 @@
     var closesByTicker = {};
     await Promise.all(tickers.map(async function(t){
       var g = grouped[t];
-      if(g.moneda === 'ARS'){
-        var cat = pfGetCurrentCategory(g.ticker, 'ARS') || 'arg_cedears';
-        closesByTicker[t] = await pfFetchUsdClosesForArs(g.ticker, cat, N);
-      } else {
-        var catUsd = pfGetCurrentCategory(g.ticker, 'USD') || 'usa_stocks';
-        closesByTicker[t] = await pfFetchHistorico(catUsd, g.ticker, N);
-      }
+      closesByTicker[t] = await pfFetchUsdClosesFor(g.ticker, g.moneda, N);
     }));
     // grouped pasa a exponer solo cantidad (para el promedio ponderado de abajo)
     var qtyByKey = {}; tickers.forEach(function(t){ qtyByKey[t] = grouped[t].cantidad; });
@@ -9535,22 +9780,12 @@
     lots.forEach(function(p){ byKey[p.ticker + '|' + (p.moneda === 'ARS' ? 'ARS' : 'USD')] = p; });
     var closesByKey = {};
     var arsLimited = false;
+    // (Antes las ventanas largas iban directo a Yahoo, que bloquea los pedidos del navegador
+    // por CORS y quedaban "sin datos". Se usa el worker con su tope de ~180 ruedas.)
+    if(useYahoo) arsLimited = true;
     await Promise.all(Object.keys(byKey).map(async function(k){
       var p = byKey[k];
-      if(p.moneda === 'ARS'){
-        var catA = pfGetCurrentCategory(p.ticker, 'ARS') || 'arg_cedears';
-        closesByKey[k] = await pfFetchUsdClosesForArs(p.ticker, catA, nFetch);
-        if(useYahoo) arsLimited = true;
-      } else if(useYahoo){
-        // Antes iba directo a Yahoo, pero Yahoo bloquea los pedidos del navegador (CORS)
-        // y estas ventanas largas quedaban siempre "sin datos". Se usa el worker con su tope.
-        var catL = pfGetCurrentCategory(p.ticker, 'USD') || 'usa_stocks';
-        closesByKey[k] = await pfFetchHistorico(catL, p.ticker, nFetch);
-        arsLimited = true;
-      } else {
-        var catU = pfGetCurrentCategory(p.ticker, 'USD') || 'usa_stocks';
-        closesByKey[k] = await pfFetchHistorico(catU, p.ticker, nFetch);
-      }
+      closesByKey[k] = await pfFetchUsdClosesFor(p.ticker, p.moneda === 'ARS' ? 'ARS' : 'USD', nFetch);
     }));
 
     var benchCloses;
@@ -9576,9 +9811,14 @@
         if(!c) return;
         var px = c[c.length - L + i];
         if(px == null) return;
-        val += p.cantidad * px;
+        // sin precio de compra no hay costo contra el cual medir: afuera de la curva (si no,
+        // todo su valor aparecia como ganancia)
+        if(p.precioCompra == null) return;
+        var u = pfUnits(p);
         var pc = p.moneda === 'ARS' ? (ccl ? p.precioCompra / ccl : null) : p.precioCompra;
-        if(pc != null) cost += p.cantidad * pc;
+        if(pc == null) return;
+        val += u * px;
+        cost += u * pc;
       });
       valSeries.push(val + cashUSD); costSeries.push(cost + cashUSD);
     }
