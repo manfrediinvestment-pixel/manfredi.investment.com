@@ -1,13 +1,13 @@
 /* Ayuda de Manfredi: preguntas frecuentes con buscador y derivación al mail del equipo.
    Vive en un Shadow DOM (igual que assets/cartel/cartel.js) para no chocar con el CSS global.
    Botón fijo arriba a la derecha, debajo del menú; Warren sigue abajo a la derecha.
-   Las preguntas están en assets/ayuda/faq.json y se cargan recién al abrir. */
+   Las preguntas están en assets/ayuda/faq.json y se cargan recién al abrir.
+   Lo que no está en las preguntas se manda por mail (mailto) a MAIL_EQUIPO. */
 (function () {
   if (window.__miAyuda) return;
   window.__miAyuda = true;
 
   var FAQ_URL = 'assets/ayuda/faq.json';
-  var ENDPOINT = 'https://manfredi-memberships.nachito2502.workers.dev/consulta-ayuda';
   var MAIL_EQUIPO = 'manfredi.investment@gmail.com';
 
   var CSS = "\
@@ -132,13 +132,8 @@
   .fld input:focus,.fld textarea:focus{outline:none;border-color:rgba(242,201,76,.7);box-shadow:0 0 0 3px rgba(242,201,76,.12)}\
   .fld input[aria-invalid=true]{border-color:var(--neg)}\
   .err{margin:-4px 0 0;font-size:12.5px;color:#f1938d}\
-  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}\
   .note{margin:0;font-size:12.5px;line-height:1.5;color:var(--ink3)}\
   .done{text-align:left;padding-top:6px}\
-  .chk{width:52px;height:52px;margin-bottom:14px}\
-  .chk circle{fill:none;stroke:rgba(92,192,142,.35);stroke-width:2}\
-  .chk path{fill:none;stroke:var(--pos);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:30;stroke-dashoffset:30;animation:draw .5s var(--ease) .12s forwards}\
-  @keyframes draw{to{stroke-dashoffset:0}}\
   .done h3{margin:0 0 6px;font:400 22px/1.2 var(--serif);color:#fff}\
   .done p{margin:0 0 16px;font-size:14px;line-height:1.55;color:var(--ink2)}\
   .mailbox{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:10px 12px;border-radius:8px;border:1px solid var(--line2);background:var(--raised);font-size:14px;color:#fff;user-select:all}\
@@ -157,7 +152,7 @@
   }\
   @media (prefers-reduced-motion:reduce){\
     .trig,.pan,.pan.open,.qi,.qi svg,.qi>span,.trig__t{transition:none}\
-    .v.on,.chk path,.sk{animation:none}.chk path{stroke-dashoffset:0}\
+    .v.on,.sk{animation:none}\
   }";
 
   var I = {
@@ -355,48 +350,31 @@
     show('ans');
   }
 
-  function userEmail() { var u = window._currentUser; return (u && u.email) || ''; }
-
   function renderMail(pregunta) {
     V.mail.innerHTML = '<button type="button" class="back" data-act="back">' + I.back + 'Volver</button>' +
-      '<h3 class="aq">Mandanos tu pregunta</h3><p class="note" style="font-size:14px;color:var(--ink2);margin-bottom:6px">La lee una persona del equipo y te responde a tu mail.</p>' +
+      '<h3 class="aq">Mandanos tu pregunta</h3><p class="note" style="font-size:14px;color:var(--ink2);margin-bottom:6px">Al tocar Enviar se abre tu app de mail con la pregunta lista para mandar a <b style="color:#fff">' + MAIL_EQUIPO + '</b>. Te respondemos a ese mismo mail.</p>' +
       '<form class="frm" id="frm" novalidate>' +
-      '<label class="fld">Tu mail<input id="fMail" type="email" autocomplete="email" inputmode="email" required value="' + esc(userEmail()) + '"></label>' +
-      '<p class="err" id="eMail" hidden>Escribí un mail válido para poder responderte.</p>' +
       '<label class="fld">Tu pregunta<textarea id="fQ" maxlength="1000" required>' + esc(pregunta || '') + '</textarea></label>' +
       '<p class="err" id="eQ" hidden>Contanos tu duda en al menos unas palabras.</p>' +
-      '<label class="hp" aria-hidden="true">No completar<input id="fHp" tabindex="-1" autocomplete="off"></label>' +
-      '<div><button type="submit" class="btn" id="fBtn">' + I.send + 'Enviar pregunta</button></div></form>';
+      '<div><button type="submit" class="btn" id="fBtn">' + I.send + 'Enviar por mail</button></div></form>';
     show('mail');
-    var f = V.mail.querySelector(pregunta ? '#fMail' : '#fQ');
-    if (f && !(f.id === 'fMail' && f.value)) f.focus(); else V.mail.querySelector('#fQ').focus();
+    var q = V.mail.querySelector('#fQ');
+    q.focus(); q.setSelectionRange(q.value.length, q.value.length);
   }
 
+  // Abre la app de mail del visitante con la consulta armada (sin servidor de por medio)
   function sendMail(ev) {
     ev.preventDefault();
-    var m = V.mail.querySelector('#fMail'), q = V.mail.querySelector('#fQ'), btn = V.mail.querySelector('#fBtn');
-    var okM = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m.value.trim()), okQ = q.value.trim().length >= 5;
-    m.setAttribute('aria-invalid', !okM); V.mail.querySelector('#eMail').hidden = okM;
-    q.setAttribute('aria-invalid', !okQ); V.mail.querySelector('#eQ').hidden = okQ;
-    if (!okM) { m.focus(); return; }
-    if (!okQ) { q.focus(); return; }
-    btn.disabled = true; btn.innerHTML = 'Enviando…';
-    var body = { email: m.value.trim(), pregunta: q.value.trim(), pagina: location.hash || '#inicio', website: V.mail.querySelector('#fHp').value };
-    fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.ok) throw new Error(j.error || r.status); return j; }); })
-      .then(function () {
-        V.mail.innerHTML = '<div class="done"><svg class="chk" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M16 27l7 7 13-15"/></svg>' +
-          '<h3>Listo, ya nos llegó.</h3><p>Te respondemos a <b style="color:#fff">' + esc(body.email) + '</b>. También te mandamos una copia de tu pregunta.</p>' +
-          '<button type="button" class="btn btn--ghost" data-act="home">Volver a la ayuda</button></div>';
-        bd.scrollTop = 0;
-      })
-      .catch(function (e) {
-        var msg = /limite|429/.test(String(e.message)) ? 'Ya mandaste varias preguntas hoy.' : 'No pudimos enviar tu pregunta.';
-        V.mail.innerHTML = '<div class="done"><h3>' + msg + '</h3><p>Escribinos directo a este mail y te respondemos igual:</p>' +
-          '<div class="mailbox"><span>' + MAIL_EQUIPO + '</span><button type="button" data-act="copy">Copiar</button></div>' +
-          '<button type="button" class="btn btn--ghost" data-act="home">Volver a la ayuda</button></div>';
-        bd.scrollTop = 0;
-      });
+    var q = V.mail.querySelector('#fQ'), texto = q.value.trim(), ok = texto.length >= 5;
+    q.setAttribute('aria-invalid', !ok); V.mail.querySelector('#eQ').hidden = ok;
+    if (!ok) { q.focus(); return; }
+    var asunto = 'Consulta desde la web: ' + texto.split('\n')[0].slice(0, 60);
+    var cuerpo = texto + '\n\n—\nSección: ' + (location.hash || '#inicio');
+    location.href = 'mailto:' + MAIL_EQUIPO + '?subject=' + encodeURIComponent(asunto) + '&body=' + encodeURIComponent(cuerpo);
+    V.mail.innerHTML = '<div class="done"><h3>Se abrió tu app de mail.</h3><p>Revisá el mensaje y tocá <b style="color:#fff">Enviar</b> ahí para que nos llegue. Si no se abrió nada, escribinos a este mail con tu pregunta:</p>' +
+      '<div class="mailbox"><span>' + MAIL_EQUIPO + '</span><button type="button" data-act="copy">Copiar</button></div>' +
+      '<button type="button" class="btn btn--ghost" data-act="home">Volver a la ayuda</button></div>';
+    bd.scrollTop = 0;
   }
 
   function doGo(dest) {
