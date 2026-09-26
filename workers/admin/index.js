@@ -56,54 +56,48 @@ async function gql(env, query, variables) {
 }
 const isoDia = d => d.toISOString().slice(0, 10);
 
-// GET /trafico -- 30 dias. Dos fuentes, cada una opcional:
-//  - zona (todo pedido que pasa por Cloudflare: requests, visitantes unicos, paises)
-//  - Web Analytics (visitas reales de navegador: paginas, de donde vienen, dispositivos)
+// GET /trafico -- 30 dias de Web Analytics: solo navegadores reales (sin bots).
+// Filtra por dominio en vez de listar sitios, asi alcanza con el permiso Account Analytics: Read.
+// Web Analytics MUESTREA si se le pide un rango largo de una (da 100, 200...): por eso se pide
+// un alias por dia para la serie y tramos de 6 dias para los rankings, y se suman aca.
+// Ojo: no usa cookies, asi que da VISITAS (entradas al sitio) y paginas vistas, no personas distintas.
 async function trafico(env) {
-    const hasta = new Date(), desde = new Date(Date.now() - 29 * 86400e3);
-    const out = { desde: isoDia(desde), hasta: isoDia(hasta), zona: null, web: null, errores: {} };
-
+    const DIA = 86400e3, hoy = new Date(), hoy0 = Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate());
+    const desde = new Date(hoy0 - 29 * DIA);
+    const out = { desde: isoDia(desde), hasta: isoDia(hoy), web: null, errores: {} };
+    const rango = (a, b) => `requestHost_in:$h, datetime_geq:"${new Date(a).toISOString()}", datetime_leq:"${new Date(Math.min(b, Date.now())).toISOString()}"`;
+    const consulta = partes => gql(env, `query($a:String!,$h:[String!]){viewer{accounts(filter:{accountTag:$a}){${partes.join('\n')}}}}`,
+        { a: env.CF_ACCOUNT_ID, h: [env.SITE_HOST, 'www.' + env.SITE_HOST] }).then(d => d.viewer.accounts[0]);
     try {
-        const zonas = await cf(env, '/zones?name=' + encodeURIComponent(env.SITE_HOST));
-        if (!zonas.length) throw new Error('No encontré la zona ' + env.SITE_HOST);
-        const d = await gql(env, `query($z:String!,$a:Date!,$b:Date!){viewer{zones(filter:{zoneTag:$z}){
-            httpRequests1dGroups(limit:31,filter:{date_geq:$a,date_leq:$b},orderBy:[date_ASC]){
-              dimensions{date} sum{requests pageViews bytes threats countryMap{clientCountryName requests}} uniq{uniques}}}}}`,
-            { z: zonas[0].id, a: out.desde, b: out.hasta });
-        const dias = d.viewer.zones[0].httpRequests1dGroups;
-        const paises = {};
-        dias.forEach(g => (g.sum.countryMap || []).forEach(c => { paises[c.clientCountryName] = (paises[c.clientCountryName] || 0) + c.requests; }));
-        out.zona = {
-            dias: dias.map(g => ({ fecha: g.dimensions.date, requests: g.sum.requests, paginas: g.sum.pageViews, unicos: g.uniq.uniques, bytes: g.sum.bytes, amenazas: g.sum.threats })),
-            paises: Object.entries(paises).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([pais, requests]) => ({ pais, requests }))
+        const dias = [];
+        for (let t = +desde; t <= hoy0; t += DIA) dias.push(t);
+        const s = await consulta(dias.map((t, i) => `d${i}: rumPageloadEventsAdaptiveGroups(limit:1, filter:{${rango(t, t + DIA - 1)}}){ count sum{visits} }`));
+        const serie = dias.map((t, i) => { const g = s['d' + i][0]; return { fecha: isoDia(new Date(t)), vistas: g ? g.count : 0, visitas: g ? g.sum.visits : 0 }; });
+
+        const DIMS = { paginas: ['requestPath', 12], origen: ['refererHost', 10], paises: ['countryName', 10], dispositivos: ['deviceType', 5] };
+        const tramos = [];
+        for (let t = +desde; t <= hoy0; t += 6 * DIA) tramos.push([t, t + 6 * DIA - 1]);
+        const partes = [];
+        Object.entries(DIMS).forEach(([k, [dim]]) => tramos.forEach(([a, b], i) =>
+            partes.push(`${k}${i}: rumPageloadEventsAdaptiveGroups(limit:50, filter:{${rango(a, b)}}, orderBy:[count_DESC]){ count sum{visits} dimensions{${dim}} }`)));
+        const r = await consulta(partes);
+        const rank = k => {
+            const [dim, top] = DIMS[k], acc = {};
+            tramos.forEach((_, i) => (r[k + i] || []).forEach(g => {
+                const n = g.dimensions[dim] || '(directo)', e = acc[n] || (acc[n] = { nombre: n, vistas: 0, visitas: 0 });
+                e.vistas += g.count; e.visitas += g.sum.visits;
+            }));
+            return Object.values(acc).sort((x, y) => y.vistas - x.vistas).slice(0, top);
         };
-    } catch (e) { out.errores.zona = e.message; }
-
-    try {
-        const sitios = await cf(env, `/accounts/${env.CF_ACCOUNT_ID}/rum/site_info/list?per_page=50`);
-        const sitio = (sitios || []).find(s => (s.ruleset && s.ruleset.zone_name === env.SITE_HOST) || s.host === env.SITE_HOST || (s.host || '').endsWith('.pages.dev')) || (sitios || [])[0];
-        if (!sitio) throw new Error('Web Analytics no está activado');
-        const v = { a: env.CF_ACCOUNT_ID, s: sitio.site_tag, d1: desde.toISOString(), d2: hasta.toISOString() };
-        const grupo = (alias, dim, limit, order) => `${alias}: rumPageloadEventsAdaptiveGroups(limit:${limit}, filter:{siteTag:$s, datetime_geq:$d1, datetime_leq:$d2}, orderBy:[${order}]){ count sum{visits} dimensions{${dim}} }`;
-        const d = await gql(env, `query($a:String!,$s:String!,$d1:Time!,$d2:Time!){viewer{accounts(filter:{accountTag:$a}){
-            ${grupo('serie', 'date', 31, 'date_ASC')}
-            ${grupo('paginas', 'requestPath', 12, 'count_DESC')}
-            ${grupo('origen', 'refererHost', 10, 'count_DESC')}
-            ${grupo('paises', 'countryName', 10, 'count_DESC')}
-            ${grupo('dispositivos', 'deviceType', 5, 'count_DESC')}
-          }}}`, v);
-        const a = d.viewer.accounts[0];
-        const map = (arr, k) => arr.map(g => ({ [k]: g.dimensions[k === 'fecha' ? 'date' : k], vistas: g.count, visitas: g.sum.visits }));
         out.web = {
-            sitio: sitio.host || sitio.site_tag,
-            serie: map(a.serie, 'fecha'),
-            paginas: a.paginas.map(g => ({ ruta: g.dimensions.requestPath, vistas: g.count, visitas: g.sum.visits })),
-            origen: a.origen.map(g => ({ origen: g.dimensions.refererHost || '(directo)', vistas: g.count, visitas: g.sum.visits })),
-            paises: a.paises.map(g => ({ pais: g.dimensions.countryName, vistas: g.count, visitas: g.sum.visits })),
-            dispositivos: a.dispositivos.map(g => ({ tipo: g.dimensions.deviceType, vistas: g.count, visitas: g.sum.visits }))
+            sitio: env.SITE_HOST, serie,
+            paginas: rank('paginas').map(e => ({ ruta: e.nombre, vistas: e.vistas, visitas: e.visitas })),
+            // origen: solo llegadas desde afuera (la navegacion interna trae visitas = 0)
+            origen: rank('origen').filter(e => e.visitas > 0).sort((x, y) => y.visitas - x.visitas).map(e => ({ origen: e.nombre, vistas: e.vistas, visitas: e.visitas })),
+            paises: rank('paises').map(e => ({ pais: e.nombre, vistas: e.vistas, visitas: e.visitas })),
+            dispositivos: rank('dispositivos').map(e => ({ tipo: e.nombre, vistas: e.vistas, visitas: e.visitas }))
         };
     } catch (e) { out.errores.web = e.message; }
-
     return out;
 }
 

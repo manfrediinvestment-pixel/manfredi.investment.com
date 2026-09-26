@@ -57,7 +57,7 @@
     });
   }
 
-  // ---------- graficos (SVG, una serie, tooltip nativo por marca) ----------
+  // ---------- graficos (SVG, una serie, tooltip propio por marca via data-tip) ----------
   // barras verticales: data = [{ label, value, tip }]
   function barras(data, opt) {
     opt = opt || {};
@@ -74,10 +74,10 @@
     data.forEach(function (d, i) {
       var h = d.value > 0 ? Math.max(2, ih * d.value / paso) : 0, x = L + i * bw + gap / 2, w = bw - gap, y = T + ih - h;
       var r = Math.min(4, w / 2, h);
-      s += '<g class="pn-mark"><rect x="' + (L + i * bw) + '" y="' + T + '" width="' + bw + '" height="' + ih + '" fill="transparent"/>' +
+      s += '<g class="pn-mark" data-tip="' + esc(d.tip || (d.label + ': ' + num(d.value))) + '"><rect x="' + (L + i * bw) + '" y="' + T + '" width="' + bw + '" height="' + ih + '" fill="transparent"/>' +
         (h ? '<path d="M' + x + ',' + (T + ih) + 'V' + (y + r) + 'Q' + x + ',' + y + ' ' + (x + r) + ',' + y + 'H' + (x + w - r) + 'Q' + (x + w) + ',' + y + ' ' + (x + w) + ',' + (y + r) + 'V' + (T + ih) + 'Z" class="pn-bar"/>' : '') +
-        '<title>' + esc(d.tip || (d.label + ': ' + num(d.value))) + '</title></g>';
-      if (i % cada === 0 || i === data.length - 1) s += '<text x="' + (L + i * bw + bw / 2) + '" y="' + (H - 8) + '" class="pn-axis" text-anchor="middle">' + esc(d.label) + '</text>';
+        '</g>';
+      if ((i % cada === 0 && data.length - 1 - i >= cada / 2) || i === data.length - 1) s += '<text x="' + (L + i * bw + bw / 2) + '" y="' + (H - 8) + '" class="pn-axis" text-anchor="middle">' + esc(d.label) + '</text>';
     });
     return s + '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + (T + ih) + '" y2="' + (T + ih) + '" class="pn-base"/></svg>';
   }
@@ -104,7 +104,7 @@
       s += '<circle cx="' + X(last) + '" cy="' + Y(data[last].value) + '" r="4.5" class="pn-dot"/>';
       data.forEach(function (d, i) {
         var bw = iw / Math.max(1, data.length - 1);
-        s += '<g class="pn-hit"><rect x="' + (X(i) - bw / 2) + '" y="' + T + '" width="' + bw + '" height="' + ih + '" fill="transparent"/><line x1="' + X(i) + '" x2="' + X(i) + '" y1="' + T + '" y2="' + (T + ih) + '" class="pn-cross"/><circle cx="' + X(i) + '" cy="' + Y(d.value) + '" r="4" class="pn-dot"/><title>' + esc(d.tip || (d.label + ': ' + num(d.value))) + '</title></g>';
+        s += '<g class="pn-hit" data-tip="' + esc(d.tip || (d.label + ': ' + num(d.value))) + '"><rect x="' + (X(i) - bw / 2) + '" y="' + T + '" width="' + bw + '" height="' + ih + '" fill="transparent"/><line x1="' + X(i) + '" x2="' + X(i) + '" y1="' + T + '" y2="' + (T + ih) + '" class="pn-cross"/><circle cx="' + X(i) + '" cy="' + Y(d.value) + '" r="4" class="pn-dot"/></g>';
         if (i % cada === 0 || i === last) s += '<text x="' + X(i) + '" y="' + (H - 8) + '" class="pn-axis" text-anchor="' + (i === 0 ? 'start' : i === last ? 'end' : 'middle') + '">' + esc(d.label) + '</text>';
       });
     }
@@ -200,22 +200,15 @@
     var html = '';
     if (d.web && d.web.serie.length) {
       var tot = d.web.serie.reduce(function (a, g) { return a + g.visitas; }, 0), vistas = d.web.serie.reduce(function (a, g) { return a + g.vistas; }, 0);
-      K.visitas = tot; K.visitasSub = num(vistas) + ' páginas vistas'; pintarKpis();
-      html += '<div class="pn-sub">Visitas por día <span class="pn-muted">(Web Analytics: navegadores reales)</span></div>' +
-        area(d.web.serie.map(function (g) { var f = new Date(g.fecha + 'T12:00:00'); return { label: dia(f), value: g.visitas, tip: dia(f) + ': ' + num(g.visitas) + ' visitas · ' + num(g.vistas) + ' vistas' }; }), { aria: 'Visitas por día', w: 900, h: 220, labels: 8 }) +
+      K.visitas = tot; K.visitasSub = num(vistas) + ' páginas vistas · sin bots'; pintarKpis();
+      html += '<div class="pn-sub">Visitas por día <span class="pn-muted">(personas reales en el navegador, sin bots · pasá el mouse por una barra)</span></div>' +
+        barras(d.web.serie.map(function (g) { var f = new Date(g.fecha + 'T12:00:00'); return { label: dia(f), value: g.visitas, tip: dia(f) + ' · ' + num(g.visitas) + ' visitas · ' + num(g.vistas) + ' páginas vistas' }; }), { aria: 'Visitas por día', w: 900, h: 220, labels: 8 }) +
         '<div class="pn-cols3"><div><div class="pn-sub">Páginas más vistas</div>' + ranking(d.web.paginas.map(function (p) { return { label: p.ruta, value: p.vistas }; })) + '</div>' +
         '<div><div class="pn-sub">De dónde llegan</div>' + ranking(d.web.origen.map(function (p) { return { label: p.origen, value: p.visitas }; })) + '</div>' +
         '<div><div class="pn-sub">Países</div>' + ranking(d.web.paises.map(function (p) { return { label: p.pais, value: p.visitas }; })) +
         '<div class="pn-sub" style="margin-top:14px">Dispositivos</div>' + ranking(d.web.dispositivos.map(function (p) { return { label: p.tipo, value: p.visitas }; })) + '</div></div>';
     }
-    if (d.zona && d.zona.dias.length) {
-      var uni = d.zona.dias.reduce(function (a, g) { return a + g.unicos; }, 0);
-      if (K.visitas == null) { K.visitas = uni; K.visitasLabel = 'Visitantes 30 días'; K.visitasSub = 'únicos por día, sumados'; pintarKpis(); }
-      html += '<div class="pn-sub" style="margin-top:' + (html ? 22 : 0) + 'px">Visitantes únicos por día <span class="pn-muted">(todo lo que pasa por Cloudflare, incluye bots)</span></div>' +
-        barras(d.zona.dias.map(function (g) { var f = new Date(g.fecha + 'T12:00:00'); return { label: dia(f), value: g.unicos, tip: dia(f) + ': ' + num(g.unicos) + ' únicos · ' + num(g.requests) + ' pedidos · ' + num(g.amenazas) + ' amenazas' }; }), { aria: 'Visitantes únicos por día', labels: 8, w: 900, h: 200 });
-      if (!d.web && d.zona.paises.length) html += '<div class="pn-sub">Países (pedidos)</div>' + ranking(d.zona.paises.map(function (p) { return { label: p.pais, value: p.requests }; }));
-    }
-    var errs = Object.keys(d.errores || {}).map(function (k) { return (k === 'web' ? 'Web Analytics' : 'Zona') + ': ' + d.errores[k]; });
+    var errs = Object.keys(d.errores || {}).map(function (k) { return 'Web Analytics: ' + d.errores[k]; });
     if (errs.length) html += '<p class="pn-muted" style="margin-top:12px">' + esc(errs.join(' · ')) + '</p>';
     set('trafico', html || '<p class="pn-empty">Cloudflare respondió sin datos todavía.</p>');
   }
@@ -353,6 +346,25 @@
       document.getElementById('pnWorkers').innerHTML = '<p class="pn-muted">' + (e.code === 'sin_token' || e.status === 503 || e.message === 'Failed to fetch' ? 'Se activa al conectar Cloudflare (ver arriba).' : 'No se pudo cargar: ' + esc(e.message)) + '</p>';
     });
   }
+
+  // ---------- tooltip de los graficos: aparece al instante sobre la marca (mouse o toque) ----------
+  var tip = document.createElement('div');
+  tip.className = 'pn-tooltip';
+  tip.setAttribute('role', 'status');
+  document.body.appendChild(tip);
+  function mostrarTip(e) {
+    var g = e.target.closest && e.target.closest('.pn-chart [data-tip]');
+    if (!g) { tip.classList.remove('on'); return; }
+    tip.textContent = g.getAttribute('data-tip');
+    var r = (g.querySelector('.pn-bar, .pn-dot') || g).getBoundingClientRect();
+    tip.classList.add('on');
+    var x = Math.min(Math.max(8, r.left + r.width / 2 - tip.offsetWidth / 2), window.innerWidth - tip.offsetWidth - 8);
+    tip.style.left = x + 'px';
+    tip.style.top = Math.max(8, r.top - tip.offsetHeight - 8) + 'px';
+  }
+  document.addEventListener('mouseover', mostrarTip);
+  document.addEventListener('click', mostrarTip);
+  window.addEventListener('scroll', function () { tip.classList.remove('on'); }, { passive: true });
 
   // ---------- arranque ----------
   var btn = document.getElementById('panelRefresh');
