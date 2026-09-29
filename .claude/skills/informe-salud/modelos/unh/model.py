@@ -281,7 +281,7 @@ put('kttm_diff', M['dcf_base_kttm']-M['dcf_base'])
 # P/E sobre EPS de los próximos 12 meses (0.25 x 2026 + 0.75 x 2027), precios 28-sep-2026.
 PEERS = {
  'ELV': dict(name='Elevance Health', px=394.59, e26=27.18, e27=29.32, e28=33.30, pre=33.14, pre_y=2023, beta=0.70, pt=450.44),
- 'CI':  dict(name='Cigna Group',     px=271.83, e26=30.51, e27=33.38, e28=36.95, pre=28.33, pre_y=2024, beta=0.32, pt=342.50),
+ 'CI':  dict(name='Cigna Group',     px=271.83, e26=30.51, e27=33.38, e28=36.95, pre=27.33, pre_y=2024, beta=0.32, pt=342.50),
  'CVS': dict(name='CVS Health',      px=87.85,  e26=8.02,  e27=8.51,  e28=9.53,  pre=8.74,  pre_y=2023, beta=0.58, pt=113.25),
  'HUM': dict(name='Humana',          px=389.63, e26=9.00,  e27=15.36, e28=27.45, pre=26.09, pre_y=2023, beta=0.75, pt=431.67),
  'CNC': dict(name='Centene',         px=62.53,  e26=4.89,  e27=5.34,  e28=6.83,  pre=7.17,  pre_y=2024, beta=1.11, pt=68.56),
