@@ -5550,6 +5550,63 @@
     .section-portfolio { background: var(--navy-1); position: relative; }
     .section-portfolio .section-title { color: var(--white); }
     .section-portfolio .section-sub   { color: rgba(255,255,255,.38); }
+    /* ── Portfolio por secciones + acceso a la cartera del autor ── */
+    .mf-access { display: flex; align-items: center; gap: 18px; width: 100%; margin: 0 0 28px; padding: 16px 20px; border-radius: 12px; background: var(--navy-4); border: 1px solid rgba(242,201,76,.35); color: var(--white); font-family: inherit; text-align: left; cursor: pointer; transition: border-color .15s ease, background .15s ease; }
+    .mf-access:hover { border-color: rgba(242,201,76,.7); background: #0F1E33; }
+    .mf-access:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .mf-access__m { flex: none; width: 42px; height: 42px; border-radius: 10px; background: var(--gold); color: var(--primary); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 24px; }
+    .mf-access__txt { display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0; }
+    .mf-access__t { font-family: var(--font-display); font-size: 19px; line-height: 1.2; }
+    .mf-access__s { font-size: 13px; color: rgba(255,255,255,.6); }
+    .mf-access__kpis { display: flex; gap: 22px; }
+    .mf-access__kpi { display: flex; flex-direction: column; align-items: flex-end; }
+    .mf-access__kl { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.55); white-space: nowrap; }
+    .mf-access__kv { font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 600; color: #93A4BD; }
+    .mf-access__kv.gold { color: var(--gold); }
+    .mf-access__cta { flex: none; display: flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 8px; background: var(--gold); color: var(--primary); font-weight: 700; font-size: 14px; white-space: nowrap; }
+    .mf-view-head { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 18px; }
+    .mf-back { background: none; border: none; padding: 6px 0; color: var(--gold); font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .mf-back:hover { color: var(--gold-light); }
+    .pf-sec-head { display: flex; align-items: center; gap: 16px; margin: 18px 0 6px; }
+    .pf-sec-title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 28px; color: var(--white); }
+    .pf-sec-rule { flex: 1; height: 1px; background: rgba(255,255,255,.1); }
+    .pf-sec-nav { display: flex; gap: 4px; margin-bottom: 22px; border-bottom: 1px solid rgba(255,255,255,.1); overflow-x: auto; scrollbar-width: none; }
+    .pf-sec-nav::-webkit-scrollbar { display: none; }
+    .pf-sec-tab { flex: none; display: inline-flex; align-items: center; gap: 7px; padding: 12px 16px; margin-bottom: -1px; background: transparent; border: none; border-bottom: 2px solid transparent; color: rgba(255,255,255,.6); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; transition: color .15s ease, border-color .15s ease; }
+    .pf-sec-tab:hover { color: var(--white); }
+    .pf-sec-tab.active { color: var(--white); font-weight: 600; border-bottom-color: var(--gold); }
+    .pf-sec-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px rgba(16,185,129,.18); }
+    .pf-sec-panel { display: none; }
+    .pf-sec-panel.active { display: block; }
+    .pf-sec-panel > .pf-card + .pf-card:not([style*="display:none"]),
+    .pf-sec-panel > .pf-card + .pf-row-split { border-top: 1px solid rgba(255,255,255,.09); }
+    .pf-sec-panel > #pfQuizCard:empty + .pf-card { border-top: 0; }
+    .pf-sec-empty { color: rgba(255,255,255,.6); font-size: 14px; }
+    .pf-warren-sec { display: flex; gap: 18px; align-items: flex-start; padding: 26px; }
+    .pf-warren-sec__av { flex: none; width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--gold); color: var(--gold); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 26px; }
+    .pf-warren-sec__body { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .pf-warren-sec__top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .pf-warren-sec__t { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 24px; color: var(--white); }
+    .pf-warren-sec__s { margin: 0; font-size: 14px; line-height: 1.6; color: rgba(255,255,255,.7); max-width: 60ch; }
+    .pf-warren-on { display: inline-flex; align-items: center; gap: 7px; padding: 4px 10px; border-radius: 999px; background: rgba(16,185,129,.14); border: 1px solid rgba(16,185,129,.45); color: #34D399; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+    .pf-warren-on__dot { width: 8px; height: 8px; border-radius: 50%; background: #34D399; box-shadow: 0 0 0 3px rgba(52,211,153,.2); }
+    .pf-warren-open { align-self: flex-start; display: inline-flex; align-items: center; gap: 9px; min-height: 46px; margin-top: 4px; padding: 0 20px; border-radius: 8px; border: none; background: var(--green); color: #04291C; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background .15s ease, transform .1s ease; }
+    .pf-warren-open .pf-warren-on__dot { background: #04291C; box-shadow: 0 0 0 3px rgba(4,41,28,.18); }
+    .pf-warren-open:hover { background: #34D399; }
+    .pf-warren-open:active { transform: scale(.98); }
+    @media (max-width: 760px) {
+      .mf-access { flex-wrap: wrap; gap: 12px 14px; padding: 16px; }
+      .mf-access__m { width: 38px; height: 38px; font-size: 21px; }
+      .mf-access__txt { flex-basis: calc(100% - 52px); }
+      .mf-access__t { font-size: 18px; }
+      .mf-access__kpis { flex: 1; gap: 16px; }
+      .mf-access__kpi { align-items: flex-start; }
+      .mf-access__kv { font-size: 15px; }
+      .mf-access__cta { padding: 0 14px; font-size: 13px; }
+      .pf-sec-title { font-size: 24px; }
+      .pf-sec-tab { padding: 11px 12px; font-size: 13.5px; }
+      .pf-warren-sec { flex-direction: column; padding: 20px 18px; }
+    }
     .pf-card { background: var(--navy-4); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 20px 22px; margin-bottom: 20px; }
     .pf-quiz-cta { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
     .pf-quiz-cta h3 { font-family: var(--font-display); font-weight: 400; font-size: 18px; margin: 0 0 6px; color: var(--white); }
@@ -6046,15 +6103,37 @@
         <span>Herramienta educativa de autogestión. No es asesoramiento financiero ni una recomendación de inversión personalizada.</span>
       </div>
 
-      <div class="mkt-tabs" id="pfViewTabs">
-        <button type="button" class="mkt-tab active" data-pfview="tuyo">Tu Portafolio</button>
-        <button type="button" class="mkt-tab" data-pfview="manfredi">Portafolio de Manfredi</button>
-      </div>
+      <!-- acceso a la cartera del autor (gratis): abre la vista "manfredi" -->
+      <button type="button" class="mf-access" id="mfAccess" data-pfview-go="manfredi" aria-label="Ver la cartera Manfredi Investment">
+        <span class="mf-access__m" aria-hidden="true">M</span>
+        <span class="mf-access__txt">
+          <span class="mf-access__t">Cartera Manfredi Investment</span>
+          <span class="mf-access__s">Composición, rendimiento frente al S&amp;P 500 y tesis de inversión de cada posición.</span>
+        </span>
+        <span class="mf-access__kpis" id="mfAccessKpis">
+          <span class="mf-access__kpi"><span class="mf-access__kl">1 mes · cartera</span><span class="mf-access__kv gold" id="mfAccessMine">&mdash;</span></span>
+          <span class="mf-access__kpi"><span class="mf-access__kl">S&amp;P 500</span><span class="mf-access__kv" id="mfAccessBench">&mdash;</span></span>
+        </span>
+        <span class="mf-access__cta">Ver cartera &rarr;</span>
+      </button>
 
       <div class="pf-view-panel active pf-compact" data-pfview-panel="tuyo">
 
-        <div class="pf-card" id="pfQuizCard"></div>
+        <div class="pf-sec-head">
+          <h2 class="pf-sec-title">Tu portafolio</h2>
+          <span class="pf-sec-rule" aria-hidden="true"></span>
+        </div>
 
+        <div class="pf-sec-nav" id="pfSecNav" role="tablist" aria-label="Secciones de tu portafolio">
+          <button type="button" class="pf-sec-tab active" role="tab" aria-selected="true" data-pfsec="resumen">Resumen</button>
+          <button type="button" class="pf-sec-tab" role="tab" aria-selected="false" data-pfsec="rendimiento">Rendimiento</button>
+          <button type="button" class="pf-sec-tab" role="tab" aria-selected="false" data-pfsec="riesgo">Riesgo</button>
+          <button type="button" class="pf-sec-tab" role="tab" aria-selected="false" data-pfsec="diversificacion">Diversificación</button>
+          <button type="button" class="pf-sec-tab" role="tab" aria-selected="false" data-pfsec="ratios">Ratios</button>
+          <button type="button" class="pf-sec-tab pf-sec-tab--warren" role="tab" aria-selected="false" data-pfsec="warren"><span class="pf-sec-dot" aria-hidden="true"></span>Warren IA</button>
+        </div>
+
+        <div class="pf-sec-panel active" data-pfsec-panel="resumen">
         <div class="pf-row-split">
         <div class="pf-card">
           <h2 class="pf-metrics-label" style="margin-bottom:14px;">Tus posiciones</h2>
@@ -6102,7 +6181,10 @@
           <div id="pfPieWrap" style="max-width:340px;margin:0 auto;"><canvas id="pfPieCanvas"></canvas></div>
         </div>
         </div>
+        </div>
 
+        <div class="pf-sec-panel" data-pfsec-panel="rendimiento">
+          <div class="pf-card pf-sec-empty" id="pfPerfEmpty">Cargá al menos una posición con fecha de compra para ver la curva de rendimiento contra el S&amp;P 500.</div>
         <div class="pf-card" id="pfPerfCard" style="display:none;">
           <div class="pf-perf-head">
             <h2 class="pf-metrics-label" style="margin:0;">Rendimiento de tu cartera</h2>
@@ -6120,28 +6202,54 @@
           <div class="brk-heat" id="pfHeat"></div>
           <p class="pf-metric-note" id="pfPerfNote"></p>
         </div>
+        </div>
 
-        <div class="pf-row-align">
+        <div class="pf-sec-panel" data-pfsec-panel="riesgo">
+        <div class="pf-card" id="pfQuizCard"></div>
         <div class="pf-card" id="pfAlignWrapper" style="position:relative;">
           <div id="pfAlignGrid"></div>
         </div>
+        </div>
+
+        <div class="pf-sec-panel" data-pfsec-panel="diversificacion">
         <div class="pf-card" id="pfSectorMiniWrapper" style="position:relative;">
           <div id="pfSectorMini"></div>
           <div id="pfAssetMap"></div>
         </div>
-        </div>
-
         <div class="pf-card" id="pfMetricsWrapper" style="position:relative;">
           <div id="pfMetricsGrid"></div>
         </div>
+        </div>
 
+        <div class="pf-sec-panel" data-pfsec-panel="ratios">
         <div class="pf-card" id="pfAdvWrapper" style="position:relative;">
           <div id="pfAdvGrid"></div>
+        </div>
+        </div>
+
+        <div class="pf-sec-panel" data-pfsec-panel="warren">
+          <div class="pf-card pf-warren-sec">
+            <div class="pf-warren-sec__av" aria-hidden="true">W</div>
+            <div class="pf-warren-sec__body">
+              <div class="pf-warren-sec__top">
+                <h3 class="pf-warren-sec__t">Warren IA</h3>
+                <span class="pf-warren-on"><span class="pf-warren-on__dot" aria-hidden="true"></span>Activado</span>
+              </div>
+              <p class="pf-warren-sec__s">Tu asesor de inversiones con inteligencia artificial. Preguntale sobre tu cartera, tus ratios o cualquier empresa, y te lo explica en criollo.</p>
+              <button type="button" class="pf-warren-open" onclick="pfOpenWarren()">
+                <span class="pf-warren-on__dot" aria-hidden="true"></span>Abrir chat con Warren
+              </button>
+            </div>
+          </div>
         </div>
 
       </div>
 
       <div class="pf-view-panel" data-pfview-panel="manfredi">
+        <div class="mf-view-head">
+          <button type="button" class="mf-back" data-pfview-go="tuyo">&larr; Volver a tu portafolio</button>
+          <h2 class="pf-sec-title">Cartera Manfredi Investment</h2>
+        </div>
         <div class="pf-card">
           <h2 class="pf-metrics-label" style="margin-bottom:14px;">Rendimiento real vs S&amp;P 500</h2>
           <div class="mkt-tabs mf-window-tabs" id="mfWindowTabs">
@@ -7478,19 +7586,63 @@
 
   <script>
   (function(){
-    var tabs = document.querySelectorAll('#pfViewTabs .mkt-tab');
     var panels = document.querySelectorAll('#portfolio > .container > .pf-view-panel');
-    tabs.forEach(function(btn){
+    var access = document.getElementById('mfAccess');
+    function pfShowView(v){
+      panels.forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-pfview-panel') === v); });
+      if(access) access.style.display = (v === 'manfredi') ? 'none' : '';
+      if(v === 'manfredi' && !window._mfRendered){
+        window._mfRendered = true;
+        if(typeof mfRenderPerformance === 'function') mfRenderPerformance('mfSummary', 'mfChartCanvas', '1m');
+      }
+      var sec = document.getElementById('portfolio');
+      if(sec && sec.getBoundingClientRect().top < 0) sec.scrollIntoView({ block: 'start' });
+    }
+    window.pfShowView = pfShowView;
+    document.querySelectorAll('#portfolio [data-pfview-go]').forEach(function(btn){
+      btn.addEventListener('click', function(){ pfShowView(btn.getAttribute('data-pfview-go')); });
+    });
+
+    // Secciones de "Tu portafolio": los graficos de una seccion oculta se dibujan con
+    // ancho 0, asi que al mostrarla se les avisa del nuevo tamano.
+    var secTabs = document.querySelectorAll('#pfSecNav .pf-sec-tab');
+    var secPanels = document.querySelectorAll('[data-pfview-panel="tuyo"] .pf-sec-panel');
+    secTabs.forEach(function(btn){
       btn.addEventListener('click', function(){
-        tabs.forEach(function(b){ b.classList.toggle('active', b === btn); });
-        var v = btn.getAttribute('data-pfview');
-        panels.forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-pfview-panel') === v); });
-        if(v === 'manfredi' && !window._mfRendered){
-          window._mfRendered = true;
-          if(typeof mfRenderPerformance === 'function') mfRenderPerformance('mfSummary', 'mfChartCanvas', '1m');
+        var k = btn.getAttribute('data-pfsec');
+        secTabs.forEach(function(b){ var on = b === btn; b.classList.toggle('active', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+        secPanels.forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-pfsec-panel') === k); });
+        if(btn.scrollIntoView) btn.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        if(typeof Chart !== 'undefined' && Chart.instances){
+          Object.keys(Chart.instances).forEach(function(id){ try { Chart.instances[id].resize(); } catch(e){} });
         }
+        window.dispatchEvent(new Event('resize'));
       });
     });
+
+    // Seccion Warren IA: abre el mismo chat flotante del sitio (nunca lo cierra)
+    window.pfOpenWarren = function(){
+      if(typeof warrenOpen !== 'undefined' && warrenOpen) return;
+      if(typeof toggleWarren === 'function') toggleWarren();
+    };
+
+    // Numeros del cartel de acceso: misma serie de 1 mes que la vista (queda en cache)
+    function mfFillAccess(){
+      if(typeof mfBuildPerformanceSeries !== 'function' || typeof mfGetWindows !== 'function') return;
+      var w = mfGetWindows().filter(function(x){ return x.key === '1m'; })[0];
+      if(!w) return;
+      var key = w.key + '_' + w.portfolioDays + '_' + w.benchDays;
+      Promise.resolve(mfSeriesCache[key] || mfBuildPerformanceSeries(w.portfolioDays, w.benchDays, w.granularity)).then(function(m){
+        if(!m || m.dataUnavailable) return;
+        mfSeriesCache[key] = m;
+        function fmt(v){ return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1).replace('.', ',') + '%'; }
+        var a = document.getElementById('mfAccessMine'), b = document.getElementById('mfAccessBench');
+        if(a && isFinite(m.totalReturn)) a.textContent = fmt(m.totalReturn);
+        if(b && isFinite(m.benchTotalReturn)) b.textContent = fmt(m.benchTotalReturn);
+      }).catch(function(){});
+    }
+    if(document.readyState === 'complete') setTimeout(mfFillAccess, 1500);
+    else window.addEventListener('load', function(){ setTimeout(mfFillAccess, 1500); });
   })();
 
   (function(){
@@ -8782,8 +8934,7 @@
         + '<div class="pf-metric-grid pf-metric-grid-2col">'
         + pfLockedMetricCard('sect', 'Concentración sectorial')
         + pfLockedMetricCard('geo', 'Concentración geográfica')
-        + '</div>'
-        + pfLockedWarrenPanel();
+        + '</div>';
       return;
     }
 
@@ -8806,15 +8957,7 @@
       + '<div class="pf-metric-grid pf-metric-grid-2col">'
       + cardHtml('Concentración sectorial', sg.sector, pfSectorNote)
       + cardHtml('Concentración geográfica', sg.country, pfCountryNote)
-      + '</div>'
-      + '<div class="pf-warren-panel"><div class="pf-warren-avatar">W</div><div class="pf-warren-body" id="pfWarrenBody">'
-      + '<div class="pf-w-name">Warren &middot; IA</div>'
-      + '<div class="pf-w-headline">Ya vi tus números.</div>'
-      + '<div class="pf-w-sub">Pedile que te explique, en criollo, qué significan para tu perfil.</div>'
-      + '<button class="pf-warren-cta" id="pfExplainBtn" onclick="pfExplainWithWarren()">'
-      + '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2L12 2z"/></svg>'
-      + 'Preguntale a Warren</button>'
-      + '<div id="pfWarrenBubble"></div></div></div>';
+      + '</div>';
   }
 
   function pfBuildNarrationPrompt(sg, profileEntry){
@@ -9648,10 +9791,7 @@
           return row + detail;
         }).join('')
       + '</tbody></table>';
-
-    if(!(window._miIsMember && window._miIsMember())){
-      if(window._miApplyPaywall) window._miApplyPaywall('#mfCompGrid', '#mfCompWrapper');
-    }
+    // La cartera del autor es gratis para todos (sin paywall).
   }
 
   function mfToggleWhy(rowId){
@@ -9911,8 +10051,10 @@
     windowKey = windowKey || pfPerfActiveWin || '1m';
     pfPerfActiveWin = windowKey;
     var lots = (window._pfPositions||[]).filter(function(p){ return !p.isCash && p.cantidad > 0; });
-    if(!lots.length){ card.style.display = 'none'; return; }
+    var empty = document.getElementById('pfPerfEmpty');
+    if(!lots.length){ card.style.display = 'none'; if(empty) empty.style.display = ''; return; }
     card.style.display = '';
+    if(empty) empty.style.display = 'none';
     var summary = document.getElementById('pfPerfSummary');
     var note = document.getElementById('pfPerfNote');
     summary.innerHTML = '<span style="color:rgba(255,255,255,.4);">Reconstruyendo con precios históricos…</span>';
