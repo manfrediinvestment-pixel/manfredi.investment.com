@@ -6069,6 +6069,13 @@
     .pf-perf-foot { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: rgba(255,255,255,.34); margin-top: 4px; }
     .pf-perf-flow { display: inline-flex; align-items: center; gap: 7px; }
     .pf-perf-flow i { width: 8px; height: 8px; background: var(--gold); transform: rotate(45deg); display: inline-block; }
+    .mf-comp-split { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+    .mf-comp-pie { position: sticky; top: 90px; padding-left: 26px; border-left: 1px solid rgba(255,255,255,.09); }
+    .mf-comp-pie__lbl { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.45); margin-bottom: 12px; }
+    @media (max-width: 900px) {
+      .mf-comp-split { grid-template-columns: minmax(0, 1fr); }
+      .mf-comp-pie { position: static; order: -1; padding-left: 0; border-left: 0; max-width: 360px; width: 100%; margin: 0 auto; }
+    }
     .mf-comp-table tr:hover td { background: rgba(255,255,255,.025); }
     .mf-sector-tag {
       font-size: 11px; font-weight: 600; letter-spacing: .02em; color: rgba(255,255,255,.55);
@@ -6265,7 +6272,14 @@
         </div>
 
         <div class="pf-card" id="mfCompWrapper" style="position:relative;">
-          <div id="mfCompGrid"></div>
+          <h2 class="pf-metrics-label" style="margin-bottom:14px;">Composición de la cartera</h2>
+          <div class="mf-comp-split">
+            <div id="mfCompGrid"></div>
+            <aside class="mf-comp-pie" aria-label="Peso de cada activo en la cartera">
+              <div class="mf-comp-pie__lbl">Peso de cada activo</div>
+              <div id="mfPieWrap"><canvas id="mfPieCanvas" aria-label="Gráfico de torta con el peso de cada activo"></canvas></div>
+            </aside>
+          </div>
         </div>
       </div>
 
@@ -9771,8 +9785,7 @@
     var total = priced.reduce(function(s,p){ return s+p.valorActual; }, 0);
     priced.sort(function(a,b){ return b.valorActual-a.valorActual; });
 
-    grid.innerHTML = '<h2 class="pf-metrics-label" style="margin-bottom:14px;">Composición de la cartera</h2>'
-      + '<table class="pf-positions-table mf-comp-table"><thead><tr><th>Activo</th><th>Sector</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Desde compra</th><th style="text-align:right;">% cartera</th></tr></thead><tbody>'
+    grid.innerHTML = '<table class="pf-positions-table mf-comp-table"><thead><tr><th>Activo</th><th>Sector</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Desde compra</th><th style="text-align:right;">% cartera</th></tr></thead><tbody>'
       + priced.map(function(p){
           var pct = total>0 ? (p.valorActual/total*100) : 0;
           var varStr = p.varPct==null ? '—' : (p.varPct>=0?'+':'−') + Math.abs(p.varPct).toFixed(1) + '%';
@@ -9792,6 +9805,37 @@
         }).join('')
       + '</tbody></table>';
     // La cartera del autor es gratis para todos (sin paywall).
+    mfRenderPie(priced, total);
+  }
+
+  // Torta al lado de la tabla: mismo orden y colores que la paleta de "Tu portafolio"
+  var mfPieChart = null;
+  // 12 posiciones: la paleta base tiene 10, se suman 2 para que no se repitan colores
+  var MF_PIE_COLORS = PF_PALETTE.concat(['#C084FC', '#94A3B8']);
+  function mfRenderPie(priced, total){
+    var canvas = document.getElementById('mfPieCanvas');
+    if(!canvas || typeof Chart === 'undefined' || !(total > 0)) return;
+    if(mfPieChart) mfPieChart.destroy();
+    mfPieChart = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: priced.map(function(p){ return p.ticker; }),
+        datasets: [{ data: priced.map(function(p){ return p.valorActual; }), backgroundColor: priced.map(function(_, i){ return MF_PIE_COLORS[i % MF_PIE_COLORS.length]; }), borderColor: '#0C1828', borderWidth: 2 }]
+      },
+      options: {
+        cutout: '58%',
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,.7)', font: { size: 11.5 }, boxWidth: 10, padding: 10,
+            generateLabels: function(chart){
+              return chart.data.labels.map(function(l, i){
+                return { text: l + '  ' + (priced[i].valorActual / total * 100).toFixed(1) + '%', fillStyle: chart.data.datasets[0].backgroundColor[i], strokeStyle: 'transparent', fontColor: 'rgba(255,255,255,.7)', hidden: !chart.getDataVisibility(i), index: i };
+              });
+            } } },
+          tooltip: { callbacks: { label: function(ctx){ return ' ' + ctx.label + ': ' + (ctx.parsed / total * 100).toFixed(1) + '% de la cartera'; } } }
+        }
+      }
+    });
   }
 
   function mfToggleWhy(rowId){
