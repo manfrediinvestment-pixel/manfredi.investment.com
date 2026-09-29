@@ -10368,6 +10368,48 @@
   </div>
 
   <!-- -- REPORT BANNER (nuevo informe) -- -->
+  <!-- Anuncio de cambio de seccion (una vez por persona, con fecha de vencimiento) -->
+  <div class="report-banner feature-banner" id="featureBanner" role="status" aria-live="polite">
+    <div class="report-banner-top">
+      <span class="report-banner-tag">Nuevo en Portfolio</span>
+      <button type="button" class="report-banner-close" id="featureBannerClose" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="report-banner-title">Portfolio renovado: la Cartera Manfredi Investment, abierta para todos</div>
+    <div class="report-banner-abstract">Mirá gratis qué tengo y por qué, y usá tu portafolio ordenado en secciones.</div>
+    <div class="report-banner-footer">
+      <span class="report-banner-meta">29 de septiembre de 2026</span>
+      <button type="button" class="report-banner-cta" id="featureBannerCta">Ver Portfolio &rarr;</button>
+    </div>
+  </div>
+  <script>
+  (function(){
+    // Para un anuncio nuevo: cambiar id y hasta. Se muestra una sola vez por persona.
+    var ANUNCIO = { id: 'portfolio-secciones-2026-09', hasta: '2026-10-13', destino: 'portfolio' };
+    var KEY = 'mi_feature_banner_seen';
+    function visto(){ try { return localStorage.getItem(KEY) === ANUNCIO.id; } catch(e){ return false; } }
+    function marcar(){ try { localStorage.setItem(KEY, ANUNCIO.id); } catch(e){} }
+    if(visto() || new Date() > new Date(ANUNCIO.hasta + 'T23:59:59')) return;
+    function init(){
+      var banner = document.getElementById('featureBanner');
+      var informe = document.getElementById('reportBanner');
+      if(!banner) return;
+      function cerrar(){ banner.classList.remove('show'); marcar(); }
+      document.getElementById('featureBannerClose').onclick = cerrar;
+      document.getElementById('featureBannerCta').onclick = function(){ cerrar(); location.hash = ANUNCIO.destino; };
+      // No se muestra estando ya en Portfolio ni mientras esta abierto el cartel de "Nuevo informe"
+      function evaluar(){
+        var enDestino = (location.hash || '').replace('#', '') === ANUNCIO.destino;
+        var informeAbierto = informe && informe.classList.contains('show');
+        banner.classList.toggle('show', !visto() && !enDestino && !informeAbierto);
+      }
+      setTimeout(evaluar, 2200);
+      window.addEventListener('hashchange', evaluar);
+      if(informe && window.MutationObserver) new MutationObserver(function(){ setTimeout(evaluar, 400); }).observe(informe, { attributes: true, attributeFilter: ['class'] });
+    }
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  })();
+  </script>
+
   <div class="report-banner" id="reportBanner">
     <div class="report-banner-top">
       <span class="report-banner-tag">Nuevo informe</span>
