@@ -2,7 +2,7 @@
 name: informe-consumo-masivo
 description: "Use when writing or updating institutional-grade equity research for consumer staples / consumo masivo en la sección 'Inversiones' de manfredi.investment.com — alimentos y snacks (MDLZ, GIS, KHC, HSY), bebidas (KO, PEP, KDP, MNST), bebidas alcohólicas (DEO, STZ, BUD), cuidado personal y del hogar (PG, CL, KMB, CLX, EL, KVUE), tabaco (PM, MO, BTI) y retail de consumo masivo (WMT, COST, KR, DG, TGT). Reemplaza el foco 'crecimiento + márgenes de expansión' de informe-bigtech por el marco que usan los fondos para staples: crecimiento orgánico descompuesto en precio/mix vs. volumen, participación de mercado medida (Circana/Nielsen), margen bruto y productividad, reinversión en marca (A&P), conversión de FCF, ROIC, dividendo, y valuación por P/E relativo al S&P 500 + EV/EBITDA + DCF de bajo crecimiento. Mismo esqueleto de 15 secciones, mismo gate de vista previa. Trigger on: 'informe de [ticker de consumo masivo]', 'análisis de [KO/PEP/PG/PM/WMT/COST/etc.]', 'tesis de [empresa de consumo]', 'price target de [staple]', earnings/10-Q/10-K de un staple bajo cobertura."
 metadata:
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # Equity Research Institucional — Consumo Masivo (Consumer Staples) — Manfredi Investment
@@ -169,11 +169,21 @@ Blend final ponderado (mismos pesos y misma lógica que informe-bigtech; consens
    Margen de OCF anclado en el OCF real (regla de informe-bigtech). Terminal growth 2-3% (un staple
    maduro rara vez justifica 4%; si usás más de 3%, justificalo con exposición a emergentes).
    Reportá % del EV desde terminal (en staples suele ser 70-80%, decilo).
-2. **Comparables — 25%.** P/E forward (el múltiplo principal que usa el sector) y EV/EBITDA forward de
-   3-4 peers de la **misma sub-industria**, promedio de ambos resultados. **Ajuste por calidad del
-   crecimiento:** si el ticker tiene volumen claramente mejor/peor que los peers, podés aplicar
-   premio/descuento, pero explícito y cuantificado (ej. "+1x por 2 puntos más de volumen orgánico"),
-   nunca de ojo.
+2. **Comparables — 25%.** P/E forward (el múltiplo principal que usa el sector) y EV/EBITDA de 3-6
+   peers de la **misma sub-industria** (más staples de calidad similar como referencia cruzada si el
+   grupo es chico), promedio de ambos resultados. **Regla anti-circularidad (agregada 30-sep-2026, caso
+   KO; misma regla que informe-salud tras LLY):** el método no puede usar el precio ni el múltiplo del
+   propio ticker en ningún paso. El P/E se calcula con el consenso de dos años (EPS de los próximos 12
+   meses = fracción de cada año fiscal), nunca con el "forward P/E" del propio ticker. **No hay ajuste
+   por PEG ni por "calidad del crecimiento" salvo que una regresión del grupo lo sostenga:** antes de
+   correrla, declarar el criterio (en KO: R² ≥ 0.5 con pendiente positiva, con todos los puntos **y**
+   sin el punto más extremo) y mostrar en el informe la tabla de regresiones (P/E vs. crecimiento del EPS
+   a dos años y P/E vs. volumen del último trimestre) con R², pendiente y el resultado sin el extremo.
+   En KO la regresión contra crecimiento dio R² 0.56, pero toda por Monster: sin Monster, 0.006 y
+   pendiente negativa. Si no se sostiene, aplicar la **mediana** del grupo (no el cuartil superior:
+   elegirlo es meter por la ventana el premio por calidad que la regresión no sostiene; mostrarlo solo
+   como referencia) y mostrar el **rango completo**: piso = par más barato, techo = par más caro, en
+   ambos múltiplos.
 3. **Reversión histórica — 35%.** Dos lecturas, promediadas:
    - P/E forward propio: promedio de 5-10 años limpio (excluir años con desvalorizaciones grandes de
      marcas o cargos puntuales, regla de "ventana limpia" de informe-bigtech).
@@ -196,6 +206,58 @@ Adicionales (se reportan, no entran al blend salvo que se indique):
 - **SOTP** cuando haya segmentos de perfil muy distinto (ej. PEP bebidas vs. Frito-Lay; PM
   cigarrillos vs. smoke-free; BUD por región) — mismo tratamiento que informe-bigtech (reparte el
   15% del DCF).
+
+**Transparencia del blend (obligatoria, agregada 30-sep-2026 como en informe-salud):** en la síntesis
+etiquetá cada método como "independiente del precio" (DCF, comparables) o "anclado al mercado"
+(reversión, consenso: 60% del peso) y reportá el promedio ponderado de cada grupo por separado, en la
+tabla y en la verdict-bar. PG: independientes $118.30 / anclados $160.73. KO: $63.57 / $84.27 (en KO ni
+siquiera los anclados llegaban al precio).
+
+## Reglas agregadas tras KO (30-sep-2026)
+
+- **Participaciones en otras compañías (embotelladoras, Monster, joint ventures): nunca contarlas dos
+  veces.** En el DCF, descontá el flujo **sin** los dividendos cobrados de participadas y sumá las
+  participaciones aparte: cotizantes a valor de mercado (el 10-K da el valor al cierre del año;
+  actualizalo por la variación de cada acción en dólares hasta el corte) menos un impuesto sobre la
+  ganancia no realizada (21% contra el valor contable, declarado como aproximación), y no cotizantes a
+  valor contable. En comparables, el P/E ya las incluye (el EPS tiene la participación en ganancias):
+  no se suman; el EV/EBITDA no (el EBITDA las excluye): se suman. Mostrá la alternativa (dividendos
+  dentro del flujo, sin sumarlas a mercado) como chequeo.
+- **Unidades en venta (held for sale)**: modelá la compañía sin la unidad y sumala al precio de la
+  operación por la participación propia. Si sus ventas y resultado no son públicos, estimalos con las
+  cifras pro forma del comprador y declaralo (en KO, CCBA: ~$3.6 mil millones de ventas con margen de
+  caja ~5%; sacarla subió el margen de la base 1.5 puntos). Ojo con los minoritarios que pertenecen a la
+  unidad vendida (restarlos todos sesga hacia abajo; decilo).
+- **Margen de caja del año 1 con pagos extraordinarios dentro del OCF**: ajustá el OCF por pagos que no
+  se repiten (KO: depósito de $6,000 millones al IRS en 2024, pago final de fairlife en 2025) y usá la
+  ventana año real + guía del año en curso. Si el semestre está distorsionado por calendario (KO: seis
+  días más en el 1T, cierre el 3 de julio, flujo estacional), no lo uses como base; mostrá cuánto daría.
+- **Hiperinflación con datos de la compañía**: si la compañía cuantifica los puntos de precio de
+  "mercados con inflación intensa" (KO los dio en los cuatro trimestres de 2024), mostrá el precio/mix
+  y el orgánico sin ellos; donde no los cuantifica, poné "n. c." y no inventes el número. El precio del
+  Base no puede salir de un promedio de 8 trimestres contaminado por hiperinflación.
+- **Bebidas: volumen de cajas del sistema vs. ventas de concentrado.** Proyectá con el volumen de cajas
+  (mide la demanda del consumidor); el concentrado se mueve con despachos y días de más o de menos.
+  Mostrá los dos por trimestre.
+- **Reversión "ex post" con shocks imprevistos**: además de la ventana limpia por cargos, excluí los
+  cierres cuyo EPS de los doce meses siguientes incluye un shock que nadie esperaba (KO: los cuatro
+  cierres de junio de 2019 a marzo de 2020, por el 2T 2020 de la pandemia, daban 26-28x). Declaralo y
+  mostrá el efecto. Si el EPS ajustado ya excluye los cargos de un año, excluir ese año solo cambia qué
+  precios entran: decilo y mostrá el efecto (puede ir para cualquier lado).
+- **Litigios fiscales o legales binarios** (KO vs. IRS): no entran al Base. Mostrá el valor por acción
+  si gana y si pierde (incluido el valor presente de una tasa efectiva más alta hacia adelante), el
+  blend en cada caso y la asimetría.
+- **Conversión de FCF con participaciones**: si la utilidad incluye participación en ganancias que se
+  cobra solo en parte, mostrá también la conversión sin la parte no cobrada (KO: 88% → 96%).
+- **Redacción**: nada de dobles negativos ("cayeron −18%", "resta −$6"): usá tokens con valor absoluto
+  para la prosa y dejá el signo para tablas.
+- **Gráficos en celular**: con 10 o más categorías usá rótulos cortos ('16, "3T 23" con espacio para
+  que se partan en dos líneas); si una leyenda de `drawLines` ocupa más de una fila, el margen inferior
+  tiene que crecer (parche en `modelos/ko/build.py`), y en `drawGroupedBars` con rangos amplios la
+  grilla va cada 2 o 5 puntos.
+- **Modelo y plantilla**: el pipeline de referencia es `modelos/ko/` (model.py → model.json → plantilla con
+  tokens → build → verify con 0 diferencias). Ningún número derivado se tipea a mano, tampoco sumas de
+  balance ni promedios que aparecen en el texto.
 
 **Grilla de sensibilidad**: WACC × crecimiento terminal (5×5) recalculada con la fórmula, celda Base
 = fair value publicado. **Sensibilidad extra obligatoria**: fair value del DCF con volumen orgánico
