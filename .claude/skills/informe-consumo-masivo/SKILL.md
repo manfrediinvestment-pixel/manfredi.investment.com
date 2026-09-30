@@ -2,7 +2,7 @@
 name: informe-consumo-masivo
 description: "Use when writing or updating institutional-grade equity research for consumer staples / consumo masivo en la sección 'Inversiones' de manfredi.investment.com — alimentos y snacks (MDLZ, GIS, KHC, HSY), bebidas (KO, PEP, KDP, MNST), bebidas alcohólicas (DEO, STZ, BUD), cuidado personal y del hogar (PG, CL, KMB, CLX, EL, KVUE), tabaco (PM, MO, BTI) y retail de consumo masivo (WMT, COST, KR, DG, TGT). Reemplaza el foco 'crecimiento + márgenes de expansión' de informe-bigtech por el marco que usan los fondos para staples: crecimiento orgánico descompuesto en precio/mix vs. volumen, participación de mercado medida (Circana/Nielsen), margen bruto y productividad, reinversión en marca (A&P), conversión de FCF, ROIC, dividendo, y valuación por P/E relativo al S&P 500 + EV/EBITDA + DCF de bajo crecimiento. Mismo esqueleto de 15 secciones, mismo gate de vista previa. Trigger on: 'informe de [ticker de consumo masivo]', 'análisis de [KO/PEP/PG/PM/WMT/COST/etc.]', 'tesis de [empresa de consumo]', 'price target de [staple]', earnings/10-Q/10-K de un staple bajo cobertura."
 metadata:
-  version: 1.1.0
+  version: 1.2.0
 ---
 
 # Equity Research Institucional — Consumo Masivo (Consumer Staples) — Manfredi Investment
@@ -45,6 +45,61 @@ ventas, rotación de inventario, ROIC, y en COST/BJ/Sam's además **ingresos por
 renovación** (el grueso de la utilidad operativa de COST viene de las cuotas). Cuando el ticker sea
 retail, la Sección 6 usa esas métricas en vez de precio/mix de marca, y los peers son otros
 minoristas, nunca PG/KO.
+
+## Bloque de retail (agregado 30-sep-2026, caso WMT)
+
+Reglas que salieron del primer minorista. Modelo de referencia: `modelos/wmt/` (model.py → model.json → plantilla
+con tokens → `verify.py` con 0 diferencias).
+
+**Métricas (reemplazan precio/mix de marca en las Secciones 05-08):**
+- **Ventas comparables sin combustible separadas en transacciones (tráfico) y ticket promedio**, mínimo 8 trimestres,
+  por formato (en WMT: Walmart U.S. y Sam's Club). Es el gráfico central (`drawGroupedBars` con el rombo de la comparable
+  total). La señal de alerta del marco se traduce así: ticket positivo con tráfico negativo varios trimestres seguidos.
+  Reportá el aporte del e-commerce a la comparable (si supera la comparable total, las compras iniciadas en tienda caen)
+  y separá los efectos regulatorios (en WMT: deflación de farmacia por los precios máximos de Medicare, comparables "sin
+  salud y bienestar").
+- **E-commerce**: ventas por segmento y % de ventas (10-K, nota de ingresos desagregados), crecimiento trimestral, y si
+  es rentable — citá la frase de la gerencia y aclarà que no es un dato auditado.
+- **Negocios de alto margen** (publicidad, membresías, marketplace): ingresos por año de los comunicados y del 10-K
+  ("membership fee revenue"). Su aporte a la utilidad solo con una cita de la compañía (en WMT: "casi un tercio del
+  resultado del 4T FY2026"); anualizarla es una cota superior, nunca un insumo de la valuación. Si la compañía no publica
+  la tasa de renovación, decilo (no se estima).
+- Margen bruto sobre ventas netas, gastos/ventas, margen operativo ajustado, **rotación de inventario** (costo de ventas /
+  inventario promedio) y **cuentas a pagar / inventario** (en retail los proveedores financian el stock), ROIC propio
+  (resultado ajustado después de impuestos / patrimonio + deuda financiera − caja) junto al ROI de la compañía,
+  **conversión de FCF** (en un minorista que automatiza puede estar en 60%-70% por capex: explicá si es inversión o deterioro).
+- **Año fiscal que no coincide con el calendario** (WMT cierra el 31 de enero): nomenclatura de la compañía en todo el
+  informe, aclarada en portada; el EPS de "próximos 12 meses" como suma del consenso de los próximos cuatro trimestres.
+- **Devoluciones o cargos puntuales dentro del EPS ajustado** (en 2026: devoluciones de aranceles IEEPA, que WMT, TGT y DLTR
+  NO excluyeron): elegí ventanas de consenso que no las incluyan, para el ticket y para los pares por igual, y estimá el
+  efecto neto contra el techo de la guía del trimestre.
+
+**Pares:** minoristas del mismo tipo de canal (COST, TGT, KR, BJ, DG, DLTR para WMT), nunca marcas. AMZN solo como
+referencia cruzada fuera del promedio (el mercado la valúa por la nube). Para cada par: P/E sobre el consenso de los
+próximos cuatro trimestres, comparables del último trimestre, crecimiento del EPS del año+2, EV/EBITDA con arrendamientos
+y beta.
+
+**Comparables — regresión antes que criterio:** corré P/E vs. comparables y P/E vs. crecimiento del EPS del grupo. El ajuste
+se usa solo si R² ≥ 0.50 **con todos los pares y sin el par extremo**; en WMT, P/E vs. comparables dio 0.74 / 0.57 (se usó
+la recta) y vs. crecimiento del EPS 0.00 (el mercado paga tráfico, no EPS de consenso). Mismo test para EV/EBITDA. Si no
+pasa: mediana si las comparables del ticket están debajo de la mediana del grupo, cuartil superior si están encima.
+
+**Suma de partes (reparte el 15% intrínseco 7.5/7.5 con el DCF consolidado)** cuando hay participaciones con precio
+observable (en WMT: Walmex a precio de bolsa, Flipkart a la última transacción real, PhonePe a la valuación de su salida a
+bolsa). Reglas para no contar dos veces: (1) en la suma de partes, sacá del flujo del segmento el resultado de lo que va a
+marca (margen de la filial × ventas en dólares que publica la matriz) y sumá de vuelta sus pérdidas; (2) en el DCF
+consolidado, el flujo incluye 100% de las filiales y se restan las **minoritarias a valor de mercado**, no de libros;
+(3) la publicidad no se valúa aparte si la compañía no publica su resultado (ya está en el flujo del segmento).
+Deuda neta sin arrendamientos operativos en el DCF (los financieros sí se restan: su capital no pasa por el OCF) y con
+arrendamientos en EV/EBITDA.
+
+**Reversión con cambio de escalón:** la ventana nueva se reconoce solo si todos los cierres desde un punto superan el
+máximo de al menos cinco años previos durante al menos ocho trimestres (sin el mínimo de cinco años, una suba gradual
+dispara la regla). La lectura 2 (relativo al S&P) queda en diez años. Reportá siempre el resultado sin la regla.
+
+**Crecimiento del DCF:** tráfico de 8 trimestres + ticket = inflación de largo plazo + formatos nuevos; mejora de margen
+anclada en el promedio histórico y la guía, con Bear/Bull de ±10 pb; capex desde la guía, bajando solo si se declara el
+fin de un ciclo de inversión. Sensibilidad obligatoria: comparables −2 / 0 / +2 puntos.
 
 ## Antes de empezar — reunir datos reales
 
