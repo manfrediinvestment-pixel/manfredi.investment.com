@@ -22,6 +22,9 @@ def fmt(v, f):
         return (MINUS+s) if v < 0 and float(s[:-1])!=0 else ('+'+s if float(s[:-1])!=0 else s)
     if f in ('spp0',):  # puntos con signo, entero
         s=f'{abs(v):.0f}'; return (MINUS+s) if v<0 and s!='0' else ('+'+s if s!='0' else '0')
+    if f in ('sg', 'sg1'):  # puntos con signo: hasta 1 decimal, sin ".0" (PepsiCo reporta medios puntos)
+        r = round(v + 0.0, 1); s = (f'{abs(r):.1f}').rstrip('0').rstrip('.')
+        return (MINUS+s) if r < 0 else ('+'+s if r > 0 else '0')
     if f == 'a1': return f'{abs(v):.1f}'
     if f == 'a0': return f'{abs(v):,.0f}'
     if f == 'js2': return f'{v:.2f}'

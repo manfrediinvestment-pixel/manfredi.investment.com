@@ -31,6 +31,30 @@ eng = eng.replace(a, """        var narrow = slot < 40;
         ctx.font = (narrow ? '600 9px' : '600 10.5px') + ' "IBM Plex Mono", monospace'; ctx.textAlign = 'center';
         var mv = markers.values[i];
         ctx.fillText((mv>0?'+':'')+mv+(narrow?'':'%'), cx, padT - 6);""", 1)
+# drawGroupedBars: rango del eje Y opcional (opts.minV / opts.maxV) para comparar dos gráficos con la misma escala (PEP vs. KO)
+a = "    var maxV = Math.max.apply(null, all) + 0.8, minV = Math.min.apply(null, all) - 0.8;\n"
+assert eng.count(a) == 1, 'groupedbars range'
+eng = eng.replace(a, a + "    if(opts.minV != null) minV = opts.minV; if(opts.maxV != null) maxV = opts.maxV;\n", 1)
+# drawLines: valores null cortan la línea (para mostrar un promedio solo en el tramo donde aplica)
+a = """      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });"""
+assert eng.count(a) == 1, 'drawLines path'
+eng = eng.replace(a, """      var started = false;
+      s.values.forEach(function(v,i){
+        if(v == null){ started = false; return; }
+        var x = scaleX(i), y = scaleY(v);
+        if(!started){ ctx.moveTo(x,y); started = true; } else ctx.lineTo(x,y);
+      });""", 1)
+a = """      s.values.forEach(function(v,i){
+        var x = scaleX(i), y = scaleY(v);
+        ctx.fillStyle = s.color;"""
+assert eng.count(a) == 1, 'drawLines points'
+eng = eng.replace(a, """      s.values.forEach(function(v,i){
+        if(v == null) return;
+        var x = scaleX(i), y = scaleY(v);
+        ctx.fillStyle = s.color;""", 1)
 ch = open('charts_pep.js', encoding='utf-8').read()
 tpl = open('pep.tpl.html', encoding='utf-8').read().replace('@@CSS@@', css).replace('@@SCRIPT@@', eng.rstrip() + '\n' + ch.lstrip('\n').rstrip('\n'))
 assert '@@' not in tpl

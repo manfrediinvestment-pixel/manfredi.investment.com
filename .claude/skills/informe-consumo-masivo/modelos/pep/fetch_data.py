@@ -4,7 +4,7 @@
 import json, urllib.request, os, sys, datetime
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
-os.makedirs('yh', exist_ok=True); os.makedirs('raw', exist_ok=True)
+os.makedirs('yh', exist_ok=True); os.makedirs('raw', exist_ok=True); os.makedirs('data', exist_ok=True)
 UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/128 Safari/537.36'}
 SEC = {'User-Agent': 'Manfredi Research nachito2502@gmail.com'}
 def get(u, h=UA): return urllib.request.urlopen(urllib.request.Request(u, headers=h), timeout=90).read()
@@ -32,4 +32,4 @@ for t in ['PEP', 'KO', 'KDP', 'MNST', 'MDLZ', 'PG', 'CL', 'PM', 'HSY', 'GIS']:
         print(t, [(r['fiscalEnd'], r['consensusEPSForecast'], r['noOfEstimates']) for r in j['yearlyForecast']['rows']])
     except Exception as e:
         print(t, 'nasdaq error', e, file=sys.stderr)
-json.dump(out, open('raw/nasdaq_eps.json', 'w'), indent=1)
+json.dump(out, open('data/nasdaq_eps.json', 'w'), indent=1)

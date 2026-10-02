@@ -2,7 +2,7 @@
 name: informe-consumo-masivo
 description: "Use when writing or updating institutional-grade equity research for consumer staples / consumo masivo en la sección 'Inversiones' de manfredi.investment.com — alimentos y snacks (MDLZ, GIS, KHC, HSY), bebidas (KO, PEP, KDP, MNST), bebidas alcohólicas (DEO, STZ, BUD), cuidado personal y del hogar (PG, CL, KMB, CLX, EL, KVUE), tabaco (PM, MO, BTI) y retail de consumo masivo (WMT, COST, KR, DG, TGT). Reemplaza el foco 'crecimiento + márgenes de expansión' de informe-bigtech por el marco que usan los fondos para staples: crecimiento orgánico descompuesto en precio/mix vs. volumen, participación de mercado medida (Circana/Nielsen), margen bruto y productividad, reinversión en marca (A&P), conversión de FCF, ROIC, dividendo, y valuación por P/E relativo al S&P 500 + EV/EBITDA + DCF de bajo crecimiento. Mismo esqueleto de 15 secciones, mismo gate de vista previa. Trigger on: 'informe de [ticker de consumo masivo]', 'análisis de [KO/PEP/PG/PM/WMT/COST/etc.]', 'tesis de [empresa de consumo]', 'price target de [staple]', earnings/10-Q/10-K de un staple bajo cobertura."
 metadata:
-  version: 1.2.0
+  version: 1.3.0
 ---
 
 # Equity Research Institucional — Consumo Masivo (Consumer Staples) — Manfredi Investment
@@ -266,7 +266,8 @@ Adicionales (se reportan, no entran al blend salvo que se indique):
 etiquetá cada método como "independiente del precio" (DCF, comparables) o "anclado al mercado"
 (reversión, consenso: 60% del peso) y reportá el promedio ponderado de cada grupo por separado, en la
 tabla y en la verdict-bar. PG: independientes $118.30 / anclados $160.73. KO: $63.57 / $84.27 (en KO ni
-siquiera los anclados llegaban al precio).
+siquiera los anclados llegaban al precio). PEP: $167.89 / $160.02, con el DCF solo en $129.60 (en el precio): cuando los
+independientes incluyen métodos de múltiplos de pares, separá el DCF en la verdict-bar.
 
 ## Reglas agregadas tras KO (30-sep-2026)
 
@@ -313,6 +314,80 @@ siquiera los anclados llegaban al precio).
 - **Modelo y plantilla**: el pipeline de referencia es `modelos/ko/` (model.py → model.json → plantilla con
   tokens → build → verify con 0 diferencias). Ningún número derivado se tipea a mano, tampoco sumas de
   balance ni promedios que aparecen en el texto.
+
+## Reglas agregadas tras PEP (2-oct-2026)
+
+Modelo de referencia: `modelos/pep/` (DCF por negocio, suma de partes, comparación con KO que lee `modelos/ko/model.json`).
+
+**Compañía integrada vs. asset-light (PEP vs. KO, y cualquier par fabricante vs. franquiciante):**
+- Nunca compares margen contra margen en crudo. Explicitá el modelo en la Sección de modelo de negocio con un dato
+  propio de la compañía: % de ventas de embotelladoras propias (PEP: 36%, 10-K nota 1) y, si existe, el segmento de la
+  misma compañía que opera con el otro modelo (PEP: International Beverages Franchise, concentrado, margen 37% contra
+  12% de PBNA, que embotella). Ese contraste interno es la mejor medida del costo de integrar.
+- Las métricas que sí se comparan con la misma definición: conversión de caja (OCF ajustado por pagos que no se repiten
+  − capex, sobre utilidad ajustada), capex y depreciación sobre ventas **y por dólar de utilidad**, ROIC sobre capital
+  operativo (excluyendo participadas de numerador y denominador), P/FCF de consenso y EV/(EBITDA − capex).
+- Descomponé la brecha de P/E entre los dos en (1) conversión de caja: P/E del integrado × conversión del asset-light /
+  conversión propia (a igual precio por dólar de flujo libre); (2) crecimiento: diferencia de P/E que asigna la regresión
+  de los pares a cada crecimiento, marcada como indicativa si no pasa el criterio (y como cota superior si sin el punto
+  extremo la pendiente cambia de signo); (3) resto = prima no explicada. En PEP vs. KO: 22% / 23% / 55% de 10.6 puntos.
+
+**Comparación entre pares bajo la misma vara (sección propia, como MA vs. V):**
+- Los números del otro ticker salen de su `model.json`, nunca del HTML ni de memoria. Solo se actualiza lo que depende
+  del precio (P/E, rendimientos, EV, relativo, gap del blend), con el cierre de la fuente a la misma fecha de corte; los
+  fair values publicados no se tocan y se dice contra qué precio se publicaron.
+- Tabla de definiciones idénticas con una columna "Lectura", y una nota explícita para lo que difiere aunque se llame
+  igual (PEP excluye hiperinflación del orgánico desde 2025; KO la incluía y la cuantificó en 2024).
+- Gráficos lado a lado con `.chartpair` (dos columnas en escritorio, una en celular) y la **misma escala** (opción
+  `minV`/`maxV` de `drawGroupedBars`, parche en `modelos/pep/build.py`). Métricas en `drawHBars` con pares "· PEP / · KO"
+  y colores fijos por compañía.
+- Chequeo cruzado de comparables: si cada uno está en el grupo del otro, mostrá el resultado sin él (PEP sin KO: $181.52
+  contra $183.21; no depende de la prima de KO).
+
+**Suma de partes snacks / bebidas (reparte el 15% intrínseco 7.5/7.5 con el DCF):**
+- Múltiplo **EV/(EBITDA − capex)** de los pares puros, no EV/EBITDA: el múltiplo de un modelo de concentrado aplicado a un
+  embotellador integrado infla el valor (en PEP, EV/EBITDA simple daba $213 contra $155). Fuente: EV, EBITDA y capex de
+  los últimos doce meses de stockanalysis, con el EV llevado al cierre de corte por la variación de la capitalización.
+- Criterio de par: mediana del grupo puro, **salvo que la mediana sea un modelo de negocio distinto** del segmento que se
+  valúa: entonces el par de modelo más parecido (bebidas de PEP: Keurig Dr Pepper, integrada con embotellado; la mediana
+  era Coca-Cola), con la mediana como techo del rango. Declaralo y mostrá el resultado con la mediana.
+- Resultado por negocio = resultado core de segmentos de los últimos doce meses + D&A − capex; segmentos mixtos (EMEA)
+  por el reparto de ventas que publica el 10-K (supuesto declarado); gastos corporativos por ventas.
+- Para no contar dos veces: DCF y suma de partes son estimaciones alternativas del mismo todo (no se suman); el
+  embotellado está una sola vez dentro de bebidas en las dos; participaciones (Celsius, participadas) se suman aparte una
+  vez en cada método; deuda neta **con** arrendamientos en la suma de partes (el EV de los pares los incluye) y **sin**
+  ellos en el DCF. `verify.py` chequea los dos puentes. Declarar que suma de partes + comparables pesan 32.5% del blend
+  y usan múltiplos de pares.
+
+**DCF por negocio:** volumen de cada negocio = promedio de ocho trimestres del volumen unitario que publica la compañía
+(bebidas: cajas del sistema, la misma medida que las cajas unitarias de KO); precio en el mismo sendero que el par
+comparado (2.0% → 2.5%) para que la diferencia de valor salga del volumen y del margen; margen consolidado anclado en el
+flujo real y repartido por EBITDA − capex de cada negocio. La sensibilidad obligatoria de volumen se hace sobre el
+negocio más expuesto (PEP: snacks −2/0/+2), con los otros casos en nota. Promesas de margen de la compañía solo en el Bull.
+
+**Chequeo de margen contra el consenso de FCF (pendiente desde KO, ahora obligatorio):** llevá el FCF de consenso del año
+en curso (S&P Global vía stockanalysis) a la misma definición del DCF (sumá pagos que no se repiten e intereses después de
+impuestos, restá dividendos de participadas si el DCF los excluye) y compará con el margen Base. PEP: Base 10.6% contra
+12.3% del consenso (Base conservador, anclado en el piso de la guía); KO: 25.1% contra 23.4% (su DCF no estaba sesgado a
+la baja por el margen).
+
+**Reversión — dos ajustes:**
+- Ventana limpia por **deterioros de marcas/inversiones y leyes impositivas** (> 10% del EPS ajustado, por acción y después
+  de impuestos según el 10-K), no por la brecha GAAP vs. ajustado cuando la compañía registra reestructuración todos los
+  años (en PEP la regla mecánica de KO excluía 7 de 10 años). Mostrá el resultado con la regla mecánica.
+- **Regla de cambio de escalón, simétrica:** también hacia abajo (todos los cierres desde un punto debajo del mínimo de los
+  cinco años previos durante ocho trimestres o más). Incluí el último cierre trimestral anterior a la fecha de corte. Si se
+  cumple justo con el mínimo, decilo (frágil) y mostrá el blend sin la regla. La Lectura 2 (relativo al S&P) queda en diez
+  años.
+
+**Anti-circularidad verificada por código:** `verify.py` vuelve a correr el modelo con otro precio del ticker (con los
+asserts de redacción neutralizados) y exige que comparables y suma de partes den exactamente lo mismo. El DCF puede moverse
+solo por los pesos de mercado del WACC (práctica estándar): declaralo con el valor a otro precio.
+
+**Otras:** guías de FCF como piso ("al menos 80%"): payout sobre el piso y sobre el consenso; caja en países con
+restricciones (PEP: Rusia, 20% de la caja) se declara en Limitaciones; insumos del modelo que vienen de APIs van a
+`data/` (versionado), no a `raw/` (ignorado); los `assert` del modelo atan las frases cualitativas del texto ("menos de
+la mitad", "el más barato del grupo") a los números; formato `sg` para componentes reportados en medios puntos.
 
 **Grilla de sensibilidad**: WACC × crecimiento terminal (5×5) recalculada con la fórmula, celda Base
 = fair value publicado. **Sensibilidad extra obligatoria**: fair value del DCF con volumen orgánico
