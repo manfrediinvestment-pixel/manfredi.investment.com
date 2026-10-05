@@ -35,6 +35,11 @@ Si una URL deja de servir, corregila en `CAL_SOURCES` **verificándola de nuevo*
 | `Nivel3-Tema-3-6` | Economía › Industria manufacturera (UCII) |
 | `Nivel3-Tema-3-13` | Economía › Turismo (turismo internacional) |
 | `Nivel3-Tema-3-52` | Economía › Tendencia de negocios |
+| `Nivel4-Tema-3-6-14` | Economía › Industria manufacturera › **IPI manufacturero** (04-oct-2026) |
+| `Nivel4-Tema-3-3-42` | Economía › Construcción › Actividad de la construcción (**ISAC**) (04-oct-2026) |
+| `Nivel3-Tema-3-7` | Economía › Minería (muestra el **IPI minero**) (04-oct-2026) |
+| `Nivel3-Tema-3-50` | Economía › Pesca (muestra el **IPI pesquero**) (04-oct-2026) |
+| `Nivel3-Tema-3-11` | Economía › Servicios (muestra el **ISSP**, servicios públicos) (04-oct-2026) |
 
 Otras categorías Nivel3 verificadas: `3-2` Comercio exterior, `3-4` Empresas, `3-7` Minería,
 `3-8` Sector agropecuario, `3-10` Sector público, `3-11` Servicios, `3-12` Sistema financiero,
@@ -54,6 +59,7 @@ farmacéutica. Si el usuario o el sitio dan una URL mejor, agregá la regla.
 - Informe de Pagos Minoristas: `https://www.bcra.gob.ar/informe-de-pagos-minoristas/`
 - Evolución del Mercado de Cambios y Balance Cambiario:
   `https://www.bcra.gob.ar/informe-de-la-evolucion-del-mercado-de-cambios-y-balance-cambiario/`
+- Informe Monetario Mensual: `https://www.bcra.gob.ar/informe-monetario-mensual/` (200, `<title>` "Informe monetario mensual | BCRA", 04-oct-2026)
 - Boletín Estadístico, Informe sobre Bancos, otros: caen a
   `https://www.bcra.gob.ar/PublicacionesEstadisticas/Principales_variables.asp` (página general).
 
