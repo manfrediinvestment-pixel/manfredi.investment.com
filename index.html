@@ -6196,6 +6196,7 @@
           <div class="pf-perf-head">
             <h2 class="pf-metrics-label" style="margin:0;">Rendimiento de tu cartera</h2>
             <div class="mkt-tabs mf-window-tabs" id="pfPerfWindowTabs" aria-label="Ventana de tiempo">
+              <button type="button" class="mkt-tab" data-pfwin="1d">1 día</button>
               <button type="button" class="mkt-tab" data-pfwin="1w">1 semana</button>
               <button type="button" class="mkt-tab active" data-pfwin="1m">1 mes</button>
               <button type="button" class="mkt-tab" data-pfwin="ytd">YTD</button>
@@ -6260,6 +6261,7 @@
         <div class="pf-card">
           <h2 class="pf-metrics-label" style="margin-bottom:14px;">Rendimiento real vs S&amp;P 500</h2>
           <div class="mkt-tabs mf-window-tabs" id="mfWindowTabs">
+            <button type="button" class="mkt-tab" data-mfwin="1d">1 día</button>
             <button type="button" class="mkt-tab" data-mfwin="1w">1 semana</button>
             <button type="button" class="mkt-tab active" data-mfwin="1m">1 mes</button>
             <button type="button" class="mkt-tab" data-mfwin="ytd">YTD</button>
@@ -9477,7 +9479,10 @@
       { key:'1w',  label:'1 semana', portfolioDays: Math.min(5, sinceInception),  benchDays: 5,              granularity:'day',   tickEvery: 1 },
       { key:'1m',  label:'1 mes',    portfolioDays: Math.min(21, sinceInception), benchDays: 21,             granularity:'week',  tickEvery: 5 },
       { key:'ytd', label:'YTD',      portfolioDays: Math.min(ytdRealDays, sinceInception), benchDays: ytdRealDays, granularity:'month', tickEvery: 21 },
-      { key:'1y',  label:'1 año',    portfolioDays: Math.min(oneYearRealDays, sinceInception), benchDays: oneYearRealDays, granularity:'month', tickEvery: 21 }
+      { key:'1y',  label:'1 año',    portfolioDays: Math.min(oneYearRealDays, sinceInception), benchDays: oneYearRealDays, granularity:'month', tickEvery: 21 },
+      // Ultima rueda: cierre anterior vs ultimo cierre (2 puntos). Va al final para no correr
+      // los indices que usan los fallbacks (windows[1] = 1 mes).
+      { key:'1d',  label:'1 día · última rueda', portfolioDays: 2, benchDays: 2, granularity:'day', tickEvery: 1 }
     ];
   }
 
@@ -9924,6 +9929,7 @@
     var jan1 = new Date(today.getFullYear(), 0, 1);
     var ytdDays = Math.max(1, Math.round((today - jan1) / 86400000));
     return [
+      { key:'1d',  label:'1 día',     days:1 },
       { key:'1w',  label:'1 semana',  days:7 },
       { key:'1m',  label:'1 mes',     days:30 },
       { key:'ytd', label:'YTD',       days:ytdDays },
@@ -9948,7 +9954,7 @@
 
     var today = new Date(); today.setHours(0,0,0,0);
     var wins = pfPerfWindows();
-    var win = wins.filter(function(w){ return w.key === windowKey; })[0] || wins[1];
+    var win = wins.filter(function(w){ return w.key === windowKey; })[0] || wins[2];
     var inc = pfInceptionDate();
 
     var winStart = new Date(today.getTime() - win.days * 86400000);
@@ -9983,7 +9989,8 @@
     if(!lens.length || !benchCloses || benchCloses.length < 6) return { unavailable:true };
 
     var L = Math.min.apply(null, lens.concat([benchCloses.length]));
-    L = Math.min(L, Math.max(6, mfBizDaysBetween(winStart, today)));
+    // 1 dia = ultima rueda: cierre anterior vs ultimo cierre (el resto pide al menos 6 puntos)
+    L = Math.min(L, win.key === '1d' ? 2 : Math.max(6, mfBizDaysBetween(winStart, today)));
     var dates = mfBizDaysList(L, today);
 
     var ccl = pfGetCclRate();
