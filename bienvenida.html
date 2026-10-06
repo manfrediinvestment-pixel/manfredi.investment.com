@@ -273,8 +273,8 @@ img{display:block;max-width:100%}
     <li><a href="#planes">Planes</a></li>
   </ul>
   <div class="act">
-    <a class="lnk2" href="/#inicio">Ingresar</a>
-    <a class="btn" href="/#portfolio" data-registro>Crear cuenta<span class="xl">&nbsp;gratis</span></a>
+    <a class="lnk2" href="/?ingresar=1">Ingresar</a>
+    <a class="btn" href="/?registro=1" data-registro>Crear cuenta<span class="xl">&nbsp;gratis</span></a>
   </div>
 </nav>
 
@@ -299,7 +299,7 @@ img{display:block;max-width:100%}
     <h1 class="d1" id="heroTitle"><span class="line"><span>Diez pestañas.</span></span><span class="line"><span><em>Una sola página.</em></span></span></h1>
     <p class="lead" id="heroLead">Cotizaciones, noticias, el calendario, informes de empresas y tu cartera contra el mercado. Todo junto, pensado para el inversor argentino.</p>
     <div class="ctas" id="heroCtas">
-      <a class="btn btn--lg" href="/#portfolio" data-registro>Crear cuenta gratis <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="btn btn--lg" href="/?registro=1" data-registro>Crear cuenta gratis <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       <a class="btn-ghost" href="#secciones">Ver qué hay adentro</a>
     </div>
     <div class="ticker" id="heroTicker" aria-live="polite">
@@ -361,7 +361,7 @@ img{display:block;max-width:100%}
           <li><span class="ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span>Tu cartera contra el S&amp;P 500<small>Importás el PDF de tu broker y ves el rendimiento real</small></span></li>
           <li><span class="ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span>Cursos de University<small>Desde finanzas personales hasta análisis fundamental</small></span></li>
         </ul>
-        <a class="btn-ghost cta" href="/#portfolio" data-registro>Crear cuenta gratis</a>
+        <a class="btn-ghost cta" href="/?registro=1" data-registro>Crear cuenta gratis</a>
         <p class="fine">Sin tarjeta</p>
       </article>
       <article class="plan plan--pro reveal">
@@ -373,7 +373,7 @@ img{display:block;max-width:100%}
           <li><span class="ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span>Warren IA<small>100 consultas por mes sobre empresas y tu cartera</small></span></li>
           <li><span class="ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span>Ratios de riesgo de tu portafolio<small>Beta, volatilidad, Sharpe y caída máxima</small></span></li>
         </ul>
-        <a class="btn btn--lg cta" href="/#informes">Sumar la membresía <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn--lg cta" href="/?membresia=1">Sumar la membresía <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         <p class="fine">Pagás con Mercado Pago y cancelás cuando quieras</p>
       </article>
     </div>
@@ -387,7 +387,7 @@ img{display:block;max-width:100%}
     <h2 class="d1" style="position:relative">Cerrá las pestañas. <em>Abrí una.</em></h2>
     <p class="lead" style="position:relative">Creá tu cuenta con Google o con tu mail y armá tu cartera hoy.</p>
     <div class="ctas" style="position:relative">
-      <a class="btn btn--lg" href="/#portfolio" data-registro>Crear cuenta gratis <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="btn btn--lg" href="/?registro=1" data-registro>Crear cuenta gratis <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       <a class="btn-ghost" href="/">Explorar la página</a>
     </div>
   </div>
@@ -399,6 +399,8 @@ img{display:block;max-width:100%}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
 <script>
 (function () {
+  // ya la vio: la home no lo vuelve a mandar acá
+  try { localStorage.setItem('mi_bienvenida_vista', 'vista'); } catch (e) {}
   var CH = [
     { id: 'mercados', name: 'Mercados', h: 'El mercado, <em>en vivo.</em>', p: 'Todos los dólares, el Merval, Wall Street, bonos, CEDEARs y cripto en una pantalla, con lo que más se movió hoy.', link: 'Ir a Mercados', free: true },
     { id: 'informes', name: 'Noticias', h: 'Lo que importa, <em>sin el ruido.</em>', p: 'Un reporte diario de Argentina y otro de Wall Street, las noticias que mueven el mercado y un informe semanal para leer tranquilo.', link: 'Ver las noticias', free: true },
@@ -471,7 +473,7 @@ img{display:block;max-width:100%}
     main.insertAdjacentHTML('beforeend',
       '<section class="chap" id="s-' + c.id + '" data-s="' + c.id + '" aria-label="' + c.name + '"><div class="chap-in">' +
       '<div class="ctext"><h2 class="d2">' + c.h + '</h2><p class="lead">' + c.p + '</p>' +
-      '<div class="meta"><a href="/#' + (c.id === 'warren' ? 'inicio' : c.id) + '">' + c.link + ARROW + '</a><span class="pill ' + (c.free ? 'pill--free">Gratis' : 'pill--pro">Membresía') + '</span></div></div>' +
+      '<div class="meta"><a href="' + (c.id === 'warren' ? '/?warren=1' : '/#' + c.id) + '">' + c.link + ARROW + '</a><span class="pill ' + (c.free ? 'pill--free">Gratis' : 'pill--pro">Membresía') + '</span></div></div>' +
       '<div class="app" aria-hidden="true"><div class="app-bar"><div class="dots"><i></i><i></i><i></i></div><div class="url">manfredinvestment.com/<b>#' + c.id + '</b></div></div>' +
       '<div class="scr">' + S[c.id]() + '</div></div></div></section>');
   });
