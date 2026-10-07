@@ -1,5 +1,7 @@
-"""Genera reports/fci.json: los fondos comunes de inversión más grandes de cada
-categoría, con su rendimiento del día, del mes, del año y de 12 meses.
+"""Genera reports/fci.json (los fondos comunes más grandes de cada categoría,
+con su rendimiento del día, del mes, del año y de 12 meses) y
+reports/fci-todos.json (todas las clases con su valor de cuotaparte, para
+cargar fondos en el Portfolio).
 
 Fuente: planilla diaria pública de CAFCI, leída con la skill cafci
 (.claude/skills/cafci/scripts/fetch_cafci.py, de gauss314/skills, MIT).
@@ -10,11 +12,13 @@ Uso: python scripts/build_fci.py
 import importlib.util
 import json
 import os
+import re
 import sys
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILL = os.path.join(RAIZ, '.claude', 'skills', 'cafci', 'scripts', 'fetch_cafci.py')
 SALIDA = os.path.join(RAIZ, 'reports', 'fci.json')
+SALIDA_TODOS = os.path.join(RAIZ, 'reports', 'fci-todos.json')
 POR_CATEGORIA = 15
 
 # (categoría de CAFCI, clave, nombre para mostrar, moneda)
@@ -70,6 +74,24 @@ def main():
     with open(SALIDA, 'w', encoding='utf-8') as fh:
         json.dump(salida, fh, ensure_ascii=False, separators=(',', ':'))
     print('fci.json:', salida['fecha'], ', '.join(f"{c['label']} {len(c['items'])}" for c in salida['categorias']))
+
+    # Lista completa para cargar fondos en el Portfolio: cada clase con un
+    # código propio estable (FCI + código CNV + clase + U si es en dólares) y su
+    # valor de cuotaparte del día.
+    todos, usados = [], set()
+    for f in fondos:
+        if not f.get('vcp_actual') or re.search(r'Liquidaci|tramite', f.get('categoria') or '', re.I):
+            continue
+        clase = re.search(r'Clase\s+([A-Z0-9]+)', f.get('nombre') or '', re.I)
+        base = 'FCI' + str(f.get('codigo_cnv') or '') + (clase.group(1).upper() if clase else '') + ('U' if f.get('moneda') == 'USD' else '')
+        sym, n = base, 2
+        while sym in usados:
+            sym, n = f'{base}-{n}', n + 1
+        usados.add(sym)
+        todos.append({'s': sym, 'n': f.get('nombre'), 'v': redondear(f.get('vcp_actual'), 6), 'm': f.get('moneda') or 'ARS', 'd': redondear(f.get('variacion_dia_pct'))})
+    with open(SALIDA_TODOS, 'w', encoding='utf-8') as fh:
+        json.dump({'fecha': diario.get('fecha_reporte'), 'fondos': todos}, fh, ensure_ascii=False, separators=(',', ':'))
+    print('fci-todos.json:', len(todos), 'fondos')
     return 0
 
 

@@ -871,7 +871,14 @@ async function fetchSerie(category, symbol, tf) {
   const intradiario = tf === '1D';
   if (category === 'arg_stocks' || category === 'arg_cedears') {
     if (intradiario) return serieYahoo(symbol + '.BA', tf);
-    return serieD912(category === 'arg_stocks' ? 'stocks' : 'cedears', symbol, tf);
+    // data912 no tiene el histórico de muchos CEDEARs (NU, IBIT, GLD, VIST…):
+    // si falla o viene corto, se usa Yahoo con el ticker de BYMA (.BA).
+    try {
+      const pts = await serieD912(category === 'arg_stocks' ? 'stocks' : 'cedears', symbol, tf);
+      if (pts.length >= 2) return pts;
+    } catch (e) { /* sigue con Yahoo */ }
+    try { return await serieYahoo(symbol + '.BA', tf); }
+    catch (e) { throw new Error('Todavía no hay histórico de precios para este activo'); }
   }
   if (category === 'arg_bonds') {
     if (intradiario) throw new Error('Los bonos no tienen datos dentro del día');

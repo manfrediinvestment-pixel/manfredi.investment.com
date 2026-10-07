@@ -3686,7 +3686,7 @@
   }
   .htx-h1 em { font-style:normal; color:var(--htx-amber-ink); display:block; }
   .htx-deck { margin:0 0 28px; font-size:18px; line-height:1.55; color:var(--htx-ink); max-width:46ch; }
-  .htx-cta { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  .htx-cta { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:8px; }
   /* panel en vivo del hero */
   .htx-panel { min-width:0; align-self:center; border:1px solid var(--htx-line); border-radius:14px; background:rgba(12,24,40,.72); overflow:hidden; }
   .htx-panel__row { display:flex; flex-direction:column; gap:6px; padding:16px 22px; border-top:1px solid var(--htx-line-soft); transition:background-color .15s ease; }
@@ -3906,7 +3906,6 @@
     <div class="htx-hero">
       <div class="htx-hero__lead">
         <h1 class="htx-h1">Tu mundo financiero, <em>en un solo lugar.</em></h1>
-        <p class="htx-deck">Dej&aacute; de abrir diez pesta&ntilde;as para seguir el mercado. Ac&aacute; ten&eacute;s cotizaciones, calendario, tu portafolio en vivo, informes con valuaci&oacute;n propia y un analista IA.</p>
         <div class="htx-cta">
           <a class="htx-btn" href="#inversiones" data-tab-target="inversiones">Ver los informes</a>
           <a class="htx-ghost" href="#portfolio" data-tab-target="portfolio">Probar el Portfolio</a>
@@ -8025,11 +8024,32 @@
       console.warn('pfFetchMarketData failed:', e);
       if(!window._pfMarketData) window._pfMarketData = {};
     }
+    await pfAgregarFondos(window._pfMarketData, window._pfTickerList || (window._pfTickerList = []));
     return window._pfMarketData;
+  }
+  // Fondos comunes de inversión: reports/fci-todos.json (CAFCI, se actualiza cada
+  // mañana). Cada clase tiene un código propio (ej. FCI1901A); el precio es el
+  // valor de la cuotaparte, así que la cantidad se carga en cuotapartes.
+  var PF_FCI = null;
+  async function pfAgregarFondos(idx, list){
+    if(!PF_FCI){
+      try{
+        var r = await fetch('/reports/fci-todos.json?d=' + new Date().toISOString().slice(0, 10));
+        if(r.ok) PF_FCI = (await r.json()).fondos || [];
+      }catch(e){ console.warn('[MI] fondos comunes:', e.message); }
+    }
+    if(!PF_FCI || !idx) return;
+    var yaEnLista = {};
+    list.forEach(function(it){ if(it.category === 'fci') yaEnLista[it.symbol] = 1; });
+    PF_FCI.forEach(function(f){
+      if(!idx[f.s]) idx[f.s] = {};
+      idx[f.s][f.m === 'USD' ? 'USD' : 'ARS'] = { price: f.v, change: f.d, category: 'fci' };
+      if(!yaEnLista[f.s]) list.push({ symbol: f.s, name: f.n, currency: f.m === 'USD' ? 'USD' : 'ARS', category: 'fci' });
+    });
   }
   // ---- buscador de tickers (autocompletar en "+ Agregar posición") ----
   // Reusa el mismo payload del Worker de mercados -- no pega un fetch aparte.
-  var PF_CAT_LABELS = { arg_stocks:'Acción AR', arg_cedears:'CEDEAR', usa_stocks:'Acción USA', usa_adrs:'ADR', arg_bonds:'Bono', cripto:'Cripto', commodities:'Commodity' };
+  var PF_CAT_LABELS = { arg_stocks:'Acción AR', arg_cedears:'CEDEAR', usa_stocks:'Acción USA', usa_adrs:'ADR', arg_bonds:'Bono', cripto:'Cripto', commodities:'Commodity', fci:'Fondo común' };
   function pfBuildTickerList(payload){
     var list = [];
     if(payload && payload.categorias){
@@ -8054,11 +8074,14 @@
     var q = pfNormalize(query).trim();
     if(!q) return [];
     var starts = [], contains = [];
+    var palabras = q.split(/\s+/).filter(Boolean);
     (window._pfTickerList || []).forEach(function(it){
       var symN = pfNormalize(it.symbol);
       var nameN = pfNormalize(it.name);
       if(symN.indexOf(q) === 0) starts.push(it);
       else if(symN.indexOf(q) !== -1 || nameN.indexOf(q) !== -1) contains.push(it);
+      // varias palabras en cualquier orden (sirve para los fondos: "galileo renta")
+      else if(palabras.length > 1 && palabras.every(function(w){ return nameN.indexOf(w) !== -1; })) contains.push(it);
     });
     return starts.concat(contains).slice(0, 8);
   }
@@ -8281,7 +8304,10 @@
         var fechaSub = r.isCash ? '' : (r.fecha
             ? '<div class="pf-lot-date">'+ pfPerfFmtDate(pfPerfParseDate(r.fecha)) +'</div>'
             : '<div class="pf-lot-date pf-lot-nodate">sin fecha de compra</div>');
-        return '<tr><td>'+ (r.isCash ? '&#128176; ' : '') + pfEsc(r.ticker) + arsTag + note + fechaSub +'</td>'
+        // fondos comunes: debajo del código, el nombre del fondo (cantidad = cuotapartes)
+        var fondo = (!r.isCash && PF_FCI && /^FCI/.test(r.ticker)) ? PF_FCI.find(function(f){ return f.s === r.ticker; }) : null;
+        var fondoSub = fondo ? '<div class="pf-lot-date" style="color:rgba(238,242,248,.72);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+ pfEsc(fondo.n) +' · cuotapartes</div>' : '';
+        return '<tr><td>'+ (r.isCash ? '&#128176; ' : '') + pfEsc(r.ticker) + arsTag + note + fondoSub + fechaSub +'</td>'
           + '<td class="num">'+ (r.isCash ? pfMoney(r.cantidad) + ' ' + r.moneda : pfQty(r.cantidad) + (r.isBond ? '<div class="pf-lot-date">VN</div>' : '')) +'</td>'
           + '<td class="num">'+ (r.isCash || r.precioCompraNativo==null ? '—' : pfPrice(r.precioCompraNativo)) +'</td>'
           + '<td class="num">'+ (r.isCash || r.precioActualNativo==null ? '—' : pfPrice(r.precioActualNativo)) +'</td>'
