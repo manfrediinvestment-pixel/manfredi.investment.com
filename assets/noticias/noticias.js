@@ -56,10 +56,28 @@
     var resto = lista.length - st.mostrar;
     $('ntMore').hidden = resto <= 0;
   }
+  // se dibujan una vez; al elegir solo cambia la clase y la línea dorada se desliza
   function pintarChips() {
-    $('ntChips').innerHTML = FILTROS.map(function (f) {
-      return '<button type="button" data-f="' + f[0] + '" class="' + (f[0] === st.filtro ? 'on' : '') + '" aria-pressed="' + (f[0] === st.filtro) + '">' + f[1] + '</button>';
-    }).join('');
+    $('ntChips').innerHTML = FILTROS.map(function (f, i) {
+      return (i === 3 ? '<span class="nt-sep" aria-hidden="true"></span>' : '') +
+        '<button type="button" data-f="' + f[0] + '">' + f[1] + '</button>';
+    }).join('') + '<span class="nt-ind" aria-hidden="true"></span>';
+    marcarChip();
+  }
+  function marcarChip() {
+    var on = null;
+    $('ntChips').querySelectorAll('[data-f]').forEach(function (b) {
+      var si = b.dataset.f === st.filtro;
+      b.classList.toggle('on', si); b.setAttribute('aria-pressed', si);
+      if (si) on = b;
+    });
+    var ind = $('ntChips').querySelector('.nt-ind');
+    if (!on || !on.offsetWidth) return;
+    var pad = parseFloat(getComputedStyle(on).paddingRight) || 0, izq = parseFloat(getComputedStyle(on).paddingLeft) || 0;
+    ind.style.transform = 'translateX(' + (on.offsetLeft + izq) + 'px) scaleX(' + (on.offsetWidth - izq - pad) + ')';
+    // en el celular, que el elegido quede a la vista
+    var box = $('ntChips');
+    if (on.offsetLeft < box.scrollLeft || on.offsetLeft + on.offsetWidth > box.scrollLeft + box.clientWidth) box.scrollTo({ left: on.offsetLeft - 24, behavior: 'smooth' });
   }
   function cargarNoticias() {
     return fetch(P.api + '/noticias', { signal: AbortSignal.timeout(15000) })
@@ -159,6 +177,9 @@
     if (iniciado || !visible()) return;
     iniciado = true;
     fijar();
+    // el ancho de cada filtro cambia cuando termina de cargar la tipografía
+    marcarChip();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(marcarChip);
     cargarNoticias(); cargarInformes(); cargarCotizaciones();
     setInterval(function () { if (visible()) { cargarNoticias(); cargarCotizaciones(); } }, 5 * 60000);
   }
@@ -169,7 +190,7 @@
     var b = e.target.closest('[data-f]');
     if (!b || b.dataset.f === st.filtro) return;
     st.filtro = b.dataset.f; st.mostrar = POR_PAGINA;
-    pintarChips(); pintarFeed();
+    marcarChip(); pintarFeed();
     // si ya se había bajado, se vuelve al principio de la lista (la barra queda fija arriba)
     var off = (parseInt(getComputedStyle(document.querySelector('.nt')).getPropertyValue('--nt-sticky'), 10) || 0) + $('ntBar').offsetHeight;
     var top = $('ntFeed').getBoundingClientRect().top;
@@ -180,9 +201,9 @@
     var b = e.target.closest('[data-r]');
     if (b && b.dataset.r !== st.region) { st.region = b.dataset.r; pintarCotizaciones(); }
   });
-  window.addEventListener('resize', function () { fijar(); acomodar(); });
+  window.addEventListener('resize', function () { fijar(); acomodar(); marcarChip(); });
   // la pestaña puede abrirse más tarde: se carga recién cuando se ve
-  window.addEventListener('hashchange', function () { setTimeout(function () { iniciar(); acomodar(); }, 50); });
-  document.addEventListener('click', function (e) { if (e.target.closest('[data-tab-target="informes"]')) setTimeout(function () { iniciar(); acomodar(); }, 50); });
+  window.addEventListener('hashchange', function () { setTimeout(function () { iniciar(); acomodar(); marcarChip(); }, 50); });
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-tab-target="informes"]')) setTimeout(function () { iniciar(); acomodar(); marcarChip(); }, 50); });
   if (document.readyState === 'complete') iniciar(); else window.addEventListener('load', iniciar);
 })();
