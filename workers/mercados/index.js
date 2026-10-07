@@ -884,6 +884,20 @@ async function fetchSerie(category, symbol, tf) {
     return serieYahoo(y, tf);
   }
   if (category === 'cripto') return serieKraken(symbol, tf);
+  // índices (para los carteles de arriba de Mercados)
+  if (category === 'indices') {
+    const y = { MERVAL: '^MERV', SP500: '^GSPC', NASDAQ: '^NDX' }[symbol];
+    if (!y) throw new Error('Índice desconocido');
+    return serieYahoo(y, tf);
+  }
+  if (category === 'riesgo') {
+    if (intradiario) throw new Error('El riesgo país no tiene datos dentro del día');
+    const resp = await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais', { signal: AbortSignal.timeout(10000) });
+    if (!resp.ok) throw new Error(`ArgentinaDatos HTTP ${resp.status}`);
+    const rows = await resp.json();
+    const pts = rows.filter(r => r.valor != null).map(r => ({ t: diaTs(r.fecha), o: r.valor, h: r.valor, l: r.valor, c: r.valor, v: 0 }));
+    return recortarDiario(pts, tf);
+  }
   if (category === 'dolares') {
     if (intradiario) throw new Error('El dólar no tiene datos dentro del día');
     return serieDolar(symbol.toLowerCase(), tf);

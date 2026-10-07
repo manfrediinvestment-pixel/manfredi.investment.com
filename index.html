@@ -4254,9 +4254,9 @@
         <div class="mt-strip-sk">Cargando cotizaciones&hellip;</div>
       </div>
 
+      <div class="mkt-tabs mt-tabs" id="mktTabs"></div>
       <div class="mt-body" id="mktBody">
         <div class="mt-left">
-          <div class="mkt-tabs mt-tabs" id="mktTabs"></div>
           <div id="mktSearchResults" class="mkt-search-results mt-results" hidden></div>
           <div class="mkt-table-wrap mt-table" id="mktTableWrap">
             <div class="mkt-table-head mt-head" id="mktTableHead">
@@ -4269,10 +4269,10 @@
           </div>
           <div class="mkt-maps-wrap" id="mktMapsWrap" hidden></div>
           <div class="mt-fci" id="mktFci" hidden></div>
-          <aside class="mt-detail" id="mktDetail" aria-label="Gráfico del activo">
-            <div class="mt-d-empty">Tocá un activo de la lista para ver su gráfico.</div>
-          </aside>
         </div>
+        <aside class="mt-detail" id="mktDetail" aria-label="Gráfico del activo">
+          <div class="mt-d-empty">Tocá un activo de la lista para ver su gráfico.</div>
+        </aside>
       </div>
       <p class="mt-foot" id="lastUpdated"></p>
     </div>
@@ -11161,42 +11161,78 @@
     el.innerHTML = svg;
   }
 
-  // Carteles de arriba (diseño Terminal): un solo dólar (MEP, con CCL, blue y
-  // oficial chicos debajo), Merval, riesgo país y S&P 500, Bitcoin y oro con su
-  // línea de los últimos 20 días.
-  let MKT_RIESGO = null;
-  function mktSpark(arr, up) {
-    if (!arr || arr.length < 2) return '';
-    const w = 120, h = 34, mn = Math.min(...arr), mx = Math.max(...arr), r = (mx - mn) || 1;
-    const pts = arr.map((v, i) => (i / (arr.length - 1) * w).toFixed(1) + ',' + (h - 2 - (v - mn) / r * (h - 6)).toFixed(1));
-    const col = up ? '#4fc48c' : '#ee7369';
-    return `<svg class="mt-c-spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts.join(' ')}" fill="none" stroke="${col}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
+  // Carteles de arriba (diseño Terminal). Cada uno con su línea del último mes
+  // (endpoint /serie del worker): una luz recorre la línea sin parar, más
+  // rápido cuanto más se movió el activo. Dólar: MEP, CCL, blue y oficial
+  // juntos en un cartel ancho, cada uno con su línea.
+  const MKT_SPARKS = {};
+  let mktSparksPedidas = false;
+  const MKT_SPARK_SERIES = [
+    ['dolares', 'BOLSA'], ['dolares', 'CONTADOCONLIQUI'], ['dolares', 'BLUE'], ['dolares', 'OFICIAL'],
+    ['indices', 'MERVAL'], ['indices', 'SP500'], ['riesgo', 'RP'],
+  ];
+  function mktPedirSparks() {
+    if (mktSparksPedidas) return;
+    mktSparksPedidas = true;
+    const base = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? 'http://127.0.0.1:8790' : MKT_WORKER_BASE;
+    Promise.all(MKT_SPARK_SERIES.map(([c, sym]) =>
+      fetch(base + '/serie?category=' + c + '&symbol=' + sym + '&tf=1M', { signal: AbortSignal.timeout(12000) })
+        .then(r => r.ok ? r.json() : null)
+        .then(j => { if (j && j.points && j.points.length > 1) MKT_SPARKS[c + ':' + sym] = j.points.map(p => p.c); })
+        .catch(() => {})
+    )).then(renderHeroCards);
   }
+  let mktSparkN = 0;
+  function mktSpark(arr, chg) {
+    if (!arr || arr.length < 2) return '<div class="mt-spark mt-spark--vacia"></div>';
+    const w = 160, h = 44, mn = Math.min(...arr), mx = Math.max(...arr), r = (mx - mn) || 1;
+    const xy = arr.map((v, i) => [i / (arr.length - 1) * w, h - 4 - (v - mn) / r * (h - 10)]);
+    const d = xy.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+    const up = chg == null ? arr[arr.length - 1] >= arr[0] : chg >= 0;
+    const col = up ? '#4fc48c' : '#ee7369';
+    const id = 'mtg' + (++mktSparkN);
+    // cuanto más se movió, más rápido corre la luz (entre 1,4 s y 5 s por vuelta)
+    const vari = Math.abs(chg == null ? (arr[arr.length - 1] / arr[0] - 1) * 100 : chg);
+    const dur = Math.max(1.4, 5 - vari * 1.6).toFixed(2);
+    const last = xy[xy.length - 1];
+    return `<div class="mt-spark" style="--c:${col};--dur:${dur}s">
+      <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="${id}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".28"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+        <path d="${d} L${w} ${h} L0 ${h}Z" fill="url(#${id})" class="mt-sp-area"/>
+        <path d="${d}" class="mt-sp-line" pathLength="100"/>
+        <path d="${d}" class="mt-sp-flow" pathLength="100"/>
+      </svg>
+      <i class="mt-sp-dot" style="top:${(last[1] / h * 100).toFixed(1)}%"></i>
+    </div>`;
+  }
+  function mktVarSerie(arr) { return arr && arr.length > 1 ? (arr[arr.length - 1] / arr[arr.length - 2] - 1) * 100 : null; }
   function renderHeroCards() {
     const el = document.getElementById('mktStrip');
     if (!el || !MERCADOS) return;
+    mktPedirSparks();
+    mktSparkN = 0;
     const dol = {};
     ((MERCADOS.categorias.dolares || {}).items || []).forEach(d => { dol[d.symbol] = d; });
     const fe = {};
     (MERCADOS.featured || []).forEach(f => { fe[f.id] = f; });
     const ars = v => v == null ? '—' : '$' + Math.round(v).toLocaleString('es-AR');
-    const pill = c => c == null ? '' : `<span class="mt-c-pill ${c >= 0 ? 'up' : 'dn'}">${c >= 0 ? '+' : '−'}${Math.abs(c).toFixed(2).replace('.', ',')}%</span>`;
-    const card = (cls, label, value, extra, c) => `<div class="mt-card ${cls}"><div class="mt-c-top"><span>${label}</span>${pill(c)}</div><b>${value}</b>${extra || ''}</div>`;
-    const sparkCard = (f, label, value) => f ? card('mt-card--spark', label, value, mktSpark(f.spark, (f.change == null ? f.spark[f.spark.length - 1] >= f.spark[0] : f.change >= 0)), f.change) : '';
-    el.innerHTML = [
-      card('mt-card--dolar', 'Dólar MEP', ars(dol.BOLSA && dol.BOLSA.price),
-        `<div class="mt-c-dl"><span>CCL <i>${ars(dol.CONTADOCONLIQUI && dol.CONTADOCONLIQUI.price)}</i></span><span>Blue <i>${ars(dol.BLUE && dol.BLUE.price)}</i></span><span>Oficial <i>${ars(dol.OFICIAL && dol.OFICIAL.price)}</i></span></div>`),
-      card('mt-card--merval', 'Merval', fe.merval && fe.merval.price != null ? Math.round(fe.merval.price).toLocaleString('es-AR') : '—', '<div class="mt-c-note">Índice de la Bolsa porteña</div>', fe.merval && fe.merval.change),
-      card('mt-card--rp', 'Riesgo país', MKT_RIESGO != null ? MKT_RIESGO.toLocaleString('es-AR') : '—', '<div class="mt-c-note">puntos básicos</div>'),
-      sparkCard(fe.sp500, 'S&amp;P 500 · SPY', fe.sp500 && fe.sp500.price != null ? 'US$ ' + fe.sp500.price.toLocaleString('es-AR', { maximumFractionDigits: 2 }) : '—'),
-      sparkCard(fe.btc, 'Bitcoin', fe.btc && fe.btc.price != null ? 'US$ ' + Math.round(fe.btc.price).toLocaleString('es-AR') : '—'),
-      sparkCard(fe.oro, 'Oro', fe.oro && fe.oro.price != null ? 'US$ ' + Math.round(fe.oro.price).toLocaleString('es-AR') : '—'),
-    ].join('');
-    if (MKT_RIESGO == null && !renderHeroCards._rp) {
-      renderHeroCards._rp = true;
-      fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais/ultimo', { signal: AbortSignal.timeout(8000) })
-        .then(r => r.ok ? r.json() : null).then(d => { if (d && d.valor != null) { MKT_RIESGO = d.valor; renderHeroCards(); } }).catch(() => {});
-    }
+    const pctTxt = c => (c >= 0 ? '+' : '−') + Math.abs(c).toFixed(2).replace('.', ',') + '%';
+    const pill = (c, txt) => c == null ? '' : `<span class="mt-c-pill ${c >= 0 ? 'up' : 'dn'}">${txt || pctTxt(c)}</span>`;
+    const card = (cls, label, value, c, spark, txt) => `<div class="mt-card ${cls}"><div class="mt-c-top"><span>${label}</span>${pill(c, txt)}</div><b>${value}</b>${spark}</div>`;
+    const dolar = (sym, label) => {
+      const arr = MKT_SPARKS['dolares:' + sym], c = mktVarSerie(arr);
+      return `<div class="mt-dl"><span class="mt-dl-l">${label}</span><b>${ars(dol[sym] && dol[sym].price)}</b><span class="mt-dl-p">${pill(c) || '&nbsp;'}</span>${mktSpark(arr, c)}</div>`;
+    };
+    const merv = MKT_SPARKS['indices:MERVAL'], spx = MKT_SPARKS['indices:SP500'], rp = MKT_SPARKS['riesgo:RP'];
+    const rpVal = rp ? rp[rp.length - 1] : null, rpChg = rp && rp.length > 1 ? rp[rp.length - 1] - rp[rp.length - 2] : null;
+    el.innerHTML =
+      `<div class="mt-card mt-card--dolar"><div class="mt-c-top"><span>Dólar</span><span class="mt-c-src">hoy</span></div><div class="mt-dls">${dolar('BOLSA', 'MEP')}${dolar('CONTADOCONLIQUI', 'CCL')}${dolar('BLUE', 'Blue')}${dolar('OFICIAL', 'Oficial')}</div></div>` +
+      card('', 'Merval', fe.merval && fe.merval.price != null ? Math.round(fe.merval.price).toLocaleString('es-AR') : '—', fe.merval && fe.merval.change, mktSpark(merv, fe.merval && fe.merval.change)) +
+      // el riesgo país baja = bueno: la línea y la píldora usan el signo invertido
+      card('mt-card--rp', 'Riesgo país', rpVal != null ? Math.round(rpVal).toLocaleString('es-AR') + ' pb' : '—', rpChg == null ? null : -rpChg, mktSpark(rp && rp.map(v => -v), rpChg == null ? null : -rpChg), rpChg == null ? '' : (rpChg > 0 ? '+' : '−') + Math.abs(Math.round(rpChg)) + ' pb') +
+      card('', 'S&amp;P 500', spx ? Math.round(spx[spx.length - 1]).toLocaleString('es-AR') : '—', spx ? mktVarSerie(spx) : (fe.sp500 && fe.sp500.change), mktSpark(spx || (fe.sp500 && fe.sp500.spark), spx ? mktVarSerie(spx) : null)) +
+      card('', 'Bitcoin', fe.btc && fe.btc.price != null ? 'US$ ' + Math.round(fe.btc.price).toLocaleString('es-AR') : '—', fe.btc && fe.btc.change, mktSpark(fe.btc && fe.btc.spark, fe.btc && fe.btc.change)) +
+      card('', 'Oro', fe.oro && fe.oro.price != null ? 'US$ ' + Math.round(fe.oro.price).toLocaleString('es-AR') : '—', fe.oro && fe.oro.change, mktSpark(fe.oro && fe.oro.spark, fe.oro && fe.oro.change));
   }
 
   const MKT_CATEGORIES = [
@@ -11302,9 +11338,9 @@
     return `
       <div class="mkt-row" data-symbol="${item.symbol}" data-category="${category}" data-currency="${currency}">
         <button type="button" class="mkt-star-btn${isFav ? ' on' : ''}" data-symbol="${item.symbol}" data-category="${category}" aria-label="${isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}">${mktStarIcon(isFav)}</button>
-        <div class="mr-name-wrap">${mktLogoHTML(item)}<span class="mr-ticker">${item.symbol}</span><span class="mr-name">${name}</span>${badge}</div>
+        <div class="mr-name-wrap">${mktLogoHTML(item)}<span class="mr-tx"><span class="mr-ticker">${item.symbol}</span>${name || badge ? `<span class="mr-name">${name}${badge}</span>` : ''}</span></div>
         <div class="mr-price">${mktFmtPrice(item.price, unit)}</div>
-        <div class="mr-chg ${cls}">${text}</div>
+        <div class="mr-chg ${cls}"><i class="mt-chip ${cls === 'pos' ? 'up' : cls === 'neg' ? 'dn' : ''}">${text.replace('&#9650; ', '').replace('&#9660; ', '−').replace('.', ',')}</i></div>
         <div class="mr-vol mt-hide-s">${item.volume ? mktFmtVol(item.volume) : '&mdash;'}</div>
       </div>
     `;
