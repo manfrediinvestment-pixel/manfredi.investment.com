@@ -8013,7 +8013,12 @@
   }
   async function pfFetchMarketData(force){
     var now = Date.now();
-    if(!force && window._pfMarketData && (now - (window._pfMarketDataTs||0)) < 90000) return window._pfMarketData;
+    if(!force && window._pfMarketData && (now - (window._pfMarketDataTs||0)) < 90000){
+      // si otra llamada todavía está trayendo los fondos, esperarla (si no, las
+      // posiciones en fondos se dibujaban "sin cotización")
+      await pfAgregarFondos(window._pfMarketData, window._pfTickerList || (window._pfTickerList = []));
+      return window._pfMarketData;
+    }
     try{
       var res = await fetch(PF_MERCADOS_URL);
       var data = await res.json();
@@ -8030,15 +8035,18 @@
   // Fondos comunes de inversión: reports/fci-todos.json (CAFCI, se actualiza cada
   // mañana). Cada clase tiene un código propio (ej. FCI1901A); el precio es el
   // valor de la cuotaparte, así que la cantidad se carga en cuotapartes.
-  var PF_FCI = null;
+  var PF_FCI = null, PF_FCI_CARGA = null;
   async function pfAgregarFondos(idx, list){
     if(!PF_FCI){
-      try{
-        var r = await fetch('/reports/fci-todos.json?d=' + new Date().toISOString().slice(0, 10));
-        if(r.ok) PF_FCI = (await r.json()).fondos || [];
-      }catch(e){ console.warn('[MI] fondos comunes:', e.message); }
+      // una sola descarga aunque la pidan varias llamadas a la vez
+      if(!PF_FCI_CARGA) PF_FCI_CARGA = fetch('/reports/fci-todos.json?d=' + new Date().toISOString().slice(0, 10))
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(d){ PF_FCI = (d && d.fondos) || []; })
+        .catch(function(e){ console.warn('[MI] fondos comunes:', e.message); PF_FCI_CARGA = null; });
+      await PF_FCI_CARGA;
     }
-    if(!PF_FCI || !idx) return;
+    if(!PF_FCI || !idx || idx.__fci) return;
+    Object.defineProperty(idx, '__fci', { value: true });
     var yaEnLista = {};
     list.forEach(function(it){ if(it.category === 'fci') yaEnLista[it.symbol] = 1; });
     PF_FCI.forEach(function(f){
