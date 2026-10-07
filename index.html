@@ -31,6 +31,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <!-- Mercados · diseño Terminal: gráfico con TradingView Lightweight Charts (v5) -->
   <link rel="stylesheet" href="assets/mercados/terminal.css" />
+<link rel="stylesheet" href="assets/pulso/pulso.css" />
   <script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js" defer></script>
   <script src="assets/mercados/terminal.js"></script>
   <style>
@@ -3910,34 +3911,12 @@
           <a class="htx-btn" href="#inversiones" data-tab-target="inversiones">Ver los informes</a>
           <a class="htx-ghost" href="#portfolio" data-tab-target="portfolio">Probar el Portfolio</a>
         </div>
+        <!-- S&P 500 con 1D / 1M / 1A (assets/pulso/pulso.js) -->
+        <div class="htx-spx" id="htxSpx"></div>
       </div>
 
-      <!-- Panel en vivo: todo el sitio en una sola vista (mercado, portafolio, calendario, informe) -->
-      <aside class="htx-panel" aria-label="Resumen en vivo">
-        <a class="htx-panel__row" href="#mercados" data-tab-target="mercados">
-          <span class="htx-panel__head"><span class="htx-panel__k">S&amp;P 500</span><span class="htx-panel__m">Cierre del <span id="htx-us-asof">&mdash;</span></span></span>
-          <span class="htx-panel__val"><span class="htx-metric__value htx-num" id="htx-spx-price">&mdash;</span><span class="htx-metric__delta"><span id="htx-spx-chg">&mdash;</span></span></span>
-          <svg class="htx-panel__spark" id="htxSpxSpark" viewBox="0 0 480 110" preserveAspectRatio="none" aria-hidden="true">
-            <polyline points="0,64 120,60 240,58 360,56 480,54" fill="none" stroke="rgba(232,238,246,.18)" stroke-width="1.5" />
-          </svg>
-        </a>
-        <a class="htx-panel__row htx-panel__row--split" href="#portfolio" data-tab-target="portfolio">
-          <span class="htx-panel__head"><span class="htx-panel__k">Manfredi Portfolio</span><span class="htx-panel__m">&Uacute;ltimo mes</span></span>
-          <span class="htx-panel__val"><span class="htx-panel__num htx-num" id="htxHeroPf">&hellip;</span><span class="htx-panel__m" id="htxHeroPfBench"></span></span>
-        </a>
-        <a class="htx-panel__row" href="#calendario" data-tab-target="calendario">
-          <span class="htx-panel__head"><span class="htx-panel__k">Pr&oacute;ximo en el calendario</span><span class="htx-panel__m" id="htxHeroEvDay"></span></span>
-          <span class="htx-panel__txt" id="htxHeroEv">Cargando agenda&hellip;</span>
-        </a>
-        <a class="htx-panel__row" href="#inversiones" data-tab-target="inversiones" id="htxHeroInf">
-          <span class="htx-panel__head"><span class="htx-panel__k">&Uacute;ltimo informe</span><span class="htx-panel__m" id="htxHeroInfDate"></span></span>
-          <span class="htx-panel__inf">
-            <img class="htx-inf__logo" id="htxHeroInfLogo" src="assets/logos/msft.png" alt="" width="28" height="28" hidden>
-            <span class="htx-panel__txt" id="htxHeroInfName">Ver informes</span>
-          </span>
-          <span class="htx-panel__m htx-panel__fv" id="htxHeroInfFv"></span>
-        </a>
-      </aside>
+      <!-- Pulso del día: cotizaciones de Argentina y EE.UU. + titulares; "Ampliar" baja la cortina (assets/pulso/pulso.js) -->
+      <aside class="pls" id="plsCard" aria-label="Pulso del día"></aside>
     </div>
 
     <!-- membresia: carrusel Warren IA / Informes / Portfolio (assets/cartel/cartel.js) -->
@@ -4107,6 +4086,8 @@
   <script src="assets/ayuda/ayuda.js" defer></script>
   <!-- bienvenida: presentación de la página para quien entra por primera vez sin cuenta (assets/bienvenida/bienvenida.js, Shadow DOM) -->
   <script src="assets/bienvenida/bienvenida.js" defer></script>
+  <!-- Pulso del día + gráfico del S&P 500 del hero -->
+  <script src="assets/pulso/pulso.js" defer></script>
 
   <script>
   /* Home Terminal: S&P 500 / Nasdaq / UST 10Y del reporte diario (reports/wallstreet.json).
@@ -4165,59 +4146,6 @@
       var v = parseFloat(String(t).replace(/[^\d,.\-]/g, '').replace(/,(?=\d{3}\b)/g, '').replace(/\.(?=\d{3}\b)/g, '').replace(',', '.'));
       return isNaN(v) ? null : v;
     }
-    /* Panel en vivo del hero: refleja datos que ya carga la home (sin fetch extra salvo el manifest) */
-    function mirror(srcId, fn) {
-      var src = document.getElementById(srcId);
-      if (!src) return;
-      fn(src);
-      new MutationObserver(function () { fn(src); }).observe(src, { childList: true, characterData: true, subtree: true, attributes: true });
-    }
-    mirror('htxPfBig', function (src) {
-      var t = document.getElementById('htxHeroPf');
-      if (!t) return;
-      t.textContent = src.textContent;
-      t.style.color = src.style.color || '';
-    });
-    mirror('htxPfBench', function (src) {
-      var t = document.getElementById('htxHeroPfBench');
-      if (t) t.textContent = /S&P/.test(src.textContent) ? src.textContent.split('·')[0].trim() : '';
-    });
-    mirror('htxCalEcoList', function (src) {
-      var evs = src.querySelectorAll('.htx-cal2__ev, .htx-cal2__newsitem');
-      if (!evs.length) return;
-      var ev = null;
-      evs.forEach(function (e) { if (!ev && e.querySelector('.htx-cal2__hoy')) ev = e; });
-      if (!ev) {
-        var today = new Date().getDate();
-        evs.forEach(function (e) {
-          var d = e.querySelector('.htx-cal2__day .d');
-          if (!ev && d && parseInt(d.textContent, 10) >= today) ev = e;
-        });
-      }
-      ev = ev || evs[evs.length - 1];
-      var title = ev.querySelector('.htx-cal2__title');
-      var day = ev.querySelector('.htx-cal2__day');
-      document.getElementById('htxHeroEv').textContent = title ? title.textContent.trim() : '';
-      document.getElementById('htxHeroEvDay').textContent = ev.querySelector('.htx-cal2__hoy') ? 'Hoy' : (day ? day.textContent.replace(/\s+/g, ' ').trim() : '');
-    });
-    fetch('informes/manifest.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (list) {
-      var it = list && list[0];
-      if (!it) return;
-      var name = (it.title.match(/:\s*(.+?)\s*\(/) || [])[1] || it.ticker;
-      var bl = (it.abstract || '').match(/Blend \$?([\d.,]+) vs\. \$?([\d.,]+) \(([−\-+]?[\d.,]+%)\)/);
-      var a = document.getElementById('htxHeroInf');
-      a.href = it.href;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.removeAttribute('data-tab-target');
-      document.getElementById('htxHeroInfName').textContent = it.ticker + ' · ' + name;
-      document.getElementById('htxHeroInfDate').textContent = it.date || '';
-      var logo = document.getElementById('htxHeroInfLogo');
-      logo.src = 'assets/logos/' + it.ticker.toLowerCase().replace('.', '-') + '.png';
-      logo.onload = function () { logo.hidden = false; };
-      if (bl) document.getElementById('htxHeroInfFv').textContent = 'Fair value $' + bl[1].replace('.', ',') + ' · ' + bl[3].replace('.', ',') + ' vs. mercado';
-    }).catch(function () {});
-
     home.querySelectorAll('.htx-mk__val, .htx-metric__value').forEach(function (el) {
       var last = num(el.textContent);
       new MutationObserver(function () {

@@ -893,7 +893,7 @@ async function fetchSerie(category, symbol, tf) {
   if (category === 'cripto') return serieKraken(symbol, tf);
   // índices (para los carteles de arriba de Mercados)
   if (category === 'indices') {
-    const y = { MERVAL: '^MERV', SP500: '^GSPC', NASDAQ: '^NDX' }[symbol];
+    const y = { MERVAL: '^MERV', SP500: '^GSPC', NASDAQ: '^NDX', DOW: '^DJI' }[symbol];
     if (!y) throw new Error('Índice desconocido');
     return serieYahoo(y, tf);
   }
@@ -910,6 +910,133 @@ async function fetchSerie(category, symbol, tf) {
     return serieDolar(symbol.toLowerCase(), tf);
   }
   throw new Error('Categoría desconocida');
+}
+
+// ─── Pulso del día (/pulso) ─────────────────────────────────────────────────
+// Cartel de la home: 6 cotizaciones de Argentina + 6 de EE.UU./mundo con su
+// variación del día, y los titulares con bajada de Ámbito (Finanzas) y
+// Bloomberg Línea (Mercados). Todo en una sola respuesta; cache en memoria
+// (no escribe en KV, que tiene cupo diario).
+const PULSO_TTL = 300;
+const PULSO_FEEDS = [
+  { fuente: 'Ámbito', url: 'https://www.ambito.com/rss/pages/finanzas.xml' },
+  { fuente: 'Bloomberg Línea', url: 'https://www.bloomberglinea.com/arc/outboundfeeds/rss/category/mercados/?outputType=xml' },
+];
+// Notas de servicio que se repiten todo el día ("Dólar hoy: a cuánto opera…") o guías.
+const PULSO_DESCARTE = /a cu[aá]nto (opera|cotiza|oper[oó]|cotiz[oó])|minuto a minuto|^(real|euro)\b|^¿(c[oó]mo|qu[eé] es)\b/i;
+const PULSO_MUNDO = /wall street|\bee\.?uu\b|estados unidos|\bfed\b|reserva federal|tesoro|nasdaq|s&p|dow jones|bitcoin|cripto|europa|china|petr[oó]leo|brasil|m[eé]xico|chile|colombia|per[uú]|trump|ormuz|ibex|ibovespa|am[eé]rica latina|anthropic|openai|nvidia|inteligencia artificial/i;
+// De lo que no es de Argentina, solo entra lo que mueve a EE.UU. y al mundo (no
+// notas sueltas de empresas de otros países de la región).
+const PULSO_GLOBAL = /wall street|\bee\.?uu\b|estados unidos|\bfed\b|reserva federal|tesoro|nasdaq|s&p|dow jones|bitcoin|cripto|petr[oó]leo|crudo|\boro\b|d[oó]lar|tasas|bonos|trump|china|europa|ormuz|inflaci[oó]n|aranceles|nvidia|apple|microsoft|amazon|tesla|alphabet|meta\b|anthropic|openai|inteligencia artificial|brasil|ibovespa/i;
+const PULSO_AR = /argentin|bcra|banco central|merval|milei|caputo|riesgo pa[ií]s|\binde[cx]\b|\bbyma\b|\bcnv\b|bonos en d[oó]lares|d[oó]lar (oficial|blue|mep|ccl|mayorista)|ypf|galicia|globant|mercadolibre/i;
+
+// Algunos feeds mezclan UTF-8 y Latin-1 en el mismo XML: se decodifica en
+// Latin-1 (1 byte = 1 caracter) y cada texto se reinterpreta como UTF-8 si es válido.
+function pulsoTexto(s) {
+  if (!s) return '';
+  let out = s;
+  try {
+    out = new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(s, c => c.charCodeAt(0) & 0xff));
+  } catch (e) { /* era Latin-1 */ }
+  return out
+    .replace(/<!\[CDATA\[|\]\]>/g, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n))
+    .replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ').trim();
+}
+
+async function pulsoFeed(f) {
+  const resp = await fetch(f.url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(9000) });
+  if (!resp.ok) throw new Error(`${f.fuente} HTTP ${resp.status}`);
+  const xml = new TextDecoder('latin1').decode(await resp.arrayBuffer());
+  const tag = (b, t) => { const m = b.match(new RegExp(`<${t}[^>]*>([\\s\\S]*?)</${t}>`)); return m ? m[1] : ''; };
+  return (xml.match(/<item[\s\S]*?<\/item>/g) || []).slice(0, 30).map(b => {
+    const img = b.match(/<media:content[^>]*?url="([^"]+)"/) || b.match(/<enclosure[^>]*?url="([^"]+)"[^>]*?type="image/);
+    const fecha = Date.parse(pulsoTexto(tag(b, 'pubDate')));
+    return {
+      titulo: pulsoTexto(tag(b, 'title')),
+      resumen: pulsoTexto(tag(b, 'description')).slice(0, 320),
+      link: pulsoTexto(tag(b, 'link')),
+      fecha: isNaN(fecha) ? null : new Date(fecha).toISOString(),
+      imagen: img ? img[1].replace(/&amp;/g, '&') : '',
+      fuente: f.fuente,
+    };
+  }).filter(n => n.titulo && n.link && !PULSO_DESCARTE.test(n.titulo));
+}
+
+async function pulsoNoticias() {
+  const res = await Promise.allSettled(PULSO_FEEDS.map(pulsoFeed));
+  const todas = res.flatMap(r => r.status === 'fulfilled' ? r.value : []);
+  const limite = Date.now() - 48 * 3600 * 1000;
+  const vistas = new Set();
+  const ar = [], mundo = [];
+  todas
+    .filter(n => n.fecha && Date.parse(n.fecha) >= limite)
+    .sort((a, b) => Date.parse(b.fecha) - Date.parse(a.fecha))
+    .forEach(n => {
+      const k = n.titulo.toLowerCase().slice(0, 60);
+      if (vistas.has(k)) return;
+      vistas.add(k);
+      const txt = n.titulo + ' ' + n.resumen;
+      // Ámbito Finanzas es local salvo que hable del mundo; Bloomberg Línea es regional salvo que hable de Argentina.
+      const esAr = n.fuente === 'Ámbito' ? (PULSO_AR.test(txt) || !PULSO_MUNDO.test(n.titulo)) : PULSO_AR.test(n.titulo);
+      if (esAr) ar.push(n);
+      else if (PULSO_GLOBAL.test(n.titulo)) mundo.push(n);
+    });
+  return { argentina: ar.slice(0, 4), mundo: mundo.slice(0, 4) };
+}
+
+// Venta de hoy (dolarapi) contra el último cierre anterior a hoy (argentinadatos).
+async function pulsoDolares() {
+  const CASAS = [['oficial', 'Dólar oficial'], ['bolsa', 'Dólar MEP'], ['contadoconliqui', 'Dólar CCL'], ['blue', 'Dólar blue']];
+  const hoy = new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10);
+  const vivo = await fetch('https://dolarapi.com/v1/dolares', { signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : []).catch(() => []);
+  return Promise.all(CASAS.map(async ([casa, nombre]) => {
+    const v = (vivo || []).find(x => x.casa === casa);
+    let prev = null;
+    try {
+      const r = await fetch(`https://api.argentinadatos.com/v1/cotizaciones/dolares/${casa}`, { signal: AbortSignal.timeout(8000) });
+      if (r.ok) { const rows = (await r.json()).filter(x => x.fecha < hoy && x.venta != null); prev = rows.length ? rows[rows.length - 1].venta : null; }
+    } catch (e) { /* sin variación */ }
+    const price = v ? v.venta : null;
+    return { id: casa, name: nombre, unit: '$', price, change: price != null && prev ? (price - prev) / prev * 100 : null };
+  }));
+}
+
+async function pulsoRiesgo() {
+  try {
+    const r = await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais', { signal: AbortSignal.timeout(8000) });
+    if (!r.ok) return null;
+    const rows = (await r.json()).filter(x => x.valor != null);
+    const a = rows[rows.length - 1], b = rows[rows.length - 2];
+    return { id: 'riesgo', name: 'Riesgo país', unit: 'pb', price: a.valor, delta: b ? a.valor - b.valor : null, fecha: a.fecha, inverso: true };
+  } catch (e) { return null; }
+}
+
+async function pulsoYahoo(id, name, symbol, unit) {
+  const q = await fetchYahoo(symbol);
+  return { id, name, unit, price: q ? q.price : null, change: q ? q.change : null };
+}
+
+async function buildPulso() {
+  const [dolares, merval, riesgo, sp, ndx, dow, oro, wti, btc, noticias] = await Promise.all([
+    pulsoDolares(),
+    pulsoYahoo('merval', 'Merval', '^MERV', ''),
+    pulsoRiesgo(),
+    pulsoYahoo('sp500', 'S&P 500', '^GSPC', ''),
+    pulsoYahoo('nasdaq', 'Nasdaq 100', '^NDX', ''),
+    pulsoYahoo('dow', 'Dow Jones', '^DJI', ''),
+    pulsoYahoo('oro', 'Oro', 'GC=F', 'US$'),
+    pulsoYahoo('wti', 'Petróleo WTI', 'CL=F', 'US$'),
+    pulsoYahoo('btc', 'Bitcoin', 'BTC-USD', 'US$'),
+    pulsoNoticias(),
+  ]);
+  return {
+    updated: new Date().toISOString(),
+    argentina: { cotizaciones: [...dolares, merval, riesgo].filter(Boolean), noticias: noticias.argentina },
+    mundo: { cotizaciones: [sp, ndx, dow, oro, wti, btc], noticias: noticias.mundo },
+  };
 }
 
 export default {
@@ -998,6 +1125,20 @@ export default {
         return new Response(json, { headers: sh });
       } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 404, headers });
+      }
+    }
+
+    // GET /pulso -- cartel "Pulso del día" de la home (ver buildPulso)
+    if (url.pathname === '/pulso') {
+      const sh = { ...headers, 'Cache-Control': 'public, max-age=120' };
+      const mem = memGet('pulso');
+      if (mem) return new Response(mem, { headers: sh });
+      try {
+        const json = JSON.stringify(await buildPulso());
+        memSet('pulso', json, PULSO_TTL);
+        return new Response(json, { headers: sh });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), { status: 502, headers });
       }
     }
 
