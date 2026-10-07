@@ -8,9 +8,16 @@
    Datos: endpoint /pulso y /serie del worker manfredi-mercados. */
 (function () {
   var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
-  var API = LOCAL ? (new URLSearchParams(location.search).get('api') || 'http://127.0.0.1:8790') : 'https://manfredi-mercados.nachito2502.workers.dev';
+  // En local, ?api=http://127.0.0.1:PUERTO apunta a un wrangler dev distinto; se
+  // recuerda para que no se pierda al pasar por /bienvenida u otra página.
+  var API = 'https://manfredi-mercados.nachito2502.workers.dev';
+  if (LOCAL) {
+    var q = new URLSearchParams(location.search).get('api');
+    try { if (q) localStorage.setItem('pls_api', q); q = q || localStorage.getItem('pls_api'); } catch (e) {}
+    API = q || 'http://127.0.0.1:8790';
+  }
   var TZ = 'America/Argentina/Buenos_Aires';
-  var DATA = null, last = {};
+  var DATA = null, last = {}, reintento = false;
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -183,6 +190,8 @@
         console.warn('[pulso]', e.message);
         var card = $('plsCard');
         if (card && !DATA) card.innerHTML = '<div class="pls__hd"><h2 class="pls__t">Pulso del día</h2></div><div class="pls__body"><p class="pls-empty">No pudimos cargar las cotizaciones. Probá de nuevo en un rato.</p></div>';
+        // primer intento fallido (ej. el worker tardó): se reintenta enseguida, no al minuto
+        if (!DATA && !reintento) { reintento = true; setTimeout(cargar, 4000); }
       });
   }
 
