@@ -31,6 +31,9 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <!-- Mercados · diseño Terminal: gráfico con TradingView Lightweight Charts (v5) -->
   <link rel="stylesheet" href="assets/mercados/terminal.css" />
+<link rel="stylesheet" href="assets/pulso/pulso.css?v=20261007e" />
+<link rel="stylesheet" href="assets/noticias/noticias.css?v=20261007e" />
+<link rel="stylesheet" href="assets/lector/lector.css?v=20261007e" />
   <script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js" defer></script>
   <script src="assets/mercados/terminal.js"></script>
   <style>
@@ -1308,86 +1311,7 @@
     }
 
     /* âââ PDF VIEWER ââââââââââââââââââââââââââââââââââââââââââââââ */
-    .pdf-overlay {
-      position: fixed; inset: 0;
-      background: rgba(5,10,20,.88);
-      backdrop-filter: blur(6px);
-      z-index: 300;
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px;
-      opacity: 0; pointer-events: none;
-      transition: opacity .25s ease;
-    }
-    .pdf-overlay.open { opacity: 1; pointer-events: auto; }
-    .pdf-modal {
-      background: var(--primary);
-      border: 1px solid rgba(242,201,76,.2);
-      width: 100%; max-width: 900px;
-      height: 90vh;
-      display: flex; flex-direction: column;
-      transform: translateY(12px);
-      transition: transform .25s ease;
-    }
-    .pdf-overlay.open .pdf-modal { transform: none; }
-    .pdf-modal-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 20px;
-      border-bottom: 1px solid rgba(255,255,255,.07);
-      background: rgba(0,0,0,.3);
-      flex-shrink: 0;
-    }
-    .pdf-modal-title {
-      font-size: 12px; font-weight: 600;
-      color: rgba(255,255,255,.6);
-      letter-spacing: .06em;
-      text-transform: uppercase;
-    }
-    .pdf-modal-actions { display: flex; align-items: center; gap: 12px; }
-    .pdf-modal-download {
-      font-size: 11px; font-weight: 600;
-      letter-spacing: .08em; text-transform: uppercase;
-      color: var(--gold); border: 1px solid rgba(242,201,76,.35);
-      padding: 5px 12px; text-decoration: none;
-      transition: background var(--transition), color var(--transition);
-    }
-    .pdf-modal-download:hover { background: var(--gold); color: var(--primary); }
-    .pdf-modal-close {
-      width: 28px; height: 28px; border: none;
-      background: rgba(255,255,255,.06); color: rgba(255,255,255,.5);
-      font-size: 16px; cursor: pointer; display: flex;
-      align-items: center; justify-content: center;
-      transition: background var(--transition);
-    }
-    .pdf-modal-close:hover { background: rgba(255,255,255,.12); color: white; }
-    .pdf-viewer-body {
-      flex: 1; overflow-y: auto;
-      background: #1a1a1a;
-      display: flex; flex-direction: column; align-items: center;
-      padding: 24px 16px; gap: 12px;
-    }
-    .pdf-viewer-body canvas {
-      max-width: 100%;
-      box-shadow: 0 4px 24px rgba(0,0,0,.5);
-    }
-    .pdf-viewer-loading {
-      color: rgba(255,255,255,.4); font-size: 13px;
-      padding: 48px; text-align: center;
-    }
-    .pdf-nav {
-      display: flex; align-items: center; gap: 12px;
-      padding: 8px 20px;
-      border-top: 1px solid rgba(255,255,255,.07);
-      background: rgba(0,0,0,.2);
-      font-size: 12px; color: rgba(255,255,255,.4);
-      flex-shrink: 0;
-    }
-    .pdf-nav button {
-      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
-      color: rgba(255,255,255,.6); padding: 4px 12px; cursor: pointer; font-size: 12px;
-      transition: background var(--transition);
-    }
-    .pdf-nav button:hover { background: rgba(255,255,255,.12); }
-    .pdf-nav button:disabled { opacity: .3; cursor: default; }
+/* visor de PDF: assets/lector/lector.css */
 
     /* âââ MODAL âââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .modal-overlay {
@@ -3905,39 +3829,17 @@
     <!-- hero -->
     <div class="htx-hero">
       <div class="htx-hero__lead">
-        <h1 class="htx-h1">Tu mundo financiero, <em>en un solo lugar.</em></h1>
+        <h1 class="htx-h1">Tu mundo financiero, <em>en un solo lugar.</em></h1><script src="assets/aurora/aurora.js?v=20261007e"></script>
         <div class="htx-cta">
           <a class="htx-btn" href="#inversiones" data-tab-target="inversiones">Ver los informes</a>
           <a class="htx-ghost" href="#portfolio" data-tab-target="portfolio">Probar el Portfolio</a>
         </div>
+        <!-- S&P 500 con 1D / 1M / 1A (assets/pulso/pulso.js) -->
+        <div class="htx-spx" id="htxSpx"></div>
       </div>
 
-      <!-- Panel en vivo: todo el sitio en una sola vista (mercado, portafolio, calendario, informe) -->
-      <aside class="htx-panel" aria-label="Resumen en vivo">
-        <a class="htx-panel__row" href="#mercados" data-tab-target="mercados">
-          <span class="htx-panel__head"><span class="htx-panel__k">S&amp;P 500</span><span class="htx-panel__m">Cierre del <span id="htx-us-asof">&mdash;</span></span></span>
-          <span class="htx-panel__val"><span class="htx-metric__value htx-num" id="htx-spx-price">&mdash;</span><span class="htx-metric__delta"><span id="htx-spx-chg">&mdash;</span></span></span>
-          <svg class="htx-panel__spark" id="htxSpxSpark" viewBox="0 0 480 110" preserveAspectRatio="none" aria-hidden="true">
-            <polyline points="0,64 120,60 240,58 360,56 480,54" fill="none" stroke="rgba(232,238,246,.18)" stroke-width="1.5" />
-          </svg>
-        </a>
-        <a class="htx-panel__row htx-panel__row--split" href="#portfolio" data-tab-target="portfolio">
-          <span class="htx-panel__head"><span class="htx-panel__k">Manfredi Portfolio</span><span class="htx-panel__m">&Uacute;ltimo mes</span></span>
-          <span class="htx-panel__val"><span class="htx-panel__num htx-num" id="htxHeroPf">&hellip;</span><span class="htx-panel__m" id="htxHeroPfBench"></span></span>
-        </a>
-        <a class="htx-panel__row" href="#calendario" data-tab-target="calendario">
-          <span class="htx-panel__head"><span class="htx-panel__k">Pr&oacute;ximo en el calendario</span><span class="htx-panel__m" id="htxHeroEvDay"></span></span>
-          <span class="htx-panel__txt" id="htxHeroEv">Cargando agenda&hellip;</span>
-        </a>
-        <a class="htx-panel__row" href="#inversiones" data-tab-target="inversiones" id="htxHeroInf">
-          <span class="htx-panel__head"><span class="htx-panel__k">&Uacute;ltimo informe</span><span class="htx-panel__m" id="htxHeroInfDate"></span></span>
-          <span class="htx-panel__inf">
-            <img class="htx-inf__logo" id="htxHeroInfLogo" src="assets/logos/msft.png" alt="" width="28" height="28" hidden>
-            <span class="htx-panel__txt" id="htxHeroInfName">Ver informes</span>
-          </span>
-          <span class="htx-panel__m htx-panel__fv" id="htxHeroInfFv"></span>
-        </a>
-      </aside>
+      <!-- Pulso del día: cotizaciones de Argentina y EE.UU. + titulares; "Ampliar" baja la cortina (assets/pulso/pulso.js) -->
+      <aside class="pls" id="plsCard" aria-label="Pulso del día"></aside>
     </div>
 
     <!-- membresia: carrusel Warren IA / Informes / Portfolio (assets/cartel/cartel.js) -->
@@ -4107,6 +4009,12 @@
   <script src="assets/ayuda/ayuda.js" defer></script>
   <!-- bienvenida: presentación de la página para quien entra por primera vez sin cuenta (assets/bienvenida/bienvenida.js, Shadow DOM) -->
   <script src="assets/bienvenida/bienvenida.js" defer></script>
+  <!-- Pulso del día + gráfico del S&P 500 del hero -->
+  <script src="assets/pulso/pulso.js?v=20261007f" defer></script>
+  <!-- Pestaña Noticias (usa window.MIPulso de pulso.js: va después) -->
+  <script src="assets/noticias/noticias.js?v=20261007e" defer></script>
+  <!-- Lector de informes en PDF (window.openPdf) -->
+  <script src="assets/lector/lector.js?v=20261007e" defer></script>
 
   <script>
   /* Home Terminal: S&P 500 / Nasdaq / UST 10Y del reporte diario (reports/wallstreet.json).
@@ -4165,59 +4073,6 @@
       var v = parseFloat(String(t).replace(/[^\d,.\-]/g, '').replace(/,(?=\d{3}\b)/g, '').replace(/\.(?=\d{3}\b)/g, '').replace(',', '.'));
       return isNaN(v) ? null : v;
     }
-    /* Panel en vivo del hero: refleja datos que ya carga la home (sin fetch extra salvo el manifest) */
-    function mirror(srcId, fn) {
-      var src = document.getElementById(srcId);
-      if (!src) return;
-      fn(src);
-      new MutationObserver(function () { fn(src); }).observe(src, { childList: true, characterData: true, subtree: true, attributes: true });
-    }
-    mirror('htxPfBig', function (src) {
-      var t = document.getElementById('htxHeroPf');
-      if (!t) return;
-      t.textContent = src.textContent;
-      t.style.color = src.style.color || '';
-    });
-    mirror('htxPfBench', function (src) {
-      var t = document.getElementById('htxHeroPfBench');
-      if (t) t.textContent = /S&P/.test(src.textContent) ? src.textContent.split('·')[0].trim() : '';
-    });
-    mirror('htxCalEcoList', function (src) {
-      var evs = src.querySelectorAll('.htx-cal2__ev, .htx-cal2__newsitem');
-      if (!evs.length) return;
-      var ev = null;
-      evs.forEach(function (e) { if (!ev && e.querySelector('.htx-cal2__hoy')) ev = e; });
-      if (!ev) {
-        var today = new Date().getDate();
-        evs.forEach(function (e) {
-          var d = e.querySelector('.htx-cal2__day .d');
-          if (!ev && d && parseInt(d.textContent, 10) >= today) ev = e;
-        });
-      }
-      ev = ev || evs[evs.length - 1];
-      var title = ev.querySelector('.htx-cal2__title');
-      var day = ev.querySelector('.htx-cal2__day');
-      document.getElementById('htxHeroEv').textContent = title ? title.textContent.trim() : '';
-      document.getElementById('htxHeroEvDay').textContent = ev.querySelector('.htx-cal2__hoy') ? 'Hoy' : (day ? day.textContent.replace(/\s+/g, ' ').trim() : '');
-    });
-    fetch('informes/manifest.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (list) {
-      var it = list && list[0];
-      if (!it) return;
-      var name = (it.title.match(/:\s*(.+?)\s*\(/) || [])[1] || it.ticker;
-      var bl = (it.abstract || '').match(/Blend \$?([\d.,]+) vs\. \$?([\d.,]+) \(([−\-+]?[\d.,]+%)\)/);
-      var a = document.getElementById('htxHeroInf');
-      a.href = it.href;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.removeAttribute('data-tab-target');
-      document.getElementById('htxHeroInfName').textContent = it.ticker + ' · ' + name;
-      document.getElementById('htxHeroInfDate').textContent = it.date || '';
-      var logo = document.getElementById('htxHeroInfLogo');
-      logo.src = 'assets/logos/' + it.ticker.toLowerCase().replace('.', '-') + '.png';
-      logo.onload = function () { logo.hidden = false; };
-      if (bl) document.getElementById('htxHeroInfFv').textContent = 'Fair value $' + bl[1].replace('.', ',') + ' · ' + bl[3].replace('.', ',') + ' vs. mercado';
-    }).catch(function () {});
-
     home.querySelectorAll('.htx-mk__val, .htx-metric__value').forEach(function (el) {
       var last = num(el.textContent);
       new MutationObserver(function () {
@@ -4367,77 +4222,30 @@
   </div>
 </section>
   <!-- ââ INFORMES âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-<section class="section-informes" id="informes" data-tab="informes">
-      
-    <div class="container">
-      <div class="section-header">
-        <span class="section-label">Reportes &amp; News</span>
-        <h2 class="section-title">Inteligencia de Mercado</h2>
-        <p class="section-sub">News diarias y papers de investigación. Análisis con foco en impacto real.</p>
-      </div>
-
-      <!-- ââ Sub-sección 1: Biblioteca de Informes ââ -->
-      <div class="inf-sub-header">
-        <span class="inf-sub-title">Biblioteca de Reportes</span>
-        <div style="display:flex;align-items:center;gap:16px;">
-          <span class="inf-sub-meta">Resumen semanal económico y financiero</span>
-          <div class="carousel-nav">
-            <button type="button" class="carousel-btn" id="papersRailPrev" aria-label="Reportes anteriores">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-            </button>
-            <button type="button" class="carousel-btn" id="papersRailNext" aria-label="Reportes siguientes">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-            </button>
+<section class="nt" id="informes" data-tab="informes">
+    <!-- Noticias minuto a minuto + informe semanal + cotizaciones (assets/noticias/noticias.js) -->
+    <div class="nt-wrap nt-grid">
+      <div class="nt-main">
+        <header class="nt-head" id="reportes">
+          <h2 class="nt-title">Noticias</h2>
+          <span class="nt-date" id="ntDate"></span>
+        </header>
+        <div id="ntInforme"></div>
+        <div class="nt-bar" id="ntBar"><div class="nt-chips" id="ntChips" role="group" aria-label="Filtrar noticias"></div></div>
+        <div id="ntFeed" aria-live="polite">
+          <div style="padding:26px 0;display:grid;gap:22px">
+            <span class="nt-skel" style="height:18px;width:70%"></span>
+            <span class="nt-skel" style="height:18px;width:85%"></span>
+            <span class="nt-skel" style="height:18px;width:60%"></span>
           </div>
         </div>
+        <button type="button" class="nt-more" id="ntMore" hidden>Ver más noticias</button>
       </div>
-      <div class="papers-rail-outer">
-        <div class="papers-grid" id="papersGrid">
-          <!-- Se carga dinámicamente desde papers/manifest.json -->
-        </div>
-      </div>
-
-      <!-- ââ Sub-sección 2: Reportes Diarios ââ -->
-      <div class="inf-sub-header" id="reportes">
-        <span class="inf-sub-title">News Diarias</span>
-        <span class="inf-sub-meta" id="reportLastUpdate">Actualizado · 11:01 hs</span>
-      </div>
-      <div class="reports-grid">
-
-        <!-- Card Argentina -->
-        <div class="report-card-daily">
-          <div class="rpt-header">
-            <span class="rpt-header-title"><span class="report-country-flag">&#127462;&#127479;</span>Argentina</span>
-            <span class="rpt-header-meta">Agente IA</span>
-            <div class="rpt-live"><span class="rpt-live-dot"></span>LIVE</div>
-          </div>
-          <div class="rpt-loading-wrap" id="argFeed">
-            <div class="report-loading">Cargando reporte&hellip;</div>
-          </div>
-          <div class="report-signal" id="argSignal" style="display:none">
-            <div class="report-signal-label">&#9889; Señal del día</div>
-            <div class="report-signal-text" id="argSignalText"></div>
-          </div>
-        </div>
-
-        <!-- Card Wall Street -->
-        <div class="report-card-daily">
-          <div class="rpt-header">
-            <span class="rpt-header-title"><span class="report-country-flag">&#127482;&#127480;</span>Wall Street</span>
-            <span class="rpt-header-meta">Agente IA</span>
-            <div class="rpt-live"><span class="rpt-live-dot"></span>LIVE</div>
-          </div>
-          <div class="rpt-loading-wrap" id="wsFeed">
-            <div class="report-loading">Cargando reporte&hellip;</div>
-          </div>
-          <div class="report-signal" id="wsSignal" style="display:none">
-            <div class="report-signal-label">&#9889; Señal del día</div>
-            <div class="report-signal-text" id="wsSignalText"></div>
-          </div>
-        </div>
-
-      </div>
-
+      <aside class="nt-rail" aria-label="Cotizaciones e informes">
+        <div class="nt-card" id="ntQuotes"><h3 class="nt-card__h">Cotizaciones</h3><span class="nt-skel" style="height:160px"></span></div>
+        <div class="nt-card" id="ntPrevs"></div>
+      </aside>
+    </div>
   </section>
 
   <!-- ââ UNIVERSITY âââââââââââââââââââââââââââââââââââââââââââââââââ -->
@@ -10476,27 +10284,6 @@
   <!-- ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
        JAVASCRIPT &mdash; APIs en tiempo real
        ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <!-- ââ PDF VIEWER MODAL âââââââââââââââââââââââââââââââââââââââââââ -->
-  <div class="pdf-overlay" id="pdfOverlay" onclick="closePdfIfOutside(event)">
-    <div class="pdf-modal">
-      <div class="pdf-modal-header">
-        <span class="pdf-modal-title" id="pdfModalTitle"></span>
-        <div class="pdf-modal-actions">
-          <a class="pdf-modal-download" id="pdfModalDownload" download>&#8595; Descargar</a>
-          <button type="button" class="pdf-modal-close" onclick="closePdf()">&#x2715;</button>
-        </div>
-      </div>
-      <div class="pdf-viewer-body" id="pdfViewerBody">
-        <div class="pdf-viewer-loading" id="pdfLoading">Cargando documento&hellip;</div>
-      </div>
-      <div class="pdf-nav">
-        <button type="button" id="pdfPrev" style="display:none"></button>
-        <span id="pdfPageInfo">&mdash;</span>
-        <button type="button" id="pdfNext" style="display:none"></button>
-      </div>
-    </div>
-  </div>
-
   <script defer src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
   <script>
   // pdf.js carga diferido: se configura cuando ya está disponible
@@ -10508,7 +10295,9 @@
       const res  = await fetch('papers/manifest.json');
       const list = await res.json();
       const grid = document.getElementById('papersGrid');
-      grid.innerHTML = list.map(p => `
+      // la grilla vieja ya no está (la pestaña Noticias arma el informe en assets/noticias/noticias.js);
+      // esto queda solo para el cartel de "nuevo informe"
+      if (grid) grid.innerHTML = list.map(p => `
         <div class="paper-card paper-card--cover">
           <button type="button" class="paper-cover" aria-label="Abrir: ${p.title.replace(/"/g,'&quot;')}" onclick="openPdf('${'papers/' + encodeURIComponent(p.file)}','${p.title.replace(/'/g,"\\'")}')">
             <span class="paper-cover-fallback">${p.title}</span>
@@ -10569,7 +10358,7 @@
         // no-miembro (informes/_preview-gate.js).
         window.open(latest.href, '_blank', 'noopener');
       } else {
-        openPdf('papers/' + encodeURIComponent(latest.file), latest.title);
+        openPdf('papers/' + encodeURIComponent(latest.file), latest.title, { fecha: latest.date, tapa: latest.cover || 'papers/covers/' + latest.num + '.jpg' });
       }
       dismiss();
     };
@@ -10616,48 +10405,7 @@
   }
 
   // Á¢ÂÂÁ¢ÂÂ Visor PDF Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-  async function openPdf(url, title) {
-    document.getElementById('pdfModalTitle').textContent = title;
-    document.getElementById('pdfModalDownload').href = url;
-    document.getElementById('pdfOverlay').classList.add('open');
-    // overflow disabled
-    const body = document.getElementById('pdfViewerBody');
-    body.innerHTML = '<div class="pdf-viewer-loading">Cargando documento&hellip;</div>';
-    document.getElementById('pdfPageInfo').textContent = '&mdash;';
-    try {
-      const pdfDoc = await pdfjsLib.getDocument(url).promise;
-      body.innerHTML = '';
-      document.getElementById('pdfPageInfo').textContent = `${pdfDoc.numPages} páginas`;
-      for (let i = 1; i <= pdfDoc.numPages; i++) {
-        const page     = await pdfDoc.getPage(i);
-        const scale    = Math.min(1.5, Math.min(window.innerWidth * 0.85, 860) / page.getViewport({scale:1}).width);
-        const viewport = page.getViewport({ scale });
-        const canvas   = document.createElement('canvas');
-        canvas.width   = viewport.width;
-        canvas.height  = viewport.height;
-        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-        body.appendChild(canvas);
-      }
-    } catch(e) {
-      body.innerHTML = `<div class="pdf-viewer-loading">
-        No se pudo cargar el visor.<br>
-        <small style="opacity:.5">${e.message}</small><br><br>
-        <a href="${url}" target="_blank" style="color:var(--gold);font-weight:600;font-size:13px;">
-          → Abrir PDF en nueva pestaña
-        </a>
-      </div>`;
-    }
-  }
-
-  function closePdf() {
-    document.getElementById('pdfOverlay').classList.remove('open');
-    document.getElementById('pdfViewerBody').innerHTML = '';
-    document.body.style.overflow = '';
-  }
-  function closePdfIfOutside(e) {
-    if (e.target === document.getElementById('pdfOverlay')) closePdf();
-  }
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePdf(); });
+  // El visor de PDF ahora es assets/lector/lector.js (window.openPdf).
 
   loadPapersManifest();
 
@@ -10828,6 +10576,8 @@
   }
 
   async function loadDailyReports() {
+    // las tarjetas de reportes diarios se reemplazaron por el feed de assets/noticias/noticias.js
+    if (!document.getElementById('argFeed')) return;
     try {
       const [argRes, wsRes, noticiasRes] = await Promise.all([
         fetch('reports/argentina.json?t=' + Date.now()),
@@ -17940,5 +17690,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
     .mi-panel, .cr-toast { animation-name:htx-fade !important; }
   }
 </style>
+  <!-- Fondo Aurora de todo el sitio (al final para ganarle a los estilos de cada sección; el título lo anima assets/aurora/aurora.js, junto al h1) -->
+  <link rel="stylesheet" href="assets/aurora/aurora.css?v=20261007e" />
 </body>
 </html>

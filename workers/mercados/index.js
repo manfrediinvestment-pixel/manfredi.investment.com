@@ -893,7 +893,7 @@ async function fetchSerie(category, symbol, tf) {
   if (category === 'cripto') return serieKraken(symbol, tf);
   // índices (para los carteles de arriba de Mercados)
   if (category === 'indices') {
-    const y = { MERVAL: '^MERV', SP500: '^GSPC', NASDAQ: '^NDX' }[symbol];
+    const y = { MERVAL: '^MERV', SP500: '^GSPC', NASDAQ: '^NDX', DOW: '^DJI' }[symbol];
     if (!y) throw new Error('Índice desconocido');
     return serieYahoo(y, tf);
   }
@@ -910,6 +910,183 @@ async function fetchSerie(category, symbol, tf) {
     return serieDolar(symbol.toLowerCase(), tf);
   }
   throw new Error('Categoría desconocida');
+}
+
+// ─── Pulso del día (/pulso) ─────────────────────────────────────────────────
+// Cartel de la home: 6 cotizaciones de Argentina + 6 de EE.UU./mundo con su
+// variación del día, y los titulares más nuevos (ver noticiasTodas).
+
+// ─── Noticias (/noticias y titulares del /pulso) ────────────────────────────
+// Titulares con bajada de diarios en español. Cada nota sale clasificada por
+// región (Argentina / EE.UU. y el mundo) y por tema, para los filtros de la
+// pestaña Noticias. Cache en memoria (no escribe en KV, que tiene cupo diario).
+const PULSO_TTL = 300;
+const NOTICIAS_FEEDS = [
+  { fuente: 'Ámbito', url: 'https://www.ambito.com/rss/pages/finanzas.xml' },
+  { fuente: 'Ámbito', url: 'https://www.ambito.com/rss/pages/economia.xml' },
+  { fuente: 'El Cronista', url: 'https://www.cronista.com/arc/outboundfeeds/rss/category/finanzas-mercados/?outputType=xml' },
+  { fuente: 'El Cronista', url: 'https://www.cronista.com/arc/outboundfeeds/rss/category/economia-politica/' },
+  { fuente: 'Infobae', url: 'https://www.infobae.com/arc/outboundfeeds/rss/category/economia/' },
+  { fuente: 'Bloomberg Línea', url: 'https://www.bloomberglinea.com/arc/outboundfeeds/rss/category/mercados/?outputType=xml' },
+];
+// Notas de servicio que se repiten todo el día ("Dólar hoy: a cuánto opera…") o guías.
+const NOT_DESCARTE = /a cu[aá]nto (opera|cotiza|oper[oó]|cotiz[oó]|se ofrece|cerr[oó])|minuto a minuto|^(real|euro)\b|^¿(c[oó]mo|qu[eé] es)\b|hor[oó]scopo/i;
+const NOT_MUNDO = /xi jinping|chin[ao]s?|wall street|\bee\.?uu\b|estados unidos|\bfed\b|reserva federal|tesoro|nasdaq|s&p|dow jones|bitcoin|cripto|europa|china|petr[oó]leo|brasil|m[eé]xico|chile|colombia|per[uú]|trump|ormuz|ibex|ibovespa|am[eé]rica latina|anthropic|openai|nvidia|inteligencia artificial/i;
+// De lo que no es de Argentina, solo entra lo que mueve a EE.UU. y al mundo (no
+// notas sueltas de empresas de otros países de la región).
+const NOT_GLOBAL = /wall street|\bee\.?uu\b|estados unidos|\bfed\b|reserva federal|tesoro|nasdaq|s&p|dow jones|bitcoin|cripto|petr[oó]leo|crudo|\boro\b|d[oó]lar|tasas|bonos|trump|china|europa|ormuz|inflaci[oó]n|aranceles|nvidia|apple|microsoft|amazon|tesla|alphabet|meta\b|anthropic|openai|inteligencia artificial|brasil|ibovespa/i;
+const NOT_AR = /argentin|bcra|banco central|merval|milei|caputo|riesgo pa[ií]s|\binde[cx]\b|\bbyma\b|\bcnv\b|bonos en d[oó]lares|d[oó]lar (oficial|blue|mep|ccl|mayorista)|ypf|galicia|globant|mercadolibre|arca\b|afip|monotributo|jubilaci|salario|inflaci[oó]n|tarifas|plazo fijo|cr[eé]ditos? hipotecario/i;
+// Las secciones de economía traen también política y servicios: de Argentina
+// solo entra lo que tiene que ver con plata, mercados o la economía.
+const NOT_FINANZAS = /d[oó]lar|bonos?|acciones|merval|bcra|banco central|reservas|riesgo pa[ií]s|tasas?|inflaci|cr[eé]dito|pr[eé]stamo|plazo fijo|inversi|impuesto|iva\b|salari|consumo|actividad|export|import|deuda|fmi|mercado|cedear|ypf|morosidad|precios?|tarifa|jubil|licitaci|caputo|econom/i;
+const NOT_TEMAS = [
+  ['Bonos', /bonos?|riesgo pa[ií]s|deuda|tasas|licitaci/i],
+  ['Dólar', /d[oó]lar|cambiari|reservas|bcra/i],
+  ['Acciones', /acciones|merval|wall street|s&p|nasdaq|balances?|cedear|bitcoin|cripto/i],
+  ['Economía', /inflaci|actividad|pbi|salari|consumo|jubil|tarifa|cr[eé]dito|impuesto|iva\b|monotrib|empleo|precios?|export|import/i],
+];
+
+// Algunos feeds mezclan UTF-8 y Latin-1 en el mismo XML: se decodifica en
+// Latin-1 (1 byte = 1 caracter) y cada texto se reinterpreta como UTF-8 si es válido.
+function pulsoTexto(s) {
+  if (!s) return '';
+  let out = s;
+  try {
+    out = new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(s, c => c.charCodeAt(0) & 0xff));
+  } catch (e) { /* era Latin-1 */ }
+  return out
+    .replace(/<!\[CDATA\[|\]\]>/g, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n))
+    .replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ').trim();
+}
+
+async function pulsoFeed(f) {
+  const resp = await fetch(f.url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(9000) });
+  if (!resp.ok) throw new Error(`${f.fuente} HTTP ${resp.status}`);
+  // 1 byte = 1 caracter, a mano: TextDecoder('latin1') en realidad es windows-1252
+  // y cambia los bytes 0x80-0x9F (rompía comillas tipográficas como ‘ ’).
+  const bytes = new Uint8Array(await resp.arrayBuffer());
+  let xml = '';
+  for (let i = 0; i < bytes.length; i += 8192) xml += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
+  const tag = (b, t) => { const m = b.match(new RegExp(`<${t}[^>]*>([\\s\\S]*?)</${t}>`)); return m ? m[1] : ''; };
+  return (xml.match(/<item[\s\S]*?<\/item>/g) || []).slice(0, 30).map(b => {
+    const img = b.match(/<media:content[^>]*?url="([^"]+)"/) || b.match(/<enclosure[^>]*?url="([^"]+)"/) || b.match(/<media:thumbnail[^>]*?url="([^"]+)"/);
+    const fecha = Date.parse(pulsoTexto(tag(b, 'pubDate')));
+    return {
+      titulo: pulsoTexto(tag(b, 'title')),
+      resumen: pulsoTexto(tag(b, 'description')).slice(0, 320),
+      link: pulsoTexto(tag(b, 'link')),
+      fecha: isNaN(fecha) ? null : new Date(fecha).toISOString(),
+      imagen: img ? img[1].replace(/&amp;/g, '&') : '',
+      fuente: f.fuente,
+    };
+  }).filter(n => n.titulo && n.link && /^https?:/.test(n.link) && !NOT_DESCARTE.test(n.titulo));
+}
+
+// Todas las notas de las últimas horas, sin repetidas, de la más nueva a la más vieja.
+async function noticiasTodas() {
+  const mem = memGet('noticias_todas');
+  if (mem) return mem;
+  const res = await Promise.allSettled(NOTICIAS_FEEDS.map(pulsoFeed));
+  const todas = res.flatMap(r => r.status === 'fulfilled' ? r.value : [])
+    .filter(n => n.fecha)
+    .sort((a, b) => Date.parse(b.fecha) - Date.parse(a.fecha));
+  const vistas = new Set();
+  const salida = [];
+  for (const n of todas) {
+    const k = n.titulo.toLowerCase().replace(/[^a-z0-9áéíóúñ ]/g, '').slice(0, 60);
+    if (vistas.has(k)) continue;
+    vistas.add(k);
+    const txt = n.titulo + ' ' + n.resumen;
+    // Los diarios argentinos son locales salvo que hablen del mundo; Bloomberg Línea es regional salvo que hable de Argentina.
+    const local = n.fuente !== 'Bloomberg Línea';
+    const esAr = local ? (NOT_AR.test(txt) || !NOT_MUNDO.test(n.titulo)) : NOT_AR.test(n.titulo);
+    let region = null;
+    if (esAr && NOT_FINANZAS.test(txt)) region = 'ar';
+    else if (!esAr && NOT_GLOBAL.test(n.titulo)) region = 'mundo';
+    if (!region) continue;
+    const tema = (NOT_TEMAS.find(([, rx]) => rx.test(txt)) || ['Mercados'])[0];
+    salida.push({ ...n, region, tema });
+  }
+  // Ventana de 48 h; si un lunes temprano quedan pocas, se estira.
+  const ahora = Date.now();
+  let lista = salida.filter(n => ahora - Date.parse(n.fecha) <= 48 * 3600e3);
+  if (lista.length < 20) lista = salida.filter(n => ahora - Date.parse(n.fecha) <= 120 * 3600e3);
+  lista = lista.slice(0, 60);
+  if (lista.length) memSet('noticias_todas', lista, PULSO_TTL);
+  return lista;
+}
+
+// Titulares del cartel de la home: primero lo de mercados (dólar, bonos, acciones).
+async function pulsoNoticias() {
+  const todas = await noticiasTodas();
+  const elegir = region => {
+    const r = todas.filter(n => n.region === region);
+    const mercado = r.filter(n => n.tema !== 'Economía');
+    return mercado.concat(r.filter(n => n.tema === 'Economía')).slice(0, 4)
+      .sort((a, b) => Date.parse(b.fecha) - Date.parse(a.fecha));
+  };
+  return { argentina: elegir('ar'), mundo: elegir('mundo') };
+}
+
+// Venta de hoy (dolarapi) contra el último cierre anterior a hoy (argentinadatos).
+async function pulsoDolares() {
+  const CASAS = [['oficial', 'Dólar oficial'], ['bolsa', 'Dólar MEP'], ['contadoconliqui', 'Dólar CCL'], ['blue', 'Dólar blue']];
+  const hoy = new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10);
+  const vivo = await fetch('https://dolarapi.com/v1/dolares', { signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : []).catch(() => []);
+  return Promise.all(CASAS.map(async ([casa, nombre]) => {
+    const v = (vivo || []).find(x => x.casa === casa);
+    let prev = null;
+    try {
+      const r = await fetch(`https://api.argentinadatos.com/v1/cotizaciones/dolares/${casa}`, { signal: AbortSignal.timeout(8000) });
+      if (r.ok) { const rows = (await r.json()).filter(x => x.fecha < hoy && x.venta != null); prev = rows.length ? rows[rows.length - 1].venta : null; }
+    } catch (e) { /* sin variación */ }
+    const price = v ? v.venta : null;
+    return { id: casa, name: nombre, unit: '$', price, change: price != null && prev ? (price - prev) / prev * 100 : null };
+  }));
+}
+
+async function pulsoRiesgo() {
+  try {
+    const r = await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais', { signal: AbortSignal.timeout(8000) });
+    if (!r.ok) return null;
+    const rows = (await r.json()).filter(x => x.valor != null);
+    const a = rows[rows.length - 1], b = rows[rows.length - 2];
+    return { id: 'riesgo', name: 'Riesgo país', unit: 'pb', price: a.valor, delta: b ? a.valor - b.valor : null, fecha: a.fecha, inverso: true };
+  } catch (e) { return null; }
+}
+
+// Último valor bueno de cada cotización: si Yahoo falla un rato, se muestra ese
+// en vez de un guion (vive en la memoria del isolate, no en KV).
+const PULSO_ULTIMO = new Map();
+async function pulsoYahoo(id, name, symbol, unit) {
+  let q = await fetchYahoo(symbol);
+  if (!q) q = await fetchYahoo(symbol); // un reintento: a veces Yahoo tarda o corta
+  if (q) PULSO_ULTIMO.set(id, q);
+  else q = PULSO_ULTIMO.get(id) || null;
+  return { id, name, unit, price: q ? q.price : null, change: q ? q.change : null };
+}
+
+async function buildPulso() {
+  const [dolares, merval, riesgo, sp, ndx, dow, oro, wti, btc, noticias] = await Promise.all([
+    pulsoDolares(),
+    pulsoYahoo('merval', 'Merval', '^MERV', ''),
+    pulsoRiesgo(),
+    pulsoYahoo('sp500', 'S&P 500', '^GSPC', ''),
+    pulsoYahoo('nasdaq', 'Nasdaq 100', '^NDX', ''),
+    pulsoYahoo('dow', 'Dow Jones', '^DJI', ''),
+    pulsoYahoo('oro', 'Oro', 'GC=F', 'US$'),
+    pulsoYahoo('wti', 'Petróleo WTI', 'CL=F', 'US$'),
+    pulsoYahoo('btc', 'Bitcoin', 'BTC-USD', 'US$'),
+    pulsoNoticias(),
+  ]);
+  return {
+    updated: new Date().toISOString(),
+    argentina: { cotizaciones: [...dolares, merval, riesgo].filter(Boolean), noticias: noticias.argentina },
+    mundo: { cotizaciones: [sp, ndx, dow, oro, wti, btc], noticias: noticias.mundo },
+  };
 }
 
 export default {
@@ -998,6 +1175,34 @@ export default {
         return new Response(json, { headers: sh });
       } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 404, headers });
+      }
+    }
+
+    // GET /noticias -- pestaña Noticias: titulares con bajada, región y tema
+    if (url.pathname === '/noticias') {
+      const sh = { ...headers, 'Cache-Control': 'public, max-age=120' };
+      try {
+        const items = await noticiasTodas();
+        return new Response(JSON.stringify({ updated: new Date().toISOString(), items }), { headers: sh });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), { status: 502, headers });
+      }
+    }
+
+    // GET /pulso -- cartel "Pulso del día" de la home (ver buildPulso)
+    if (url.pathname === '/pulso') {
+      const sh = { ...headers, 'Cache-Control': 'public, max-age=120' };
+      const mem = memGet('pulso');
+      if (mem) return new Response(mem, { headers: sh });
+      try {
+        const data = await buildPulso();
+        const json = JSON.stringify(data);
+        // si quedó alguna cotización sin dato, se guarda poco para reintentar pronto
+        const incompleto = [...data.argentina.cotizaciones, ...data.mundo.cotizaciones].some(q => q.price == null);
+        memSet('pulso', json, incompleto ? 30 : PULSO_TTL);
+        return new Response(json, { headers: sh });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), { status: 502, headers });
       }
     }
 
