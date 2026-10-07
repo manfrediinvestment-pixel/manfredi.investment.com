@@ -27,7 +27,7 @@
     var ch = LC.createChart(el, {
       autoSize: true,
       layout: { background: { type: 'solid', color: 'transparent' }, textColor: 'rgba(238,242,248,.78)', fontFamily: "'IBM Plex Sans', system-ui, sans-serif", fontSize: 12, attributionLogo: true,
-        panes: { separatorColor: 'rgba(238,242,248,.08)', enableResize: false } },
+        panes: { separatorColor: '#1c2b44', separatorHoverColor: 'rgba(242, 201, 76, 0.45)', enableResize: true } },
       grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(238,242,248,.05)' } },
       rightPriceScale: { borderVisible: false, scaleMargins: { top: .1, bottom: .06 } },
       timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false, fixLeftEdge: true, fixRightEdge: true },
@@ -42,16 +42,30 @@
     var area = ch.addSeries(LC.AreaSeries, { priceFormat: fmt, lineColor: '#f2c94c', lineWidth: 2, topColor: 'rgba(242,201,76,.28)', bottomColor: 'rgba(242,201,76,0)', priceLineColor: 'rgba(242,201,76,.6)', crosshairMarkerBorderColor: '#0b1528', crosshairMarkerBackgroundColor: '#f2c94c', crosshairMarkerRadius: 5 }, 0);
     var velas = ch.addSeries(LC.CandlestickSeries, { priceFormat: fmt, upColor: '#4fc48c', downColor: '#ee7369', borderVisible: false, wickUpColor: '#4fc48c', wickDownColor: '#ee7369', priceLineColor: 'rgba(242,201,76,.6)', visible: false }, 0);
     var volumen = ch.addSeries(LC.HistogramSeries, { priceFormat: { type: 'volume' }, priceLineVisible: false, lastValueVisible: false }, 1);
-    ch.panes()[1].setHeight(80);
+    // qué paneles se ven: ambos (precio grande, volumen chico), solo precio o
+    // solo volumen. Se reparte el alto con stretch factors; el usuario además
+    // puede arrastrar la línea divisoria.
+    var modo = 'linea', vista = 'ambos', hayVol = true;
+    function aplicar() {
+      var v = hayVol ? vista : 'precio';
+      var p = ch.panes();
+      area.applyOptions({ visible: v !== 'volumen' && modo !== 'velas' });
+      velas.applyOptions({ visible: v !== 'volumen' && modo === 'velas' });
+      volumen.applyOptions({ visible: v !== 'precio' });
+      p[0].setStretchFactor(v === 'volumen' ? 0.0001 : v === 'precio' ? 1 : 4);
+      p[1].setStretchFactor(v === 'precio' ? 0.0001 : 1);
+    }
+    aplicar();
     return {
       ch: ch,
-      modo: function (m) { area.applyOptions({ visible: m !== 'velas' }); velas.applyOptions({ visible: m === 'velas' }); },
+      modo: function (m) { modo = m; aplicar(); },
+      vista: function (v) { vista = v; aplicar(); },
       datos: function (pts) {
         area.setData(pts.map(function (p) { return { time: p.t, value: p.c }; }));
         velas.setData(pts.map(function (p) { return { time: p.t, open: p.o, high: p.h, low: p.l, close: p.c }; }));
-        var hayVol = pts.some(function (p) { return p.v > 0; });
+        hayVol = pts.some(function (p) { return p.v > 0; });
         volumen.setData(hayVol ? pts.map(function (p) { return { time: p.t, value: p.v, color: p.c >= p.o ? 'rgba(79,196,140,.45)' : 'rgba(238,115,105,.45)' }; }) : []);
-        ch.panes()[1].setHeight(hayVol ? 80 : 1);
+        aplicar();
         ch.timeScale().fitContent();
         return hayVol;
       },
@@ -60,7 +74,7 @@
   }
 
   /* ------------------------------ panel ------------------------------ */
-  var st = { cur: null, tf: '1A', modo: 'linea', g: null, req: 0 };
+  var st = { cur: null, tf: '1A', modo: 'linea', vista: 'ambos', g: null, req: 0 };
 
   function marcar() {
     var c = st.cur;
@@ -86,7 +100,8 @@
         var off = t[0] === '1D' && SIN_INTRADIARIO[o.category];
         return '<button type="button" data-tf="' + t[0] + '" class="' + (t[0] === st.tf ? 'on' : '') + '"' + (off ? ' disabled title="Sin datos intradiarios"' : '') + '>' + t[0] + '</button>';
       }).join('') + '</div>' +
-      '<div class="mt-seg" id="mtModo" role="group" aria-label="Tipo de gráfico"><button type="button" data-m="linea" class="' + (st.modo === 'linea' ? 'on' : '') + '">Línea</button><button type="button" data-m="velas" class="' + (st.modo === 'velas' ? 'on' : '') + '">Velas</button></div></div></div>' +
+      '<div class="mt-seg" id="mtModo" role="group" aria-label="Tipo de gráfico"><button type="button" data-m="linea" class="' + (st.modo === 'linea' ? 'on' : '') + '">Línea</button><button type="button" data-m="velas" class="' + (st.modo === 'velas' ? 'on' : '') + '">Velas</button></div>' +
+      '<div class="mt-seg" id="mtVista" role="group" aria-label="Qué ver">' + [['ambos', 'Ambos'], ['precio', 'Precio'], ['volumen', 'Volumen']].map(function (v) { return '<button type="button" data-v="' + v[0] + '" class="' + (st.vista === v[0] ? 'on' : '') + '">' + v[1] + '</button>'; }).join('') + '</div></div></div>' +
       '<div class="mt-d-chart"><div class="mt-d-cv" id="mtChart"></div><div class="mt-d-msg" id="mtMsg" hidden></div></div>' +
       '<div class="mt-d-kpis" id="mtKpis"></div>';
     marcar();
@@ -98,11 +113,13 @@
     panel.querySelector('.mt-d-close').addEventListener('click', cerrar);
     $('mtTf').addEventListener('click', function (e) { var b = e.target.closest('[data-tf]'); if (!b || b.disabled) return; st.tf = b.dataset.tf; [].forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); }); cargar(); });
     $('mtModo').addEventListener('click', function (e) { var b = e.target.closest('[data-m]'); if (!b) return; st.modo = b.dataset.m; [].forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); }); if (st.g) st.g.modo(st.modo); });
+    $('mtVista').addEventListener('click', function (e) { var b = e.target.closest('[data-v]'); if (!b || b.disabled) return; st.vista = b.dataset.v; [].forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); }); if (st.g) st.g.vista(st.vista); });
     if (st.g) { st.g.quitar(); st.g = null; }
     conLC(function () {
       if (st.cur !== o) return;
       st.g = crearGrafico($('mtChart'), usd);
       st.g.modo(st.modo);
+      st.g.vista(st.vista);
       cargar();
     });
   }
@@ -122,6 +139,7 @@
       if (pts.length < 2) throw new Error('Sin datos para esta temporalidad');
       msg.hidden = true;
       var hayVol = st.g.datos(pts);
+      [].forEach.call($('mtVista').children, function (x) { if (x.dataset.v !== 'precio') { x.disabled = !hayVol; x.title = hayVol ? '' : 'Este activo no tiene volumen'; } });
       var a = pts[0].o || pts[0].c, z = pts[pts.length - 1].c, v = (z / a - 1) * 100;
       $('mtVar').textContent = pct(v); $('mtVar').className = cls(v);
       $('mtVarL').textContent = 'en ' + TF.find(function (t) { return t[0] === tf; })[1];
