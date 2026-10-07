@@ -247,6 +247,8 @@
       spx.serie.setData(pts.map(function (p) { return { time: p.t, value: p.c }; }));
       spx.ch.timeScale().fitContent();
       var a = pts[0].c, z = pts[pts.length - 1].c, v = (z - a) / a * 100;
+      // si /pulso todavía no llegó (o falló), el número sale del último punto del gráfico
+      if (!DATA && $('htxSpxV').textContent === '—') $('htxSpxV').textContent = n(z, 2);
       var p = $('htxSpxP');
       p.innerHTML = tf === '1D' ? '' : '<b class="' + (v > 0 ? 'up' : v < 0 ? 'dn' : '') + '">' + (v > 0 ? '+' : v < 0 ? '−' : '') + n(Math.abs(v), 2) + '%</b> ' + TF_TXT[tf];
     };
