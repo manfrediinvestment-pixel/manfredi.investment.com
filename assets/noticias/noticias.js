@@ -25,7 +25,7 @@
   }
   function pdf(p) { return 'papers/' + encodeURIComponent(p.file); }
   function tapa(p) { return p.cover || 'papers/covers/' + p.num + '.jpg'; }
-  function abrir(p) { if (typeof window.openPdf === 'function') window.openPdf(pdf(p), p.title); else window.open(pdf(p), '_blank', 'noopener'); }
+  function abrir(p) { if (typeof window.openPdf === 'function') window.openPdf(pdf(p), p.title, { fecha: p.date, tapa: tapa(p) }); else window.open(pdf(p), '_blank', 'noopener'); }
 
   /* ------------------------------ feed ------------------------------ */
   function grupo(x) {

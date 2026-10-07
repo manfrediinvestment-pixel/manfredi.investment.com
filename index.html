@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="assets/mercados/terminal.css" />
 <link rel="stylesheet" href="assets/pulso/pulso.css?v=20261007c" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261007c" />
+<link rel="stylesheet" href="assets/lector/lector.css?v=20261007c" />
   <script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js" defer></script>
   <script src="assets/mercados/terminal.js"></script>
   <style>
@@ -1310,86 +1311,7 @@
     }
 
     /* âââ PDF VIEWER ââââââââââââââââââââââââââââââââââââââââââââââ */
-    .pdf-overlay {
-      position: fixed; inset: 0;
-      background: rgba(5,10,20,.88);
-      backdrop-filter: blur(6px);
-      z-index: 300;
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px;
-      opacity: 0; pointer-events: none;
-      transition: opacity .25s ease;
-    }
-    .pdf-overlay.open { opacity: 1; pointer-events: auto; }
-    .pdf-modal {
-      background: var(--primary);
-      border: 1px solid rgba(242,201,76,.2);
-      width: 100%; max-width: 900px;
-      height: 90vh;
-      display: flex; flex-direction: column;
-      transform: translateY(12px);
-      transition: transform .25s ease;
-    }
-    .pdf-overlay.open .pdf-modal { transform: none; }
-    .pdf-modal-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 20px;
-      border-bottom: 1px solid rgba(255,255,255,.07);
-      background: rgba(0,0,0,.3);
-      flex-shrink: 0;
-    }
-    .pdf-modal-title {
-      font-size: 12px; font-weight: 600;
-      color: rgba(255,255,255,.6);
-      letter-spacing: .06em;
-      text-transform: uppercase;
-    }
-    .pdf-modal-actions { display: flex; align-items: center; gap: 12px; }
-    .pdf-modal-download {
-      font-size: 11px; font-weight: 600;
-      letter-spacing: .08em; text-transform: uppercase;
-      color: var(--gold); border: 1px solid rgba(242,201,76,.35);
-      padding: 5px 12px; text-decoration: none;
-      transition: background var(--transition), color var(--transition);
-    }
-    .pdf-modal-download:hover { background: var(--gold); color: var(--primary); }
-    .pdf-modal-close {
-      width: 28px; height: 28px; border: none;
-      background: rgba(255,255,255,.06); color: rgba(255,255,255,.5);
-      font-size: 16px; cursor: pointer; display: flex;
-      align-items: center; justify-content: center;
-      transition: background var(--transition);
-    }
-    .pdf-modal-close:hover { background: rgba(255,255,255,.12); color: white; }
-    .pdf-viewer-body {
-      flex: 1; overflow-y: auto;
-      background: #1a1a1a;
-      display: flex; flex-direction: column; align-items: center;
-      padding: 24px 16px; gap: 12px;
-    }
-    .pdf-viewer-body canvas {
-      max-width: 100%;
-      box-shadow: 0 4px 24px rgba(0,0,0,.5);
-    }
-    .pdf-viewer-loading {
-      color: rgba(255,255,255,.4); font-size: 13px;
-      padding: 48px; text-align: center;
-    }
-    .pdf-nav {
-      display: flex; align-items: center; gap: 12px;
-      padding: 8px 20px;
-      border-top: 1px solid rgba(255,255,255,.07);
-      background: rgba(0,0,0,.2);
-      font-size: 12px; color: rgba(255,255,255,.4);
-      flex-shrink: 0;
-    }
-    .pdf-nav button {
-      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
-      color: rgba(255,255,255,.6); padding: 4px 12px; cursor: pointer; font-size: 12px;
-      transition: background var(--transition);
-    }
-    .pdf-nav button:hover { background: rgba(255,255,255,.12); }
-    .pdf-nav button:disabled { opacity: .3; cursor: default; }
+/* visor de PDF: assets/lector/lector.css */
 
     /* âââ MODAL âââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .modal-overlay {
@@ -4091,6 +4013,8 @@
   <script src="assets/pulso/pulso.js?v=20261007c" defer></script>
   <!-- Pestaña Noticias (usa window.MIPulso de pulso.js: va después) -->
   <script src="assets/noticias/noticias.js?v=20261007c" defer></script>
+  <!-- Lector de informes en PDF (window.openPdf) -->
+  <script src="assets/lector/lector.js?v=20261007c" defer></script>
 
   <script>
   /* Home Terminal: S&P 500 / Nasdaq / UST 10Y del reporte diario (reports/wallstreet.json).
@@ -10360,27 +10284,6 @@
   <!-- ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
        JAVASCRIPT &mdash; APIs en tiempo real
        ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <!-- ââ PDF VIEWER MODAL âââââââââââââââââââââââââââââââââââââââââââ -->
-  <div class="pdf-overlay" id="pdfOverlay" onclick="closePdfIfOutside(event)">
-    <div class="pdf-modal">
-      <div class="pdf-modal-header">
-        <span class="pdf-modal-title" id="pdfModalTitle"></span>
-        <div class="pdf-modal-actions">
-          <a class="pdf-modal-download" id="pdfModalDownload" download>&#8595; Descargar</a>
-          <button type="button" class="pdf-modal-close" onclick="closePdf()">&#x2715;</button>
-        </div>
-      </div>
-      <div class="pdf-viewer-body" id="pdfViewerBody">
-        <div class="pdf-viewer-loading" id="pdfLoading">Cargando documento&hellip;</div>
-      </div>
-      <div class="pdf-nav">
-        <button type="button" id="pdfPrev" style="display:none"></button>
-        <span id="pdfPageInfo">&mdash;</span>
-        <button type="button" id="pdfNext" style="display:none"></button>
-      </div>
-    </div>
-  </div>
-
   <script defer src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
   <script>
   // pdf.js carga diferido: se configura cuando ya está disponible
@@ -10455,7 +10358,7 @@
         // no-miembro (informes/_preview-gate.js).
         window.open(latest.href, '_blank', 'noopener');
       } else {
-        openPdf('papers/' + encodeURIComponent(latest.file), latest.title);
+        openPdf('papers/' + encodeURIComponent(latest.file), latest.title, { fecha: latest.date, tapa: latest.cover || 'papers/covers/' + latest.num + '.jpg' });
       }
       dismiss();
     };
@@ -10502,48 +10405,7 @@
   }
 
   // Á¢ÂÂÁ¢ÂÂ Visor PDF Á¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂÁ¢ÂÂ
-  async function openPdf(url, title) {
-    document.getElementById('pdfModalTitle').textContent = title;
-    document.getElementById('pdfModalDownload').href = url;
-    document.getElementById('pdfOverlay').classList.add('open');
-    // overflow disabled
-    const body = document.getElementById('pdfViewerBody');
-    body.innerHTML = '<div class="pdf-viewer-loading">Cargando documento&hellip;</div>';
-    document.getElementById('pdfPageInfo').textContent = '&mdash;';
-    try {
-      const pdfDoc = await pdfjsLib.getDocument(url).promise;
-      body.innerHTML = '';
-      document.getElementById('pdfPageInfo').textContent = `${pdfDoc.numPages} páginas`;
-      for (let i = 1; i <= pdfDoc.numPages; i++) {
-        const page     = await pdfDoc.getPage(i);
-        const scale    = Math.min(1.5, Math.min(window.innerWidth * 0.85, 860) / page.getViewport({scale:1}).width);
-        const viewport = page.getViewport({ scale });
-        const canvas   = document.createElement('canvas');
-        canvas.width   = viewport.width;
-        canvas.height  = viewport.height;
-        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-        body.appendChild(canvas);
-      }
-    } catch(e) {
-      body.innerHTML = `<div class="pdf-viewer-loading">
-        No se pudo cargar el visor.<br>
-        <small style="opacity:.5">${e.message}</small><br><br>
-        <a href="${url}" target="_blank" style="color:var(--gold);font-weight:600;font-size:13px;">
-          → Abrir PDF en nueva pestaña
-        </a>
-      </div>`;
-    }
-  }
-
-  function closePdf() {
-    document.getElementById('pdfOverlay').classList.remove('open');
-    document.getElementById('pdfViewerBody').innerHTML = '';
-    document.body.style.overflow = '';
-  }
-  function closePdfIfOutside(e) {
-    if (e.target === document.getElementById('pdfOverlay')) closePdf();
-  }
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePdf(); });
+  // El visor de PDF ahora es assets/lector/lector.js (window.openPdf).
 
   loadPapersManifest();
 
