@@ -27,6 +27,20 @@ jobs:
       - name: Generate Reports
         run: python update_reports.py
 
+      # Fondos comunes (CAFCI) para la pestaña "Fondos comunes" de Mercados.
+      # La skill cafci usa sintaxis de Python 3.10+, por eso su propio Python.
+      # Si CAFCI falla, se sigue con el fci.json del día anterior.
+      - name: Setup Python 3.11 (fondos)
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Generate FCI
+        continue-on-error: true
+        run: |
+          pip install requests openpyxl
+          python scripts/build_fci.py
+
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"

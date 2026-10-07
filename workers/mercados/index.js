@@ -774,6 +774,144 @@ async function refreshMegaCapPins(env) {
   return { processed: results.length, results };
 }
 
+// ─── Series OHLCV para el gráfico de cada activo (/serie) ─────────────────
+// Temporalidades: 1D (intradiario 5 min), 1M, YTD, 1A (diario) y 5A (semanal).
+// Solo cache en memoria del isolate: NO escribe en KV (cupo gratis de 1.000
+// escrituras/día, ver nota en CACHE_TTL_SECONDS).
+const SERIE_TFS = ['1D', '1M', 'YTD', '1A', '5A'];
+
+// data912 no ajusta los desdoblamientos (ej. YPFD 10:1 el 3-ago-2026): si de un
+// día al siguiente el precio cae por un factor casi entero (2, 3, 4, 5, 10…), se
+// divide todo lo anterior por ese factor (y el volumen se multiplica).
+function ajustarDesdoblamientos(rows) {
+  const out = rows.map(r => ({ ...r }));
+  for (let i = out.length - 1; i > 0; i--) {
+    if (!out[i].c || !out[i - 1].c) continue;
+    const k = out[i - 1].c / out[i].c, f = Math.round(k);
+    if (f >= 2 && Math.abs(k - f) / f < 0.12) {
+      for (let j = 0; j < i; j++) { const r = out[j]; r.o /= f; r.h /= f; r.l /= f; r.c /= f; r.v = (r.v || 0) * f; }
+    }
+  }
+  return out;
+}
+
+function diaTs(dateStr) { return Math.floor(Date.parse(dateStr + 'T15:00:00Z') / 1000); }
+
+function semanal(points) {
+  const out = [];
+  let cur = null;
+  for (const p of points) {
+    const d = new Date(p.t * 1000), dow = (d.getUTCDay() + 6) % 7;
+    const lunes = Math.floor((p.t - dow * 86400) / 86400) * 86400 + 54000;
+    if (!cur || cur.t !== lunes) { cur = { t: lunes, o: p.o, h: p.h, l: p.l, c: p.c, v: p.v || 0 }; out.push(cur); }
+    else { cur.h = Math.max(cur.h, p.h); cur.l = Math.min(cur.l, p.l); cur.c = p.c; cur.v += p.v || 0; }
+  }
+  return out;
+}
+
+// Recorta una serie diaria a la temporalidad pedida (1M / YTD / 1A / 5A).
+function recortarDiario(points, tf) {
+  if (!points.length) return points;
+  const last = points[points.length - 1].t * 1000;
+  const d = new Date(last);
+  let desde;
+  if (tf === '1M') desde = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - 1, d.getUTCDate());
+  else if (tf === 'YTD') desde = Date.UTC(d.getUTCFullYear(), 0, 1);
+  else if (tf === '1A') desde = Date.UTC(d.getUTCFullYear() - 1, d.getUTCMonth(), d.getUTCDate());
+  else desde = Date.UTC(d.getUTCFullYear() - 5, d.getUTCMonth(), d.getUTCDate());
+  const r = points.filter(p => p.t * 1000 >= desde);
+  return tf === '5A' ? semanal(r) : r;
+}
+
+async function serieYahoo(ySymbol, tf) {
+  const cfg = { '1D': ['5m', '1d'], '1M': ['1d', '1mo'], 'YTD': ['1d', 'ytd'], '1A': ['1d', '1y'], '5A': ['1wk', '5y'] }[tf];
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?interval=${cfg[0]}&range=${cfg[1]}`;
+  const resp = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(10000) });
+  if (!resp.ok) throw new Error(`Yahoo HTTP ${resp.status}`);
+  const json = await resp.json();
+  const r = json?.chart?.result?.[0], q = r?.indicators?.quote?.[0];
+  if (!r || !q || !Array.isArray(r.timestamp)) throw new Error('Yahoo: sin datos');
+  return r.timestamp.map((t, i) => ({ t, o: q.open[i], h: q.high[i], l: q.low[i], c: q.close[i], v: q.volume[i] || 0 }))
+    .filter(p => p.c != null && p.o != null);
+}
+
+async function serieD912(endpoint, symbol, tf) {
+  const resp = await fetch(`https://data912.com/historical/${endpoint}/${encodeURIComponent(symbol)}`, { signal: AbortSignal.timeout(10000) });
+  if (!resp.ok) throw new Error(`data912 historical HTTP ${resp.status}`);
+  const raw = await resp.json();
+  if (!Array.isArray(raw) || !raw.length) throw new Error('Todavía no hay histórico de precios para este activo');
+  const rows = ajustarDesdoblamientos(raw);
+  const pts = rows.filter(r => r.c != null).map(r => ({ t: diaTs(r.date), o: r.o ?? r.c, h: r.h ?? r.c, l: r.l ?? r.c, c: r.c, v: r.v || 0 }));
+  return recortarDiario(pts, tf);
+}
+
+async function serieKraken(symbol, tf) {
+  const pair = KRAKEN_SYMBOL_TO_PAIR[symbol] || `${symbol}USD`;
+  const interval = tf === '1D' ? 5 : tf === '5A' ? 10080 : 1440;
+  const resp = await fetch(`https://api.kraken.com/0/public/OHLC?pair=${encodeURIComponent(pair)}&interval=${interval}`, { signal: AbortSignal.timeout(10000) });
+  if (!resp.ok) throw new Error(`Kraken HTTP ${resp.status}`);
+  const json = await resp.json();
+  const series = json.result && Object.values(json.result).find(Array.isArray);
+  if (!series || !series.length) throw new Error('Kraken: sin datos');
+  const pts = series.map(r => ({ t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[6] }));
+  if (tf === '1D') return pts.slice(-288);
+  if (tf === '5A') return pts.slice(-262);
+  return recortarDiario(pts, tf);
+}
+
+async function serieDolar(casa, tf) {
+  const resp = await fetch(`https://api.argentinadatos.com/v1/cotizaciones/dolares/${encodeURIComponent(casa)}`, { signal: AbortSignal.timeout(10000) });
+  if (!resp.ok) throw new Error(`ArgentinaDatos HTTP ${resp.status}`);
+  const rows = await resp.json();
+  const pts = rows.filter(r => r.venta != null).map(r => ({ t: diaTs(r.fecha), o: r.venta, h: r.venta, l: r.venta, c: r.venta, v: 0 }));
+  return recortarDiario(pts, tf);
+}
+
+async function fetchSerie(category, symbol, tf) {
+  const intradiario = tf === '1D';
+  if (category === 'arg_stocks' || category === 'arg_cedears') {
+    if (intradiario) return serieYahoo(symbol + '.BA', tf);
+    // data912 no tiene el histórico de muchos CEDEARs (NU, IBIT, GLD, VIST…):
+    // si falla o viene corto, se usa Yahoo con el ticker de BYMA (.BA).
+    try {
+      const pts = await serieD912(category === 'arg_stocks' ? 'stocks' : 'cedears', symbol, tf);
+      if (pts.length >= 2) return pts;
+    } catch (e) { /* sigue con Yahoo */ }
+    try { return await serieYahoo(symbol + '.BA', tf); }
+    catch (e) { throw new Error('Todavía no hay histórico de precios para este activo'); }
+  }
+  if (category === 'arg_bonds') {
+    if (intradiario) throw new Error('Los bonos no tienen datos dentro del día');
+    return serieD912('bonds', symbol, tf);
+  }
+  if (category === 'usa_stocks' || category === 'usa_adrs') return serieYahoo(symbol.replace('.', '-'), tf);
+  if (category === 'commodities') {
+    const y = COMMODITY_YAHOO_MAP[symbol];
+    if (!y) throw new Error('Commodity desconocida');
+    return serieYahoo(y, tf);
+  }
+  if (category === 'cripto') return serieKraken(symbol, tf);
+  // índices (para los carteles de arriba de Mercados)
+  if (category === 'indices') {
+    const y = { MERVAL: '^MERV', SP500: '^GSPC', NASDAQ: '^NDX' }[symbol];
+    if (!y) throw new Error('Índice desconocido');
+    return serieYahoo(y, tf);
+  }
+  if (category === 'riesgo') {
+    if (intradiario) throw new Error('El riesgo país no tiene datos dentro del día');
+    const resp = await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais', { signal: AbortSignal.timeout(10000) });
+    if (!resp.ok) throw new Error(`ArgentinaDatos HTTP ${resp.status}`);
+    const rows = await resp.json();
+    const pts = rows.filter(r => r.valor != null).map(r => ({ t: diaTs(r.fecha), o: r.valor, h: r.valor, l: r.valor, c: r.valor, v: 0 }));
+    return recortarDiario(pts, tf);
+  }
+  if (category === 'dolares') {
+    if (intradiario) throw new Error('El dólar no tiene datos dentro del día');
+    return serieDolar(symbol.toLowerCase(), tf);
+  }
+  throw new Error('Categoría desconocida');
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -838,6 +976,31 @@ export default {
     // usa buildPayload() para SPY/QQQ/Merval) -- ninguna cuenta ni key nueva.
     // Cache largo (24h) porque estos datos fundamentales cambian a lo sumo una
     // vez por trimestre, no vale la pena pedirlos seguido.
+    // GET /serie?category=arg_stocks&symbol=GGAL&tf=1A -- velas + volumen para el
+    // gráfico del detalle de cada activo. Solo cache en memoria (no gasta KV).
+    if (url.pathname === '/serie') {
+      const category = url.searchParams.get('category') || '';
+      const symbol = url.searchParams.get('symbol') || '';
+      const tf = (url.searchParams.get('tf') || '1A').toUpperCase();
+      if (!category || !symbol || !SERIE_TFS.includes(tf)) {
+        return new Response(JSON.stringify({ error: 'Faltan category, symbol o tf (1D, 1M, YTD, 1A, 5A)' }), { status: 400, headers });
+      }
+      const cacheKey = `serie:${category}:${symbol}:${tf}`;
+      const ttl = tf === '1D' ? 120 : 3600;
+      const sh = { ...headers, 'Cache-Control': `public, max-age=${tf === '1D' ? 60 : 900}` };
+      const mem = memGet(cacheKey);
+      if (mem) return new Response(mem, { headers: sh });
+      try {
+        const points = await fetchSerie(category, symbol, tf);
+        if (!points.length) throw new Error('Sin datos para esta temporalidad');
+        const json = JSON.stringify({ symbol, category, tf, intradiario: tf === '1D', points });
+        memSet(cacheKey, json, ttl);
+        return new Response(json, { headers: sh });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), { status: 404, headers });
+      }
+    }
+
     if (url.pathname === '/fundamentals') {
       const symbol = url.searchParams.get('symbol') || '';
       if (!symbol) {

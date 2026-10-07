@@ -29,6 +29,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Mercados · diseño Terminal: gráfico con TradingView Lightweight Charts (v5) -->
+  <link rel="stylesheet" href="assets/mercados/terminal.css" />
+  <script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js" defer></script>
+  <script src="assets/mercados/terminal.js"></script>
   <style>
     /* âââ RESET & BASE âââââââââââââââââââââââââââââââââââââââââââ */ 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -3682,7 +3686,7 @@
   }
   .htx-h1 em { font-style:normal; color:var(--htx-amber-ink); display:block; }
   .htx-deck { margin:0 0 28px; font-size:18px; line-height:1.55; color:var(--htx-ink); max-width:46ch; }
-  .htx-cta { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  .htx-cta { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:8px; }
   /* panel en vivo del hero */
   .htx-panel { min-width:0; align-self:center; border:1px solid var(--htx-line); border-radius:14px; background:rgba(12,24,40,.72); overflow:hidden; }
   .htx-panel__row { display:flex; flex-direction:column; gap:6px; padding:16px 22px; border-top:1px solid var(--htx-line-soft); transition:background-color .15s ease; }
@@ -3902,7 +3906,6 @@
     <div class="htx-hero">
       <div class="htx-hero__lead">
         <h1 class="htx-h1">Tu mundo financiero, <em>en un solo lugar.</em></h1>
-        <p class="htx-deck">Dej&aacute; de abrir diez pesta&ntilde;as para seguir el mercado. Ac&aacute; ten&eacute;s cotizaciones, calendario, tu portafolio en vivo, informes con valuaci&oacute;n propia y un analista IA.</p>
         <div class="htx-cta">
           <a class="htx-btn" href="#inversiones" data-tab-target="inversiones">Ver los informes</a>
           <a class="htx-ghost" href="#portfolio" data-tab-target="portfolio">Probar el Portfolio</a>
@@ -4232,33 +4235,31 @@
   </script>
 
   <!-- ââ MERCADOS âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="section section-mercados" id="mercados" data-tab="mercados">
-    <div class="container">
-      <div class="markets-v2-header">
-        <div class="markets-v2-title-block">
-          <div class="markets-v2-live">LIVE</div>
-          <h2 class="section-title" style="margin-bottom:6px;">El pulso del mercado</h2>
-          <p class="section-sub" style="margin-bottom:0;">Buscá entre miles de activos &mdash; acciones, CEDEARs, ADRs, bonos, cripto, commodities y divisas.</p>
+  <section class="section section-mercados mt" id="mercados" data-tab="mercados">
+    <div class="mt-wrap">
+      <header class="mt-top">
+        <h2 class="mt-title"><span class="mt-live" aria-hidden="true"></span>Mercados <em>en vivo</em></h2>
+        <div class="mt-top-r">
+          <span class="api-status loading" id="apiStatus"><span class="api-status-dot"></span></span>
+          <div class="mkt-search-wrap mt-search">
+            <svg class="mkt-search-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="search" id="mktSearchInput" name="q" spellcheck="false" aria-label="Buscar activo" aria-controls="mktSearchResults" class="mkt-search-input" placeholder="Buscar acción, CEDEAR, bono o cripto: GGAL, Apple, AL30…">
+            <button type="button" id="mktSearchClear" class="mkt-search-clear" hidden aria-label="Limpiar b&uacute;squeda">&times;</button>
+          </div>
         </div>
-        <span class="api-status loading" id="apiStatus"><span class="api-status-dot"></span></span>
+      </header>
+
+      <div class="mt-strip" id="mktStrip" aria-label="Indicadores principales">
+        <div class="mt-strip-sk">Cargando cotizaciones&hellip;</div>
       </div>
 
-      <div class="mkt-search-wrap">
-        <svg class="mkt-search-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="search" id="mktSearchInput" name="q" spellcheck="false" aria-label="Buscar activo" aria-controls="mktSearchResults" class="mkt-search-input" placeholder="Buscar activo &mdash; &quot;GGAL&quot;, &quot;Apple&quot;, &quot;AL30&quot;&hellip;" autocomplete="off">
-        <button type="button" id="mktSearchClear" class="mkt-search-clear" hidden aria-label="Limpiar b&uacute;squeda">&times;</button>
-      </div>
-      <div id="mktSearchResults" class="mkt-search-results" hidden></div>
-
-      <div class="mkt-body" id="mktBody">
-        <aside class="mkt-hero-col" id="mktHeroCol">
-          <div class="mkt-hero-skeleton">Cargando cotizaciones&hellip;</div>
-        </aside>
-        <div class="mkt-main">
-          <div class="mkt-tabs" id="mktTabs"></div>
-          <div class="mkt-table-wrap" id="mktTableWrap">
-            <div class="mkt-table-head" id="mktTableHead">
-              <span></span><span>Activo</span><span style="text-align:right;">Precio</span><span style="text-align:right;">Var%</span>
+      <div class="mkt-tabs mt-tabs" id="mktTabs"></div>
+      <div class="mt-body" id="mktBody">
+        <div class="mt-left">
+          <div id="mktSearchResults" class="mkt-search-results mt-results" hidden></div>
+          <div class="mkt-table-wrap mt-table" id="mktTableWrap">
+            <div class="mkt-table-head mt-head" id="mktTableHead">
+              <span></span><span>Activo</span><span class="r">Precio</span><span class="r">Hoy</span><span class="r mt-hide-s">Volumen</span>
             </div>
             <div id="mktTableBody" class="mkt-table-body">
               <div class="mkt-row-msg">Cargando…</div>
@@ -4266,9 +4267,13 @@
             <button type="button" id="mktShowAllBtn" class="mkt-show-all" hidden>Ver los <span id="mktShowAllCount">&mdash;</span> restantes &rarr;</button>
           </div>
           <div class="mkt-maps-wrap" id="mktMapsWrap" hidden></div>
+          <div class="mt-fci" id="mktFci" hidden></div>
         </div>
+        <aside class="mt-detail" id="mktDetail" aria-label="Gráfico del activo">
+          <div class="mt-d-empty">Tocá un activo de la lista para ver su gráfico.</div>
+        </aside>
       </div>
-      <p class="last-updated" id="lastUpdated" style="margin-top:16px;text-align:right;font-size:11px;color:var(--text-sec);"></p>
+      <p class="mt-foot" id="lastUpdated"></p>
     </div>
   </section>
 
@@ -8019,11 +8024,32 @@
       console.warn('pfFetchMarketData failed:', e);
       if(!window._pfMarketData) window._pfMarketData = {};
     }
+    await pfAgregarFondos(window._pfMarketData, window._pfTickerList || (window._pfTickerList = []));
     return window._pfMarketData;
+  }
+  // Fondos comunes de inversión: reports/fci-todos.json (CAFCI, se actualiza cada
+  // mañana). Cada clase tiene un código propio (ej. FCI1901A); el precio es el
+  // valor de la cuotaparte, así que la cantidad se carga en cuotapartes.
+  var PF_FCI = null;
+  async function pfAgregarFondos(idx, list){
+    if(!PF_FCI){
+      try{
+        var r = await fetch('/reports/fci-todos.json?d=' + new Date().toISOString().slice(0, 10));
+        if(r.ok) PF_FCI = (await r.json()).fondos || [];
+      }catch(e){ console.warn('[MI] fondos comunes:', e.message); }
+    }
+    if(!PF_FCI || !idx) return;
+    var yaEnLista = {};
+    list.forEach(function(it){ if(it.category === 'fci') yaEnLista[it.symbol] = 1; });
+    PF_FCI.forEach(function(f){
+      if(!idx[f.s]) idx[f.s] = {};
+      idx[f.s][f.m === 'USD' ? 'USD' : 'ARS'] = { price: f.v, change: f.d, category: 'fci' };
+      if(!yaEnLista[f.s]) list.push({ symbol: f.s, name: f.n, currency: f.m === 'USD' ? 'USD' : 'ARS', category: 'fci' });
+    });
   }
   // ---- buscador de tickers (autocompletar en "+ Agregar posición") ----
   // Reusa el mismo payload del Worker de mercados -- no pega un fetch aparte.
-  var PF_CAT_LABELS = { arg_stocks:'Acción AR', arg_cedears:'CEDEAR', usa_stocks:'Acción USA', usa_adrs:'ADR', arg_bonds:'Bono', cripto:'Cripto', commodities:'Commodity' };
+  var PF_CAT_LABELS = { arg_stocks:'Acción AR', arg_cedears:'CEDEAR', usa_stocks:'Acción USA', usa_adrs:'ADR', arg_bonds:'Bono', cripto:'Cripto', commodities:'Commodity', fci:'Fondo común' };
   function pfBuildTickerList(payload){
     var list = [];
     if(payload && payload.categorias){
@@ -8048,11 +8074,14 @@
     var q = pfNormalize(query).trim();
     if(!q) return [];
     var starts = [], contains = [];
+    var palabras = q.split(/\s+/).filter(Boolean);
     (window._pfTickerList || []).forEach(function(it){
       var symN = pfNormalize(it.symbol);
       var nameN = pfNormalize(it.name);
       if(symN.indexOf(q) === 0) starts.push(it);
       else if(symN.indexOf(q) !== -1 || nameN.indexOf(q) !== -1) contains.push(it);
+      // varias palabras en cualquier orden (sirve para los fondos: "galileo renta")
+      else if(palabras.length > 1 && palabras.every(function(w){ return nameN.indexOf(w) !== -1; })) contains.push(it);
     });
     return starts.concat(contains).slice(0, 8);
   }
@@ -8275,7 +8304,10 @@
         var fechaSub = r.isCash ? '' : (r.fecha
             ? '<div class="pf-lot-date">'+ pfPerfFmtDate(pfPerfParseDate(r.fecha)) +'</div>'
             : '<div class="pf-lot-date pf-lot-nodate">sin fecha de compra</div>');
-        return '<tr><td>'+ (r.isCash ? '&#128176; ' : '') + pfEsc(r.ticker) + arsTag + note + fechaSub +'</td>'
+        // fondos comunes: debajo del código, el nombre del fondo (cantidad = cuotapartes)
+        var fondo = (!r.isCash && PF_FCI && /^FCI/.test(r.ticker)) ? PF_FCI.find(function(f){ return f.s === r.ticker; }) : null;
+        var fondoSub = fondo ? '<div class="pf-lot-date" style="color:rgba(238,242,248,.72);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+ pfEsc(fondo.n) +' · cuotapartes</div>' : '';
+        return '<tr><td>'+ (r.isCash ? '&#128176; ' : '') + pfEsc(r.ticker) + arsTag + note + fondoSub + fechaSub +'</td>'
           + '<td class="num">'+ (r.isCash ? pfMoney(r.cantidad) + ' ' + r.moneda : pfQty(r.cantidad) + (r.isBond ? '<div class="pf-lot-date">VN</div>' : '')) +'</td>'
           + '<td class="num">'+ (r.isCash || r.precioCompraNativo==null ? '—' : pfPrice(r.precioCompraNativo)) +'</td>'
           + '<td class="num">'+ (r.isCash || r.precioActualNativo==null ? '—' : pfPrice(r.precioActualNativo)) +'</td>'
@@ -11102,6 +11134,15 @@
     return (unit || '') + n.toLocaleString('es-AR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   }
 
+  function mktFmtVol(v) {
+    const n = Number(v);
+    if (!n) return '&mdash;';
+    if (n >= 1e9) return (n / 1e9).toFixed(1).replace('.', ',') + ' mil M';
+    if (n >= 1e6) return (n / 1e6).toFixed(1).replace('.', ',') + ' M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1).replace('.', ',') + ' mil';
+    return n.toLocaleString('es-AR');
+  }
+
   function mktFmtChange(change) {
     if (change == null) return { text: '&mdash;', cls: 'neutral' };
     const n = parseFloat(change);
@@ -11146,26 +11187,78 @@
     el.innerHTML = svg;
   }
 
+  // Carteles de arriba (diseño Terminal). Cada uno con su línea del último mes
+  // (endpoint /serie del worker): una luz recorre la línea sin parar, más
+  // rápido cuanto más se movió el activo. Dólar: MEP, CCL, blue y oficial
+  // juntos en un cartel ancho, cada uno con su línea.
+  const MKT_SPARKS = {};
+  let mktSparksPedidas = false;
+  const MKT_SPARK_SERIES = [
+    ['dolares', 'BOLSA'], ['dolares', 'CONTADOCONLIQUI'], ['dolares', 'BLUE'], ['dolares', 'OFICIAL'],
+    ['indices', 'MERVAL'], ['indices', 'SP500'], ['riesgo', 'RP'],
+  ];
+  function mktPedirSparks() {
+    if (mktSparksPedidas) return;
+    mktSparksPedidas = true;
+    const base = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? 'http://127.0.0.1:8790' : MKT_WORKER_BASE;
+    Promise.all(MKT_SPARK_SERIES.map(([c, sym]) =>
+      fetch(base + '/serie?category=' + c + '&symbol=' + sym + '&tf=1M', { signal: AbortSignal.timeout(12000) })
+        .then(r => r.ok ? r.json() : null)
+        .then(j => { if (j && j.points && j.points.length > 1) MKT_SPARKS[c + ':' + sym] = j.points.map(p => p.c); })
+        .catch(() => {})
+    )).then(renderHeroCards);
+  }
+  let mktSparkN = 0;
+  function mktSpark(arr, chg) {
+    if (!arr || arr.length < 2) return '<div class="mt-spark mt-spark--vacia"></div>';
+    const w = 160, h = 44, mn = Math.min(...arr), mx = Math.max(...arr), r = (mx - mn) || 1;
+    const xy = arr.map((v, i) => [i / (arr.length - 1) * w, h - 4 - (v - mn) / r * (h - 10)]);
+    const d = xy.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+    const up = chg == null ? arr[arr.length - 1] >= arr[0] : chg >= 0;
+    const col = up ? '#4fc48c' : '#ee7369';
+    const id = 'mtg' + (++mktSparkN);
+    // cuanto más se movió, más rápido corre la luz (entre 1,4 s y 5 s por vuelta)
+    const vari = Math.abs(chg == null ? (arr[arr.length - 1] / arr[0] - 1) * 100 : chg);
+    const dur = Math.max(1.4, 5 - vari * 1.6).toFixed(2);
+    const last = xy[xy.length - 1];
+    return `<div class="mt-spark" style="--c:${col};--dur:${dur}s">
+      <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="${id}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".28"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+        <path d="${d} L${w} ${h} L0 ${h}Z" fill="url(#${id})" class="mt-sp-area"/>
+        <path d="${d}" class="mt-sp-line" pathLength="100"/>
+        <path d="${d}" class="mt-sp-flow" pathLength="100"/>
+      </svg>
+      <i class="mt-sp-dot" style="top:${(last[1] / h * 100).toFixed(1)}%"></i>
+    </div>`;
+  }
+  function mktVarSerie(arr) { return arr && arr.length > 1 ? (arr[arr.length - 1] / arr[arr.length - 2] - 1) * 100 : null; }
   function renderHeroCards() {
-    const col = document.getElementById('mktHeroCol');
-    if (!col || !MERCADOS) return;
-    col.innerHTML = MERCADOS.featured.map(item => {
-      const { text, cls } = mktFmtChange(item.change);
-      const unit = item.unit ? item.unit + ' ' : '';
-      return `
-        <div class="mkt-hero-card">
-          <div class="mh-name"><span>${item.flag}</span>${item.name}</div>
-          <div class="mh-price">${mktFmtPrice(item.price, unit)}</div>
-          <div class="mh-chg ${cls}">${text}</div>
-          <div class="mh-chart" id="mh-chart-${item.id}"></div>
-        </div>
-      `;
-    }).join('');
-    MERCADOS.featured.forEach(item => {
-      if (item.spark && item.spark.length >= 2) {
-        mktDrawChart('mh-chart-' + item.id, item.spark, 220, 34, { grid: false, dot: false });
-      }
-    });
+    const el = document.getElementById('mktStrip');
+    if (!el || !MERCADOS) return;
+    mktPedirSparks();
+    mktSparkN = 0;
+    const dol = {};
+    ((MERCADOS.categorias.dolares || {}).items || []).forEach(d => { dol[d.symbol] = d; });
+    const fe = {};
+    (MERCADOS.featured || []).forEach(f => { fe[f.id] = f; });
+    const ars = v => v == null ? '—' : '$' + Math.round(v).toLocaleString('es-AR');
+    const pctTxt = c => (c >= 0 ? '+' : '−') + Math.abs(c).toFixed(2).replace('.', ',') + '%';
+    const pill = (c, txt) => c == null ? '' : `<span class="mt-c-pill ${c >= 0 ? 'up' : 'dn'}">${txt || pctTxt(c)}</span>`;
+    const card = (cls, label, value, c, spark, txt) => `<div class="mt-card ${cls}"><div class="mt-c-top"><span>${label}</span>${pill(c, txt)}</div><b>${value}</b>${spark}</div>`;
+    const dolar = (sym, label) => {
+      const arr = MKT_SPARKS['dolares:' + sym], c = mktVarSerie(arr);
+      return `<div class="mt-dl"><span class="mt-dl-l">${label}</span><b>${ars(dol[sym] && dol[sym].price)}</b><span class="mt-dl-p">${pill(c) || '&nbsp;'}</span>${mktSpark(arr, c)}</div>`;
+    };
+    const merv = MKT_SPARKS['indices:MERVAL'], spx = MKT_SPARKS['indices:SP500'], rp = MKT_SPARKS['riesgo:RP'];
+    const rpVal = rp ? rp[rp.length - 1] : null, rpChg = rp && rp.length > 1 ? rp[rp.length - 1] - rp[rp.length - 2] : null;
+    el.innerHTML =
+      `<div class="mt-card mt-card--dolar"><div class="mt-c-top"><span>Dólar</span><span class="mt-c-src">hoy</span></div><div class="mt-dls">${dolar('BOLSA', 'MEP')}${dolar('CONTADOCONLIQUI', 'CCL')}${dolar('BLUE', 'Blue')}${dolar('OFICIAL', 'Oficial')}</div></div>` +
+      card('', 'Merval', fe.merval && fe.merval.price != null ? Math.round(fe.merval.price).toLocaleString('es-AR') : '—', fe.merval && fe.merval.change, mktSpark(merv, fe.merval && fe.merval.change)) +
+      // el riesgo país baja = bueno: la línea y la píldora usan el signo invertido
+      card('mt-card--rp', 'Riesgo país', rpVal != null ? Math.round(rpVal).toLocaleString('es-AR') + ' pb' : '—', rpChg == null ? null : -rpChg, mktSpark(rp && rp.map(v => -v), rpChg == null ? null : -rpChg), rpChg == null ? '' : (rpChg > 0 ? '+' : '−') + Math.abs(Math.round(rpChg)) + ' pb') +
+      card('', 'S&amp;P 500', spx ? Math.round(spx[spx.length - 1]).toLocaleString('es-AR') : '—', spx ? mktVarSerie(spx) : (fe.sp500 && fe.sp500.change), mktSpark(spx || (fe.sp500 && fe.sp500.spark), spx ? mktVarSerie(spx) : null)) +
+      card('', 'Bitcoin', fe.btc && fe.btc.price != null ? 'US$ ' + Math.round(fe.btc.price).toLocaleString('es-AR') : '—', fe.btc && fe.btc.change, mktSpark(fe.btc && fe.btc.spark, fe.btc && fe.btc.change)) +
+      card('', 'Oro', fe.oro && fe.oro.price != null ? 'US$ ' + Math.round(fe.oro.price).toLocaleString('es-AR') : '—', fe.oro && fe.oro.change, mktSpark(fe.oro && fe.oro.spark, fe.oro && fe.oro.change));
   }
 
   const MKT_CATEGORIES = [
@@ -11180,7 +11273,8 @@
   ];
   const MKT_FAV_KEY = 'fav';
   const MKT_MAPS_KEY = 'mapas';
-  let mktActiveCategory = MKT_MAPS_KEY;
+  const MKT_FCI_KEY = 'fci';
+  let mktActiveCategory = 'arg_stocks';
   let mktShowingAll = false;
 
   // ─── Favoritos: guardar/quitar activos y persistirlos en Firestore ───────
@@ -11241,6 +11335,8 @@
     html += MKT_CATEGORIES.map(c =>
       `<button type="button" class="mkt-tab${c.key === mktActiveCategory ? ' active' : ''}" data-cat="${c.key}">${c.label}</button>`
     ).join('');
+    // Fondos comunes va después de Bonos
+    html = html.replace(/(<button[^>]*data-cat="cripto"[^>]*>)/, `<button type="button" class="mkt-tab mkt-tab-fci${mktActiveCategory === MKT_FCI_KEY ? ' active' : ''}" data-cat="${MKT_FCI_KEY}">Fondos comunes<span class="mt-new">Nuevo</span></button>$1`);
     wrap.innerHTML = html;
     wrap.querySelectorAll('.mkt-tab').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -11268,9 +11364,10 @@
     return `
       <div class="mkt-row" data-symbol="${item.symbol}" data-category="${category}" data-currency="${currency}">
         <button type="button" class="mkt-star-btn${isFav ? ' on' : ''}" data-symbol="${item.symbol}" data-category="${category}" aria-label="${isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}">${mktStarIcon(isFav)}</button>
-        <div class="mr-name-wrap">${mktLogoHTML(item)}<span class="mr-ticker">${item.symbol}</span><span class="mr-name">${name}</span>${badge}</div>
+        <div class="mr-name-wrap">${mktLogoHTML(item)}<span class="mr-tx"><span class="mr-ticker">${item.symbol}</span>${name || badge ? `<span class="mr-name">${name}${badge}</span>` : ''}</span></div>
         <div class="mr-price">${mktFmtPrice(item.price, unit)}</div>
-        <div class="mr-chg ${cls}">${text}</div>
+        <div class="mr-chg ${cls}"><i class="mt-chip ${cls === 'pos' ? 'up' : cls === 'neg' ? 'dn' : ''}">${text.replace('&#9650; ', '').replace('&#9660; ', '−').replace('.', ',')}</i></div>
+        <div class="mr-vol mt-hide-s">${item.volume ? mktFmtVol(item.volume) : '&mdash;'}</div>
       </div>
     `;
   }
@@ -11519,6 +11616,17 @@
   function renderCategoryTable() {
     const tableWrap = document.getElementById('mktTableWrap');
     const mapsWrap = document.getElementById('mktMapsWrap');
+    const fciWrap = document.getElementById('mktFci');
+    const mtBody = document.getElementById('mktBody');
+    // mapas y fondos ocupan todo el ancho (sin panel de gráfico)
+    if (mtBody) mtBody.classList.toggle('mt-wide', mktActiveCategory === MKT_MAPS_KEY || mktActiveCategory === MKT_FCI_KEY);
+    if (fciWrap) fciWrap.hidden = mktActiveCategory !== MKT_FCI_KEY;
+    if (mktActiveCategory === MKT_FCI_KEY) {
+      if (tableWrap) tableWrap.hidden = true;
+      if (mapsWrap) mapsWrap.hidden = true;
+      if (window.mktFci) window.mktFci.render(fciWrap);
+      return;
+    }
     if (mktActiveCategory === MKT_MAPS_KEY) {
       if (tableWrap) tableWrap.hidden = true;
       if (mapsWrap) mapsWrap.hidden = false;
@@ -11539,6 +11647,11 @@
     }
     const items = mktShowingAll ? cat.items : cat.items.slice(0, 10);
     body.innerHTML = items.map(item => mktRowHTML(item, cat.currency, mktActiveCategory)).join('');
+    if (window.mktDetail && !window.mktDetail.current() && items[0] && window.matchMedia('(min-width: 1001px)').matches) {
+      openAssetModal._auto = true;
+      openAssetModal(items.find(i => i.symbol === 'GGAL') || items[0], mktActiveCategory, cat.currency);
+      openAssetModal._auto = false;
+    } else if (window.mktDetail) window.mktDetail.mark();
     const remaining = cat.items.length - 10;
     if (btn) {
       if (!mktShowingAll && remaining > 0) {
@@ -11556,12 +11669,14 @@
     const resultsEl = document.getElementById('mktSearchResults');
     const bodyEl = document.getElementById('mktBody');
     if (!resultsEl || !bodyEl) return;
+    const vistas = ['mktTableWrap', 'mktMapsWrap', 'mktFci'].map(id => document.getElementById(id));
     if (!q) {
       resultsEl.hidden = true;
-      bodyEl.hidden = false;
+      renderCategoryTable();
       return;
     }
-    bodyEl.hidden = true;
+    vistas.forEach(v => { if (v) v.hidden = true; });
+    bodyEl.classList.remove('mt-wide');
     resultsEl.hidden = false;
     if (!MERCADOS) { resultsEl.innerHTML = '<div class="mkt-search-empty">Cargando datos&hellip;</div>'; return; }
     const matches = [];
@@ -11604,6 +11719,18 @@
   }
 
   function openAssetModal(item, category, currency) {
+    if (window.mktDetail) {
+      window.mktDetail.show({
+        item, category, currency,
+        logoHTML: mktLogoHTML(item, 'mt-d-logo'),
+        label: mktCategoryLabel(category),
+        priceHTML: mktFmtPrice(item.price, currency === 'USD' ? 'US$ ' : '$ '),
+        change: item.change,
+        volume: item.volume,
+        traer: !openAssetModal._auto,
+      });
+      return;
+    }
     const overlay = document.getElementById('mktModalOverlay');
     if (!overlay || !item) return;
     const { text, cls } = mktFmtChange(item.change);
