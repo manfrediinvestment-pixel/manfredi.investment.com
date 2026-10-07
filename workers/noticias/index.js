@@ -44,7 +44,9 @@ export default {
 
         const result = await generarNoticias();
         const json = JSON.stringify(result);
-        await env.NOTICIAS_KV.put(KV_KEY, json, { expirationTtl: KV_TTL });
+        // si el cupo diario de escrituras de KV esta agotado, igual respondemos
+        try { await env.NOTICIAS_KV.put(KV_KEY, json, { expirationTtl: KV_TTL }); }
+        catch (e) { console.error('[noticias] KV put fallo:', e.message); }
         return new Response(json, { headers: CORS_HEADERS });
       } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: CORS_HEADERS });
@@ -55,7 +57,9 @@ export default {
       try {
         const result = await generarNoticias();
         const json = JSON.stringify(result);
-        await env.NOTICIAS_KV.put(KV_KEY, json, { expirationTtl: KV_TTL });
+        // si el cupo diario de escrituras de KV esta agotado, igual respondemos
+        try { await env.NOTICIAS_KV.put(KV_KEY, json, { expirationTtl: KV_TTL }); }
+        catch (e) { console.error('[noticias] KV put fallo:', e.message); }
         return new Response(json, { headers: CORS_HEADERS });
       } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: CORS_HEADERS });

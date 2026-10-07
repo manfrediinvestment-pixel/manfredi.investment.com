@@ -8,7 +8,28 @@
  */
 
 const CACHE_KEY = 'mercados_v1';
-const CACHE_TTL_SECONDS = 120;
+// 5 min: con el plan gratis de Cloudflare hay 1.000 escrituras de KV por dia.
+// Con 2 min solo este cache gastaba hasta 720 y el 06-oct-2026 se agoto el cupo.
+const CACHE_TTL_SECONDS = 300;
+
+// Cache en memoria del isolate: si KV no puede escribir (cupo diario agotado),
+// las visitas que caen en el mismo isolate no vuelven a pegarle a las fuentes.
+const MEM = new Map();
+function memGet(key) {
+  const e = MEM.get(key);
+  if (!e) return null;
+  if (Date.now() > e.exp) { MEM.delete(key); return null; }
+  return e.val;
+}
+function memSet(key, val, ttlSeconds) {
+  if (MEM.size > 400) MEM.clear();
+  MEM.set(key, { val, exp: Date.now() + ttlSeconds * 1000 });
+}
+// Una escritura que falla (429 por cupo agotado) no tiene que romper la respuesta.
+async function kvPut(env, key, val, opts) {
+  try { await env.MERCADOS_KV.put(key, val, opts); }
+  catch (e) { console.error('[mercados] KV put fallo (' + key + '):', e.message); }
+}
 // Cierres historicos diarios: cambian a lo sumo una vez por dia, asi que
 // cachear unas horas reduce muchisimo la carga sobre Yahoo/D912/Kraken
 // cuando muchos usuarios calculan metricas de cartera (beta, volatilidad,
@@ -767,12 +788,15 @@ export default {
       try {
         const forceRefresh = url.searchParams.get('refresh') === '1';
         if (!forceRefresh) {
+          const mem = memGet(CACHE_KEY);
+          if (mem) return new Response(mem, { headers });
           const cached = await env.MERCADOS_KV.get(CACHE_KEY);
-          if (cached) return new Response(cached, { headers });
+          if (cached) { memSet(CACHE_KEY, cached, 60); return new Response(cached, { headers }); }
         }
         const payload = await buildPayload(env);
         const json = JSON.stringify(payload);
-        await env.MERCADOS_KV.put(CACHE_KEY, json, { expirationTtl: CACHE_TTL_SECONDS });
+        memSet(CACHE_KEY, json, CACHE_TTL_SECONDS);
+        await kvPut(env, CACHE_KEY, json, { expirationTtl: CACHE_TTL_SECONDS });
         return new Response(json, { headers });
       } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 500, headers });
@@ -790,6 +814,8 @@ export default {
       const forceRefresh = url.searchParams.get('refresh') === '1';
       try {
         if (!forceRefresh) {
+          const mem = memGet(cacheKey);
+          if (mem) return new Response(mem, { headers });
           const cached = await env.MERCADOS_KV.get(cacheKey);
           if (cached) return new Response(cached, { headers });
         }
@@ -799,7 +825,8 @@ export default {
           symbol, category, closes,
           min: Math.min(...closes), max: Math.max(...closes),
         });
-        await env.MERCADOS_KV.put(cacheKey, json, { expirationTtl: HISTORICO_CACHE_TTL_SECONDS });
+        memSet(cacheKey, json, HISTORICO_CACHE_TTL_SECONDS);
+        await kvPut(env, cacheKey, json, { expirationTtl: HISTORICO_CACHE_TTL_SECONDS });
         return new Response(json, { headers });
       } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 404, headers });
@@ -855,7 +882,8 @@ export default {
           marketCap = (profile && typeof profile.marketCapitalization === 'number') ? profile.marketCapitalization : null;
         }
         const json = JSON.stringify({ symbol: symbol.toUpperCase(), roe, pe, divYield, sector, country, marketCap });
-        await env.MERCADOS_KV.put(cacheKey, json, { expirationTtl: 86400 });
+        memSet(cacheKey, json, 86400);
+        await kvPut(env, cacheKey, json, { expirationTtl: 86400 });
         return new Response(json, { headers });
       } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 404, headers });
