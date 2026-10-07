@@ -232,7 +232,7 @@
     spx.ch = LC.createChart(el, {
       autoSize: true,
       layout: { background: { type: 'solid', color: 'transparent' }, textColor: 'rgba(238,242,248,.62)', fontFamily: "'IBM Plex Sans', system-ui, sans-serif", fontSize: 11.5, attributionLogo: false },
-      grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(238,242,248,.045)' } },
+      grid: { vertLines: { visible: false }, horzLines: { visible: false } },
       rightPriceScale: { borderVisible: false, scaleMargins: { top: .12, bottom: .04 } },
       timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false, fixLeftEdge: true, fixRightEdge: true },
       crosshair: { mode: LC.CrosshairMode.Magnet, vertLine: { color: 'rgba(242,201,76,.45)', labelBackgroundColor: '#1d3357', style: 3 }, horzLine: { color: 'rgba(242,201,76,.3)', labelBackgroundColor: '#1d3357', style: 3 } },
@@ -240,8 +240,15 @@
         timeFormatter: function (t) { return new Date(t * 1000).toLocaleString('es-AR', spx.tf === '1D' ? { timeZone: TZ, hour: '2-digit', minute: '2-digit' } : { timeZone: TZ, day: '2-digit', month: 'short', year: '2-digit' }); } },
       handleScale: false, handleScroll: false
     });
-    spx.serie = spx.ch.addSeries(LC.AreaSeries, { lineColor: '#f2c94c', lineWidth: 2, topColor: 'rgba(242,201,76,.26)', bottomColor: 'rgba(242,201,76,0)', priceLineVisible: false, lastValueVisible: true, crosshairMarkerBorderColor: '#0b1528', crosshairMarkerBackgroundColor: '#f2c94c', crosshairMarkerRadius: 5 });
+    // el color lo define la variación del período (colorSpx): verde si sube, rojo si baja
+    spx.serie = spx.ch.addSeries(LC.AreaSeries, { lineWidth: 2.5, priceLineVisible: false, lastValueVisible: true, crosshairMarkerBorderColor: '#0b1528', crosshairMarkerRadius: 5,
+      lastPriceAnimation: LC.LastPriceAnimationMode ? LC.LastPriceAnimationMode.Continuous : 0 });
+    colorSpx(1);
     serieSpx();
+  }
+  function colorSpx(v) {
+    var up = v >= 0, c = up ? '86,199,147' : '240,123,112', hex = up ? '#56c793' : '#f07b70';
+    spx.serie.applyOptions({ lineColor: hex, topColor: 'rgba(' + c + ',.26)', bottomColor: 'rgba(' + c + ',0)', crosshairMarkerBackgroundColor: hex });
   }
   function serieSpx() {
     if (!spx.serie) return;
@@ -252,6 +259,7 @@
       spx.serie.setData(pts.map(function (p) { return { time: p.t, value: p.c }; }));
       spx.ch.timeScale().fitContent();
       var a = pts[0].c, z = pts[pts.length - 1].c, v = (z - a) / a * 100;
+      colorSpx(v);
       // si /pulso todavía no llegó (o falló), el número sale del último punto del gráfico
       if (!DATA && $('htxSpxV').textContent === '—') $('htxSpxV').textContent = n(z, 2);
       var p = $('htxSpxP');
