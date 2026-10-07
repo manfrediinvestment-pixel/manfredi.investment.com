@@ -259,7 +259,10 @@
       spx.serie.setData(pts.map(function (p) { return { time: p.t, value: p.c }; }));
       spx.ch.timeScale().fitContent();
       var a = pts[0].c, z = pts[pts.length - 1].c, v = (z - a) / a * 100;
-      colorSpx(v);
+      // en 1D manda la variación del día contra el cierre de ayer (la del "hoy"),
+      // no la del primer minuto de la rueda contra el último
+      var hoy = DATA && DATA.mundo.cotizaciones.filter(function (x) { return x.id === 'sp500'; })[0];
+      colorSpx(tf === '1D' && hoy && hoy.change != null ? hoy.change : v);
       // si /pulso todavía no llegó (o falló), el número sale del último punto del gráfico
       if (!DATA && $('htxSpxV').textContent === '—') $('htxSpxV').textContent = n(z, 2);
       var p = $('htxSpxP');
