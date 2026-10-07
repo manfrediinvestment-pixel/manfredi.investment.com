@@ -1,0 +1,149 @@
+/* Mercados · diseño Terminal. Todo va bajo #mercados para pisar los estilos
+   viejos de la sección sin tocar el resto del sitio. */
+#mercados.mt {
+  --mt-bg: #060d19; --mt-p1: #0b1629; --mt-p2: #0f1e36; --mt-line: rgba(226,234,245,.09); --mt-line2: rgba(226,234,245,.16);
+  --mt-ink: #f4f7fb; --mt-ink2: #dde6f2; --mt-soft: #b9cbe3; --mt-gold: #f2c94c; --mt-gold2: #f7dc8a; --mt-up: #4fc48c; --mt-dn: #ee7369;
+  background: var(--mt-bg); color: var(--mt-ink); padding: 34px 0 40px;
+}
+#mercados.mt .up { color: var(--mt-up); } #mercados.mt .dn { color: var(--mt-dn); }
+#mercados .mt-wrap { width: min(1440px, 100% - 40px); margin: 0 auto; }
+
+/* encabezado */
+#mercados .mt-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding-bottom: 22px; }
+#mercados .mt-title { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: clamp(34px, 3.6vw, 48px); line-height: 1; letter-spacing: -.01em; color: var(--mt-ink); margin: 0; }
+#mercados .mt-title em { color: var(--mt-gold); font-style: italic; }
+#mercados .mt-sub { margin: 10px 0 0; font-size: 15.5px; color: var(--mt-ink2); max-width: 60ch; }
+#mercados .mt-top-r { display: flex; align-items: center; gap: 14px; flex: 1; justify-content: flex-end; min-width: 280px; }
+#mercados .mt-search { margin: 0; flex: 1; max-width: 460px; }
+#mercados .mt-search .mkt-search-input { background: var(--mt-p1); border: 1px solid var(--mt-line2); border-radius: 12px; height: 46px; font-size: 14.5px; color: var(--mt-ink); }
+#mercados .mt-search .mkt-search-input::placeholder { color: var(--mt-soft); }
+#mercados .mt-search .mkt-search-icon { color: var(--mt-soft); }
+#mercados #apiStatus { color: var(--mt-soft); white-space: nowrap; }
+
+/* franja de indicadores */
+#mercados .mt-strip { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); border: 1px solid var(--mt-line); border-radius: 16px; background: linear-gradient(180deg, var(--mt-p2), var(--mt-p1)); overflow: hidden; }
+#mercados .mt-strip-sk { padding: 18px 22px; color: var(--mt-soft); font-size: 14px; grid-column: 1 / -1; }
+#mercados .mt-cell { padding: 14px 18px; border-right: 1px solid var(--mt-line); min-width: 0; }
+#mercados .mt-cell:last-child { border-right: 0; }
+#mercados .mt-cell small { display: block; font-size: 12.5px; color: var(--mt-soft); margin-bottom: 5px; white-space: nowrap; }
+#mercados .mt-cell b { font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 18px; letter-spacing: -.02em; color: var(--mt-ink); white-space: nowrap; }
+#mercados .mt-cell i { display: block; font-style: normal; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; margin-top: 2px; }
+#mercados .mt-cell em { display: block; font-style: normal; font-size: 11.5px; color: var(--mt-gold2); margin-top: 2px; }
+
+/* cuerpo: lista + panel */
+#mercados .mt-body { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
+#mercados .mt-body.mt-wide { grid-template-columns: minmax(0, 1fr); }
+#mercados .mt-body.mt-wide .mt-detail { display: none; }
+#mercados .mt-left { min-width: 0; }
+#mercados .mt-tabs { display: flex; flex-wrap: nowrap; gap: 4px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+#mercados .mt-tabs::-webkit-scrollbar { display: none; }
+#mercados .mt-tabs .mkt-tab { flex: 0 0 auto; white-space: nowrap; }
+#mercados .mt-tabs .mkt-tab { border: 1px solid transparent !important; color: var(--mt-ink2); background: transparent; }
+#mercados .mt-tabs .mkt-tab:hover { background: rgba(255,255,255,.05); color: var(--mt-ink); border-color: transparent !important; }
+#mercados .mt-tabs .mkt-tab.active { background: var(--mt-gold) !important; color: #0a1120 !important; border-color: var(--mt-gold) !important; font-weight: 600 !important; }
+#mercados .mt-tabs .mkt-tab-fav { color: var(--mt-gold2); }
+#mercados .mt-new { margin-left: 7px; font-size: 10.5px; font-weight: 700; color: #0a1120; background: var(--mt-gold2); border-radius: 5px; padding: 1px 6px; }
+#mercados .mkt-tab.active .mt-new { background: #0a1120; color: var(--mt-gold); }
+
+/* tabla */
+#mercados .mt-table, #mercados .mt-results { background: var(--mt-p1); border: 1px solid var(--mt-line); border-radius: 16px; overflow: hidden; max-height: none; }
+#mercados .mt-head, #mercados .mt-body .mkt-row { grid-template-columns: 30px minmax(0, 1.9fr) minmax(0, 1fr) minmax(0, .9fr) minmax(0, .9fr); }
+#mercados .mt-head { padding: 12px 18px; background: transparent; border-bottom: 1px solid var(--mt-line); font-family: 'IBM Plex Sans', sans-serif; font-size: 12.5px; letter-spacing: 0; text-transform: none; color: var(--mt-soft); }
+#mercados .mt-head .r { text-align: right; }
+#mercados .mt-body .mkt-row { padding: 12px 18px; border-bottom: 1px solid var(--mt-line); font-size: 14.5px; transition: background-color .15s; }
+#mercados .mt-body .mkt-row:hover { background: rgba(255,255,255,.03); }
+#mercados .mt-body .mkt-row.mt-sel { background: rgba(242,201,76,.07); box-shadow: inset 3px 0 0 var(--mt-gold); }
+#mercados .mkt-row .mr-name-wrap { gap: 11px; }
+#mercados .mkt-row .mr-logo { width: 30px; height: 30px; border-radius: 8px; background: #fff; padding: 3px; }
+#mercados .mkt-row .mr-logo-fallback { background: #1d3357; color: var(--mt-gold2); font-size: 13px; padding: 0; }
+#mercados .mkt-row .mr-ticker { font-size: 14.5px; color: var(--mt-ink); }
+#mercados .mkt-row .mr-name { font-size: 13px; color: var(--mt-soft); }
+#mercados .mkt-row .mr-price { font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; color: var(--mt-ink); }
+#mercados .mkt-row .mr-chg { font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; }
+#mercados .mkt-row .mr-chg.pos { color: var(--mt-up); } #mercados .mkt-row .mr-chg.neg { color: var(--mt-dn); }
+#mercados .mkt-row .mr-chg.neutral { color: var(--mt-soft); }
+#mercados .mkt-row .mr-vol { text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--mt-ink2); }
+#mercados .mkt-star-btn { color: var(--mt-soft); }
+#mercados .mkt-show-all { font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--mt-gold2); padding: 14px; }
+#mercados .mkt-row-msg, #mercados .mkt-search-empty { color: var(--mt-soft); font-size: 14px; }
+#mercados .mt-foot { margin: 14px 0 0; text-align: right; font-size: 12.5px; color: var(--mt-soft); }
+
+/* panel del gráfico */
+#mercados .mt-detail { position: sticky; top: 92px; display: flex; flex-direction: column; gap: 14px; padding: 22px 24px; border: 1px solid var(--mt-line2); border-radius: 20px; background: linear-gradient(180deg, var(--mt-p2), var(--mt-p1) 38%); min-height: 560px; }
+#mercados .mt-d-empty { margin: auto; color: var(--mt-soft); font-size: 15px; text-align: center; }
+#mercados .mt-d-close { display: none; }
+#mercados .mt-d-h { display: flex; align-items: center; gap: 14px; }
+#mercados .mt-d-logo { width: 48px !important; height: 48px !important; border-radius: 12px !important; background: #fff; padding: 5px; flex: none; object-fit: contain; }
+#mercados .mt-d-logo.mr-logo-fallback { background: #1d3357; color: var(--mt-gold2); font-size: 20px; padding: 0; }
+#mercados .mt-d-h h3 { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 28px; line-height: 1.05; color: var(--mt-ink); margin: 0; }
+#mercados .mt-d-h small { display: block; font-size: 13.5px; color: var(--mt-soft); margin-top: 4px; }
+#mercados .mt-d-px { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+#mercados .mt-d-px b { font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 40px; letter-spacing: -.03em; color: var(--mt-ink); }
+#mercados .mt-d-hoy { font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; }
+#mercados .mt-d-var { margin-top: -8px; font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; min-height: 20px; }
+#mercados .mt-d-var small { font-family: 'IBM Plex Sans', sans-serif; font-weight: 400; color: var(--mt-soft); margin-left: 8px; }
+#mercados .mt-d-ctl { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+#mercados .mt-seg { display: inline-flex; padding: 3px; border-radius: 11px; background: var(--mt-bg); border: 1px solid var(--mt-line); }
+#mercados .mt-seg button { padding: 8px 14px; border-radius: 8px; font: 500 13.5px 'IBM Plex Sans', sans-serif; color: var(--mt-ink2); background: none; border: 0; cursor: pointer; min-height: 36px; transition: color .15s, background-color .15s; }
+#mercados .mt-seg button:hover { color: var(--mt-ink); }
+#mercados .mt-seg button.on { background: var(--mt-p2); color: var(--mt-gold2); box-shadow: inset 0 0 0 1px rgba(242,201,76,.38); }
+#mercados .mt-seg button:disabled { opacity: .35; cursor: not-allowed; }
+#mercados .mt-d-chart { position: relative; flex: 1; min-height: 340px; border: 1px solid var(--mt-line); border-radius: 14px; background: rgba(6,13,25,.5); padding: 10px 4px 2px; }
+#mercados .mt-d-cv { position: absolute; inset: 10px 4px 2px; }
+#mercados .mt-d-msg { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; font-size: 14px; color: var(--mt-soft); background: rgba(6,13,25,.55); border-radius: 14px; }
+#mercados .mt-d-msg.err { color: var(--mt-gold2); }
+#mercados .mt-d-msg[hidden], #mercados .mt-fci[hidden], #mercados .mt-results[hidden] { display: none; }
+#mercados .mt-d-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; min-height: 62px; }
+#mercados .mt-d-kpis div { padding: 11px 14px; border: 1px solid var(--mt-line); border-radius: 12px; background: var(--mt-bg); min-width: 0; }
+#mercados .mt-d-kpis small { display: block; font-size: 12px; color: var(--mt-soft); white-space: nowrap; }
+#mercados .mt-d-kpis b { font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 15.5px; color: var(--mt-ink); white-space: nowrap; }
+
+/* fondos comunes */
+#mercados .mt-fci { background: var(--mt-p1); border: 1px solid var(--mt-line); border-radius: 16px; overflow: hidden; }
+#mercados .mt-f-h { padding: 22px 24px 6px; }
+#mercados .mt-f-h h3 { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 28px; margin: 0; color: var(--mt-ink); }
+#mercados .mt-f-h p { margin: 6px 0 0; font-size: 14.5px; color: var(--mt-ink2); }
+#mercados .mt-f-cats { display: flex; gap: 8px; flex-wrap: wrap; padding: 14px 24px 16px; border-bottom: 1px solid var(--mt-line); }
+#mercados .mt-f-cats button { font: 500 13.5px 'IBM Plex Sans', sans-serif; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--mt-line2); background: none; color: var(--mt-ink2); cursor: pointer; }
+#mercados .mt-f-cats button.on { border-color: rgba(242,201,76,.6); color: var(--mt-gold2); background: rgba(242,201,76,.08); }
+#mercados .mt-f-r { display: grid; grid-template-columns: 34px minmax(0, 2.6fr) repeat(4, minmax(0, .8fr)) minmax(0, 1fr); gap: 12px; align-items: center; padding: 13px 24px; border-bottom: 1px solid var(--mt-line); font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--mt-ink); }
+#mercados .mt-f-r > span:nth-child(n+3) { text-align: right; }
+#mercados .mt-f-head { font-family: 'IBM Plex Sans', sans-serif; font-size: 12.5px; color: var(--mt-soft); padding-top: 12px; padding-bottom: 12px; }
+#mercados .mt-f-n { font-family: 'DM Serif Display', Georgia, serif; font-size: 20px; color: var(--mt-gold2); }
+#mercados .mt-f-name { font-family: 'IBM Plex Sans', sans-serif; min-width: 0; }
+#mercados .mt-f-name b { display: block; font-size: 14.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#mercados .mt-f-name small { font-size: 12.5px; color: var(--mt-soft); }
+#mercados .mt-chip { font-style: normal; padding: 3px 8px; border-radius: 6px; }
+#mercados .mt-chip.up { background: rgba(79,196,140,.12); } #mercados .mt-chip.dn { background: rgba(238,115,105,.12); }
+#mercados .mt-f-note { margin: 0; padding: 14px 24px 18px; font-size: 12.5px; color: var(--mt-soft); }
+
+/* celular: el gráfico se abre como hoja desde abajo */
+@media (max-width: 1000px) {
+  #mercados .mt-strip { display: flex; overflow-x: auto; scrollbar-width: none; }
+  #mercados .mt-strip::-webkit-scrollbar { display: none; }
+  #mercados .mt-cell { flex: 0 0 auto; }
+  #mercados .mt-body { grid-template-columns: minmax(0, 1fr); }
+  #mercados .mt-top-r { min-width: 0; width: 100%; }
+  #mercados .mt-search { max-width: none; }
+  #mercados .mt-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  #mercados .mt-detail { position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 900; height: 90vh; height: 90dvh; min-height: 0; border-radius: 22px 22px 0 0; padding: 18px 16px calc(16px + env(safe-area-inset-bottom)); overflow-y: auto; transform: translateY(105%); transition: transform .45s cubic-bezier(.16,1,.3,1); box-shadow: 0 -30px 60px rgba(0,0,0,.6); }
+  #mercados .mt-detail.open { transform: none; }
+  #mercados .mt-body.mt-wide .mt-detail { display: flex; }
+  #mercados .mt-d-close { display: grid; place-items: center; position: absolute; top: 12px; right: 12px; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--mt-line2); background: var(--mt-bg); color: var(--mt-ink); font-size: 22px; line-height: 1; cursor: pointer; }
+  #mercados .mt-d-h { padding-right: 46px; }
+  #mercados .mt-d-px b { font-size: 32px; }
+  #mercados .mt-d-chart { min-height: 300px; flex: none; height: 320px; }
+  #mercados .mt-d-kpis { grid-template-columns: 1fr 1fr; }
+  body.mt-sheet-open { overflow: hidden; }
+  body.mt-sheet-open::after { content: ""; position: fixed; inset: 0; background: rgba(2,6,14,.6); z-index: 899; }
+}
+@media (max-width: 640px) {
+  #mercados .mt-hide-s { display: none !important; }
+  #mercados .mt-head, #mercados .mt-body .mkt-row { grid-template-columns: 26px minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, .9fr); padding-left: 12px; padding-right: 12px; }
+  #mercados .mkt-row .mr-name { display: none; }
+  #mercados .mt-f-r { grid-template-columns: 24px minmax(0, 2fr) repeat(2, minmax(0, .9fr)); padding: 12px 14px; }
+  #mercados .mt-f-r > span:nth-child(4), #mercados .mt-f-r > span:nth-child(6) { display: none; }
+  #mercados .mt-f-h, #mercados .mt-f-cats { padding-left: 14px; padding-right: 14px; }
+  #mercados .mt-wrap { width: calc(100% - 32px); }
+}
+@media (prefers-reduced-motion: reduce) { #mercados .mt-detail { transition: none; } }

@@ -29,6 +29,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Mercados · diseño Terminal: gráfico con TradingView Lightweight Charts (v5) -->
+  <link rel="stylesheet" href="assets/mercados/terminal.css" />
+  <script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js" defer></script>
+  <script src="assets/mercados/terminal.js"></script>
   <style>
     /* âââ RESET & BASE âââââââââââââââââââââââââââââââââââââââââââ */ 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -4232,33 +4236,34 @@
   </script>
 
   <!-- ââ MERCADOS âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="section section-mercados" id="mercados" data-tab="mercados">
-    <div class="container">
-      <div class="markets-v2-header">
-        <div class="markets-v2-title-block">
-          <div class="markets-v2-live">LIVE</div>
-          <h2 class="section-title" style="margin-bottom:6px;">El pulso del mercado</h2>
-          <p class="section-sub" style="margin-bottom:0;">Buscá entre miles de activos &mdash; acciones, CEDEARs, ADRs, bonos, cripto, commodities y divisas.</p>
+  <section class="section section-mercados mt" id="mercados" data-tab="mercados">
+    <div class="mt-wrap">
+      <header class="mt-top">
+        <div>
+          <h2 class="mt-title">Mercados <em>en vivo</em></h2>
+          <p class="mt-sub">Acciones, CEDEARs, bonos, fondos comunes, cripto y dólares. Tocá cualquier activo para ver su gráfico.</p>
         </div>
-        <span class="api-status loading" id="apiStatus"><span class="api-status-dot"></span></span>
+        <div class="mt-top-r">
+          <span class="api-status loading" id="apiStatus"><span class="api-status-dot"></span></span>
+          <div class="mkt-search-wrap mt-search">
+            <svg class="mkt-search-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="search" id="mktSearchInput" name="q" spellcheck="false" aria-label="Buscar activo" aria-controls="mktSearchResults" class="mkt-search-input" placeholder="Buscar acción, CEDEAR, bono o cripto: GGAL, Apple, AL30…">
+            <button type="button" id="mktSearchClear" class="mkt-search-clear" hidden aria-label="Limpiar b&uacute;squeda">&times;</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="mt-strip" id="mktStrip" aria-label="Indicadores principales">
+        <div class="mt-strip-sk">Cargando cotizaciones&hellip;</div>
       </div>
 
-      <div class="mkt-search-wrap">
-        <svg class="mkt-search-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="search" id="mktSearchInput" name="q" spellcheck="false" aria-label="Buscar activo" aria-controls="mktSearchResults" class="mkt-search-input" placeholder="Buscar activo &mdash; &quot;GGAL&quot;, &quot;Apple&quot;, &quot;AL30&quot;&hellip;" autocomplete="off">
-        <button type="button" id="mktSearchClear" class="mkt-search-clear" hidden aria-label="Limpiar b&uacute;squeda">&times;</button>
-      </div>
-      <div id="mktSearchResults" class="mkt-search-results" hidden></div>
-
-      <div class="mkt-body" id="mktBody">
-        <aside class="mkt-hero-col" id="mktHeroCol">
-          <div class="mkt-hero-skeleton">Cargando cotizaciones&hellip;</div>
-        </aside>
-        <div class="mkt-main">
-          <div class="mkt-tabs" id="mktTabs"></div>
-          <div class="mkt-table-wrap" id="mktTableWrap">
-            <div class="mkt-table-head" id="mktTableHead">
-              <span></span><span>Activo</span><span style="text-align:right;">Precio</span><span style="text-align:right;">Var%</span>
+      <div class="mt-body" id="mktBody">
+        <div class="mt-left">
+          <div class="mkt-tabs mt-tabs" id="mktTabs"></div>
+          <div id="mktSearchResults" class="mkt-search-results mt-results" hidden></div>
+          <div class="mkt-table-wrap mt-table" id="mktTableWrap">
+            <div class="mkt-table-head mt-head" id="mktTableHead">
+              <span></span><span>Activo</span><span class="r">Precio</span><span class="r">Hoy</span><span class="r mt-hide-s">Volumen</span>
             </div>
             <div id="mktTableBody" class="mkt-table-body">
               <div class="mkt-row-msg">Cargando…</div>
@@ -4266,9 +4271,13 @@
             <button type="button" id="mktShowAllBtn" class="mkt-show-all" hidden>Ver los <span id="mktShowAllCount">&mdash;</span> restantes &rarr;</button>
           </div>
           <div class="mkt-maps-wrap" id="mktMapsWrap" hidden></div>
+          <div class="mt-fci" id="mktFci" hidden></div>
         </div>
+        <aside class="mt-detail" id="mktDetail" aria-label="Detalle del activo">
+          <div class="mt-d-empty">Elegí un activo de la lista para ver su gráfico.</div>
+        </aside>
       </div>
-      <p class="last-updated" id="lastUpdated" style="margin-top:16px;text-align:right;font-size:11px;color:var(--text-sec);"></p>
+      <p class="mt-foot" id="lastUpdated"></p>
     </div>
   </section>
 
@@ -11102,6 +11111,15 @@
     return (unit || '') + n.toLocaleString('es-AR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   }
 
+  function mktFmtVol(v) {
+    const n = Number(v);
+    if (!n) return '&mdash;';
+    if (n >= 1e9) return (n / 1e9).toFixed(1).replace('.', ',') + ' mil M';
+    if (n >= 1e6) return (n / 1e6).toFixed(1).replace('.', ',') + ' M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1).replace('.', ',') + ' mil';
+    return n.toLocaleString('es-AR');
+  }
+
   function mktFmtChange(change) {
     if (change == null) return { text: '&mdash;', cls: 'neutral' };
     const n = parseFloat(change);
@@ -11146,26 +11164,36 @@
     el.innerHTML = svg;
   }
 
+  // Franja de indicadores de arriba (diseño Terminal): dólares, Merval, S&P,
+  // riesgo país, Bitcoin y oro. El riesgo país sale de ArgentinaDatos.
+  let MKT_RIESGO = null;
   function renderHeroCards() {
-    const col = document.getElementById('mktHeroCol');
-    if (!col || !MERCADOS) return;
-    col.innerHTML = MERCADOS.featured.map(item => {
-      const { text, cls } = mktFmtChange(item.change);
-      const unit = item.unit ? item.unit + ' ' : '';
-      return `
-        <div class="mkt-hero-card">
-          <div class="mh-name"><span>${item.flag}</span>${item.name}</div>
-          <div class="mh-price">${mktFmtPrice(item.price, unit)}</div>
-          <div class="mh-chg ${cls}">${text}</div>
-          <div class="mh-chart" id="mh-chart-${item.id}"></div>
-        </div>
-      `;
-    }).join('');
-    MERCADOS.featured.forEach(item => {
-      if (item.spark && item.spark.length >= 2) {
-        mktDrawChart('mh-chart-' + item.id, item.spark, 220, 34, { grid: false, dot: false });
-      }
-    });
+    const el = document.getElementById('mktStrip');
+    if (!el || !MERCADOS) return;
+    const dol = {};
+    ((MERCADOS.categorias.dolares || {}).items || []).forEach(d => { dol[d.symbol] = d; });
+    const fe = {};
+    (MERCADOS.featured || []).forEach(f => { fe[f.id] = f; });
+    const cell = (label, value, chg, sub) => {
+      const c = chg == null ? '' : `<i class="${chg >= 0 ? 'up' : 'dn'}">${chg >= 0 ? '+' : '−'}${Math.abs(chg).toFixed(2).replace('.', ',')}%</i>`;
+      return `<div class="mt-cell"><small>${label}</small><b>${value}</b>${c}${sub ? `<em>${sub}</em>` : ''}</div>`;
+    };
+    const ars = v => v == null ? '—' : '$' + Math.round(v).toLocaleString('es-AR');
+    el.innerHTML = [
+      cell('Dólar MEP', ars(dol.BOLSA && dol.BOLSA.price)),
+      cell('Dólar CCL', ars(dol.CONTADOCONLIQUI && dol.CONTADOCONLIQUI.price)),
+      cell('Dólar oficial', ars(dol.OFICIAL && dol.OFICIAL.price)),
+      cell('Dólar blue', ars(dol.BLUE && dol.BLUE.price)),
+      cell('Merval', fe.merval && fe.merval.price != null ? Math.round(fe.merval.price).toLocaleString('es-AR') : '—', fe.merval && fe.merval.change),
+      cell('S&amp;P 500', fe.sp500 && fe.sp500.change != null ? (fe.sp500.change >= 0 ? '+' : '−') + Math.abs(fe.sp500.change).toFixed(2).replace('.', ',') + '%' : '—', null, 'vía SPY'),
+      cell('Riesgo país', MKT_RIESGO != null ? MKT_RIESGO + ' pb' : '—'),
+      cell('Bitcoin', fe.btc && fe.btc.price != null ? 'US$ ' + Math.round(fe.btc.price).toLocaleString('es-AR') : '—', fe.btc && fe.btc.change),
+    ].join('');
+    if (MKT_RIESGO == null && !renderHeroCards._rp) {
+      renderHeroCards._rp = true;
+      fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais/ultimo', { signal: AbortSignal.timeout(8000) })
+        .then(r => r.ok ? r.json() : null).then(d => { if (d && d.valor != null) { MKT_RIESGO = d.valor; renderHeroCards(); } }).catch(() => {});
+    }
   }
 
   const MKT_CATEGORIES = [
@@ -11180,7 +11208,8 @@
   ];
   const MKT_FAV_KEY = 'fav';
   const MKT_MAPS_KEY = 'mapas';
-  let mktActiveCategory = MKT_MAPS_KEY;
+  const MKT_FCI_KEY = 'fci';
+  let mktActiveCategory = 'arg_stocks';
   let mktShowingAll = false;
 
   // ─── Favoritos: guardar/quitar activos y persistirlos en Firestore ───────
@@ -11241,6 +11270,8 @@
     html += MKT_CATEGORIES.map(c =>
       `<button type="button" class="mkt-tab${c.key === mktActiveCategory ? ' active' : ''}" data-cat="${c.key}">${c.label}</button>`
     ).join('');
+    // Fondos comunes va después de Bonos
+    html = html.replace(/(<button[^>]*data-cat="cripto"[^>]*>)/, `<button type="button" class="mkt-tab mkt-tab-fci${mktActiveCategory === MKT_FCI_KEY ? ' active' : ''}" data-cat="${MKT_FCI_KEY}">Fondos comunes<span class="mt-new">Nuevo</span></button>$1`);
     wrap.innerHTML = html;
     wrap.querySelectorAll('.mkt-tab').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -11271,6 +11302,7 @@
         <div class="mr-name-wrap">${mktLogoHTML(item)}<span class="mr-ticker">${item.symbol}</span><span class="mr-name">${name}</span>${badge}</div>
         <div class="mr-price">${mktFmtPrice(item.price, unit)}</div>
         <div class="mr-chg ${cls}">${text}</div>
+        <div class="mr-vol mt-hide-s">${item.volume ? mktFmtVol(item.volume) : '&mdash;'}</div>
       </div>
     `;
   }
@@ -11519,6 +11551,17 @@
   function renderCategoryTable() {
     const tableWrap = document.getElementById('mktTableWrap');
     const mapsWrap = document.getElementById('mktMapsWrap');
+    const fciWrap = document.getElementById('mktFci');
+    const mtBody = document.getElementById('mktBody');
+    // mapas y fondos ocupan todo el ancho (sin panel de gráfico)
+    if (mtBody) mtBody.classList.toggle('mt-wide', mktActiveCategory === MKT_MAPS_KEY || mktActiveCategory === MKT_FCI_KEY);
+    if (fciWrap) fciWrap.hidden = mktActiveCategory !== MKT_FCI_KEY;
+    if (mktActiveCategory === MKT_FCI_KEY) {
+      if (tableWrap) tableWrap.hidden = true;
+      if (mapsWrap) mapsWrap.hidden = true;
+      if (window.mktFci) window.mktFci.render(fciWrap);
+      return;
+    }
     if (mktActiveCategory === MKT_MAPS_KEY) {
       if (tableWrap) tableWrap.hidden = true;
       if (mapsWrap) mapsWrap.hidden = false;
@@ -11539,6 +11582,9 @@
     }
     const items = mktShowingAll ? cat.items : cat.items.slice(0, 10);
     body.innerHTML = items.map(item => mktRowHTML(item, cat.currency, mktActiveCategory)).join('');
+    if (window.mktDetail && !window.mktDetail.current() && items[0] && window.matchMedia('(min-width: 1001px)').matches) {
+      openAssetModal(items.find(i => i.symbol === 'GGAL') || items[0], mktActiveCategory, cat.currency);
+    } else if (window.mktDetail) window.mktDetail.mark();
     const remaining = cat.items.length - 10;
     if (btn) {
       if (!mktShowingAll && remaining > 0) {
@@ -11556,12 +11602,14 @@
     const resultsEl = document.getElementById('mktSearchResults');
     const bodyEl = document.getElementById('mktBody');
     if (!resultsEl || !bodyEl) return;
+    const vistas = ['mktTableWrap', 'mktMapsWrap', 'mktFci'].map(id => document.getElementById(id));
     if (!q) {
       resultsEl.hidden = true;
-      bodyEl.hidden = false;
+      renderCategoryTable();
       return;
     }
-    bodyEl.hidden = true;
+    vistas.forEach(v => { if (v) v.hidden = true; });
+    bodyEl.classList.remove('mt-wide');
     resultsEl.hidden = false;
     if (!MERCADOS) { resultsEl.innerHTML = '<div class="mkt-search-empty">Cargando datos&hellip;</div>'; return; }
     const matches = [];
@@ -11604,6 +11652,17 @@
   }
 
   function openAssetModal(item, category, currency) {
+    if (window.mktDetail) {
+      window.mktDetail.show({
+        item, category, currency,
+        logoHTML: mktLogoHTML(item, 'mt-d-logo'),
+        label: mktCategoryLabel(category),
+        priceHTML: mktFmtPrice(item.price, currency === 'USD' ? 'US$ ' : '$ '),
+        change: item.change,
+        volume: item.volume,
+      });
+      return;
+    }
     const overlay = document.getElementById('mktModalOverlay');
     if (!overlay || !item) return;
     const { text, cls } = mktFmtChange(item.change);
