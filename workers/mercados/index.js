@@ -1058,8 +1058,14 @@ async function pulsoRiesgo() {
   } catch (e) { return null; }
 }
 
+// Último valor bueno de cada cotización: si Yahoo falla un rato, se muestra ese
+// en vez de un guion (vive en la memoria del isolate, no en KV).
+const PULSO_ULTIMO = new Map();
 async function pulsoYahoo(id, name, symbol, unit) {
-  const q = await fetchYahoo(symbol);
+  let q = await fetchYahoo(symbol);
+  if (!q) q = await fetchYahoo(symbol); // un reintento: a veces Yahoo tarda o corta
+  if (q) PULSO_ULTIMO.set(id, q);
+  else q = PULSO_ULTIMO.get(id) || null;
   return { id, name, unit, price: q ? q.price : null, change: q ? q.change : null };
 }
 
@@ -1189,8 +1195,11 @@ export default {
       const mem = memGet('pulso');
       if (mem) return new Response(mem, { headers: sh });
       try {
-        const json = JSON.stringify(await buildPulso());
-        memSet('pulso', json, PULSO_TTL);
+        const data = await buildPulso();
+        const json = JSON.stringify(data);
+        // si quedó alguna cotización sin dato, se guarda poco para reintentar pronto
+        const incompleto = [...data.argentina.cotizaciones, ...data.mundo.cotizaciones].some(q => q.price == null);
+        memSet('pulso', json, incompleto ? 30 : PULSO_TTL);
         return new Response(json, { headers: sh });
       } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 502, headers });

@@ -203,6 +203,8 @@
 
   /* ------------------------------ S&P 500 ------------------------------ */
   var spx = { tf: '1M', ch: null, serie: null, req: 0, cache: {} };
+  window.MIPulso.spx = spx;
+  window.MIPulso.spxRecargar = function () { serieSpx(); };
   var TF_TXT = { '1D': 'hoy', '1M': 'en 1 mes', '1A': 'en 1 año' };
 
   function montarSpx() {
@@ -266,7 +268,8 @@
   }
   function pintarSpxHead() {
     var q = DATA && DATA.mundo.cotizaciones.filter(function (x) { return x.id === 'sp500'; })[0];
-    if (!q || !$('htxSpxV')) return;
+    // sin dato del S&P queda el valor que puso el gráfico (nunca "0,00")
+    if (!q || q.price == null || !$('htxSpxV')) return;
     var v = $('htxSpxV'), prev = parseFloat(v.getAttribute('data-p'));
     v.textContent = n(q.price, 2);
     v.setAttribute('data-p', q.price);
