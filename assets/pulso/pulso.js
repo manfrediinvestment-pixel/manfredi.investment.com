@@ -23,11 +23,12 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function n(v, d) { return Number(v).toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d }); }
 
+  // la moneda va chica y apagada para que se lea primero el número
   function valor(q) {
     if (q.price == null) return '—';
-    if (q.unit === 'pb') return Math.round(q.price) + ' pb';
+    if (q.unit === 'pb') return Math.round(q.price) + '<small style="margin:0 0 0 4px">pb</small>';
     var d = q.unit === '$' ? (Number.isInteger(q.price) ? 0 : 2) : (Math.abs(q.price) >= 10000 ? 0 : 2);
-    return (q.unit ? q.unit + ' ' : '') + n(q.price, d);
+    return (q.unit ? '<small>' + q.unit + '</small>' : '') + n(q.price, d);
   }
   function signo(q) {
     var v = q.unit === 'pb' ? q.delta : q.change;
@@ -38,9 +39,9 @@
   function cambio(q) {
     var v = q.unit === 'pb' ? q.delta : q.change;
     if (v == null || isNaN(v)) return '—';
-    if (q.unit === 'pb') return (v > 0 ? '▲ +' : v < 0 ? '▼ −' : '') + Math.abs(Math.round(v)) + ' pb';
+    if (q.unit === 'pb') return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(Math.round(v)) + ' pb';
     if (Math.abs(v) < 0.005) return '0,00%';
-    return (v > 0 ? '▲ +' : '▼ −') + n(Math.abs(v), 2) + '%';
+    return (v > 0 ? '+' : '−') + n(Math.abs(v), 2) + '%';
   }
   function cls(q) { var s = signo(q); return s > 0 ? 'up' : s < 0 ? 'dn' : 'fl'; }
   function fechaLarga(iso) {
@@ -58,6 +59,7 @@
     return d.toLocaleDateString('es-AR', { timeZone: TZ, day: 'numeric', month: 'short' });
   }
   function link(x) { return ' href="' + esc(x.link) + '" target="_blank" rel="noopener"'; }
+  function fuente(x) { return '<div class="pls-src">' + esc(x.fuente) + (x.fecha ? '<time datetime="' + esc(x.fecha) + '">' + hora(x.fecha) + '</time>' : '') + '</div>'; }
 
   // destello cuando un valor cambia entre refrescos
   function flash(root) {
@@ -79,7 +81,7 @@
   var ICON_DOWN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
 
   function grupo(titulo, arr) {
-    return '<div class="pls__grp"><span class="pls-sec">' + titulo + '</span><div class="pls__q">' + arr.map(function (q) {
+    return '<div class="pls__grp"><h3 class="pls__gt">' + titulo + '</h3><div class="pls__q">' + arr.map(function (q) {
       return '<div class="pls__qi" data-q="' + q.id + '" data-p="' + q.price + '"><div class="pls__qn">' + esc(q.name) + '</div><div class="pls__qv">' + valor(q) + '</div><div class="pls__qc ' + cls(q) + '">' + cambio(q) + '</div></div>';
     }).join('') + '</div></div>';
   }
@@ -100,7 +102,7 @@
     card.innerHTML = head + '<div class="pls__body">' +
       grupo('Argentina', DATA.argentina.cotizaciones) + grupo('EE.UU. y el mundo', DATA.mundo.cotizaciones) +
       (tit.length ? '<ul class="pls__news">' + tit.map(function (x) {
-        return '<li><a' + link(x) + '><div class="m"><b>' + esc(x.fuente) + '</b> · ' + hora(x.fecha) + '</div><div class="t">' + esc(x.titulo) + '</div></a></li>';
+        return '<li><a' + link(x) + '>' + fuente(x) + '<div class="t">' + esc(x.titulo) + '</div></a></li>';
       }).join('') + '</ul>' : '') +
       '</div><button type="button" class="pls__more" data-pls-open>Ver el pulso completo ' + ICON_DOWN + '</button>';
     flash(card);
@@ -115,14 +117,15 @@
     }).join('');
   }
   function columna(titulo, nw) {
-    if (!nw.length) return '<div class="pls-col"><span class="pls-sec">' + titulo + '</span><p class="pls-empty">No hay noticias nuevas por ahora.</p></div>';
+    var t = '<h3 class="pls-col__t">' + titulo + '</h3>';
+    if (!nw.length) return '<div class="pls-col">' + t + '<p class="pls-empty">No hay noticias nuevas por ahora.</p></div>';
     var lead = nw.filter(function (x) { return x.imagen; })[0] || nw[0];
     var resto = nw.filter(function (x) { return x !== lead; }).slice(0, 3);
-    return '<div class="pls-col"><span class="pls-sec">' + titulo + '</span>' +
-      '<a class="pls-lead' + (lead.imagen ? '' : ' sin-img') + '"' + link(lead) + '><div><div class="pls-meta"><b>' + esc(lead.fuente) + '</b> · ' + hora(lead.fecha) + '</div><h3>' + esc(lead.titulo) + '</h3>' + (lead.resumen ? '<p>' + esc(lead.resumen) + '</p>' : '') + '</div>' +
+    return '<div class="pls-col">' + t +
+      '<a class="pls-lead' + (lead.imagen ? '' : ' sin-img') + '"' + link(lead) + '><div>' + fuente(lead) + '<h3>' + esc(lead.titulo) + '</h3>' + (lead.resumen ? '<p>' + esc(lead.resumen) + '</p>' : '') + '</div>' +
       (lead.imagen ? '<img src="' + esc(lead.imagen) + '" alt="" loading="lazy" onerror="this.remove();this.parentNode&&this.parentNode.classList.add(\'sin-img\')">' : '') + '</a>' +
       '<ul class="pls-small">' + resto.map(function (x) {
-        return '<li><a' + link(x) + '><div class="pls-meta"><b>' + esc(x.fuente) + '</b> · ' + hora(x.fecha) + '</div><h4>' + esc(x.titulo) + '</h4>' + (x.resumen ? '<p>' + esc(x.resumen) + '</p>' : '') + '</a></li>';
+        return '<li><a' + link(x) + '>' + fuente(x) + '<h4>' + esc(x.titulo) + '</h4>' + (x.resumen ? '<p>' + esc(x.resumen) + '</p>' : '') + '</a></li>';
       }).join('') + '</ul></div>';
   }
   function pintarSheet() {
@@ -151,7 +154,7 @@
     scrim.addEventListener('click', cerrar);
     sheet.addEventListener('click', function (e) { if (e.target.closest('[data-pls-close]')) cerrar(); });
     document.addEventListener('keydown', teclas);
-    requestAnimationFrame(function () { requestAnimationFrame(function () { wrap.classList.add('pls-open'); var x = sheet.querySelector('.pls-x'); if (x) x.focus({ preventScroll: true }); }); });
+    requestAnimationFrame(function () { requestAnimationFrame(function () { wrap.classList.add('pls-open', 'pls-entering'); setTimeout(function () { wrap.classList.remove('pls-entering'); }, 900); var x = sheet.querySelector('.pls-x'); if (x) x.focus({ preventScroll: true }); }); });
   }
   function cerrar() {
     if (!sheet) return;
@@ -223,7 +226,7 @@
     var LC = window.LightweightCharts, el = $('htxSpxChart');
     spx.ch = LC.createChart(el, {
       autoSize: true,
-      layout: { background: { type: 'solid', color: 'transparent' }, textColor: 'rgba(238,242,248,.62)', fontFamily: "'IBM Plex Mono', ui-monospace, monospace", fontSize: 11, attributionLogo: false },
+      layout: { background: { type: 'solid', color: 'transparent' }, textColor: 'rgba(238,242,248,.62)', fontFamily: "'IBM Plex Sans', system-ui, sans-serif", fontSize: 11.5, attributionLogo: false },
       grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(238,242,248,.045)' } },
       rightPriceScale: { borderVisible: false, scaleMargins: { top: .12, bottom: .04 } },
       timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false, fixLeftEdge: true, fixRightEdge: true },
@@ -245,9 +248,7 @@
       spx.ch.timeScale().fitContent();
       var a = pts[0].c, z = pts[pts.length - 1].c, v = (z - a) / a * 100;
       var p = $('htxSpxP');
-      p.textContent = (v > 0 ? '+' : v < 0 ? '−' : '') + n(Math.abs(v), 2) + '% ' + TF_TXT[tf];
-      p.className = 'htx-spx__p ' + (tf === '1D' ? '' : v > 0 ? 'up' : v < 0 ? 'dn' : '');
-      if (tf === '1D') p.textContent = '';
+      p.innerHTML = tf === '1D' ? '' : '<b class="' + (v > 0 ? 'up' : v < 0 ? 'dn' : '') + '">' + (v > 0 ? '+' : v < 0 ? '−' : '') + n(Math.abs(v), 2) + '%</b> ' + TF_TXT[tf];
     };
     if (spx.cache[tf]) return poner(spx.cache[tf]);
     fetch(API + '/serie?category=indices&symbol=SP500&tf=' + tf, { signal: AbortSignal.timeout(12000) })
