@@ -17,7 +17,7 @@
   function pct(v, d) { if (v == null || isNaN(v)) return '—'; d = d == null ? 2 : d; return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d }) + '%'; }
   function cls(v) { return v > 0 ? 'up' : v < 0 ? 'dn' : ''; }
   function precio(v, usd) { if (v == null) return '—'; var d = Math.abs(v) >= 1000 ? 0 : 2; return (usd ? 'US$ ' : '$ ') + Number(v).toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d }); }
-  function vol(n) { n = Number(n) || 0; if (!n) return '—'; if (n >= 1e9) return (n / 1e9).toFixed(1).replace('.', ',') + ' mil M'; if (n >= 1e6) return (n / 1e6).toFixed(1).replace('.', ',') + ' M'; if (n >= 1e3) return (n / 1e3).toFixed(1).replace('.', ',') + ' mil'; return Math.round(n).toLocaleString('es-AR'); }
+  function vol(n) { n = Number(n) || 0; if (!n) return '—'; if (n >= 1e12) return (n / 1e12).toFixed(1).replace('.', ',') + ' billones'; if (n >= 1e9) return (n / 1e9).toFixed(1).replace('.', ',') + ' mil M'; if (n >= 1e6) return (n / 1e6).toFixed(1).replace('.', ',') + ' M'; if (n >= 1e3) return (n / 1e3).toFixed(1).replace('.', ',') + ' mil'; return Math.round(n).toLocaleString('es-AR'); }
   function esCel() { return window.matchMedia('(max-width: 1000px)').matches; }
   function conLC(cb) { var t0 = Date.now(); (function w() { if (window.LightweightCharts) return cb(window.LightweightCharts); if (Date.now() - t0 < 10000) setTimeout(w, 100); })(); }
 
@@ -79,18 +79,22 @@
     var hoy = o.change == null ? '' : '<span class="mt-d-hoy ' + cls(o.change) + '">' + pct(o.change) + ' hoy</span>';
     panel.innerHTML =
       '<button type="button" class="mt-d-close" aria-label="Cerrar">&times;</button>' +
+      '<div class="mt-d-top"><div class="mt-d-id">' +
       '<div class="mt-d-h">' + o.logoHTML + '<div><h3>' + esc(nombre) + '</h3><small>' + esc(item.symbol) + ' · ' + esc(o.label) + '</small></div></div>' +
-      '<div class="mt-d-px"><b>' + o.priceHTML + '</b>' + hoy + '</div>' +
-      '<div class="mt-d-var"><span id="mtVar"></span><small id="mtVarL"></small></div>' +
+      '<div class="mt-d-px"><b>' + o.priceHTML + '</b>' + hoy + '<span class="mt-d-var"><span id="mtVar"></span><small id="mtVarL"></small></span></div></div>' +
       '<div class="mt-d-ctl"><div class="mt-seg" id="mtTf" role="group" aria-label="Temporalidad">' + TF.map(function (t) {
         var off = t[0] === '1D' && SIN_INTRADIARIO[o.category];
         return '<button type="button" data-tf="' + t[0] + '" class="' + (t[0] === st.tf ? 'on' : '') + '"' + (off ? ' disabled title="Sin datos intradiarios"' : '') + '>' + t[0] + '</button>';
       }).join('') + '</div>' +
-      '<div class="mt-seg" id="mtModo" role="group" aria-label="Tipo de gráfico"><button type="button" data-m="linea" class="' + (st.modo === 'linea' ? 'on' : '') + '">Línea</button><button type="button" data-m="velas" class="' + (st.modo === 'velas' ? 'on' : '') + '">Velas</button></div></div>' +
+      '<div class="mt-seg" id="mtModo" role="group" aria-label="Tipo de gráfico"><button type="button" data-m="linea" class="' + (st.modo === 'linea' ? 'on' : '') + '">Línea</button><button type="button" data-m="velas" class="' + (st.modo === 'velas' ? 'on' : '') + '">Velas</button></div></div></div>' +
       '<div class="mt-d-chart"><div class="mt-d-cv" id="mtChart"></div><div class="mt-d-msg" id="mtMsg" hidden></div></div>' +
       '<div class="mt-d-kpis" id="mtKpis"></div>';
     marcar();
     if (esCel()) { panel.classList.add('open'); document.body.classList.add('mt-sheet-open'); }
+    else if (o.traer) {
+      var r = panel.getBoundingClientRect();
+      if (r.top < 70 || r.bottom > innerHeight) panel.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+    }
     panel.querySelector('.mt-d-close').addEventListener('click', cerrar);
     $('mtTf').addEventListener('click', function (e) { var b = e.target.closest('[data-tf]'); if (!b || b.disabled) return; st.tf = b.dataset.tf; [].forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); }); cargar(); });
     $('mtModo').addEventListener('click', function (e) { var b = e.target.closest('[data-m]'); if (!b) return; st.modo = b.dataset.m; [].forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); }); if (st.g) st.g.modo(st.modo); });
@@ -160,7 +164,7 @@
     var d = F.data, c = d.categorias[F.sel];
     var fecha = (d.fecha || '').split('-').reverse().join('/');
     el.innerHTML =
-      '<div class="mt-f-h"><div><h3>Fondos comunes de inversión</h3><p>Los fondos más grandes de cada tipo y lo que rindieron. Datos de CAFCI al cierre del ' + esc(fecha) + '.</p></div></div>' +
+      '<div class="mt-f-h"><h3>Fondos comunes <em>de inversión</em></h3><span class="mt-f-src">CAFCI · ' + esc(fecha) + '</span></div>' +
       '<div class="mt-f-cats" role="tablist">' + d.categorias.map(function (x, i) { return '<button type="button" role="tab" aria-selected="' + (i === F.sel) + '" data-f="' + i + '" class="' + (i === F.sel ? 'on' : '') + '">' + esc(x.label) + '</button>'; }).join('') + '</div>' +
       '<div class="mt-f-t"><div class="mt-f-r mt-f-head"><span></span><span>Fondo</span><span>Hoy</span><span>Mes</span><span>En el año</span><span>12 meses</span><span class="mt-hide-s">Patrimonio</span></div>' +
       c.items.map(function (f, i) {
