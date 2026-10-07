@@ -32,6 +32,7 @@
   <!-- Mercados · diseño Terminal: gráfico con TradingView Lightweight Charts (v5) -->
   <link rel="stylesheet" href="assets/mercados/terminal.css" />
 <link rel="stylesheet" href="assets/pulso/pulso.css" />
+<link rel="stylesheet" href="assets/noticias/noticias.css" />
   <script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js" defer></script>
   <script src="assets/mercados/terminal.js"></script>
   <style>
@@ -4088,6 +4089,8 @@
   <script src="assets/bienvenida/bienvenida.js" defer></script>
   <!-- Pulso del día + gráfico del S&P 500 del hero -->
   <script src="assets/pulso/pulso.js" defer></script>
+  <!-- Pestaña Noticias (usa window.MIPulso de pulso.js: va después) -->
+  <script src="assets/noticias/noticias.js" defer></script>
 
   <script>
   /* Home Terminal: S&P 500 / Nasdaq / UST 10Y del reporte diario (reports/wallstreet.json).
@@ -4295,77 +4298,30 @@
   </div>
 </section>
   <!-- ââ INFORMES âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-<section class="section-informes" id="informes" data-tab="informes">
-      
-    <div class="container">
-      <div class="section-header">
-        <span class="section-label">Reportes &amp; News</span>
-        <h2 class="section-title">Inteligencia de Mercado</h2>
-        <p class="section-sub">News diarias y papers de investigación. Análisis con foco en impacto real.</p>
-      </div>
-
-      <!-- ââ Sub-sección 1: Biblioteca de Informes ââ -->
-      <div class="inf-sub-header">
-        <span class="inf-sub-title">Biblioteca de Reportes</span>
-        <div style="display:flex;align-items:center;gap:16px;">
-          <span class="inf-sub-meta">Resumen semanal económico y financiero</span>
-          <div class="carousel-nav">
-            <button type="button" class="carousel-btn" id="papersRailPrev" aria-label="Reportes anteriores">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-            </button>
-            <button type="button" class="carousel-btn" id="papersRailNext" aria-label="Reportes siguientes">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-            </button>
+<section class="nt" id="informes" data-tab="informes">
+    <!-- Noticias minuto a minuto + informe semanal + cotizaciones (assets/noticias/noticias.js) -->
+    <div class="nt-wrap nt-grid">
+      <div class="nt-main">
+        <header class="nt-head" id="reportes">
+          <h2 class="nt-title">Noticias</h2>
+          <span class="nt-date" id="ntDate"></span>
+        </header>
+        <div id="ntInforme"></div>
+        <div class="nt-bar" id="ntBar"><div class="nt-chips" id="ntChips" role="group" aria-label="Filtrar noticias"></div></div>
+        <div id="ntFeed" aria-live="polite">
+          <div style="padding:26px 0;display:grid;gap:22px">
+            <span class="nt-skel" style="height:18px;width:70%"></span>
+            <span class="nt-skel" style="height:18px;width:85%"></span>
+            <span class="nt-skel" style="height:18px;width:60%"></span>
           </div>
         </div>
+        <button type="button" class="nt-more" id="ntMore" hidden>Ver más noticias</button>
       </div>
-      <div class="papers-rail-outer">
-        <div class="papers-grid" id="papersGrid">
-          <!-- Se carga dinámicamente desde papers/manifest.json -->
-        </div>
-      </div>
-
-      <!-- ââ Sub-sección 2: Reportes Diarios ââ -->
-      <div class="inf-sub-header" id="reportes">
-        <span class="inf-sub-title">News Diarias</span>
-        <span class="inf-sub-meta" id="reportLastUpdate">Actualizado · 11:01 hs</span>
-      </div>
-      <div class="reports-grid">
-
-        <!-- Card Argentina -->
-        <div class="report-card-daily">
-          <div class="rpt-header">
-            <span class="rpt-header-title"><span class="report-country-flag">&#127462;&#127479;</span>Argentina</span>
-            <span class="rpt-header-meta">Agente IA</span>
-            <div class="rpt-live"><span class="rpt-live-dot"></span>LIVE</div>
-          </div>
-          <div class="rpt-loading-wrap" id="argFeed">
-            <div class="report-loading">Cargando reporte&hellip;</div>
-          </div>
-          <div class="report-signal" id="argSignal" style="display:none">
-            <div class="report-signal-label">&#9889; Señal del día</div>
-            <div class="report-signal-text" id="argSignalText"></div>
-          </div>
-        </div>
-
-        <!-- Card Wall Street -->
-        <div class="report-card-daily">
-          <div class="rpt-header">
-            <span class="rpt-header-title"><span class="report-country-flag">&#127482;&#127480;</span>Wall Street</span>
-            <span class="rpt-header-meta">Agente IA</span>
-            <div class="rpt-live"><span class="rpt-live-dot"></span>LIVE</div>
-          </div>
-          <div class="rpt-loading-wrap" id="wsFeed">
-            <div class="report-loading">Cargando reporte&hellip;</div>
-          </div>
-          <div class="report-signal" id="wsSignal" style="display:none">
-            <div class="report-signal-label">&#9889; Señal del día</div>
-            <div class="report-signal-text" id="wsSignalText"></div>
-          </div>
-        </div>
-
-      </div>
-
+      <aside class="nt-rail" aria-label="Cotizaciones e informes">
+        <div class="nt-card" id="ntQuotes"><h3 class="nt-card__h">Cotizaciones</h3><span class="nt-skel" style="height:160px"></span></div>
+        <div class="nt-card" id="ntPrevs"></div>
+      </aside>
+    </div>
   </section>
 
   <!-- ââ UNIVERSITY âââââââââââââââââââââââââââââââââââââââââââââââââ -->
@@ -10436,7 +10392,9 @@
       const res  = await fetch('papers/manifest.json');
       const list = await res.json();
       const grid = document.getElementById('papersGrid');
-      grid.innerHTML = list.map(p => `
+      // la grilla vieja ya no está (la pestaña Noticias arma el informe en assets/noticias/noticias.js);
+      // esto queda solo para el cartel de "nuevo informe"
+      if (grid) grid.innerHTML = list.map(p => `
         <div class="paper-card paper-card--cover">
           <button type="button" class="paper-cover" aria-label="Abrir: ${p.title.replace(/"/g,'&quot;')}" onclick="openPdf('${'papers/' + encodeURIComponent(p.file)}','${p.title.replace(/'/g,"\\'")}')">
             <span class="paper-cover-fallback">${p.title}</span>
@@ -10756,6 +10714,8 @@
   }
 
   async function loadDailyReports() {
+    // las tarjetas de reportes diarios se reemplazaron por el feed de assets/noticias/noticias.js
+    if (!document.getElementById('argFeed')) return;
     try {
       const [argRes, wsRes, noticiasRes] = await Promise.all([
         fetch('reports/argentina.json?t=' + Date.now()),

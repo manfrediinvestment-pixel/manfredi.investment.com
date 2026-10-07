@@ -58,6 +58,9 @@
     if (dia(d) === dia(ayer)) return 'Ayer ' + hh;
     return d.toLocaleDateString('es-AR', { timeZone: TZ, day: 'numeric', month: 'short' });
   }
+  // la pestaña Noticias (assets/noticias/noticias.js) usa el mismo worker y formato
+  window.MIPulso = { api: API, valor: valor, cambio: cambio, cls: cls, hora: hora };
+
   function link(x) { return ' href="' + esc(x.link) + '" target="_blank" rel="noopener"'; }
   function fuente(x) { return '<div class="pls-src">' + esc(x.fuente) + (x.fecha ? '<time datetime="' + esc(x.fecha) + '">' + hora(x.fecha) + '</time>' : '') + '</div>'; }
 
