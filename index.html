@@ -35,6 +35,7 @@
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261007e" />
 <link rel="stylesheet" href="assets/calendario/calendario.css?v=20261008a" />
 <link rel="stylesheet" href="assets/informes/estanteria.css?v=20261008a" />
+<link rel="stylesheet" href="assets/portfolio/portfolio.css?v=20261008a" />
 <link rel="stylesheet" href="assets/lector/lector.css?v=20261007e" />
   <script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js" defer></script>
   <script src="assets/mercados/terminal.js"></script>
@@ -5906,14 +5907,9 @@
   <section class="section section-portfolio" id="portfolio" data-tab="portfolio">
     <div class="container">
       <div class="section-header">
-        <span class="section-label">Manfredi Investment Portfolio</span>
-        <h2 class="section-title">Manfredi Investment Portfolio</h2>
+        <span class="section-label">Portfolio</span>
+        <h2 class="section-title">Portfolio</h2>
         <p class="section-sub">Armá tu portafolio y chequeá si está alineado con tu perfil de riesgo.</p>
-      </div>
-
-      <div class="inv-disclaimer">
-        <span style="color:#D97706;font-size:14px;flex-shrink:0;">&#9888;</span>
-        <span>Herramienta educativa de autogestión. No es asesoramiento financiero ni una recomendación de inversión personalizada.</span>
       </div>
 
       <!-- acceso a la cartera del autor (gratis): abre la vista "manfredi" -->
@@ -5947,18 +5943,18 @@
         </div>
 
         <div class="pf-sec-panel active" data-pfsec-panel="resumen">
+        <div class="pf-totals-row" id="pfTotalsRow"></div>
         <div class="pf-row-split">
         <div class="pf-card">
-          <h2 class="pf-metrics-label" style="margin-bottom:14px;">Tus posiciones</h2>
-          <div class="pf-totals-row" id="pfTotalsRow"></div>
-          <table class="pf-positions-table">
-            <thead><tr><th>Activo</th><th style="text-align:right;">Cant.</th><th style="text-align:right;">Compra</th><th style="text-align:right;">Actual</th><th style="text-align:right;">Resultado</th><th style="text-align:right;">% cartera</th><th></th></tr></thead>
+          <h2 class="pf-metrics-label" style="margin-bottom:14px;">Posiciones</h2>
+          <table class="pf-positions-table pfx-tbl">
+            <thead><tr><th>Activo</th><th style="text-align:right;">Compra</th><th style="text-align:right;">Actual</th><th style="text-align:right;">Hoy</th><th style="text-align:right;">Resultado</th><th style="text-align:right;">Peso</th><th></th></tr></thead>
             <tbody id="pfPositionsBody"></tbody>
           </table>
           <div class="pf-add-actions">
             <div class="pf-add-row" id="pfAddRowBtn" onclick="pfShowAddForm()">+ Agregar posición</div>
             <div class="pf-add-row pf-import-row" id="pfImportRowBtn" onclick="pfImportPdfClick()">
-              <span>&#128196; Importar PDF del broker</span>
+              <span><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="vertical-align:-2px;margin-right:4px"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>Importar PDF del broker</span>
               <span class="pf-import-hint">IOL &middot; Balanz &middot; Cocos &middot; PPI &middot; Bull Market</span>
             </div>
           </div>
@@ -5981,7 +5977,6 @@
             <button type="button" class="pf-btn-gold" id="pfAddBtn" onclick="pfAddPosition()">Agregar</button>
             <button type="button" class="pf-btn-ghost" onclick="pfHideAddForm()">Cancelar</button>
             <div class="pf-form-hint" id="pfFormHint" role="status" aria-live="polite"></div>
-            <div style="flex-basis:100%;font-size:11px;color:rgba(255,255,255,.35);">Cargá el mismo activo con varias fechas si compraste en distintos momentos. Las posiciones en ARS se convierten a USD al dólar CCL actual (no al de la fecha de compra).</div>
           </div>
           <div class="pf-save-row">
             <button type="button" class="pf-btn-ghost" id="pfSaveBtn" style="display:none;" onclick="pfSavePortfolio()">Guardar mi portafolio</button>
@@ -5991,7 +5986,7 @@
 
         <div class="pf-card">
           <h2 class="pf-metrics-label" style="margin-bottom:14px;">Composición</h2>
-          <div id="pfPieWrap" style="max-width:340px;margin:0 auto;"><canvas id="pfPieCanvas"></canvas></div>
+          <div id="pfPieWrap"></div>
         </div>
         </div>
         </div>
@@ -6049,7 +6044,12 @@
                 <h3 class="pf-warren-sec__t">Warren IA</h3>
                 <span class="pf-warren-on"><span class="pf-warren-on__dot" aria-hidden="true"></span>Activado</span>
               </div>
-              <p class="pf-warren-sec__s">Tu asesor de inversiones con inteligencia artificial. Preguntale sobre tu cartera, tus ratios o cualquier empresa, y te lo explica en criollo.</p>
+              <div class="pfx-wq" role="group" aria-label="Preguntas para Warren">
+                <button type="button" onclick="pfAskWarren(0)">Analizá mi cartera completa</button>
+                <button type="button" onclick="pfAskWarren(1)">¿Qué posición me suma más riesgo?</button>
+                <button type="button" onclick="pfAskWarren(2)">¿Estoy muy concentrado en un sector?</button>
+                <button type="button" onclick="pfAskWarren(3)">¿Cómo vengo contra el S&amp;P 500?</button>
+              </div>
               <button type="button" class="pf-warren-open" onclick="pfOpenWarren()">
                 <span class="pf-warren-on__dot" aria-hidden="true"></span>Abrir chat con Warren
               </button>
@@ -6065,7 +6065,7 @@
           <h2 class="pf-sec-title">Cartera Manfredi Investment</h2>
         </div>
         <div class="pf-card">
-          <h2 class="pf-metrics-label" style="margin-bottom:14px;">Rendimiento real vs S&amp;P 500</h2>
+          <h2 class="pf-metrics-label" style="margin-bottom:14px;">Rendimiento real vs S&amp;P 500<button type="button" class="pfx-i" aria-label="Cómo se calcula" data-tip="Incluye únicamente las posiciones en acciones y CEDEARs de mi cartera personal &mdash; no incluye el fondo común de inversión ni el efectivo. En YTD y 1 año, el % de &quot;Mi cartera&quot; es proyectado: no es lo que la cartera rindió en ese período completo (todavía no existía desde el inicio), sino el ritmo de rendimiento actual llevado a esa ventana.">i</button></h2>
           <div class="mkt-tabs mf-window-tabs" id="mfWindowTabs">
             <button type="button" class="mkt-tab" data-mfwin="1d">1 día</button>
             <button type="button" class="mkt-tab" data-mfwin="1w">1 semana</button>
@@ -6076,7 +6076,7 @@
           <div id="mfSummary" class="mf-summary">Calculando con datos históricos...</div>
           <div class="mf-chart-wrap"><canvas id="mfChartCanvas"></canvas></div>
           <div class="brk-heat" id="mfHeat"></div>
-          <div class="pf-metric-note">Incluye únicamente las posiciones en acciones y CEDEARs de mi cartera personal &mdash; no incluye el fondo común de inversión ni el efectivo. En YTD y 1 año, el % de "Mi cartera" es proyectado: no es lo que la cartera rindió en ese período completo (todavía no existía desde el inicio), sino el ritmo de rendimiento actual llevado a esa ventana.</div>
+          
         </div>
 
         <div class="pf-card" id="mfCompWrapper" style="position:relative;">
@@ -6085,13 +6085,18 @@
             <div id="mfCompGrid"></div>
             <aside class="mf-comp-pie" aria-label="Peso de cada activo en la cartera">
               <div class="mf-comp-pie__lbl">Peso de cada activo</div>
-              <div id="mfPieWrap"><canvas id="mfPieCanvas" aria-label="Gráfico de torta con el peso de cada activo"></canvas></div>
+              <div id="mfPieWrap"></div>
             </aside>
           </div>
         </div>
       </div>
 
 
+
+      <div class="inv-disclaimer pf-aviso">
+        <span aria-hidden="true">&#9888;</span>
+        <span>Herramienta educativa de autogestión. No es asesoramiento financiero ni una recomendación de inversión personalizada.</span>
+      </div>
     </div>
   </section>
 
@@ -7442,6 +7447,15 @@
       });
     });
 
+    // Preguntas listas de la sección Warren IA: van con el resumen real de la cartera
+    var PFX_WQ = [null, '¿Qué posición de mi cartera me suma más riesgo y por qué?', '¿Estoy muy concentrado en un sector o en un país?', '¿Cómo viene mi cartera contra el S&P 500 y qué lo explica?'];
+    window.pfAskWarren = function(i){
+      var base = (i && typeof pfSummarizeUserPortfolio === 'function') ? pfSummarizeUserPortfolio() : null;
+      if(!base){ if(typeof warrenAnalyzePortfolio === 'function') warrenAnalyzePortfolio(); return; }
+      if(typeof warrenOpen !== 'undefined' && !warrenOpen) toggleWarren();
+      warrenSuggest(PFX_WQ[i] + '\n\n' + base.split('\n\nAnalizá')[0]);
+    };
+
     // Seccion Warren IA: abre el mismo chat flotante del sitio (nunca lo cierra)
     window.pfOpenWarren = function(){
       if(typeof warrenOpen !== 'undefined' && warrenOpen) return;
@@ -7804,6 +7818,11 @@
           if(!idx[sym]) idx[sym] = {};
           // si el mismo simbolo aparece en 2 categorias de la misma moneda (raro), gana la de mayor volumen/la primera ya indexada
           if(!idx[sym][currency]) idx[sym][currency] = { price: it.price, change: it.change, category: cat };
+          // nombre y logo para la tabla: los CEDEAR traen el símbolo como nombre, gana el que tenga nombre real
+          var meta = window._pfMeta || (window._pfMeta = {});
+          var m0 = meta[sym] || (meta[sym] = {});
+          if(it.name && it.name.toUpperCase() !== sym && !m0.n) m0.n = it.name;
+          if(it.logo && !m0.logo) m0.logo = it.logo;
         });
       });
     }
@@ -8048,39 +8067,52 @@
   }
   function pfColor(i){ return PF_PALETTE[i % PF_PALETTE.length]; }
 
-  var pfPieChart = null;
+  // ---- formato y avatar de cada activo (tabla, composición, cartera Manfredi) ----
+  function pfxPct(v, dec, sign){ if(v == null || !isFinite(v)) return '—'; var d = dec == null ? 1 : dec; return (sign ? (v > 0 ? '+' : v < 0 ? '−' : '') : (v < 0 ? '−' : '')) + Math.abs(v).toFixed(d).replace('.', ',') + '%'; }
+  function pfxCls(v){ return v > 0 ? 'up' : (v < 0 ? 'dn' : ''); }
+  function pfxName(t){ var m = (window._pfMeta || {})[(t||'').toUpperCase()]; return m && m.n ? m.n : ''; }
+  function pfxAv(t, isCash){
+    if(isCash) return '<span class="pfx-av pfx-av--cash" aria-hidden="true">$</span>';
+    var T = (t||'').toUpperCase(), m = (window._pfMeta || {})[T] || {};
+    if(/^FCI/.test(T)) return '<span class="pfx-av" data-t="FCI" aria-hidden="true"></span>';
+    return '<span class="pfx-av" data-t="'+ pfEsc(T.replace(/\..*$/, '').slice(0, 4)) +'" aria-hidden="true"><img src="assets/logos/'+ pfEsc(T.toLowerCase()) +'.png" alt="" loading="lazy" data-alt="'+ pfEsc(m.logo || '') +'" onerror="pfxLogoErr(this)"></span>';
+  }
+  window.pfxLogoErr = function(img){
+    var alt = img.getAttribute('data-alt');
+    if(alt){ img.removeAttribute('data-alt'); img.src = alt; return; }
+    img.remove();
+  };
+  // Composición: barras de un solo color ordenadas por peso + mayor posición, top 3 y reparto por tipo
   function pfRenderPieChart(rows, total){
-    var canvas = document.getElementById('pfPieCanvas');
     var wrap = document.getElementById('pfPieWrap');
-    if(!canvas || typeof Chart === 'undefined') return;
-    if(!rows.length || total <= 0){
-      if(pfPieChart){ pfPieChart.destroy(); pfPieChart = null; }
-      wrap.innerHTML = '<div class="pf-metrics-empty" style="text-align:center;">Cargá posiciones para ver la composición.</div><canvas id="pfPieCanvas"></canvas>';
-      return;
-    }
-    if(wrap.querySelector('.pf-metrics-empty')){
-      wrap.innerHTML = '<canvas id="pfPieCanvas"></canvas>';
-      canvas = document.getElementById('pfPieCanvas');
-    }
-    var grouped = pfGroupByTicker(rows);
-    var labels = grouped.map(function(g){ return g.ticker; });
-    var data = grouped.map(function(g){ return g.valorActual; });
-    var colors = labels.map(function(_,i){ return pfColor(i); });
-    if(pfPieChart) pfPieChart.destroy();
-    pfPieChart = new Chart(canvas, {
-      type: 'doughnut',
-      data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderColor: '#0A0F1E', borderWidth: 2 }] },
-      options: {
-        cutout: '60%',
-        plugins: {
-          legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,.65)', font: { size: 11.5 }, boxWidth: 10, padding: 12 } },
-          tooltip: { callbacks: { label: function(ctx){
-            var val = ctx.parsed; var pct = total > 0 ? (val/total*100).toFixed(1) : 0;
-            return ctx.label + ': ' + pfMoney(val) + ' (' + pct + '%)';
-          } } }
-        }
-      }
-    });
+    if(!wrap) return;
+    if(!rows.length || total <= 0){ wrap.innerHTML = '<div class="pf-metrics-empty">Cargá posiciones para ver la composición.</div>'; return; }
+    var g = pfGroupByTicker(rows).filter(function(x){ return x.valorActual > 0; })
+      .sort(function(a, b){ return b.valorActual - a.valorActual; });
+    var pcts = g.map(function(x){ return x.valorActual / total * 100; });
+    var top = g[0], top3 = pcts.slice(0, 3).reduce(function(s, v){ return s + v; }, 0);
+    var tipos = {};
+    rows.forEach(function(r){ var k = pfAllocCategory(r); tipos[k] = (tipos[k] || 0) + r.valorActual; });
+    var tiposArr = PF_ALIGN_ORDER.filter(function(k){ return tipos[k] > 0; }).map(function(k){ return { k: k, v: tipos[k] / total * 100 }; })
+      .sort(function(a, b){ return b.v - a.v; });
+    var max = pcts[0] || 1;
+    function op(i){ return Math.max(.25, 1 - i * .3).toFixed(2); }
+    wrap.innerHTML = '<div class="pfx-cmp-kpis">'
+      + '<div><span>Mayor posición</span><b>'+ pfEsc(top.isCash ? 'Efectivo' : top.tickerRaw) +' <em>'+ pfxPct(pcts[0]) +'</em></b></div>'
+      + '<div><span>Top 3</span><b>'+ pfxPct(top3) +'</b></div>'
+      + '</div>'
+      + '<div class="pfx-tipo" aria-label="Por tipo de activo">'
+      +   '<div class="pfx-tipo__bar">'+ tiposArr.map(function(t, i){ return '<i style="width:'+ t.v.toFixed(2) +'%;opacity:'+ op(i) +'"></i>'; }).join('') +'</div>'
+      +   '<div class="pfx-tipo__lg">'+ tiposArr.map(function(t, i){ return '<span><i style="opacity:'+ op(i) +'"></i>'+ pfEsc(t.k) +' <b>'+ pfxPct(t.v) +'</b></span>'; }).join('') +'</div>'
+      + '</div>'
+      + '<div class="pfx-wl">'
+      + g.map(function(x, i){
+          return '<div class="pfx-w">'+ pfxAv(x.tickerRaw, x.isCash)
+            + '<span class="pfx-w__t">'+ pfEsc(x.isCash ? 'Efectivo' : x.ticker) +'</span>'
+            + '<span class="pfx-w__b"><i style="width:'+ (pcts[i] / max * 100).toFixed(1) +'%"></i></span>'
+            + '<span class="pfx-w__v">'+ pfxPct(pcts[i]) +'</span></div>';
+        }).join('')
+      + '</div>';
   }
 
   async function pfRenderPositions(){
@@ -8102,41 +8134,65 @@
     } else {
       body.innerHTML = rows.map(function(r){
         var pct = total > 0 ? (r.valorActual/total*100) : 0;
-        var gainColor = r.gain > 0 ? 'var(--green)' : (r.gain < 0 ? 'var(--red)' : 'rgba(255,255,255,.5)');
-        var sign = r.gain >= 0 ? '+' : '−';
-        var note = !r.priceKnown ? ' <span style="color:var(--yellow);font-size:11px;">sin cotización</span>'
-          : (!r.isCash && !r.hasCost ? ' <span style="color:var(--yellow);font-size:11px;">sin precio de compra</span>' : '');
-        var arsTag = (!r.isCash && r.moneda==='ARS') ? ' <span style="color:rgba(255,255,255,.4);font-size:11px;border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:1px 5px;">ARS</span>' : '';
-        var fechaSub = r.isCash ? '' : (r.fecha
-            ? '<div class="pf-lot-date">'+ pfPerfFmtDate(pfPerfParseDate(r.fecha)) +'</div>'
-            : '<div class="pf-lot-date pf-lot-nodate">sin fecha de compra</div>');
-        // fondos comunes: debajo del código, el nombre del fondo (cantidad = cuotapartes)
+        var note = !r.priceKnown ? ' <span class="pfx-warn">sin cotización</span>'
+          : (!r.isCash && !r.hasCost ? ' <span class="pfx-warn">sin precio de compra</span>' : '');
+        var arsTag = (!r.isCash && r.moneda==='ARS') ? ' <span class="pfx-tag">ARS</span>' : '';
+        // fondos comunes: el nombre del fondo (cantidad = cuotapartes)
         var fondo = (!r.isCash && PF_FCI && /^FCI/.test(r.ticker)) ? PF_FCI.find(function(f){ return f.s === r.ticker; }) : null;
-        var fondoSub = fondo ? '<div class="pf-lot-date" style="color:rgba(238,242,248,.72);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+ pfEsc(fondo.n) +' · cuotapartes</div>' : '';
-        return '<tr><td>'+ (r.isCash ? '&#128176; ' : '') + pfEsc(r.ticker) + arsTag + note + fondoSub + fechaSub +'</td>'
-          + '<td class="num">'+ (r.isCash ? pfMoney(r.cantidad) + ' ' + r.moneda : pfQty(r.cantidad) + (r.isBond ? '<div class="pf-lot-date">VN</div>' : '')) +'</td>'
+        var nombre = fondo ? fondo.n : (r.isCash ? '' : pfxName(r.ticker));
+        var sub = r.isCash ? (pfMoney(r.cantidad) + ' ' + r.moneda)
+          : (pfQty(r.cantidad) + (fondo ? ' cuotapartes' : (r.isBond ? ' VN' : ' u.')) + ' · '
+             + (r.fecha ? pfPerfFmtDate(pfPerfParseDate(r.fecha)) : '<span class="pfx-warn">sin fecha de compra</span>'));
+        var ch = r.isCash ? null : pfGetCurrentChange(r.ticker, r.moneda);
+        var gs = r.gain >= 0 ? '+' : '−';
+        var res = (r.isCash || !r.gainKnown) ? '—'
+          : '<span class="pfx-g">' + gs + pfMoney(Math.abs(r.gain)) + '</span><span class="pfx-gp">' + pfxPct(r.gainPct, 1, true) + '</span>';
+        return '<tr><td><div class="pfx-a">'+ pfxAv(r.ticker, r.isCash)
+          + '<div class="pfx-a__txt"><div class="pfx-a__t"><b>'+ (r.isCash ? 'Efectivo' : pfEsc(r.ticker)) +'</b>'+ arsTag + note
+          + (nombre ? '<span class="pfx-a__n">'+ pfEsc(nombre) +'</span>' : '') +'</div>'
+          + '<div class="pf-lot-date">'+ sub +'</div></div></div></td>'
           + '<td class="num">'+ (r.isCash || r.precioCompraNativo==null ? '—' : pfPrice(r.precioCompraNativo)) +'</td>'
           + '<td class="num">'+ (r.isCash || r.precioActualNativo==null ? '—' : pfPrice(r.precioActualNativo)) +'</td>'
-          + '<td class="num" style="color:'+ gainColor +';">'+ (r.isCash || !r.gainKnown ? '—' : sign + pfMoney(Math.abs(r.gain)) + ' (' + sign + Math.abs(r.gainPct).toFixed(1) + '%)') +'</td>'
-          + '<td class="num">'+ pct.toFixed(1) +'%</td>'
-          + '<td style="text-align:right;"><span class="pf-rm" onclick="pfRemovePosition('+ r.id +')">&times;</span></td></tr>';
+          + '<td class="num"><span class="pfx-chg '+ pfxCls(ch) +'">'+ (ch == null ? '—' : pfxPct(ch, 2, true)) +'</span></td>'
+          + '<td class="num '+ (r.isCash || !r.gainKnown ? '' : pfxCls(r.gain)) +'">'+ res +'</td>'
+          + '<td class="num">'+ pfxPct(pct) +'</td>'
+          + '<td style="text-align:right;"><button type="button" class="pf-rm" onclick="pfRemovePosition('+ r.id +')" aria-label="Quitar '+ (r.isCash ? 'efectivo' : pfEsc(r.ticker)) +'">&times;</button></td></tr>';
       }).join('');
       var totGain = totalValKnown - totalInv;
       var totGainPct = totalInv > 0 ? (totGain/totalInv*100) : 0;
       var totColor = totGain > 0 ? 'var(--green)' : (totGain < 0 ? 'var(--red)' : 'rgba(255,255,255,.7)');
       var incDate = pfInceptionDate();
+      // variación de hoy en USD: cada posición con su cambio del día (el efectivo no se mueve)
+      var dayUsd = 0, dayBase = 0;
+      rows.forEach(function(r){
+        if(r.isCash){ dayBase += r.valorActual; return; }
+        if(!r.priceKnown) return;
+        var c = pfGetCurrentChange(r.ticker, r.moneda);
+        if(c == null || !isFinite(c)) return;
+        var prev = r.valorActual / (1 + c/100);
+        dayUsd += r.valorActual - prev; dayBase += prev;
+      });
+      var dayPct = dayBase > 0 ? dayUsd / dayBase * 100 : 0;
+      var nPos = pfGroupByTicker(rows).filter(function(g){ return !g.isCash; }).length;
+      var cashV = rows.reduce(function(s2, r){ return s2 + (r.isCash ? r.valorActual : 0); }, 0);
+      var MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+      var ccyTip = 'Valores en USD; las posiciones en pesos, al dólar CCL de hoy. Compra y Actual, en la moneda de cada posición'
+        + (rows.some(function(r){ return r.isBond; }) ? '; bonos y letras, cada 100 nominales' : '') + '.';
       document.getElementById('pfTotalsRow').innerHTML =
-        '<div class="pf-hero">'
-        + '<div><span class="pf-hero-lbl">Valor actual</span><span class="pf-hero-big">'+ pfMoney(total) +'</span></div>'
-        + '<div class="pf-hero-ctx">'
-        +   '<div>Resultado <b style="color:'+ totColor +';">'+ (totGain>=0?'+':'−') + pfMoney(Math.abs(totGain)) +' ('+ (totGain>=0?'+':'−') + Math.abs(totGainPct).toFixed(1) +'%)</b></div>'
-        +   '<div>Invertido <b>'+ pfMoney(totalInv) +'</b></div>'
-        +   (incDate ? '<div>Cartera desde <b>'+ pfPerfFmtDate(incDate) +'</b></div>' : '')
-        + '</div></div>'
-        + '<div class="pf-hero-foot">Valores en USD (las posiciones en pesos, al CCL de hoy). Compra y Actual, en la moneda de cada posición'
-        + (rows.some(function(r){ return r.isBond; }) ? '; bonos y letras, cada 100 nominales' : '') + '.'
-        + (nUnknown ? ' ' + nUnknown + (nUnknown === 1 ? ' posición queda' : ' posiciones quedan') + ' fuera del resultado por no tener precio de compra o cotización.' : '')
-        + '</div>';
+        '<div class="pfx-hero">'
+        + '<div class="pfx-hero__main">'
+        +   '<span class="pfx-lbl">Valor de la cartera <span class="pfx-ccy" title="'+ pfEsc(ccyTip) +'">USD</span></span>'
+        +   '<span class="pfx-big">'+ pfMoney(total) +'</span>'
+        +   '<span class="pfx-day '+ pfxCls(dayUsd) +'">'+ (dayUsd >= 0 ? '+' : '−') + pfMoney(Math.abs(dayUsd)) +' <em>'+ pfxPct(dayPct, 2, true) +'</em> <span>hoy</span></span>'
+        + '</div>'
+        + '<div class="pfx-kpis">'
+        +   '<div><span class="pfx-lbl">Resultado</span><b class="'+ pfxCls(totGain) +'">'+ (totGain>=0?'+':'−') + pfMoney(Math.abs(totGain)) +'</b><i class="'+ pfxCls(totGain) +'">'+ pfxPct(totGainPct, 1, true) +'</i></div>'
+        +   '<div><span class="pfx-lbl">Invertido</span><b>'+ pfMoney(totalInv) +'</b></div>'
+        +   '<div><span class="pfx-lbl">Posiciones</span><b>'+ nPos +'</b>'+ (cashV > 0 && total > 0 ? '<i>'+ pfxPct(cashV/total*100) +' en efectivo</i>' : '') +'</div>'
+        +   (incDate ? '<div><span class="pfx-lbl">Cartera desde</span><b>'+ incDate.getDate() + ' ' + MESES[incDate.getMonth()] +'</b><i>'+ incDate.getFullYear() +'</i></div>' : '')
+        + '</div>'
+        + '</div>'
+        + (nUnknown ? '<div class="pfx-hero__warn">' + nUnknown + (nUnknown === 1 ? ' posición queda' : ' posiciones quedan') + ' fuera del resultado por no tener precio de compra o cotización.</div>' : '');
     }
 
     pfPerfCache = {};
@@ -8524,22 +8580,20 @@
     var profile = QZProfiles[profileEntry.tier] || {};
     var bands = profileEntry.bands;
     grid.innerHTML = '<div class="pf-metrics-label">Composición vs. tu perfil</div>'
-      + '<div class="pf-align-profile"><span style="color:'+ (profile.color||'var(--gold)') +';">'+ (profile.emoji||'') +' '+ pfEsc(profileEntry.name) +'.</span> '+ pfEsc(profile.desc||'') +'</div>'
       + '<div class="pf-align-list">'
       + PF_ALIGN_ORDER.map(function(cat){
           var band = bands[cat] || [0,100];
           var value = pct[cat];
           var status = pfAlignStatus(value, bands[cat]);
-          return '<div class="pf-align-row"><div class="pf-align-top"><span class="pf-align-name">'+ cat +'</span>'
-            + '<span class="pf-align-right"><span class="pf-align-val">'+ value.toFixed(1) +'%</span><span class="pf-chip '+ status +'">'+ pfChipLabel[status] +'</span></span></div>'
+          var chip = status === 'ok' ? 'En rango' : (value > band[1] ? 'Por encima' : 'Por debajo');
+          return '<div class="pf-align-row"><div class="pf-align-top"><span class="pf-align-name">'+ cat +'<span class="pfx-rng">rango '+ band[0] +'–'+ band[1] +'%</span></span>'
+            + '<span class="pf-align-right"><span class="pf-align-val">'+ pfxPct(value) +'</span><span class="pf-chip '+ status +'">'+ chip +'</span></span></div>'
             + '<div class="pf-align-track"><div class="pf-align-band" style="left:'+ band[0] +'%;width:'+ (band[1]-band[0]) +'%;background:'+ (profile.color||'var(--gold)') +';"></div>'
             + '<div class="pf-align-edge" style="left:'+ band[0] +'%;background:'+ (profile.color||'var(--gold)') +';"></div>'
             + '<div class="pf-align-edge" style="left:'+ band[1] +'%;background:'+ (profile.color||'var(--gold)') +';"></div>'
-            + '<div class="pf-align-marker '+ status +'" style="left:'+ Math.min(100,Math.max(0,value)) +'%;"></div></div>'
-            + '<div class="pf-align-note">'+ pfAlignNote(value, band, status) +'</div></div>';
+            + '<div class="pf-align-marker '+ status +'" style="left:'+ Math.min(100,Math.max(0,value)) +'%;"></div></div></div>';
         }).join('')
-      + '</div>'
-      + '<p class="pf-metric-note" style="margin-top:14px;">Herramienta educativa de autogestión. No es una recomendación de comprar, vender o rotar activos.</p>';
+      + '</div>';
 
     // "Composición vs. tu perfil" es gratis: el paywall arranca recién en "Resultados del chequeo".
   }
@@ -8565,7 +8619,16 @@
     Insurance:'Seguros', 'Retail Trade':'Retail', Semiconductors:'Semiconductores', Software:'Software',
     Media:'Medios', 'Telecommunication Services':'Telecomunicaciones', 'Metals & Mining':'Minería y metales',
     Airlines:'Aerolíneas', 'Auto Manufacturers':'Automotriz', Pharmaceuticals:'Farmacéutica',
-    Biotechnology:'Biotecnología', 'Oil & Gas':'Petróleo y gas', Construction:'Construcción', Transportation:'Transporte' };
+    Biotechnology:'Biotecnología', 'Oil & Gas':'Petróleo y gas', Construction:'Construcción', Transportation:'Transporte',
+    Beverages:'Bebidas', 'Food Products':'Alimentos', Tobacco:'Tabaco', 'Household Products':'Productos del hogar', 'Personal Products':'Cuidado personal',
+    Chemicals:'Químicos', 'Aerospace & Defense':'Aeroespacial y defensa', Machinery:'Maquinaria', 'Electrical Equipment':'Equipos eléctricos',
+    'Diversified Financial Services':'Servicios financieros', 'Capital Markets':'Mercado de capitales', 'Consumer Finance':'Crédito al consumo',
+    'Health Care Providers & Services':'Servicios de salud', 'Health Care Equipment & Supplies':'Equipamiento médico', 'Life Sciences Tools & Services':'Ciencias de la vida',
+    'Hotels, Restaurants & Leisure':'Hoteles y restaurantes', 'Textiles, Apparel & Luxury Goods':'Indumentaria y lujo', 'Leisure Products':'Ocio',
+    'Logistics & Transportation':'Logística', 'Professional Services':'Servicios profesionales', 'Commercial Services & Supplies':'Servicios comerciales',
+    'Trading Companies & Distributors':'Distribución', Distributors:'Distribución', Packaging:'Envases', Building:'Construcción',
+    'Internet Software & Services':'Software', 'IT Services':'Servicios de TI', 'Electronic Equipment, Instruments & Components':'Componentes electrónicos',
+    'Technology Hardware, Storage & Peripherals':'Hardware', 'Interactive Media & Services':'Medios digitales', Entertainment:'Entretenimiento', Automobiles:'Automotriz' };
   var PF_COUNTRY_ES = { US:'Estados Unidos', AR:'Argentina', UY:'Uruguay', BR:'Brasil', CL:'Chile', MX:'México',
     CN:'China', DE:'Alemania', FR:'Francia', GB:'Reino Unido', JP:'Japón', NL:'Países Bajos', CH:'Suiza',
     CA:'Canadá', KR:'Corea del Sur', IE:'Irlanda', ES:'España', IL:'Israel', IN:'India', LU:'Luxemburgo',
@@ -8651,8 +8714,6 @@
 
     var items = Object.keys(map).map(function(k){ return { label:k, pct: map[k]/total*100 }; })
       .sort(function(a,b){ return b.pct - a.pct; });
-    var top = items[0];
-
     el.innerHTML = '<div class="pf-metrics-label">Sectores de tu cartera</div>'
       + '<div class="pf-sect-bars">'
       + items.map(function(it){
@@ -8660,12 +8721,7 @@
             + '<span class="pf-sb-t"><span class="pf-sb-f" style="width:'+ Math.max(2, Math.min(100, it.pct)).toFixed(0) +'%;"></span></span>'
             + '<span class="pf-sb-v">'+ it.pct.toFixed(0) +'%</span></div>';
         }).join('')
-      + '</div>'
-      + '<p class="pf-metric-note" style="margin-top:12px;">'
-      + (top && top.pct > 40
-          ? '<b>'+ pfEsc(top.label) +'</b> concentra el '+ top.pct.toFixed(0) +'% de la cartera.'
-          : 'Repartida entre '+ items.length +' sector'+(items.length===1?'':'es')+'.')
-      + '</p>';
+      + '</div>';
 
     // "Sectores de tu cartera" es gratis: el paywall arranca recién en "Resultados del chequeo".
   }
@@ -8699,7 +8755,8 @@
       var symSize = Math.max(9, Math.min(13, rowH / 4));
       var chg = item.change;
       var html = '<div class="mt-sym" style="font-size:'+ symSize +'px">'+ pfEsc(item.symbol) +'</div>';
-      if(rowH >= 40) html += '<div class="mt-chg" style="font-size:'+ Math.max(8, symSize - 3) +'px">'+ (chg != null ? ((chg>=0?'+':'') + chg.toFixed(1) + '%') : 's/d') +'</div>';
+      if(rowH >= 40) html += '<div class="mt-chg" style="font-size:'+ Math.max(8, symSize - 3) +'px">'+ (chg != null ? pfxPct(chg, 1, true) : 's/d') +'</div>';
+      if(rowH >= 40 && item.w != null) html += '<div class="pfx-mt-w">'+ pfxPct(item.w) +'</div>';
       tile.innerHTML = html;
       tile.title = item.symbol + (chg != null ? ' · ' + (chg>=0?'+':'') + chg.toFixed(2) + '%' : ' · variación no disponible hoy');
       if(item.category && item.price != null){
@@ -8712,6 +8769,7 @@
     var el = document.getElementById('pfAssetMap');
     if(!el) return;
     var rows = pfBuildRows();
+    var totalMap = rows.reduce(function(s2, r){ return s2 + r.valorActual; }, 0);
     var grouped = pfGroupByTicker(rows).filter(function(g){ return !g.isCash; });
     if(!grouped.length){
       el.innerHTML = '<div class="pf-metrics-label" style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);">Mapa de tu cartera</div>'
@@ -8725,6 +8783,7 @@
         change: pfGetCurrentChange(g.tickerRaw, g.moneda),
         category: pfGetCurrentCategory(g.tickerRaw, g.moneda),
         currency: g.moneda,
+        w: totalMap > 0 ? g.valorActual / totalMap * 100 : null,
         size: 1
       };
     });
@@ -8746,7 +8805,6 @@
       + '<button type="button" class="pf-mini-warren pf-mini-warren--lock" onclick="pfMetricUpsell(event)" title="Desbloqueá esto con la membresía" aria-label="Desbloqueá esto con la membresía">'+ PF_SPARK_SVG +'</button>'
       + '</span></div>'
       + '<div class="pf-metric-val">'+ PF_LOCK_SVG +' Solo con membresía</div>'
-      + '<div class="pf-metric-note">Se calcula sobre tu cartera con la membresía activa.</div>'
       + '<div class="pf-mini-warren-answer" id="pfMWA-'+ key +'"></div></div>';
   }
   function pfLockedWarrenPanel(){
@@ -9634,15 +9692,16 @@
     grid.innerHTML = '<table class="pf-positions-table mf-comp-table"><thead><tr><th>Activo</th><th>Sector</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Desde compra</th><th style="text-align:right;">% cartera</th></tr></thead><tbody>'
       + priced.map(function(p){
           var pct = total>0 ? (p.valorActual/total*100) : 0;
-          var varStr = p.varPct==null ? '—' : (p.varPct>=0?'+':'−') + Math.abs(p.varPct).toFixed(1) + '%';
+          var varStr = pfxPct(p.varPct, 1, true);
           var varColor = p.varPct==null ? 'rgba(255,255,255,.4)' : (p.varPct>=0 ? 'var(--green)' : 'var(--red)');
           var motivo = (holdingByTicker[p.ticker] && holdingByTicker[p.ticker].motivo) || '';
           var rowId = 'mfWhy_' + p.ticker;
-          var row = '<tr class="mf-comp-row" onclick="mfToggleWhy(\''+ rowId +'\')"><td><b>'+ pfEsc(p.ticker) +'</b><span class="mf-comp-chevron">&#9656;</span></td>'
+          var nm = pfxName(p.ticker);
+          var row = '<tr class="mf-comp-row" onclick="mfToggleWhy(\''+ rowId +'\')"><td><div class="pfx-a">'+ pfxAv(p.ticker) +'<div class="pfx-a__txt"><div class="pfx-a__t"><b>'+ pfEsc(p.ticker) +'</b><span class="mf-comp-chevron">&#9656;</span></div>'+ (nm ? '<div class="pf-lot-date">'+ pfEsc(nm) +'</div>' : '') +'</div></div></td>'
             + '<td><span class="mf-sector-tag">'+ pfEsc(p.sector) +'</span></td>'
-            + '<td class="num">US$'+ p.priceUsd.toFixed(2) +'</td>'
+            + '<td class="num">US$'+ p.priceUsd.toFixed(2).replace('.', ',') +'</td>'
             + '<td class="num" style="color:'+ varColor +';font-weight:600;">'+ varStr +'</td>'
-            + '<td class="num">'+ pct.toFixed(1) +'%</td></tr>';
+            + '<td class="num">'+ pfxPct(pct) +'</td></tr>';
           var detail = '<tr class="mf-comp-detail-row" id="'+ rowId +'"><td colspan="5"><div class="mf-comp-detail">'
             + '<span class="mf-comp-why-label">Por qué tengo '+ pfEsc(p.ticker) +'</span>'
             + '<p class="mf-comp-why-text">'+ (motivo ? pfEsc(motivo) : 'Todavía no cargué el motivo de esta posición.') +'</p>'
@@ -9654,34 +9713,16 @@
     mfRenderPie(priced, total);
   }
 
-  // Torta al lado de la tabla: mismo orden y colores que la paleta de "Tu portafolio"
-  var mfPieChart = null;
-  // 12 posiciones: la paleta base tiene 10, se suman 2 para que no se repitan colores
-  var MF_PIE_COLORS = PF_PALETTE.concat(['#C084FC', '#94A3B8']);
+  // Al lado de la tabla: el peso de cada activo en barras (mismo estilo que Tu portafolio)
   function mfRenderPie(priced, total){
-    var canvas = document.getElementById('mfPieCanvas');
-    if(!canvas || typeof Chart === 'undefined' || !(total > 0)) return;
-    if(mfPieChart) mfPieChart.destroy();
-    mfPieChart = new Chart(canvas, {
-      type: 'doughnut',
-      data: {
-        labels: priced.map(function(p){ return p.ticker; }),
-        datasets: [{ data: priced.map(function(p){ return p.valorActual; }), backgroundColor: priced.map(function(_, i){ return MF_PIE_COLORS[i % MF_PIE_COLORS.length]; }), borderColor: '#0C1828', borderWidth: 2 }]
-      },
-      options: {
-        cutout: '58%',
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,.7)', font: { size: 11.5 }, boxWidth: 10, padding: 10,
-            generateLabels: function(chart){
-              return chart.data.labels.map(function(l, i){
-                return { text: l + '  ' + (priced[i].valorActual / total * 100).toFixed(1) + '%', fillStyle: chart.data.datasets[0].backgroundColor[i], strokeStyle: 'transparent', fontColor: 'rgba(255,255,255,.7)', hidden: !chart.getDataVisibility(i), index: i };
-              });
-            } } },
-          tooltip: { callbacks: { label: function(ctx){ return ' ' + ctx.label + ': ' + (ctx.parsed / total * 100).toFixed(1) + '% de la cartera'; } } }
-        }
-      }
-    });
+    var wrap = document.getElementById('mfPieWrap');
+    if(!wrap || !(total > 0)) return;
+    var max = priced.length ? priced[0].valorActual / total * 100 : 1;
+    wrap.innerHTML = '<div class="pfx-wl">' + priced.map(function(p){
+      var v = p.valorActual / total * 100;
+      return '<div class="pfx-w">'+ pfxAv(p.ticker) +'<span class="pfx-w__t">'+ pfEsc(p.ticker) +'</span>'
+        + '<span class="pfx-w__b"><i style="width:'+ (v / max * 100).toFixed(1) +'%"></i></span><span class="pfx-w__v">'+ pfxPct(v) +'</span></div>';
+    }).join('') + '</div>';
   }
 
   function mfToggleWhy(rowId){
