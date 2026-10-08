@@ -34,6 +34,7 @@
 <link rel="stylesheet" href="assets/pulso/pulso.css?v=20261007e" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261007e" />
 <link rel="stylesheet" href="assets/calendario/calendario.css?v=20261008a" />
+<link rel="stylesheet" href="assets/informes/estanteria.css?v=20261008a" />
 <link rel="stylesheet" href="assets/lector/lector.css?v=20261007e" />
   <script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js" defer></script>
   <script src="assets/mercados/terminal.js"></script>
@@ -4015,6 +4016,7 @@
   <!-- Pestaña Noticias (usa window.MIPulso de pulso.js: va después) -->
   <script src="assets/noticias/noticias.js?v=20261007e" defer></script>
   <script src="assets/calendario/calendario.js?v=20261008a" defer></script>
+  <script src="assets/informes/estanteria.js?v=20261008a" defer></script>
   <!-- Lector de informes en PDF (window.openPdf) -->
   <script src="assets/lector/lector.js?v=20261007e" defer></script>
 
@@ -4294,22 +4296,14 @@
   <section class="section section-inversiones" id="inversiones" data-tab="inversiones">
     <div class="container">
 
-      <div class="section-header inv-header">
-        <h2 class="section-title">Informes Institucionales</h2>
-        <!-- Buscador: indexa las pick-card de abajo (ticker + nombre) y dice si la accion ya tiene informe -->
-        <div class="inv-search" id="invSearch">
-          <div class="inv-search-box">
-            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-            <input type="search" id="invSearchInput" placeholder="Buscá una acción: ticker o empresa (ej. NVDA, Galicia)" autocomplete="off" spellcheck="false" aria-label="Buscar acción" aria-controls="invSearchResults" />
-          </div>
-          <div class="inv-search-results" id="invSearchResults" role="listbox" hidden></div>
-        </div>
+      <div class="section-header inv-header est-head">
+        <h2 class="section-title">Informes</h2>
+        <button type="button" class="est-pedir" id="piOpenBtn" onclick="miOpenPedirInforme()">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z"/></svg>
+          Pedí tu propio informe<em>1 por mes</em>
+        </button>
       </div>
 
-      <div class="inv-disclaimer">
-        <span style="color:#D97706;font-size:14px;flex-shrink:0;">&#9888;</span>
-        <span>Posiciones con fines exclusivamente ilustrativos. No constituyen recomendación ni asesoramiento financiero. Toda decisión de inversión es responsabilidad exclusiva del inversor.</span>
-      </div>
 
       <!-- Panel de creador: solo lo ve una cuenta en MI_CREADORES (el worker lo vuelve a validar con el token) -->
       <div class="cr-panel" id="crPanel" hidden>
@@ -4329,7 +4323,26 @@
         <div class="cr-list" id="crList"></div>
       </div>
 
-      <div class="inv-tabs-row">
+      <!-- Estantería: la arma assets/informes/estanteria.js leyendo las pick-card de abajo (la fuente de verdad,
+           la que actualizan las skills de informes) + informes/catalogo.json (scripts/catalogo-informes.mjs) -->
+      <div class="est" id="est">
+        <section class="est-fx" id="estFicha" hidden></section>
+        <div class="est-secs" id="estSecs" role="group" aria-label="Elegir sector"></div>
+        <div class="est-tools">
+          <span class="est-cnt" id="estCnt"></span>
+          <!-- Buscador: indexa las pick-card de abajo (ticker + nombre) y dice si la accion ya tiene informe -->
+          <div class="inv-search" id="invSearch">
+            <div class="inv-search-box">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input type="search" id="invSearchInput" placeholder="Buscá una acción: ticker o empresa (ej. NVDA, Galicia)" autocomplete="off" spellcheck="false" aria-label="Buscar acción" aria-controls="invSearchResults" />
+            </div>
+            <div class="inv-search-results" id="invSearchResults" role="listbox" hidden></div>
+          </div>
+        </div>
+        <div id="estShelves"></div>
+      </div>
+
+      <div class="inv-tabs-row est-oculto" aria-hidden="true">
       <div class="mkt-tabs inv-tabs" id="invTabs">
         <button type="button" class="mkt-tab active" data-sector="software">Software</button>
         <button type="button" class="mkt-tab" data-sector="semis">Semiconductores</button>
@@ -4338,13 +4351,9 @@
         <button type="button" class="mkt-tab" data-sector="bancos">Bancos</button>
         <button type="button" class="mkt-tab" data-sector="defensivos">Defensivos</button>
       </div>
-        <button type="button" class="pi-cta" id="piOpenBtn" onclick="miOpenPedirInforme()">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z"/></svg>
-          Pedí tu propio informe
-        </button>
       </div>
 
-      <div class="picks-list" style="display:block;">
+      <div class="picks-list est-oculto" aria-hidden="true">
 
         <div class="inv-panel" data-sector-panel="semis">
           <div class="inv-panel-progress">10 de 10 con informe completo</div>
@@ -4982,6 +4991,11 @@
           </div>
         </div>
 
+      </div>
+
+      <div class="inv-disclaimer est-aviso">
+        <span style="color:#D97706;font-size:14px;flex-shrink:0;">&#9888;</span>
+        <span>Posiciones con fines exclusivamente ilustrativos. No constituyen recomendación ni asesoramiento financiero. Toda decisión de inversión es responsabilidad exclusiva del inversor.</span>
       </div>
     </div>
   </section>
