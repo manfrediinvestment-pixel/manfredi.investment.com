@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Red de Asesores Manfredi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: barra superior con pestañas; Perfil = columna editorial + lateral; Consola = KPIs, matriz cliente×activo, gráfico y chat. */
+:root{
+  --bg:#07101e; --raised:#0c1828; --raised2:#11223a;
+  --line:rgba(232,238,246,.10); --line-soft:rgba(232,238,246,.06);
+  --ink:#eef2f7; --ink2:rgba(238,242,247,.84); --ink3:rgba(238,242,247,.62);
+  --gold:#f2c94c; --gold-ink:#f5d67a; --gold-dim:rgba(242,201,76,.14);
+  --pos:#5cc08e; --neg:#e8675f; --data:#6fb1e8; --warn:#f0a44b;
+  --serif:'DM Serif Display',Georgia,serif;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --r:8px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--gold-ink)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(7,16,30,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:20px;min-height:60px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:.01em}
+.brand .m{width:30px;height:30px;border-radius:6px;background:linear-gradient(145deg,#f7dc6f,#b8943f);color:#0a0f1e;display:grid;place-items:center;font-family:var(--serif);font-size:19px}
+.brand small{display:block;font-size:11px;color:var(--ink3);font-weight:500;letter-spacing:.08em;text-transform:uppercase}
+.tabs{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.tab{background:none;border:1px solid transparent;border-radius:999px;padding:7px 14px;cursor:pointer;color:var(--ink3);font-weight:500;font-size:14px}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:#0a0f1e;background:var(--gold)}
+.sample{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--warn);border:1px solid rgba(240,164,75,.35);border-radius:999px;padding:3px 9px;white-space:nowrap}
+
+main{padding-block:28px 64px}
+section[role="tabpanel"]{display:grid;gap:22px}
+h1,h2,h3{text-wrap:balance;margin:0}
+h2{font-family:var(--serif);font-weight:400;font-size:26px;line-height:1.15}
+h3{font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.panel{background:var(--raised);border:1px solid var(--line);border-radius:var(--r);padding:20px;min-width:0}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--ink2);white-space:nowrap}
+.chip.ok{border-color:rgba(92,192,142,.4);color:var(--pos)}
+.chip.gold{border-color:rgba(242,201,76,.4);color:var(--gold-ink);background:var(--gold-dim)}
+.chip.warn{border-color:rgba(240,164,75,.45);color:var(--warn)}
+.btn{border:1px solid var(--line);background:var(--raised2);border-radius:6px;padding:8px 14px;cursor:pointer;font-weight:500;font-size:14px}
+.btn:hover{border-color:rgba(242,201,76,.5)}
+.btn.primary{background:var(--gold);color:#0a0f1e;border-color:var(--gold)}
+.pos{color:var(--pos)} .neg{color:var(--neg)}
+
+/* ---------- PERFIL ---------- */
+.hero{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center;padding:26px;background:
+  radial-gradient(600px 220px at 85% -40%,rgba(242,201,76,.12),transparent 70%),var(--raised)}
+.avatar{width:92px;height:92px;border-radius:50%;background:linear-gradient(160deg,#1d3557,#0c1828);border:2px solid var(--gold);display:grid;place-items:center;font-family:var(--serif);font-size:36px;color:var(--gold-ink)}
+.hero h1{font-family:var(--serif);font-weight:400;font-size:36px;line-height:1.05}
+.hero .role{color:var(--ink2);margin:6px 0 10px}
+.hero .actions{display:flex;flex-direction:column;gap:8px}
+.verify{display:grid;gap:4px;font-size:12px;color:var(--ink3);margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.stat{background:var(--raised);padding:16px 18px}
+.stat b{display:block;font-family:var(--mono);font-size:24px;font-weight:500;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--ink3)}
+.cols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:22px;align-items:start}
+.stack{display:grid;gap:22px;min-width:0}
+.post{display:grid;gap:8px;padding:16px 0;border-top:1px solid var(--line-soft)}
+.post:first-of-type{border-top:0;padding-top:4px}
+.post h4{margin:0;font-family:var(--serif);font-weight:400;font-size:20px;line-height:1.2}
+.post p{margin:0;color:var(--ink2);max-width:65ch}
+.meta{font-size:12px;color:var(--ink3)}
+.tr{width:100%;border-collapse:collapse;font-size:14px}
+.tr th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);font-weight:600;text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+.tr td{padding:9px 6px;border-bottom:1px solid var(--line-soft)}
+.tr td.r,.tr th.r{text-align:right}
+.timeline{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.timeline li{display:grid;grid-template-columns:76px 1fr;gap:12px}
+.timeline .y{font-family:var(--mono);font-size:12px;color:var(--gold-ink);padding-top:2px}
+.timeline b{display:block;font-weight:600}
+.timeline span{font-size:13px;color:var(--ink3)}
+.disclaimer{font-size:12px;color:var(--ink3);border-left:2px solid var(--line);padding-left:12px}
+
+/* ---------- CONSOLA ---------- */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.kpi{background:var(--raised);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:4px;min-width:0}
+.kpi span{font-size:12px;color:var(--ink3)}
+.kpi b{font-family:var(--mono);font-weight:500;font-size:22px;font-variant-numeric:tabular-nums}
+.kpi small{font-size:12px}
+.scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.matrix{border-collapse:separate;border-spacing:0;width:100%;min-width:840px;font-size:13px}
+.matrix th{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);font-weight:600;padding:8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.matrix th:first-child{text-align:left}
+.matrix td{padding:0;border-bottom:1px solid var(--line-soft);text-align:right}
+.matrix td .c{padding:9px 8px;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.matrix tbody tr{cursor:pointer}
+.matrix tbody tr:hover td{background:rgba(255,255,255,.025)}
+.matrix tbody tr[aria-selected="true"] td{background:rgba(242,201,76,.07)}
+.matrix tbody tr[aria-selected="true"] td:first-child{box-shadow:inset 3px 0 0 var(--gold)}
+.matrix td.name{text-align:left;padding:8px}
+.matrix td.name b{display:block;font-weight:600;font-size:14px}
+.matrix td.name span{font-size:11px;color:var(--ink3)}
+.cell-w{position:relative}
+.cell-w .c{position:relative;z-index:1}
+.cell-w i{position:absolute;inset:4px 3px;border-radius:4px;background:var(--data);opacity:.0}
+.cell-w.drift .c{color:var(--warn);font-weight:600}
+.cell-w.drift i{background:var(--warn)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink3)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:22px;align-items:start}
+.chart svg{width:100%;height:auto;display:block}
+.alloc{display:grid;gap:8px}
+.alloc .ar{display:grid;grid-template-columns:96px 1fr 70px;gap:10px;align-items:center;font-size:13px}
+.alloc .bar{height:8px;border-radius:4px;background:var(--line-soft);position:relative}
+.alloc .bar b{position:absolute;inset:0 auto 0 0;border-radius:4px;background:var(--data)}
+.alloc .bar em{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--gold)}
+.alloc .ar.drift .bar b{background:var(--warn)}
+.alloc .v{font-family:var(--mono);font-size:12px;text-align:right;color:var(--ink2)}
+.alert{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:12px;border-radius:6px;background:rgba(240,164,75,.08);border:1px solid rgba(240,164,75,.28);font-size:13px}
+.alert.okb{background:rgba(92,192,142,.07);border-color:rgba(92,192,142,.28)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--warn);margin-top:6px}
+.okb .dot{background:var(--pos)}
+
+.chat{display:grid;grid-template-rows:auto 1fr auto;height:520px;padding:0;overflow:hidden}
+.chat header{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.chat header b{font-weight:600}
+.msgs{overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:82%;padding:9px 12px;border-radius:10px;font-size:14px;line-height:1.45}
+.msg time{display:block;font-size:10.5px;color:var(--ink3);margin-top:4px;font-family:var(--mono)}
+.msg.in{background:var(--raised2);align-self:flex-start;border-bottom-left-radius:3px}
+.msg.out{background:rgba(242,201,76,.13);border:1px solid rgba(242,201,76,.22);align-self:flex-end;border-bottom-right-radius:3px}
+.msg.sys{align-self:center;max-width:none;font-size:11.5px;color:var(--ink3);background:none;padding:2px}
+.proposal{border:1px solid rgba(242,201,76,.35);border-radius:8px;padding:10px 12px;margin-top:6px;background:var(--bg);display:grid;gap:4px;font-size:13px}
+.proposal b{color:var(--gold-ink);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.composer{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
+.composer input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:9px 12px;color:var(--ink);font:inherit;font-size:14px}
+.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tool{background:var(--raised);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:6px;align-content:start}
+.tool b{font-weight:600}
+.tool p{margin:0;font-size:13px;color:var(--ink3)}
+.tool .tag{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink)}
+
+/* ---------- PLANES ---------- */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+.plan{background:var(--raised);border:1px solid var(--line);border-radius:var(--r);padding:22px;display:grid;gap:12px;align-content:start}
+.plan.feat{border-color:rgba(242,201,76,.55);background:radial-gradient(400px 160px at 50% -30%,rgba(242,201,76,.12),transparent 70%),var(--raised)}
+.plan h4{margin:0;font-family:var(--serif);font-weight:400;font-size:24px}
+.price{font-family:var(--mono);font-size:30px;font-weight:500}
+.price small{font-size:13px;color:var(--ink3);font-family:var(--sans)}
+.plan ul{margin:0;padding:0;list-style:none;display:grid;gap:7px;font-size:14px;color:var(--ink2)}
+.plan li{padding-left:18px;position:relative}
+.plan li::before{content:"";position:absolute;left:0;top:9px;width:8px;height:2px;background:var(--gold)}
+.rules{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.rules ul{margin:8px 0 0;padding-left:18px;display:grid;gap:6px;font-size:14px;color:var(--ink2)}
+
+@media (max-width:980px){
+  .kpis{grid-template-columns:repeat(3,1fr)}
+  .cols,.grid2{grid-template-columns:1fr}
+  .plans,.tools{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  .hero{grid-template-columns:auto 1fr;padding:18px}
+  .hero .actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}
+  .avatar{width:64px;height:64px;font-size:26px}
+  .hero h1{font-size:28px}
+  .stats{grid-template-columns:1fr 1fr}
+  .kpis{grid-template-columns:1fr 1fr}
+  .plans,.tools,.rules{grid-template-columns:1fr}
+  .tabs{margin-left:0;width:100%}
+  .chat{height:460px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .cell-w i{transition:opacity .25s ease}
+  .alloc .bar b{transition:width .35s cubic-bezier(.2,.7,.2,1)}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><span class="m">M</span><div>Red de Asesores<small>Manfredi Investment</small></div></div>
+    <nav class="tabs" role="tablist" aria-label="Secciones">
+      <button class="tab" role="tab" id="t-perfil" aria-controls="p-perfil" aria-selected="true">Perfil público</button>
+      <button class="tab" role="tab" id="t-consola" aria-controls="p-consola" aria-selected="false">Consola del asesor</button>
+      <button class="tab" role="tab" id="t-planes" aria-controls="p-planes" aria-selected="false">Planes</button>
+    </nav>
+    <span class="sample">Datos de ejemplo</span>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ================= PERFIL ================= -->
+<section role="tabpanel" id="p-perfil" aria-labelledby="t-perfil">
+  <div class="panel hero">
+    <div class="avatar" aria-hidden="true">LF</div>
+    <div>
+      <h1>Lucía Ferraro</h1>
+      <div class="role">Asesora financiera independiente · Renta fija argentina y CEDEARs · Rosario</div>
+      <div class="row">
+        <span class="chip ok">✓ Idónea CNV verificada</span>
+        <span class="chip">Opera vía ALyC registrado</span>
+        <span class="chip">CFA Nivel II</span>
+        <span class="chip gold">Fundadora de la Red</span>
+      </div>
+      <div class="verify">Verificación hecha por Manfredi contra el registro público de la CNV · última revisión 01-oct-2026</div>
+    </div>
+    <div class="actions">
+      <button class="btn primary" type="button">Pedir una primera reunión</button>
+      <button class="btn" type="button">Seguir análisis</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b>6 años</b><span>asesorando clientes</span></div>
+    <div class="stat"><b class="num">38</b><span>clientes activos</span></div>
+    <div class="stat"><b class="num">24</b><span>análisis publicados</span></div>
+    <div class="stat"><b class="num">14/21</b><span>ideas por encima del S&amp;P 500 desde su publicación</span></div>
+  </div>
+
+  <div class="cols">
+    <div class="stack">
+      <div class="panel">
+        <div class="row" style="justify-content:space-between;margin-bottom:6px"><h3>Análisis publicados</h3><span class="meta">Opinión general, no recomendación personalizada</span></div>
+        <article class="post">
+          <span class="meta">06-oct-2026 · Renta fija · 7 min</span>
+          <h4>Curva de Bonares: el tramo 2030 quedó barato contra el 2035</h4>
+          <p>Con el riesgo país en la zona de 600 puntos, el diferencial entre AL30 y AL35 ya descuenta un escenario de reestructuración que el calendario de pagos no justifica. Comparo TIR, duration y flujos por cada USD 100 nominales.</p>
+          <div class="row"><span class="chip">AL30</span><span class="chip">AL35</span><span class="chip">GD38</span><span class="meta">· 312 lecturas · 41 guardados</span></div>
+        </article>
+        <article class="post">
+          <span class="meta">22-sep-2026 · CEDEARs · 5 min</span>
+          <h4>Tres CEDEARs de dividendos para una cartera que cobra en pesos</h4>
+          <p>Cómo pesa el ratio de conversión y el CCL implícito en el rendimiento final del dividendo, con un ejemplo armado con KO, PEP y JNJ.</p>
+          <div class="row"><span class="chip">KO</span><span class="chip">PEP</span><span class="chip">JNJ</span><span class="meta">· 528 lecturas · 77 guardados</span></div>
+        </article>
+        <article class="post">
+          <span class="meta">09-sep-2026 · Macro · 4 min</span>
+          <h4>Lecaps contra caución: cuándo conviene estirar plazo</h4>
+          <p>La pendiente de la curva en pesos y lo que dice sobre la inflación que espera el mercado para el primer trimestre.</p>
+          <div class="row"><span class="chip">S31O6</span><span class="chip">S30E7</span><span class="meta">· 204 lecturas · 19 guardados</span></div>
+        </article>
+      </div>
+
+      <div class="panel">
+        <div class="row" style="justify-content:space-between;margin-bottom:8px"><h3>Track record de ideas</h3><span class="meta">Calculado por Manfredi desde el precio de cierre del día de publicación</span></div>
+        <div class="scroll-x">
+        <table class="tr">
+          <thead><tr><th>Publicada</th><th>Idea</th><th class="r">Desde publicación</th><th class="r">S&amp;P 500 mismo período</th></tr></thead>
+          <tbody>
+            <tr><td class="num">14-jul-26</td><td>Largo GD35</td><td class="r num pos">+9,4%</td><td class="r num">+3,1%</td></tr>
+            <tr><td class="num">02-jun-26</td><td>Largo VIST</td><td class="r num pos">+12,7%</td><td class="r num">+5,8%</td></tr>
+            <tr><td class="num">18-may-26</td><td>Largo MELI</td><td class="r num neg">−4,2%</td><td class="r num">+6,4%</td></tr>
+            <tr><td class="num">03-abr-26</td><td>Largo KO</td><td class="r num pos">+7,9%</td><td class="r num">+7,2%</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="panel">
+        <h3 style="margin-bottom:14px">Trayectoria</h3>
+        <ul class="timeline">
+          <li><span class="y">2023–hoy</span><div><b>Asesora independiente</b><span>Carteras de renta fija y CEDEARs para profesionales y pymes</span></div></li>
+          <li><span class="y">2020–2023</span><div><b>Analista de renta fija</b><span>Mesa de trading de un ALyC, Buenos Aires</span></div></li>
+          <li><span class="y">2018–2020</span><div><b>Productora</b><span>Atención de clientes minoristas</span></div></li>
+          <li><span class="y">2017</span><div><b>Lic. en Economía</b><span>Universidad Nacional de Rosario</span></div></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3 style="margin-bottom:12px">Cómo trabaja</h3>
+        <div class="alloc">
+          <div class="row"><span class="chip">Perfiles: conservador a moderado</span><span class="chip">Mínimo USD 10.000</span><span class="chip">Honorario fijo anual</span></div>
+          <p class="meta" style="margin:6px 0 0">Los fondos quedan siempre en la cuenta comitente del cliente en su ALyC. La asesora no recibe ni administra dinero.</p>
+        </div>
+      </div>
+      <p class="disclaimer">Los análisis publicados son opiniones generales y no tienen en cuenta el perfil de riesgo de cada lector. El asesoramiento personalizado lo presta la profesional bajo su propia inscripción. Manfredi Investment ofrece el software y no asesora ni intermedia.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONSOLA ================= -->
+<section role="tabpanel" id="p-consola" aria-labelledby="t-consola" hidden>
+  <div class="row" style="justify-content:space-between">
+    <h2>Buen día, Lucía</h2>
+    <div class="row"><span class="chip warn" id="alertCount"></span><span class="meta">Precios al cierre 07-oct-2026</span></div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><span>Patrimonio asesorado</span><b id="kAum"></b><small class="meta">8 clientes en esta muestra</small></div>
+    <div class="kpi"><span>Rendimiento 2026 ponderado</span><b id="kYtd" class="pos"></b><small class="pos" id="kYtdVs"></small></div>
+    <div class="kpi"><span>Sharpe promedio</span><b id="kSharpe"></b><small class="meta">12 meses, tasa libre 4,1%</small></div>
+    <div class="kpi"><span>Carteras desalineadas</span><b id="kDrift" style="color:var(--warn)"></b><small class="meta">desvío ≥ 5 pp del modelo</small></div>
+    <div class="kpi"><span>Próximo cobro de cupones</span><b>09-oct</b><small class="meta">AL30 y GD30 · 6 clientes</small></div>
+  </div>
+
+  <div class="panel">
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <h3>Matriz de clientes · peso por clase de activo</h3>
+      <div class="legend"><span><i style="background:var(--data)"></i>peso en cartera</span><span><i style="background:var(--warn)"></i>desvío ≥ 5 pp del modelo de su perfil</span></div>
+    </div>
+    <div class="scroll-x"><table class="matrix" id="matrix"></table></div>
+  </div>
+
+  <div class="grid2">
+    <div class="stack">
+      <div class="panel chart">
+        <div class="row" style="justify-content:space-between;margin-bottom:10px">
+          <h3>Rendimiento acumulado 2026</h3>
+          <div class="legend"><span><i style="background:var(--gold)"></i>Clientes (ponderado)</span><span><i style="background:var(--data)"></i>S&amp;P 500</span><span><i style="background:var(--ink3)"></i>Merval CCL</span></div>
+        </div>
+        <div id="chart"></div>
+      </div>
+      <div class="panel">
+        <div class="row" style="justify-content:space-between;margin-bottom:12px">
+          <h3 id="selTitle"></h3><span class="meta">barra = cartera actual · marca dorada = modelo del perfil</span>
+        </div>
+        <div class="alloc" id="alloc"></div>
+        <div id="selAlert" style="margin-top:14px"></div>
+      </div>
+    </div>
+
+    <div class="panel chat" aria-label="Chat con el cliente">
+      <header><div><b id="chatName"></b> <span class="meta" id="chatProfile"></span></div><span class="chip">Conversación archivada para cumplimiento</span></header>
+      <div class="msgs" id="msgs" aria-live="polite"></div>
+      <form class="composer" id="composer">
+        <label for="chatInput" class="meta" hidden>Mensaje</label>
+        <input id="chatInput" autocomplete="off" placeholder="Escribí un mensaje…">
+        <button class="btn primary" type="submit">Enviar</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="tools">
+    <div class="tool"><span class="tag">Automático</span><b>Reporte mensual al cliente</b><p>Un PDF con rendimiento real (Dietz modificado), cupones cobrados y comparación contra su benchmark, con la firma de la asesora.</p></div>
+    <div class="tool"><span class="tag">Cumplimiento</span><b>Test de perfil de riesgo</b><p>El cliente lo completa online. Si una propuesta no encaja con su perfil, la consola avisa antes de enviarla.</p></div>
+    <div class="tool"><span class="tag">Warren IA</span><b>Copiloto del asesor</b><p>"¿Qué clientes tienen más del 30% en un solo emisor?" Responde con los datos de tu propia consola.</p></div>
+    <div class="tool"><span class="tag">Mercado</span><b>Eventos que tocan a tus clientes</b><p>Earnings, cortes de cupón y vencimientos del calendario Manfredi, cruzados con las tenencias de cada uno.</p></div>
+    <div class="tool"><span class="tag">Importación</span><b>Carga desde el PDF del broker</b><p>El mismo importador del Portfolio de Manfredi: el cliente sube el resumen de IOL, Balanz, Cocos o PPI y la matriz se actualiza.</p></div>
+    <div class="tool"><span class="tag">Reputación</span><b>Track record verificable</b><p>Cada idea publicada queda con precio y fecha. El rendimiento lo calcula Manfredi y no se puede editar.</p></div>
+  </div>
+</section>
+
+<!-- ================= PLANES ================= -->
+<section role="tabpanel" id="p-planes" aria-labelledby="t-planes" hidden>
+  <div class="row" style="justify-content:space-between">
+    <h2>Licencia anual para asesores</h2>
+    <span class="meta">Precios ilustrativos, a definir</span>
+  </div>
+  <div class="plans">
+    <div class="plan">
+      <h4>Perfil</h4>
+      <div class="price">Gratis</div>
+      <ul><li>Perfil público con CV y verificación CNV</li><li>Publicación de análisis</li><li>Track record de ideas</li><li>Recibir pedidos de reunión</li></ul>
+    </div>
+    <div class="plan feat">
+      <span class="chip gold" style="justify-self:start">Primer año bonificado para los fundadores</span>
+      <h4>Consola Pro</h4>
+      <div class="price">USD 290 <small>/ año</small></div>
+      <ul><li>Hasta 15 clientes en la consola</li><li>Matriz, métricas, alertas de desvío</li><li>Chat archivado con cada cliente</li><li>Reporte mensual automático</li><li>Warren IA como copiloto</li></ul>
+    </div>
+    <div class="plan">
+      <h4>Consola Estudio</h4>
+      <div class="price">USD 690 <small>/ año</small></div>
+      <ul><li>Hasta 60 clientes y 3 asesores</li><li>Todo lo de Pro</li><li>Marca propia en los reportes</li><li>Cliente adicional: USD 2 por mes</li></ul>
+    </div>
+  </div>
+  <div class="rules">
+    <div class="panel">
+      <h3>Qué cobra Manfredi</h3>
+      <ul>
+        <li>Una licencia de software por año.</li>
+        <li>Un cargo fijo por cada cliente cargado en la consola, igual para todos.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Qué no cobra Manfredi</h3>
+      <ul>
+        <li>Porcentajes sobre el patrimonio de los clientes o sobre los honorarios del asesor.</li>
+        <li>Comisiones por presentar clientes a un asesor.</li>
+        <li>Nada relacionado con operaciones: no recibe órdenes ni fondos.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function(){
+  var ASSETS=['CEDEARs','Acciones AR','Bonos USD','ONs','Lecaps','FCI / Caución','Cash USD'];
+  var MODEL={
+    'Conservador':[10,5,25,30,15,10,5],
+    'Moderado':[25,10,25,15,10,10,5],
+    'Agresivo':[45,20,15,5,5,5,5]
+  };
+  var CLIENTS=[
+    {n:'Martín A.',p:'Moderado',aum:84200,ytd:11.8,sh:1.3,w:[34,12,22,12,8,7,5],last:'hoy'},
+    {n:'Carolina S.',p:'Conservador',aum:152000,ytd:6.9,sh:1.6,w:[9,4,27,31,14,10,5],last:'ayer'},
+    {n:'Diego P.',p:'Agresivo',aum:41500,ytd:14.2,sh:1.0,w:[47,22,12,5,4,5,5],last:'3 días'},
+    {n:'Valentina R.',p:'Moderado',aum:66900,ytd:9.6,sh:1.4,w:[22,9,26,16,12,10,5],last:'1 semana'},
+    {n:'Federico M.',p:'Agresivo',aum:23800,ytd:16.1,sh:0.8,w:[38,31,10,6,5,5,5],last:'2 días'},
+    {n:'Sofía L.',p:'Conservador',aum:210400,ytd:5.4,sh:1.2,w:[12,6,18,30,14,10,10],last:'5 días'},
+    {n:'Tomás G.',p:'Moderado',aum:58300,ytd:10.2,sh:1.3,w:[26,11,24,14,10,10,5],last:'hoy'},
+    {n:'Julieta B.',p:'Moderado',aum:97600,ytd:9.9,sh:1.4,w:[24,10,25,16,10,10,5],last:'2 semanas'}
+  ];
+  var CHATS={
+    0:[
+      {k:'sys',t:'Martín completó el test de perfil: Moderado · 12-ago-2026'},
+      {k:'in',t:'Lucía, vi que los CEDEARs subieron bastante este mes. ¿Estoy muy cargado?',at:'09:12'},
+      {k:'out',t:'Sí, hoy tenés 34% en CEDEARs y tu modelo moderado es 25%. Te armé una propuesta para volver al rango.',at:'09:20',prop:'Pasar 9 pp de CEDEARs a Bonos USD (+3) y ONs (+3) y Lecaps (+3). Quedás alineado a tu perfil. La ejecución la hacés vos en tu broker.'},
+      {k:'in',t:'Dale, me parece bien. ¿Las ONs que decís son en dólares MEP?',at:'09:31'}
+    ],
+    4:[
+      {k:'sys',t:'Alerta automática: Acciones AR 31% contra 20% del modelo agresivo'},
+      {k:'out',t:'Federico, el rally de bancos te dejó con 31% en acciones argentinas. ¿Charlamos esta semana si querés tomar algo de ganancia?',at:'ayer 17:40'}
+    ],
+    5:[
+      {k:'in',t:'¿Me mandás el reporte de septiembre? Lo necesito para el contador.',at:'lun 10:05'},
+      {k:'out',t:'Ya lo tenés en tu panel, con cupones cobrados y el detalle para Bienes Personales.',at:'lun 10:22'}
+    ]
+  };
+  var fmtUSD=function(v){return 'USD '+v.toLocaleString('es-AR')};
+  var fmtPct=function(v,d){return (v>=0?'+':'−')+Math.abs(v).toFixed(d==null?1:d).replace('.',',')+'%'};
+  var driftOf=function(c){var m=MODEL[c.p];return c.w.map(function(x,i){return x-m[i]})};
+  var isDrift=function(d){return Math.abs(d)>=5};
+
+  // KPIs
+  var tot=CLIENTS.reduce(function(s,c){return s+c.aum},0);
+  var ytd=CLIENTS.reduce(function(s,c){return s+c.ytd*c.aum},0)/tot;
+  var sh=CLIENTS.reduce(function(s,c){return s+c.sh},0)/CLIENTS.length;
+  var nd=CLIENTS.filter(function(c){return driftOf(c).some(isDrift)}).length;
+  document.getElementById('kAum').textContent=fmtUSD(tot);
+  document.getElementById('kYtd').textContent=fmtPct(ytd);
+  document.getElementById('kYtdVs').textContent=(ytd-8.2>=0?'+':'−')+Math.abs(ytd-8.2).toFixed(1).replace('.',',')+' pp contra el S&P 500';
+  document.getElementById('kSharpe').textContent=sh.toFixed(2).replace('.',',');
+  document.getElementById('kDrift').textContent=nd+' de '+CLIENTS.length;
+  document.getElementById('alertCount').textContent=nd+' alertas de desvío';
+
+  // Matrix
+  var tbl=document.getElementById('matrix');
+  var h='<thead><tr><th>Cliente</th>'+ASSETS.map(function(a){return '<th>'+a+'</th>'}).join('')+'<th>Patrimonio</th><th>2026</th></tr></thead><tbody>';
+  CLIENTS.forEach(function(c,i){
+    var d=driftOf(c);
+    h+='<tr data-i="'+i+'" tabindex="0"><td class="name"><b>'+c.n+'</b><span>'+c.p+' · último contacto '+c.last+'</span></td>';
+    c.w.forEach(function(x,j){
+      var dr=isDrift(d[j]);
+      var op=dr?.22:(0.05+x/50*0.4);
+      h+='<td class="cell-w'+(dr?' drift':'')+'" title="Modelo '+MODEL[c.p][j]+'% · desvío '+(d[j]>0?'+':'')+d[j]+' pp"><i style="opacity:'+op.toFixed(2)+'"></i><div class="c">'+x+'%</div></td>';
+    });
+    h+='<td><div class="c">'+fmtUSD(c.aum)+'</div></td><td><div class="c '+(c.ytd>=0?'pos':'neg')+'">'+fmtPct(c.ytd)+'</div></td></tr>';
+  });
+  tbl.innerHTML=h+'</tbody>';
+
+  // Chart
+  var M=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct'];
+  var S=[
+    {c:'var(--gold)',w:2.5,v:[0,1.8,3.1,2.4,4.9,6.2,5.5,7.8,9.1,10.4]},
+    {c:'var(--data)',w:1.8,v:[0,1.2,-0.8,1.5,3.2,4.0,5.6,6.1,7.4,8.2]},
+    {c:'var(--ink3)',w:1.5,v:[0,-3.5,-6.1,-2.0,4.5,8.8,3.1,6.4,12.0,9.5]}
+  ];
+  var W=640,H=280,pl=40,pr=46,pt=14,pb=28,lo=-8,hi=14;
+  var x=function(i){return pl+i*(W-pl-pr)/(M.length-1)};
+  var y=function(v){return pt+(hi-v)*(H-pt-pb)/(hi-lo)};
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Rendimiento acumulado 2026: clientes +10,4%, S&P 500 +8,2%, Merval CCL +9,5%">';
+  [-8,-4,0,4,8,12].forEach(function(t){
+    svg+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y(t)+'" y2="'+y(t)+'" stroke="var(--line'+(t===0?'':'-soft')+')"/>';
+    svg+='<text x="'+(pl-8)+'" y="'+(y(t)+4)+'" text-anchor="end" font-size="11" fill="var(--ink3)" font-family="IBM Plex Mono,monospace">'+(t>0?'+':'')+t+'%</text>';
+  });
+  M.forEach(function(m,i){svg+='<text x="'+x(i)+'" y="'+(H-8)+'" text-anchor="middle" font-size="11" fill="var(--ink3)">'+m+'</text>'});
+  // area under clients series
+  var g=S[0];
+  svg+='<defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2c94c" stop-opacity=".22"/><stop offset="1" stop-color="#f2c94c" stop-opacity="0"/></linearGradient></defs>';
+  svg+='<path fill="url(#ga)" d="M'+x(0)+','+y(0)+g.v.map(function(v,i){return 'L'+x(i)+','+y(v)}).join('')+'L'+x(g.v.length-1)+','+y(0)+'Z"/>';
+  S.slice().reverse().forEach(function(s){
+    svg+='<path fill="none" stroke="'+s.c+'" stroke-width="'+s.w+'" stroke-linejoin="round" stroke-linecap="round" d="'+s.v.map(function(v,i){return (i?'L':'M')+x(i)+','+y(v)}).join('')+'"/>';
+    var last=s.v[s.v.length-1];
+    svg+='<circle cx="'+x(s.v.length-1)+'" cy="'+y(last)+'" r="3.5" fill="'+s.c+'"/>';
+  });
+  // end labels, nudged so they don't collide
+  var ends=S.map(function(s){return {v:s.v[s.v.length-1],c:s.c,yy:y(s.v[s.v.length-1])}}).sort(function(a,b){return a.yy-b.yy});
+  for(var k=1;k<ends.length;k++){if(ends[k].yy-ends[k-1].yy<13)ends[k].yy=ends[k-1].yy+13}
+  ends.forEach(function(e){svg+='<text x="'+(W-pr+8)+'" y="'+(e.yy+4)+'" font-size="11" fill="'+e.c+'" font-family="IBM Plex Mono,monospace">'+fmtPct(e.v)+'</text>'});
+  document.getElementById('chart').innerHTML=svg+'</svg>';
+
+  // Selection
+  var sel=0;
+  function select(i){
+    sel=i;var c=CLIENTS[i],d=driftOf(c),m=MODEL[c.p];
+    tbl.querySelectorAll('tbody tr').forEach(function(r){r.setAttribute('aria-selected',r.dataset.i==i?'true':'false')});
+    document.getElementById('selTitle').textContent=c.n+' · cartera contra modelo '+c.p.toLowerCase();
+    document.getElementById('alloc').innerHTML=ASSETS.map(function(a,j){
+      return '<div class="ar'+(isDrift(d[j])?' drift':'')+'"><span>'+a+'</span><div class="bar"><b style="width:'+(c.w[j]*2)+'%"></b><em style="left:'+(m[j]*2)+'%"></em></div><span class="v">'+c.w[j]+'% · '+(d[j]>0?'+':d[j]<0?'−':'')+Math.abs(d[j])+'</span></div>';
+    }).join('');
+    var bad=ASSETS.map(function(a,j){return isDrift(d[j])?a+' '+(d[j]>0?'+':'−')+Math.abs(d[j])+' pp':null}).filter(Boolean);
+    document.getElementById('selAlert').innerHTML=bad.length
+      ?'<div class="alert"><span class="dot"></span><div><b>Fuera de su perfil:</b> '+bad.join(', ')+'. <button class="btn" type="button" style="margin-left:6px;padding:4px 10px;font-size:12px" id="mkProp">Armar propuesta de rebalanceo</button></div></div>'
+      :'<div class="alert okb"><span class="dot"></span><div>Alineada a su perfil. Ninguna clase de activo se desvía 5 pp o más del modelo.</div></div>';
+    document.getElementById('chatName').textContent=c.n;
+    document.getElementById('chatProfile').textContent='· '+c.p+' · '+fmtUSD(c.aum);
+    renderChat();
+    var b=document.getElementById('mkProp');
+    if(b)b.addEventListener('click',function(){
+      var parts=ASSETS.map(function(a,j){return d[j]?a+' '+(d[j]>0?'−':'+')+Math.abs(d[j])+' pp':null}).filter(Boolean);
+      push({k:'out',t:'Te paso una propuesta para volver a tu perfil '+c.p.toLowerCase()+'.',at:'ahora',prop:parts.join(' · ')+'. La ejecución la hacés vos en tu broker.'});
+    });
+  }
+  function renderChat(){
+    var list=CHATS[sel]||[{k:'sys',t:'Todavía no hay mensajes con '+CLIENTS[sel].n+'.'}];
+    document.getElementById('msgs').innerHTML=list.map(function(m){
+      if(m.k==='sys')return '<div class="msg sys">'+m.t+'</div>';
+      return '<div class="msg '+m.k+'">'+esc(m.t)+(m.prop?'<div class="proposal"><b>Propuesta de rebalanceo</b>'+esc(m.prop)+'</div>':'')+'<time>'+m.at+'</time></div>';
+    }).join('');
+    var box=document.getElementById('msgs');box.scrollTop=box.scrollHeight;
+  }
+  function push(m){(CHATS[sel]=CHATS[sel]||[]).push(m);renderChat()}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]})}
+
+  tbl.addEventListener('click',function(e){var r=e.target.closest('tr[data-i]');if(r)select(+r.dataset.i)});
+  tbl.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){var r=e.target.closest('tr[data-i]');if(r){e.preventDefault();select(+r.dataset.i)}}});
+  document.getElementById('composer').addEventListener('submit',function(e){
+    e.preventDefault();var inp=document.getElementById('chatInput');var t=inp.value.trim();if(!t)return;
+    push({k:'out',t:t,at:'ahora'});inp.value='';
+  });
+  select(0);
+
+  // Tabs
+  var tabs=document.querySelectorAll('.tab');
+  function show(id){
+    tabs.forEach(function(t){var on=t.id==='t-'+id;t.setAttribute('aria-selected',on);document.getElementById(t.getAttribute('aria-controls')).hidden=!on});
+    try{localStorage.setItem('ra-tab',id)}catch(e){}
+  }
+  tabs.forEach(function(t){t.addEventListener('click',function(){show(t.id.slice(2))})});
+  var start=(location.hash||'').slice(1);
+  if(!document.getElementById('t-'+start)){try{start=localStorage.getItem('ra-tab')}catch(e){start=null}}
+  if(start&&document.getElementById('t-'+start))show(start);
+})();
+</script>
+</body>
+</html>
