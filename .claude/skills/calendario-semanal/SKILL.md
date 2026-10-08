@@ -173,6 +173,12 @@ sean centrales, y **solo dos tipos: `ar` y `us`**):
 - **EE.UU.:** título `"<Nombre en castellano> - <Nombre en inglés> (<Mes>)"`, p. ej.
   `Ventas Minoristas - Retail Sales M/M (Agosto)`. La descripción incluye el **dato previo**
   y, si corresponde, el consenso.
+- **Campos opcionales para la tabla de la pestaña Calendario** (desde 08-oct-2026,
+  `assets/calendario/calendario.js`): `"hora": "11:00"` (hora argentina), `"relevancia": 3`
+  (1 baja, 2 media, 3 alta), `"previo": "55.4"`, `"consenso": "55.7"` y, si se actualiza la
+  semana después de publicado, `"dato": "56.1"`. Si faltan, la página los saca de la
+  descripción ("a las 11:00 ART", "Previo 55.4", "consenso de Investing.com: 55.7") o usa
+  la hora habitual (INDEC 16:00), así que ponelos siempre que estén verificados.
 - **Los títulos deben contener las palabras que matchean `CAL_SOURCES`** (INDEC, BCRA,
   "Fed", "Michigan", "S&P Global", "Ventas Minoristas", …). El paso 6 lo comprueba.
 - Máximo razonable: ~5 eventos por día. Priorizá lo que mueve mercados.

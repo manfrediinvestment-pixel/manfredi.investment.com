@@ -78,3 +78,35 @@ footer { border-top:1px solid rgba(214,226,244,.08) !important; }
 /* gráfico del S&P: se funde a la izquierda */
 .htx-spx__chart { -webkit-mask-image:linear-gradient(90deg, transparent, #000 6%, #000 100%); mask-image:linear-gradient(90deg, transparent, #000 6%, #000 100%); }
 .pick-sparkline polyline { stroke:rgba(211,222,237,.42) !important; }
+
+/* títulos de cada pestaña: chicos y sobrios, como el encabezado de sección de
+   un diario financiero. Una línea fina abajo los separa del contenido; el
+   texto de apoyo queda en una sola línea suave. */
+section[data-tab] .section-header { margin-bottom:30px; padding-bottom:18px; border-bottom:1px solid rgba(214,226,244,.1); }
+section[data-tab] .section-title,
+#mercados .mt-title,
+.nt .nt-title { font-family:'DM Serif Display',Georgia,serif; font-weight:400; font-size:clamp(26px,2.3vw,32px); line-height:1.1; letter-spacing:-.008em; margin:0; }
+section[data-tab] .section-title { color:#f3f6fb !important; }
+/* los subtítulos internos (Tu portafolio, Cartera Manfredi) quedan por debajo del título de la página */
+#portfolio .pf-sec-title { font-size:24px; }
+section[data-tab] .section-sub { font-size:14px; line-height:1.55; color:rgba(211,222,237,.62) !important; max-width:64ch; margin:6px 0 0; }
+section[data-tab].section, section[data-tab="calendario"] { padding-top:44px !important; }
+
+#mercados .mt-title { gap:12px; }
+#mercados .mt-live { width:8px; height:8px; }
+/* "Mercados en vivo" en un solo color: sin el acento dorado */
+#mercados .mt-title em { color:inherit; }
+#mercados .mt-top { padding-bottom:18px; margin-bottom:22px; border-bottom:1px solid rgba(214,226,244,.1); }
+.nt { padding-top:40px; }
+.nt .nt-head { flex-direction:row; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px 16px; padding-bottom:18px; margin-bottom:24px; border-bottom:1px solid rgba(214,226,244,.1); }
+@media (max-width:600px) {
+  section[data-tab] .section-title, #mercados .mt-title, .nt .nt-title { font-size:26px; }
+  section[data-tab].section, section[data-tab="calendario"] { padding-top:28px !important; }
+  #mercados.mt, .nt { padding-top:26px; }
+}
+
+/* sin párrafos grises explicativos bajo títulos y tarjetas: el título y los
+   datos alcanzan (los avisos legales se quedan) */
+.section-sub, .mf-access__s, .nt-inf__s, .htx-pf__note, .report-banner-abstract,
+#university .course-desc, #university .course-card > p { display:none !important; }
+.nt-inf .nt-inf__row { margin-top:18px; }

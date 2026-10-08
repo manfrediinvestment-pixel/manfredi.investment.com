@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # el catálogo de informes usa la fecha del primer commit de cada uno
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -41,11 +43,17 @@ jobs:
           pip install requests openpyxl
           python scripts/build_fci.py
 
+      # Catálogo de la pestaña Informes (trimestre, secciones, cifras de la tapa y fecha
+      # de cada informe): así la estantería suma sola los informes nuevos.
+      - name: Generate catálogo de informes
+        continue-on-error: true
+        run: node scripts/catalogo-informes.mjs
+
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add reports/*.json
+          git add reports/*.json informes/catalogo.json
           git commit -m "Update daily reports [skip ci]" || echo "No changes to commit"
           git push
 
