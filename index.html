@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="assets/mercados/terminal.css" />
 <link rel="stylesheet" href="assets/pulso/pulso.css?v=20261007e" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261007e" />
+<link rel="stylesheet" href="assets/calendario/calendario.css?v=20261008a" />
 <link rel="stylesheet" href="assets/lector/lector.css?v=20261007e" />
   <script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js" defer></script>
   <script src="assets/mercados/terminal.js"></script>
@@ -4013,6 +4014,7 @@
   <script src="assets/pulso/pulso.js?v=20261007f" defer></script>
   <!-- Pestaña Noticias (usa window.MIPulso de pulso.js: va después) -->
   <script src="assets/noticias/noticias.js?v=20261007e" defer></script>
+  <script src="assets/calendario/calendario.js?v=20261008a" defer></script>
   <!-- Lector de informes en PDF (window.openPdf) -->
   <script src="assets/lector/lector.js?v=20261007e" defer></script>
 
@@ -4160,67 +4162,43 @@
     </div>
   </div>
 
-  <section style="background:var(--navy-1);padding:72px 32px 68px;" id="calendario" data-tab="calendario">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-label">Seguimiento macro</span>
-      <h2 class="section-title" style="color:var(--white);">Calendario Económico</h2>
-      <p class="section-sub" style="color:rgba(255,255,255,.4);">Variables clave Argentina &amp; EE.UU. · Tocá cualquier indicador para ver el detalle. Eventos actualizados cada lunes.</p>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:22px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06);">
-          <div style="display:flex;align-items:center;gap:9px;font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.45);"><span style="font-size:18px;">🇦🇷</span>Argentina</div>
-          <span style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--green);border:1px solid rgba(16,185,129,.3);padding:3px 8px;">En vivo</span>
+  <section class="cal" id="calendario" data-tab="calendario">
+    <!-- Calendario de la semana en tabla (assets/calendario/calendario.js); los indicadores los llenan loadMacroAR/loadMacroUS -->
+    <div class="cal-wrap">
+      <header class="section-header cal-head">
+        <h2 class="section-title">Calendario</h2>
+        <span class="cal-head__meta" id="calSemanaMeta">Esta semana</span>
+        <span id="calSemanaLabel" hidden></span>
+      </header>
+      <div class="cal-grid">
+        <div class="cal-main">
+          <div class="cal-tabs" id="calTabs" role="group" aria-label="Filtrar calendario"></div>
+          <div id="calTabla" aria-live="polite">
+            <div style="padding:26px 0;display:grid;gap:22px">
+              <span class="cal-skel" style="width:70%"></span>
+              <span class="cal-skel" style="width:85%"></span>
+              <span class="cal-skel" style="width:60%"></span>
+            </div>
+          </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div class="cal-kpi" onclick="calShowDetail('ar-pbi',this)"><div class="cal-kpi-label">Crecimiento PBI</div><div class="cal-kpi-main cal-up" id="ar-pbi-val">Cargando…</div><div class="cal-kpi-sub" id="ar-pbi-sub">Interanual</div><div class="cal-kpi-bar"></div></div>
-          <div class="cal-kpi" onclick="calShowDetail('ar-inf',this)"><div class="cal-kpi-label">Inflación</div><div class="cal-kpi-main cal-down" id="ar-inf-val">Cargando…</div><div class="cal-kpi-sub" id="ar-inf-sub">Mensual</div><div class="cal-kpi-bar"></div></div>
-          <div class="cal-kpi" onclick="calShowDetail('ar-desemp',this)"><div class="cal-kpi-label">Desempleo</div><div class="cal-kpi-main cal-down" id="ar-desemp-val">Cargando…</div><div class="cal-kpi-sub" id="ar-desemp-sub">EPH INDEC</div><div class="cal-kpi-bar"></div></div>
-          <div class="cal-kpi" onclick="calShowDetail('ar-riesgo',this)"><div class="cal-kpi-label">Riesgo País</div><div class="cal-kpi-main cal-gold" id="ar-riesgo-val">Cargando…</div><div class="cal-kpi-sub" id="ar-riesgo-sub">EMBI+</div><div class="cal-kpi-bar"></div></div>
-        </div>
-      </div>
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:22px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06);">
-          <div style="display:flex;align-items:center;gap:9px;font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.45);"><span style="font-size:18px;">🇺🇸</span>Estados Unidos</div>
-          <span style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--green);border:1px solid rgba(16,185,129,.3);padding:3px 8px;">En vivo</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div class="cal-kpi" onclick="calShowDetail('us-pbi',this)"><div class="cal-kpi-label">Crecimiento PBI</div><div class="cal-kpi-main cal-down" id="us-pbi-val">Cargando…</div><div class="cal-kpi-sub" id="us-pbi-sub">Anual</div><div class="cal-kpi-bar"></div></div>
-          <div class="cal-kpi" onclick="calShowDetail('us-inf',this)"><div class="cal-kpi-label">Inflación</div><div class="cal-kpi-main cal-up" id="us-inf-val">Cargando…</div><div class="cal-kpi-sub" id="us-inf-sub">CPI Anual</div><div class="cal-kpi-bar"></div></div>
-          <div class="cal-kpi" onclick="calShowDetail('us-desemp',this)"><div class="cal-kpi-label">Desempleo</div><div class="cal-kpi-main" id="us-desemp-val">Cargando…</div><div class="cal-kpi-sub" id="us-desemp-sub">Mensual</div><div class="cal-kpi-bar"></div></div>
-          <div class="cal-kpi" onclick="calShowDetail('us-treasury',this)"><div class="cal-kpi-label">Treasury 10Y</div><div class="cal-kpi-main cal-gold" id="us-treasury-val">Cargando…</div><div class="cal-kpi-sub" id="us-treasury-sub">Yield</div><div class="cal-kpi-bar"></div></div>
-        </div>
-      </div>
-    </div>
-    <div id="calDetailBox" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:18px 22px;margin-bottom:28px;display:flex;align-items:center;gap:16px;min-height:68px;transition:border-color .2s,background .2s;">
-      <div style="width:36px;height:36px;background:rgba(242,201,76,.1);border:1px solid rgba(242,201,76,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📊</div>
-      <div><div id="calDetailTitle" style="font-size:11px;font-weight:600;color:var(--gold);letter-spacing:.04em;margin-bottom:4px;">Seleccioná un indicador</div><div id="calDetailText" style="font-size:12.5px;color:rgba(255,255,255,.45);line-height:1.6;">Tocá cualquier cuadro para ver el contexto, la tendencia y qué significa para los mercados.</div></div>
-    </div>
-    <div>
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);">Eventos de la semana — <span id="calSemanaLabel">cargando...</span></div>
-        <div class="cal-view-tabs" aria-label="Tipo de calendario">
-          <button type="button" class="cal-view-tab active" data-cal-view="economico" onclick="calSetView('economico')">Económico</button>
-          <button type="button" class="cal-view-tab" data-cal-view="earnings" onclick="calSetView('earnings')">Earnings</button>
-          <button type="button" class="cal-view-tab" data-cal-view="dividendos" onclick="calSetView('dividendos')">Dividendos</button>
-        </div>
-      </div>
-      <div id="calWeekGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
-        <div class="cal-day"><div class="cal-day-head"><span class="cal-day-name">Lun</span></div></div>
-        <div class="cal-day"><div class="cal-day-head"><span class="cal-day-name">Mar</span></div></div>
-        <div class="cal-day"><div class="cal-day-head"><span class="cal-day-name">Mié</span></div></div>
-        <div class="cal-day"><div class="cal-day-head"><span class="cal-day-name">Jue</span></div></div>
-        <div class="cal-day"><div class="cal-day-head"><span class="cal-day-name">Vie</span></div></div>
-      </div>
-      <div id="calLegend" style="display:flex;gap:18px;margin-top:12px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,.3);"><div style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;"></div>Argentina</div>
-        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,.3);"><div style="width:6px;height:6px;border-radius:50%;background:#60A5FA;flex-shrink:0;"></div>EE.UU.</div>
-        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,.3);"><div style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>Alta relevancia</div>
+        <aside class="cal-rail" aria-label="Indicadores y empresas de la semana">
+          <div class="cal-card">
+            <h3 class="cal-card__h">Argentina vs. EE.UU.</h3>
+            <table class="cal-cmp">
+              <thead><tr><th>Indicador</th><th>Argentina</th><th>EE.UU.</th></tr></thead>
+              <tbody>
+                <tr><td>Inflación</td><td><span id="ar-inf-val">…</span><small id="ar-inf-sub">Mensual</small></td><td><span id="us-inf-val">…</span><small id="us-inf-sub">Anual</small></td></tr>
+                <tr><td>Crecimiento</td><td><span id="ar-pbi-val">…</span><small id="ar-pbi-sub">Interanual</small></td><td><span id="us-pbi-val">…</span><small id="us-pbi-sub">Anual</small></td></tr>
+                <tr><td>Desempleo</td><td><span id="ar-desemp-val">…</span><small id="ar-desemp-sub">EPH INDEC</small></td><td><span id="us-desemp-val">…</span><small id="us-desemp-sub">Mensual</small></td></tr>
+                <tr><td>Riesgo / tasa</td><td><span id="ar-riesgo-val">…</span><small id="ar-riesgo-sub">Riesgo país</small></td><td><span id="us-treasury-val">…</span><small id="us-treasury-sub">Bono a 10 años</small></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="cal-card" id="calEmpresas"><h3 class="cal-card__h">Empresas esta semana</h3><span class="cal-skel" style="height:90px"></span></div>
+        </aside>
       </div>
     </div>
-  </div>
-</section>
+  </section>
   <!-- ââ INFORMES âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
 <section class="nt" id="informes" data-tab="informes">
     <!-- Noticias minuto a minuto + informe semanal + cotizaciones (assets/noticias/noticias.js) -->
@@ -11694,14 +11672,14 @@
   setInterval(initMercados, MKT_REFRESH_MS);
 
   const CAL_DETAILS={'ar-pbi':{icon:'📈',title:'PBI Argentina',text:'La economía retomó el crecimiento liderada por agro, construcción y servicios. <strong>Para los mercados:</strong> positivo para acciones del Merval y bonos soberanos.'},'ar-inf':{icon:'🔥',title:'Inflación Argentina',text:'La inflación mensual continúa desacelerando. Crawling peg y ancla cambiaria son los drivers. <strong>Próximo dato:</strong> IPC INDEC el 12 de cada mes.'},'ar-desemp':{icon:'👷',title:'Desempleo Argentina',text:'Resiliencia pese al ajuste del sector público. <strong>Publicación:</strong> trimestral por EPH-INDEC.'},'ar-riesgo':{icon:'🌡',title:'Riesgo País EMBI+',text:'Compresión por acuerdo FMI y disciplina fiscal. <strong>Para los mercados:</strong> cada 100 bps de caída impulsa GD30/AL30 un ~8-12%.'},'us-pbi':{icon:'📉',title:'PBI Estados Unidos',text:'Contracción leve por caída de exportaciones ante aranceles. Consumo privado resisó.'},'us-inf':{icon:'📊',title:'Inflación EE.UU. CPI',text:'Desacelerando hacia el target del 2%. <strong>Dato más importante para la Fed:</strong> PCE Core, último jueves de cada mes.'},'us-desemp':{icon:'💼',title:'Desempleo EE.UU.',text:'Mercado laboral resiliente. <strong>Próximo dato clave:</strong> Nonfarm Payrolls el primer viernes de cada mes.'},'us-treasury':{icon:'🏦',title:'Treasury 10Y Yield',text:'Yields altos comprimen valuaciones tech. <strong>Para los mercados:</strong> impacta en CEDEARs y bonos argentinos en USD.'}}; function calShowDetail(key,el){var d=CAL_DETAILS[key];if(!d)return;document.querySelectorAll('.cal-kpi').forEach(function(k){k.classList.remove('active');});el.classList.add('active');var box=document.getElementById('calDetailBox');box.children[0].textContent=d.icon;document.getElementById('calDetailTitle').textContent=d.title;document.getElementById('calDetailText').innerHTML=d.text;box.style.borderColor='rgba(242,201,76,.4)';box.style.background='rgba(242,201,76,.04)';} async function loadMacroAR(){var MES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];var INDEC='https://apis.datos.gob.ar/series/api/series/?limit=5&sort=desc&format=json&ids=';var el=function(id){return document.getElementById(id);};var mesAnio=function(f){var p=String(f).split('-');return MES[+p[1]-1]+' '+p[0];};var diaMes=function(f){var p=String(f).split('-');return +p[2]+' '+MES[+p[1]-1];};var trim=function(f){var p=String(f).split('-');return (Math.floor((+p[1]-1)/3)+1)+'T '+p[0];};var indec=async function(id){var r=await fetch(INDEC+id,{signal:AbortSignal.timeout(8000)});if(!r.ok)throw new Error('status '+r.status);var j=await r.json();if(!j.data||!j.data.length)throw new Error('sin datos');return j.data;};
-try{var infR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/inflacion').catch(function(){return null;});var riesgoR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais').catch(function(){return null;});if(infR&&infR.ok){var infD=await infR.json();if(Array.isArray(infD)&&infD.length){var last=infD[infD.length-1];var val=last.valor!=null?last.valor:last.value;if(val!=null){el('ar-inf-val').textContent=val.toFixed(1)+'%';el('ar-inf-sub').textContent='Mensual · '+(last.fecha?mesAnio(last.fecha):'');}}}if(riesgoR&&riesgoR.ok){var riesgoD=await riesgoR.json();if(Array.isArray(riesgoD)&&riesgoD.length){var rLast=riesgoD[riesgoD.length-1];var rVal=rLast.valor!=null?rLast.valor:rLast.value;if(rVal!=null){el('ar-riesgo-val').textContent=Math.round(rVal)+' bps';el('ar-riesgo-sub').textContent='EMBI+ · '+(rLast.fecha?diaMes(rLast.fecha):'');}}}}catch(e){console.warn('[MI] MacroAR:',e.message);}
+try{var infR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/inflacion').catch(function(){return null;});var riesgoR=await fetch('https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais').catch(function(){return null;});if(infR&&infR.ok){var infD=await infR.json();if(Array.isArray(infD)&&infD.length){var last=infD[infD.length-1];var val=last.valor!=null?last.valor:last.value;if(val!=null){el('ar-inf-val').textContent=val.toFixed(1)+'%';el('ar-inf-sub').textContent='Mensual · '+(last.fecha?mesAnio(last.fecha):'');}}}if(riesgoR&&riesgoR.ok){var riesgoD=await riesgoR.json();if(Array.isArray(riesgoD)&&riesgoD.length){var rLast=riesgoD[riesgoD.length-1];var rVal=rLast.valor!=null?rLast.valor:rLast.value;if(rVal!=null){el('ar-riesgo-val').textContent=Math.round(rVal)+' pb';el('ar-riesgo-sub').textContent='EMBI+ · '+(rLast.fecha?diaMes(rLast.fecha):'');}}}}catch(e){console.warn('[MI] MacroAR:',e.message);}
 /* PBI: serie trimestral de Cuentas Nacionales (INDEC, precios constantes) -> variacion interanual contra el mismo trimestre del anio anterior */
 try{var pib=await indec('4.2_OGP_2004_T_17');if(pib.length<5)throw new Error('serie corta');var yoy=(pib[0][1]/pib[4][1]-1)*100;el('ar-pbi-val').textContent=(yoy>=0?'+':'')+yoy.toFixed(1)+'%';el('ar-pbi-val').className='cal-kpi-main '+(yoy>=0?'cal-up':'cal-down');el('ar-pbi-sub').textContent='Interanual · '+trim(pib[0][0]);}catch(e){console.warn('[MI] MacroAR PBI:',e.message);el('ar-pbi-val').textContent='—';el('ar-pbi-sub').textContent='Sin datos';}
 /* Desempleo: EPH continua, total aglomerados urbanos (INDEC), la API lo devuelve como fraccion */
 try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(des[0][1]*100).toFixed(1)+'%';el('ar-desemp-sub').textContent='EPH INDEC · '+trim(des[0][0]);}catch(e){console.warn('[MI] MacroAR Desempleo:',e.message);el('ar-desemp-val').textContent='—';el('ar-desemp-sub').textContent='Sin datos';}} async function loadMacroUS(){try{var r=await fetch('https://manfredi-calendario.nachito2502.workers.dev/macro-us',{signal:AbortSignal.timeout(5000)});if(r.ok){var d=await r.json();if(d.gdp!=null){var v=parseFloat(d.gdp);document.getElementById('us-pbi-val').textContent=(v>=0?'+':'')+v.toFixed(1)+'%';document.getElementById('us-pbi-val').className='cal-kpi-main '+(v>=0?'cal-up':'cal-down');}if(d.cpi!=null)document.getElementById('us-inf-val').textContent=parseFloat(d.cpi).toFixed(1)+'%';if(d.unemp!=null)document.getElementById('us-desemp-val').textContent=parseFloat(d.unemp).toFixed(1)+'%';if(d.treasury!=null)document.getElementById('us-treasury-val').textContent=parseFloat(d.treasury).toFixed(2)+'%';}}catch(e){console.warn('[MI] MacroUS:',e.message);}} function renderHeroCalToday(dia){var dateEl=document.getElementById('heroCalDate');var evEl=document.getElementById('heroCalEvents');if(!dateEl||!evEl)return;var hoyStr=new Date().toLocaleDateString('es-AR',{weekday:'long',day:'2-digit',month:'2-digit'});hoyStr=hoyStr.charAt(0).toUpperCase()+hoyStr.slice(1);dateEl.textContent=hoyStr;if(dia&&dia.eventos&&dia.eventos.length){evEl.innerHTML=dia.eventos.map(function(ev){var src=calSourceFor(ev);var titleHtml=src?'<a href="'+src.url+'" target="_blank" rel="noopener noreferrer">'+ev.titulo+'</a>':ev.titulo;return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+titleHtml+'</strong>'+ev.descripcion+calSourceTag(src)+'</div></div>';}).join('');}else{evEl.innerHTML='<span style="font-size:11px;color:rgba(255,255,255,.3);font-style:italic;">Sin eventos relevantes hoy</span>';}}
-  function calRenderDayGrid(dias){var dow=new Date().getDay();var grid=document.getElementById('calWeekGrid');grid.innerHTML=dias.map(function(dia,i){var isToday=(i+1)===dow;var evs=dia.eventos&&dia.eventos.length?dia.eventos.map(function(ev){var src=calSourceFor(ev);var titleHtml=ev.ticker?'<a href="informes/'+ev.ticker+'.html">'+ev.titulo+'</a>':(src?'<a href="'+src.url+'" target="_blank" rel="noopener noreferrer" title="Ver el dato en la fuente original">'+ev.titulo+'</a>':ev.titulo);return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+titleHtml+'</strong>'+ev.descripcion+calSourceTag(src)+'</div></div>';}).join(''):'<span style="font-size:11px;color:rgba(255,255,255,.2);font-style:italic;">Sin eventos</span>';return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+dia.nombre+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+dia.fecha+'</span></div>'+evs+'</div>';}).join('');}
+  function calRenderDayGrid(dias){var dow=new Date().getDay();var grid=document.getElementById('calWeekGrid');if(!grid)return;grid.innerHTML=dias.map(function(dia,i){var isToday=(i+1)===dow;var evs=dia.eventos&&dia.eventos.length?dia.eventos.map(function(ev){var src=calSourceFor(ev);var titleHtml=ev.ticker?'<a href="informes/'+ev.ticker+'.html">'+ev.titulo+'</a>':(src?'<a href="'+src.url+'" target="_blank" rel="noopener noreferrer" title="Ver el dato en la fuente original">'+ev.titulo+'</a>':ev.titulo);return '<div class="cal-ev"><div class="cal-ev-dot '+ev.tipo+'"></div><div class="cal-ev-text"><strong>'+titleHtml+'</strong>'+ev.descripcion+calSourceTag(src)+'</div></div>';}).join(''):'<span style="font-size:11px;color:rgba(255,255,255,.2);font-style:italic;">Sin eventos</span>';return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+dia.nombre+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+dia.fecha+'</span></div>'+evs+'</div>';}).join('');}
 
-  function calRenderEmptyGrid(msg){var hoy=new Date();var dow=hoy.getDay();var lun=new Date(hoy);lun.setDate(hoy.getDate()-(dow===0?6:dow-1));var nombres=['Lun','Mar','Mié','Jue','Vie'];var fmt=function(d){return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});};document.getElementById('calWeekGrid').innerHTML=nombres.map(function(n,i){var d=new Date(lun);d.setDate(lun.getDate()+i);var isToday=(i+1)===dow;return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+n+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+fmt(d)+'</span></div>'+'<span style="font-size:11px;color:rgba(255,255,255,.2);font-style:italic;">'+msg+'</span></div>';}).join('');}
+  function calRenderEmptyGrid(msg){if(!document.getElementById('calWeekGrid'))return;var hoy=new Date();var dow=hoy.getDay();var lun=new Date(hoy);lun.setDate(hoy.getDate()-(dow===0?6:dow-1));var nombres=['Lun','Mar','Mié','Jue','Vie'];var fmt=function(d){return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});};document.getElementById('calWeekGrid').innerHTML=nombres.map(function(n,i){var d=new Date(lun);d.setDate(lun.getDate()+i);var isToday=(i+1)===dow;return '<div class="cal-day '+(isToday?'cal-today':'')+'">'+'<div class="cal-day-head"><span class="cal-day-name">'+n+(isToday?' · Hoy':'')+'</span><span class="cal-day-num">'+fmt(d)+'</span></div>'+'<span style="font-size:11px;color:rgba(255,255,255,.2);font-style:italic;">'+msg+'</span></div>';}).join('');}
 
   var CAL_ENDPOINTS={economico:'calendario',earnings:'earnings',dividendos:'dividends'};
   var CAL_LEGENDS={
@@ -17691,6 +17669,6 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
   }
 </style>
   <!-- Fondo Aurora de todo el sitio (al final para ganarle a los estilos de cada sección; el título lo anima assets/aurora/aurora.js, junto al h1) -->
-  <link rel="stylesheet" href="assets/aurora/aurora.css?v=20261007e" />
+  <link rel="stylesheet" href="assets/aurora/aurora.css?v=20261008a" />
 </body>
 </html>
