@@ -1,0 +1,54 @@
+// Reglas de Firestore para /asesoria.html
+//
+// Cómo publicarlas: Firebase Console → proyecto manfrediinvestment-989c8 →
+// Firestore Database → Reglas. PEGÁ SOLO el bloque "match /asesoria_clientes"
+// y las dos funciones DENTRO del `match /databases/{database}/documents { ... }`
+// que ya existe, al lado de las reglas de /users. No borres las reglas actuales.
+//
+// La lista de emails de asesor tiene que ser la misma que CONFIG.asesorEmails
+// en asesoria.html.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- desde acá: copiar ----
+    function esAsesor() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() in ['nachito2502@gmail.com'];
+    }
+    function esCliente(id) {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() == id;
+    }
+
+    match /asesoria_clientes/{id} {
+      allow read: if esAsesor() || esCliente(id);
+      allow create, delete: if esAsesor();
+      allow update: if esAsesor()
+        || (esCliente(id) && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['positions', 'positionsActualizado', 'positionsFuente',
+                        'consentimiento', 'testPerfil', 'ultimoMensaje']));
+
+      // Chat: cada uno escribe solo como sí mismo; nadie edita ni borra (archivo).
+      match /mensajes/{m} {
+        allow read: if esAsesor() || esCliente(id);
+        allow create: if request.resource.data.texto is string
+          && request.resource.data.texto.size() <= 3000
+          && request.resource.data.ts == request.time
+          && ((esAsesor() && request.resource.data.de == 'asesor')
+              || (esCliente(id) && request.resource.data.de == 'cliente'));
+        allow update, delete: if false;
+      }
+
+      // Notas privadas del asesor: el cliente no las ve.
+      match /privado/{doc} {
+        allow read, write: if esAsesor();
+      }
+    }
+    // ---- hasta acá ----
+
+  }
+}

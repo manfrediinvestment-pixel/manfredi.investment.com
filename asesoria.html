@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Asesoría Manfredi</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Asesoría privada: el asesor ve la lista de clientes y entra a cada uno; el cliente ve solo lo suyo. Mismos tokens que el resto del sitio. */
+:root{
+  --bg:#07101e; --raised:#0c1828; --raised2:#11223a;
+  --line:rgba(232,238,246,.10); --line-soft:rgba(232,238,246,.06);
+  --ink:#eef2f7; --ink2:rgba(238,242,247,.84); --ink3:rgba(238,242,247,.62);
+  --gold:#f2c94c; --gold-ink:#f5d67a; --gold-dim:rgba(242,201,76,.14);
+  --pos:#5cc08e; --neg:#e8675f; --data:#6fb1e8; --warn:#f0a44b;
+  --serif:'DM Serif Display',Georgia,serif;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --r:8px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+a{color:var(--gold-ink)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px}
+.meta{font-size:12px;color:var(--ink3)}
+.pos{color:var(--pos)} .neg{color:var(--neg)} .warn{color:var(--warn)}
+h1,h2,h3{margin:0;text-wrap:balance}
+h2{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.15}
+h3{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(7,16,30,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:14px;min-height:58px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;text-decoration:none;color:var(--ink)}
+.brand .m{width:30px;height:30px;border-radius:6px;background:linear-gradient(145deg,#f7dc6f,#b8943f);color:#0a0f1e;display:grid;place-items:center;font-family:var(--serif);font-size:19px}
+.brand small{display:block;font-size:11px;color:var(--ink3);font-weight:500;letter-spacing:.08em;text-transform:uppercase}
+.who{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+main{padding-block:26px 40px;display:grid;gap:20px}
+.panel{background:var(--raised);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.stack{display:grid;gap:16px;min-width:0}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--ink2);white-space:nowrap}
+.chip.ok{border-color:rgba(92,192,142,.4);color:var(--pos)}
+.chip.warn{border-color:rgba(240,164,75,.45);color:var(--warn)}
+.chip.gold{border-color:rgba(242,201,76,.45);color:var(--gold-ink);background:var(--gold-dim)}
+.btn{border:1px solid var(--line);background:var(--raised2);border-radius:6px;padding:8px 14px;cursor:pointer;font-weight:500;font-size:14px;white-space:nowrap}
+.btn:hover{border-color:rgba(242,201,76,.5)}
+.btn.primary{background:var(--gold);color:#0a0f1e;border-color:var(--gold)}
+.btn.small{padding:4px 10px;font-size:12px}
+.btn.ghost{background:none}
+.btn:disabled{opacity:.5;cursor:default}
+.x{background:none;border:0;color:var(--ink3);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px}
+.x:hover{color:var(--neg);background:rgba(232,103,95,.1)}
+
+label.f{display:grid;gap:4px;font-size:12px;color:var(--ink3);min-width:0}
+input.in,select.in,textarea.in{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;color:var(--ink);font-size:14px;width:100%;min-width:0}
+textarea.in{resize:vertical;min-height:90px;line-height:1.5}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end}
+
+/* login */
+.gate{max-width:460px;margin:8vh auto 0;text-align:center;display:grid;gap:16px;justify-items:center}
+.gate h1{font-family:var(--serif);font-weight:400;font-size:38px;line-height:1.1}
+.gate p{color:var(--ink2);margin:0;max-width:40ch}
+.gbtn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#1a1a2e;border:0;border-radius:6px;padding:11px 18px;font-weight:600;cursor:pointer}
+
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.kpi{background:var(--raised);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:3px;min-width:0}
+.kpi span{font-size:12px;color:var(--ink3)}
+.kpi b{font-family:var(--mono);font-weight:500;font-size:22px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+
+/* tables */
+.scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.t{width:100%;border-collapse:collapse;font-size:13.5px}
+table.t th{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);font-weight:600;padding:8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+table.t th.l,table.t td.l{text-align:left}
+table.t td{padding:9px 8px;border-bottom:1px solid var(--line-soft);text-align:right;white-space:nowrap}
+table.t td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+table.t tfoot td{border-bottom:0;border-top:1px solid var(--line);font-weight:600}
+table.clients tbody tr{cursor:pointer}
+table.clients tbody tr:hover td{background:rgba(255,255,255,.03)}
+.cname b{display:block;font-weight:600}
+.cname span{font-size:11.5px;color:var(--ink3)}
+.wcell{position:relative}
+.wcell i{position:absolute;inset:5px 3px;border-radius:4px;background:var(--data)}
+.wcell span{position:relative}
+.wcell.d{color:var(--warn);font-weight:600}
+.wcell.d i{background:var(--warn)}
+
+/* detail */
+.dhead{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.avatar{width:52px;height:52px;border-radius:50%;border:2px solid var(--gold);display:grid;place-items:center;font-family:var(--serif);font-size:22px;color:var(--gold-ink);background:var(--raised2);flex:none}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;cursor:pointer;color:var(--ink3);font-weight:500;margin-bottom:-1px}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--gold)}
+.tab .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin-left:6px;vertical-align:1px}
+
+.bars{display:grid;gap:10px}
+.br{display:grid;grid-template-columns:minmax(90px,130px) 1fr 104px;gap:10px;align-items:center;font-size:13px}
+.br .bar{height:9px;border-radius:5px;background:var(--line-soft);position:relative}
+.br .bar b{position:absolute;inset:0 auto 0 0;border-radius:5px;background:var(--data)}
+.br .bar em{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--gold)}
+.br.d .bar b{background:var(--warn)}
+.br .v{font-family:var(--mono);font-size:12px;text-align:right;color:var(--ink2)}
+.div{display:grid;grid-template-columns:minmax(60px,90px) 1fr 70px;gap:10px;align-items:center;font-size:13px}
+.div .track{height:9px;position:relative}
+.div .track::before{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--line)}
+.div .track b{position:absolute;top:0;bottom:0;border-radius:4px}
+.alert{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:12px;border-radius:6px;background:rgba(240,164,75,.08);border:1px solid rgba(240,164,75,.28);font-size:13.5px}
+.alert.ok{background:rgba(92,192,142,.07);border-color:rgba(92,192,142,.28)}
+.alert.info{background:var(--gold-dim);border-color:rgba(242,201,76,.3)}
+.alert .d{width:8px;height:8px;border-radius:50%;background:var(--warn);margin-top:6px}
+.alert.ok .d{background:var(--pos)} .alert.info .d{background:var(--gold)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+
+/* chat */
+.chat{display:grid;grid-template-rows:1fr auto;height:min(560px,70vh);padding:0;overflow:hidden}
+.msgs{overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:80%;padding:9px 12px;border-radius:10px;font-size:14px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg time{display:block;font-size:10.5px;color:var(--ink3);margin-top:4px;font-family:var(--mono)}
+.msg.them{background:var(--raised2);align-self:flex-start;border-bottom-left-radius:3px}
+.msg.me{background:rgba(242,201,76,.13);border:1px solid rgba(242,201,76,.22);align-self:flex-end;border-bottom-right-radius:3px}
+.msg.sys{align-self:center;font-size:11.5px;color:var(--ink3);padding:2px;max-width:none;text-align:center}
+.prop{border:1px solid rgba(242,201,76,.35);border-radius:8px;padding:9px 11px;margin-top:6px;background:var(--bg);font-size:13px}
+.prop b{display:block;color:var(--gold-ink);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.composer{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
+.composer textarea{flex:1;min-height:42px;height:42px;resize:none}
+
+/* test */
+.q{display:grid;gap:8px;padding:14px 0;border-top:1px solid var(--line-soft)}
+.q:first-child{border-top:0}
+.q legend{font-weight:600;padding:0;margin-bottom:4px}
+.q label{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:var(--ink2);cursor:pointer}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--raised2);border:1px solid var(--line);border-radius:8px;padding:10px 16px;font-size:14px;z-index:20;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.foot{border-top:1px solid var(--line);padding-block:18px 28px;font-size:12px;color:var(--ink3);display:grid;gap:6px}
+.demo{background:rgba(240,164,75,.12);color:var(--warn);font-size:12px;text-align:center;padding:6px 16px;border-bottom:1px solid rgba(240,164,75,.3)}
+.imp table.t td{padding:5px 6px}
+.imp input.in{padding:5px 8px;font-size:13px}
+.imp tr.off td{opacity:.4}
+
+@media (max-width:760px){
+  .grid2{grid-template-columns:1fr}
+  .br{grid-template-columns:88px 1fr 96px}
+  h2{font-size:24px}
+  .msg{max-width:92%}
+}
+@media print{
+  .top,.tabs,.no-print,.composer,.foot,.demo{display:none!important}
+  body{background:#fff;color:#111}
+  .panel,.kpi{border-color:#ccc;background:#fff;break-inside:avoid}
+  :root{--ink:#111;--ink2:#222;--ink3:#555;--line:#ccc;--line-soft:#e5e5e5;--raised:#fff;--raised2:#f3f3f3;--bg:#fff}
+}
+</style>
+</head>
+<body>
+<div class="demo" id="demoBar" hidden>Modo demo: clientes y mensajes de ejemplo, nada se guarda. Cotizaciones reales.</div>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><span class="m">M</span><div>Asesoría<small>Manfredi Investment</small></div></a>
+    <div class="who" id="who"></div>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <div class="gate" id="loading"><p class="meta">Cargando…</p></div>
+</main>
+
+<footer class="wrap foot" id="foot"></footer>
+
+<script type="module">
+/* ============================================================
+   CONFIGURACIÓN — completá estos datos antes de publicar
+   ============================================================ */
+const CONFIG = {
+  // Emails que entran como asesor. El resto entra como cliente.
+  // Tiene que coincidir con la lista de las reglas de Firestore (docs/asesoria-firestore.rules).
+  asesorEmails: ['nachito2502@gmail.com'],
+  asesorNombre: 'Manfredi Investment',
+  registroCNV: 'Agente Productor registrado ante la CNV · Matrícula N° (completar)',
+  agente: 'Opera bajo convenio con (completar nombre del ALyC), ALyC registrado ante la CNV',
+  contacto: 'manfredinvestment.com',
+  // Cartera modelo por perfil, en % por clase de activo:
+  // [Renta variable, Renta fija, Liquidez y FCI, Cripto y otros]
+  modelos: {
+    Conservador: [20, 60, 20, 0],
+    Moderado:    [45, 40, 15, 0],
+    Agresivo:    [70, 20, 5, 5],
+  },
+  umbralDesvio: 5, // puntos porcentuales
+};
+const FIREBASE = {
+  apiKey: "AIzaSyBwhZ5TPGQ7WHwLT7UdKb3pidS_PdM0F0k",
+  authDomain: "manfrediinvestment-989c8.firebaseapp.com",
+  projectId: "manfrediinvestment-989c8",
+  storageBucket: "manfrediinvestment-989c8.firebasestorage.app",
+  messagingSenderId: "1086484475152",
+  appId: "1:1086484475152:web:f70ca1b6e74e5b7c1b4995",
+};
+const MERCADOS_URL = 'https://manfredi-mercados.nachito2502.workers.dev/mercados';
+const PARSE_URL = 'https://warren.nachito2502.workers.dev/portfolio/parse';
+const PDFJS_VER = '3.11.174';
+const FB_VER = '10.12.0';
+
+const BUCKETS = ['Renta variable', 'Renta fija', 'Liquidez y FCI', 'Cripto y otros'];
+const PERFILES = ['Conservador', 'Moderado', 'Agresivo'];
+const DEMO = location.hash === '#demo' || location.hash === '#demo-cliente';
+
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nf = (v, d = 0) => v == null || !isFinite(v) ? '—' : v.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
+const usd = v => v == null ? '—' : 'US$ ' + nf(v, 0);
+const pct = (v, d = 1, sign = false) => v == null || !isFinite(v) ? '—' : (sign && v > 0 ? '+' : v < 0 ? '−' : '') + nf(Math.abs(v), d) + '%';
+const pp = x => Math.round(x) === 0 ? '0' : (x > 0 ? '+' : '−') + nf(Math.abs(x), 0);
+const cls = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
+const parseNum = s => { s = String(s || '').trim().replace(/\s/g, ''); if (!s) return NaN; if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.'); return Number(s); };
+const iniciales = n => (n || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+const toMs = t => !t ? null : typeof t === 'number' ? t : t.toMillis ? t.toMillis() : null;
+const fecha = ms => ms ? new Date(ms).toLocaleString('es-AR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+function toast(t) { const el = document.createElement('div'); el.className = 'toast'; el.textContent = t; document.body.appendChild(el); setTimeout(() => el.remove(), 3200); }
+
+/* ---------- mercado ---------- */
+const MKT = { idx: {}, list: [], ccl: null, ts: 0 };
+async function loadMarket() {
+  try {
+    const d = await (await fetch(MERCADOS_URL)).json();
+    const cats = d.categorias || {};
+    const ccl = ((cats.dolares || {}).items || []).find(i => i.symbol === 'CONTADOCONLIQUI');
+    MKT.ccl = ccl ? ccl.price : null;
+    // especies D/C que cotizan en dólares dentro de categorías en pesos (AL30D, GD35D…)
+    const usdVar = {};
+    if (MKT.ccl) ['arg_stocks', 'arg_cedears', 'arg_bonds'].forEach(cat => {
+      const by = {}; ((cats[cat] || {}).items || []).forEach(i => { if (i.symbol && i.price != null) by[i.symbol.toUpperCase()] = i.price; });
+      Object.keys(by).forEach(s => { if (!/^[A-Z0-9]{2,}[DC]$/.test(s)) return; const b = by[s.slice(0, -1)]; if (!(b > 0)) return; const r = by[s] * MKT.ccl / b; if (r > .6 && r < 1.6) usdVar[cat + ':' + s] = 1; });
+    });
+    const idx = {}, list = [];
+    Object.keys(cats).forEach(cat => {
+      if (cat === 'dolares') return;
+      const c = cats[cat] || {}; const base = c.currency === 'USD' ? 'USD' : 'ARS';
+      (c.items || []).forEach(i => {
+        if (!i.symbol) return; const s = i.symbol.toUpperCase(); const cur = usdVar[cat + ':' + s] ? 'USD' : base;
+        list.push({ s, n: i.name || '', cur, cat });
+        if (i.price == null) return;
+        idx[s] = idx[s] || {}; if (!idx[s][cur]) idx[s][cur] = { price: i.price, change: i.change, cat };
+      });
+    });
+    try {
+      const f = await (await fetch('/reports/fci-todos.json?d=' + new Date().toISOString().slice(0, 10))).json();
+      (f.fondos || []).forEach(x => { const cur = x.m === 'USD' ? 'USD' : 'ARS'; idx[x.s] = idx[x.s] || {}; idx[x.s][cur] = { price: x.v, change: x.d, cat: 'fci' }; list.push({ s: x.s, n: x.n, cur, cat: 'fci' }); });
+    } catch (e) { /* sin fondos comunes fuera del sitio */ }
+    MKT.idx = idx; MKT.list = list; MKT.ts = Date.now();
+  } catch (e) { console.warn('mercados:', e); }
+}
+
+/* ---------- análisis de cartera ---------- */
+function cotiz(p) {
+  if (p.isCash) return { price: 1, cat: 'cash' };
+  const e = MKT.idx[p.ticker];
+  if (e && e[p.moneda]) return e[p.moneda];
+  const other = e && (e.ARS || e.USD);
+  return { price: null, cat: other ? other.cat : null };
+}
+function bucketOf(p, cat) {
+  if (p.isCash || p.tipo === 'efectivo' || cat === 'fci') return 2;
+  if (cat === 'arg_bonds') return 1;
+  if (['arg_stocks', 'arg_cedears', 'usa_stocks', 'usa_adrs'].includes(cat)) return 0;
+  if (cat === 'cripto' || cat === 'commodities') return 3;
+  if (p.tipo === 'bono') return 1;
+  if (p.tipo === 'accion' || p.tipo === 'cedear') return 0;
+  if (p.tipo === 'fci') return 2;
+  return 3;
+}
+function analizar(positions) {
+  const rows = (positions || []).map(p => {
+    const q = cotiz(p);
+    const f = q.cat === 'arg_bonds' ? 0.01 : 1; // bonos: precio cada 100 VN
+    const u = (p.cantidad || 0) * f;
+    const sinCot = q.price == null;
+    const px = sinCot ? (p.precioCompra ?? null) : q.price;
+    const valor = px != null ? u * px : 0;
+    const vUSD = p.moneda === 'USD' ? valor : (MKT.ccl ? valor / MKT.ccl : null);
+    const res = (!p.isCash && p.precioCompra > 0 && !sinCot) ? (q.price / p.precioCompra - 1) * 100 : null;
+    return { p, cat: q.cat, price: q.price, change: q.change, sinCot, valor, vUSD: vUSD || 0, res, b: bucketOf(p, q.cat) };
+  });
+  const total = rows.reduce((s, r) => s + r.vUSD, 0);
+  rows.forEach(r => r.w = total ? r.vUSD / total * 100 : 0);
+  rows.sort((a, b) => b.vUSD - a.vUSD);
+  const buckets = BUCKETS.map((_, i) => rows.filter(r => r.b === i).reduce((s, r) => s + r.w, 0));
+  const conRes = rows.filter(r => r.res != null);
+  const wRes = conRes.reduce((s, r) => s + r.w, 0);
+  const resultado = wRes ? conRes.reduce((s, r) => s + r.res * r.w, 0) / wRes : null;
+  const dolar = rows.filter(r => r.p.moneda === 'USD' || r.cat === 'arg_cedears' || r.cat === 'usa_stocks' || r.cat === 'usa_adrs').reduce((s, r) => s + r.w, 0);
+  const hhi = rows.reduce((s, r) => s + (r.w / 100) ** 2, 0);
+  return { rows, total, buckets, resultado, dolar, top: rows[0] || null, nEf: hhi ? 1 / hhi : 0, sinCot: rows.filter(r => r.sinCot && !r.p.isCash).length };
+}
+function desvio(c, an) {
+  const m = CONFIG.modelos[c.perfil];
+  if (!m || !an.total) return null;
+  const d = an.buckets.map((w, i) => w - m[i]);
+  return { m, d, fuera: d.map((x, i) => Math.abs(x) >= CONFIG.umbralDesvio ? i : -1).filter(i => i >= 0) };
+}
+
+/* ---------- almacenamiento: Firestore o memoria (demo) ---------- */
+function memoryStore(rol) {
+  const now = Date.now();
+  const P = (ticker, cantidad, precioCompra, moneda, extra = {}) => ({ ticker, cantidad, precioCompra, moneda, ...extra });
+  const db = {
+    'martin@ejemplo.com': { nombre: 'Martín Ejemplo', email: 'martin@ejemplo.com', perfil: 'Moderado', honorario: 40, objetivo: 'Comprar un departamento en 5 años.', consentimiento: { aceptado: true, fecha: now - 864e6 }, testPerfil: { perfil: 'Moderado', puntaje: 15, fecha: now - 864e6 }, positionsActualizado: now - 36e5 * 20, positionsFuente: 'cliente', ultimoMensaje: { de: 'cliente', texto: '¿Las ONs que decís son en dólares MEP?', ts: now - 36e5 }, asesorLeido: now - 36e5 * 5,
+      positions: [P('SPY', 40, 18500, 'ARS'), P('MELI', 20, 21000, 'ARS'), P('AAPL', 25, 24000, 'ARS'), P('GGAL', 300, 5200, 'ARS'), P('AL30D', 6000, 52, 'USD'), P('GD35D', 4000, 70, 'USD'), P('USD', 1500, 1, 'USD', { isCash: true })] },
+    'carolina@ejemplo.com': { nombre: 'Carolina Ejemplo', email: 'carolina@ejemplo.com', perfil: 'Conservador', honorario: 60, objetivo: 'Renta en dólares para complementar la jubilación.', consentimiento: { aceptado: true, fecha: now - 2e9 }, testPerfil: { perfil: 'Conservador', puntaje: 10, fecha: now - 2e9 }, positionsActualizado: now - 864e5 * 3, positionsFuente: 'asesor', ultimoMensaje: { de: 'asesor', texto: 'Te dejé el reporte de septiembre.', ts: now - 864e5 * 2 },
+      positions: [P('AL30D', 15000, 50, 'USD'), P('T30A7', 4000000, 128, 'ARS'), P('KO', 60, 26000, 'ARS'), P('XLE', 30, 47000, 'ARS'), P('USD', 4000, 1, 'USD', { isCash: true })] },
+    'diego@ejemplo.com': { nombre: 'Diego Ejemplo', email: 'diego@ejemplo.com', perfil: 'Agresivo', honorario: 30, objetivo: 'Crecimiento de largo plazo.', consentimiento: { aceptado: true, fecha: now - 3e9 }, testPerfil: { perfil: 'Agresivo', puntaje: 21, fecha: now - 3e9 }, positionsActualizado: now - 864e5, positionsFuente: 'cliente',
+      positions: [P('NVDA', 100, 12000, 'ARS'), P('QQQ', 30, 52000, 'ARS'), P('VIST', 40, 30000, 'ARS'), P('YPFD', 150, 7000, 'ARS'), P('GD35D', 1500, 72, 'USD'), P('BTC', 0.004, 70000, 'USD'), P('USD', 300, 1, 'USD', { isCash: true })] },
+    'sofia@ejemplo.com': { nombre: 'Sofía Ejemplo', email: 'sofia@ejemplo.com', perfil: null, honorario: 40, objetivo: '', positions: [] },
+  };
+  const msgs = {
+    'martin@ejemplo.com': [
+      { de: 'cliente', texto: 'Hola, vi que los CEDEARs subieron bastante este mes. ¿Estoy muy cargado?', ts: now - 36e5 * 6 },
+      { de: 'asesor', texto: 'Al revés: tenés poca renta variable para tu perfil moderado. Te paso una propuesta.', ts: now - 36e5 * 5, propuesta: 'Renta variable +20 pp · Renta fija −20 pp. La ejecución la hacés vos en tu cuenta del broker.' },
+      { de: 'cliente', texto: '¿Las ONs que decís son en dólares MEP?', ts: now - 36e5 },
+    ],
+  };
+  const notas = { 'martin@ejemplo.com': 'Cobra aguinaldo en diciembre: revisar aporte extra.' };
+  const subs = { list: new Set(), one: {}, msg: {} };
+  const emit = id => {
+    subs.list.forEach(cb => cb(Object.entries(db).map(([k, v]) => ({ id: k, ...v }))));
+    (subs.one[id] || []).forEach(cb => cb(db[id] ? { id, ...db[id] } : null));
+    (subs.msg[id] || []).forEach(cb => cb((msgs[id] || []).slice()));
+  };
+  const me = rol === 'asesor' ? { email: CONFIG.asesorEmails[0], nombre: CONFIG.asesorNombre } : { email: 'martin@ejemplo.com', nombre: 'Martín Ejemplo' };
+  return {
+    me, rol,
+    watchClientes(cb) { subs.list.add(cb); emit(); return () => subs.list.delete(cb); },
+    watchCliente(id, cb) { (subs.one[id] = subs.one[id] || []).push(cb); setTimeout(() => cb(db[id] ? { id, ...db[id] } : null)); return () => {}; },
+    async crearCliente(d) { if (db[d.email]) throw new Error('existe'); db[d.email] = { ...d, positions: [] }; emit(d.email); },
+    async actualizar(id, patch) { Object.assign(db[id], patch); emit(id); },
+    watchMensajes(id, cb) { (subs.msg[id] = subs.msg[id] || []).push(cb); setTimeout(() => cb((msgs[id] || []).slice())); return () => { subs.msg[id] = subs.msg[id].filter(x => x !== cb); }; },
+    async enviar(id, m) { m = { ...m, ts: Date.now() }; (msgs[id] = msgs[id] || []).push(m); db[id].ultimoMensaje = { de: m.de, texto: m.texto.slice(0, 140), ts: m.ts }; emit(id); },
+    async getNotas(id) { return notas[id] || ''; },
+    async setNotas(id, t) { notas[id] = t; },
+    async signOut() { location.hash = ''; location.reload(); },
+  };
+}
+
+async function firestoreStore() {
+  const [{ initializeApp }, A, F] = await Promise.all([
+    import(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-app.js`),
+    import(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-auth.js`),
+    import(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-firestore.js`),
+  ]);
+  const app = initializeApp(FIREBASE);
+  const auth = A.getAuth(app), db = F.getFirestore(app);
+  const user = await new Promise(res => { const u = A.onAuthStateChanged(auth, x => { u(); res(x); }); });
+  const login = async () => {
+    const prov = new A.GoogleAuthProvider();
+    try { await A.signInWithPopup(auth, prov); location.reload(); }
+    catch (e) { if (e && e.code === 'auth/popup-blocked') await A.signInWithRedirect(auth, prov); else throw e; }
+  };
+  if (!user) return { login };
+  const email = (user.email || '').toLowerCase();
+  const ref = id => F.doc(db, 'asesoria_clientes', id);
+  return {
+    me: { email, nombre: user.displayName || email },
+    rol: CONFIG.asesorEmails.includes(email) ? 'asesor' : 'cliente',
+    watchClientes(cb, err) { return F.onSnapshot(F.collection(db, 'asesoria_clientes'), s => cb(s.docs.map(d => ({ id: d.id, ...d.data() }))), err); },
+    watchCliente(id, cb, err) { return F.onSnapshot(ref(id), s => cb(s.exists() ? { id: s.id, ...s.data() } : null), err); },
+    async crearCliente(d) {
+      const s = await F.getDoc(ref(d.email)); if (s.exists()) throw new Error('existe');
+      await F.setDoc(ref(d.email), { ...d, positions: [], altaEn: F.serverTimestamp() });
+    },
+    async actualizar(id, patch) { await F.updateDoc(ref(id), patch); },
+    watchMensajes(id, cb, err) {
+      const q = F.query(F.collection(db, 'asesoria_clientes', id, 'mensajes'), F.orderBy('ts'));
+      return F.onSnapshot(q, s => cb(s.docs.map(d => ({ ...d.data(), ts: toMs(d.data().ts) || Date.now() }))), err);
+    },
+    async enviar(id, m) {
+      await F.addDoc(F.collection(db, 'asesoria_clientes', id, 'mensajes'), { ...m, ts: F.serverTimestamp() });
+      await F.updateDoc(ref(id), { ultimoMensaje: { de: m.de, texto: m.texto.slice(0, 140), ts: Date.now() } });
+    },
+    async getNotas(id) { const s = await F.getDoc(F.doc(db, 'asesoria_clientes', id, 'privado', 'notas')); return s.exists() ? (s.data().texto || '') : ''; },
+    async setNotas(id, texto) { await F.setDoc(F.doc(db, 'asesoria_clientes', id, 'privado', 'notas'), { texto }); },
+    async signOut() { await A.signOut(auth); location.reload(); },
+  };
+}
+
+/* ---------- estado y arranque ---------- */
+let S = null;              // store
+const UI = { clientes: [], sel: null, tab: 'cartera', unsubSel: null, unsubMsg: null, msgs: [] };
+const main = $('#main');
+
+function renderFoot() {
+  $('#foot').innerHTML = `<div><b>${esc(CONFIG.asesorNombre)}</b> · ${esc(CONFIG.registroCNV)}</div>
+    <div>${esc(CONFIG.agente)}. Los fondos y los títulos quedan siempre en la cuenta comitente del cliente en su broker: el asesor no recibe dinero, no custodia activos ni opera en nombre del cliente.</div>
+    <div>Los datos de esta sección son privados entre el cliente y su asesor, y se usan solo para prestar el servicio de asesoramiento (Ley 25.326).</div>`;
+}
+
+function denied(e) {
+  console.warn(e);
+  main.innerHTML = `<div class="panel stack"><h2>No se pudo leer la base de datos</h2>
+    <p class="meta">Firestore rechazó el acceso (${esc(e && e.code || e)}). Si sos el asesor, revisá que estén publicadas las reglas de <code>docs/asesoria-firestore.rules</code> en la consola de Firebase.</p></div>`;
+}
+
+async function boot() {
+  renderFoot();
+  if (DEMO) { $('#demoBar').hidden = false; S = memoryStore(location.hash === '#demo-cliente' ? 'cliente' : 'asesor'); }
+  else {
+    try { S = await firestoreStore(); }
+    catch (e) { main.innerHTML = `<div class="gate"><h1>Sin conexión</h1><p>No se pudo cargar el inicio de sesión. Revisá tu conexión y recargá la página.</p></div>`; return; }
+    if (!S.me) {
+      main.innerHTML = `<div class="gate">
+        <span class="chip gold">Acceso privado</span>
+        <h1>Tu asesoría, en un solo lugar</h1>
+        <p>Tu cartera, el análisis y el chat con tu asesor. Entrá con la misma cuenta de Google con la que te dimos de alta.</p>
+        <button class="gbtn" id="gbtn" type="button"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.8 6C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.7c4.3-4 6.9-9.9 6.9-17.1z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.3.8-4.7l-7.8-6C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.8-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.5 2.3-6.3 0-11.6-4.2-13.5-9.9l-7.8 6C6.6 42.6 14.6 48 24 48z"/></svg>Entrar con Google</button>
+        <p class="meta">¿Querés ver cómo funciona? <a href="#demo" onclick="setTimeout(()=>location.reload())">Abrí la demo</a>.</p>
+      </div>`;
+      $('#gbtn').onclick = () => S.login().catch(e => toast('No se pudo iniciar sesión: ' + (e.code || e.message)));
+      return;
+    }
+  }
+  $('#who').innerHTML = `<span class="chip ${S.rol === 'asesor' ? 'gold' : ''}">${S.rol === 'asesor' ? 'Asesor' : 'Cliente'}</span><span class="meta">${esc(S.me.email)}</span><button class="btn small ghost" id="out" type="button">Salir</button>`;
+  $('#out').onclick = () => S.signOut();
+  main.innerHTML = '<div class="gate"><p class="meta">Cargando cotizaciones…</p></div>';
+  await loadMarket();
+  if (S.rol === 'asesor') startAsesor(); else startCliente();
+}
+
+/* ============================================================
+   ASESOR
+   ============================================================ */
+function startAsesor() {
+  S.watchClientes(list => {
+    UI.clientes = list.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+    if (!UI.sel) renderLista();
+  }, denied);
+}
+
+function estadoCliente(c, an, dv) {
+  if (!c.consentimiento || !c.consentimiento.aceptado) return '<span class="chip warn">Falta consentimiento</span>';
+  if (!(c.positions || []).length) return '<span class="chip">Sin cartera cargada</span>';
+  if (!c.perfil) return '<span class="chip warn">Sin perfil</span>';
+  if (dv && dv.fuera.length) return '<span class="chip warn">Desvío del perfil</span>';
+  return '<span class="chip ok">Alineada</span>';
+}
+const sinLeer = c => c.ultimoMensaje && c.ultimoMensaje.de === 'cliente' && (toMs(c.ultimoMensaje.ts) || 0) > (toMs(c.asesorLeido) || 0);
+
+function renderLista() {
+  const data = UI.clientes.map(c => { const an = analizar(c.positions); return { c, an, dv: desvio(c, an) }; });
+  const tot = data.reduce((s, x) => s + x.an.total, 0);
+  const nDesv = data.filter(x => x.dv && x.dv.fuera.length).length;
+  const nMsg = data.filter(x => sinLeer(x.c)).length;
+  const nPend = data.filter(x => !x.c.consentimiento || !x.c.consentimiento.aceptado).length;
+  const hon = data.reduce((s, x) => s + (Number(x.c.honorario) || 0), 0);
+  main.innerHTML = `
+    <div class="row between"><h2>Tus clientes</h2><button class="btn primary" id="nuevo" type="button">+ Nuevo cliente</button></div>
+    <div class="panel" id="altaBox" hidden></div>
+    <div class="kpis">
+      <div class="kpi"><span>Clientes</span><b>${data.length}</b></div>
+      <div class="kpi"><span>Patrimonio asesorado</span><b>${usd(tot)}</b></div>
+      <div class="kpi"><span>Honorarios por mes</span><b>${usd(hon)}</b></div>
+      <div class="kpi"><span>Carteras con desvío</span><b class="${nDesv ? 'warn' : ''}">${nDesv}</b></div>
+      <div class="kpi"><span>Mensajes sin leer</span><b class="${nMsg ? 'warn' : ''}">${nMsg}</b></div>
+    </div>
+    ${nPend ? `<div class="alert info"><span class="d"></span><div>${nPend === 1 ? 'Un cliente todavía no aceptó' : nPend + ' clientes todavía no aceptaron'} el consentimiento. Pasale el link <b>${esc(location.origin + location.pathname)}</b> para que entre con su cuenta de Google.</div></div>` : ''}
+    <div class="panel">
+      ${data.length ? `<div class="scroll-x"><table class="t clients">
+        <thead><tr><th class="l">Cliente</th><th>Patrimonio</th>${BUCKETS.map(b => `<th>${b}</th>`).join('')}<th>Resultado</th><th class="l">Estado</th></tr></thead>
+        <tbody>${data.map(({ c, an, dv }) => `<tr data-id="${esc(c.id)}" tabindex="0">
+          <td class="l cname"><b>${esc(c.nombre)}${sinLeer(c) ? ' <span class="chip gold" style="margin-left:4px">mensaje nuevo</span>' : ''}</b><span>${esc(c.perfil || 'sin perfil')} · ${esc(c.email)}</span></td>
+          <td class="num">${an.total ? usd(an.total) : '—'}</td>
+          ${an.buckets.map((w, i) => { const d = dv && dv.fuera.includes(i); return `<td class="num wcell${d ? ' d' : ''}" title="${dv ? 'Modelo ' + dv.m[i] + '%' : ''}"><i style="opacity:${an.total ? (d ? .2 : .06 + w / 100 * .45).toFixed(2) : 0}"></i><span>${an.total ? nf(w, 0) + '%' : '—'}</span></td>`; }).join('')}
+          <td class="num ${cls(an.resultado)}">${pct(an.resultado, 1, true)}</td>
+          <td class="l">${estadoCliente(c, an, dv)}</td></tr>`).join('')}</tbody></table></div>`
+      : `<div class="stack" style="justify-items:start"><p style="margin:0">Todavía no diste de alta a ningún cliente.</p><p class="meta" style="margin:0">Cargá su nombre y el email de Google con el que va a entrar. Después le pasás el link de esta página.</p></div>`}
+    </div>`;
+  main.querySelectorAll('tr[data-id]').forEach(tr => {
+    tr.onclick = () => abrirCliente(tr.dataset.id);
+    tr.onkeydown = e => { if (e.key === 'Enter') abrirCliente(tr.dataset.id); };
+  });
+  $('#nuevo').onclick = mostrarAlta;
+}
+
+function mostrarAlta() {
+  const box = $('#altaBox'); box.hidden = false;
+  box.innerHTML = `<form id="altaF" class="stack">
+    <h3>Nuevo cliente</h3>
+    <div class="form">
+      <label class="f">Nombre y apellido<input class="in" id="aN" required autocomplete="off"></label>
+      <label class="f">Email de Google del cliente<input class="in" id="aE" type="email" required autocomplete="off"></label>
+      <label class="f">Perfil (si ya lo sabés)<select class="in" id="aP"><option value="">Que haga el test</option>${PERFILES.map(p => `<option>${p}</option>`).join('')}</select></label>
+      <label class="f">Honorario mensual (US$)<input class="in" id="aH" inputmode="decimal" placeholder="0"></label>
+    </div>
+    <div class="row"><button class="btn primary" type="submit">Dar de alta</button><button class="btn ghost" type="button" id="aX">Cancelar</button><span class="meta" id="aMsg"></span></div>
+  </form>`;
+  $('#aN').focus();
+  $('#aX').onclick = () => { box.hidden = true; box.innerHTML = ''; };
+  $('#altaF').onsubmit = async e => {
+    e.preventDefault();
+    const email = $('#aE').value.trim().toLowerCase();
+    const h = parseNum($('#aH').value);
+    try {
+      await S.crearCliente({ nombre: $('#aN').value.trim(), email, perfil: $('#aP').value || null, honorario: isFinite(h) ? h : 0, objetivo: '' });
+      toast('Cliente dado de alta. Pasale el link de esta página.');
+    } catch (err) {
+      $('#aMsg').textContent = err.message === 'existe' ? 'Ya hay un cliente con ese email.' : 'No se pudo guardar (' + (err.code || err.message) + ').';
+    }
+  };
+}
+
+function abrirCliente(id) {
+  UI.sel = id; UI.tab = 'cartera';
+  if (UI.unsubSel) UI.unsubSel();
+  if (UI.unsubMsg) UI.unsubMsg();
+  let first = true;
+  UI.unsubSel = S.watchCliente(id, c => {
+    if (!c) { cerrarCliente(); return; }
+    UI.cliente = c;
+    if (first) { first = false; renderDetalle(); } else refrescarDetalle();
+  }, denied);
+  UI.unsubMsg = S.watchMensajes(id, m => { UI.msgs = m; if (UI.tab === 'chat') pintarMensajes(); marcarTab(); }, () => {});
+  window.scrollTo(0, 0);
+}
+function cerrarCliente() {
+  if (UI.unsubSel) UI.unsubSel(); if (UI.unsubMsg) UI.unsubMsg();
+  UI.sel = null; UI.cliente = null; UI.msgs = [];
+  renderLista();
+}
+
+/* ============================================================
+   CLIENTE
+   ============================================================ */
+function startCliente() {
+  const id = S.me.email;
+  UI.sel = id; UI.tab = 'cartera';
+  let first = true;
+  UI.unsubSel = S.watchCliente(id, c => {
+    if (!c) {
+      main.innerHTML = `<div class="gate"><h1>Todavía no tenés una asesoría activa</h1>
+        <p>Pedile a tu asesor que te dé de alta con este email: <b>${esc(id)}</b>. Después recargá esta página.</p></div>`;
+      return;
+    }
+    UI.cliente = c;
+    if (!c.consentimiento || !c.consentimiento.aceptado) { renderConsentimiento(); first = true; return; }
+    if (first) { first = false; renderDetalle(); } else refrescarDetalle();
+  }, e => {
+    // sin documento, las reglas niegan la lectura: lo tratamos como "sin alta"
+    main.innerHTML = `<div class="gate"><h1>Todavía no tenés una asesoría activa</h1>
+      <p>Pedile a tu asesor que te dé de alta con este email: <b>${esc(id)}</b>. Después recargá esta página.</p></div>`;
+  });
+  UI.unsubMsg = S.watchMensajes(id, m => { UI.msgs = m; if (UI.tab === 'chat') pintarMensajes(); marcarTab(); }, () => {});
+}
+
+function renderConsentimiento() {
+  const c = UI.cliente;
+  main.innerHTML = `<div class="panel stack" style="max-width:640px;margin:0 auto">
+    <span class="chip gold" style="justify-self:start">Antes de empezar</span>
+    <h2>Hola, ${esc((c.nombre || '').split(' ')[0])}</h2>
+    <p style="margin:0;color:var(--ink2)">En esta sección vas a cargar tu cartera, ver el análisis y hablar con tu asesor. Para eso necesitamos tu conformidad:</p>
+    <ul style="margin:0;padding-left:18px;color:var(--ink2);display:grid;gap:6px">
+      <li>Tu asesor, ${esc(CONFIG.asesorNombre)}, va a ver las tenencias que cargues y los mensajes del chat.</li>
+      <li>Usamos esos datos solo para asesorarte. No se comparten con terceros.</li>
+      <li>Tu dinero y tus títulos siguen en tu cuenta del broker. Nadie opera por vos: las operaciones las hacés vos.</li>
+      <li>Los mensajes quedan archivados y no se pueden borrar.</li>
+      <li>Podés pedir que borremos tus datos cuando quieras escribiéndole a tu asesor.</li>
+    </ul>
+    <label style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" id="okC" style="margin-top:4px"> <span>Leí y acepto que mi asesor acceda a mis tenencias y mensajes para prestarme el servicio de asesoramiento, en los términos de la Ley 25.326 de Protección de Datos Personales.</span></label>
+    <div><button class="btn primary" id="okB" type="button" disabled>Aceptar y continuar</button></div>
+  </div>`;
+  $('#okC').onchange = e => { $('#okB').disabled = !e.target.checked; };
+  $('#okB').onclick = async () => {
+    try { await S.actualizar(c.id, { consentimiento: { aceptado: true, fecha: Date.now() } }); }
+    catch (e) { toast('No se pudo guardar: ' + (e.code || e.message)); }
+  };
+}
+
+/* ============================================================
+   DETALLE (lo comparten asesor y cliente)
+   ============================================================ */
+const TABS_ASESOR = [['cartera', 'Cartera'], ['analisis', 'Análisis'], ['chat', 'Chat'], ['ficha', 'Ficha']];
+const TABS_CLIENTE = [['cartera', 'Mi cartera'], ['analisis', 'Análisis'], ['chat', 'Chat con mi asesor'], ['ficha', 'Mi perfil']];
+
+function renderDetalle() {
+  const c = UI.cliente, asesor = S.rol === 'asesor';
+  const tabs = asesor ? TABS_ASESOR : TABS_CLIENTE;
+  main.innerHTML = `
+    ${asesor ? '<div class="no-print"><button class="btn small ghost" id="back" type="button">← Todos los clientes</button></div>' : ''}
+    <div class="dhead" id="dhead"></div>
+    <nav class="tabs" role="tablist">${tabs.map(([k, l]) => `<button class="tab" role="tab" data-t="${k}" aria-selected="${UI.tab === k}">${l}</button>`).join('')}</nav>
+    <section id="tabBody" class="stack"></section>`;
+  if (asesor) $('#back').onclick = cerrarCliente;
+  main.querySelectorAll('.tab').forEach(b => b.onclick = () => { UI.tab = b.dataset.t; main.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === b)); pintarTab(); });
+  pintarHead(); pintarTab(); marcarTab();
+}
+function refrescarDetalle() {
+  if (!$('#tabBody')) { renderDetalle(); return; }
+  pintarHead();
+  const body = $('#tabBody');
+  // no pisar lo que la persona está escribiendo
+  if (UI.tab === 'chat' || body.contains(document.activeElement) && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
+  if ($('#impBox') && !$('#impBox').hidden) return;
+  pintarTab();
+}
+function marcarTab() {
+  const t = main.querySelector('.tab[data-t="chat"]'); if (!t) return;
+  const c = UI.cliente || {}; const um = c.ultimoMensaje;
+  const nuevo = um && um.de !== S.rol && UI.tab !== 'chat' && (S.rol === 'asesor' ? sinLeer(c) : true) && (toMs(um.ts) || 0) > (Number(localStorage.getItem('ase-visto-' + c.id)) || 0);
+  t.innerHTML = t.textContent.replace(/\s*$/, '') + (nuevo ? '<span class="dot" aria-label="mensaje nuevo"></span>' : '');
+}
+function pintarHead() {
+  const c = UI.cliente, an = analizar(c.positions);
+  $('#dhead').innerHTML = `<div class="avatar">${esc(iniciales(c.nombre))}</div>
+    <div style="min-width:0"><h2>${esc(c.nombre)}</h2>
+    <div class="row meta"><span>${esc(c.perfil ? 'Perfil ' + c.perfil.toLowerCase() : 'Perfil sin definir')}</span>·<span>${an.total ? usd(an.total) : 'sin cartera'}</span>${c.positionsActualizado ? `·<span>cartera actualizada ${fecha(toMs(c.positionsActualizado))}</span>` : ''}</div></div>`;
+}
+function pintarTab() {
+  const f = { cartera: tabCartera, analisis: tabAnalisis, chat: tabChat, ficha: S.rol === 'asesor' ? tabFicha : tabPerfil }[UI.tab];
+  f($('#tabBody'));
+}
+
+/* ---------- Cartera ---------- */
+const TIPO = { arg_stocks: 'Acción AR', arg_cedears: 'CEDEAR', usa_stocks: 'Acción EE.UU.', usa_adrs: 'ADR', arg_bonds: 'Bono / Letra', cripto: 'Cripto', commodities: 'Commodity', fci: 'FCI', cash: 'Efectivo' };
+async function guardarPositions(positions) {
+  try { await S.actualizar(UI.cliente.id, { positions, positionsActualizado: Date.now(), positionsFuente: S.rol }); }
+  catch (e) { toast('No se pudo guardar: ' + (e.code || e.message)); }
+}
+function tabCartera(el) {
+  const c = UI.cliente, an = analizar(c.positions);
+  const fuente = c.positionsFuente ? (c.positionsFuente === 'asesor' ? 'cargada por el asesor' : 'cargada por el cliente') : '';
+  el.innerHTML = `
+    <div class="row between no-print">
+      <div class="row">
+        <button class="btn primary" id="addB" type="button">+ Agregar posición</button>
+        <button class="btn" id="pdfB" type="button">Importar PDF del broker</button>
+        <input type="file" id="pdfIn" accept="application/pdf,.pdf" hidden>
+      </div>
+      <span class="meta">${MKT.ccl ? 'Dólar CCL $ ' + nf(MKT.ccl, 2) + ' · ' : ''}precios al ${fecha(MKT.ts)}</span>
+    </div>
+    <div class="panel" id="addBox" hidden>
+      <form id="addF" class="form">
+        <label class="f">Ticker<input class="in" id="fT" list="tk" required autocomplete="off" placeholder="GGAL, AL30D, SPY…"></label>
+        <label class="f">Cantidad (bonos: nominales)<input class="in" id="fQ" inputmode="decimal" required></label>
+        <label class="f">Precio de compra (bonos: cada 100 VN)<input class="in" id="fP" inputmode="decimal" placeholder="opcional"></label>
+        <label class="f">Moneda<select class="in" id="fM"><option>ARS</option><option>USD</option></select></label>
+        <label class="f"><span>&nbsp;</span><span class="row"><button class="btn primary" type="submit">Agregar</button><button class="btn ghost" type="button" id="addX">Cerrar</button></span></label>
+      </form>
+      <datalist id="tk">${MKT.list.filter(x => x.cat !== 'fci').map(x => `<option value="${esc(x.s)}">${esc(x.n)} · ${x.cur}</option>`).join('')}<option value="ARS">Efectivo en pesos</option><option value="USD">Efectivo en dólares</option></datalist>
+    </div>
+    <div class="panel imp" id="impBox" hidden></div>
+    <div class="panel">
+      ${an.rows.length ? `<div class="scroll-x"><table class="t">
+        <thead><tr><th class="l">Activo</th><th class="l">Clase</th><th>Cantidad</th><th>Precio compra</th><th>Precio hoy</th><th>Día</th><th>Valor</th><th>Valor US$</th><th>Peso</th><th>Resultado</th><th class="no-print"></th></tr></thead>
+        <tbody>${an.rows.map(r => { const p = r.p; const i = c.positions.indexOf(p); return `<tr>
+          <td class="l"><b>${esc(p.ticker)}</b></td>
+          <td class="l meta">${esc(TIPO[r.cat] || (p.tipo ? p.tipo : 'Sin cotización'))}</td>
+          <td class="num">${nf(p.cantidad, p.cantidad % 1 ? 4 : 0)}</td>
+          <td class="num">${p.isCash ? '' : p.precioCompra != null ? nf(p.precioCompra, 2) : '—'}</td>
+          <td class="num">${p.isCash ? '' : r.sinCot ? '<span class="warn" title="No encontramos cotización: se usa el precio de compra">s/c</span>' : nf(r.price, 2)}</td>
+          <td class="num ${cls(r.change)}">${r.change != null && !p.isCash ? pct(r.change, 1, true) : ''}</td>
+          <td class="num">${p.moneda === 'USD' ? 'US$' : '$'} ${nf(r.valor, 0)}</td>
+          <td class="num">${nf(r.vUSD, 0)}</td>
+          <td class="num">${nf(r.w, 1)}%</td>
+          <td class="num ${cls(r.res)}">${pct(r.res, 1, true)}</td>
+          <td class="no-print"><button class="x" data-del="${i}" title="Quitar ${esc(p.ticker)}" type="button">×</button></td></tr>`; }).join('')}</tbody>
+        <tfoot><tr><td class="l" colspan="7">Total</td><td class="num">${nf(an.total, 0)}</td><td class="num">100%</td><td class="num ${cls(an.resultado)}">${pct(an.resultado, 1, true)}</td><td class="no-print"></td></tr></tfoot>
+      </table></div>
+      <p class="meta" style="margin:12px 0 0">${an.rows.length} posiciones${fuente ? ' · ' + fuente : ''}${c.positionsActualizado ? ' el ' + fecha(toMs(c.positionsActualizado)) : ''}. ${an.sinCot ? an.sinCot + ' sin cotización: se valúan a precio de compra.' : ''} El resultado se mide contra el precio de compra, en la moneda de cada posición.</p>`
+      : `<div class="stack" style="justify-items:start"><p style="margin:0">Todavía no hay tenencias cargadas.</p><p class="meta" style="margin:0">La forma más rápida es descargar el PDF de tenencias desde el broker (IOL, Balanz, Cocos, PPI, Bull Market) e importarlo acá. También se pueden cargar a mano.</p></div>`}
+    </div>`;
+  $('#addB').onclick = () => { $('#addBox').hidden = false; $('#fT').focus(); };
+  $('#addX').onclick = () => { $('#addBox').hidden = true; };
+  $('#fT').oninput = e => { const s = e.target.value.trim().toUpperCase(); const m = MKT.list.find(x => x.s === s); if (m) $('#fM').value = m.cur; if (s === 'USD' || s === 'ARS') $('#fM').value = s; };
+  $('#addF').onsubmit = e => {
+    e.preventDefault();
+    const t = $('#fT').value.trim().toUpperCase(), q = parseNum($('#fQ').value), px = parseNum($('#fP').value), mon = $('#fM').value;
+    if (!t || !(q > 0)) { toast('Completá ticker y una cantidad mayor a cero.'); return; }
+    const cash = t === 'ARS' || t === 'USD';
+    const pos = { ticker: t, cantidad: q, precioCompra: cash ? 1 : (px > 0 ? px : null), moneda: cash ? t : mon };
+    if (cash) pos.isCash = true;
+    guardarPositions([...(c.positions || []), pos]);
+    $('#addF').reset();
+  };
+  el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.del; const arr = (c.positions || []).slice(); const [x] = arr.splice(i, 1);
+    guardarPositions(arr); toast(x.ticker + ' quitado de la cartera.');
+  });
+  $('#pdfB').onclick = () => $('#pdfIn').click();
+  $('#pdfIn').onchange = e => { const f = e.target.files[0]; if (f) importarPdf(f); e.target.value = ''; };
+}
+
+/* PDF: el texto se extrae en el navegador y Warren (worker existente) lo interpreta */
+let pdfjsP = null;
+function loadPdfJs() {
+  if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  return pdfjsP = pdfjsP || new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VER}/pdf.min.js`;
+    s.onload = () => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VER}/pdf.worker.min.js`; res(window.pdfjsLib); };
+    s.onerror = () => rej(new Error('pdf.js'));
+    document.head.appendChild(s);
+  });
+}
+// Reconstruye filas/columnas por posición (mismo método que el importador del Portfolio)
+function layoutText(items) {
+  const fr = (items || []).filter(it => it && it.str && it.str.trim()).map(it => { const t = it.transform || [1, 0, 0, 1, 0, 0]; return { x: t[4], y: t[5], w: it.width || it.str.length * 4, s: it.str }; });
+  if (!fr.length) return '';
+  fr.sort((a, b) => (b.y - a.y) || (a.x - b.x));
+  const lines = []; let cur = null;
+  fr.forEach(f => { if (cur && Math.abs(f.y - cur.y) <= 3) cur.it.push(f); else { cur = { y: f.y, it: [f] }; lines.push(cur); } });
+  const cw = (fr.reduce((s, f) => s + f.w, 0) / fr.reduce((s, f) => s + f.s.length, 0)) || 4;
+  return lines.map(l => { l.it.sort((a, b) => a.x - b.x); let o = '', end = null; l.it.forEach(f => { if (end != null) { const g = f.x - end; o += ' '.repeat(Math.min(g > cw * .6 ? Math.max(1, Math.round(g / cw)) : g > 0 ? 1 : 0, 14)); } o += f.s; end = f.x + f.w; }); return o.trimEnd(); }).join('\n');
+}
+async function importarPdf(file) {
+  const box = $('#impBox'); box.hidden = false;
+  const fail = m => { box.innerHTML = `<div class="stack"><h3>Importar PDF</h3><p class="neg" style="margin:0">${esc(m)}</p><div><button class="btn small" id="impX" type="button">Cerrar</button></div></div>`; $('#impX').onclick = () => { box.hidden = true; }; };
+  if (file.size > 12 * 1024 * 1024) return fail('El archivo pesa más de 12 MB. Suele ser un PDF escaneado; hace falta el PDF con texto que descarga el broker.');
+  box.innerHTML = '<p class="meta" style="margin:0">Leyendo el PDF en tu navegador…</p>';
+  let text = '';
+  try {
+    const lib = await loadPdfJs();
+    const pdf = await lib.getDocument({ data: await file.arrayBuffer() }).promise;
+    const out = [];
+    for (let i = 1; i <= Math.min(pdf.numPages, 20); i++) out.push(layoutText((await (await pdf.getPage(i)).getTextContent()).items));
+    text = out.join('\n\n');
+  } catch (e) { return fail('No se pudo leer el PDF. Probá descargarlo de nuevo desde el broker.'); }
+  if (text.replace(/\s/g, '').length < 30) return fail('El PDF no tiene texto seleccionable (parece escaneado).');
+  box.innerHTML = '<p class="meta" style="margin:0">Interpretando las tenencias…</p>';
+  let data;
+  try {
+    const r = await fetch(PARSE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: S.me.email, text }) });
+    data = await r.json();
+    if (!r.ok || data.error) return fail(data.message || 'No se pudo procesar el PDF.');
+  } catch (e) { return fail('No se pudo conectar con el servidor. Probá de nuevo en un rato.'); }
+  if (!data.positions || !data.positions.length) return fail('No encontré posiciones en este PDF.');
+  box.innerHTML = `<div class="stack">
+    <div class="row between"><h3>Revisá lo que leímos${data.broker ? ' · ' + esc(data.broker) : ''}</h3><span class="meta">Bonos: nominales y precio cada 100 VN</span></div>
+    ${(data.avisos || []).length ? `<ul class="meta" style="margin:0;padding-left:18px">${data.avisos.map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
+    <div class="scroll-x"><table class="t"><thead><tr><th></th><th class="l">Ticker</th><th>Cantidad</th><th>Precio compra</th><th>Moneda</th></tr></thead>
+    <tbody>${data.positions.map((p, i) => `<tr data-i="${i}"><td><input type="checkbox" checked></td>
+      <td class="l"><input class="in" value="${esc(p.ticker)}" style="width:110px">${p.confianza !== 'alta' ? ' <span class="chip warn">revisar</span>' : ''}</td>
+      <td><input class="in num" inputmode="decimal" value="${p.cantidad}" style="width:120px"></td>
+      <td><input class="in num" inputmode="decimal" value="${p.precioCompra ?? ''}" placeholder="s/d" style="width:110px"></td>
+      <td><select class="in" style="width:80px"><option${p.moneda !== 'USD' ? ' selected' : ''}>ARS</option><option${p.moneda === 'USD' ? ' selected' : ''}>USD</option></select></td></tr>`).join('')}</tbody></table></div>
+    <div class="row"><button class="btn primary" id="impR" type="button">Reemplazar la cartera con esto</button><button class="btn" id="impA" type="button">Sumar a la cartera actual</button><button class="btn ghost" id="impX" type="button">Descartar</button></div>
+  </div>`;
+  box.querySelectorAll('tbody input[type=checkbox]').forEach(ch => ch.onchange = () => ch.closest('tr').classList.toggle('off', !ch.checked));
+  const leer = () => [...box.querySelectorAll('tbody tr')].filter(tr => tr.querySelector('input[type=checkbox]').checked).map(tr => {
+    const o = data.positions[+tr.dataset.i], ins = tr.querySelectorAll('input.in'), mon = tr.querySelector('select').value;
+    const cash = o.tipo === 'efectivo', t = ins[0].value.trim().toUpperCase(), q = parseNum(ins[1].value), px = parseNum(ins[2].value);
+    if (!t || !(q > 0)) return null;
+    const pos = { ticker: cash ? mon : t, cantidad: q, precioCompra: cash ? 1 : (px > 0 ? px : null), moneda: mon, tipo: o.tipo || 'otro' };
+    if (cash) pos.isCash = true;
+    return pos;
+  }).filter(Boolean);
+  const fin = arr => { box.hidden = true; guardarPositions(arr); toast(arr.length + ' posiciones guardadas.'); };
+  $('#impR').onclick = () => fin(leer());
+  $('#impA').onclick = () => fin([...(UI.cliente.positions || []), ...leer()]);
+  $('#impX').onclick = () => { box.hidden = true; };
+}
+
+/* ---------- Análisis ---------- */
+function tabAnalisis(el) {
+  const c = UI.cliente, an = analizar(c.positions), dv = desvio(c, an), asesor = S.rol === 'asesor';
+  if (!an.rows.length) { el.innerHTML = '<div class="panel"><p style="margin:0">Cargá la cartera para ver el análisis.</p></div>'; return; }
+  const top = an.rows.slice(0, 12);
+  const maxAbs = Math.max(10, ...an.rows.filter(r => r.res != null).map(r => Math.abs(r.res)));
+  el.innerHTML = `
+    <div class="kpis">
+      <div class="kpi"><span>Patrimonio</span><b>${usd(an.total)}</b></div>
+      <div class="kpi"><span>Resultado sobre compra</span><b class="${cls(an.resultado)}">${pct(an.resultado, 1, true)}</b></div>
+      <div class="kpi"><span>Exposición a dólar</span><b>${pct(an.dolar, 0)}</b></div>
+      <div class="kpi"><span>Mayor posición</span><b>${an.top ? esc(an.top.p.ticker) + ' ' + nf(an.top.w, 0) + '%' : '—'}</b></div>
+      <div class="kpi"><span>Diversificación efectiva</span><b>${nf(an.nEf, 1)}</b></div>
+    </div>
+    <div class="grid2">
+      <div class="panel stack">
+        <div class="row between"><h3>Clases de activo</h3><span class="meta">${dv ? 'marca dorada: modelo ' + esc(c.perfil.toLowerCase()) : 'sin perfil definido'}</span></div>
+        <div class="bars">${an.buckets.map((w, i) => { const d = dv && dv.fuera.includes(i); return `<div class="br${d ? ' d' : ''}"><span>${BUCKETS[i]}</span><div class="bar"><b style="width:${Math.min(100, w)}%"></b>${dv ? `<em style="left:${dv.m[i]}%"></em>` : ''}</div><span class="v">${nf(w, 1)}%${dv ? ' · ' + pp(dv.d[i]) : ''}</span></div>`; }).join('')}</div>
+        ${dv ? (dv.fuera.length
+          ? `<div class="alert"><span class="d"></span><div><b>Fuera del perfil:</b> ${dv.fuera.map(i => BUCKETS[i] + ' ' + (dv.d[i] > 0 ? '+' : '−') + nf(Math.abs(dv.d[i]), 0) + ' pp').join(', ')}.${asesor ? ' <button class="btn small no-print" id="propB" type="button" style="margin-left:6px">Mandar propuesta por chat</button>' : ''}</div></div>`
+          : '<div class="alert ok"><span class="d"></span><div>Alineada al perfil: ninguna clase se desvía ' + CONFIG.umbralDesvio + ' pp o más del modelo.</div></div>') : ''}
+      </div>
+      <div class="panel stack">
+        <h3>Peso por posición</h3>
+        <div class="bars">${top.map(r => `<div class="br"><span>${esc(r.p.ticker)}</span><div class="bar"><b style="width:${Math.min(100, r.w / (top[0].w || 1) * 100)}%"></b></div><span class="v">${nf(r.w, 1)}%</span></div>`).join('')}</div>
+        ${an.rows.length > 12 ? `<p class="meta" style="margin:0">Y ${an.rows.length - 12} posiciones más.</p>` : ''}
+        ${an.top && an.top.w > 25 && !an.top.p.isCash ? `<div class="alert"><span class="d"></span><div>${esc(an.top.p.ticker)} pesa ${nf(an.top.w, 0)}% de la cartera.</div></div>` : ''}
+      </div>
+    </div>
+    <div class="panel stack">
+      <div class="row between"><h3>Resultado por posición</h3><span class="meta">contra precio de compra, en la moneda de cada posición</span></div>
+      <div class="bars">${an.rows.filter(r => r.res != null).sort((a, b) => b.res - a.res).map(r => { const w = Math.abs(r.res) / maxAbs * 50; return `<div class="div"><span>${esc(r.p.ticker)}</span><div class="track"><b style="${r.res >= 0 ? `left:50%;width:${w}%;background:var(--pos)` : `right:50%;width:${w}%;background:var(--neg)`}"></b></div><span class="v num ${cls(r.res)}" style="text-align:right;font-size:12px">${pct(r.res, 1, true)}</span></div>`; }).join('') || '<p class="meta" style="margin:0">Faltan precios de compra para calcular resultados.</p>'}</div>
+    </div>
+    <div class="row no-print"><button class="btn" id="printB" type="button">Imprimir o guardar informe en PDF</button><span class="meta">Diversificación efectiva: cuántas posiciones de igual peso equivalen a esta cartera.</span></div>`;
+  $('#printB').onclick = () => window.print();
+  const pb = $('#propB');
+  if (pb) pb.onclick = async () => {
+    const txt = dv.d.map((x, i) => Math.abs(x) >= 1 ? `${BUCKETS[i]} ${x > 0 ? '−' : '+'}${nf(Math.abs(x), 0)} pp` : null).filter(Boolean).join(' · ');
+    await S.enviar(c.id, { de: 'asesor', texto: `Te paso una propuesta para volver a tu perfil ${c.perfil.toLowerCase()}.`, propuesta: txt + '. La ejecución la hacés vos en tu cuenta del broker.' });
+    UI.tab = 'chat'; main.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x.dataset.t === 'chat')); pintarTab();
+  };
+}
+
+/* ---------- Chat ---------- */
+function tabChat(el) {
+  el.innerHTML = `<div class="panel chat">
+    <div class="msgs" id="msgs" aria-live="polite"></div>
+    <form class="composer" id="cmp"><label for="cmpT" hidden>Mensaje</label><textarea class="in" id="cmpT" placeholder="Escribí un mensaje…" maxlength="3000"></textarea><button class="btn primary" type="submit">Enviar</button></form>
+  </div>`;
+  pintarMensajes();
+  const ta = $('#cmpT');
+  ta.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('#cmp').requestSubmit(); } };
+  $('#cmp').onsubmit = async e => {
+    e.preventDefault(); const t = ta.value.trim(); if (!t) return;
+    ta.value = '';
+    try { await S.enviar(UI.cliente.id, { de: S.rol, texto: t }); }
+    catch (err) { ta.value = t; toast('No se pudo enviar: ' + (err.code || err.message)); }
+  };
+  marcarLeido();
+}
+function pintarMensajes() {
+  const box = $('#msgs'); if (!box) return;
+  const otro = S.rol === 'asesor' ? (UI.cliente.nombre || 'el cliente') : 'tu asesor';
+  box.innerHTML = `<div class="msg sys">Conversación privada con ${esc(otro)}. Los mensajes quedan archivados y no se pueden borrar.</div>` +
+    (UI.msgs.length ? UI.msgs.map(m => `<div class="msg ${m.de === S.rol ? 'me' : 'them'}">${esc(m.texto)}${m.propuesta ? `<div class="prop"><b>Propuesta de rebalanceo</b>${esc(m.propuesta)}</div>` : ''}<time>${fecha(m.ts)}</time></div>`).join('')
+      : '<div class="msg sys">Todavía no hay mensajes.</div>');
+  box.scrollTop = box.scrollHeight;
+  if (UI.tab === 'chat') marcarLeido();
+}
+function marcarLeido() {
+  const c = UI.cliente; if (!c) return;
+  try { localStorage.setItem('ase-visto-' + c.id, String(Date.now())); } catch (e) {}
+  if (S.rol === 'asesor' && sinLeer(c)) S.actualizar(c.id, { asesorLeido: Date.now() }).catch(() => {});
+  marcarTab();
+}
+
+/* ---------- Ficha (asesor) ---------- */
+function tabFicha(el) {
+  const c = UI.cliente, tp = c.testPerfil, cs = c.consentimiento;
+  el.innerHTML = `<div class="grid2">
+    <form class="panel stack" id="fichaF">
+      <h3>Datos del cliente</h3>
+      <div class="form">
+        <label class="f">Nombre<input class="in" id="xN" value="${esc(c.nombre)}"></label>
+        <label class="f">Perfil<select class="in" id="xP"><option value="">Sin definir</option>${PERFILES.map(p => `<option${c.perfil === p ? ' selected' : ''}>${p}</option>`).join('')}</select></label>
+        <label class="f">Honorario mensual (US$)<input class="in" id="xH" inputmode="decimal" value="${c.honorario ?? ''}"></label>
+      </div>
+      <label class="f">Objetivo y horizonte<textarea class="in" id="xO">${esc(c.objetivo || '')}</textarea></label>
+      <div class="row"><button class="btn primary" type="submit">Guardar</button><span class="meta">El cliente ve su perfil y su objetivo, no el honorario ni las notas.</span></div>
+    </form>
+    <div class="stack">
+      <div class="panel stack">
+        <h3>Test de perfil de riesgo</h3>
+        ${tp ? `<p style="margin:0">Resultado: <b>${esc(tp.perfil)}</b> · ${tp.puntaje} de 24 puntos · ${fecha(toMs(tp.fecha))}</p>
+          ${c.perfil !== tp.perfil ? `<div class="alert"><span class="d"></span><div>El perfil asignado (${esc(c.perfil || 'ninguno')}) no coincide con el test. <button class="btn small" id="usarTp" type="button">Usar ${esc(tp.perfil)}</button></div></div>` : '<div class="alert ok"><span class="d"></span><div>El perfil asignado coincide con el test.</div></div>'}`
+          : '<p class="meta" style="margin:0">El cliente todavía no completó el test. Lo encuentra en la pestaña "Mi perfil".</p>'}
+      </div>
+      <div class="panel stack">
+        <h3>Consentimiento de datos</h3>
+        <p style="margin:0">${cs && cs.aceptado ? `<span class="chip ok">Aceptado</span> <span class="meta">${fecha(toMs(cs.fecha))}</span>` : '<span class="chip warn">Pendiente</span> <span class="meta">Se le pide la primera vez que entra.</span>'}</p>
+      </div>
+      <div class="panel stack">
+        <h3>Notas privadas</h3>
+        <textarea class="in" id="xNotas" placeholder="Solo las ves vos.">Cargando…</textarea>
+        <div class="row"><button class="btn" id="xNotasB" type="button">Guardar notas</button><span class="meta" id="xNotasM"></span></div>
+      </div>
+    </div>
+  </div>`;
+  S.getNotas(c.id).then(t => { const n = $('#xNotas'); if (n) n.value = t; }).catch(() => { const n = $('#xNotas'); if (n) n.value = ''; });
+  $('#xNotasB').onclick = async () => { try { await S.setNotas(c.id, $('#xNotas').value); $('#xNotasM').textContent = 'Guardadas.'; } catch (e) { $('#xNotasM').textContent = 'No se pudo guardar.'; } };
+  $('#fichaF').onsubmit = async e => {
+    e.preventDefault(); const h = parseNum($('#xH').value);
+    try { await S.actualizar(c.id, { nombre: $('#xN').value.trim(), perfil: $('#xP').value || null, honorario: isFinite(h) ? h : 0, objetivo: $('#xO').value.trim() }); toast('Ficha guardada.'); document.activeElement.blur(); pintarTab(); }
+    catch (err) { toast('No se pudo guardar: ' + (err.code || err.message)); }
+  };
+  const u = $('#usarTp'); if (u) u.onclick = () => S.actualizar(c.id, { perfil: tp.perfil });
+}
+
+/* ---------- Mi perfil (cliente): test de riesgo ---------- */
+const TEST = [
+  ['¿En cuánto tiempo pensás usar esta plata?', ['Menos de 1 año', 'Entre 1 y 3 años', 'Entre 3 y 5 años', 'Más de 5 años']],
+  ['Si tu cartera cae 20% en un mes, ¿qué hacés?', ['Vendo todo', 'Vendo una parte', 'Espero sin tocar nada', 'Aprovecho para comprar más']],
+  ['¿Cuál es tu objetivo principal?', ['Que no pierda valor', 'Cobrar una renta estable', 'Crecer de forma moderada', 'Crecer lo máximo posible']],
+  ['¿Qué experiencia tenés invirtiendo?', ['Ninguna', 'Plazo fijo o fondos comunes', 'Bonos y acciones', 'Opero seguido, incluso opciones o futuros']],
+  ['¿Qué parte de tus ahorros representa esta inversión?', ['Más del 75%', 'Entre 50% y 75%', 'Entre 25% y 50%', 'Menos del 25%']],
+  ['¿Vas a necesitar retirar parte en los próximos 12 meses?', ['Sí, la mayor parte', 'Sí, una parte', 'Poco', 'No']],
+];
+const perfilDe = p => p <= 11 ? 'Conservador' : p <= 18 ? 'Moderado' : 'Agresivo';
+function tabPerfil(el) {
+  const c = UI.cliente, tp = c.testPerfil;
+  el.innerHTML = `<div class="grid2">
+    <div class="stack">
+      <div class="panel stack">
+        <h3>Tu perfil</h3>
+        <p style="margin:0;font-size:20px;font-family:var(--serif)">${esc(c.perfil || 'Todavía sin definir')}</p>
+        ${c.objetivo ? `<p class="meta" style="margin:0">Objetivo: ${esc(c.objetivo)}</p>` : ''}
+        ${tp ? `<p class="meta" style="margin:0">Último test: ${esc(tp.perfil)}, ${fecha(toMs(tp.fecha))}. Tu asesor confirma el perfil final.</p>` : ''}
+      </div>
+      <div class="panel stack">
+        <h3>Tu asesor</h3>
+        <p style="margin:0"><b>${esc(CONFIG.asesorNombre)}</b></p>
+        <p class="meta" style="margin:0">${esc(CONFIG.registroCNV)}. ${esc(CONFIG.agente)}.</p>
+      </div>
+    </div>
+    <form class="panel" id="testF">
+      <div class="row between"><h3>${tp ? 'Volver a hacer el test' : 'Test de perfil de riesgo'}</h3><span class="meta">6 preguntas</span></div>
+      ${TEST.map(([q, ops], i) => `<fieldset class="q"><legend>${i + 1}. ${esc(q)}</legend>${ops.map((o, j) => `<label><input type="radio" name="q${i}" value="${j + 1}" required> ${esc(o)}</label>`).join('')}</fieldset>`).join('')}
+      <div class="row" style="margin-top:8px"><button class="btn primary" type="submit">Enviar a mi asesor</button></div>
+    </form>
+  </div>`;
+  $('#testF').onsubmit = async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target); let pts = 0; const resp = [];
+    TEST.forEach((_, i) => { const v = Number(fd.get('q' + i)); pts += v; resp.push(v); });
+    try { await S.actualizar(c.id, { testPerfil: { respuestas: resp, puntaje: pts, perfil: perfilDe(pts), fecha: Date.now() } }); toast('Listo: tu resultado es ' + perfilDe(pts) + '. Tu asesor lo va a revisar.'); document.activeElement.blur(); pintarTab(); }
+    catch (err) { toast('No se pudo guardar: ' + (err.code || err.message)); }
+  };
+}
+
+window.addEventListener('hashchange', () => { if (/^#demo/.test(location.hash) !== DEMO) location.reload(); });
+boot();
+</script>
+</body>
+</html>
