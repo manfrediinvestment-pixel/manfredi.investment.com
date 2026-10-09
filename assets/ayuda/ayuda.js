@@ -7,7 +7,7 @@
   if (window.__miAyuda) return;
   window.__miAyuda = true;
 
-  var FAQ_URL = 'assets/ayuda/faq.json';
+  var FAQ_URL = 'assets/ayuda/faq.json?v=20261008p';
   var MAIL_EQUIPO = 'manfredi.investment@gmail.com';
 
   var CSS = "\

@@ -124,6 +124,14 @@ return new Response(
 // total del plan). Todo pago único -- sin recurrencia -- así que el
 // descuento nunca se "arrastra" a un cobro futuro.
 const PLANES_MESES_VALIDOS = [1, 3, 6, 12];
+
+// Precio mensual en USD. Promo de lanzamiento de Warren: USD 10 hasta el
+// 31-oct-2026 inclusive (hora Argentina); despues vuelve solo a USD 15. La
+// misma fecha esta en window.MI_PROMO (index.html), que es lo que se muestra.
+const PRECIO_USD_LISTA = 15;
+const PRECIO_USD_PROMO = 10;
+const PROMO_FIN = Date.parse('2026-11-01T03:00:00Z');
+const precioUsdMensual = () => (Date.now() < PROMO_FIN ? PRECIO_USD_PROMO : PRECIO_USD_LISTA);
 const CODIGOS_DESCUENTO = {
     'MANFREDI30': 0.30,
 };
@@ -169,8 +177,9 @@ async function crearPreferencia(request, env) {
           descuento = CODIGOS_DESCUENTO[codigo];
     }
 
-  const precioUsdBase = 15 * meses;
-    const precioUsdFinal = Math.round(precioUsdBase * (1 - descuento) * 100) / 100;
+  // El codigo se aplica sobre el precio de lista y no se suma a la promo: se cobra lo menor.
+  const precioUsdBase = PRECIO_USD_LISTA * meses;
+    const precioUsdFinal = Math.min(precioUsdMensual() * meses, Math.round(precioUsdBase * (1 - descuento) * 100) / 100);
 
   // 1. Obtener cotización del dólar blue desde DolarAPI
   let precioPesos;
@@ -263,10 +272,10 @@ async function crearPreferencia(request, env) {
 // ─── RUTA 1b: POST /crear-suscripcion ──────────────────────────────────────────
 // Suscripción recurrente real via Preapproval de Mercado Pago (a diferencia de
 // crear-preferencia, que es un cobro único). El monto en pesos queda fijo desde
-// el momento de la suscripción -- MP no lo reajusta solo con el dólar. Para
-// subir el precio de los socios NUEVOS alcanza con cambiar el "15" de abajo;
-// los que ya estén suscriptos siguen pagando el monto que autorizaron hasta
-// que cancelen y se vuelvan a suscribir.
+// el momento de la suscripción -- MP no lo reajusta solo con el dólar. El precio
+// sale de precioUsdMensual(); los que ya estén suscriptos siguen pagando el monto
+// que autorizaron hasta que cancelen y se vuelvan a suscribir (los que entren
+// con la promo quedan en USD 10 también después de octubre).
 async function crearSuscripcion(request, env) {
     const MP_ACCESS_TOKEN = env.MP_ACCESS_TOKEN;
     const SITE_URL = env.SITE_URL;
@@ -289,7 +298,7 @@ async function crearSuscripcion(request, env) {
         const dolarResp = await fetch('https://dolarapi.com/v1/dolares/blue');
         if (!dolarResp.ok) throw new Error('Error al consultar DolarAPI');
         const dolarData = await dolarResp.json();
-        precioPesos = Math.round(15 * dolarData.venta);
+        precioPesos = Math.round(precioUsdMensual() * dolarData.venta);
     } catch (err) {
         console.error('DolarAPI error:', err);
         return new Response(JSON.stringify({ error: 'No se pudo obtener la cotización del dólar blue' }), { status: 502, headers: CORS_HEADERS });
@@ -334,7 +343,7 @@ async function crearSuscripcion(request, env) {
             init_point: mpData.init_point,
             precio_pesos: precioPesos,
             preapproval_id: mpData.id,
-            cotizacion_blue: Math.round(precioPesos / 15),
+            cotizacion_blue: Math.round(precioPesos / precioUsdMensual()),
         }),
         { status: 200, headers: CORS_HEADERS }
     );

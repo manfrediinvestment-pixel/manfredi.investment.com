@@ -38,6 +38,18 @@
 <link rel="stylesheet" href="assets/portfolio/portfolio.css?v=20261008w" />
 <link rel="stylesheet" href="assets/lector/lector.css?v=20261007e" />
 <link rel="stylesheet" href="assets/warren/warren.css?v=20261008a" />
+<script>
+  // Promo de lanzamiento de Warren: USD 10 por mes hasta el 31-oct-2026 (hora
+  // Argentina); despues vuelve a USD 15 solo. Misma fecha en workers/memberships.
+  window.MI_PROMO = (function () {
+    var on = Date.now() < Date.parse('2026-11-01T03:00:00Z');
+    return { on: on, usd: on ? 10 : 15, antes: 15, hasta: '31 de octubre' };
+  })();
+</script>
+<style>
+  .mi-was { text-decoration: line-through; text-decoration-thickness: 1.5px; opacity: .55; font-weight: 500; margin-right: 6px; }
+  .mi-promo-tag { display: inline-block; font: 600 11px/1 'IBM Plex Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #0a1322; background: #f2c94c; padding: 5px 8px; border-radius: 999px; vertical-align: middle; }
+</style>
   <script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js" defer></script>
   <script src="assets/mercados/terminal.js"></script>
   <style>
@@ -3851,7 +3863,7 @@
       <div id="mcHost">
         <!-- Contenido de respaldo (se ve solo si el JS no carga; el componente lo reemplaza) -->
         <h2 style="font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:24px;font-weight:600;color:var(--htx-ink);margin:0 0 10px">Membres&iacute;a Manfredi Investment</h2>
-        <p style="font-size:13.5px;line-height:1.6;color:var(--htx-ink2);max-width:60ch;margin:0 0 16px">Warren IA, nuestro asesor de inversiones con inteligencia artificial; los informes institucionales de cada acci&oacute;n, con cuatro m&eacute;todos de valuaci&oacute;n y fair value; y Manfredi Investment Portfolio, para armar tu cartera y ver sus ratios de riesgo. USD 15 por mes, cancel&aacute;s cuando quieras.</p>
+        <p style="font-size:13.5px;line-height:1.6;color:var(--htx-ink2);max-width:60ch;margin:0 0 16px">Warren IA, nuestro asesor de inversiones con inteligencia artificial; los informes institucionales de cada acci&oacute;n, con cuatro m&eacute;todos de valuaci&oacute;n y fair value; y Manfredi Investment Portfolio, para armar tu cartera y ver sus ratios de riesgo. <span data-mi-precio="frase">USD 15 por mes</span>, cancel&aacute;s cuando quieras.</p>
         <button type="button" class="htx-btn" onclick="openPaymentModal()">Suscribirme &rarr;</button>
       </div>
     </div>
@@ -4008,7 +4020,7 @@
     </div>
 
   </section>
-  <script src="assets/cartel/cartel.js" defer></script>
+  <script src="assets/cartel/cartel.js?v=20261008p" defer></script>
   <!-- ayuda: preguntas frecuentes + consulta al equipo (assets/ayuda/ayuda.js, Shadow DOM) -->
   <script src="assets/ayuda/ayuda.js" defer></script>
   <!-- bienvenida: presentación de la página para quien entra por primera vez sin cuenta (assets/bienvenida/bienvenida.js, Shadow DOM) -->
@@ -5142,7 +5154,7 @@
       if (!member) {
         action.innerHTML =
           '<button type="button" class="pi-cta pi-cta-full" id="piJoin">Hacerme socio y pedir mi informe &rarr;</button>' +
-          '<p class="pi-price" style="margin-top:10px"><b>USD 15/mes</b> · incluye Warren IA, todos los informes y Portfolio' +
+          '<p class="pi-price" style="margin-top:10px">' + (window.MI_PROMO.on ? '<s class="mi-was">USD 15</s><b>USD 10/mes</b> hasta el 31 de octubre' : '<b>USD 15/mes</b>') + ' · incluye Warren IA, todos los informes y Portfolio' +
           (user ? '' : '<br>¿Ya sos socio? <a id="piLogin">Ingresá a tu cuenta</a>') + '</p>';
         document.getElementById('piJoin').onclick = function(){ miClosePedirInforme(); if (window.openPaymentModal) window.openPaymentModal(); };
         var lg = document.getElementById('piLogin');
@@ -10264,20 +10276,20 @@
   <!-- Anuncio de cambio de seccion (una vez por persona, con fecha de vencimiento) -->
   <div class="report-banner feature-banner" id="featureBanner" role="status" aria-live="polite">
     <div class="report-banner-top">
-      <span class="report-banner-tag">Nuevo en Portfolio</span>
+      <span class="report-banner-tag">Warren nuevo · USD 10</span>
       <button type="button" class="report-banner-close" id="featureBannerClose" aria-label="Cerrar">&times;</button>
     </div>
-    <div class="report-banner-title">Portfolio renovado: la Cartera Manfredi Investment, abierta para todos</div>
-    <div class="report-banner-abstract">Mirá gratis qué tengo y por qué, y usá tu portafolio ordenado en secciones.</div>
+    <div class="report-banner-title">Warren ahora te arma informes completos, y la membresía baja a USD 10</div>
+    <div class="report-banner-abstract">Valuación, escenarios y fuentes en cada análisis. <s>USD 15</s> USD 10 por mes hasta el 31 de octubre.</div>
     <div class="report-banner-footer">
-      <span class="report-banner-meta">29 de septiembre de 2026</span>
-      <button type="button" class="report-banner-cta" id="featureBannerCta">Ver Portfolio &rarr;</button>
+      <span class="report-banner-meta">Hasta el 31 de octubre</span>
+      <button type="button" class="report-banner-cta" id="featureBannerCta">Hacerme socio &rarr;</button>
     </div>
   </div>
   <script>
   (function(){
     // Para un anuncio nuevo: cambiar id y hasta. Se muestra una sola vez por persona.
-    var ANUNCIO = { id: 'portfolio-secciones-2026-09', hasta: '2026-10-13', destino: 'portfolio' };
+    var ANUNCIO = { id: 'warren-promo-2026-10', hasta: '2026-10-31', destino: 'membresia' };
     var KEY = 'mi_feature_banner_seen';
     function visto(){ try { return localStorage.getItem(KEY) === ANUNCIO.id; } catch(e){ return false; } }
     function marcar(){ try { localStorage.setItem(KEY, ANUNCIO.id); } catch(e){} }
@@ -10288,7 +10300,11 @@
       if(!banner) return;
       function cerrar(){ banner.classList.remove('show'); marcar(); }
       document.getElementById('featureBannerClose').onclick = cerrar;
-      document.getElementById('featureBannerCta').onclick = function(){ cerrar(); location.hash = ANUNCIO.destino; };
+      document.getElementById('featureBannerCta').onclick = function(){
+        cerrar();
+        if (ANUNCIO.destino === 'membresia') { if (window.openPaymentModal) window.openPaymentModal(); }
+        else location.hash = ANUNCIO.destino;
+      };
       // No se muestra estando ya en Portfolio ni mientras esta abierto el cartel de "Nuevo informe"
       function evaluar(){
         var enDestino = (location.hash || '').replace('#', '') === ANUNCIO.destino;
@@ -10300,6 +10316,24 @@
       if(informe && window.MutationObserver) new MutationObserver(function(){ setTimeout(evaluar, 400); }).observe(informe, { attributes: true, attributeFilter: ['class'] });
     }
     if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  })();
+  </script>
+
+  <script>
+  // Precios fijos del HTML: con la promo activa muestran USD 15 tachado y USD 10.
+  (function(){
+    var P = window.MI_PROMO;
+    function fill(){
+      if (!P || !P.on) return;
+      var set = function(k, html){ document.querySelectorAll('[data-mi-precio="' + k + '"]').forEach(function(el){ el.innerHTML = html; }); };
+      set('frase', '<s>USD 15</s> <b>USD 10 por mes hasta el 31 de octubre</b>');
+      set('modal', '<span class="pay-price-amount"><s class="mi-was">$15</s>$10</span><span class="pay-price-period">USD/mes</span><span class="mi-promo-tag" style="margin-left:10px">Hasta el 31/10</span>');
+      set('modal-fine', 'Precio de lanzamiento de Warren nuevo · facturación mensual · cancelás cuando quieras');
+      [1, 3, 6, 12].forEach(function(m){ set('x' + m, '<s class="mi-was">USD ' + 15 * m + '</s><br>USD ' + 10 * m); });
+      set('ap', '<s class="mi-was">$15</s><span>$10</span> USD');
+      set('ap-sub', 'por mes hasta el 31 de octubre &middot; cancelá cuando quieras');
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fill); else fill();
   })();
   </script>
 
@@ -16093,10 +16127,14 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
       if (!priceEl) return;
       errEl.textContent = '';
       var codigo = (document.getElementById('payDiscountCode').value || '').trim().toUpperCase();
-      var baseUsd = 15 * miDiscountPlanMeses;
+      var listaUsd = 15 * miDiscountPlanMeses;
+      var baseUsd = window.MI_PROMO.usd * miDiscountPlanMeses;
       if (codigo && MI_DISCOUNT_CODES_PREVIEW.hasOwnProperty(codigo)) {
-        var finalUsd = Math.round(baseUsd * (1 - MI_DISCOUNT_CODES_PREVIEW[codigo]) * 100) / 100;
-        priceEl.innerHTML = '<span class="pdp-before">USD ' + baseUsd + '</span><strong>USD ' + finalUsd + '</strong> &middot; pago único';
+        // Mismo criterio que el worker: el código no se suma a la promo, se cobra lo menor.
+        var finalUsd = Math.min(baseUsd, Math.round(listaUsd * (1 - MI_DISCOUNT_CODES_PREVIEW[codigo]) * 100) / 100);
+        priceEl.innerHTML = '<span class="pdp-before">USD ' + listaUsd + '</span><strong>USD ' + finalUsd + '</strong> &middot; pago único';
+      } else if (window.MI_PROMO.on) {
+        priceEl.innerHTML = '<span class="pdp-before">USD ' + listaUsd + '</span><strong>USD ' + baseUsd + '</strong> &middot; pago único';
       } else if (codigo) {
         priceEl.innerHTML = 'USD ' + baseUsd + ' &middot; el código se valida al confirmar el pago';
       } else {
@@ -16160,8 +16198,8 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
                           + '<svg style="width:48px;height:48px;display:block;margin:0 auto 16px;"><use href="#miMark"/></svg>'
                 + '<h3 style="margin:0 0 8px;font-size:1.2rem;font-weight:700;color:var(--white);">Contenido para miembros</h3>'
                 + '<p style="margin:0 0 20px;font-size:0.9rem;color:rgba(255,255,255,0.7);line-height:1.5;">Accedé a todos los análisis, picks y posiciones con membresía activa.</p>'
-                + '<div style="margin-bottom:6px;"><span style="font-size:2rem;font-weight:800;color:var(--gold,#F2C94C);">$15</span><span style="font-size:1rem;color:rgba(255,255,255,0.7);margin-left:4px;">USD</span></div>'
-                + '<p style="margin:0 0 20px;font-size:0.78rem;color:rgba(255,255,255,0.5);">por mes · cancelá cuando quieras</p>'
+                + '<div style="margin-bottom:6px;">' + (window.MI_PROMO.on ? '<span class="mi-was" style="font-size:1.1rem;color:rgba(255,255,255,0.7);">$15</span>' : '') + '<span style="font-size:2rem;font-weight:800;color:var(--gold,#F2C94C);">$' + window.MI_PROMO.usd + '</span><span style="font-size:1rem;color:rgba(255,255,255,0.7);margin-left:4px;">USD</span></div>'
+                + '<p style="margin:0 0 20px;font-size:0.78rem;color:rgba(255,255,255,0.5);">' + (window.MI_PROMO.on ? 'por mes hasta el 31 de octubre · cancelá cuando quieras' : 'por mes · cancelá cuando quieras') + '</p>'
                 + '<a href="#" onclick="event.preventDefault();openPaymentModal();" style="display:block;background:var(--gold,#F2C94C);color:var(--primary,#0A0F1E);font-weight:700;font-size:1rem;padding:12px 0;border-radius:8px;text-decoration:none;margin-bottom:12px;">Suscribirse ahora</a>'
                 + '<p style="margin:0;font-size:0.8rem;color:rgba(255,255,255,0.5);">¿Ya tenés membresía? <a href="#" onclick="event.preventDefault();window.showLoginOverlay && window.showLoginOverlay();" style="color:var(--gold,#F2C94C);text-decoration:underline;">Iniciá sesión</a></p>'
                 + '</div></div>';
@@ -16242,11 +16280,11 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
       <div class="pay-eyebrow">Membresía Manfredi Investment</div>
       <h2>Todo el análisis, sin límites.</h2>
       <p class="pay-sub">Acceso completo a Warren (asesor IA) y a todos los picks y tesis de inversión, sin vista parcial.</p>
-      <div class="pay-price-row">
+      <div class="pay-price-row" data-mi-precio="modal">
         <span class="pay-price-amount">$15</span>
         <span class="pay-price-period">USD/mes</span>
       </div>
-      <p class="pay-price-fine">Facturación mensual · cancelás cuando quieras</p>
+      <p class="pay-price-fine" data-mi-precio="modal-fine">Facturación mensual · cancelás cuando quieras</p>
       <ul class="pay-benefits">
         <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Warren, tu asesor IA &mdash; 100 consultas por mes, disponible 24/7</li>
         <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Picks y tesis de inversión completos, sin blur</li>
@@ -16266,10 +16304,10 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
       <div class="pay-discount-panel hidden" id="payDiscountPanel">
         <div class="pay-plan-label">Elegí cuántos meses pagar de una vez</div>
         <div class="pay-plan-grid" id="payPlanGrid">
-          <div class="pay-plan-pill" data-meses="1" onclick="selectDiscountPlan(1)"><span class="pp-meses">1 mes</span><span class="pp-usd">USD 15</span></div>
-          <div class="pay-plan-pill" data-meses="3" onclick="selectDiscountPlan(3)"><span class="pp-meses">3 meses</span><span class="pp-usd">USD 45</span></div>
-          <div class="pay-plan-pill" data-meses="6" onclick="selectDiscountPlan(6)"><span class="pp-meses">6 meses</span><span class="pp-usd">USD 90</span></div>
-          <div class="pay-plan-pill" data-meses="12" onclick="selectDiscountPlan(12)"><span class="pp-meses">12 meses</span><span class="pp-usd">USD 180</span></div>
+          <div class="pay-plan-pill" data-meses="1" onclick="selectDiscountPlan(1)"><span class="pp-meses">1 mes</span><span class="pp-usd" data-mi-precio="x1">USD 15</span></div>
+          <div class="pay-plan-pill" data-meses="3" onclick="selectDiscountPlan(3)"><span class="pp-meses">3 meses</span><span class="pp-usd" data-mi-precio="x3">USD 45</span></div>
+          <div class="pay-plan-pill" data-meses="6" onclick="selectDiscountPlan(6)"><span class="pp-meses">6 meses</span><span class="pp-usd" data-mi-precio="x6">USD 90</span></div>
+          <div class="pay-plan-pill" data-meses="12" onclick="selectDiscountPlan(12)"><span class="pp-meses">12 meses</span><span class="pp-usd" data-mi-precio="x12">USD 180</span></div>
         </div>
         <div class="pay-discount-row">
           <input type="text" id="payDiscountCode" placeholder="Código de descuento" maxlength="30" oninput="updateDiscountPriceDisplay()">
@@ -16349,8 +16387,8 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
     <div class="mi-ap-logo"><svg class="mi-mark"><use href="#miMark"/></svg></div>
     <h3>Contenido para miembros</h3>
     <p>Accedé a todos los análisis, picks y posiciones con membresía activa.</p>
-    <div class="mi-ap-price"><span>$15</span> USD</div>
-    <p class="mi-ap-sub">por mes &middot; cancelá cuando quieras</p>
+    <div class="mi-ap-price" data-mi-precio="ap"><span>$15</span> USD</div>
+    <p class="mi-ap-sub" data-mi-precio="ap-sub">por mes &middot; cancelá cuando quieras</p>
     <a href="#" class="mi-ap-btn" onclick="event.preventDefault();miCloseAnalysisPaywall();openPaymentModal();">Suscribirse ahora</a>
     <p class="mi-ap-login">&iquest;Ya tenés membresía? <a href="#" onclick="event.preventDefault();miCloseAnalysisPaywall();window.showLoginOverlay &amp;&amp; window.showLoginOverlay();">Iniciá sesión</a></p>
   </div>
