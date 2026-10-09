@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Analistas · Manfredi Investment (maqueta)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* MAQUETA de la sección Analistas (columnistas invitados). Datos ficticios.
+   Mismos tokens que assets/noticias/noticias.css para que se sienta de la casa. */
+:root {
+  --bg:#07101e; --p1:#0b1629; --p2:#0f1e36; --p3:#152a48;
+  --line:rgba(214,226,244,.09); --line2:rgba(214,226,244,.16);
+  --ink:#f3f6fb; --ink2:#d3deed; --soft:#9fb3cf; --mute:#7f94b2;
+  --gold:#f2c94c; --gold2:#f6d77e; --up:#56c793; --dn:#f07b70;
+  --c-acc:#6aa7ff; --c-bon:#56c793; --c-mac:#f2c94c; --c-pol:#c58cff; --c-tra:#f07b70;
+  --serif:'DM Serif Display',Georgia,serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',monospace;
+  --ease:cubic-bezier(.23,1,.32,1);
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); }
+a { color:inherit; text-decoration:none; }
+button { font:inherit; color:inherit; cursor:pointer; }
+:focus-visible { outline:2px solid var(--gold); outline-offset:3px; border-radius:6px; }
+
+/* barra de la maqueta (no va al sitio) */
+.mk { position:sticky; top:0; z-index:10; display:flex; gap:8px; align-items:center; padding:10px 24px; background:#030810ee; backdrop-filter:blur(8px); border-bottom:1px solid var(--line2); font:600 12px var(--mono); }
+.mk b { color:var(--gold); margin-right:10px; letter-spacing:.06em; }
+.mk button { background:transparent; border:1px solid var(--line2); border-radius:999px; padding:6px 12px; font:600 12px var(--sans); color:var(--soft); }
+.mk button[aria-pressed="true"] { background:var(--gold); color:#0a1322; border-color:var(--gold); }
+
+.wrap { width:min(1280px, 100% - 48px); margin:0 auto; padding:52px 0 96px; }
+.view[hidden] { display:none; }
+
+/* encabezado */
+.head { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:26px; flex-wrap:wrap; }
+.title { font:400 clamp(44px,5vw,64px)/1 var(--serif); letter-spacing:-.015em; margin:0; }
+.title em { font-style:italic; color:var(--gold2); }
+.stats { display:flex; gap:28px; font:500 13px var(--sans); color:var(--soft); }
+.stats strong { display:block; font:600 22px var(--mono); color:var(--ink); }
+.cta { display:inline-flex; align-items:center; gap:8px; font:600 14px var(--sans); border-radius:10px; padding:12px 18px; background:var(--gold); color:#0a1322; border:0; transition:transform .12s var(--ease); }
+.cta:active { transform:scale(.97); }
+.cta.ghost { background:transparent; color:var(--gold2); border:1px solid rgba(242,201,76,.4); }
+
+/* chips */
+.chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:28px; padding-bottom:18px; border-bottom:1px solid var(--line); }
+.chip { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line2); background:var(--p1); border-radius:999px; padding:8px 14px; font:600 13px var(--sans); color:var(--ink2); }
+.chip i { width:8px; height:8px; border-radius:50%; background:var(--c); }
+.chip span { font:500 12px var(--mono); color:var(--mute); }
+.chip[aria-pressed="true"] { background:var(--ink); color:#0a1322; border-color:var(--ink); }
+.chip[aria-pressed="true"] span { color:#3b4a60; }
+
+.grid { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:48px; align-items:start; }
+.grid > * { min-width:0; }
+
+/* destacado */
+.feat { position:relative; display:grid; grid-template-columns:200px minmax(0,1fr); gap:30px; align-items:center; padding:26px; border-radius:18px; border:1px solid rgba(242,201,76,.34);
+  background:radial-gradient(70% 160% at 0% 0%, rgba(242,201,76,.13), transparent 62%), linear-gradient(180deg,#11213a,#0b1629); box-shadow:0 24px 50px -24px rgba(0,0,0,.7); margin-bottom:34px; }
+.feat::before { content:''; position:absolute; left:26px; right:26px; top:0; height:1px; background:linear-gradient(90deg,transparent,rgba(242,201,76,.8),transparent); }
+.tag { display:inline-flex; align-items:center; gap:6px; font:700 11px/1 var(--sans); letter-spacing:.04em; text-transform:uppercase; color:var(--c); }
+.tag::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--c); }
+.feat h3 { font:400 34px/1.08 var(--serif); margin:12px 0 14px; text-wrap:balance; }
+.byline { display:flex; align-items:center; gap:12px; }
+.av { flex:none; display:grid; place-items:center; width:40px; height:40px; border-radius:50%; font:600 14px var(--sans); color:#0a1322; background:var(--c, var(--gold)); }
+.av.lg { width:96px; height:96px; font-size:34px; }
+.byline b { display:block; font:600 14.5px var(--sans); }
+.byline small { font:500 12.5px var(--sans); color:var(--mute); }
+.verif { display:inline-grid; place-items:center; width:15px; height:15px; border-radius:50%; background:var(--gold); color:#0a1322; font-size:10px; margin-left:4px; vertical-align:1px; }
+.meta { display:flex; gap:16px; margin-top:18px; font:500 12.5px var(--mono); color:var(--mute); }
+
+/* portada de documento */
+.doc { position:relative; aspect-ratio:3/4; border-radius:8px; overflow:hidden; border:1px solid var(--line2); background:linear-gradient(160deg,var(--p3),var(--p1)); box-shadow:0 16px 30px -12px rgba(0,0,0,.8); transform:rotate(-2deg); padding:16px; display:flex; flex-direction:column; justify-content:space-between; }
+.doc::before { content:''; position:absolute; inset:0 0 auto 0; height:5px; background:var(--c); }
+.doc .k { font:600 10px var(--mono); color:var(--c); letter-spacing:.08em; text-transform:uppercase; }
+.doc .t { font:400 19px/1.1 var(--serif); }
+.doc .ln { display:grid; gap:6px; }
+.doc .ln span { height:4px; border-radius:2px; background:var(--line2); }
+.doc .m { display:flex; align-items:center; gap:6px; font:600 9px var(--mono); color:var(--soft); }
+.doc .m svg { width:12px; height:12px; }
+
+/* lista */
+.list { display:grid; }
+.row { display:grid; grid-template-columns:86px minmax(0,1fr) auto; gap:22px; align-items:center; padding:20px 0; border-top:1px solid var(--line); transition:background .15s; }
+.row:hover h4 { color:var(--gold2); }
+.row .doc { transform:none; padding:8px; border-radius:6px; }
+.row .doc .t { font-size:10px; }
+.row .doc .k { font-size:7px; }
+.row h4 { font:400 23px/1.15 var(--serif); margin:8px 0 10px; transition:color .15s; text-wrap:balance; }
+.row .byline .av { width:28px; height:28px; font-size:11px; }
+.row .byline b { display:inline; font-size:13.5px; }
+.row .byline small { margin-left:6px; }
+.row .side { text-align:right; font:500 12.5px var(--mono); color:var(--mute); display:grid; gap:6px; }
+
+/* rail */
+.card { border:1px solid var(--line); background:var(--p1); border-radius:16px; padding:20px; margin-bottom:20px; }
+.card h5 { font:400 22px var(--serif); margin:0 0 14px; }
+.auth { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:12px; align-items:center; padding:11px 0; border-top:1px solid var(--line); }
+.auth:first-of-type { border-top:0; }
+.auth b { font:600 14px var(--sans); display:block; }
+.auth small { font:500 12px var(--sans); color:var(--mute); }
+.auth em { font:500 12px var(--mono); font-style:normal; color:var(--soft); }
+.join { border-color:rgba(242,201,76,.34); background:radial-gradient(90% 120% at 100% 0%, rgba(242,201,76,.12), transparent 60%), var(--p1); }
+.join h5 { margin-bottom:12px; }
+.join ul { list-style:none; margin:0 0 18px; padding:0; display:grid; gap:8px; font:500 13.5px var(--sans); color:var(--ink2); }
+.join li::before { content:'✓'; color:var(--gold); margin-right:8px; }
+.rules { font:500 12px var(--mono); color:var(--mute); display:grid; gap:6px; }
+
+/* perfil */
+.prof { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:28px; align-items:center; padding:30px; border-radius:20px; border:1px solid var(--line2); background:radial-gradient(60% 140% at 0% 0%, rgba(197,140,255,.14), transparent 60%), var(--p1); margin-bottom:34px; }
+.prof h2 { font:400 44px/1 var(--serif); margin:0 0 8px; }
+.prof .role { font:500 15px var(--sans); color:var(--ink2); }
+.links { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+.links a { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line2); border-radius:999px; padding:7px 13px; font:600 12.5px var(--sans); color:var(--ink2); }
+.links a:hover { border-color:var(--gold); color:var(--gold2); }
+.links svg { width:14px; height:14px; }
+.pstats { display:grid; grid-template-columns:repeat(3,auto); gap:26px; text-align:right; font:500 12.5px var(--sans); color:var(--mute); }
+.pstats strong { display:block; font:600 26px var(--mono); color:var(--ink); }
+.disc { margin-top:30px; padding:14px 16px; border-radius:12px; border:1px solid var(--line); font:500 12px/1.6 var(--mono); color:var(--mute); }
+
+/* portal de carga */
+.up { display:grid; grid-template-columns:minmax(0,1fr) 380px; gap:40px; align-items:start; }
+.up > * { min-width:0; }
+.drop { border:1.5px dashed rgba(242,201,76,.5); border-radius:18px; padding:54px 30px; text-align:center; background:rgba(242,201,76,.04); }
+.drop svg { width:44px; height:44px; color:var(--gold); }
+.drop b { display:block; font:400 28px var(--serif); margin:14px 0 6px; }
+.drop small { font:500 13px var(--mono); color:var(--mute); }
+.form { display:grid; gap:16px; margin-top:24px; }
+.field label { display:block; font:600 12.5px var(--sans); color:var(--ink2); margin-bottom:7px; }
+.field input, .field select { width:100%; background:var(--p1); border:1px solid var(--line2); border-radius:10px; padding:12px 14px; color:var(--ink); font:500 14px var(--sans); }
+.two { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.check { display:flex; gap:10px; align-items:flex-start; font:500 13px/1.5 var(--sans); color:var(--ink2); }
+.check input { margin-top:3px; accent-color:var(--gold); }
+.steps { list-style:none; margin:0; padding:0; display:grid; }
+.steps li { display:grid; grid-template-columns:30px minmax(0,1fr) auto; gap:12px; align-items:center; padding:14px 0; border-top:1px solid var(--line); font:600 14px var(--sans); }
+.steps li:first-child { border-top:0; }
+.steps .n { display:grid; place-items:center; width:26px; height:26px; border-radius:50%; border:1px solid var(--line2); font:600 12px var(--mono); color:var(--soft); }
+.steps .ok .n { background:var(--up); border-color:var(--up); color:#0a1322; }
+.steps .now .n { border-color:var(--gold); color:var(--gold); box-shadow:0 0 0 4px rgba(242,201,76,.15); }
+.steps em { font:500 12px var(--mono); font-style:normal; color:var(--mute); }
+.steps .ok em { color:var(--up); }
+.steps .now em { color:var(--gold2); }
+.chk { display:grid; gap:9px; font:500 13px var(--sans); color:var(--ink2); margin-top:6px; }
+.chk span::before { content:'●'; margin-right:8px; font-size:9px; vertical-align:2px; }
+.chk .g::before { color:var(--up); } .chk .r::before { color:var(--dn); } .chk .y::before { color:var(--gold); }
+
+@media (max-width:900px) {
+  .grid, .up { grid-template-columns:1fr; }
+  .feat { grid-template-columns:1fr; } .feat .doc { width:150px; }
+  .row { grid-template-columns:64px minmax(0,1fr); } .row .side { display:none; }
+  .prof { grid-template-columns:1fr; } .pstats { text-align:left; }
+}
+</style>
+</head>
+<body>
+
+<div class="mk" role="toolbar" aria-label="Vistas de la maqueta">
+  <b>MAQUETA</b>
+  <button type="button" data-v="portada" aria-pressed="true">Portada de la sección</button>
+  <button type="button" data-v="perfil" aria-pressed="false">Perfil de un autor</button>
+  <button type="button" data-v="subir" aria-pressed="false">Portal de carga (autores)</button>
+</div>
+
+<!-- ═══════════ PORTADA ═══════════ -->
+<main class="wrap view" id="v-portada">
+  <header class="head">
+    <h2 class="title">Analistas <em>invitados</em></h2>
+    <div class="stats">
+      <div><strong>12</strong>analistas</div>
+      <div><strong>38</strong>publicaciones</div>
+      <a class="cta ghost" href="#sumate">Quiero publicar</a>
+    </div>
+  </header>
+
+  <div class="chips" role="group" aria-label="Filtrar por categoría">
+    <button class="chip" aria-pressed="true">Todo <span>38</span></button>
+    <button class="chip" style="--c:var(--c-acc)"><i></i>Acciones <span>11</span></button>
+    <button class="chip" style="--c:var(--c-bon)"><i></i>Bonos y renta fija <span>7</span></button>
+    <button class="chip" style="--c:var(--c-mac)"><i></i>Macro <span>9</span></button>
+    <button class="chip" style="--c:var(--c-pol)"><i></i>Política <span>6</span></button>
+    <button class="chip" style="--c:var(--c-tra)"><i></i>Trading <span>5</span></button>
+  </div>
+
+  <div class="grid">
+    <div>
+      <article class="feat" style="--c:var(--c-pol)">
+        <div class="doc"><span class="k">Política</span><span class="t">Elecciones 2027: el mapa que mira el mercado</span><span class="ln"><span></span><span style="width:80%"></span><span style="width:60%"></span></span><span class="m"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.5h5l3.5 3.5v9.5H4z"/><path d="M9 1.5V5h3.5"/></svg>PDF · 18 pág.</span></div>
+        <div>
+          <span class="tag">Destacado de la semana · Política</span>
+          <h3>Elecciones 2027: qué provincias definen el riesgo país</h3>
+          <div class="byline"><span class="av" style="--c:var(--c-pol)">LR</span><div><b>Lucía Romero<span class="verif" title="Autora verificada">✓</span></b><small>Politóloga · UBA</small></div></div>
+          <div class="meta"><span>07 oct 2026</span><span>18 pág.</span><span>2.140 lecturas</span></div>
+        </div>
+      </article>
+
+      <div class="list">
+        <a class="row" href="#" style="--c:var(--c-bon)">
+          <div class="doc"><span class="k">Bonos</span><span class="t">Curva hard-dollar</span><span class="ln"><span></span><span style="width:70%"></span></span></div>
+          <div><span class="tag">Bonos y renta fija</span><h4>AL30 vs GD30: dónde está el valor después del canje</h4>
+            <div class="byline"><span class="av" style="--c:var(--c-bon)">TF</span><b>Tomás Ferreyra</b><small>Analista de renta fija</small></div></div>
+          <div class="side"><span>06 oct</span><span>12 pág.</span></div>
+        </a>
+        <a class="row" href="#" style="--c:var(--c-acc)">
+          <div class="doc"><span class="k">Acciones</span><span class="t">Bancos argentinos</span><span class="ln"><span></span><span style="width:70%"></span></span></div>
+          <div><span class="tag">Acciones</span><h4>GGAL, BMA y SUPV: ROE real con inflación a la baja</h4>
+            <div class="byline"><span class="av" style="--c:var(--c-acc)">MB</span><b>Martín Bustos</b><small>Estudiante de Economía · UTDT</small></div></div>
+          <div class="side"><span>05 oct</span><span>22 pág.</span></div>
+        </a>
+        <a class="row" href="#" style="--c:var(--c-mac)">
+          <div class="doc"><span class="k">Macro</span><span class="t">Reservas y bandas</span><span class="ln"><span></span><span style="width:70%"></span></span></div>
+          <div><span class="tag">Macro</span><h4>Reservas netas: tres escenarios para el techo de la banda</h4>
+            <div class="byline"><span class="av" style="--c:var(--c-mac)">SG</span><b>Sofía Giménez</b><small>Economista</small></div></div>
+          <div class="side"><span>03 oct</span><span>9 pág.</span></div>
+        </a>
+        <a class="row" href="#" style="--c:var(--c-tra)">
+          <div class="doc"><span class="k">Trading</span><span class="t">Merval en USD</span><span class="ln"><span></span><span style="width:70%"></span></span></div>
+          <div><span class="tag">Trading</span><h4>Merval en dólares: soportes, volumen y la zona de 2.000</h4>
+            <div class="byline"><span class="av" style="--c:var(--c-tra)">JP</span><b>Joaquín Paz</b><small>Análisis técnico</small></div></div>
+          <div class="side"><span>02 oct</span><span>7 pág.</span></div>
+        </a>
+      </div>
+    </div>
+
+    <aside>
+      <div class="card">
+        <h5>Analistas</h5>
+        <a class="auth" href="#"><span class="av" style="--c:var(--c-pol)">LR</span><div><b>Lucía Romero</b><small>Política</small></div><em>6</em></a>
+        <a class="auth" href="#"><span class="av" style="--c:var(--c-bon)">TF</span><div><b>Tomás Ferreyra</b><small>Bonos</small></div><em>5</em></a>
+        <a class="auth" href="#"><span class="av" style="--c:var(--c-acc)">MB</span><div><b>Martín Bustos</b><small>Acciones</small></div><em>4</em></a>
+        <a class="auth" href="#"><span class="av" style="--c:var(--c-mac)">SG</span><div><b>Sofía Giménez</b><small>Macro</small></div><em>4</em></a>
+        <a class="auth" href="#"><span class="av" style="--c:var(--c-tra)">JP</span><div><b>Joaquín Paz</b><small>Trading</small></div><em>3</em></a>
+      </div>
+      <div class="card join" id="sumate">
+        <h5>Publicá en Manfredi</h5>
+        <ul>
+          <li>Tu análisis con diseño profesional</li>
+          <li>Perfil propio con LinkedIn y redes</li>
+          <li>Difusión en Instagram de Manfredi</li>
+        </ul>
+        <a class="cta" href="#">Postularme</a>
+      </div>
+      <div class="rules">
+        <span>· Sin recomendaciones de compra/venta</span>
+        <span>· Sin venta de cursos ni servicios</span>
+        <span>· Autor identificado con nombre real</span>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<!-- ═══════════ PERFIL ═══════════ -->
+<main class="wrap view" id="v-perfil" hidden>
+  <section class="prof">
+    <span class="av lg" style="--c:var(--c-pol)">LR</span>
+    <div>
+      <span class="tag" style="--c:var(--c-pol)">Política · Macro</span>
+      <h2>Lucía Romero<span class="verif" style="width:22px;height:22px;font-size:13px;margin-left:10px;vertical-align:8px">✓</span></h2>
+      <div class="role">Politóloga (UBA) · Analista en Consultora Ejemplo</div>
+      <div class="links">
+        <a href="#"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.5h4V21H3zM9.5 9.5h3.8v1.6h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1V21h-4v-5.1c0-1.22-.02-2.78-1.7-2.78-1.7 0-1.96 1.32-1.96 2.69V21h-4z"/></svg>LinkedIn</a>
+        <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>Instagram</a>
+        <a href="#"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.2 8.2L23 22h-6.6l-5.2-6.8L5.3 22H2.2l7.7-8.8L1.6 2h6.8l4.7 6.2zm-1.1 18h1.7L7.3 3.9H5.5z"/></svg>X</a>
+        <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg>Consultora Ejemplo</a>
+      </div>
+    </div>
+    <div class="pstats">
+      <div><strong>6</strong>publicaciones</div>
+      <div><strong>8.920</strong>lecturas</div>
+      <div><strong>may 2026</strong>desde</div>
+    </div>
+  </section>
+
+  <div class="list">
+    <a class="row" href="#" style="--c:var(--c-pol)">
+      <div class="doc"><span class="k">Política</span><span class="t">Elecciones 2027</span><span class="ln"><span></span><span style="width:70%"></span></span></div>
+      <div><span class="tag">Política</span><h4>Elecciones 2027: qué provincias definen el riesgo país</h4></div>
+      <div class="side"><span>07 oct</span><span>2.140 lecturas</span></div>
+    </a>
+    <a class="row" href="#" style="--c:var(--c-pol)">
+      <div class="doc"><span class="k">Política</span><span class="t">Presupuesto 2027</span><span class="ln"><span></span><span style="width:70%"></span></span></div>
+      <div><span class="tag">Política</span><h4>Presupuesto 2027 en el Congreso: votos, gobernadores y plazos</h4></div>
+      <div class="side"><span>22 sep</span><span>1.870 lecturas</span></div>
+    </a>
+    <a class="row" href="#" style="--c:var(--c-mac)">
+      <div class="doc"><span class="k">Macro</span><span class="t">Gasto provincial</span><span class="ln"><span></span><span style="width:70%"></span></span></div>
+      <div><span class="tag" style="--c:var(--c-mac)">Macro</span><h4>Coparticipación: las 5 provincias con más riesgo fiscal</h4></div>
+      <div class="side"><span>09 sep</span><span>1.410 lecturas</span></div>
+    </a>
+  </div>
+
+  <div class="disc">Contenido de autoría de Lucía Romero. Las opiniones son del autor y no constituyen recomendación de inversión ni reflejan la posición de Manfredi Investment.</div>
+</main>
+
+<!-- ═══════════ PORTAL DE CARGA ═══════════ -->
+<main class="wrap view" id="v-subir" hidden>
+  <header class="head">
+    <h2 class="title">Subir <em>análisis</em></h2>
+    <div class="byline"><span class="av" style="--c:var(--c-pol)">LR</span><div><b>Lucía Romero<span class="verif">✓</span></b><small>Autora habilitada</small></div></div>
+  </header>
+
+  <div class="up">
+    <div>
+      <div class="drop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+        <b>Arrastrá tu PDF acá</b>
+        <small>PDF · hasta 20 MB · hasta 40 páginas</small>
+      </div>
+      <div class="form">
+        <div class="field"><label>Título</label><input value="Elecciones 2027: qué provincias definen el riesgo país" /></div>
+        <div class="two">
+          <div class="field"><label>Categoría</label><select><option>Política</option><option>Macro</option><option>Acciones</option><option>Bonos y renta fija</option><option>Trading</option></select></div>
+          <div class="field"><label>Activos mencionados</label><input value="AL30, GD30, Merval" /></div>
+        </div>
+        <label class="check"><input type="checkbox" checked />Soy el autor y no incluye recomendaciones de compra o venta</label>
+        <label class="check"><input type="checkbox" checked />Declaro mis posiciones en los activos mencionados</label>
+        <div><button class="cta" type="button">Enviar a revisión</button></div>
+      </div>
+    </div>
+
+    <aside class="card">
+      <h5>Estado</h5>
+      <ol class="steps">
+        <li class="ok"><span class="n">1</span>Recibido<em>07 oct · 10:42</em></li>
+        <li class="now"><span class="n">2</span>Revisión<em>en curso</em></li>
+        <li><span class="n">3</span>Aprobación de Manfredi<em>—</em></li>
+        <li><span class="n">4</span>Publicado<em>—</em></li>
+      </ol>
+      <div class="chk">
+        <span class="g">Autoría y datos de contacto</span>
+        <span class="g">Sin promoción de cursos</span>
+        <span class="y">Pág. 14: “conviene comprar” → reformular</span>
+        <span class="g">Cifras verificadas (riesgo país, reservas)</span>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<script>
+document.querySelectorAll('.mk button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.querySelectorAll('.mk button').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+    document.querySelectorAll('.view').forEach(function (v) { v.hidden = v.id !== 'v-' + b.dataset.v; });
+    window.scrollTo(0, 0);
+  });
+});
+document.querySelectorAll('.chip').forEach(function (c) {
+  c.addEventListener('click', function () {
+    document.querySelectorAll('.chip').forEach(function (x) { x.setAttribute('aria-pressed', x === c); });
+  });
+});
+</script>
+</body>
+</html>
