@@ -43,11 +43,33 @@
   // Argentina); despues vuelve a USD 15 solo. Misma fecha en workers/memberships.
   window.MI_PROMO = (function () {
     var on = Date.now() < Date.parse('2026-11-01T03:00:00Z');
-    return { on: on, usd: on ? 10 : 15, antes: 15, hasta: '31 de octubre' };
+    var dias = Math.max(1, Math.ceil((Date.parse('2026-11-01T03:00:00Z') - Date.now()) / 864e5));
+    return { on: on, usd: on ? 10 : 15, antes: 15, off: 33, dias: dias, hasta: '31 de octubre' };
   })();
 </script>
 <style>
   .mi-was { text-decoration: line-through; text-decoration-thickness: 1.5px; opacity: .55; font-weight: 500; margin-right: 6px; }
+  .mi-off { position: relative; display: inline-flex; align-items: center; gap: 6px; overflow: hidden; isolation: isolate;
+    font: 700 13px/1 'IBM Plex Sans', system-ui, sans-serif; letter-spacing: .04em; color: #0a1322; white-space: nowrap;
+    background: linear-gradient(135deg, #f7dc6f 0%, #f2c94c 45%, #d9a92e 100%); padding: 7px 12px; border-radius: 999px; vertical-align: middle;
+    box-shadow: 0 0 0 1px rgba(255,236,170,.55) inset, 0 0 18px rgba(242,201,76,.55), 0 0 42px rgba(242,201,76,.25);
+    animation: miOffGlow 2.4s ease-in-out infinite; }
+  .mi-off b { font-weight: 800; font-size: 1.12em; }
+  .mi-off::after { content: ''; position: absolute; top: -20%; bottom: -20%; left: -60%; width: 40%; z-index: -1;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,.85), transparent); transform: skewX(-18deg);
+    animation: miOffShine 2.8s ease-in-out infinite; }
+  .mi-off.lg { font-size: 16px; padding: 9px 16px; }
+  .mi-off.sm { font-size: 11px; padding: 5px 9px; }
+  @keyframes miOffShine { 0%, 55% { left: -60%; } 100% { left: 130%; } }
+  @keyframes miOffGlow { 0%, 100% { box-shadow: 0 0 0 1px rgba(255,236,170,.55) inset, 0 0 14px rgba(242,201,76,.45), 0 0 34px rgba(242,201,76,.18); }
+    50% { box-shadow: 0 0 0 1px rgba(255,236,170,.75) inset, 0 0 24px rgba(242,201,76,.75), 0 0 56px rgba(242,201,76,.35); } }
+  .mi-promo-strip { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    margin: 0 0 18px; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(242,201,76,.45);
+    background: linear-gradient(100deg, rgba(242,201,76,.16), rgba(242,201,76,.04)); font: 600 13px/1.3 'IBM Plex Sans', system-ui, sans-serif; color: #f6d77e; }
+  .mi-promo-strip em { font-style: normal; font-family: 'IBM Plex Mono', monospace; color: #fff; }
+  .pay-plan-pill { position: relative; }
+  .mi-pill-off { position: absolute; top: -9px; right: -6px; font: 800 10px/1 'IBM Plex Mono', monospace; color: #0a1322; background: #f2c94c; padding: 3px 6px; border-radius: 999px; box-shadow: 0 0 12px rgba(242,201,76,.6); }
+  @media (prefers-reduced-motion: reduce) { .mi-off, .mi-off::after { animation: none; } .mi-off::after { display: none; } }
   .mi-promo-tag { display: inline-block; font: 600 11px/1 'IBM Plex Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #0a1322; background: #f2c94c; padding: 5px 8px; border-radius: 999px; vertical-align: middle; }
 </style>
   <script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js" defer></script>
@@ -4020,7 +4042,7 @@
     </div>
 
   </section>
-  <script src="assets/cartel/cartel.js?v=20261008p" defer></script>
+  <script src="assets/cartel/cartel.js?v=20261008q" defer></script>
   <!-- ayuda: preguntas frecuentes + consulta al equipo (assets/ayuda/ayuda.js, Shadow DOM) -->
   <script src="assets/ayuda/ayuda.js" defer></script>
   <!-- bienvenida: presentación de la página para quien entra por primera vez sin cuenta (assets/bienvenida/bienvenida.js, Shadow DOM) -->
@@ -4033,7 +4055,7 @@
   <script src="assets/informes/estanteria.js?v=20261008a" defer></script>
   <!-- Lector de informes en PDF (window.openPdf) -->
   <script src="assets/lector/lector.js?v=20261007e" defer></script>
-  <script src="assets/warren/warren.js?v=20261008a" defer></script>
+  <script src="assets/warren/warren.js?v=20261008b" defer></script>
 
   <script>
   /* Home Terminal: S&P 500 / Nasdaq / UST 10Y del reporte diario (reports/wallstreet.json).
@@ -5154,7 +5176,7 @@
       if (!member) {
         action.innerHTML =
           '<button type="button" class="pi-cta pi-cta-full" id="piJoin">Hacerme socio y pedir mi informe &rarr;</button>' +
-          '<p class="pi-price" style="margin-top:10px">' + (window.MI_PROMO.on ? '<s class="mi-was">USD 15</s><b>USD 10/mes</b> hasta el 31 de octubre' : '<b>USD 15/mes</b>') + ' · incluye Warren IA, todos los informes y Portfolio' +
+          '<p class="pi-price" style="margin-top:10px">' + (window.MI_PROMO.on ? '<span class="mi-off sm" style="margin-right:8px"><b>33%</b> OFF</span><s class="mi-was">USD 15</s><b>USD 10/mes</b> hasta el 31 de octubre' : '<b>USD 15/mes</b>') + ' · incluye Warren IA, todos los informes y Portfolio' +
           (user ? '' : '<br>¿Ya sos socio? <a id="piLogin">Ingresá a tu cuenta</a>') + '</p>';
         document.getElementById('piJoin').onclick = function(){ miClosePedirInforme(); if (window.openPaymentModal) window.openPaymentModal(); };
         var lg = document.getElementById('piLogin');
@@ -10276,10 +10298,10 @@
   <!-- Anuncio de cambio de seccion (una vez por persona, con fecha de vencimiento) -->
   <div class="report-banner feature-banner" id="featureBanner" role="status" aria-live="polite">
     <div class="report-banner-top">
-      <span class="report-banner-tag">Warren nuevo · USD 10</span>
+      <span class="report-banner-tag mi-off sm"><b>33%</b> OFF · Warren nuevo</span>
       <button type="button" class="report-banner-close" id="featureBannerClose" aria-label="Cerrar">&times;</button>
     </div>
-    <div class="report-banner-title">Warren ahora te arma informes completos, y la membresía baja a USD 10</div>
+    <div class="report-banner-title">Warren ahora te arma informes completos. Y la membresía tiene 33% OFF</div>
     <div class="report-banner-abstract">Valuación, escenarios y fuentes en cada análisis. <s>USD 15</s> USD 10 por mes hasta el 31 de octubre.</div>
     <div class="report-banner-footer">
       <span class="report-banner-meta">Hasta el 31 de octubre</span>
@@ -10326,12 +10348,21 @@
     function fill(){
       if (!P || !P.on) return;
       var set = function(k, html){ document.querySelectorAll('[data-mi-precio="' + k + '"]').forEach(function(el){ el.innerHTML = html; }); };
-      set('frase', '<s>USD 15</s> <b>USD 10 por mes hasta el 31 de octubre</b>');
-      set('modal', '<span class="pay-price-amount"><s class="mi-was">$15</s>$10</span><span class="pay-price-period">USD/mes</span><span class="mi-promo-tag" style="margin-left:10px">Hasta el 31/10</span>');
-      set('modal-fine', 'Precio de lanzamiento de Warren nuevo · facturación mensual · cancelás cuando quieras');
-      [1, 3, 6, 12].forEach(function(m){ set('x' + m, '<s class="mi-was">USD ' + 15 * m + '</s><br>USD ' + 10 * m); });
-      set('ap', '<s class="mi-was">$15</s><span>$10</span> USD');
+      var OFF = '<span class="mi-off"><b>' + P.off + '%</b> OFF</span>';
+      var quedan = P.dias === 1 ? 'último día' : 'quedan ' + P.dias + ' días';
+      set('frase', '<s>USD 15</s> <b>USD 10 por mes</b> <span class="mi-off sm"><b>' + P.off + '%</b> OFF</span> hasta el 31 de octubre');
+      set('modal', '<span class="pay-price-amount"><s class="mi-was">$15</s>$10</span><span class="pay-price-period">USD/mes</span><span class="mi-off lg" style="margin-left:12px;align-self:center"><b>' + P.off + '%</b> OFF</span>');
+      set('modal-fine', 'Precio de lanzamiento de Warren hasta el 31 de octubre · facturación mensual · cancelás cuando quieras');
+      [1, 3, 6, 12].forEach(function(m){ set('x' + m, '<s class="mi-was">USD ' + 15 * m + '</s><br>USD ' + 10 * m + '<i class="mi-pill-off">-' + P.off + '%</i>'); });
+      set('ap', OFF + '<div style="margin-top:12px"><s class="mi-was">$15</s><span>$10</span> USD</div>');
       set('ap-sub', 'por mes hasta el 31 de octubre &middot; cancelá cuando quieras');
+      var box = document.querySelector('#paymentOverlay .payment-modal-box .pay-eyebrow');
+      if (box && !document.querySelector('.mi-promo-strip')) {
+        var strip = document.createElement('div');
+        strip.className = 'mi-promo-strip';
+        strip.innerHTML = '<span><span class="mi-off sm"><b>' + P.off + '%</b> OFF</span>&nbsp; Lanzamiento de Warren nuevo</span><em>' + quedan + '</em>';
+        box.parentNode.insertBefore(strip, box);
+      }
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fill); else fill();
   })();
@@ -16198,7 +16229,7 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
                           + '<svg style="width:48px;height:48px;display:block;margin:0 auto 16px;"><use href="#miMark"/></svg>'
                 + '<h3 style="margin:0 0 8px;font-size:1.2rem;font-weight:700;color:var(--white);">Contenido para miembros</h3>'
                 + '<p style="margin:0 0 20px;font-size:0.9rem;color:rgba(255,255,255,0.7);line-height:1.5;">Accedé a todos los análisis, picks y posiciones con membresía activa.</p>'
-                + '<div style="margin-bottom:6px;">' + (window.MI_PROMO.on ? '<span class="mi-was" style="font-size:1.1rem;color:rgba(255,255,255,0.7);">$15</span>' : '') + '<span style="font-size:2rem;font-weight:800;color:var(--gold,#F2C94C);">$' + window.MI_PROMO.usd + '</span><span style="font-size:1rem;color:rgba(255,255,255,0.7);margin-left:4px;">USD</span></div>'
+                + '<div style="margin-bottom:6px;">' + (window.MI_PROMO.on ? '<span class="mi-off" style="margin-right:10px"><b>' + window.MI_PROMO.off + '%</b> OFF</span><span class="mi-was" style="font-size:1.1rem;color:rgba(255,255,255,0.7);">$15</span>' : '') + '<span style="font-size:2rem;font-weight:800;color:var(--gold,#F2C94C);">$' + window.MI_PROMO.usd + '</span><span style="font-size:1rem;color:rgba(255,255,255,0.7);margin-left:4px;">USD</span></div>'
                 + '<p style="margin:0 0 20px;font-size:0.78rem;color:rgba(255,255,255,0.5);">' + (window.MI_PROMO.on ? 'por mes hasta el 31 de octubre · cancelá cuando quieras' : 'por mes · cancelá cuando quieras') + '</p>'
                 + '<a href="#" onclick="event.preventDefault();openPaymentModal();" style="display:block;background:var(--gold,#F2C94C);color:var(--primary,#0A0F1E);font-weight:700;font-size:1rem;padding:12px 0;border-radius:8px;text-decoration:none;margin-bottom:12px;">Suscribirse ahora</a>'
                 + '<p style="margin:0;font-size:0.8rem;color:rgba(255,255,255,0.5);">¿Ya tenés membresía? <a href="#" onclick="event.preventDefault();window.showLoginOverlay && window.showLoginOverlay();" style="color:var(--gold,#F2C94C);text-decoration:underline;">Iniciá sesión</a></p>'
@@ -16404,6 +16435,7 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
   .mi-ap-card p{margin:0 0 20px;font-size:.9rem;color:rgba(255,255,255,.7);line-height:1.5;}
   .mi-ap-price{margin-bottom:6px;}
   .mi-ap-price span{font-size:2rem;font-weight:800;color:var(--gold,#F2C94C);}
+  .mi-ap-price span.mi-off{font-size:14px;font-weight:700;color:#0a1322;}
   .mi-ap-sub{font-size:.78rem!important;color:rgba(255,255,255,.5)!important;}
   .mi-ap-btn{display:block;background:var(--gold,#F2C94C);color:var(--primary,#0A0F1E);font-weight:700;font-size:1rem;padding:12px 0;border-radius:8px;text-decoration:none;margin-bottom:12px;}
   .mi-ap-login{margin:0!important;font-size:.8rem!important;}

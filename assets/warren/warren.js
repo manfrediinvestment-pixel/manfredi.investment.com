@@ -275,7 +275,7 @@
       h += '<div class="wu-card__meta">' + (state.section ? 'Escribiendo: ' + esc(state.section) : 'Trabajando') + ' · ' + esc(state.elapsed || '0:00') + '</div>';
       h += '<button type="button" class="wu-btn wu-btn--ghost" data-wu-open>Ver en vivo</button>';
     } else {
-      h += '<div class="wu-card__meta">' + esc(TIPO[meta.tipo] || 'Informe') + ' · ' + st.secs + ' secciones · ' + st.tbls + ' tablas' + (st.ch ? ' · ' + st.ch + ' gráficos' : '') + ' · ' + st.mins + ' min de lectura</div>';
+      h += '<div class="wu-card__meta">' + esc(TIPO[meta.tipo] || 'Informe') + ' · ' + st.secs + ' secciones · ' + st.tbls + ' tablas' + (st.ch ? ' · ' + st.ch + (st.ch === 1 ? ' gráfico' : ' gráficos') : '') + ' · ' + st.mins + ' min de lectura</div>';
       h += '<button type="button" class="wu-btn wu-btn--gold" data-wu-open>Abrir informe</button>';
     }
     return h + '</div>';
