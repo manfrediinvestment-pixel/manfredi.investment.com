@@ -21,6 +21,8 @@
     links: { instagram: 'https://www.instagram.com/manfredinvestment', x: 'https://x.com/ManfredInvest', linkedin: 'https://www.linkedin.com/in/ignacio-manfredi-816468250/' }
   };
   var st = { autores: {}, orden: [], pubs: [], cat: 'todo', autor: 'todos', listo: false };
+  // hasta que se publique el primer autor invitado se muestra la guía con el botón de postularse
+  function hayInvitados() { return st.orden.some(function (s) { return s !== 'manfredi' && deAutor(s).length; }); }
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -56,7 +58,8 @@
       };
     });
     var fuentes = [semanales, json('data/analistas.json')];
-    if (LOCAL) fuentes.push(json('data/analistas-ejemplo.json'));
+    // en local se ven los autores de ejemplo; con ?ejemplos=0 se ve lo mismo que en el sitio en vivo
+    if (LOCAL && new URLSearchParams(location.search).get('ejemplos') !== '0') fuentes.push(json('data/analistas-ejemplo.json'));
     return Promise.all(fuentes.map(function (f) { return f.catch(function (e) { console.warn('[analistas]', e.message); return {}; }); }))
       .then(function (ds) {
         ds.forEach(sumar);
@@ -205,7 +208,9 @@
     $('ntDate').hidden = an;
     marcarSub();
     if (!an) { window.dispatchEvent(new Event('resize')); return; }
-    $('anGrid').hidden = w.v !== 'analisis'; $('anPerfil').hidden = w.v !== 'perfil'; $('anNota').hidden = w.v !== 'nota';
+    var guia = w.v === 'analisis' && st.listo && !hayInvitados();
+    $('anGuia').hidden = !guia;
+    $('anGrid').hidden = w.v !== 'analisis' || guia; $('anPerfil').hidden = w.v !== 'perfil'; $('anNota').hidden = w.v !== 'nota';
     if (!st.listo) return;
     if (w.v === 'perfil') { pintarPerfil(w.slug); window.scrollTo(0, 0); }
     if (w.v === 'nota') { pintarNota(w.id); window.scrollTo(0, 0); }
