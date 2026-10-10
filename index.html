@@ -33,7 +33,7 @@
   <link rel="stylesheet" href="assets/mercados/terminal.css" />
 <link rel="stylesheet" href="assets/pulso/pulso.css?v=20261007e" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261007e" />
-<link rel="stylesheet" href="assets/analistas/analistas.css?v=20261010a" />
+<link rel="stylesheet" href="assets/analistas/analistas.css?v=20261010e" />
 <link rel="stylesheet" href="assets/calendario/calendario.css?v=20261008a" />
 <link rel="stylesheet" href="assets/informes/estanteria.css?v=20261008a" />
 <link rel="stylesheet" href="assets/portfolio/portfolio.css?v=20261008w" />
@@ -4053,7 +4053,7 @@
   <script src="assets/pulso/pulso.js?v=20261007f" defer></script>
   <!-- Pestaña Noticias (usa window.MIPulso de pulso.js: va después) -->
   <script src="assets/noticias/noticias.js?v=20261007e" defer></script>
-  <script src="assets/analistas/analistas.js?v=20261010b" defer></script>
+  <script src="assets/analistas/analistas.js?v=20261010e" defer></script>
   <script src="assets/calendario/calendario.js?v=20261008a" defer></script>
   <script src="assets/informes/estanteria.js?v=20261008a" defer></script>
   <!-- Lector de informes en PDF (window.openPdf) -->
@@ -4244,40 +4244,37 @@
   <!-- ââ INFORMES âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
 <section class="nt" id="informes" data-tab="informes">
     <!-- Noticias minuto a minuto + informe semanal + cotizaciones (assets/noticias/noticias.js) -->
-    <!-- Arriba: [Noticias | Análisis e informes]. Los análisis de autores invitados: assets/analistas/analistas.js -->
+    <!-- Arriba: Noticias / Análisis e informes. Los análisis de autores invitados: assets/analistas/analistas.js -->
     <div class="nt-wrap">
       <header class="nt-head nt-head--top" id="reportes">
-        <div class="nt-top">
-          <h2 class="nt-title">Noticias</h2>
-          <div class="nt-subs" role="tablist" aria-label="Noticias o análisis">
-            <button type="button" role="tab" data-nt-sub="noticias" class="on" aria-selected="true">Noticias</button>
-            <button type="button" role="tab" data-nt-sub="analisis" aria-selected="false">Análisis e informes <span id="anCount"></span></button>
-          </div>
-        </div>
+        <h2 class="nt-switch" role="tablist" aria-label="Noticias o análisis">
+          <button type="button" role="tab" data-nt-sub="noticias" class="on" aria-selected="true">Noticias</button>
+          <button type="button" role="tab" data-nt-sub="analisis" aria-selected="false">Análisis <em>e informes</em><sup id="anCount"></sup></button>
+          <i class="nt-switch__ind" aria-hidden="true"></i>
+        </h2>
         <span class="nt-date" id="ntDate"></span>
       </header>
     </div>
     <div class="nt-wrap an" id="anPanel" hidden>
       <div class="nt-grid an-grid" id="anGrid">
         <div>
-          <div class="an-bar">
-            <div class="an-chips" id="anChips" role="group" aria-label="Filtrar por categoría"></div>
-            <label class="an-sel">Autor <select id="anAutorSel"><option value="todos">Todos</option></select></label>
-          </div>
+          <div class="an-cats" id="anChips" role="group" aria-label="Filtrar por categoría"></div>
           <div id="anList" aria-live="polite">
             <div style="display:grid;grid-template-columns:220px 1fr;gap:34px"><span class="nt-skel" style="aspect-ratio:1/1.414"></span><span class="nt-skel" style="height:40px;align-self:center"></span></div>
           </div>
         </div>
-        <aside class="nt-rail" aria-label="Autores">
-          <div class="nt-card" id="anAutores"><h3 class="nt-card__h">Autores</h3></div>
-          <div class="nt-card an-join">
-            <h3 class="nt-card__h">Publicá en Manfredi</h3>
-            <ul>
-              <li>Tu análisis con diseño profesional</li>
-              <li>Perfil propio con LinkedIn y redes</li>
-              <li>Difusión en Instagram de Manfredi</li>
-            </ul>
-            <a class="nt-btn" href="mailto:manfredi.investment@gmail.com?subject=Quiero%20publicar%20en%20Manfredi">Postularme</a>
+        <aside class="nt-rail an-rail" aria-label="Columnistas">
+          <div class="an-panel" id="anAutores"></div>
+          <div class="an-inv">
+            <span class="an-k an-k--live"><i></i>Convocatoria abierta</span>
+            <h3 class="an-inv__t">Tu firma,<br><em>en Manfredi.</em></h3>
+            <ol class="an-inv__l">
+              <li><b>01</b>Tus informes con diseño profesional</li>
+              <li><b>02</b>Perfil de autor con tus redes</li>
+              <li><b>03</b>Difusión en la comunidad Manfredi</li>
+            </ol>
+            <a class="an-cta an-cta--full" href="mailto:manfredi.investment@gmail.com?subject=Quiero%20publicar%20en%20Manfredi">Postularme<svg class="an-arr" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></a>
+            <span class="an-inv__f">Cupos limitados · por invitación</span>
           </div>
         </aside>
       </div>

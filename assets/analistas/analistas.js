@@ -12,11 +12,11 @@
   if (!root) return;
   var TZ = 'America/Argentina/Buenos_Aires';
   var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
-  var CATS = [['acciones', 'Acciones', '#6aa7ff'], ['bonos', 'Bonos', '#56c793'], ['macro', 'Macro', '#f2c94c'], ['politica', 'Política', '#c58cff'], ['trading', 'Trading', '#f07b70']];
+  var CATS = [['acciones', 'Acciones', '#8fb4ff'], ['bonos', 'Bonos', '#7fd1ae'], ['macro', 'Macro', '#e9c46a'], ['politica', 'Política', '#c3a6f2'], ['trading', 'Trading', '#f29e8e']];
   var CAT = {}; CATS.forEach(function (c) { CAT[c[0]] = { n: c[1], c: c[2] }; });
   var MANFREDI = {
     slug: 'manfredi', nombre: 'Manfredi Investment', rol: 'Research & Markets · Informes semanales y especiales', corto: 'Macro · Mercados',
-    color: '#f2c94c', logo: 'assets/img/logo-mark-512.png', verificado: true, desde: '2026-05-18',
+    color: '#e9c46a', logo: 'assets/img/logo-mark-512.png', verificado: true, desde: '2026-05-18',
     links: { instagram: 'https://www.instagram.com/manfredinvestment', x: 'https://x.com/ManfredInvest', linkedin: 'https://www.linkedin.com/in/ignacio-manfredi-816468250/' }
   };
   var st = { autores: {}, orden: [], pubs: [], cat: 'todo', autor: 'todos', listo: false };
@@ -33,6 +33,7 @@
     return '<span class="an-av' + (cls ? ' ' + cls : '') + '" style="--c:' + esc(a.color) + '">' +
       (a.logo || a.foto ? '<img src="' + esc(a.logo || a.foto) + '" alt="">' : esc(iniciales(a.nombre))) + '</span>';
   }
+  var FLECHA = '<svg class="an-arr" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg>';
   var TILDE = '<span class="an-verif" title="Autor verificado">✓</span>';
 
   /* ------------------------------ datos ------------------------------ */
@@ -98,7 +99,7 @@
       '<span class="an-hero__t">' + esc(p.titulo) + '</span>' +
       '<span class="an-by an-by--lg">' + av(a) + '<span><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + cuando(p, true) +
       (p.paginas ? ' · ' + p.paginas + ' pág.' : '') + '</small></span></span>' +
-      '<span class="nt-btn">Leer</span></span></button>';
+      '<span class="an-cta">Leer informe' + FLECHA + '</span></span></button>';
   }
   function pintarGrilla() {
     var lista = filtradas(), box = $('anList');
@@ -108,22 +109,30 @@
   }
   function pintarBarra() {
     var n = function (c) { return st.pubs.filter(function (p) { return c === 'todo' || p.categoria === c; }).length; };
-    $('anChips').innerHTML = [['todo', 'Todo', '']].concat(CATS).map(function (c) {
-      return '<button type="button" class="an-chip' + (st.cat === c[0] ? ' on' : '') + '" data-cat="' + c[0] + '" aria-pressed="' + (st.cat === c[0]) + '" style="--c:' + c[2] + '">' +
-        (c[2] ? '<i></i>' : '') + c[1] + '<span>' + n(c[0]) + '</span></button>';
-    }).join('');
-    $('anAutorSel').innerHTML = '<option value="todos">Todos</option>' + st.orden.map(function (s) {
-      return '<option value="' + esc(s) + '"' + (st.autor === s ? ' selected' : '') + '>' + esc(st.autores[s].nombre) + '</option>';
+    $('anChips').innerHTML = [['todo', 'Todo', '#f3f6fb']].concat(CATS).map(function (c) {
+      var on = st.cat === c[0];
+      return '<button type="button" class="an-cat' + (on ? ' on' : '') + '" data-cat="' + c[0] + '" aria-pressed="' + on + '" style="--c:' + c[2] + '">' +
+        '<span class="an-cat__n"><i></i>' + c[1] + '</span><span class="an-cat__c">' + String(n(c[0])).padStart(2, '0') + '</span></button>';
     }).join('');
   }
   function pintarRail() {
     var orden = st.orden.slice().sort(function (a, b) { return deAutor(b).length - deAutor(a).length; });
-    $('anAutores').innerHTML = '<h3 class="nt-card__h">Autores</h3>' + orden.map(function (s) {
-      var a = st.autores[s];
-      return '<a class="an-auth" href="#analista-' + esc(s) + '">' + av(a) + '<span><b>' + esc(a.nombre) + '</b><small>' + esc(a.corto || '') + '</small></span><em>' + deAutor(s).length + '</em></a>';
-    }).join('');
+    $('anAutores').innerHTML = '<div class="an-panel__h"><span class="an-k">Columnistas</span><span class="an-panel__n">' + String(orden.length).padStart(2, '0') + '</span></div>' +
+      '<ul class="an-auths">' + orden.map(function (s) {
+        var a = st.autores[s];
+        return '<li><a class="an-auth" href="#analista-' + esc(s) + '" style="--c:' + esc(a.color) + '">' + av(a, 'ring') +
+          '<span class="an-auth__b"><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + esc(a.corto || '') + '</small></span>' +
+          '<span class="an-auth__n">' + deAutor(s).length + '</span>' + FLECHA + '</a></li>';
+      }).join('') + '</ul>';
   }
-  function pintarCuenta() { var c = $('anCount'); if (c) c.textContent = st.pubs.length || ''; }
+  function pintarCuenta() { var c = $('anCount'); if (c) c.textContent = st.pubs.length ? String(st.pubs.length).padStart(2, '0') : ''; marcarSub(); }
+  function marcarSub() {
+    var on = document.querySelector('[data-nt-sub].on'), ind = document.querySelector('.nt-switch__ind');
+    if (!on || !ind || !on.offsetWidth) return;
+    // la línea va solo bajo la palabra, no bajo el contador
+    var sup = on.querySelector('sup'), w = on.offsetWidth - (sup ? sup.offsetWidth + 6 : 0);
+    ind.style.left = on.offsetLeft + 'px'; ind.style.width = w + 'px';
+  }
 
   /* ------------------------------ perfil ------------------------------ */
   var ICONOS = {
@@ -173,6 +182,7 @@
     });
     $('ntPanel').hidden = an; root.hidden = !an;
     $('ntDate').hidden = an;
+    marcarSub();
     if (!an) { window.dispatchEvent(new Event('resize')); return; }
     $('anGrid').hidden = w.v !== 'analisis'; $('anPerfil').hidden = w.v !== 'perfil';
     if (!st.listo) return;
@@ -198,7 +208,8 @@
     var c = e.target.closest('[data-cat]');
     if (c && c.dataset.cat !== st.cat) { st.cat = c.dataset.cat; pintarBarra(); pintarGrilla(); }
   });
-  $('anAutorSel').addEventListener('change', function (e) { st.autor = e.target.value; pintarGrilla(); });
+  window.addEventListener('resize', marcarSub);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(marcarSub);
   window.addEventListener('hashchange', mostrar);
 
   mostrar();
