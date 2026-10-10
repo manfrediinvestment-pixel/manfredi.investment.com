@@ -3285,6 +3285,7 @@
       if (document.documentElement.hasAttribute('data-bienvenida')) return false;
       if (localStorage.getItem('mi_member_token')) return false;
       if (localStorage.getItem('mi_notify_subscribed')) return false;
+      try { if (sessionStorage.getItem('mi_promo_wall_sesion') === '1') return false; } catch (e) {}
       const dismissedAt = parseInt(localStorage.getItem('mi_notify_dismissed_at') || '0', 10);
       const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
       if (dismissedAt && (Date.now() - dismissedAt) < FOURTEEN_DAYS) return false;
