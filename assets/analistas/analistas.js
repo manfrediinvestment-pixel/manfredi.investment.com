@@ -3,7 +3,8 @@
      #analisis abre la grilla, #analista-<slug> abre el perfil de un autor.
    - Los informes semanales (papers/manifest.json) entran como un autor más,
      "Manfredi Investment". Los autores invitados salen de data/analistas.json.
-   - La imagen de cada tarjeta es SIEMPRE la página 1 del PDF (campo tapa).
+   - Dos formatos: PDF (la imagen es SIEMPRE la página 1, campo tapa) o texto
+     (campo cuerpo, se lee en la página en #nota-<id>; la imagen es el logo).
    - En localhost se suman los autores ficticios de data/analistas-ejemplo.json
      para ver la sección con contenido; en el sitio en vivo no se cargan.
    Abre los PDF con el lector del sitio (window.openPdf, assets/lector/lector.js). */
@@ -76,6 +77,41 @@
   function etiqueta(p) { return p.etiqueta || CAT[p.categoria].n; }
   function deAutor(slug) { return st.pubs.filter(function (p) { return p.autor === slug; }); }
 
+  /* ------------------------------ formatos ------------------------------ */
+  function esTexto(p) { return !!p.cuerpo; }
+  function minutos(p) { return Math.max(1, Math.round(String(p.cuerpo).split(/\s+/).length / 200)); }
+  // los textos no tienen página 1: llevan el logo de Manfredi
+  function tapa(p) {
+    if (!esTexto(p)) return '<span class="an-row__cv"><img src="' + esc(p.tapa) + '" alt="" loading="lazy"></span>';
+    return '<span class="an-row__cv an-row__cv--txt"><img src="assets/img/logo-mark-512.png" alt=""><small>Análisis</small></span>';
+  }
+  // cuerpo: párrafos separados por línea en blanco, "## " subtítulo, "- " lista, **negrita**
+  function md(t) {
+    var linea = function (x) { return esc(x).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); };
+    return String(t || '').replace(/\r/g, '').split(/\n{2,}/).map(function (b) {
+      b = b.trim();
+      if (!b) return '';
+      if (b.indexOf('## ') === 0) return '<h4>' + linea(b.slice(3)) + '</h4>';
+      var ls = b.split('\n');
+      if (ls.every(function (l) { return /^- /.test(l); })) return '<ul>' + ls.map(function (l) { return '<li>' + linea(l.slice(2)) + '</li>'; }).join('') + '</ul>';
+      return '<p>' + ls.map(linea).join('<br>') + '</p>';
+    }).join('');
+  }
+  function pintarNota(id) {
+    var p = st.pubs.filter(function (x) { return x.id === id; })[0], box = $('anNota');
+    if (!p || !esTexto(p)) { box.innerHTML = '<a class="an-back" href="#analisis">← Análisis e informes</a><p class="nt-empty">No encontramos esta publicación.</p>'; return; }
+    var a = st.autores[p.autor];
+    document.title = p.titulo + ' · ' + a.nombre + ' · Manfredi Investment';
+    box.innerHTML = '<a class="an-back" href="#analisis">← Análisis e informes</a>' +
+      '<article class="an-nota"><span class="an-row__k">' + esc(etiqueta(p)) + '<i></i>' + cuando(p, true) + '<i></i>' + minutos(p) + ' min de lectura</span>' +
+      '<h3 class="an-nota__t">' + esc(p.titulo) + '</h3>' +
+      (p.resumen ? '<p class="an-nota__s">' + esc(p.resumen) + '</p>' : '') +
+      '<a class="an-nota__a" href="#analista-' + esc(a.slug) + '">' + av(a) + '<span><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + esc(a.rol || a.corto || '') + '</small></span></a>' +
+      '<div class="an-nota__c">' + md(p.cuerpo) + '</div>' +
+      (p.autor === 'manfredi' ? '' : '<p class="an-disc">Contenido de autoría de ' + esc(a.nombre) + '. Las opiniones son del autor y no constituyen recomendación de inversión ni reflejan la posición de Manfredi Investment.</p>') +
+      '</article>';
+  }
+
   /* ------------------------------ lista ------------------------------ */
   function filtradas() {
     return st.pubs.filter(function (p) { return st.cat === 'todo' || p.categoria === st.cat; });
@@ -86,8 +122,8 @@
     var nuevo = p._t && Date.now() - p._t < 7 * 864e5;
     return '<button type="button" class="an-row' + (sinAutor ? ' an-row--solo' : '') + '" data-id="' + esc(p.id) + '">' +
       (sinAutor ? '' : '<span class="an-row__a">' + av(a) + '<span><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + esc(a.corto || '') + '</small></span></span>') +
-      '<span class="an-row__cv"><img src="' + esc(p.tapa) + '" alt="" loading="lazy"></span>' +
-      '<span class="an-row__b"><span class="an-row__k">' + (nuevo ? '<em>Nuevo</em>' : '') + esc(etiqueta(p)) + '<i></i>' + cuando(p) + '</span>' +
+      tapa(p) +
+      '<span class="an-row__b"><span class="an-row__k">' + (nuevo ? '<em>Nuevo</em>' : '') + esc(etiqueta(p)) + '<i></i>' + cuando(p) + (esTexto(p) ? '<i></i>' + minutos(p) + ' min' : '') + '</span>' +
       '<span class="an-row__t">' + esc(p.titulo) + '</span>' +
       (p.resumen ? '<span class="an-row__s">' + esc(p.resumen) + '</span>' : '') + '</span>' +
       FLECHA + '</button>';
@@ -156,6 +192,7 @@
     var h = (location.hash || '').replace('#', '');
     if (h === 'analisis') return { v: 'analisis' };
     if (h.indexOf('analista-') === 0) return { v: 'perfil', slug: h.slice(9) };
+    if (h.indexOf('nota-') === 0) return { v: 'nota', id: h.slice(5) };
     return { v: 'noticias' };
   }
   function mostrar() {
@@ -168,9 +205,10 @@
     $('ntDate').hidden = an;
     marcarSub();
     if (!an) { window.dispatchEvent(new Event('resize')); return; }
-    $('anGrid').hidden = w.v !== 'analisis'; $('anPerfil').hidden = w.v !== 'perfil';
+    $('anGrid').hidden = w.v !== 'analisis'; $('anPerfil').hidden = w.v !== 'perfil'; $('anNota').hidden = w.v !== 'nota';
     if (!st.listo) return;
     if (w.v === 'perfil') { pintarPerfil(w.slug); window.scrollTo(0, 0); }
+    if (w.v === 'nota') { pintarNota(w.id); window.scrollTo(0, 0); }
   }
 
   document.querySelectorAll('[data-nt-sub]').forEach(function (b) {
@@ -185,6 +223,7 @@
     if (it) {
       var p = st.pubs.filter(function (x) { return x.id === it.dataset.id; })[0];
       if (!p) return;
+      if (esTexto(p)) { location.hash = 'nota-' + p.id; return; }
       if (typeof window.openPdf === 'function') window.openPdf(p.pdf, p.titulo, { fecha: cuando(p, true), tapa: p.tapa, etiqueta: p.autor === 'manfredi' ? etiqueta(p) : st.autores[p.autor].nombre });
       else window.open(p.pdf, '_blank', 'noopener');
       return;

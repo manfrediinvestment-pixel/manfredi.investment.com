@@ -127,3 +127,27 @@
   .an-prof { grid-template-columns:auto minmax(0,1fr); } .an-pstats { grid-column:1 / -1; } .an-pstats span:first-child { padding-left:0; border-left:0; }
 }
 @media (prefers-reduced-motion:reduce) { .an-gold::after { animation:none; } .nt-switch__ind, .an-row__cv, .an-cat, .an-auth { transition:none; } }
+
+/* ── publicaciones en texto ──────────────────────────────────────── */
+/* miniatura con el logo en lugar de la página 1 */
+.an-row__cv--txt { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px;
+  background:radial-gradient(90% 60% at 50% 0%, rgba(233,211,160,.12), transparent 70%), linear-gradient(180deg, #13243f, #0a1528); }
+.an-row__cv--txt img { width:46%; height:auto; object-fit:contain; opacity:.92; }
+.an-row__cv--txt small { font:500 6.5px var(--an-mono); letter-spacing:.2em; text-transform:uppercase; color:var(--an-champ); }
+
+/* nota abierta en la página */
+.an-nota { max-width:700px; margin:0 auto; }
+.an-nota__t { margin:14px 0 12px; font:400 clamp(28px,3vw,36px)/1.12 var(--nt-serif); letter-spacing:-.01em; color:var(--nt-ink); text-wrap:balance; }
+.an-nota__s { margin:0 0 22px; font:400 16px/1.6 var(--nt-sans); color:var(--nt-ink2); }
+.an-nota__a { display:flex; align-items:center; gap:12px; padding:16px 0; border-top:1px solid var(--nt-line); border-bottom:1px solid var(--nt-line); margin-bottom:30px; transition:transform .25s var(--nt-ease); }
+.an-nota__a > span { display:grid; gap:2px; }
+.an-nota__a b { font:600 14px var(--nt-sans); color:var(--nt-ink); transition:color .2s; }
+.an-nota__a small { font:400 12.5px var(--nt-sans); color:var(--nt-soft); }
+@media (hover:hover) { .an-nota__a:hover b { color:var(--an-champ2); } }
+.an-nota__c { font:400 16.5px/1.78 var(--nt-sans); color:var(--nt-ink2); }
+.an-nota__c p { margin:0 0 20px; }
+.an-nota__c h4 { margin:34px 0 12px; font:400 22px/1.2 var(--nt-serif); color:var(--nt-ink); }
+.an-nota__c ul { margin:0 0 20px; padding:0; list-style:none; display:grid; gap:12px; }
+.an-nota__c li { position:relative; padding-left:22px; }
+.an-nota__c li::before { content:''; position:absolute; left:0; top:.8em; width:10px; height:1px; background:var(--an-champ); }
+.an-nota__c strong { color:var(--nt-ink); font-weight:600; }

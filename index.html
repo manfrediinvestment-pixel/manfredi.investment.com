@@ -33,7 +33,7 @@
   <link rel="stylesheet" href="assets/mercados/terminal.css" />
 <link rel="stylesheet" href="assets/pulso/pulso.css?v=20261007e" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261007e" />
-<link rel="stylesheet" href="assets/analistas/analistas.css?v=20261010g" />
+<link rel="stylesheet" href="assets/analistas/analistas.css?v=20261010h" />
 <link rel="stylesheet" href="assets/calendario/calendario.css?v=20261008a" />
 <link rel="stylesheet" href="assets/informes/estanteria.css?v=20261008a" />
 <link rel="stylesheet" href="assets/portfolio/portfolio.css?v=20261008w" />
@@ -4053,7 +4053,7 @@
   <script src="assets/pulso/pulso.js?v=20261007f" defer></script>
   <!-- Pestaña Noticias (usa window.MIPulso de pulso.js: va después) -->
   <script src="assets/noticias/noticias.js?v=20261007e" defer></script>
-  <script src="assets/analistas/analistas.js?v=20261010g" defer></script>
+  <script src="assets/analistas/analistas.js?v=20261010h" defer></script>
   <script src="assets/calendario/calendario.js?v=20261008a" defer></script>
   <script src="assets/informes/estanteria.js?v=20261008a" defer></script>
   <!-- Lector de informes en PDF (window.openPdf) -->
@@ -4278,6 +4278,7 @@
         </aside>
       </div>
       <div class="an-perfil" id="anPerfil" hidden></div>
+      <div class="an-perfil" id="anNota" hidden></div>
     </div>
     <div class="nt-wrap nt-grid" id="ntPanel">
       <div class="nt-main">
@@ -17215,7 +17216,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
       hash = (hash || '').replace('#', '');
       if (!hash) return 'inicio';
       if (hash === 'reportes') return 'informes';
-      if (hash === 'analisis' || hash.indexOf('analista-') === 0) return 'informes';
+      if (hash === 'analisis' || hash.indexOf('analista-') === 0 || hash.indexOf('nota-') === 0) return 'informes';
       if (hash === 'finanzas') return 'herramientas';
       if (TAB_IDS.indexOf(hash) !== -1) return hash;
       return 'inicio';
