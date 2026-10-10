@@ -210,6 +210,7 @@
     if (!an) { window.dispatchEvent(new Event('resize')); return; }
     var guia = w.v === 'analisis' && st.listo && !hayInvitados();
     $('anGuia').hidden = !guia;
+    if (guia && !$('anGuiaBg').firstChild) $('anGuiaBg').innerHTML = '<div class="an-rows">' + st.pubs.slice(0, 5).map(function (p) { return fila(p); }).join('') + '</div>';
     $('anGrid').hidden = w.v !== 'analisis' || guia; $('anPerfil').hidden = w.v !== 'perfil'; $('anNota').hidden = w.v !== 'nota';
     if (!st.listo) return;
     if (w.v === 'perfil') { pintarPerfil(w.slug); window.scrollTo(0, 0); }
