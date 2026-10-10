@@ -36,7 +36,7 @@
   function abrir(url, titulo, info) {
     if (lx) cerrar(true);
     st = { zoom: 1, base: 0, paginas: [], foco: document.activeElement, info: info || {} };
-    var meta = ['Informe semanal', st.info.fecha].filter(Boolean).join(' · ');
+    var meta = [st.info.etiqueta || 'Informe semanal', st.info.fecha].filter(Boolean).join(' · ');
     lx = document.createElement('div');
     lx.className = 'lx';
     lx.setAttribute('role', 'dialog'); lx.setAttribute('aria-modal', 'true'); lx.setAttribute('aria-labelledby', 'lxT');

@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="assets/mercados/terminal.css" />
 <link rel="stylesheet" href="assets/pulso/pulso.css?v=20261007e" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261007e" />
+<link rel="stylesheet" href="assets/analistas/analistas.css?v=20261010a" />
 <link rel="stylesheet" href="assets/calendario/calendario.css?v=20261008a" />
 <link rel="stylesheet" href="assets/informes/estanteria.css?v=20261008a" />
 <link rel="stylesheet" href="assets/portfolio/portfolio.css?v=20261008w" />
@@ -4052,10 +4053,11 @@
   <script src="assets/pulso/pulso.js?v=20261007f" defer></script>
   <!-- Pestaña Noticias (usa window.MIPulso de pulso.js: va después) -->
   <script src="assets/noticias/noticias.js?v=20261007e" defer></script>
+  <script src="assets/analistas/analistas.js?v=20261010b" defer></script>
   <script src="assets/calendario/calendario.js?v=20261008a" defer></script>
   <script src="assets/informes/estanteria.js?v=20261008a" defer></script>
   <!-- Lector de informes en PDF (window.openPdf) -->
-  <script src="assets/lector/lector.js?v=20261007e" defer></script>
+  <script src="assets/lector/lector.js?v=20261010a" defer></script>
   <script src="assets/warren/warren.js?v=20261008b" defer></script>
 
   <script>
@@ -4242,12 +4244,47 @@
   <!-- ââ INFORMES âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
 <section class="nt" id="informes" data-tab="informes">
     <!-- Noticias minuto a minuto + informe semanal + cotizaciones (assets/noticias/noticias.js) -->
-    <div class="nt-wrap nt-grid">
-      <div class="nt-main">
-        <header class="nt-head" id="reportes">
+    <!-- Arriba: [Noticias | Análisis e informes]. Los análisis de autores invitados: assets/analistas/analistas.js -->
+    <div class="nt-wrap">
+      <header class="nt-head nt-head--top" id="reportes">
+        <div class="nt-top">
           <h2 class="nt-title">Noticias</h2>
-          <span class="nt-date" id="ntDate"></span>
-        </header>
+          <div class="nt-subs" role="tablist" aria-label="Noticias o análisis">
+            <button type="button" role="tab" data-nt-sub="noticias" class="on" aria-selected="true">Noticias</button>
+            <button type="button" role="tab" data-nt-sub="analisis" aria-selected="false">Análisis e informes <span id="anCount"></span></button>
+          </div>
+        </div>
+        <span class="nt-date" id="ntDate"></span>
+      </header>
+    </div>
+    <div class="nt-wrap an" id="anPanel" hidden>
+      <div class="nt-grid an-grid" id="anGrid">
+        <div>
+          <div class="an-bar">
+            <div class="an-chips" id="anChips" role="group" aria-label="Filtrar por categoría"></div>
+            <label class="an-sel">Autor <select id="anAutorSel"><option value="todos">Todos</option></select></label>
+          </div>
+          <div id="anList" aria-live="polite">
+            <div style="display:grid;grid-template-columns:220px 1fr;gap:34px"><span class="nt-skel" style="aspect-ratio:1/1.414"></span><span class="nt-skel" style="height:40px;align-self:center"></span></div>
+          </div>
+        </div>
+        <aside class="nt-rail" aria-label="Autores">
+          <div class="nt-card" id="anAutores"><h3 class="nt-card__h">Autores</h3></div>
+          <div class="nt-card an-join">
+            <h3 class="nt-card__h">Publicá en Manfredi</h3>
+            <ul>
+              <li>Tu análisis con diseño profesional</li>
+              <li>Perfil propio con LinkedIn y redes</li>
+              <li>Difusión en Instagram de Manfredi</li>
+            </ul>
+            <a class="nt-btn" href="mailto:manfredi.investment@gmail.com?subject=Quiero%20publicar%20en%20Manfredi">Postularme</a>
+          </div>
+        </aside>
+      </div>
+      <div class="an-perfil" id="anPerfil" hidden></div>
+    </div>
+    <div class="nt-wrap nt-grid" id="ntPanel">
+      <div class="nt-main">
         <div id="ntInforme"></div>
         <div class="nt-bar" id="ntBar"><div class="nt-chips" id="ntChips" role="group" aria-label="Filtrar noticias"></div></div>
         <div id="ntFeed" aria-live="polite">
@@ -17182,6 +17219,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
       hash = (hash || '').replace('#', '');
       if (!hash) return 'inicio';
       if (hash === 'reportes') return 'informes';
+      if (hash === 'analisis' || hash.indexOf('analista-') === 0) return 'informes';
       if (hash === 'finanzas') return 'herramientas';
       if (TAB_IDS.indexOf(hash) !== -1) return hash;
       return 'inicio';
