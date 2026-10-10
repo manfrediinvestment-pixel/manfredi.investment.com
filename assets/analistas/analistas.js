@@ -25,7 +25,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function fecha(iso, largo) {
     var d = new Date(iso + 'T12:00:00-03:00');
-    return d.toLocaleDateString('es-AR', largo ? { timeZone: TZ, day: '2-digit', month: 'short', year: 'numeric' } : { timeZone: TZ, day: '2-digit', month: 'short' }).replace(/\./g, '').replace(/ de /g, ' ');
+    return d.toLocaleDateString('es-AR', largo ? { timeZone: TZ, day: '2-digit', month: 'short', year: 'numeric' } : { timeZone: TZ, day: '2-digit', month: 'short' }).replace(/\./g, '').replace(/ de /g, ' ').replace('-', ' ');
   }
   function miles(n) { return Number(n).toLocaleString('es-AR'); }
   function iniciales(n) { return n.split(' ').map(function (p) { return p[0]; }).slice(0, 2).join('').toUpperCase(); }
@@ -49,7 +49,7 @@
         publicaciones: (Array.isArray(list) ? list : []).map(function (p) {
           return {
             id: 'manfredi-' + p.num, autor: 'manfredi', categoria: 'macro', etiqueta: p.tag, titulo: p.title,
-            fecha: p.publishedAt || '', fechaTexto: p.date, pdf: 'papers/' + encodeURIComponent(p.file), tapa: p.cover || 'papers/covers/' + p.num + '.jpg'
+            fecha: p.publishedAt || '', fechaTexto: p.date, resumen: String(p.abstract || '').split(' · ').slice(0, 3).join(' · '), pdf: 'papers/' + encodeURIComponent(p.file), tapa: p.cover || 'papers/covers/' + p.num + '.jpg'
           };
         })
       };
@@ -76,62 +76,46 @@
   function etiqueta(p) { return p.etiqueta || CAT[p.categoria].n; }
   function deAutor(slug) { return st.pubs.filter(function (p) { return p.autor === slug; }); }
 
-  /* ------------------------------ grilla ------------------------------ */
+  /* ------------------------------ lista ------------------------------ */
   function filtradas() {
-    return st.pubs.filter(function (p) {
-      return (st.cat === 'todo' || p.categoria === st.cat) && (st.autor === 'todos' || p.autor === st.autor);
-    });
+    return st.pubs.filter(function (p) { return st.cat === 'todo' || p.categoria === st.cat; });
   }
-  function tarjeta(p) {
-    var a = st.autores[p.autor];
-    return '<button type="button" class="an-it" data-id="' + esc(p.id) + '" style="--c:' + CAT[p.categoria].c + '">' +
-      '<span class="an-cv"><img src="' + esc(p.tapa) + '" alt="" loading="lazy"></span>' +
-      '<span class="an-tag">' + esc(etiqueta(p)) + '</span>' +
-      '<span class="an-it__t">' + esc(p.titulo) + '</span>' +
-      '<span class="an-by">' + av(a, 'sm') + '<b>' + esc(a.nombre) + '</b><small>' + cuando(p) + '</small></span></button>';
-  }
-  function destacado(p) {
+  // una fila: autor (foto + nombre) · tapa chica · título y resumen · fecha
+  function fila(p, sinAutor) {
     var a = st.autores[p.autor];
     var nuevo = p._t && Date.now() - p._t < 7 * 864e5;
-    return '<button type="button" class="an-hero" data-id="' + esc(p.id) + '" style="--c:' + CAT[p.categoria].c + '">' +
-      '<span class="an-cv"><img src="' + esc(p.tapa) + '" alt=""></span>' +
-      '<span class="an-hero__b"><span class="an-tag">' + (nuevo ? 'Nuevo · ' : '') + esc(etiqueta(p)) + '</span>' +
-      '<span class="an-hero__t">' + esc(p.titulo) + '</span>' +
-      '<span class="an-by an-by--lg">' + av(a) + '<span><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + cuando(p, true) +
-      (p.paginas ? ' · ' + p.paginas + ' pág.' : '') + '</small></span></span>' +
-      '<span class="an-cta">Leer informe' + FLECHA + '</span></span></button>';
+    return '<button type="button" class="an-row' + (sinAutor ? ' an-row--solo' : '') + '" data-id="' + esc(p.id) + '">' +
+      (sinAutor ? '' : '<span class="an-row__a">' + av(a) + '<span><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + esc(a.corto || '') + '</small></span></span>') +
+      '<span class="an-row__cv"><img src="' + esc(p.tapa) + '" alt="" loading="lazy"></span>' +
+      '<span class="an-row__b"><span class="an-row__k">' + (nuevo ? '<em>Nuevo</em>' : '') + esc(etiqueta(p)) + '<i></i>' + cuando(p) + '</span>' +
+      '<span class="an-row__t">' + esc(p.titulo) + '</span>' +
+      (p.resumen ? '<span class="an-row__s">' + esc(p.resumen) + '</span>' : '') + '</span>' +
+      FLECHA + '</button>';
   }
   function pintarGrilla() {
     var lista = filtradas(), box = $('anList');
     if (!lista.length) { box.innerHTML = '<p class="nt-empty">Todavía no hay publicaciones en esta categoría.</p>'; return; }
-    var conHero = st.cat === 'todo' && st.autor === 'todos';
-    box.innerHTML = (conHero ? destacado(lista[0]) : '') + '<div class="an-shelf">' + lista.slice(conHero ? 1 : 0).map(tarjeta).join('') + '</div>';
+    box.innerHTML = '<div class="an-rows">' + lista.map(function (p) { return fila(p); }).join('') + '</div>';
   }
   function pintarBarra() {
-    var n = function (c) { return st.pubs.filter(function (p) { return c === 'todo' || p.categoria === c; }).length; };
-    $('anChips').innerHTML = [['todo', 'Todo', '#f3f6fb']].concat(CATS).map(function (c) {
+    $('anChips').innerHTML = [['todo', 'Todo']].concat(CATS).map(function (c) {
       var on = st.cat === c[0];
-      return '<button type="button" class="an-cat' + (on ? ' on' : '') + '" data-cat="' + c[0] + '" aria-pressed="' + on + '" style="--c:' + c[2] + '">' +
-        '<span class="an-cat__n"><i></i>' + c[1] + '</span><span class="an-cat__c">' + String(n(c[0])).padStart(2, '0') + '</span></button>';
+      return '<button type="button" class="an-cat' + (on ? ' on' : '') + '" data-cat="' + c[0] + '" aria-pressed="' + on + '">' + c[1] + '</button>';
     }).join('');
   }
   function pintarRail() {
     var orden = st.orden.slice().sort(function (a, b) { return deAutor(b).length - deAutor(a).length; });
-    $('anAutores').innerHTML = '<div class="an-panel__h"><span class="an-k">Columnistas</span><span class="an-panel__n">' + String(orden.length).padStart(2, '0') + '</span></div>' +
-      '<ul class="an-auths">' + orden.map(function (s) {
-        var a = st.autores[s];
-        return '<li><a class="an-auth" href="#analista-' + esc(s) + '" style="--c:' + esc(a.color) + '">' + av(a, 'ring') +
-          '<span class="an-auth__b"><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + esc(a.corto || '') + '</small></span>' +
-          '<span class="an-auth__n">' + deAutor(s).length + '</span>' + FLECHA + '</a></li>';
-      }).join('') + '</ul>';
+    $('anAutores').innerHTML = '<h3 class="an-panel__h">Columnistas</h3><ul class="an-auths">' + orden.map(function (s) {
+      var a = st.autores[s], n = deAutor(s).length;
+      return '<li><a class="an-auth" href="#analista-' + esc(s) + '">' + av(a, 'sm') +
+        '<span class="an-auth__b"><b>' + esc(a.nombre) + '</b><small>' + esc(a.corto || '') + '</small></span>' +
+        '<span class="an-auth__n">' + n + '</span></a></li>';
+    }).join('') + '</ul>';
   }
-  function pintarCuenta() { var c = $('anCount'); if (c) c.textContent = st.pubs.length ? String(st.pubs.length).padStart(2, '0') : ''; marcarSub(); }
   function marcarSub() {
     var on = document.querySelector('[data-nt-sub].on'), ind = document.querySelector('.nt-switch__ind');
     if (!on || !ind || !on.offsetWidth) return;
-    // la línea va solo bajo la palabra, no bajo el contador
-    var sup = on.querySelector('sup'), w = on.offsetWidth - (sup ? sup.offsetWidth + 6 : 0);
-    ind.style.left = on.offsetLeft + 'px'; ind.style.width = w + 'px';
+    ind.style.left = on.offsetLeft + 'px'; ind.style.width = on.offsetWidth + 'px';
   }
 
   /* ------------------------------ perfil ------------------------------ */
@@ -163,7 +147,7 @@
       '<div class="an-pstats"><span><strong>' + pubs.length + '</strong>publicaciones</span>' +
       (lect ? '<span><strong>' + miles(lect) + '</strong>lecturas</span>' : '') +
       (desde ? '<span><strong>' + esc(desde) + '</strong>desde</span>' : '') + '</div></section>' +
-      '<div class="an-shelf">' + pubs.map(tarjeta).join('') + '</div>' +
+      '<div class="an-rows">' + pubs.map(function (p) { return fila(p, true); }).join('') + '</div>' +
       (slug === 'manfredi' ? '' : '<p class="an-disc">Contenido de autoría de ' + esc(a.nombre) + '. Las opiniones son del autor y no constituyen recomendación de inversión ni reflejan la posición de Manfredi Investment.</p>');
   }
 
@@ -213,5 +197,5 @@
   window.addEventListener('hashchange', mostrar);
 
   mostrar();
-  cargar().then(function () { pintarCuenta(); pintarBarra(); pintarGrilla(); pintarRail(); mostrar(); });
+  cargar().then(function () { marcarSub(); pintarBarra(); pintarGrilla(); pintarRail(); mostrar(); });
 })();
