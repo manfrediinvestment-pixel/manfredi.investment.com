@@ -221,6 +221,11 @@ img{display:block;max-width:100%}
 .price b{font-family:var(--sans);font-weight:700;font-size:clamp(68px,6vw,92px);line-height:.85;letter-spacing:-.05em;color:var(--ink)}
 .plan--pro .price b{color:#fff}
 .price span{font-size:16px;color:var(--goldsoft);margin-bottom:10px}
+.price s{font-size:30px;font-weight:600;color:var(--ink2);text-decoration-color:#f07b70;text-decoration-thickness:3px;margin-bottom:8px}
+.best.off{position:relative;overflow:hidden;font-weight:800;font-size:14px;letter-spacing:.03em;box-shadow:0 0 22px rgba(242,201,76,.55)}
+.best.off::after{content:"";position:absolute;top:-30%;bottom:-30%;left:-60%;width:30%;transform:skewX(-20deg);background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent);animation:offShine 2.8s ease-in-out infinite}
+@keyframes offShine{0%,50%{left:-60%}100%{left:140%}}
+@media (prefers-reduced-motion:reduce){.best.off::after{display:none}}
 .feats{list-style:none;margin-top:26px;display:flex;flex-direction:column;gap:16px;flex:1}
 .feats li{display:grid;grid-template-columns:28px 1fr;gap:14px;align-items:start;font-size:16.5px;line-height:1.45;color:var(--ink)}
 .feats li small{display:block;font-size:14px;color:var(--soft);margin-top:2px}
@@ -365,8 +370,8 @@ img{display:block;max-width:100%}
         <p class="fine">Sin tarjeta</p>
       </article>
       <article class="plan plan--pro reveal">
-        <div class="plan-top"><div><h3>Membresía</h3><p class="sub">Para decidir qué comprar con un análisis serio de cada empresa.</p></div><span class="best">La más completa</span></div>
-        <div class="price"><span class="cur">USD</span><b>15</b><span>por mes</span></div>
+        <div class="plan-top"><div><h3>Membresía</h3><p class="sub">Para decidir qué comprar con un análisis serio de cada empresa.</p></div><span class="best" data-promo-best>La más completa</span></div>
+        <div class="price" data-promo-precio><span class="cur">USD</span><b>15</b><span>por mes</span></div>
         <ul class="feats">
           <li><span class="ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span>Todo lo del plan gratis</span></li>
           <li><span class="ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span>Informes de más de 45 empresas<small>Valuación por cuatro métodos y un precio justo explícito</small></span></li>
@@ -395,6 +400,17 @@ img{display:block;max-width:100%}
   <footer class="foot"><b>Manfredi Investment</b><span>© 2026 · Hecho en Argentina</span></footer>
 </section>
 
+<script>
+  // Promo de lanzamiento de Warren: USD 10 hasta el 31-oct-2026 (hora Argentina).
+  // Misma fecha que window.MI_PROMO (index.html) y workers/memberships.
+  (function () {
+    if (Date.now() >= Date.parse('2026-11-01T03:00:00Z')) return;
+    var pr = document.querySelector('[data-promo-precio]');
+    if (pr) pr.innerHTML = '<s>15</s><span class="cur">USD</span><b>10</b><span>por mes<br>hasta el 31/10</span>';
+    var best = document.querySelector('[data-promo-best]');
+    if (best) { best.textContent = '33% OFF'; best.classList.add('off'); }
+  })();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
 <script>

@@ -30,6 +30,10 @@
 
   function pad2(n) { return (n < 10 ? "0" : "") + n; }
 
+  // Promo de lanzamiento de Warren: USD 10 hasta el 31-oct-2026 (hora
+  // Argentina). Misma fecha que window.MI_PROMO (index.html) y workers/memberships.
+  var PROMO_ON = Date.now() < Date.parse("2026-11-01T03:00:00Z");
+
   function run() {
     var wrap = document.querySelector(".wrap");
     var disclosure = document.querySelector(".disclosure");
@@ -80,6 +84,10 @@
       "margin:16px 0 0;}",
       ".mig-cta__login a{color:var(--blue);}",
       "@media(max-width:720px){.mig-cta{padding:32px 20px 28px;}.mig-cta__title{font-size:20px;}}",
+      ".mig-cta__was{font-size:15px;color:var(--muted);text-decoration:line-through;margin-right:8px;}",
+      ".mig-cta__off{display:inline-block;vertical-align:3px;margin-left:10px;font-family:var(--sans);font-size:11.5px;font-weight:700;",
+      "letter-spacing:.03em;color:#0a1322;background:linear-gradient(135deg,#f7dc6f,#f2c94c 50%,#d9a92e);padding:5px 10px;border-radius:999px;",
+      "box-shadow:0 0 14px rgba(242,201,76,.55);}",
 
       /* --- fair value + barra de veredicto difuminados en la portada --- */
       ".mig-fvlock .fv-value{filter:blur(7px);-webkit-user-select:none;user-select:none;pointer-events:none;}",
@@ -174,7 +182,9 @@
       '<p class="mig-cta__text">Segu&iacute; leyendo las ' + (total - 1) + ' secciones restantes: estados financieros l&iacute;nea por l&iacute;nea, ' +
       'deuda y balance, flujo de caja, comparables de industria, registro de riesgos, catalizadores, el modelo ' +
       'proyectado y la valuaci&oacute;n con el fair value.</p>' +
-      '<div class="mig-cta__price"><span class="mig-cta__amt">USD 15</span><span class="mig-cta__per">/ mes &middot; cancel&aacute;s cuando quieras</span></div>' +
+      (PROMO_ON
+        ? '<div class="mig-cta__price"><span class="mig-cta__was">USD 15</span><span class="mig-cta__amt">USD 10</span><span class="mig-cta__per">/ mes hasta el 31 de octubre</span><span class="mig-cta__off">33% OFF</span></div>'
+        : '<div class="mig-cta__price"><span class="mig-cta__amt">USD 15</span><span class="mig-cta__per">/ mes &middot; cancel&aacute;s cuando quieras</span></div>') +
       '<a class="mig-cta__btn" href="/#membresia">Hacerme miembro &rarr;</a>' +
       '<p class="mig-cta__login">&iquest;Ya sos miembro? <a href="/">Inici&aacute; sesi&oacute;n en el inicio</a></p>';
 

@@ -2947,6 +2947,10 @@
       const main    = document.getElementById('mainContent');
       if (user) {
         if (overlay) overlay.style.display = 'none';
+        if (window._miAfterLogin === 'pago') {
+          window._miAfterLogin = null;
+          setTimeout(function(){ if (!window._isMiembro && window.openPaymentModal) window.openPaymentModal(); }, 900);
+        }
         updateNavUser(user);
         // Solo registrar en Sheets si es el primer login
         const refCheck = doc(db, 'users', user.uid);
@@ -3137,6 +3141,8 @@
       const errorEl = document.getElementById('loginError');
       if (errorEl) errorEl.style.display = 'none';
       window._authMode = window._authMode === 'login' ? 'signup' : 'login';
+      const titleEl = document.getElementById('loginTitle');
+      if (titleEl) titleEl.textContent = window._authMode === 'signup' ? 'Creá tu cuenta' : 'Ingresá a Manfredi';
       if (window._authMode === 'signup') {
         if (emailBtn) { emailBtn.textContent = 'Crear cuenta'; emailBtn.onclick = window.signUpWithEmail; }
         if (toggleLink) toggleLink.textContent = '¿Ya tenés cuenta? Iniciá sesión';
@@ -3221,14 +3227,33 @@
       }
     }
 
-    function showLoginOverlay() {
+    // opts.motivo === 'pago': viene de "Suscribirme" sin cuenta. Se explica por
+    // qué se pide ingresar y, apenas entra, se vuelve a abrir el pago.
+    function showLoginOverlay(opts) {
       const overlay = document.getElementById('loginOverlay');
-      if (overlay) overlay.style.display = 'flex';
+      if (!overlay) return;
+      const ctx = document.getElementById('loginCtx');
+      const pago = opts && opts.motivo === 'pago';
+      window._miAfterLogin = pago ? 'pago' : null;
+      if (ctx) {
+        if (pago) {
+          const P = window.MI_PROMO || {};
+          ctx.innerHTML = '<b>Un paso más para activar tu membresía.</b> Ingresá o creá tu cuenta y seguís con el pago'
+            + (P.on ? ' de <s>USD ' + P.antes + '</s> <em>USD ' + P.usd + '/mes</em>.' : '.');
+          ctx.hidden = false;
+        } else { ctx.hidden = true; ctx.innerHTML = ''; }
+      }
+      window._loginReturnFocus = document.activeElement;
+      overlay.style.display = 'flex';
+      const first = overlay.querySelector('#loginBtn');
+      if (first) setTimeout(function(){ first.focus(); }, 30);
     }
 
     function hideLoginOverlay() {
       const overlay = document.getElementById('loginOverlay');
       if (overlay) overlay.style.display = 'none';
+      window._miAfterLogin = null;
+      if (window._loginReturnFocus && window._loginReturnFocus.focus) { try { window._loginReturnFocus.focus(); } catch (e) {} }
     }
 
     document.addEventListener('keydown', function(e) {
@@ -3260,6 +3285,7 @@
       if (document.documentElement.hasAttribute('data-bienvenida')) return false;
       if (localStorage.getItem('mi_member_token')) return false;
       if (localStorage.getItem('mi_notify_subscribed')) return false;
+      try { if (sessionStorage.getItem('mi_promo_wall_sesion') === '1') return false; } catch (e) {}
       const dismissedAt = parseInt(localStorage.getItem('mi_notify_dismissed_at') || '0', 10);
       const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
       if (dismissedAt && (Date.now() - dismissedAt) < FOURTEEN_DAYS) return false;
@@ -3437,12 +3463,12 @@
     </symbol>
   </svg>
   <!-- ââ Login Overlay ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <div id="loginOverlay" style="display:none" onclick="if(event.target===this) window.hideLoginOverlay && window.hideLoginOverlay()">
+  <div id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle" style="display:none" onclick="if(event.target===this) window.hideLoginOverlay && window.hideLoginOverlay()">
     <div class="login-card">
       <button type="button" class="login-close" onclick="window.hideLoginOverlay && window.hideLoginOverlay()" aria-label="Cerrar">&times;</button>
       <div class="login-logo-mark"><svg class="mi-mark"><use href="#miMark"/></svg></div>
-      <h1 class="login-title">Manfredi Investment</h1>
-      <p class="login-sub">Ingresá con tu cuenta de Google o con tu email y contraseña.</p>
+      <h2 class="login-title" id="loginTitle">Ingresá a Manfredi</h2>
+      <div class="login-ctx" id="loginCtx" hidden></div>
       <button type="button" id="loginBtn" onclick="window.signInWithGoogle && window.signInWithGoogle()">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google" style="vertical-align:middle">
         Continuar con Google
@@ -3454,7 +3480,7 @@
       <button type="button" id="loginModeToggle" class="login-forgot" style="text-align:center;width:100%" onclick="window.toggleAuthMode && window.toggleAuthMode()">¿No tenés cuenta? Registrate</button>
       <button type="button" class="login-forgot" onclick="window.resetPassword && window.resetPassword()">¿Olvidaste tu contraseña?</button>
       <p id="loginError" class="login-error"></p>
-      <p class="login-footer">Al acceder aceptás los Términos de Uso.</p>
+      <p class="login-footer">Al ingresar aceptás los Términos de Uso.</p>
     </div>
 
 
@@ -3467,21 +3493,19 @@
     <div class="notify-card">
       <button type="button" class="notify-close" onclick="window.hideNotifyOverlay && window.hideNotifyOverlay(true)" aria-label="Cerrar">&times;</button>
       <div class="notify-logo-mark"><svg class="mi-mark"><use href="#miMark"/></svg></div>
-      <span class="notify-eyebrow">Alertas de Manfredi Investment</span>
-      <h2 class="notify-title" id="notifyTitle">No te pierdas el próximo informe</h2>
-      <p class="notify-sub">Sumate para recibir un aviso apenas publicamos algo nuevo.</p>
+      <h2 class="notify-title" id="notifyTitle">Enterate primero <em>del próximo informe.</em></h2>
       <ul class="notify-list">
         <li>
           <span class="notify-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span>
-          <span class="notify-text"><strong>Informes nuevos</strong><span>AAPL, MSFT, GOOGL y los próximos picks, apenas salen del horno.</span></span>
+          <span class="notify-text"><strong>Cada informe nuevo, el día que sale</strong></span>
         </li>
         <li>
           <span class="notify-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.8" fill="currentColor" stroke="none"/></svg></span>
-          <span class="notify-text"><strong>Cambios de rating o precio objetivo</strong><span>Si se mueve algo en un activo que seguís, te enterás primero.</span></span>
+          <span class="notify-text"><strong>Cambios de fair value o de postura</strong></span>
         </li>
         <li>
           <span class="notify-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span>
-          <span class="notify-text"><strong>Novedades de la plataforma</strong><span>Secciones nuevas y mejoras, sin tener que andar buscando.</span></span>
+          <span class="notify-text"><strong>Secciones nuevas de la plataforma</strong></span>
         </li>
       </ul>
       <button type="button" class="notify-btn-google" id="notifyGoogleBtn" onclick="window.notifyWithGoogle && window.notifyWithGoogle()">
@@ -3493,7 +3517,7 @@
       <button type="button" id="notifyEmailBtn" class="notify-btn-submit" onclick="window.subscribeNotifyEmail && window.subscribeNotifyEmail()">Notificarme por email</button>
       <button type="button" class="notify-skip" onclick="window.hideNotifyOverlay && window.hideNotifyOverlay(true)">Ahora no</button>
       <p id="notifyError" class="notify-error" role="alert"></p>
-      <p class="notify-fine">Sin spam. Cancelás cuando quieras desde tu perfil.</p>
+      <p class="notify-fine">Sin spam · te das de baja cuando quieras</p>
     </div>
   </div>
 
@@ -16103,9 +16127,8 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
     async function handlePayment(method) {
   if (method === 'mercadopago') {
     if (!window._currentUser || !window._currentUser.email) {
-      alert('Necesitás iniciar sesión antes de suscribirte, así podemos asociar la membresía a tu cuenta.');
       closePaymentModal();
-      window.showLoginOverlay && window.showLoginOverlay();
+      window.showLoginOverlay && window.showLoginOverlay({ motivo: 'pago' });
       return;
     }
     var btns = document.querySelectorAll('.pay-btn');
@@ -16178,9 +16201,8 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
       var errEl = document.getElementById('payDiscountError');
       errEl.textContent = '';
       if (!window._currentUser || !window._currentUser.email) {
-        alert('Necesitás iniciar sesión antes de pagar, así podemos asociar la membresía a tu cuenta.');
         closePaymentModal();
-        window.showLoginOverlay && window.showLoginOverlay();
+        window.showLoginOverlay && window.showLoginOverlay({ motivo: 'pago' });
         return;
       }
       var codigo = (document.getElementById('payDiscountCode').value || '').trim().toUpperCase();
@@ -16311,7 +16333,6 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
       <div class="pay-mark"><svg class="mi-mark"><use href="#miMark"/></svg></div>
       <div class="pay-eyebrow">Membresía Manfredi Investment</div>
       <h2>Todo el análisis, sin límites.</h2>
-      <p class="pay-sub">Acceso completo a Warren (asesor IA) y a todos los picks y tesis de inversión, sin vista parcial.</p>
       <div class="pay-price-row" data-mi-precio="modal">
         <span class="pay-price-amount">$15</span>
         <span class="pay-price-period">USD/mes</span>
@@ -17613,5 +17634,50 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
 </style>
   <!-- Fondo Aurora de todo el sitio (al final para ganarle a los estilos de cada sección; el título lo anima assets/aurora/aurora.js, junto al h1) -->
   <link rel="stylesheet" href="assets/aurora/aurora.css?v=20261008b" />
+
+<style id="mi-auth-aurora">
+  /* Login y avisos con el mismo mundo que el resto del sitio (Aurora). */
+  #loginOverlay, #notifyOverlay { background: radial-gradient(60% 50% at 50% 35%, rgba(242,201,76,.08), transparent 70%), rgba(3,8,17,.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 20px; }
+  #loginOverlay .login-card, #notifyOverlay .notify-card {
+    position: relative; overflow: hidden; width: 100%; max-width: 410px; border-radius: 22px; padding: 40px 34px 30px; text-align: center; color: #f3f6fb;
+    background: radial-gradient(70% 55% at 0% 0%, rgba(242,201,76,.13), transparent 70%), radial-gradient(70% 60% at 100% 100%, rgba(64,128,232,.22), transparent 70%), linear-gradient(180deg, #0c1a33, #070f20);
+    border: 1px solid rgba(242,201,76,.38); box-shadow: 0 40px 100px -24px rgba(0,0,0,.9), 0 0 60px rgba(242,201,76,.08); font-family: 'IBM Plex Sans', system-ui, sans-serif; }
+  #loginOverlay .login-close, #notifyOverlay .notify-close { top: 14px; right: 14px; width: 40px; height: 40px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.14); color: #d3deed; }
+  #loginOverlay .login-close:hover, #notifyOverlay .notify-close:hover { background: rgba(255,255,255,.1); color: #fff; border-color: rgba(242,201,76,.6); }
+  #loginOverlay .login-logo-mark, #notifyOverlay .notify-logo-mark { width: 52px; height: 52px; margin: 0 auto 16px; }
+  #loginOverlay .login-title, #notifyOverlay .notify-title { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 30px; line-height: 1.08; letter-spacing: -.01em; color: #f3f6fb; margin: 0 0 22px; }
+  #notifyOverlay .notify-title em { font-style: italic; color: #f6d77e; }
+  #loginOverlay .login-ctx { margin: -6px 0 22px; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(242,201,76,.42); background: linear-gradient(100deg, rgba(242,201,76,.14), rgba(242,201,76,.04)); font-size: 13.5px; line-height: 1.5; color: #f3f6fb; text-align: left; }
+  #loginOverlay .login-ctx b { color: #f6d77e; font-weight: 600; }
+  #loginOverlay .login-ctx s { color: #9fb3cf; }
+  #loginOverlay .login-ctx em { font-style: normal; font-weight: 700; color: #fff; }
+  #loginOverlay #loginBtn, #notifyOverlay .notify-btn-google { width: 100%; padding: 13px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,.9); background: #fff; color: #0a1322; font: 600 14.5px 'IBM Plex Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: transform .12s, box-shadow .15s; }
+  #loginOverlay #loginBtn:hover, #notifyOverlay .notify-btn-google:hover { background: #fff; box-shadow: 0 10px 28px -12px rgba(255,255,255,.45); }
+  #loginOverlay #loginBtn:active, #notifyOverlay .notify-btn-google:active, #loginOverlay #loginEmailBtn:active, #notifyOverlay .notify-btn-submit:active { transform: scale(.98); }
+  #loginOverlay .login-divider, #notifyOverlay .notify-divider { color: #9fb3cf; font-size: 12px; margin: 18px 0; }
+  #loginOverlay .login-divider::before, #loginOverlay .login-divider::after, #notifyOverlay .notify-divider::before, #notifyOverlay .notify-divider::after { background: rgba(214,226,244,.16); }
+  #loginOverlay .login-input, #notifyOverlay .notify-input { width: 100%; padding: 13px 15px; margin-bottom: 10px; border-radius: 12px; border: 1px solid rgba(214,226,244,.2); background: rgba(5,11,24,.6); color: #f3f6fb; font: 400 15px 'IBM Plex Sans', sans-serif; box-sizing: border-box; outline: none; }
+  #loginOverlay .login-input::placeholder, #notifyOverlay .notify-input::placeholder { color: #8ea1bd; }
+  #loginOverlay .login-input:focus, #notifyOverlay .notify-input:focus { border-color: #f2c94c; box-shadow: 0 0 0 3px rgba(242,201,76,.18); }
+  #loginOverlay #loginEmailBtn, #notifyOverlay .notify-btn-submit { width: 100%; padding: 14px 18px; margin-top: 2px; border: 0; border-radius: 12px; background: linear-gradient(135deg, #f7dc6f, #f2c94c 55%, #e2b23a); color: #0a1322; font: 700 15px 'IBM Plex Sans', sans-serif; cursor: pointer; box-shadow: 0 14px 30px -14px rgba(242,201,76,.7); }
+  #loginOverlay #loginEmailBtn:hover, #notifyOverlay .notify-btn-submit:hover { filter: brightness(1.06); }
+  #loginOverlay .login-forgot { display: block; width: 100%; margin-top: 12px; text-align: center; font: 500 13.5px 'IBM Plex Sans', sans-serif; color: #f6d77e; background: none; border: 0; cursor: pointer; }
+  #loginOverlay #loginModeToggle { margin-top: 16px; font-weight: 600; }
+  #loginOverlay .login-forgot:hover { text-decoration: underline; text-underline-offset: 3px; }
+  #loginOverlay .login-error, #notifyOverlay .notify-error { color: #f07b70; font-size: 13px; margin-top: 10px; }
+  #loginOverlay .login-footer { margin: 20px 0 0; font-size: 12px; color: #9fb3cf; }
+  #notifyOverlay .notify-list { list-style: none; margin: 0 0 24px; padding: 0; text-align: left; display: flex; flex-direction: column; gap: 10px; }
+  #notifyOverlay .notify-list li { display: flex; gap: 12px; align-items: center; }
+  #notifyOverlay .notify-icon { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(150deg, rgba(242,201,76,.22), rgba(242,201,76,.05)); border: 1px solid rgba(242,201,76,.42); }
+  #notifyOverlay .notify-icon svg { stroke: #f6d77e; }
+  #notifyOverlay .notify-text strong { font: 500 15px/1.35 'IBM Plex Sans', sans-serif; color: #f3f6fb; }
+  #notifyOverlay .notify-skip { margin-top: 14px; font-size: 13.5px; color: #d3deed; }
+  #notifyOverlay .notify-fine { margin: 12px 0 0; font-size: 12px; color: #9fb3cf; }
+  @media (max-width: 480px) {
+    #loginOverlay, #notifyOverlay { padding: 12px; align-items: flex-end; }
+    #loginOverlay .login-card, #notifyOverlay .notify-card { padding: 34px 22px 24px; border-radius: 22px 22px 18px 18px; max-height: calc(100vh - 24px); overflow-y: auto; }
+    #loginOverlay .login-title, #notifyOverlay .notify-title { font-size: 26px; }
+  }
+</style>
 </body>
 </html>
