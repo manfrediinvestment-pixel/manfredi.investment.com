@@ -112,7 +112,10 @@
       '<a class="an-nota__a" href="#analista-' + esc(a.slug) + '">' + av(a) + '<span><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + esc(a.rol || a.corto || '') + '</small></span></a>' +
       '<div class="an-nota__c">' + md(p.cuerpo) + '</div>' +
       (p.autor === 'manfredi' ? '' : '<p class="an-disc">Contenido de autoría de ' + esc(a.nombre) + '. Las opiniones son del autor y no constituyen recomendación de inversión ni reflejan la posición de Manfredi Investment.</p>') +
+      '<div class="an-nota__soc">' + social(p.id, true) + '</div>' +
+      (window.AnSocial ? window.AnSocial.hilo(p.id) : '') +
       '</article>';
+    montar([p]);
   }
 
   /* ------------------------------ lista ------------------------------ */
@@ -123,18 +126,21 @@
   function fila(p, sinAutor) {
     var a = st.autores[p.autor];
     var nuevo = p._t && Date.now() - p._t < 7 * 864e5;
-    return '<button type="button" class="an-row' + (sinAutor ? ' an-row--solo' : '') + '" data-id="' + esc(p.id) + '">' +
+    return '<div class="an-row' + (sinAutor ? ' an-row--solo' : '') + '" role="link" tabindex="0" data-id="' + esc(p.id) + '">' +
       (sinAutor ? '' : '<span class="an-row__a">' + av(a) + '<span><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + esc(a.corto || '') + '</small></span></span>') +
       tapa(p) +
       '<span class="an-row__b"><span class="an-row__k">' + (nuevo ? '<em>Nuevo</em>' : '') + esc(etiqueta(p)) + '<i></i>' + cuando(p) + (esTexto(p) ? '<i></i>' + minutos(p) + ' min' : '') + '</span>' +
       '<span class="an-row__t">' + esc(p.titulo) + '</span>' +
-      (p.resumen ? '<span class="an-row__s">' + esc(p.resumen) + '</span>' : '') + '</span>' +
-      FLECHA + '</button>';
+      (p.resumen ? '<span class="an-row__s">' + esc(p.resumen) + '</span>' : '') + social(p.id) + '</span>' +
+      FLECHA + '</div>';
   }
+  function social(id, abierta) { return window.AnSocial ? window.AnSocial.barra(id, abierta) : ''; }
+  function montar(lista) { if (window.AnSocial) window.AnSocial.montar(lista.map(function (p) { return p.id; })); }
   function pintarGrilla() {
     var lista = filtradas(), box = $('anList');
     if (!lista.length) { box.innerHTML = '<p class="nt-empty">Todavía no hay publicaciones en esta categoría.</p>'; return; }
     box.innerHTML = '<div class="an-rows">' + lista.map(function (p) { return fila(p); }).join('') + '</div>';
+    montar(lista);
   }
   function pintarBarra() {
     $('anChips').innerHTML = [['todo', 'Todo']].concat(CATS).map(function (c) {
@@ -142,14 +148,21 @@
       return '<button type="button" class="an-cat' + (on ? ' on' : '') + '" data-cat="' + c[0] + '" aria-pressed="' + on + '">' + c[1] + '</button>';
     }).join('');
   }
+  // cuadro de columnistas: el que publicó último va primero
   function pintarRail() {
-    var orden = st.orden.slice().sort(function (a, b) { return deAutor(b).length - deAutor(a).length; });
-    $('anAutores').innerHTML = '<h3 class="an-panel__h">Columnistas</h3><ul class="an-auths">' + orden.map(function (s) {
-      var a = st.autores[s], n = deAutor(s).length;
-      return '<li><a class="an-auth" href="#analista-' + esc(s) + '">' + av(a, 'sm') +
-        '<span class="an-auth__b"><b>' + esc(a.nombre) + '</b><small>' + esc(a.corto || '') + '</small></span>' +
-        '<span class="an-auth__n">' + n + '</span></a></li>';
-    }).join('') + '</ul>';
+    var info = st.orden.map(function (s) {
+      var ps = deAutor(s);
+      return { s: s, n: ps.length, t: ps.reduce(function (m, p) { return Math.max(m, p._t || 0); }, 0) };
+    }).filter(function (x) { return x.n; }).sort(function (a, b) { return b.t - a.t; });
+    var total = info.reduce(function (m, x) { return m + x.n; }, 0), actual = (vista().slug || '');
+    $('anAutores').innerHTML = '<div class="an-cols__h"><h3 class="an-panel__h">Columnistas</h3>' +
+      '<span class="an-cols__c">' + info.length + ' firmas<i></i>' + total + ' publicaciones</span></div>' +
+      '<ul class="an-auths">' + info.map(function (x) {
+        var a = st.autores[x.s], nuevo = x.t && Date.now() - x.t < 7 * 864e5;
+        return '<li><a class="an-auth' + (x.s === actual ? ' on' : '') + '" href="#analista-' + esc(x.s) + '" style="--c:' + esc(a.color) + '">' + av(a, 'sm') +
+          '<span class="an-auth__b"><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + esc(a.corto || '') + '</small></span>' +
+          '<span class="an-auth__d"><strong>' + x.n + '</strong><small>' + (nuevo ? '<i></i>' : '') + (x.t ? fecha(new Date(x.t).toISOString().slice(0, 10)) : '') + '</small></span></a></li>';
+      }).join('') + '</ul>';
   }
   function marcarSub() {
     var on = document.querySelector('[data-nt-sub].on'), ind = document.querySelector('.nt-switch__ind');
@@ -188,6 +201,7 @@
       (desde ? '<span><strong>' + esc(desde) + '</strong>desde</span>' : '') + '</div></section>' +
       '<div class="an-rows">' + pubs.map(function (p) { return fila(p, true); }).join('') + '</div>' +
       (slug === 'manfredi' ? '' : '<p class="an-disc">Contenido de autoría de ' + esc(a.nombre) + '. Las opiniones son del autor y no constituyen recomendación de inversión ni reflejan la posición de Manfredi Investment.</p>');
+    montar(pubs);
   }
 
   /* ------------------------------ sub-pestañas ------------------------------ */
@@ -213,6 +227,7 @@
     if (guia && !$('anGuiaBg').firstChild) $('anGuiaBg').innerHTML = '<div class="an-rows">' + st.pubs.slice(0, 5).map(function (p) { return fila(p); }).join('') + '</div>';
     $('anGrid').hidden = w.v !== 'analisis' || guia; $('anPerfil').hidden = w.v !== 'perfil'; $('anNota').hidden = w.v !== 'nota';
     if (!st.listo) return;
+    pintarRail();
     if (w.v === 'perfil') { pintarPerfil(w.slug); window.scrollTo(0, 0); }
     if (w.v === 'nota') { pintarNota(w.id); window.scrollTo(0, 0); }
   }
@@ -224,7 +239,11 @@
       mostrar();
     });
   });
+  root.addEventListener('keydown', function (e) {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.an-row[data-id]')) { e.preventDefault(); e.target.click(); }
+  });
   root.addEventListener('click', function (e) {
+    if (e.target.closest('.an-soc, .an-hilo')) return;
     var it = e.target.closest('[data-id]');
     if (it) {
       var p = st.pubs.filter(function (x) { return x.id === it.dataset.id; })[0];
