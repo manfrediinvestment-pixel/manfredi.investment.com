@@ -34,6 +34,7 @@
 <link rel="stylesheet" href="assets/pulso/pulso.css?v=20261010z" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261010z" />
 <link rel="stylesheet" href="assets/analistas/analistas.css?v=20261010pst" />
+<link rel="stylesheet" href="assets/portfolio/ratios.css?v=20261012" />
 <link rel="stylesheet" href="assets/calendario/calendario.css?v=20261010z" />
 <link rel="stylesheet" href="assets/informes/estanteria.css?v=20261010z" />
 <link rel="stylesheet" href="assets/portfolio/portfolio.css?v=20261010z" />
@@ -4094,6 +4095,7 @@
   <script src="assets/pulso/pulso.js?v=20261010z" defer></script>
   <!-- Pestaña Noticias (usa window.MIPulso de pulso.js: va después) -->
   <script src="assets/noticias/noticias.js?v=20261010z" defer></script>
+  <script src="assets/portfolio/ratios.js?v=20261012" defer></script>
   <script src="assets/analistas/analistas.js?v=20261010z" defer></script>
   <!-- cartel con los pasos para postularse como analista -->
   <script src="assets/analistas/postular.js?v=20261010a" defer></script>
@@ -8984,7 +8986,7 @@
       return;
     }
 
-    if(!(window._miIsMember && window._miIsMember())){
+    if(false){ // Portfolio es gratis desde oct-2026
       grid.innerHTML = '<div class="pf-metrics-label">Resultados del chequeo</div>'
         + '<div class="pf-metric-grid pf-metric-grid-2col">'
         + pfLockedMetricCard('sect', 'Concentración sectorial')
@@ -9234,7 +9236,9 @@
       avgCorrelation: pfAvgCorrelation(returnsByTicker), daysUsed: minLen,
       benchVolAnual: benchVolAnual, benchSharpe: benchSharpe,
       benchMaxDrawdown: pfMaxDrawdown(benchClosesAligned), benchVar95Daily: pfPercentile(benchReturns,0.05),
-      grouped: qtyByKey, assetMeta: grouped, validTickers: validTickers
+      grouped: qtyByKey, assetMeta: grouped, validTickers: validTickers,
+      // series para los gráficos del detalle de cada ratio (assets/portfolio/ratios.js)
+      serie: series, benchSerie: benchClosesAligned, port: portfolioReturns, bench: benchReturns, rbt: returnsByTicker
     };
   }
 
@@ -9277,7 +9281,11 @@
 
     return {
       roe: weightedAvg('roe'), pe: weightedAvg('pe'), divYield: weightedAvg('divYield'),
-      coverage: tickers.filter(function(t){ return fundByTicker[t]; }).length + '/' + tickers.length
+      coverage: tickers.filter(function(t){ return fundByTicker[t]; }).length + '/' + tickers.length,
+      porActivo: tickers.map(function(t){
+        var f = fundByTicker[t] || {};
+        return { n: (assetMeta && assetMeta[t] && assetMeta[t].ticker) || t, roe: f.roe, pe: f.pe, div: f.divYield, w: (grouped[t]||0) * (priceByTicker[t]||0) / totalVal };
+      })
     };
   }
 
@@ -9297,7 +9305,7 @@
       return;
     }
 
-    if(!(window._miIsMember && window._miIsMember())){
+    if(false){ // Portfolio es gratis desde oct-2026: queda el bloque por si se vuelve a cerrar
       var locked = [
         ['beta','Beta vs S&amp;P 500'], ['vol','Volatilidad anual'], ['sharpe','Sharpe Ratio'],
         ['dd','Máximo drawdown'], ['corr','Correlación promedio'], ['var','VaR diario (95%)'],
@@ -9324,13 +9332,12 @@
     function card(key, name, valStr, unit, note, status, bench){
       var st = status || 'neutral';
       pfAdvMetricRegistry[key] = { name:name, valStr:valStr+(unit||''), note:note, bench:bench||'', status:status||null };
-      return '<div class="pf-metric-card status-'+st+'"><div class="pf-metric-top"><span class="name">'+name+'</span>'
+      return '<div class="pf-metric-card pf-metric-card--pfr status-'+st+'" role="button" tabindex="0" data-pfr="'+key+'" aria-expanded="false"><div class="pf-metric-top"><span class="name">'+name+'</span>'
         + '<span class="pf-metric-top-right">'+(status?'<span class="pf-chip '+status+'">'+pfChipLabel[status]+'</span>':'')
-        + '<button type="button" class="pf-mini-warren" onclick="pfExplainMetricWithWarren(event,\''+key+'\')" title="Preguntale a Warren sobre esto" aria-label="Preguntale a Warren sobre esto">'
-        + '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2L12 2z"/></svg></button></span></div>'
+        + '<span class="pfr-ver" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 15l4-5 3 3 6-8"/></svg></span></span></div>'
         + '<div class="pf-metric-val">'+valStr+(unit?'<span class="unit">'+unit+'</span>':'')+'</div><div class="pf-metric-note">'+note+'</div>'
         + (bench?'<div class="pf-metric-bench">'+bench+'</div>':'')
-        + '<div class="pf-mini-warren-answer" id="pfMWA-'+key+'"></div>' + '</div>';
+        + '</div>';
     }
     var betaStatus = m.beta>1.3 ? 'bad' : (m.beta>=0.8 && m.beta<=1.3 ? 'ok' : 'warn');
     var volStatus = m.volAnual<0.20 ? 'ok' : (m.volAnual<0.40 ? 'warn' : 'bad');
@@ -9351,7 +9358,9 @@
     var peStatus = fund && fund.pe!=null ? (fund.pe<25 ? 'ok' : (fund.pe<40 ? 'warn' : 'bad')) : null;
     var divStatus = fund && fund.divYield!=null ? (fund.divYield>1.5 ? 'ok' : 'warn') : null;
 
-    grid.innerHTML = '<div class="pf-metrics-label">Métricas de cartera <span style="text-transform:none;letter-spacing:0;color:rgb(255,255,255);">&middot; últimos '+ m.daysUsed +' días hábiles</span></div>'
+    var nombres = {}; (m.validTickers||[]).forEach(function(t){ nombres[t] = (m.assetMeta && m.assetMeta[t] && m.assetMeta[t].ticker) || t; });
+    window._pfRatioDatos = { m:m, fund:fund, serie:m.serie, benchSerie:m.benchSerie, port:m.port, bench:m.bench, rbt:m.rbt, nombres:nombres };
+    grid.innerHTML = '<div class="pf-metrics-label">Métricas de cartera <span style="text-transform:none;letter-spacing:0;color:rgb(255,255,255);">&middot; últimos '+ m.daysUsed +' días hábiles &middot; tocá cualquiera para ver su gráfico</span></div>'
       + '<div class="pf-metric-grid">'
       + card('beta', 'Beta vs S&amp;P 500', m.beta.toFixed(2), '', 'Sensibilidad al mercado. 1 = se mueve igual que el S&amp;P 500.', betaStatus,
              'El S&amp;P 500 tiene beta <b>1.00</b> por definición.')
@@ -9375,6 +9384,7 @@
              'Cuánto te rinde tu cartera en dividendos por año.', divStatus,
              'Promedio histórico S&amp;P 500: <b>~1,3%</b> (referencia aproximada, no en vivo).')
       + '</div>'
+      + '<div class="pfr" id="pfRatioPanel" hidden></div>'
       + '<div class="pf-metric-note">Calculado con los últimos '+ m.daysUsed +' cierres diarios disponibles de cada activo. La tasa libre de riesgo y los promedios de referencia son aproximaciones fijas, no datos en vivo.</div>';
   }
   var pfAdvReqSeq = 0;
@@ -9425,6 +9435,31 @@
       box.innerHTML = '<p class="pf-mini-warren-error">Hubo un error al conectar con Warren. Probá de nuevo.</p>';
     }
   }
+
+  // ---- detalle de cada ratio: gráfico + explicación (assets/portfolio/ratios.js, sin IA) ----
+  function pfRatioToggle(card){
+    var panel = document.getElementById('pfRatioPanel');
+    if(!panel || !window.PfRatios || !window._pfRatioDatos) return;
+    var key = card ? card.getAttribute('data-pfr') : null;
+    var abierto = !panel.hidden && panel.getAttribute('data-key') === key;
+    document.querySelectorAll('[data-pfr]').forEach(function(c){ c.classList.remove('is-on'); c.setAttribute('aria-expanded','false'); });
+    if(!key || abierto){ panel.hidden = true; panel.removeAttribute('data-key'); return; }
+    panel.innerHTML = window.PfRatios.panel(key, window._pfRatioDatos);
+    panel.setAttribute('data-key', key); panel.hidden = false;
+    card.classList.add('is-on'); card.setAttribute('aria-expanded','true');
+    var r = panel.getBoundingClientRect();
+    if(r.top < 80 || r.top > window.innerHeight - 160) window.scrollTo({ top: window.scrollY + r.top - 120, behavior: 'smooth' });
+  }
+  document.addEventListener('click', function(e){
+    if(e.target.closest && e.target.closest('[data-pfr-cerrar]')){ pfRatioToggle(null); return; }
+    var c = e.target.closest && e.target.closest('[data-pfr]');
+    if(c) pfRatioToggle(c);
+  });
+  document.addEventListener('keydown', function(e){
+    var c = e.target.closest && e.target.closest('[data-pfr]');
+    if(c && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); pfRatioToggle(c); }
+    if(e.key === 'Escape' && document.getElementById('pfRatioPanel') && !document.getElementById('pfRatioPanel').hidden) pfRatioToggle(null);
+  });
 
   // ---- "Portafolio de Manfredi": rendimiento real vs S&P 500 (gratis, sin composicion) ----
   // Reusa el mismo pipeline ARS->USD que las metricas de "Tu Portafolio" (pfFetchHistorico,
