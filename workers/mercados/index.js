@@ -883,7 +883,9 @@ async function bymaVelas(symbol) {
   if (!resp.ok) throw new Error(`BYMA HTTP ${resp.status}`);
   const j = await resp.json();
   if (j.s !== 'ok' || !Array.isArray(j.t) || !j.t.length) throw new Error('BYMA: sin datos');
-  return j.t.map((t, i) => ({ t: t + 18 * 3600, o: j.o[i] ?? j.c[i], h: j.h[i] ?? j.c[i], l: j.l[i] ?? j.c[i], c: j.c[i], v: j.v?.[i] || 0 }))
+  // BYMA marca cada vela a la medianoche de Buenos Aires (03:00 UTC); se corre a
+  // las 15:00 UTC como diaTs() para que las dos fuentes caigan igual en semanal()
+  return j.t.map((t, i) => ({ t: t + 12 * 3600, o: j.o[i] ?? j.c[i], h: j.h[i] ?? j.c[i], l: j.l[i] ?? j.c[i], c: j.c[i], v: j.v?.[i] || 0 }))
     .filter(p => p.c != null);
 }
 
