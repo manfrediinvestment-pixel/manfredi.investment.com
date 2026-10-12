@@ -210,6 +210,7 @@
     if (h === 'analisis') return { v: 'analisis' };
     if (h.indexOf('analista-') === 0) return { v: 'perfil', slug: h.slice(9) };
     if (h.indexOf('nota-') === 0) return { v: 'nota', id: h.slice(5) };
+    if (h === 'autor') return { v: 'autor' };
     return { v: 'noticias' };
   }
   function mostrar() {
@@ -225,7 +226,8 @@
     var guia = w.v === 'analisis' && st.listo && !hayInvitados();
     $('anGuia').hidden = !guia;
     if (guia && !$('anGuiaBg').firstChild) $('anGuiaBg').innerHTML = '<div class="an-rows">' + st.pubs.slice(0, 5).map(function (p) { return fila(p); }).join('') + '</div>';
-    $('anGrid').hidden = w.v !== 'analisis' || guia; $('anPerfil').hidden = w.v !== 'perfil'; $('anNota').hidden = w.v !== 'nota';
+    $('anGrid').hidden = w.v !== 'analisis' || guia; $('anPerfil').hidden = w.v !== 'perfil'; $('anNota').hidden = w.v !== 'nota'; $('anAutor').hidden = w.v !== 'autor';
+    if (w.v === 'autor') { if (window.AnAutor) window.AnAutor.mostrar(); else $('anAutor').innerHTML = '<a class="an-back" href="#analisis">← Análisis e informes</a><p class="nt-empty">Esta sección es para autores habilitados.</p>'; window.scrollTo(0, 0); }
     if (!st.listo) return;
     pintarRail();
     if (w.v === 'perfil') { pintarPerfil(w.slug); window.scrollTo(0, 0); }

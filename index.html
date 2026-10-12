@@ -33,7 +33,7 @@
   <link rel="stylesheet" href="assets/mercados/terminal.css?v=20261010z" />
 <link rel="stylesheet" href="assets/pulso/pulso.css?v=20261010z" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261010z" />
-<link rel="stylesheet" href="assets/analistas/analistas.css?v=20261012rv" />
+<link rel="stylesheet" href="assets/analistas/analistas.css?v=20261012au" />
 <link rel="stylesheet" href="assets/calendario/calendario.css?v=20261010z" />
 <link rel="stylesheet" href="assets/informes/estanteria.css?v=20261010z" />
 <link rel="stylesheet" href="assets/portfolio/portfolio.css?v=20261010z" />
@@ -4095,8 +4095,9 @@
   <!-- Pestaña Noticias (usa window.MIPulso de pulso.js: va después) -->
   <script src="assets/noticias/noticias.js?v=20261010z" defer></script>
   <script src="assets/analistas/social.js?v=20261012soc" defer></script>
-  <script src="assets/analistas/analistas.js?v=20261012soc" defer></script>
+  <script src="assets/analistas/analistas.js?v=20261012au" defer></script>
   <script src="assets/analistas/revision.js?v=20261012rv" defer></script>
+  <script src="assets/analistas/autor.js?v=20261012au2" defer></script>
   <!-- cartel con los pasos para postularse como analista -->
   <script src="assets/analistas/postular.js?v=20261010a" defer></script>
   <script src="assets/calendario/calendario.js?v=20261010z" defer></script>
@@ -4296,6 +4297,7 @@
           <button type="button" role="tab" data-nt-sub="noticias" class="on" aria-selected="true">Noticias</button>
           <button type="button" role="tab" data-nt-sub="analisis" aria-selected="false">Análisis e informes</button>
           <i class="nt-switch__ind" aria-hidden="true"></i>
+          <a class="an-mio" id="anMio" href="#autor" hidden>Mi espacio de autor</a>
         </h2>
         <span class="nt-date" id="ntDate"></span>
       </header>
@@ -4348,6 +4350,7 @@
       </div>
       <div class="an-perfil" id="anPerfil" hidden></div>
       <div class="an-perfil" id="anNota" hidden></div>
+      <div class="an-perfil an-autor" id="anAutor" hidden></div>
     </div>
     <div class="nt-wrap nt-grid" id="ntPanel">
       <div class="nt-main">
@@ -17282,7 +17285,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
       hash = (hash || '').replace('#', '');
       if (!hash) return 'inicio';
       if (hash === 'reportes') return 'informes';
-      if (hash === 'analisis' || hash.indexOf('analista-') === 0 || hash.indexOf('nota-') === 0) return 'informes';
+      if (hash === 'analisis' || hash.indexOf('analista-') === 0 || hash.indexOf('nota-') === 0 || hash === 'autor') return 'informes';
       if (hash === 'finanzas') return 'herramientas';
       if (TAB_IDS.indexOf(hash) !== -1) return hash;
       return 'inicio';
