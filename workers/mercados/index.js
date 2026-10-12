@@ -119,7 +119,11 @@ const USA_DUPLICATE_CLASS_EXCLUDE = ['GOOG'];
 // volumen los deje afuera -- para activos reales de la cartera con poco volumen
 // de CEDEAR (ej. AIG), sin los cuales el buscador de Mercados y el pricing en
 // vivo del Portafolio de Manfredi los tratan como inexistentes.
+// data912 a veces manda el volumen en 0 para todo (feriados, antes de la
+// apertura): sin desempate el orden quedaba alfabético y el límite cortaba
+// todo lo que viene después de la "I". Se desempata por cantidad de operaciones.
 function mapD912Rows(rows, { sortByVolume = true, limit = null, pin = [] } = {}) {
+  const ops = new Map(rows.map(r => [r.symbol, r.q_op || 0]));
   let items = rows
     .filter(r => r.symbol && r.c != null)
     .map(r => ({
@@ -129,7 +133,7 @@ function mapD912Rows(rows, { sortByVolume = true, limit = null, pin = [] } = {})
       change: r.pct_change ?? null,
       volume: r.v ?? 0,
     }));
-  if (sortByVolume) items.sort((a, b) => (b.volume || 0) - (a.volume || 0));
+  if (sortByVolume) items.sort((a, b) => (b.volume || 0) - (a.volume || 0) || ops.get(b.symbol) - ops.get(a.symbol));
   if (limit && items.length > limit) {
     const kept = items.slice(0, limit);
     const keptSymbols = new Set(kept.map(it => it.symbol));
@@ -391,17 +395,19 @@ async function fetchDolares() {
   }
 }
 
+const FX = [
+  { code: 'EUR', name: 'Euro' }, { code: 'BRL', name: 'Real brasileño' },
+  { code: 'CNY', name: 'Yuan chino' }, { code: 'GBP', name: 'Libra esterlina' },
+  { code: 'CHF', name: 'Franco suizo' }, { code: 'JPY', name: 'Yen japonés' },
+];
+const DIVISAS = new Set(FX.map(f => f.code));
+
 async function fetchDivisas() {
   try {
     const resp = await fetch('https://open.er-api.com/v6/latest/USD', { signal: AbortSignal.timeout(8000) });
     if (!resp.ok) return [];
     const data = await resp.json();
     const rates = data.rates || {};
-    const FX = [
-      { code: 'EUR', name: 'Euro' }, { code: 'BRL', name: 'Real brasileño' },
-      { code: 'CNY', name: 'Yuan chino' }, { code: 'GBP', name: 'Libra esterlina' },
-      { code: 'CHF', name: 'Franco suizo' }, { code: 'JPY', name: 'Yen japonés' },
-    ];
     return FX.filter(f => rates[f.code]).map(f => ({
       symbol: f.code, name: f.name, price: rates[f.code], change: null, volume: 0, isRateVsUSD: true,
     }));
@@ -620,9 +626,16 @@ async function fetchDolarCloses(casa, n = 30) {
 }
 
 async function fetchHistoricalCloses(category, symbol, n = 30) {
-  if (category === 'arg_stocks') return fetchD912Closes('stocks', symbol, n);
-  if (category === 'arg_cedears') return fetchD912Closes('cedears', symbol, n);
-  if (category === 'arg_bonds') return fetchD912Closes('bonds', symbol, n);
+  const d912 = { arg_stocks: 'stocks', arg_cedears: 'cedears', arg_bonds: 'bonds' }[category];
+  if (d912) {
+    // lo que data912 no tiene (especies D/C, letras, A3…) sale de BYMA
+    try {
+      const closes = await fetchD912Closes(d912, symbol, n);
+      if (closes.length >= 2) return closes;
+    } catch (e) { /* sigue con BYMA */ }
+    return (await bymaVelas(symbol)).slice(-n).map(p => p.c);
+  }
+  if (category === 'dolares' && DIVISAS.has(symbol)) return fetchYahooCloses(symbol + '=X', n);
   if (category === 'usa_stocks' || category === 'usa_adrs') return fetchYahooCloses(symbol, n);
   if (category === 'commodities') {
     const ySymbol = COMMODITY_YAHOO_MAP[symbol];
@@ -728,7 +741,9 @@ async function buildPayload(env) {
       return { ...it, marketCap };
     });
   const [argCedearsItems, usaStocksItems, usaAdrsItems] = await Promise.all([
-    enrichWithLogos(mapD912Rows(argCedearsRaw, { limit: 400, pin: ['AIG'] }), finnhubKey, logoBlob, logoBudget),
+    // CEDEARs sin límite: el Portafolio saca de acá el precio de cada tenencia,
+    // y con el corte en 400 quedaban "sin cotización" MSFT, NVDA, QQQ, SPY…
+    enrichWithLogos(mapD912Rows(argCedearsRaw), finnhubKey, logoBlob, logoBudget),
     enrichWithLogos(mapD912Rows(usaStocksRaw.filter(r => !USA_DUPLICATE_CLASS_EXCLUDE.includes(r.symbol)), { limit: 500, pin: USA_MEGA_CAP_PINS }), finnhubKey, logoBlob, logoBudget),
     enrichWithLogos(mapD912Rows(usaAdrsRaw), finnhubKey, logoBlob, logoBudget),
   ]);
@@ -783,8 +798,15 @@ const SERIE_TFS = ['1D', '1M', 'YTD', '1A', '5A'];
 // data912 no ajusta los desdoblamientos (ej. YPFD 10:1 el 3-ago-2026): si de un
 // día al siguiente el precio cae por un factor casi entero (2, 3, 4, 5, 10…), se
 // divide todo lo anterior por ese factor (y el volumen se multiplica).
+// Antes se sacan los datos sueltos mal cargados: un solo día que salta y al día
+// siguiente vuelve (AL30 figura a 6,45 el 4-nov-2021 entre 6.407 y 6.498), que
+// si no se confunde con un desdoblamiento y divide por 1.000 todo lo anterior.
 function ajustarDesdoblamientos(rows) {
-  const out = rows.map(r => ({ ...r }));
+  const lejos = (a, b) => a > 0 && b > 0 && (a / b > 1.8 || b / a > 1.8);
+  const out = rows.filter((r, i) => {
+    const prev = rows[i - 1]?.c, next = rows[i + 1]?.c;
+    return !(prev && next && lejos(r.c, prev) && lejos(r.c, next) && !lejos(prev, next));
+  }).map(r => ({ ...r }));
   for (let i = out.length - 1; i > 0; i--) {
     if (!out[i].c || !out[i - 1].c) continue;
     const k = out[i - 1].c / out[i].c, f = Math.round(k);
@@ -845,6 +867,38 @@ async function serieD912(endpoint, symbol, tf) {
   return recortarDiario(pts, tf);
 }
 
+// BYMA Open Data: velas diarias de los últimos ~2 años de todo lo que cotiza en
+// BYMA (plazo 24hs). Cubre lo que data912 no tiene: letras, duales, provinciales,
+// CEDEARs en dólares (AAPLD, AAPLC) y acciones nuevas como A3. Sin intradiario.
+// Devuelve 503 si se le pide muy seguido: un reintento corto.
+async function bymaVelas(symbol) {
+  const to = Math.floor(Date.now() / 1000), from = to - 6 * 366 * 86400;
+  const url = `https://open.bymadata.com.ar/vanoms-be-core/rest/api/bymadata/free/chart/historical-series/history?symbol=${encodeURIComponent(symbol + ' 24HS')}&resolution=D&from=${from}&to=${to}`;
+  let resp;
+  for (let i = 0; i < 2; i++) {
+    resp = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(10000) });
+    if (resp.status !== 503) break;
+    await new Promise(r => setTimeout(r, 600));
+  }
+  if (!resp.ok) throw new Error(`BYMA HTTP ${resp.status}`);
+  const j = await resp.json();
+  if (j.s !== 'ok' || !Array.isArray(j.t) || !j.t.length) throw new Error('BYMA: sin datos');
+  // BYMA marca cada vela a la medianoche de Buenos Aires (03:00 UTC); se corre a
+  // las 15:00 UTC como diaTs() para que las dos fuentes caigan igual en semanal()
+  return j.t.map((t, i) => ({ t: t + 12 * 3600, o: j.o[i] ?? j.c[i], h: j.h[i] ?? j.c[i], l: j.l[i] ?? j.c[i], c: j.c[i], v: j.v?.[i] || 0 }))
+    .filter(p => p.c != null);
+}
+
+async function serieByma(symbol, tf) {
+  return recortarDiario(await bymaVelas(symbol), tf);
+}
+
+// Yahoo a veces deja congelado el histórico de una especie de BYMA (A3.BA
+// repetía 2.215 todo el año con el precio real en 2.785): se descarta.
+function seriePlana(pts) {
+  return pts.length >= 10 && new Set(pts.map(p => p.c)).size <= 2;
+}
+
 async function serieKraken(symbol, tf) {
   const pair = KRAKEN_SYMBOL_TO_PAIR[symbol] || `${symbol}USD`;
   const interval = tf === '1D' ? 5 : tf === '5A' ? 10080 : 1440;
@@ -871,18 +925,32 @@ async function fetchSerie(category, symbol, tf) {
   const intradiario = tf === '1D';
   if (category === 'arg_stocks' || category === 'arg_cedears') {
     if (intradiario) return serieYahoo(symbol + '.BA', tf);
-    // data912 no tiene el histórico de muchos CEDEARs (NU, IBIT, GLD, VIST…):
-    // si falla o viene corto, se usa Yahoo con el ticker de BYMA (.BA).
+    // data912 no tiene el histórico de muchos CEDEARs (NU, IBIT, GLD, VIST…), de
+    // las especies en dólares (D/C) ni de A3: si falla o viene corto, BYMA, y
+    // como último recurso Yahoo con el ticker de BYMA (.BA).
     try {
       const pts = await serieD912(category === 'arg_stocks' ? 'stocks' : 'cedears', symbol, tf);
       if (pts.length >= 2) return pts;
+    } catch (e) { /* sigue con BYMA */ }
+    try {
+      const pts = await serieByma(symbol, tf);
+      if (pts.length >= 2) return pts;
     } catch (e) { /* sigue con Yahoo */ }
-    try { return await serieYahoo(symbol + '.BA', tf); }
-    catch (e) { throw new Error('Todavía no hay histórico de precios para este activo'); }
+    try {
+      const pts = await serieYahoo(symbol + '.BA', tf);
+      if (pts.length >= 2 && !seriePlana(pts)) return pts;
+    } catch (e) { /* sin histórico */ }
+    throw new Error('Todavía no hay histórico de precios para este activo');
   }
   if (category === 'arg_bonds') {
     if (intradiario) throw new Error('Los bonos no tienen datos dentro del día');
-    return serieD912('bonds', symbol, tf);
+    // data912 no tiene letras, duales, provinciales ni muchas especies D/C: BYMA sí
+    try {
+      const pts = await serieD912('bonds', symbol, tf);
+      if (pts.length >= 2) return pts;
+    } catch (e) { /* sigue con BYMA */ }
+    try { return await serieByma(symbol, tf); }
+    catch (e) { throw new Error('Todavía no hay histórico de precios para este activo'); }
   }
   if (category === 'usa_stocks' || category === 'usa_adrs') return serieYahoo(symbol.replace('.', '-'), tf);
   if (category === 'commodities') {
@@ -906,6 +974,9 @@ async function fetchSerie(category, symbol, tf) {
     return recortarDiario(pts, tf);
   }
   if (category === 'dolares') {
+    // las divisas (EUR, BRL…) se muestran como unidades por cada dólar (open.er-api):
+    // en Yahoo es el par "EUR=X", misma unidad
+    if (DIVISAS.has(symbol)) return serieYahoo(symbol + '=X', tf);
     if (intradiario) throw new Error('El dólar no tiene datos dentro del día');
     return serieDolar(symbol.toLowerCase(), tf);
   }
@@ -1144,7 +1215,11 @@ export default {
         await kvPut(env, cacheKey, json, { expirationTtl: HISTORICO_CACHE_TTL_SECONDS });
         return new Response(json, { headers });
       } catch (err) {
-        return new Response(JSON.stringify({ error: err.message }), { status: 404, headers });
+        // 404 solo si el activo no tiene histórico: el Portafolio lo recuerda en el
+        // navegador y no lo vuelve a pedir. Una falla pasajera de la fuente (Yahoo
+        // limitando pedidos, timeout) es 502, si no SPY quedaba "inexistente" días.
+        const pasajera = /HTTP (408|429|5\d\d)|timeout|aborted|fetch failed|network/i.test(err.message);
+        return new Response(JSON.stringify({ error: err.message }), { status: pasajera ? 502 : 404, headers });
       }
     }
 

@@ -136,7 +136,7 @@
       if (id !== st.req || !st.g) return;
       CACHE[key] = j;
       var pts = j.points || [];
-      if (pts.length < 2) throw new Error('Sin datos para esta temporalidad');
+      if (pts.length < 2) { var e = new Error('Sin datos para esta temporalidad'); e.propio = true; throw e; }
       msg.hidden = true;
       var hayVol = st.g.datos(pts);
       [].forEach.call($('mtVista').children, function (x) { if (x.dataset.v !== 'precio') { x.disabled = !hayVol; x.title = hayVol ? '' : 'Este activo no tiene volumen'; } });
