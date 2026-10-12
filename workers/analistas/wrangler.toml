@@ -1,0 +1,17 @@
+name = "manfredi-analistas"
+main = "index.js"
+compatibility_date = "2026-04-19"
+
+# Análisis e informes de autores invitados: envíos, revisión, publicación.
+# Todo (PDF, tapas e índices JSON) vive en un bucket R2 -- no usa KV.
+# Antes del primer deploy: crear el bucket
+#   npx wrangler r2 bucket create manfredi-analistas
+[[r2_buckets]]
+binding = "ANALISTAS"
+bucket_name = "manfredi-analistas"
+
+# Secrets (wrangler secret put <NOMBRE> --config workers/analistas/wrangler.toml):
+#   ADMIN_KEY       clave larga para la skill revisar-analisis (header X-Admin-Key)
+#   RESEND_API_KEY  la misma de memberships, para los mails
+# Para probar en local sin Firebase:
+#   npx wrangler dev --config workers/analistas/wrangler.toml --port 8791 --var DEV:1 --var ADMIN_KEY:clave-de-prueba-larga

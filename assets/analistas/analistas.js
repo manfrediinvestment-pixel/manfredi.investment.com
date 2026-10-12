@@ -57,7 +57,12 @@
         })
       };
     });
-    var fuentes = [semanales, json('data/analistas.json')];
+    // lo que se publica desde el Panel sale del worker (workers/analistas)
+    var worker = window.AnApi ? window.AnApi.get('/publicados').then(function (d) {
+      (d.publicaciones || []).forEach(function (p) { if (p.pdf) p.pdf = window.AnApi.url(p.pdf); if (p.tapa) p.tapa = window.AnApi.url(p.tapa); });
+      return d;
+    }) : Promise.resolve({});
+    var fuentes = [semanales, json('data/analistas.json'), worker];
     // en local se ven los autores de ejemplo; con ?ejemplos=0 se ve lo mismo que en el sitio en vivo
     if (LOCAL && new URLSearchParams(location.search).get('ejemplos') !== '0') fuentes.push(json('data/analistas-ejemplo.json'));
     return Promise.all(fuentes.map(function (f) { return f.catch(function (e) { console.warn('[analistas]', e.message); return {}; }); }))

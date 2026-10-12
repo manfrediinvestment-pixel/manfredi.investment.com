@@ -2,19 +2,21 @@
    Solo para autores habilitados: el creador habilita su mail y, cuando inician sesión,
    les aparece el botón "Mi espacio de autor" junto a las sub-pestañas.
    Tres partes: Subir análisis (PDF o texto) · Mis envíos (estado de cada uno) · Mi perfil.
-   - Por ahora es una vista previa en local: http://127.0.0.1:8800/?autor=martin-bustos#autor
-     usa los autores de data/analistas-ejemplo.json y no envía nada.
-   - Cuando exista el portal (worker + R2), la habilitación y los envíos salen del worker. */
+   - De verdad: la habilitación, los envíos y el perfil salen del worker (assets/analistas/api.js).
+   - Vista de ejemplo en local, sin worker: http://127.0.0.1:8800/?autor=martin-bustos#autor
+     (usa data/analistas-ejemplo.json y no envía nada). */
 (function () {
   var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   var qs = new URLSearchParams(location.search);
   var slug = qs.get('autor');
-  if (!LOCAL || !slug || !/^[\w-]+$/.test(slug)) return;
+  var DEMO = LOCAL && !!slug && /^[\w-]+$/.test(slug);
+  var API = window.AnApi;
+  if (!DEMO && !API) return;
 
   var CATS = [['acciones', 'Acciones'], ['bonos', 'Bonos'], ['macro', 'Macro'], ['politica', 'Política'], ['trading', 'Trading']];
   var CATN = {}; CATS.forEach(function (c) { CATN[c[0]] = c[1]; });
   var MAX_MB = 20, MAX_RES = 180, MAX_TIT = 90;
-  var st = { autor: null, envios: [], tab: 'subir', formato: 'pdf', archivo: null, tapa: '', paginas: 0, abierto: null };
+  var st = { autor: null, envios: [], tab: 'subir', formato: 'pdf', archivo: null, tapa: '', paginas: 0, abierto: null, reemplaza: null, enviando: false };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -29,8 +31,26 @@
     setTimeout(function () { a.classList.remove('on'); setTimeout(function () { a.remove(); }, 300); }, 2800);
   }
 
-  /* ------------------------------ datos de prueba ------------------------------ */
-  function cargar() {
+  /* ------------------------------ datos ------------------------------ */
+  function cargar() { return DEMO ? cargarDemo() : cargarReal(); }
+  function cargarReal() {
+    return API.yo().then(function (yo) {
+      if (!yo.habilitado) throw new Error('no habilitado');
+      st.autor = yo.autor;
+      return cargarEnvios();
+    });
+  }
+  function cargarEnvios() {
+    if (DEMO) return Promise.resolve();
+    return API.get('/mis-envios').then(function (d) {
+      st.envios = (d.envios || []).map(function (e) {
+        return { id: e.id, titulo: e.titulo, categoria: e.categoria, estado: e.estado, enviado: e.enviado, revisado: e.revisado, publicado: e.publicado,
+          mensaje: e.mensaje, retiroPedido: e.retiroPedido, formato: e.formato, tapa: e.estado === 'publicado' && e.formato === 'pdf' ? API.url('/pub/' + e.id + '.jpg') : '' };
+      });
+      if (!st.abierto && st.envios[0]) st.abierto = st.envios[0].id;
+    });
+  }
+  function cargarDemo() {
     return Promise.all([
       json('data/analistas-ejemplo.json'),
       json('revision/prueba/prueba-bustos-ggal/revision.json').catch(function () { return null; })
@@ -72,8 +92,10 @@
   // ---------- subir ----------
   function subir() {
     var pdf = st.formato === 'pdf';
+    var corr = st.reemplaza && st.envios.filter(function (x) { return x.id === st.reemplaza; })[0];
     return '<form class="au-up" id="auForm" novalidate>' +
       '<div class="au-main">' +
+      (corr ? '<p class="au-corr">Versión corregida de <b>' + esc(corr.titulo) + '</b> <button type="button" class="au-link" data-au-nocorr>No es una corrección</button></p>' : '') +
       '<div class="au-seg" role="radiogroup" aria-label="Formato">' +
       '<button type="button" role="radio" data-au-fmt="pdf" aria-checked="' + pdf + '">PDF</button>' +
       '<button type="button" role="radio" data-au-fmt="texto" aria-checked="' + !pdf + '">Texto</button></div>' +
@@ -115,15 +137,15 @@
   // ---------- mis envíos ----------
   var PASOS = ['Recibido', 'Revisión editorial', 'Publicado'];
   function pasos(e) {
-    var i = { recibido: 0, revision: 1, cambios: 1, publicado: 2 }[e.estado];
+    var i = { recibido: 0, revision: 1, cambios: 1, rechazado: 1, publicado: 2, retirado: 2 }[e.estado];
     return '<ol class="au-track">' + PASOS.map(function (p, k) {
-      var cls = k < i || e.estado === 'publicado' ? 'ok' : k === i ? (e.estado === 'cambios' ? 'ojo' : 'now') : '';
-      var txt = k === 1 && e.estado === 'cambios' ? 'Cambios sugeridos' : p;
+      var cls = k < i || e.estado === 'publicado' ? 'ok' : k === i ? (e.estado === 'cambios' || e.estado === 'rechazado' ? 'ojo' : 'now') : '';
+      var txt = k === 1 && e.estado === 'cambios' ? 'Cambios sugeridos' : k === 1 && e.estado === 'rechazado' ? 'No publicado' : k === 2 && e.estado === 'retirado' ? 'Retirado' : p;
       var cuando = k === 0 ? fecha(e.enviado) : k === 1 && e.revisado ? fecha(e.revisado) : k === 2 && e.publicado ? fecha(e.publicado) : '';
       return '<li class="' + cls + '"><span class="au-track__d"></span><b>' + txt + '</b><em>' + cuando + '</em></li>';
     }).join('') + '</ol>';
   }
-  var ESTADO = { recibido: ['Recibido', ''], revision: ['En revisión', ''], cambios: ['Cambios sugeridos', 'ojo'], publicado: ['Publicado', 'ok'] };
+  var ESTADO = { recibido: ['En revisión', ''], revision: ['En revisión', ''], cambios: ['Cambios sugeridos', 'ojo'], publicado: ['Publicado', 'ok'], rechazado: ['No publicado', 'mal'], retirado: ['Retirado', ''] };
   function envios() {
     if (!st.envios.length) return '<p class="au-vacio">Todavía no enviaste nada. <button type="button" class="au-link" data-au-tab="subir">Subí tu primer análisis</button></p>';
     return '<div class="au-list">' + st.envios.map(function (e) {
@@ -134,10 +156,10 @@
         '<span class="au-env__b"><span class="au-k">' + esc(CATN[e.categoria] || '') + '<i></i>enviado ' + fecha(e.enviado) + '</span><span class="au-env__t">' + esc(e.titulo) + '</span></span>' +
         '<span class="rv-pill ' + es[1] + '"><span class="rv-dot"></span>' + es[0] + '</span></button>' +
         (ab ? '<div class="au-env__d">' + pasos(e) +
-          (e.estado === 'cambios' ? '<div class="au-msg"><span class="au-k">Mensaje de Ignacio · ' + fecha(e.revisado) + '</span><p>' + esc(e.mensaje).replace(/\n/g, '<br>') + '</p>' +
-            '<div class="au-msg__acc"><button type="button" class="an-gold au-btn" data-au-tab="subir">Subir versión corregida</button><a class="au-link" href="mailto:manfredi.investment@gmail.com?subject=' + encodeURIComponent('Sobre mi análisis: ' + e.titulo) + '">Responder por mail</a></div></div>' : '') +
+          (e.estado === 'cambios' || e.estado === 'rechazado' ? '<div class="au-msg"><span class="au-k">Mensaje de Ignacio · ' + fecha(e.revisado) + '</span><p>' + esc(e.mensaje).replace(/\n/g, '<br>') + '</p>' +
+            '<div class="au-msg__acc">' + (e.estado === 'cambios' ? '<button type="button" class="an-gold au-btn" data-au-corregir="' + esc(e.id) + '">Subir versión corregida</button>' : '') + '<a class="au-link" href="mailto:manfredi.investment@gmail.com?subject=' + encodeURIComponent('Sobre mi análisis: ' + e.titulo) + '">Responder por mail</a></div></div>' : '') +
           (e.estado === 'publicado' ? '<div class="au-pub"><span><strong>' + (e.lecturas ? e.lecturas.toLocaleString('es-AR') : '—') + '</strong>lecturas</span>' +
-            '<a class="au-link" href="#analisis">Verlo en la sección</a><button type="button" class="au-link" data-au-retirar="' + esc(e.id) + '">Pedir que lo retiren</button></div>' : '') +
+            '<a class="au-link" href="#analisis">Verlo en la sección</a>' + (e.retiroPedido ? '<span class="au-help">Pediste retirarlo el ' + fecha(e.retiroPedido) + '</span>' : '<button type="button" class="au-link" data-au-retirar="' + esc(e.id) + '">Pedir que lo retiren</button>') + '</div>' : '') +
           (e.estado === 'recibido' ? '<p class="au-note">Lo estamos revisando. Te avisamos por mail.</p>' : '') +
           '</div>' : '') + '</article>';
     }).join('') + '</div>';
@@ -169,7 +191,7 @@
     var box = $('anAutor');
     if (!st.autor) return;
     box.innerHTML = '<div class="au">' + cabeza() + '<div class="au-body">' + (st.tab === 'subir' ? subir() : st.tab === 'envios' ? envios() : perfil()) + '</div>' +
-      '<p class="rv-pie">Vista previa en local: nada se envía ni se guarda.</p></div>';
+      (DEMO ? '<p class="rv-pie">Vista previa en local: nada se envía ni se guarda.</p>' : '') + '</div>';
     if (st.tab === 'subir') validar();
   }
 
@@ -183,7 +205,7 @@
     if (!f.resumen.value.trim()) falta.push('el resumen');
     if (!f.categoria.value) falta.push('la categoría');
     if (!f.autoria.checked || !f.reglas.checked) falta.push('las dos confirmaciones');
-    $('auEnviar').disabled = !!falta.length;
+    $('auEnviar').disabled = !!falta.length || st.enviando;
     $('auFalta').textContent = falta.length ? 'Te falta completar: ' + falta.join(', ') + '.' : 'Listo para enviar.';
     $('auFalta').classList.toggle('au-ok', !falta.length);
     $('auResN').textContent = f.resumen.value.length + ' / ' + MAX_RES;
@@ -223,13 +245,24 @@
   function montarEventos() {
     var box = $('anAutor');
     box.addEventListener('click', function (e) {
-      var t = e.target.closest('[data-au-tab],[data-au-fmt],[data-au-abrir],[data-au-quitar],[data-au-retirar]');
+      var t = e.target.closest('[data-au-tab],[data-au-fmt],[data-au-abrir],[data-au-quitar],[data-au-retirar],[data-au-corregir],[data-au-nocorr]');
       if (!t) return;
+      if (t.dataset.auCorregir) {
+        var v = st.envios.filter(function (x) { return x.id === t.dataset.auCorregir; })[0];
+        st.reemplaza = v.id; st.tab = 'subir'; st.formato = v.formato || 'pdf'; pintar(); window.scrollTo({ top: 0 });
+        var f0 = $('auForm'); if (f0) { f0.titulo.value = v.titulo; f0.categoria.value = v.categoria; validar(); }
+        return;
+      }
+      if (t.hasAttribute('data-au-nocorr')) { var g0 = guardarForm(); st.reemplaza = null; pintar(); restaurarForm(g0); return; }
       if (t.dataset.auTab) { st.tab = t.dataset.auTab; pintar(); window.scrollTo({ top: 0 }); return; }
       if (t.dataset.auFmt) { var g = guardarForm(); st.formato = t.dataset.auFmt; pintar(); restaurarForm(g); return; }
       if (t.dataset.auAbrir) { st.abierto = st.abierto === t.dataset.auAbrir ? null : t.dataset.auAbrir; pintar(); return; }
       if (t.hasAttribute('data-au-quitar')) { var g2 = guardarForm(); st.archivo = null; st.tapa = ''; pintar(); restaurarForm(g2); return; }
-      if (t.dataset.auRetirar) aviso('Vista previa: acá se manda el pedido para retirarlo.');
+      if (t.dataset.auRetirar) {
+        if (DEMO) { aviso('Vista previa: acá se manda el pedido para retirarlo.'); return; }
+        API.post('/envios/' + t.dataset.auRetirar + '/retirar').then(cargarEnvios).then(function () { pintar(); aviso('Listo: le avisamos a Ignacio para que lo retire.'); })
+          .catch(function (er) { aviso(er.message); });
+      }
     });
     box.addEventListener('change', function (e) {
       if (e.target.id === 'auPdf') leerPdf(e.target.files[0]);
@@ -241,22 +274,59 @@
     box.addEventListener('drop', function (e) { var d = e.target.closest('#auDrop'); if (d) { e.preventDefault(); leerPdf(e.dataTransfer.files[0]); } });
     box.addEventListener('submit', function (e) {
       e.preventDefault();
-      if (e.target.id === 'auPerfil') { aviso('Vista previa: acá se guardaría tu perfil.'); return; }
+      if (e.target.id === 'auPerfil') { guardarPerfil(e.target); return; }
       var f = e.target;
-      st.envios.unshift({ id: 'nuevo-' + Date.now(), titulo: f.titulo.value.trim(), categoria: f.categoria.value, estado: 'recibido', enviado: new Date().toISOString(), tapa: st.formato === 'pdf' ? st.tapa : '' });
-      st.abierto = st.envios[0].id; st.archivo = null; st.tapa = ''; st.tab = 'envios';
-      pintar(); window.scrollTo({ top: 0 });
-      aviso('Recibido. Te avisamos por mail cuando esté revisado.');
+      if (DEMO) {
+        st.envios.unshift({ id: 'nuevo-' + Date.now(), titulo: f.titulo.value.trim(), categoria: f.categoria.value, estado: 'recibido', enviado: new Date().toISOString(), tapa: st.formato === 'pdf' ? st.tapa : '' });
+        st.abierto = st.envios[0].id; st.archivo = null; st.tapa = ''; st.tab = 'envios';
+        pintar(); window.scrollTo({ top: 0 });
+        aviso('Recibido. Te avisamos por mail cuando esté revisado.');
+        return;
+      }
+      enviar(f);
     });
   }
 
+  /* ------------------------------ envío real ------------------------------ */
+  function enviar(f) {
+    var btn = $('auEnviar');
+    st.enviando = true; btn.disabled = true; btn.textContent = st.formato === 'pdf' ? 'Subiendo el PDF…' : 'Enviando…';
+    var datos = { formato: st.formato, titulo: f.titulo.value, resumen: f.resumen.value, categoria: f.categoria.value, activos: f.activos.value, posiciones: f.posiciones.value,
+      autoria: f.autoria.checked, reglas: f.reglas.checked, reemplaza: st.reemplaza || undefined };
+    if (st.formato === 'texto') datos.cuerpo = f.cuerpo.value; else if (st.tapa) datos.tapa = st.tapa;
+    API.post('/envios', datos).then(function (r) {
+      if (st.formato !== 'pdf') return r;
+      // el PDF va aparte, directo al bucket
+      return API.put('/envios/' + r.id + '/pdf', new Blob([st.archivo], { type: 'application/pdf' }));
+    }).then(function (r) {
+      st.enviando = false; st.archivo = null; st.tapa = ''; st.reemplaza = null; st.tab = 'envios'; st.abierto = r.id;
+      return cargarEnvios();
+    }).then(function () {
+      pintar(); window.scrollTo({ top: 0 });
+      aviso('Recibido. Te avisamos por mail cuando esté revisado.');
+    }).catch(function (er) {
+      st.enviando = false; btn.textContent = 'Enviar a revisión'; validar();
+      aviso('No se pudo enviar: ' + er.message);
+    });
+  }
+  function guardarPerfil(f) {
+    if (DEMO) { aviso('Vista previa: acá se guardaría tu perfil.'); return; }
+    var d = {}; ['nombre', 'rol', 'bio', 'linkedin', 'instagram', 'x', 'trabajo'].forEach(function (k) { d[k] = f.elements[k] ? f.elements[k].value : ''; });
+    API.post('/perfil', d).then(function (r) { st.autor = r.autor; pintar(); aviso('Perfil guardado.'); }).catch(function (er) { aviso('No se pudo guardar: ' + er.message); });
+  }
+
   window.AnAutor = {
-    habilitado: true,
-    mostrar: function () { if (st.autor) pintar(); }
+    habilitado: false,
+    mostrar: function () {
+      if (st.autor) { cargarEnvios().then(pintar, pintar); return; }
+      var box = $('anAutor');
+      if (box) box.innerHTML = '<a class="an-back" href="#analisis">← Análisis e informes</a><p class="nt-empty">Esta sección es para autores habilitados. Iniciá sesión con el mail que te habilitamos.</p>';
+    }
   };
   function iniciar() {
     var btn = $('anMio');
     cargar().then(function () {
+      window.AnAutor.habilitado = true;
       if (btn) btn.hidden = false;
       montarEventos();
       if (location.hash === '#autor') pintar();

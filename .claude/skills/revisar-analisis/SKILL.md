@@ -2,7 +2,7 @@
 name: revisar-analisis
 description: "Use when the user asks to review the pieces that guest analysts sent to the 'Análisis e informes' section of manfredinvestment.com — 'revisá los análisis', 'hay análisis para revisar', 'revisá lo que mandaron los analistas', 'revisá el informe de [autor]'. Reads every pending submission (PDF or text) end to end, checks it against the section's hard rules (no personalized buy/sell advice from non-advisors, no selling courses/signals/paid groups, only allowed links, no guaranteed returns, no plagiarism), verifies the key numbers against primary sources, grades quality, and writes one revision.json per submission with a verdict (publicar / cambios / rechazar), a traffic-light checklist with page references and a ready-to-send message to the author. The verdicts show up in the creator Panel ('Análisis por revisar'), where the user only approves or rejects. Runs locally in Claude Code: zero API cost."
 metadata:
-  version: 0.1.0
+  version: 0.2.0
 ---
 
 # Revisar análisis de autores invitados — Manfredi Investment
@@ -15,26 +15,37 @@ Nunca publicás ni rechazás vos: **la decisión final es siempre del usuario**.
 
 ## 1. De dónde salen los envíos
 
-Cada envío es una carpeta con `envio.json` (lo que completó el autor en el portal de carga)
-y el archivo (`analisis.pdf`) si es PDF:
+Los autores suben sus análisis desde "Mi espacio de autor" y quedan en el worker
+`manfredi-analistas` (workers/analistas, bucket R2). La skill los baja, los revisa y sube
+la revisión con `sync.py` (al lado de este archivo):
+
+```bash
+# la clave es el secret ADMIN_KEY del worker; pedísela al usuario si no está en el entorno
+export ANALISTAS_ADMIN_KEY=...            # nunca la escribas en el repo
+python .claude/skills/revisar-analisis/sync.py bajar      # pendientes sin revisión → revision/pendientes/<id>/
+#   ... revisás cada uno (pasos 2 a 5) y escribís revision/pendientes/<id>/revision.json
+python .claude/skills/revisar-analisis/sync.py subir --todos
+```
+
+Para probar contra el worker en local (`wrangler dev`, ver workers/analistas/wrangler.toml):
+`ANALISTAS_API=http://127.0.0.1:8791`.
+
+Cada envío bajado es una carpeta:
 
 ```
-revision/<origen>/<id>/
-  envio.json      ← datos del envío (ver esquema abajo)
+revision/pendientes/<id>/
+  envio.json      ← datos del envío (ver esquema abajo; si es texto, el campo "cuerpo")
   analisis.pdf    ← solo si formato = "pdf"
-  tapa.jpg        ← página 1 del PDF (la genera el portal)
+  tapa.jpg        ← página 1 del PDF (la genera el navegador del autor al subirlo)
   revision.json   ← LO QUE ESCRIBÍS VOS
 ```
 
-- `revision/prueba/` tiene 3 envíos de prueba (uno bueno, uno con cambios, uno para
-  rechazar). Sirven para probar la skill y son los que se ven en el Panel en local.
-- `revision/pendientes/` es donde van a caer los envíos reales. **Todavía no existe el
-  portal de carga** (worker + R2): cuando exista, el paso 0 de esta skill es bajar los
-  pendientes del worker a esta carpeta y el paso 6 es subir las revisiones. Hasta
-  entonces, si el usuario te pasa un PDF a mano, creá la carpeta vos con su `envio.json`.
+`revision/` está en .gitignore: los envíos de los autores nunca van al repo (el sitio es
+público). `revision/prueba/` tiene 3 envíos de prueba (`prueba/generar.py`) para probar la
+skill sin worker: uno bueno, uno con cambios, uno para rechazar.
 
-Revisá **solo** los envíos que no tienen `revision.json`, salvo que el usuario pida
-revisar de nuevo uno puntual.
+Revisá **solo** los que bajó `sync.py bajar` (no tienen revisión), salvo que el usuario
+pida revisar de nuevo uno puntual (`sync.py bajar --todos`).
 
 ### envio.json
 
@@ -126,7 +137,7 @@ independiente de las reglas. Sirve para que el usuario ordene qué publicar prim
   ],
   "mensajeAutor": "Mensaje listo para mandar al autor si hay cambios o rechazo. Vacío si es publicar.",
   "revisadoEn": "2026-10-12T15:30:00-03:00",
-  "revisor": "skill revisar-analisis 0.1.0"
+  "revisor": "skill revisar-analisis 0.2.0"
 }
 ```
 
@@ -141,14 +152,11 @@ Reglas para escribir el revision.json:
 
 ## 6. Cerrar
 
-1. Validá cada revision.json con `python -m json.tool` y reescribí
-   `revision/<origen>/index.json` = `{"origen": "<origen>", "envios": [ids con envio.json]}`
-   (el Panel en local lee ese índice; el server estático no lista carpetas).
-2. Si el portal ya existe: subí las revisiones al worker (pendiente de construir).
-3. Abrí el Panel en local para ver cómo quedó:
-   `python -m http.server 8800` en la raíz del repo y
-   `http://127.0.0.1:8800/?revision=prueba#panel` (en local muestra `revision/prueba`
-   sin necesidad de iniciar sesión).
+1. Validá cada revision.json con `python -m json.tool`.
+2. Subilas: `python .claude/skills/revisar-analisis/sync.py subir --todos`. Aparecen en el
+   Panel → Análisis por revisar, con el semáforo y el mensaje para el autor.
+3. **No apruebes ni rechaces vos**: el worker no se lo permite a la skill. Decide el usuario
+   en el Panel (Aprobar y publicar · Pedir cambios · Rechazar); el mail al autor sale solo.
 4. Contale al usuario en 3 o 4 líneas: cuántos revisaste, cuáles están para publicar,
    cuáles necesitan cambios y si hay alguno para rechazar, con el motivo en una frase.
    **No** le repitas los checklists: están en el Panel.
