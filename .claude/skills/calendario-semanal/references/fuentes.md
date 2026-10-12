@@ -15,6 +15,8 @@ Si una URL deja de servir, corregila en `CAL_SOURCES` **verificándola de nuevo*
 | `Nivel4-Tema-3-5-31` | Economía › Precios › Precios al consumidor (IPC) |
 | `Nivel4-Tema-3-9-48` | Economía › Cuentas nacionales › **EMAE** |
 | `Nivel4-Tema-3-9-47` | Cuentas nacionales › Agregados macroeconómicos (**PIB**) — *no es el EMAE* |
+| `Nivel4-Tema-3-9-49` | Economía › Cuentas nacionales › Generación del ingreso (12-oct-2026) |
+| `Nivel4-Tema-3-11-160` | Economía › Servicios › Índices de patentamientos (12-oct-2026) |
 | `Nivel4-Tema-3-35-45` | Economía › Cuentas internacionales › Balanza de pagos, PII y deuda externa (28-sep-2026) |
 | `Nivel4-Tema-3-35-46` | Economía › Cuentas internacionales › Posición de inversión internacional |
 | `Nivel4-Tema-3-6-18` | Economía › Industria manufacturera › Productos Industriales (EPI) (28-sep-2026) |
@@ -60,7 +62,9 @@ farmacéutica. Si el usuario o el sitio dan una URL mejor, agregá la regla.
 - Evolución del Mercado de Cambios y Balance Cambiario:
   `https://www.bcra.gob.ar/informe-de-la-evolucion-del-mercado-de-cambios-y-balance-cambiario/`
 - Informe Monetario Mensual: `https://www.bcra.gob.ar/informe-monetario-mensual/` (200, `<title>` "Informe monetario mensual | BCRA", 04-oct-2026)
-- Boletín Estadístico, Informe sobre Bancos, otros: caen a
+- Boletín Estadístico: `https://www.bcra.gob.ar/boletin-estadistico/` (12-oct-2026, 200 + `<title>`)
+- Informe sobre Bancos: `https://www.bcra.gob.ar/informe-sobre-bancos/` (12-oct-2026, 200 + `<title>`)
+- Otros: caen a
   `https://www.bcra.gob.ar/PublicacionesEstadisticas/Principales_variables.asp` (página general).
 
 ### Presupuesto (Oficina Nacional de Presupuesto)
