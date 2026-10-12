@@ -35,6 +35,7 @@
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261010z" />
 <link rel="stylesheet" href="assets/analistas/analistas.css?v=20261010pst" />
 <link rel="stylesheet" href="assets/portfolio/ratios.css?v=20261012" />
+<link rel="stylesheet" href="assets/pro/pro.css?v=20261012" />
 <link rel="stylesheet" href="assets/calendario/calendario.css?v=20261010z" />
 <link rel="stylesheet" href="assets/informes/estanteria.css?v=20261010z" />
 <link rel="stylesheet" href="assets/portfolio/portfolio.css?v=20261010z" />
@@ -3548,7 +3549,7 @@
         <li><a href="#calendario" class="nav-link" data-tab-target="calendario">Calendario</a></li>
         <li><a href="#reportes" class="nav-link" data-tab-target="informes">Noticias<span class="nav-pronto" title="Próximamente: Análisis e informes" aria-hidden="true"></span></a></li>
         <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
-        <li><a href="#inversiones" class="nav-link" data-tab-target="inversiones">Informes<span class="mi-nav-count" id="navPedidosCount" hidden></span></a></li>
+        <li><a href="#pro" class="nav-link nav-link-pro" data-tab-target="inversiones">Manfredi <span class="nav-pro">Pro</span><span class="mi-nav-count" id="navPedidosCount" hidden></span></a></li>
         <li id="navPanelItem" hidden><a href="#panel" class="nav-link nav-link-panel" data-tab-target="panel">&#10022; Panel</a></li>
         <li>
           <button type="button" class="nav-link nav-more-btn" id="navMoreBtn" data-tab-group="herramientas" aria-expanded="false" aria-controls="navMore">
@@ -3575,7 +3576,7 @@
         <a href="#calendario" data-tab-target="calendario">Calendario</a>
         <a href="#reportes" data-tab-target="informes">Noticias</a>
         <a href="#portfolio" data-tab-target="portfolio">Portfolio</a>
-        <a href="#inversiones" data-tab-target="inversiones">Informes</a>
+        <a href="#pro" data-tab-target="inversiones">Manfredi <span class="nav-pro">Pro</span></a>
       </div>
       <div class="nav-sheet__label">M&aacute;s</div>
       <div class="nav-sheet__more">
@@ -4097,6 +4098,7 @@
   <script src="assets/noticias/noticias.js?v=20261010z" defer></script>
   <script src="assets/portfolio/ratios.js?v=20261012" defer></script>
   <script src="assets/analistas/analistas.js?v=20261010z" defer></script>
+  <script src="assets/pro/pro.js?v=20261012" defer></script>
   <!-- cartel con los pasos para postularse como analista -->
   <script src="assets/analistas/postular.js?v=20261010a" defer></script>
   <script src="assets/calendario/calendario.js?v=20261010z" defer></script>
@@ -4436,6 +4438,16 @@
   <!-- ââ INVERSIONES âââââââââââââââââââââââââââââââââââââââââââââââââââ -->
   <section class="section section-inversiones" id="inversiones" data-tab="inversiones">
     <div class="container">
+      <!-- Manfredi Pro: La mesa (#pro, assets/pro/pro.js) · Informes (#inversiones, lo de siempre) · Warren -->
+      <div class="pro-top">
+        <span class="pro-brand">Manfredi <span class="nav-pro">Pro</span></span>
+        <nav class="pro-nav" id="proNav" role="tablist" aria-label="Manfredi Pro">
+          <button type="button" role="tab" data-pro-tab="mesa" aria-selected="false">La mesa</button>
+          <button type="button" role="tab" data-pro-tab="informes" aria-selected="true">Informes</button>
+          <button type="button" role="tab" data-pro-tab="warren" aria-selected="false">Warren IA</button>
+        </nav>
+      </div>
+      <div class="pro-mesa" id="proMesa"></div>
 
       <div class="section-header inv-header est-head">
         <h2 class="section-title">Informes</h2>
@@ -17315,7 +17327,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
     var TAB_IDS = ['inicio', 'mercados', 'calendario', 'informes', 'university', 'inversiones', 'portfolio', 'herramientas', 'asesoria', 'panel'];
     var TAB_TITLES = {
       inicio: 'Inicio', mercados: 'Mercados', calendario: 'Calendario Economico',
-      informes: 'Reportes & News', university: 'University', inversiones: 'Informes',
+      informes: 'Reportes & News', university: 'University', inversiones: 'Manfredi Pro',
       portfolio: 'Portfolio', herramientas: 'Herramientas', asesoria: 'Asesoria', panel: 'Panel de creador'
     };
 
@@ -17323,6 +17335,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
       hash = (hash || '').replace('#', '');
       if (!hash) return 'inicio';
       if (hash === 'reportes') return 'informes';
+      if (hash === 'pro') return 'inversiones';
       if (hash === 'analisis' || hash.indexOf('analista-') === 0 || hash.indexOf('nota-') === 0) return 'informes';
       if (hash === 'finanzas') return 'herramientas';
       if (TAB_IDS.indexOf(hash) !== -1) return hash;
