@@ -1215,7 +1215,11 @@ export default {
         await kvPut(env, cacheKey, json, { expirationTtl: HISTORICO_CACHE_TTL_SECONDS });
         return new Response(json, { headers });
       } catch (err) {
-        return new Response(JSON.stringify({ error: err.message }), { status: 404, headers });
+        // 404 solo si el activo no tiene histórico: el Portafolio lo recuerda en el
+        // navegador y no lo vuelve a pedir. Una falla pasajera de la fuente (Yahoo
+        // limitando pedidos, timeout) es 502, si no SPY quedaba "inexistente" días.
+        const pasajera = /HTTP (408|429|5\d\d)|timeout|aborted|fetch failed|network/i.test(err.message);
+        return new Response(JSON.stringify({ error: err.message }), { status: pasajera ? 502 : 404, headers });
       }
     }
 

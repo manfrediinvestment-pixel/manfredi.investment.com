@@ -9063,7 +9063,11 @@
   // Algunos CEDEARs no tienen historico en la fuente ARS (el worker responde 404) y el
   // codigo cae al historico USD de la accion. Se recuerda ese "no hay" 7 dias por
   // navegador para no repetir el pedido fallido (y el error en consola) en cada carga.
-  var PF_HIST_MISS_KEY = 'mi_hist_missing_v1', PF_HIST_MISS_TTL = 7*24*60*60*1000;
+  // Solo los 404 (no hay histórico); las fallas pasajeras del worker son 502 y no se
+  // recuerdan. v2: la v1 tenía guardados como "inexistentes" SPY, NVDA, MSFT… por
+  // errores pasajeros de antes, y por 7 días la Cartera Manfredi quedaba en "—".
+  var PF_HIST_MISS_KEY = 'mi_hist_missing_v2', PF_HIST_MISS_TTL = 24*60*60*1000;
+  try{ localStorage.removeItem('mi_hist_missing_v1'); }catch(e){}
   function pfHistMissing(){ try{ return JSON.parse(localStorage.getItem(PF_HIST_MISS_KEY) || '{}'); }catch(e){ return {}; } }
   function pfHistMarkMissing(id){ try{ var m = pfHistMissing(); m[id] = Date.now(); localStorage.setItem(PF_HIST_MISS_KEY, JSON.stringify(m)); }catch(e){} }
   async function pfFetchHistorico(category, symbol, n){
