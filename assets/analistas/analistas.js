@@ -200,7 +200,7 @@
       '<section class="an-prof" style="--c:' + esc(a.color) + '">' + av(a, 'lg') +
       '<div><span class="an-tag">' + cats.map(function (c) { return CAT[c].n; }).join(' · ') + '</span>' +
       '<h3 class="an-prof__n">' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</h3>' +
-      '<div class="an-prof__r">' + esc(a.rol || '') + '</div><div class="an-links">' + links(a) + '</div></div>' +
+      '<div class="an-prof__r">' + esc(a.rol || '') + '</div>' + (a.bio ? '<p class="an-prof__bio">' + esc(a.bio) + '</p>' : '') + '<div class="an-links">' + links(a) + '</div></div>' +
       '<div class="an-pstats"><span><strong>' + pubs.length + '</strong>publicaciones</span>' +
       (lect ? '<span><strong>' + miles(lect) + '</strong>lecturas</span>' : '') +
       (desde ? '<span><strong>' + esc(desde) + '</strong>desde</span>' : '') + '</div></section>' +
