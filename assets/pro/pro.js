@@ -178,22 +178,44 @@
 
   /* ------------------------------ sub-pestañas ------------------------------ */
   var nav = document.getElementById('proNav');
-  function vista() { return (location.hash || '').replace('#', '') === 'pro' ? 'mesa' : 'informes'; }
+  var HASH = { mesa: '#pro', informes: '#inversiones', warren: '#pro-warren' };
+  function vista() { var h = (location.hash || '').replace('#', ''); return h === 'pro' ? 'mesa' : h === 'pro-warren' ? 'warren' : 'informes'; }
+
+  // Warren en grande: el mismo panel del chat flotante se muda adentro de la sección
+  // (conserva conversación e historial) y vuelve a su lugar al salir.
+  var wHogar = null;
+  function warrenAdentro(on) {
+    var panel = document.getElementById('warrenPanel'), caja = document.getElementById('proWarren');
+    if (!panel || !caja) return;
+    document.body.classList.toggle('pro-warren-on', on);
+    if (on) {
+      if (!wHogar) wHogar = { padre: panel.parentNode, sig: panel.nextSibling };
+      if (panel.parentNode !== caja) caja.appendChild(panel);
+      panel.classList.add('is-embedded');
+      if (typeof warrenOpen !== 'undefined' && !warrenOpen && typeof window.toggleWarren === 'function') window.toggleWarren();
+    } else if (wHogar && panel.parentNode === caja) {
+      panel.classList.remove('is-embedded');
+      if (typeof window.closeWarren === 'function') window.closeWarren();
+      wHogar.padre.insertBefore(panel, wHogar.sig);
+    }
+  }
   function mostrar() {
-    var v = vista();
+    var v = vista(), enPro = !sec.classList.contains('tab-hidden');
     sec.classList.toggle('pro-v-mesa', v === 'mesa');
     sec.classList.toggle('pro-v-informes', v === 'informes');
+    sec.classList.toggle('pro-v-warren', v === 'warren');
+    warrenAdentro(v === 'warren' && enPro);
     if (nav) nav.querySelectorAll('[data-pro-tab]').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.proTab === v); });
   }
   if (nav) nav.addEventListener('click', function (e) {
     var b = e.target.closest('[data-pro-tab]');
     if (!b) return;
-    if (b.dataset.proTab === 'warren') { if (typeof window.toggleWarren === 'function') window.toggleWarren(); return; }
-    var h = b.dataset.proTab === 'mesa' ? '#pro' : '#inversiones';
+    var h = HASH[b.dataset.proTab];
     if (location.hash !== h) history.replaceState(null, '', h);
     mostrar(); window.scrollTo({ top: 0 });
   });
-  window.addEventListener('hashchange', mostrar);
+  // el router del sitio cambia de pestaña después del hashchange: esperamos un cuadro
+  window.addEventListener('hashchange', function () { requestAnimationFrame(mostrar); });
 
   root.addEventListener('click', function (e) {
     var t = e.target.closest('[data-pro-seguir],[data-pro-voto],[data-pro-ir]');

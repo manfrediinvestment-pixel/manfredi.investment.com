@@ -171,3 +171,15 @@
   .pro-top { gap:10px; } .pro-brand { padding-bottom:0; width:100%; }
 }
 @media (prefers-reduced-motion:reduce) { .pro-post.flash, .pro-land__card, .pro-poll i { animation:none; transition:none; } }
+
+/* Warren en grande dentro de Manfredi Pro (#pro-warren): el panel del chat se muda acá */
+.section-inversiones.pro-v-warren > .container > :not(.pro-top):not(.pro-warren) { display:none !important; }
+.section-inversiones:not(.pro-v-warren) .pro-warren { display:none; }
+.warren-panel.is-embedded, .warren-panel.is-embedded.fullscreen { position:relative !important; top:auto !important; left:auto !important; right:auto !important; bottom:auto !important;
+  transform:none !important; z-index:auto !important; display:flex; width:100%; max-width:100%; height:calc(100vh - 230px); min-height:560px; max-height:none;
+  border:1px solid var(--pro-line2); border-radius:18px; box-shadow:0 30px 80px -40px rgba(0,0,0,.9); }
+.warren-panel.is-embedded .warren-close-btn, .warren-panel.is-embedded .warren-expand-btn { display:none; }
+/* historial de conversaciones siempre visible, como en pantalla completa */
+.warren-panel.has-sidebar.is-embedded .warren-side { position:static; transform:none; }
+.warren-panel.has-sidebar.is-embedded .warren-side-toggle, .warren-panel.has-sidebar.is-embedded .warren-side-backdrop { display:none; }
+body.pro-warren-on .warren-fab-wrap { display:none; }
