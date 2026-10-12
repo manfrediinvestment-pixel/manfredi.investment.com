@@ -70,7 +70,7 @@
     var malos = cks.filter(function (c) { return c.estado !== 'ok'; }), buenos = cks.filter(function (c) { return c.estado === 'ok'; });
     return '<div class="rv-det">' +
       '<div class="rv-col"><h5>Controles</h5><ul class="rv-cks">' + malos.map(check).join('') + '</ul>' +
-      (buenos.length ? '<details class="rv-oks"' + (malos.length ? '' : ' open') + '><summary>' + buenos.length + ' controles en orden</summary><ul class="rv-cks">' + buenos.map(check).join('') + '</ul></details>' : '') + '</div>' +
+      (buenos.length ? '<details class="rv-oks"' + (malos.length ? '' : ' open') + '><summary>' + buenos.length + (buenos.length === 1 ? ' control en orden' : ' controles en orden') + '</summary><ul class="rv-cks">' + buenos.map(check).join('') + '</ul></details>' : '') + '</div>' +
       '<div class="rv-col">' +
       (r.datos && r.datos.length ? '<h5>Datos verificados</h5><ul class="rv-datos">' + r.datos.map(function (d) {
         var f = /^https?:/.test(d.fuente || '') ? '<a href="' + esc(d.fuente) + '" target="_blank" rel="noopener">fuente</a>' : esc(d.fuente || '');
