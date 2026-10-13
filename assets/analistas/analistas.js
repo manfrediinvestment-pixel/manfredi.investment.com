@@ -38,6 +38,12 @@
   }
   var FLECHA = '<svg class="an-arr" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg>';
   var TILDE = '<span class="an-verif" title="Autor verificado">✓</span>';
+  // matrícula para asesorar (la carga el creador; Términos de colaboración, cl. 5)
+  function registro(a, corto) {
+    var r = a && a.registro;
+    if (!r) return '';
+    return '<span class="an-reg">' + (corto ? 'Asesor registrado · ' + esc(r.organismo) : 'Asesor registrado · ' + esc(r.organismo) + (r.categoria ? ' · ' + esc(r.categoria) : '') + ' · N.º ' + esc(r.numero)) + '</span>';
+  }
 
   /* ------------------------------ datos ------------------------------ */
   function json(url) { return fetch(url, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(url + ' HTTP ' + r.status); return r.json(); }); }
@@ -114,7 +120,7 @@
       '<article class="an-nota"><span class="an-row__k">' + esc(etiqueta(p)) + '<i></i>' + cuando(p, true) + '<i></i>' + minutos(p) + ' min de lectura</span>' +
       '<h3 class="an-nota__t">' + esc(p.titulo) + '</h3>' +
       (p.resumen ? '<p class="an-nota__s">' + esc(p.resumen) + '</p>' : '') +
-      '<a class="an-nota__a" href="#analista-' + esc(a.slug) + '">' + av(a) + '<span><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + esc(a.rol || a.corto || '') + '</small></span></a>' +
+      '<a class="an-nota__a" href="#analista-' + esc(a.slug) + '">' + av(a) + '<span><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + esc(a.rol || a.corto || '') + '</small>' + registro(a) + '</span></a>' +
       '<div class="an-nota__c">' + md(p.cuerpo) + '</div>' +
       (p.posiciones ? '<p class="an-disc an-disc--pos">Declaración del autor: ' + esc(p.posiciones) + '</p>' : '') +
       (p.autor === 'manfredi' ? '' : '<p class="an-disc">Contenido de autoría de ' + esc(a.nombre) + '. Las opiniones son del autor y no constituyen recomendación de inversión ni reflejan la posición de Manfredi Investment.</p>') +
@@ -133,7 +139,7 @@
     var a = st.autores[p.autor];
     var nuevo = p._t && Date.now() - p._t < 7 * 864e5;
     return '<div class="an-row' + (sinAutor ? ' an-row--solo' : '') + '" role="link" tabindex="0" data-id="' + esc(p.id) + '">' +
-      (sinAutor ? '' : '<span class="an-row__a">' + av(a) + '<span><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + esc(a.corto || '') + '</small></span></span>') +
+      (sinAutor ? '' : '<span class="an-row__a">' + av(a) + '<span><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + esc(a.corto || '') + '</small>' + registro(a, true) + '</span></span>') +
       tapa(p) +
       '<span class="an-row__b"><span class="an-row__k">' + (nuevo ? '<em>Nuevo</em>' : '') + esc(etiqueta(p)) + '<i></i>' + cuando(p) + (esTexto(p) ? '<i></i>' + minutos(p) + ' min' : '') + '</span>' +
       '<span class="an-row__t">' + esc(p.titulo) + '</span>' +
@@ -203,7 +209,7 @@
       '<section class="an-prof" style="--c:' + esc(a.color) + '">' + av(a, 'lg') +
       '<div><span class="an-tag">' + cats.map(function (c) { return CAT[c].n; }).join(' · ') + '</span>' +
       '<h3 class="an-prof__n">' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</h3>' +
-      '<div class="an-prof__r">' + esc(a.rol || '') + '</div>' + (a.bio ? '<p class="an-prof__bio">' + esc(a.bio) + '</p>' : '') + '<div class="an-links">' + links(a) + '</div></div>' +
+      '<div class="an-prof__r">' + esc(a.rol || '') + '</div>' + registro(a) + (a.bio ? '<p class="an-prof__bio">' + esc(a.bio) + '</p>' : '') + '<div class="an-links">' + links(a) + '</div></div>' +
       '<div class="an-pstats"><span><strong>' + pubs.length + '</strong>publicaciones</span>' +
       (lect ? '<span><strong>' + miles(lect) + '</strong>lecturas</span>' : '') +
       (desde ? '<span><strong>' + esc(desde) + '</strong>desde</span>' : '') + '</div></section>' +

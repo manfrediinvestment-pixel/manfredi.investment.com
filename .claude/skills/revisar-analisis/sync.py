@@ -41,7 +41,7 @@ def bajar(todos):
         completo = pedir('GET', '/creador/envio/%s/envio.json' % e['id'])
         a = e.get('autorPerfil') or {}
         completo['autor'] = {'slug': a.get('slug', e.get('autor')), 'nombre': a.get('nombre', ''), 'email': e['email'], 'rol': a.get('rol', ''),
-                             'pais': a.get('pais', 'AR'), 'asesor': bool(a.get('asesor')), 'links': a.get('links', {})}
+                             'pais': a.get('pais', 'AR'), 'asesor': bool(a.get('asesor')), 'registro': a.get('registro'), 'links': a.get('links', {})}
         if e['formato'] == 'pdf':
             (d / 'analisis.pdf').write_bytes(pedir('GET', '/creador/envio/%s/analisis.pdf' % e['id'], crudo=True))
             try:

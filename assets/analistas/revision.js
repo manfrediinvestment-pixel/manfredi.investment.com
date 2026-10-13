@@ -17,7 +17,7 @@
   var VER = { publicar: { t: 'Para publicar', c: 'ok' }, cambios: { t: 'Pide cambios', c: 'ojo' }, rechazar: { t: 'No publicar', c: 'mal' } };
   var ESTADO = { recibido: 'pendiente', publicado: 'aprobado', cambios: 'cambios', rechazado: 'rechazado', retirado: 'aprobado' };
   var ORDEN = { mal: 0, ojo: 1, ok: 2 };
-  var st = { envios: [], autores: [], tab: 'pendiente', abierto: null, confirmar: null, ocupado: false };
+  var st = { envios: [], autores: [], tab: 'pendiente', abierto: null, confirmar: null, ocupado: false, editando: null };
   var box = null, boxAut = null;
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -166,24 +166,39 @@
   }
 
   /* ------------------------------ vista: autores ------------------------------ */
+  var ORGANISMOS = ['CNV', 'CNMV', 'CMF', 'SMV', 'SEC'];
+  function formAutor() {
+    var e = st.editando || {}, r = e.registro || null;
+    var org = r ? r.organismo : 'CNV', otro = !!r && ORGANISMOS.indexOf(r.organismo) < 0;
+    return '<form class="rv-hab" data-rv-hab>' +
+      '<label><span>Mail</span><input name="email" type="email" required placeholder="analista@mail.com" autocomplete="off" value="' + esc(e.email || '') + '"' + (e.email ? ' readonly' : '') + '></label>' +
+      '<label><span>Nombre</span><input name="nombre" required placeholder="Nombre y apellido" value="' + esc(e.nombre || '') + '"></label>' +
+      '<label><span>Cómo se presenta</span><input name="rol" placeholder="Ej.: Economista (UBA) · Renta fija" value="' + esc(e.rol || '') + '"></label>' +
+      '<div class="rv-hab__acc">' + (st.editando ? '<button type="button" class="rv-btn" data-rv-cancelar>Cancelar</button>' : '') +
+      '<button type="submit" class="rv-btn is-main"' + (st.ocupado ? ' disabled' : '') + '>' + (st.editando ? 'Guardar' : 'Habilitar') + '</button></div>' +
+      '<label class="rv-hab__mat"><input type="checkbox" name="asesor"' + (r ? ' checked' : '') + '> <b>Tiene matrícula para asesorar</b> <small>Viste la constancia. Puede incluir recomendaciones si cumple la cláusula 5 de los Términos.</small></label>' +
+      '<div class="rv-hab__reg"' + (r ? '' : ' hidden') + '>' +
+      '<label><span>Organismo</span><select name="organismo">' + ORGANISMOS.map(function (o) { return '<option' + (o === org ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '<option value="otro"' + (otro ? ' selected' : '') + '>Otro</option></select></label>' +
+      '<label' + (otro ? '' : ' hidden') + ' data-rv-otro><span>Cuál</span><input name="organismoOtro" placeholder="Autoridad de su país" value="' + esc(otro ? org : '') + '"></label>' +
+      '<label><span>Categoría</span><input name="categoria" placeholder="Ej.: Agente Productor · Asesor de inversiones" value="' + esc(r ? r.categoria : '') + '"></label>' +
+      '<label><span>N.º de registro</span><input name="numero" placeholder="Matrícula" value="' + esc(r ? r.numero : '') + '"></label></div>' +
+      '</form>';
+  }
+  function registroTxt(r) { return r ? 'Asesor registrado · ' + r.organismo + (r.categoria ? ' · ' + r.categoria : '') + ' · N.º ' + r.numero : ''; }
   function pintarAutores() {
     if (!boxAut) return;
     var act = st.autores.filter(function (a) { return !a.baja; }), baja = st.autores.filter(function (a) { return a.baja; });
     boxAut.innerHTML = '<section class="rv rv-aut">' +
       '<header class="rv-top"><div><span class="rv-kick">Analistas invitados</span><h3>Autores habilitados</h3></div>' +
       '<div class="rv-sum"><span><b>' + act.length + '</b>habilitados</span><span class="ok"><b>' + act.reduce(function (s, a) { return s + a.publicados; }, 0) + '</b>publicaciones</span></div></header>' +
-      '<form class="rv-hab" data-rv-hab>' +
-      '<label><span>Mail</span><input name="email" type="email" required placeholder="analista@mail.com" autocomplete="off"></label>' +
-      '<label><span>Nombre</span><input name="nombre" required placeholder="Nombre y apellido"></label>' +
-      '<label><span>Cómo se presenta</span><input name="rol" placeholder="Ej.: Economista (UBA) · Renta fija"></label>' +
-      '<button type="submit" class="rv-btn is-main"' + (st.ocupado ? ' disabled' : '') + '>Habilitar</button></form>' +
-      '<p class="rv-pie rv-pie--top">Le llega un mail de bienvenida y, cuando inicia sesión con ese mail, le aparece "Mi espacio de autor".</p>' +
+      formAutor() +
+      '<p class="rv-pie rv-pie--top">' + (st.editando ? 'Editando a ' + esc(st.editando.nombre) + '. Los cambios se ven al toque en su perfil.' : 'Le llega un mail de bienvenida y, cuando inicia sesión con ese mail, le aparece "Mi espacio de autor".') + '</p>' +
       (act.length ? '<ul class="rv-auts">' + act.map(function (a) {
         var conf = st.confirmar === 'baja:' + a.email;
         return '<li><span class="an-av sm" style="--c:' + esc(a.color) + '">' + esc(a.nombre.split(' ').map(function (p) { return p[0]; }).slice(0, 2).join('').toUpperCase()) + '</span>' +
-          '<span class="rv-auts__b"><b>' + esc(a.nombre) + '</b><small>' + esc(a.email) + (a.rol ? ' · ' + esc(a.rol) : '') + '</small></span>' +
+          '<span class="rv-auts__b"><b>' + esc(a.nombre) + '</b><small>' + esc(a.email) + (a.rol ? ' · ' + esc(a.rol) : '') + '</small>' + (a.registro ? '<em class="rv-reg">' + esc(registroTxt(a.registro)) + '</em>' : '') + '</span>' +
           '<span class="rv-auts__n">' + a.envios + ' envíos · ' + a.publicados + ' publicados</span>' +
-          '<span class="rv-auts__acc"><button type="button" class="rv-link" data-rv-reenviar="' + esc(a.email) + '">Reenviar mail</button>' +
+          '<span class="rv-auts__acc"><button type="button" class="rv-link" data-rv-editar="' + esc(a.email) + '">Editar</button><button type="button" class="rv-link" data-rv-reenviar="' + esc(a.email) + '">Reenviar mail</button>' +
           '<button type="button" class="rv-link rv-link--mal" data-rv-baja="' + esc(a.email) + '">' + (conf ? 'Confirmar' : 'Deshabilitar') + '</button></span></li>';
       }).join('') + '</ul>' : '<p class="rv-vacio">Todavía no habilitaste a nadie.</p>') +
       (baja.length ? '<details class="rv-oks"><summary>' + baja.length + ' deshabilitados</summary><ul class="rv-auts">' + baja.map(function (a) {
@@ -262,11 +277,30 @@
       var f = ev.target.closest('[data-rv-hab]');
       if (!f) return;
       ev.preventDefault();
-      habilitar({ email: f.email.value, nombre: f.nombre.value, rol: f.rol.value });
+      var org = f.organismo.value === 'otro' ? f.organismoOtro.value.trim() : f.organismo.value;
+      var datos = { email: f.email.value, nombre: f.nombre.value, rol: f.rol.value };
+      if (f.asesor.checked) {
+        if (!org || !f.numero.value.trim()) { aviso('Completá el organismo y el número de registro.'); return; }
+        datos.registro = { organismo: org, categoria: f.categoria.value, numero: f.numero.value };
+      } else datos.registro = null;
+      var editando = !!st.editando;
+      habilitar(datos, editando ? 'Cambios guardados.' : null).then(function () { if (editando) { st.editando = null; pintarAutores(); } });
+    });
+    boxAut.addEventListener('change', function (ev) {
+      var f = ev.target.form;
+      if (!f || !f.hasAttribute('data-rv-hab')) return;
+      if (ev.target.name === 'asesor') f.querySelector('.rv-hab__reg').hidden = !ev.target.checked;
+      if (ev.target.name === 'organismo') f.querySelector('[data-rv-otro]').hidden = ev.target.value !== 'otro';
     });
     boxAut.addEventListener('click', function (ev) {
-      var t = ev.target.closest('[data-rv-baja],[data-rv-reenviar],[data-rv-rehab]');
+      var t = ev.target.closest('[data-rv-baja],[data-rv-reenviar],[data-rv-rehab],[data-rv-editar],[data-rv-cancelar]');
       if (!t) return;
+      if (t.hasAttribute('data-rv-cancelar')) { st.editando = null; pintarAutores(); return; }
+      if (t.dataset.rvEditar) {
+        st.editando = st.autores.filter(function (x) { return x.email === t.dataset.rvEditar; })[0];
+        pintarAutores(); boxAut.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
       var a = function (m) { return st.autores.filter(function (x) { return x.email === m; })[0]; };
       if (t.dataset.rvReenviar) { var x = a(t.dataset.rvReenviar); habilitar({ email: x.email, nombre: x.nombre, rol: x.rol, reenviar: true }, 'Mail reenviado.'); return; }
       if (t.dataset.rvRehab) { habilitar({ email: t.dataset.rvRehab, nombre: t.dataset.nombre }, 'Habilitado de nuevo.'); return; }

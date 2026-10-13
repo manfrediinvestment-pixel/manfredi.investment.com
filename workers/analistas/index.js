@@ -178,7 +178,15 @@ async function yo(request, env) {
   return json({ sesion: true, email: u.email, creador: CREADORES.includes(u.email), habilitado: !!(a && !a.baja), autor: a && !a.baja ? perfilPublico(a) : null });
 }
 function perfilPublico(a) {
-  return { slug: a.slug, nombre: a.nombre, rol: a.rol || '', corto: a.corto || '', bio: a.bio || '', color: a.color, verificado: true, desde: a.desde, links: a.links || {} };
+  const p = { slug: a.slug, nombre: a.nombre, rol: a.rol || '', corto: a.corto || '', bio: a.bio || '', color: a.color, verificado: true, desde: a.desde, links: a.links || {}, asesor: !!a.registro };
+  // matrícula para asesorar: la carga el creador después de ver la constancia (Términos, cl. 5)
+  if (a.registro) p.registro = { organismo: a.registro.organismo, categoria: a.registro.categoria, numero: a.registro.numero };
+  return p;
+}
+function registroDe(r) {
+  if (!r || typeof r !== 'object') return null;
+  const reg = { organismo: txt(r.organismo, 40), categoria: txt(r.categoria, 80), numero: txt(r.numero, 40) };
+  return reg.organismo && reg.numero ? reg : null;
 }
 const txt = (v, n) => String(v == null ? '' : v).replace(/\s+/g, ' ').trim().slice(0, n);
 function nuevoId(slug) {
@@ -386,7 +394,8 @@ async function creadorAutores(request, env) {
 }
 const slugDe = n => n.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
 
-// POST /creador/habilitar {email, nombre, rol, corto}
+// POST /creador/habilitar {email, nombre, rol, corto, registro?: {organismo, categoria, numero} | null}
+// Con un mail ya habilitado sirve para editar: si viene "registro" (aunque sea null) se actualiza.
 async function creadorHabilitar(request, env, ctx) {
   const c = await creador(request, env);
   if (!c || c.skill) return err('Solo el creador', 403);
@@ -398,14 +407,20 @@ async function creadorHabilitar(request, env, ctx) {
   let nuevo = false;
   const hab = await actualizar(env, 'meta/habilitados.json', {}, h => {
     const usados = new Set(Object.entries(h).filter(([k]) => k !== email).map(([, a]) => a.slug));
-    if (h[email]) { h[email].baja = false; h[email].nombre = nombre; h[email].rol = txt(b.rol, 90) || h[email].rol; return h; }
+    if (h[email]) {
+      h[email].baja = false; h[email].nombre = nombre; h[email].rol = txt(b.rol, 90) || h[email].rol;
+      if ('registro' in b) { const r = registroDe(b.registro); if (r) h[email].registro = r; else delete h[email].registro; }
+      return h;
+    }
     nuevo = true;
     let slug = slugDe(nombre) || 'autor', s = slug, i = 2;
     while (usados.has(s) || s === 'manfredi') s = slug + '-' + i++;
     h[email] = { slug: s, nombre, rol: txt(b.rol, 90), corto: txt(b.corto, 40) || txt(b.rol, 40), color: COLORES[Object.keys(h).length % COLORES.length],
       desde: new Date().toISOString().slice(0, 10), habilitadoEn: new Date().toISOString(), links: {} };
+    const r = registroDe(b.registro); if (r) h[email].registro = r;
     return h;
   });
+  await refrescarAutoresPublicados(env, hab);
   if (nuevo || b.reenviar) ctx.waitUntil(mail(env, [email], 'Ya podés publicar en Manfredi Investment', plantilla('Bienvenido a Análisis e informes',
     '<p>Hola ' + esc(nombre.split(' ')[0]) + ', habilitamos tu mail para publicar en la sección Análisis e informes.</p>' +
     '<p>Iniciá sesión en el sitio con <b>' + esc(email) + '</b> y vas a ver el botón <b>Mi espacio de autor</b> junto a las pestañas de Noticias. Desde ahí subís tus análisis (PDF o texto) y completás tu perfil.</p>',

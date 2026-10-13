@@ -113,7 +113,9 @@
       '</div>' +
       '<aside class="au-side">' +
       '<div class="au-card"><h5>Antes de enviar</h5><ul class="au-rules">' +
-      '<li><b>Análisis, no órdenes.</b> Contá qué ves y por qué; evitá "comprá" o "conviene vender".</li>' +
+      (st.autor && st.autor.registro
+        ? '<li><b>Recomendaciones, con tu matrícula.</b> Podés incluirlas si son generales, llevan tu aviso de riesgo y tu número de registro figura en la pieza.</li>'
+        : '<li><b>Análisis, no órdenes.</b> Contá qué ves y por qué; evitá "comprá" o "conviene vender". Las recomendaciones quedan para autores con matrícula.</li>') +
       '<li><b>Datos con fecha y fuente.</b> Los verificamos antes de publicar.</li>' +
       '<li><b>Sin promociones.</b> Nada de cursos, grupos pagos ni links de referido.</li>' +
       '<li><b>Tus links van en tu perfil:</b> LinkedIn, redes y el lugar donde trabajás.</li></ul></div>' +
