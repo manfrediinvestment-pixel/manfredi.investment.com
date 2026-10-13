@@ -363,6 +363,7 @@ async function creadorDecision(request, env, ctx) {
 // rutas relativas al worker: el sitio les antepone la URL del worker
 function publicacion(e) {
   const p = { id: e.id, autor: e.autor, categoria: e.categoria, titulo: e.titulo, resumen: e.resumen, fecha: e.publicado.slice(0, 10) };
+  if (e.posiciones) p.posiciones = e.posiciones; // la declaración del autor se publica junto con la pieza
   if (e.formato === 'pdf') { p.pdf = '/pub/' + e.id + '.pdf'; p.tapa = '/pub/' + e.id + '.jpg'; }
   else p.cuerpo = e.cuerpo; // los textos se leen en la página (#nota-<id>)
   return p;

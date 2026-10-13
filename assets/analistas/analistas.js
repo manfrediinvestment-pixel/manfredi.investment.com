@@ -116,6 +116,7 @@
       (p.resumen ? '<p class="an-nota__s">' + esc(p.resumen) + '</p>' : '') +
       '<a class="an-nota__a" href="#analista-' + esc(a.slug) + '">' + av(a) + '<span><b>' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</b><small>' + esc(a.rol || a.corto || '') + '</small></span></a>' +
       '<div class="an-nota__c">' + md(p.cuerpo) + '</div>' +
+      (p.posiciones ? '<p class="an-disc an-disc--pos">Declaración del autor: ' + esc(p.posiciones) + '</p>' : '') +
       (p.autor === 'manfredi' ? '' : '<p class="an-disc">Contenido de autoría de ' + esc(a.nombre) + '. Las opiniones son del autor y no constituyen recomendación de inversión ni reflejan la posición de Manfredi Investment.</p>') +
       '<div class="an-nota__soc">' + social(p.id, true) + '</div>' +
       (window.AnSocial ? window.AnSocial.hilo(p.id) : '') +
@@ -136,9 +137,11 @@
       tapa(p) +
       '<span class="an-row__b"><span class="an-row__k">' + (nuevo ? '<em>Nuevo</em>' : '') + esc(etiqueta(p)) + '<i></i>' + cuando(p) + (esTexto(p) ? '<i></i>' + minutos(p) + ' min' : '') + '</span>' +
       '<span class="an-row__t">' + esc(p.titulo) + '</span>' +
-      (p.resumen ? '<span class="an-row__s">' + esc(p.resumen) + '</span>' : '') + social(p.id) + '</span>' +
+      (p.resumen ? '<span class="an-row__s">' + esc(p.resumen) + '</span>' : '') + posiciones(p) + social(p.id) + '</span>' +
       FLECHA + '</div>';
   }
+  // declaración del autor sobre sus posiciones (Términos de colaboración, cláusula 5)
+  function posiciones(p) { return p.posiciones ? '<span class="an-row__pos">Declaración del autor: ' + esc(p.posiciones) + '</span>' : ''; }
   function social(id, abierta) { return window.AnSocial ? window.AnSocial.barra(id, abierta) : ''; }
   function montar(lista) { if (window.AnSocial) window.AnSocial.montar(lista.map(function (p) { return p.id; })); }
   function pintarGrilla() {

@@ -86,6 +86,14 @@ Las fijó el usuario el 09-oct-2026. Son las que hacen que la sección sea segur
 | R6 | **Sin ataques personales ni información privilegiada** | insultos a personas, datos no públicos de empresas, rumores presentados como hechos | `mal` |
 | R7 | **Declaración de posiciones** | si menciona activos y `declaraciones.posiciones` está vacío | `ojo` |
 
+**Autores con matrícula** (`asesor: true`, decisión del usuario 13-oct-2026, Términos de colaboración cl. 5):
+SÍ pueden recomendar, pero cada recomendación tiene que cumplir las cuatro condiciones; si falta
+alguna es `ojo` (reformulable) y el mensaje al autor pide lo que falta:
+(a) categoría y número de registro (CNV o la autoridad de su país) en la pieza y en su perfil;
+(b) recomendación general, no dirigida a la situación de un lector puntual;
+(c) aviso de riesgo propio del autor; (d) la responsabilidad es suya (el aviso lo dice).
+Si `asesor: true` pero no hay número de registro verificable, tratalo como `asesor: false`.
+
 **Reformular no es censurar**: si una frase rompe R1, proponé en el mensaje al autor la
 versión en lenguaje de análisis ("conviene comprar GD30" → "el GD30 ofrece más valor
 relativo que el AL30 en este escenario"). La opinión del autor se respeta.
