@@ -16,6 +16,7 @@
   var CATS = [['acciones', 'Acciones'], ['bonos', 'Bonos'], ['macro', 'Macro'], ['politica', 'Política'], ['trading', 'Trading']];
   var CATN = {}; CATS.forEach(function (c) { CATN[c[0]] = c[1]; });
   var MAX_MB = 20, MAX_RES = 180, MAX_TIT = 90;
+  var TERMINOS = '1.0'; // versión de terminos-autores.html; tiene que coincidir con la del worker
   var st = { autor: null, envios: [], tab: 'subir', formato: 'pdf', archivo: null, tapa: '', paginas: 0, abierto: null, reemplaza: null, enviando: false };
 
   function $(id) { return document.getElementById(id); }
@@ -106,9 +107,12 @@
       '<div class="au-field"><label for="auRes">Resumen <small>se ve debajo del título en la lista</small></label><textarea id="auRes" name="resumen" rows="2" maxlength="' + MAX_RES + '" placeholder="Dos líneas: de qué trata y a qué conclusión llegás." required></textarea><small class="au-help au-count" id="auResN">0 / ' + MAX_RES + '</small></div>' +
       '<div class="au-two"><div class="au-field"><label for="auCat">Categoría</label><select id="auCat" name="categoria" required><option value="">Elegí una</option>' + CATS.map(function (c) { return '<option value="' + c[0] + '">' + c[1] + '</option>'; }).join('') + '</select></div>' +
       '<div class="au-field"><label for="auAct">Activos que mencionás <small>opcional</small></label><input id="auAct" name="activos" placeholder="AL30, GD30, GGAL"></div></div>' +
-      '<div class="au-field"><label for="auPos">Tus posiciones en esos activos</label><input id="auPos" name="posiciones" placeholder="Ej.: Tengo GD30 · No tengo posiciones"><small class="au-help">Se aclara al pie del análisis.</small></div>' +
+      '<div class="au-field"><label for="auPos">Tus posiciones en esos activos</label><input id="auPos" name="posiciones" placeholder="Ej.: Tengo GD30 · No tengo posiciones"><small class="au-help">Se publica junto al análisis como «Declaración del autor».</small></div>' +
       '<label class="au-check"><input type="checkbox" name="autoria" required><span>Soy el autor del contenido y tengo derecho a publicarlo.</span></label>' +
-      '<label class="au-check"><input type="checkbox" name="reglas" required><span>No incluye recomendaciones de compra o venta, promesas de rentabilidad ni promoción de servicios pagos.</span></label>' +
+      '<label class="au-check"><input type="checkbox" name="reglas" required><span>' + (st.autor && st.autor.registro
+        ? 'Si incluye recomendaciones, son generales, llevan mi aviso de riesgo y mi número de registro. No incluye promesas de rentabilidad ni promoción de servicios pagos.'
+        : 'No incluye recomendaciones de compra o venta, promesas de rentabilidad ni promoción de servicios pagos.') + '</span></label>' +
+      '<label class="au-check"><input type="checkbox" name="terminos" required><span>Leí y acepto los <a class="au-link" href="terminos-autores.html" target="_blank" rel="noopener">Términos de colaboración</a> (versión ' + TERMINOS + ').</span></label>' +
       '<div class="au-send"><button type="submit" class="an-gold au-btn" id="auEnviar" disabled>Enviar a revisión</button><span class="au-help" id="auFalta">Completá los campos para enviar.</span></div>' +
       '</div>' +
       '<aside class="au-side">' +
@@ -121,7 +125,7 @@
       '<li><b>Tus links van en tu perfil:</b> LinkedIn, redes y el lugar donde trabajás.</li></ul></div>' +
       '<div class="au-card"><h5>Qué pasa después</h5><ol class="au-steps">' +
       '<li><span>1</span>Recibido</li><li><span>2</span>Revisión editorial</li><li><span>3</span>Publicado o con cambios sugeridos</li></ol>' +
-      '<p class="au-note">Te avisamos por mail en cada paso. El contenido sigue siendo tuyo: podés publicarlo en tus canales y pedir que lo retiremos cuando quieras.</p></div>' +
+      '<p class="au-note">Te avisamos por mail en cada paso. El contenido sigue siendo tuyo: podés publicarlo en tus canales y pedir que lo retiremos cuando quieras. <a class="au-link" href="terminos-autores.html" target="_blank" rel="noopener">Términos de colaboración</a></p></div>' +
       '</aside></form>';
   }
   function zona() {
@@ -206,7 +210,8 @@
     if (!f.titulo.value.trim()) falta.push('el título');
     if (!f.resumen.value.trim()) falta.push('el resumen');
     if (!f.categoria.value) falta.push('la categoría');
-    if (!f.autoria.checked || !f.reglas.checked) falta.push('las dos confirmaciones');
+    if (!f.autoria.checked || !f.reglas.checked) falta.push('las confirmaciones');
+    if (!f.terminos.checked) falta.push('aceptar los Términos');
     $('auEnviar').disabled = !!falta.length || st.enviando;
     $('auFalta').textContent = falta.length ? 'Te falta completar: ' + falta.join(', ') + '.' : 'Listo para enviar.';
     $('auFalta').classList.toggle('au-ok', !falta.length);
@@ -294,7 +299,7 @@
     var btn = $('auEnviar');
     st.enviando = true; btn.disabled = true; btn.textContent = st.formato === 'pdf' ? 'Subiendo el PDF…' : 'Enviando…';
     var datos = { formato: st.formato, titulo: f.titulo.value, resumen: f.resumen.value, categoria: f.categoria.value, activos: f.activos.value, posiciones: f.posiciones.value,
-      autoria: f.autoria.checked, reglas: f.reglas.checked, reemplaza: st.reemplaza || undefined };
+      autoria: f.autoria.checked, reglas: f.reglas.checked, terminos: f.terminos.checked ? TERMINOS : '', reemplaza: st.reemplaza || undefined };
     if (st.formato === 'texto') datos.cuerpo = f.cuerpo.value; else if (st.tapa) datos.tapa = st.tapa;
     API.post('/envios', datos).then(function (r) {
       if (st.formato !== 'pdf') return r;

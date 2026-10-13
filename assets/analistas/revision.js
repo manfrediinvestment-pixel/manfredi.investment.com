@@ -197,7 +197,7 @@
         var conf = st.confirmar === 'baja:' + a.email;
         return '<li><span class="an-av sm" style="--c:' + esc(a.color) + '">' + esc(a.nombre.split(' ').map(function (p) { return p[0]; }).slice(0, 2).join('').toUpperCase()) + '</span>' +
           '<span class="rv-auts__b"><b>' + esc(a.nombre) + '</b><small>' + esc(a.email) + (a.rol ? ' · ' + esc(a.rol) : '') + '</small>' + (a.registro ? '<em class="rv-reg">' + esc(registroTxt(a.registro)) + '</em>' : '') + '</span>' +
-          '<span class="rv-auts__n">' + a.envios + ' envíos · ' + a.publicados + ' publicados</span>' +
+          '<span class="rv-auts__n">' + a.envios + ' envíos · ' + a.publicados + ' publicados<br>' + (a.terminos ? 'Términos v' + esc(a.terminos.version) + ' · ' + esc(String(a.terminos.fecha).slice(0, 10)) : 'Sin aceptar los Términos') + '</span>' +
           '<span class="rv-auts__acc"><button type="button" class="rv-link" data-rv-editar="' + esc(a.email) + '">Editar</button><button type="button" class="rv-link" data-rv-reenviar="' + esc(a.email) + '">Reenviar mail</button>' +
           '<button type="button" class="rv-link rv-link--mal" data-rv-baja="' + esc(a.email) + '">' + (conf ? 'Confirmar' : 'Deshabilitar') + '</button></span></li>';
       }).join('') + '</ul>' : '<p class="rv-vacio">Todavía no habilitaste a nadie.</p>') +

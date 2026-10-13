@@ -21,6 +21,8 @@ const SITIO = 'https://manfredinvestment.com';
 const CATEGORIAS = ['acciones', 'bonos', 'macro', 'politica', 'trading'];
 const MAX_PDF = 20 * 1024 * 1024;
 const MAX_TAPA = 600 * 1024;
+// versión vigente de los Términos de colaboración (terminos-autores.html). Si cambia, los autores la aceptan de nuevo al enviar.
+const TERMINOS = '1.0';
 const COLORES = ['#c3a6f2', '#7fd1ae', '#8fb4ff', '#f29e8e', '#e9c46a', '#9fd3e6', '#f2b880'];
 
 const CORS = {
@@ -175,7 +177,8 @@ async function yo(request, env) {
   if (!u) return json({ sesion: false });
   const hab = await leer(env, 'meta/habilitados.json', {});
   const a = hab[u.email];
-  return json({ sesion: true, email: u.email, creador: CREADORES.includes(u.email), habilitado: !!(a && !a.baja), autor: a && !a.baja ? perfilPublico(a) : null });
+  return json({ sesion: true, email: u.email, creador: CREADORES.includes(u.email), habilitado: !!(a && !a.baja), autor: a && !a.baja ? perfilPublico(a) : null,
+    terminos: { vigente: TERMINOS, aceptado: a && a.terminos ? a.terminos.version : null } });
 }
 function perfilPublico(a) {
   const p = { slug: a.slug, nombre: a.nombre, rol: a.rol || '', corto: a.corto || '', bio: a.bio || '', color: a.color, verificado: true, desde: a.desde, links: a.links || {}, asesor: !!a.registro };
@@ -214,7 +217,12 @@ async function crearEnvio(request, env, ctx) {
     reemplaza: /^[\w-]{6,80}$/.test(b.reemplaza || '') ? b.reemplaza : undefined
   };
   if (!e.titulo || !e.resumen || !e.categoria) return err('Faltan título, resumen o categoría');
-  if (!e.declaraciones.autoria || !e.declaraciones.sinRecomendaciones) return err('Faltan las dos confirmaciones');
+  if (!e.declaraciones.autoria || !e.declaraciones.sinRecomendaciones) return err('Faltan las confirmaciones');
+  if (b.terminos !== TERMINOS) return err('Tenés que aceptar los Términos de colaboración (versión ' + TERMINOS + ')');
+  e.terminos = { version: TERMINOS, aceptado: e.enviado };
+  // la aceptación también queda en el autor (la primera vez y con cada versión nueva)
+  if (!a.terminos || a.terminos.version !== TERMINOS)
+    await actualizar(env, 'meta/habilitados.json', {}, h => { if (h[u.email]) h[u.email].terminos = { version: TERMINOS, fecha: e.enviado }; return h; });
   if (formato === 'texto') {
     const cuerpo = String(b.cuerpo || '').replace(/\r/g, '').slice(0, 60000);
     if (cuerpo.trim().split(/\s+/).length < 150) return err('El texto tiene que tener al menos 150 palabras');
@@ -389,7 +397,7 @@ async function creadorAutores(request, env) {
   if (!(await creador(request, env))) return err('Solo el creador', 403);
   const hab = await leer(env, 'meta/habilitados.json', {});
   const envios = await leer(env, 'meta/envios.json', []);
-  return json({ autores: Object.entries(hab).map(([email, a]) => ({ email, ...perfilPublico(a), baja: !!a.baja, habilitadoEn: a.habilitadoEn,
+  return json({ terminosVigentes: TERMINOS, autores: Object.entries(hab).map(([email, a]) => ({ email, ...perfilPublico(a), baja: !!a.baja, habilitadoEn: a.habilitadoEn, terminos: a.terminos || null,
     envios: envios.filter(x => x.email === email && x.estado !== 'subiendo').length, publicados: envios.filter(x => x.email === email && x.estado === 'publicado').length })) });
 }
 const slugDe = n => n.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
