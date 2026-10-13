@@ -82,7 +82,8 @@
     return '<a class="an-back" href="#analisis">← Análisis e informes</a>' +
       '<header class="au-head">' + av(a, 'lg') +
       '<div><span class="au-k">Mi espacio de autor</span><h3 class="au-t">Hola, ' + esc(a.nombre.split(' ')[0]) + '.</h3>' +
-      '<p class="au-s">' + esc(a.rol || '') + '<i></i><a href="#analista-' + esc(a.slug) + '">Ver mi perfil público</a></p></div>' +
+      '<p class="au-s">' + esc(a.rol || '') + '<i></i><a href="#analista-' + esc(a.slug) + '">Ver mi perfil público</a></p>' +
+      (a.registro ? '<span class="an-reg au-reg">Asesor registrado · ' + esc(a.registro.organismo) + (a.registro.categoria ? ' · ' + esc(a.registro.categoria) : '') + ' · N.º ' + esc(a.registro.numero) + '</span>' : '') + '</div>' +
       '<div class="au-stats"><span><strong>' + nPub + '</strong>' + (nPub === 1 ? 'publicado' : 'publicados') + '</span>' +
       '<span><strong>' + st.envios.filter(function (e) { return e.estado !== 'publicado'; }).length + '</strong>en curso</span></div></header>' +
       '<div class="au-tabs" role="tablist">' + [['subir', 'Subir análisis', ''], ['envios', 'Mis envíos', pend ? '<i class="au-badge">' + pend + '</i>' : ''], ['perfil', 'Mi perfil', '']].map(function (t) {
