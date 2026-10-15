@@ -195,7 +195,7 @@
       '</div>' +
       '<aside class="au-side"><div class="au-card"><h5>Así te ven los lectores</h5>' +
       '<div class="au-prev">' + av(a) + '<div><b>' + esc(a.nombre) + (a.verificado ? '<span class="an-verif">✓</span>' : '') + '</b><small>' + esc(a.rol || '') + '</small></div></div>' +
-      '<p class="au-note">Tu perfil muestra tus publicaciones, tus links y desde cuándo publicás en Manfredi. Es tu página para compartir.</p>' +
+      '<p class="au-note">Tu perfil muestra tus publicaciones, tus links y desde cuándo publicás en Manfredi Investment. Es tu página para compartir.</p>' +
       '<a class="au-link" href="#analista-' + esc(a.slug) + '">Abrir mi perfil público</a></div></aside></form>';
   }
 

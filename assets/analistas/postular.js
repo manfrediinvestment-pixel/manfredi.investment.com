@@ -4,7 +4,7 @@
    link sigue siendo un mailto común. Estilos en assets/analistas/analistas.css. */
 (function () {
   var MAIL = 'manfredi.investment@gmail.com';
-  var ASUNTO = 'Quiero publicar en Manfredi';
+  var ASUNTO = 'Quiero publicar en Manfredi Investment';
   var CUERPO = 'Nombre:\nLinkedIn o redes:\nTemas que analizás:\nLink o PDF de un análisis tuyo:\n';
   var HREF = 'mailto:' + MAIL + '?subject=' + encodeURIComponent(ASUNTO) + '&body=' + encodeURIComponent(CUERPO);
   var box = null, antes = null;
