@@ -16,7 +16,7 @@
   var CATS = [['acciones', 'Acciones'], ['bonos', 'Bonos'], ['macro', 'Macro'], ['politica', 'Política'], ['trading', 'Trading']];
   var CATN = {}; CATS.forEach(function (c) { CATN[c[0]] = c[1]; });
   var MAX_MB = 20, MAX_RES = 180, MAX_TIT = 90;
-  var TERMINOS = '1.0'; // versión de terminos-autores.html; tiene que coincidir con la del worker
+  var TERMINOS = '1.1'; // versión de terminos-autores.html; tiene que coincidir con la del worker
   var st = { autor: null, envios: [], tab: 'subir', formato: 'pdf', archivo: null, tapa: '', paginas: 0, abierto: null, reemplaza: null, enviando: false };
 
   function $(id) { return document.getElementById(id); }
@@ -123,7 +123,7 @@
         : '<li><b>Análisis, no órdenes.</b> Contá qué ves y por qué; evitá "comprá" o "conviene vender". Las recomendaciones quedan para autores con matrícula.</li>') +
       '<li><b>Datos con fecha y fuente.</b> Los verificamos antes de publicar.</li>' +
       '<li><b>Sin promociones.</b> Nada de cursos, grupos pagos ni links de referido.</li>' +
-      '<li><b>Tus links van en tu perfil:</b> LinkedIn, redes y el lugar donde trabajás.</li></ul></div>' +
+      '<li><b>Tus links van en tu perfil:</b> LinkedIn, redes, el lugar donde trabajás y tu negocio.</li></ul></div>' +
       '<div class="au-card"><h5>Qué pasa después</h5><ol class="au-steps">' +
       '<li><span>1</span>Recibido</li><li><span>2</span>Revisión editorial</li><li><span>3</span>Publicado o con cambios sugeridos</li></ol>' +
       '<p class="au-note">Te avisamos por mail en cada paso. El contenido sigue siendo tuyo: podés publicarlo en tus canales y pedir que lo retiremos cuando quieras. <a class="au-link" href="terminos-autores.html" target="_blank" rel="noopener">Términos de colaboración</a></p></div>' +
@@ -174,7 +174,7 @@
 
   // ---------- perfil ----------
   function perfil() {
-    var a = st.autor, l = a.links || {}, t = l.trabajo || {};
+    var a = st.autor, l = a.links || {}, t = l.trabajo || {}, n = a.negocio || {};
     return '<form class="au-up" id="auPerfil">' +
       '<div class="au-main">' +
       '<div class="au-foto">' + av(a, 'lg') + '<div><b>Foto de perfil</b><small class="au-help">Cuadrada, mínimo 400 px.</small><label class="au-link">Cambiar foto<input type="file" accept="image/*" hidden></label></div></div>' +
@@ -186,6 +186,11 @@
       '<div class="au-field"><label>Instagram</label><input name="instagram" value="' + esc(l.instagram || '') + '" placeholder="https://www.instagram.com/…"></div></div>' +
       '<div class="au-two"><div class="au-field"><label>X</label><input name="x" value="' + esc(l.x || '') + '" placeholder="https://x.com/…"></div>' +
       '<div class="au-field"><label>Dónde trabajás</label><input name="trabajo" value="' + esc(t.nombre || '') + '" placeholder="Nombre de la empresa o facultad"></div></div>' +
+      '<h5 class="au-h5">Tu negocio <small>opcional</small></h5>' +
+      '<p class="au-help">Tu consultora, asesoría o estudio, aunque sus servicios sean pagos. No se admiten cursos, mentorías, señales, grupos pagos ni links de referido.</p>' +
+      '<div class="au-two"><div class="au-field"><label>Nombre</label><input name="negocio" maxlength="60" value="' + esc(n.nombre || '') + '" placeholder="Ej.: Estudio Romero · Asesoría financiera"></div>' +
+      '<div class="au-field"><label>Link</label><input name="negocioUrl" value="' + esc(n.url || '') + '" placeholder="https://…"></div></div>' +
+      '<div class="au-field"><label>Qué hacés, en una línea</label><input name="negocioDesc" maxlength="120" value="' + esc(n.desc || '') + '" placeholder="Ej.: Planificación financiera para pymes y profesionales"></div>' +
       '<div class="au-send"><button type="submit" class="an-gold au-btn">Guardar cambios</button></div>' +
       '</div>' +
       '<aside class="au-side"><div class="au-card"><h5>Así te ven los lectores</h5>' +
@@ -319,7 +324,7 @@
   }
   function guardarPerfil(f) {
     if (DEMO) { aviso('Vista previa: acá se guardaría tu perfil.'); return; }
-    var d = {}; ['nombre', 'rol', 'bio', 'linkedin', 'instagram', 'x', 'trabajo'].forEach(function (k) { d[k] = f.elements[k] ? f.elements[k].value : ''; });
+    var d = {}; ['nombre', 'rol', 'bio', 'linkedin', 'instagram', 'x', 'trabajo', 'negocio', 'negocioUrl', 'negocioDesc'].forEach(function (k) { d[k] = f.elements[k] ? f.elements[k].value : ''; });
     API.post('/perfil', d).then(function (r) { st.autor = r.autor; pintar(); aviso('Perfil guardado.'); }).catch(function (er) { aviso('No se pudo guardar: ' + er.message); });
   }
 

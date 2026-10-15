@@ -199,6 +199,14 @@
       return '<a href="' + esc(url) + '" target="_blank" rel="noopener nofollow">' + ICONOS[k] + esc(txt) + '</a>';
     }).join('');
   }
+  // el negocio propio del autor (consultora, asesoría, estudio): Términos 1.1, cl. 9.3
+  function negocio(a) {
+    var n = a.negocio;
+    if (!n || !n.nombre) return '';
+    var cuerpo = '<small>Su negocio</small><b>' + esc(n.nombre) + '</b>' + (n.desc ? '<span>' + esc(n.desc) + '</span>' : '');
+    return n.url ? '<a class="an-neg" href="' + esc(n.url) + '" target="_blank" rel="noopener nofollow">' + cuerpo + '<i aria-hidden="true">↗</i></a>'
+      : '<div class="an-neg">' + cuerpo + '</div>';
+  }
   function pintarPerfil(slug) {
     var a = st.autores[slug], box = $('anPerfil');
     if (!a) { box.innerHTML = '<a class="an-back" href="#analisis">← Análisis e informes</a><p class="nt-empty">No encontramos a este autor.</p>'; return; }
@@ -209,7 +217,7 @@
       '<section class="an-prof" style="--c:' + esc(a.color) + '">' + av(a, 'lg') +
       '<div><span class="an-tag">' + cats.map(function (c) { return CAT[c].n; }).join(' · ') + '</span>' +
       '<h3 class="an-prof__n">' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</h3>' +
-      '<div class="an-prof__r">' + esc(a.rol || '') + '</div>' + registro(a) + (a.bio ? '<p class="an-prof__bio">' + esc(a.bio) + '</p>' : '') + '<div class="an-links">' + links(a) + '</div></div>' +
+      '<div class="an-prof__r">' + esc(a.rol || '') + '</div>' + registro(a) + (a.bio ? '<p class="an-prof__bio">' + esc(a.bio) + '</p>' : '') + negocio(a) + '<div class="an-links">' + links(a) + '</div></div>' +
       '<div class="an-pstats"><span><strong>' + pubs.length + '</strong>publicaciones</span>' +
       (lect ? '<span><strong>' + miles(lect) + '</strong>lecturas</span>' : '') +
       (desde ? '<span><strong>' + esc(desde) + '</strong>desde</span>' : '') + '</div></section>' +

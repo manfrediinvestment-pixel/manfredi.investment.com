@@ -2,7 +2,7 @@
 name: revisar-analisis
 description: "Use when the user asks to review the pieces that guest analysts sent to the 'Análisis e informes' section of manfredinvestment.com — 'revisá los análisis', 'hay análisis para revisar', 'revisá lo que mandaron los analistas', 'revisá el informe de [autor]'. Reads every pending submission (PDF or text) end to end, checks it against the section's hard rules (no personalized buy/sell advice from non-advisors, no selling courses/signals/paid groups, only allowed links, no guaranteed returns, no plagiarism), verifies the key numbers against primary sources, grades quality, and writes one revision.json per submission with a verdict (publicar / cambios / rechazar), a traffic-light checklist with page references and a ready-to-send message to the author. The verdicts show up in the creator Panel ('Análisis por revisar'), where the user only approves or rejects. Runs locally in Claude Code: zero API cost."
 metadata:
-  version: 0.2.0
+  version: 0.3.0
 ---
 
 # Revisar análisis de autores invitados — Manfredi Investment
@@ -80,7 +80,7 @@ Las fijó el usuario el 09-oct-2026. Son las que hacen que la sección sea segur
 |---|---|---|---|
 | R1 | **Sin recomendaciones personalizadas** si `asesor = false` | "comprá", "conviene comprar/vender", "hay que entrar", "yo me posicionaría", precio objetivo presentado como orden, "stop en X" dirigido al lector, carteras sugeridas con % | `ojo` si es una frase reformulable; `mal` si todo el texto es una recomendación |
 | R2 | **Nada de venta** | cursos, mentorías, señales pagas, grupos VIP de Telegram/WhatsApp/Discord, links de referido a brokers, cupones, "escribime por privado para más" | `mal` siempre |
-| R3 | **Solo links permitidos** | LinkedIn, redes, lugar de trabajo. Newsletter **gratis** de análisis: `ojo` (decide el usuario, todavía no lo definió). Cualquier otro link comercial: `mal` | |
+| R3 | **Sin promoción dentro de la pieza** | Dentro del análisis solo se citan fuentes: LinkedIn, redes, lugar de trabajo y el negocio del autor van en su PERFIL, no en la pieza. Mención del propio negocio o link comercial en la pieza ("consultá con mi estudio", "contratá en…"): `mal`. Newsletter **gratis** de análisis: `ojo` (decide el usuario, todavía no lo definió). El negocio propio en el perfil (consultora, asesoría, estudio, aunque sea pago) SÍ está permitido (Términos 1.1, cl. 9.3); si es de asesoramiento o administración de inversiones y el autor no tiene matrícula cargada (`asesor = false`): `ojo` en el mensaje al usuario (cl. 9.4) | |
 | R4 | **Sin promesas de rentabilidad** | "rendimiento asegurado", "no puede bajar", "x2 seguro", "sin riesgo" | `mal` |
 | R5 | **Autoría propia** | Buscá en la web 2 o 3 frases distintivas entre comillas. Si aparecen en otro sitio sin cita: `mal` (plagio). Gráficos o tablas de terceros sin fuente: `ojo` | |
 | R6 | **Sin ataques personales ni información privilegiada** | insultos a personas, datos no públicos de empresas, rumores presentados como hechos | `mal` |

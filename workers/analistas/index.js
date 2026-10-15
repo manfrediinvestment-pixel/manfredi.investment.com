@@ -22,7 +22,7 @@ const CATEGORIAS = ['acciones', 'bonos', 'macro', 'politica', 'trading'];
 const MAX_PDF = 20 * 1024 * 1024;
 const MAX_TAPA = 600 * 1024;
 // versión vigente de los Términos de colaboración (terminos-autores.html). Si cambia, los autores la aceptan de nuevo al enviar.
-const TERMINOS = '1.0';
+const TERMINOS = '1.1';
 const COLORES = ['#c3a6f2', '#7fd1ae', '#8fb4ff', '#f29e8e', '#e9c46a', '#9fd3e6', '#f2b880'];
 
 const CORS = {
@@ -184,6 +184,7 @@ function perfilPublico(a) {
   const p = { slug: a.slug, nombre: a.nombre, rol: a.rol || '', corto: a.corto || '', bio: a.bio || '', color: a.color, verificado: true, desde: a.desde, links: a.links || {}, asesor: !!a.registro };
   // matrícula para asesorar: la carga el creador después de ver la constancia (Términos, cl. 5)
   if (a.registro) p.registro = { organismo: a.registro.organismo, categoria: a.registro.categoria, numero: a.registro.numero };
+  if (a.negocio) p.negocio = { nombre: a.negocio.nombre, desc: a.negocio.desc || '', url: a.negocio.url || '' };
   return p;
 }
 function registroDe(r) {
@@ -289,6 +290,9 @@ async function guardarPerfil(request, env) {
     a.links = { linkedin: url(b.linkedin), instagram: url(b.instagram), x: url(b.x) };
     if (txt(b.trabajo, 80)) a.links.trabajo = { nombre: txt(b.trabajo, 80), url: url(b.trabajoUrl) };
     Object.keys(a.links).forEach(k => { if (!a.links[k]) delete a.links[k]; });
+    // su negocio propio (consultora, asesoría, estudio), aunque sea pago: Términos 1.1, cl. 9.3
+    if (txt(b.negocio, 60)) a.negocio = { nombre: txt(b.negocio, 60), desc: txt(b.negocioDesc, 120), url: url(b.negocioUrl) };
+    else delete a.negocio;
     return h;
   });
   await refrescarAutoresPublicados(env, hab);
