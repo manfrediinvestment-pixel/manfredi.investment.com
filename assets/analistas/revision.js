@@ -63,6 +63,15 @@
       }));
     });
   }
+  // en la vista de ejemplo, los autores salen de los envíos de prueba
+  var COLORES = ['#8fb4ff', '#7fd1ae', '#e9c46a', '#c3a6f2', '#f29e8e'];
+  function autoresDemo() {
+    var vistos = {};
+    return st.envios.filter(function (e) { return !vistos[e.autor.email] && (vistos[e.autor.email] = 1); }).map(function (e, i) {
+      return { email: e.autor.email, nombre: e.autor.nombre, rol: e.autor.rol, color: COLORES[i % COLORES.length], envios: 1, publicados: i === 0 ? 1 : 0,
+        terminos: i < 2 ? { version: '1.1', fecha: e.enviado } : null, registro: i === 0 ? { organismo: 'CNV', categoria: 'Agente Productor', numero: '1234' } : null };
+    });
+  }
   function cargarAutores() { return API.get('/creador/autores').then(function (d) { st.autores = d.autores || []; }); }
   // lo pesado se pide recién al abrir: la revisión completa, el texto, la tapa
   function completar(e) {
@@ -89,13 +98,13 @@
   function resumen() {
     var p = st.envios.filter(function (e) { return e.estado === 'pendiente'; });
     var n = function (v) { return p.filter(function (e) { var r = e.revision || e.resumenRev; return r && r.veredicto === v; }).length; };
-    return '<div class="rv-sum"><span><b>' + p.length + '</b>por revisar</span><span class="ok"><b>' + n('publicar') + '</b>para publicar</span>' +
-      '<span class="ojo"><b>' + n('cambios') + '</b>con cambios</span><span class="mal"><b>' + n('rechazar') + '</b>para rechazar</span></div>';
+    return '<div class="rv-sum"><span><b>' + p.length + '</b>por revisar</span><span class="ok"><b>' + n('publicar') + '</b><em><i class="rv-dot"></i>para publicar</em></span>' +
+      '<span class="ojo"><b>' + n('cambios') + '</b><em><i class="rv-dot"></i>con cambios</em></span><span class="mal"><b>' + n('rechazar') + '</b><em><i class="rv-dot"></i>para rechazar</em></span></div>';
   }
   function tabs() {
     var c = function (s) { return st.envios.filter(function (e) { return e.estado === s; }).length; };
     return '<div class="rv-tabs" role="tablist">' + [['pendiente', 'Por revisar'], ['aprobado', 'Publicados'], ['cambios', 'Cambios pedidos'], ['rechazado', 'Rechazados']].map(function (t) {
-      return '<button type="button" role="tab" data-rv-tab="' + t[0] + '" aria-selected="' + (st.tab === t[0]) + '">' + t[1] + '<i>' + c(t[0]) + '</i></button>';
+      return '<button type="button" role="tab" data-rv-tab="' + t[0] + '" aria-selected="' + (st.tab === t[0]) + '">' + t[1] + '<sup>' + c(t[0]) + '</sup></button>';
     }).join('') + '</div>';
   }
   function check(c) {
@@ -127,13 +136,13 @@
   function boton(e, accion, texto, cls) {
     var conf = st.confirmar === e.id + ':' + accion;
     return '<button type="button" class="rv-btn' + (cls ? ' ' + cls : '') + (conf ? ' is-conf' : '') + '" data-rv-accion="' + accion + '" data-id="' + esc(e.id) + '"' + (st.ocupado ? ' disabled' : '') + '>' +
-      (conf ? 'Tocá de nuevo para confirmar' : texto) + '</button>';
+      (conf ? 'Tocá de nuevo para confirmar' : texto) + (conf ? '<i class="rv-btn__t" aria-hidden="true"></i>' : '') + '</button>';
   }
   function acciones(e) {
     var v = e.revision && e.revision.veredicto || e.resumenRev && e.resumenRev.veredicto;
-    var ver = '<button type="button" class="rv-btn" data-rv-pdf="' + esc(e.id) + '">' + (e.formato === 'texto' ? 'Ver en la página' : 'Ver PDF') + '</button>';
+    var ver = '<button type="button" class="rv-btn rv-btn--ver" data-rv-pdf="' + esc(e.id) + '">' + (e.formato === 'texto' ? 'Ver en la página' : 'Ver PDF') + '</button>';
     if (e.estado === 'pendiente') return '<div class="rv-acc">' + (e.formato === 'pdf' ? ver : '') +
-      boton(e, 'rechazar', 'Rechazar', v === 'rechazar' ? 'is-main-mal' : '') + boton(e, 'cambios', 'Pedir cambios', v === 'cambios' ? 'is-main' : '') +
+      boton(e, 'rechazar', 'Rechazar', 'rv-btn--mal' + (v === 'rechazar' ? ' is-main-mal' : '')) + boton(e, 'cambios', 'Pedir cambios', v === 'cambios' ? 'is-main' : '') +
       boton(e, 'aprobar', 'Aprobar y publicar', v === 'publicar' ? 'is-main' : '') + '</div>';
     if (DEMO) return '<div class="rv-acc"><button type="button" class="rv-btn" data-rv-accion="volver" data-id="' + esc(e.id) + '">Volver a por revisar</button></div>';
     if (e.estadoReal === 'publicado') return '<div class="rv-acc">' + (e.formato === 'pdf' ? ver : '') + '<a class="rv-btn" href="#analista-' + esc(e.autor.slug) + '">Ver en la sección</a>' + boton(e, 'retirar', 'Retirar de la sección', e.retiroPedido ? 'is-main-mal' : '') + '</div>';
@@ -236,6 +245,7 @@
     API.get('/creador/envio/' + e.id + '/analisis.pdf', { blob: true }).then(function (b) { abrir(URL.createObjectURL(b)); }).catch(function (er) { aviso('No se pudo abrir: ' + er.message); });
   }
   function habilitar(datos, msj) {
+    if (DEMO) { aviso('En prueba: no se habilita ni se manda nada.'); st.editando = null; pintarAutores(); return Promise.resolve(); }
     st.ocupado = true; pintarAutores();
     return API.post('/creador/habilitar', datos).then(function () {
       st.ocupado = false; aviso(msj || 'Habilitado. Le mandamos el mail de bienvenida.');
@@ -264,7 +274,7 @@
       if (accion === 'volver') { decidir(e, 'volver'); return; }
       // publicar, rechazar y retirar se confirman con un segundo toque (sin ventanas del navegador)
       var clave = e.id + ':' + accion;
-      if (!DEMO && accion !== 'cambios' && st.confirmar !== clave) {
+      if (accion !== 'cambios' && st.confirmar !== clave) {
         st.confirmar = clave; pintar();
         setTimeout(function () { if (st.confirmar === clave) { st.confirmar = null; pintar(); } }, 4000);
         return;
@@ -307,6 +317,7 @@
       var clave = 'baja:' + t.dataset.rvBaja;
       if (st.confirmar !== clave) { st.confirmar = clave; pintarAutores(); setTimeout(function () { if (st.confirmar === clave) { st.confirmar = null; pintarAutores(); } }, 4000); return; }
       st.confirmar = null;
+      if (DEMO) { aviso('En prueba: no se deshabilita a nadie.'); pintarAutores(); return; }
       API.post('/creador/deshabilitar', { email: t.dataset.rvBaja }).then(function () { aviso('Deshabilitado. Sus publicaciones ya no se muestran.'); return cargarAutores(); })
         .then(pintarAutores).catch(function (er) { aviso('No se pudo: ' + er.message); });
     });
@@ -319,7 +330,7 @@
     if (!root) return false;
     var cont = document.getElementById('rvPanel');
     if (!cont) { cont = document.createElement('div'); cont.id = 'rvPanel'; cont.className = 'rv-panel'; root.parentNode.insertBefore(cont, root); }
-    cont.innerHTML = '<div id="rvRoot"></div>' + (DEMO ? '' : '<div id="rvAutores"></div>');
+    cont.innerHTML = '<div id="rvRoot"></div><div id="rvAutores"></div>';
     box = document.getElementById('rvRoot'); boxAut = document.getElementById('rvAutores');
     if (DEMO) root.hidden = true; // en la vista de ejemplo no hay sesión: se oculta el aviso de "solo creador"
     return true;
@@ -330,7 +341,7 @@
       if (!contenedores()) return;
       box.innerHTML = '<div class="pn-loading">Cargando envíos…</div>';
       eventos();
-      cargarDemo().then(function () { st.abierto = st.envios[0] && st.envios[0].id; pintar(); })
+      cargarDemo().then(function () { st.abierto = st.envios[0] && st.envios[0].id; st.autores = autoresDemo(); pintar(); pintarAutores(); })
         .catch(function (e) { box.innerHTML = '<p class="rv-vacio">No se pudieron leer los envíos: ' + esc(e.message) + '</p>'; });
       return;
     }

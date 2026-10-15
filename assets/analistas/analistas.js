@@ -13,7 +13,7 @@
   if (!root) return;
   var TZ = 'America/Argentina/Buenos_Aires';
   var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
-  var CATS = [['acciones', 'Acciones', '#8fb4ff'], ['bonos', 'Bonos', '#7fd1ae'], ['macro', 'Macro', '#e9c46a'], ['politica', 'Política', '#c3a6f2'], ['trading', 'Trading', '#f29e8e']];
+  var CATS = [['semanal', 'Resúmenes semanales', '#e9d3a0'], ['acciones', 'Acciones', '#8fb4ff'], ['bonos', 'Bonos', '#7fd1ae'], ['macro', 'Macro', '#e9c46a'], ['politica', 'Política', '#c3a6f2'], ['trading', 'Trading', '#f29e8e']];
   var CAT = {}; CATS.forEach(function (c) { CAT[c[0]] = { n: c[1], c: c[2] }; });
   var MANFREDI = {
     slug: 'manfredi', nombre: 'Manfredi Investment', rol: 'Research & Markets · Informes semanales y especiales', corto: 'Macro · Mercados',
@@ -57,7 +57,7 @@
         autores: [MANFREDI],
         publicaciones: (Array.isArray(list) ? list : []).map(function (p) {
           return {
-            id: 'manfredi-' + p.num, autor: 'manfredi', categoria: 'macro', etiqueta: p.tag, titulo: p.title,
+            id: 'manfredi-' + p.num, autor: 'manfredi', categoria: 'semanal', etiqueta: p.tag, titulo: p.title,
             fecha: p.publishedAt || '', fechaTexto: p.date, resumen: String(p.abstract || '').split(' · ').slice(0, 3).join(' · '), pdf: 'papers/' + encodeURIComponent(p.file), tapa: p.cover || 'papers/covers/' + p.num + '.jpg'
           };
         })
@@ -156,11 +156,28 @@
     box.innerHTML = '<div class="an-rows">' + lista.map(function (p) { return fila(p); }).join('') + '</div>';
     montar(lista);
   }
+  // índice de categorías: texto con la cantidad al lado y una línea champagne que se desliza
   function pintarBarra() {
+    var n = function (c) { return c === 'todo' ? st.pubs.length : st.pubs.filter(function (p) { return p.categoria === c; }).length; };
     $('anChips').innerHTML = [['todo', 'Todo']].concat(CATS).map(function (c) {
-      var on = st.cat === c[0];
-      return '<button type="button" class="an-cat' + (on ? ' on' : '') + '" data-cat="' + c[0] + '" aria-pressed="' + on + '">' + c[1] + '</button>';
-    }).join('');
+      var on = st.cat === c[0], k = n(c[0]);
+      return '<button type="button" class="an-cat' + (on ? ' on' : '') + '" data-cat="' + c[0] + '" aria-pressed="' + on + '"' + (k ? '' : ' disabled') + '>' +
+        '<span>' + c[1] + '</span><sup>' + k + '</sup></button>';
+    }).join('') + '<i class="an-cats__ind" aria-hidden="true"></i>';
+    marcarCat();
+  }
+  function marcarCat() {
+    var box = $('anChips'), on = box && box.querySelector('.an-cat.on'), ind = box && box.querySelector('.an-cats__ind');
+    if (!on || !ind || !on.offsetWidth) return;
+    var t = on.querySelector('span');
+    ind.style.left = (on.offsetLeft + t.offsetLeft) + 'px'; ind.style.width = t.offsetWidth + 'px';
+  }
+  function elegirCat(cat) {
+    st.cat = cat;
+    $('anChips').querySelectorAll('.an-cat').forEach(function (b) { var on = b.dataset.cat === cat; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+    marcarCat(); pintarGrilla();
+    var rows = $('anList').firstElementChild;
+    if (rows) { rows.classList.remove('an-rows--in'); void rows.offsetWidth; rows.classList.add('an-rows--in'); }
   }
   // cuadro de columnistas: el que publicó último va primero
   function pintarRail() {
@@ -251,6 +268,7 @@
     $('anGrid').hidden = w.v !== 'analisis' || guia; $('anPerfil').hidden = w.v !== 'perfil'; $('anNota').hidden = w.v !== 'nota'; $('anAutor').hidden = w.v !== 'autor';
     if (w.v === 'autor') { if (window.AnAutor) window.AnAutor.mostrar(); else $('anAutor').innerHTML = '<a class="an-back" href="#analisis">← Análisis e informes</a><p class="nt-empty">Esta sección es para autores habilitados.</p>'; window.scrollTo(0, 0); }
     if (!st.listo) return;
+    marcarCat();
     pintarRail();
     if (w.v === 'perfil') { pintarPerfil(w.slug); window.scrollTo(0, 0); }
     if (w.v === 'nota') { pintarNota(w.id); window.scrollTo(0, 0); }
@@ -278,10 +296,10 @@
       return;
     }
     var c = e.target.closest('[data-cat]');
-    if (c && c.dataset.cat !== st.cat) { st.cat = c.dataset.cat; pintarBarra(); pintarGrilla(); }
+    if (c && !c.disabled && c.dataset.cat !== st.cat) elegirCat(c.dataset.cat);
   });
-  window.addEventListener('resize', marcarSub);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(marcarSub);
+  window.addEventListener('resize', function () { marcarSub(); marcarCat(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { marcarSub(); marcarCat(); });
   window.addEventListener('hashchange', mostrar);
 
   mostrar();
