@@ -537,7 +537,7 @@
 .au-tabs button[aria-selected="true"] { font-weight:600; }
 .au-tabs button[aria-selected="true"]::after { transform:scaleX(1); }
 @media (hover:hover) { .au-tabs button:hover { color:var(--an-champ2); } }
-.au-badge { display:inline-grid; place-items:center; min-width:18px; height:18px; padding:0 5px; border-radius:999px; background:#e9c46a; color:#1d1606; font:700 10.5px var(--nt-sans); font-style:normal; }
+.au-badge { display:inline-grid; place-items:center; min-width:17px; height:17px; padding:0 5px; border-radius:999px; border:1px solid rgba(233,211,160,.55); background:rgba(233,211,160,.1); color:var(--an-champ2); font:600 10px var(--an-mono); font-style:normal; }
 
 .au-up { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:40px; align-items:start; }
 .au-main { display:grid; gap:18px; min-width:0; }
@@ -571,10 +571,14 @@
 .au-count { justify-self:end; font-family:var(--an-mono); }
 .au-two { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 .au-check { display:flex; gap:11px; align-items:flex-start; cursor:pointer; font:400 13.5px/1.5 var(--nt-sans); color:var(--nt-ink); }
-.au-check input { margin-top:3px; width:16px; height:16px; accent-color:#d4b067; flex:none; }
+.au-check input { -webkit-appearance:none; appearance:none; margin:3px 0 0; width:16px; height:16px; flex:none; cursor:pointer; border:1px solid rgba(233,211,160,.5); border-radius:4px; background:rgba(7,15,32,.55);
+  transition:background-color .2s, border-color .2s, box-shadow .2s; }
+.au-check input:checked { border-color:rgba(255,238,200,.4); background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%231d1606' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 8.5l3 3 6-7'/%3E%3C/svg%3E") center/12px no-repeat, linear-gradient(135deg, #c9a24f, #e6cb8a 50%, #c9a24f); }
+.au-check input:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(233,211,160,.18); }
+@media (hover:hover) { .au-check:hover input:not(:checked) { border-color:rgba(233,211,160,.8); } }
 .au-send { display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top:4px; }
 .nt .au-btn { margin:0; padding:12px 30px; border:1px solid rgba(255,238,200,.28); cursor:pointer; }
-.nt .au-btn:disabled { opacity:.35; cursor:default; filter:saturate(.6); }
+.nt .au-btn:disabled { cursor:default; background:transparent; border-color:rgba(233,211,160,.3); color:var(--an-champ); box-shadow:none; }
 .nt .au-btn:disabled::after { animation:none; }
 
 .au-side { display:grid; gap:16px; position:sticky; top:96px; }
@@ -693,3 +697,27 @@ a.rv-btn { display:inline-flex; align-items:center; text-decoration:none; }
 .an-reg { display:block; margin-top:3px; font:500 10.5px var(--an-mono); letter-spacing:.06em; color:#bdf0d6; }
 .an-prof .an-reg { margin-top:8px; font-size:11.5px; }
 .au-reg { margin-top:8px; font-size:11.5px; }
+
+/* ── categoría del envío: opciones a la vista (autor.js) ─────────── */
+.au-cats { margin:0; padding:0; border:0; }
+.au-cats legend { padding:0; margin-bottom:9px; font:600 12.5px var(--nt-sans); color:var(--nt-ink); }
+.au-cats__l { display:grid; grid-template-columns:repeat(auto-fill, minmax(148px, 1fr)); gap:8px; }
+.au-cats .au-cat { position:relative; display:block; cursor:pointer; }
+.au-cat input { position:absolute; opacity:0; pointer-events:none; }
+.au-cat span { display:flex; align-items:center; gap:10px; min-height:40px; padding:0 13px; border:1px solid var(--nt-line2); border-radius:8px; font:500 13px var(--nt-sans); color:var(--nt-ink);
+  transition:border-color .2s, background-color .2s, color .2s, transform .15s var(--nt-ease); }
+.au-cat span::before { content:''; flex:none; width:8px; height:8px; border-radius:50%; border:1px solid rgba(233,211,160,.55); transition:background-color .2s, box-shadow .2s; }
+@media (hover:hover) { .au-cat:hover span { border-color:rgba(233,211,160,.45); color:var(--an-champ2); } }
+.au-cat:active span { transform:scale(.98); }
+.au-cat input:checked + span { border-color:rgba(233,211,160,.6); background:rgba(233,211,160,.06); color:var(--an-champ2); font-weight:600; }
+.au-cat input:checked + span::before { background:var(--an-champ); border-color:var(--an-champ); box-shadow:0 0 8px rgba(233,211,160,.6); }
+.au-cat input:focus-visible + span { outline:1px solid rgba(233,211,160,.7); outline-offset:2px; }
+.au-help--pos { margin-top:-8px; }
+
+/* ── convocatoria del costado: qué gana el autor, en tres líneas con etiqueta ── */
+.an-inv__p { margin:-4px 0 0; font:400 13.5px/1.55 var(--nt-sans); color:var(--nt-ink); }
+.an-inv__d { margin:0; display:grid; border-top:1px solid var(--nt-line); }
+.an-inv__d > div { display:grid; gap:4px; padding:12px 0; border-bottom:1px solid var(--nt-line); }
+.an-inv__d dt { font:500 10px/1 var(--an-mono); letter-spacing:.16em; text-transform:uppercase; color:var(--an-champ); }
+.an-inv__d dd { margin:0; font:400 13.5px/1.5 var(--nt-sans); color:var(--nt-ink); }
+@media (prefers-reduced-motion:reduce) { .au-cat span, .au-check input { transition:none; } }

@@ -13,7 +13,10 @@
   if (!root) return;
   var TZ = 'America/Argentina/Buenos_Aires';
   var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
-  var CATS = [['semanal', 'Resúmenes semanales', '#e9d3a0'], ['acciones', 'Acciones', '#8fb4ff'], ['bonos', 'Bonos', '#7fd1ae'], ['macro', 'Macro', '#e9c46a'], ['politica', 'Política', '#c3a6f2'], ['trading', 'Trading', '#f29e8e']];
+  // las categorías sin publicaciones no se muestran arriba; los autores pueden elegir cualquiera (assets/analistas/autor.js, workers/analistas)
+  var CATS = [['semanal', 'Resúmenes semanales', '#e9d3a0'], ['acciones', 'Acciones', '#8fb4ff'], ['bonos', 'Bonos', '#7fd1ae'], ['macro', 'Macro', '#e9c46a'],
+    ['politica', 'Política', '#c3a6f2'], ['geopolitica', 'Geopolítica', '#9fd3e6'], ['global', 'Mercados globales', '#8fb4ff'], ['commodities', 'Commodities', '#e9c46a'],
+    ['cripto', 'Cripto', '#f2b880'], ['finanzas', 'Finanzas personales', '#7fd1ae'], ['trading', 'Trading', '#f29e8e']];
   var CAT = {}; CATS.forEach(function (c) { CAT[c[0]] = { n: c[1], c: c[2] }; });
   var MANFREDI = {
     slug: 'manfredi', nombre: 'Manfredi Investment', rol: 'Research & Markets · Informes semanales y especiales', corto: 'Macro · Mercados',
@@ -156,13 +159,12 @@
     box.innerHTML = '<div class="an-rows">' + lista.map(function (p) { return fila(p); }).join('') + '</div>';
     montar(lista);
   }
-  // índice de categorías: texto con la cantidad al lado y una línea champagne que se desliza
+  // índice de categorías: solo las que tienen publicaciones, con una línea champagne que se desliza
   function pintarBarra() {
-    var n = function (c) { return c === 'todo' ? st.pubs.length : st.pubs.filter(function (p) { return p.categoria === c; }).length; };
-    $('anChips').innerHTML = [['todo', 'Todo']].concat(CATS).map(function (c) {
-      var on = st.cat === c[0], k = n(c[0]);
-      return '<button type="button" class="an-cat' + (on ? ' on' : '') + '" data-cat="' + c[0] + '" aria-pressed="' + on + '"' + (k ? '' : ' disabled') + '>' +
-        '<span>' + c[1] + '</span><sup>' + k + '</sup></button>';
+    var hay = function (c) { return st.pubs.some(function (p) { return p.categoria === c; }); };
+    $('anChips').innerHTML = [['todo', 'Todo']].concat(CATS.filter(function (c) { return hay(c[0]); })).map(function (c) {
+      var on = st.cat === c[0];
+      return '<button type="button" class="an-cat' + (on ? ' on' : '') + '" data-cat="' + c[0] + '" aria-pressed="' + on + '"><span>' + c[1] + '</span></button>';
     }).join('') + '<i class="an-cats__ind" aria-hidden="true"></i>';
     marcarCat();
   }
@@ -185,9 +187,9 @@
       var ps = deAutor(s);
       return { s: s, n: ps.length, t: ps.reduce(function (m, p) { return Math.max(m, p._t || 0); }, 0) };
     }).filter(function (x) { return x.n; }).sort(function (a, b) { return b.t - a.t; });
-    var total = info.reduce(function (m, x) { return m + x.n; }, 0), actual = (vista().slug || '');
+    var actual = (vista().slug || '');
     $('anAutores').innerHTML = '<div class="an-cols__h"><h3 class="an-panel__h">Columnistas</h3>' +
-      '<span class="an-cols__c">' + info.length + ' firmas<i></i>' + total + ' publicaciones</span></div>' +
+      '<span class="an-cols__c">' + info.length + (info.length === 1 ? ' analista' : ' analistas') + '</span></div>' +
       '<ul class="an-auths">' + info.map(function (x) {
         var a = st.autores[x.s], nuevo = x.t && Date.now() - x.t < 7 * 864e5;
         return '<li><a class="an-auth' + (x.s === actual ? ' on' : '') + '" href="#analista-' + esc(x.s) + '" style="--c:' + esc(a.color) + '">' + av(a, 'sm') +
@@ -296,7 +298,7 @@
       return;
     }
     var c = e.target.closest('[data-cat]');
-    if (c && !c.disabled && c.dataset.cat !== st.cat) elegirCat(c.dataset.cat);
+    if (c && c.dataset.cat !== st.cat) elegirCat(c.dataset.cat);
   });
   window.addEventListener('resize', function () { marcarSub(); marcarCat(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { marcarSub(); marcarCat(); });

@@ -13,7 +13,8 @@
   var API = window.AnApi;
   if (!DEMO && !API) return;
 
-  var CATS = [['acciones', 'Acciones'], ['bonos', 'Bonos'], ['macro', 'Macro'], ['politica', 'Política'], ['trading', 'Trading']];
+  var CATS = [['acciones', 'Acciones'], ['bonos', 'Bonos'], ['macro', 'Macro'], ['politica', 'Política'], ['geopolitica', 'Geopolítica'], ['global', 'Mercados globales'],
+    ['commodities', 'Commodities'], ['cripto', 'Cripto'], ['finanzas', 'Finanzas personales'], ['trading', 'Trading']];
   var CATN = {}; CATS.forEach(function (c) { CATN[c[0]] = c[1]; });
   var MAX_MB = 20, MAX_RES = 180, MAX_TIT = 90;
   var TERMINOS = '1.1'; // versión de terminos-autores.html; tiene que coincidir con la del worker
@@ -106,9 +107,13 @@
         '<small class="au-help" id="auPalabras">Párrafos separados por una línea en blanco · "## " subtítulo · "- " lista · **negrita**</small></div>') +
       '<div class="au-field"><label for="auTit">Título</label><input id="auTit" name="titulo" maxlength="' + MAX_TIT + '" placeholder="Ej.: AL30 vs GD30: cuánto se paga hoy por la ley Nueva York" required></div>' +
       '<div class="au-field"><label for="auRes">Resumen <small>se ve debajo del título en la lista</small></label><textarea id="auRes" name="resumen" rows="2" maxlength="' + MAX_RES + '" placeholder="Dos líneas: de qué trata y a qué conclusión llegás." required></textarea><small class="au-help au-count" id="auResN">0 / ' + MAX_RES + '</small></div>' +
-      '<div class="au-two"><div class="au-field"><label for="auCat">Categoría</label><select id="auCat" name="categoria" required><option value="">Elegí una</option>' + CATS.map(function (c) { return '<option value="' + c[0] + '">' + c[1] + '</option>'; }).join('') + '</select></div>' +
-      '<div class="au-field"><label for="auAct">Activos que mencionás <small>opcional</small></label><input id="auAct" name="activos" placeholder="AL30, GD30, GGAL"></div></div>' +
-      '<div class="au-field"><label for="auPos">Tus posiciones en esos activos</label><input id="auPos" name="posiciones" placeholder="Ej.: Tengo GD30 · No tengo posiciones"><small class="au-help">Se publica junto al análisis como «Declaración del autor».</small></div>' +
+      // categoría: opciones a la vista en lugar de un desplegable
+      '<fieldset class="au-field au-cats"><legend>Categoría</legend><div class="au-cats__l">' + CATS.map(function (c) {
+        return '<label class="au-cat"><input type="radio" name="categoria" value="' + c[0] + '" required><span>' + c[1] + '</span></label>';
+      }).join('') + '</div></fieldset>' +
+      '<div class="au-two"><div class="au-field"><label for="auAct">Activos que mencionás <small>opcional</small></label><input id="auAct" name="activos" placeholder="AL30, GD30, GGAL"></div>' +
+      '<div class="au-field"><label for="auPos">Tus posiciones en esos activos</label><input id="auPos" name="posiciones" placeholder="Ej.: Tengo GD30 · No tengo posiciones"></div></div>' +
+      '<small class="au-help au-help--pos">Tus posiciones se publican junto al análisis como «Declaración del autor».</small>' +
       '<label class="au-check"><input type="checkbox" name="autoria" required><span>Soy el autor del contenido y tengo derecho a publicarlo.</span></label>' +
       '<label class="au-check"><input type="checkbox" name="reglas" required><span>' + (st.autor && st.autor.registro
         ? 'Si incluye recomendaciones, son generales, llevan mi aviso de riesgo y mi número de registro. No incluye promesas de rentabilidad ni promoción de servicios pagos.'

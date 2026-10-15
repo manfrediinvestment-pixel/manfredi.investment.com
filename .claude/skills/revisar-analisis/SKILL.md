@@ -54,7 +54,7 @@ pida revisar de nuevo uno puntual (`sync.py bajar --todos`).
   "id": "2026-10-12-romero-elecciones",
   "autor": { "slug": "lucia-romero", "nombre": "Lucía Romero", "email": "…", "rol": "Politóloga (UBA)",
              "pais": "AR", "asesor": false, "links": { "linkedin": "…", "newsletter": "…" } },
-  "titulo": "…", "categoria": "macro|acciones|bonos|politica|trading", "resumen": "2 líneas",
+  "titulo": "…", "categoria": "acciones|bonos|macro|politica|geopolitica|global|commodities|cripto|finanzas|trading", "resumen": "2 líneas",
   "activos": ["AL30", "GD30"], "formato": "pdf|texto", "cuerpo": "solo si formato = texto",
   "paginas": 12, "enviado": "2026-10-12T10:42:00-03:00",
   "declaraciones": { "autoria": true, "sinRecomendaciones": true, "posiciones": "Tengo GD30" }

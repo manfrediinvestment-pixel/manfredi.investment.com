@@ -2,17 +2,16 @@
    - Feed minuto a minuto: /noticias del worker manfredi-mercados (titular +
      bajada de Ámbito, El Cronista, Infobae y Bloomberg Línea, con región y tema).
      Filtros por región y tema; de a 20 con "Ver más noticias".
-   - Informe semanal destacado arriba (papers/manifest.json, el más nuevo); la
-     etiqueta "Nuevo" solo durante la semana del informe. Abre el visor de PDF.
-   - Al costado: cotizaciones (/pulso) con selector Argentina / EE.UU. y los
-     informes anteriores, 3 a la vista y una flecha para ver más.
+   - Al costado: cotizaciones (/pulso) con selector Argentina / EE.UU.
+   Los informes semanales viven en Análisis e informes → Resúmenes semanales
+   (assets/analistas/analistas.js), no acá.
    Formato y dirección del worker: window.MIPulso (assets/pulso/pulso.js). */
 (function () {
   var TZ = 'America/Argentina/Buenos_Aires';
   var P = window.MIPulso;
   if (!P || !document.getElementById('ntFeed')) return;
   var POR_PAGINA = 20;
-  var st = { items: [], filtro: 'todo', mostrar: POR_PAGINA, region: 'ar', pulso: null, papers: [], pag: 0 };
+  var st = { items: [], filtro: 'todo', mostrar: POR_PAGINA, region: 'ar', pulso: null };
   var FILTROS = [['todo', 'Todo'], ['ar', 'Argentina'], ['mundo', 'EE.UU. y el mundo'], ['Dólar', 'Dólar'], ['Bonos', 'Bonos'], ['Acciones', 'Acciones'], ['Economía', 'Economía']];
 
   function $(id) { return document.getElementById(id); }
@@ -23,9 +22,6 @@
     var f = new Date().toLocaleDateString('es-AR', { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long' });
     return f.charAt(0).toUpperCase() + f.slice(1).replace(',', '');
   }
-  function pdf(p) { return 'papers/' + encodeURIComponent(p.file); }
-  function tapa(p) { return p.cover || 'papers/covers/' + p.num + '.jpg'; }
-  function abrir(p) { if (typeof window.openPdf === 'function') window.openPdf(pdf(p), p.title, { fecha: p.date, tapa: tapa(p) }); else window.open(pdf(p), '_blank', 'noopener'); }
 
   /* ------------------------------ feed ------------------------------ */
   function grupo(x) {
@@ -89,64 +85,6 @@
       });
   }
 
-  /* ------------------------------ informe semanal ------------------------------ */
-  var ICON_CAL = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>';
-  var ICON_DOWN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
-  function pintarInforme() {
-    var p = st.papers[0], box = $('ntInforme');
-    if (!p) { box.hidden = true; return; }
-    var pub = p.publishedAt ? Date.parse(p.publishedAt + 'T12:00:00-03:00') : NaN;
-    var nuevo = !isNaN(pub) && Date.now() - pub < 7 * 864e5;
-    var resumen = String(p.abstract || '').split(' · ').slice(0, 3).join(' · ');
-    box.innerHTML = '<button type="button" class="nt-inf" aria-label="Leer el informe semanal: ' + esc(p.title) + '">' +
-      '<span class="nt-inf__cover"><img src="' + esc(tapa(p)) + '" alt="" loading="lazy"></span>' +
-      '<span><span class="nt-inf__top"><span class="nt-inf__tag' + (nuevo ? '' : ' viejo') + '">' + (nuevo ? 'Nuevo · Informe semanal' : 'Informe semanal') + '</span>' +
-      '<span class="nt-inf__when">' + ICON_CAL + esc(p.date) + '</span></span>' +
-      '<span class="nt-inf__t">' + esc(p.title) + '</span>' +
-      (resumen ? '<span class="nt-inf__s">' + esc(resumen) + '</span>' : '') +
-      '<span class="nt-inf__row"><span class="nt-btn">Leer el informe</span><small>PDF</small></span></span></button>';
-    box.firstChild.addEventListener('click', function () { abrir(p); });
-  }
-  function pintarAnteriores() {
-    var prev = st.papers.slice(1), card = $('ntPrevs');
-    if (!prev.length) { card.hidden = true; return; }
-    card.innerHTML = '<h3 class="nt-card__h">Informes anteriores</h3><div class="nt-prevs-win" id="ntPrevsWin"><div class="nt-prevs-list" id="ntPrevsList">' +
-      prev.map(function (p, i) {
-        return '<button type="button" class="nt-prev" data-i="' + (i + 1) + '"><img src="' + esc(tapa(p)) + '" alt="" loading="lazy"><span><b>' + esc(p.title) + '</b><span>' + esc(p.date) + '</span></span></button>';
-      }).join('') + '</div></div>' +
-      (prev.length > 3 ? '<button type="button" class="nt-prevs-more" id="ntPrevsMore"><span>Ver más</span>' + ICON_DOWN + '</button>' : '');
-    card.addEventListener('click', function (e) {
-      var b = e.target.closest('.nt-prev');
-      if (b) abrir(st.papers[+b.dataset.i]);
-      if (e.target.closest('#ntPrevsMore')) { st.pag = st.pag >= paginas() - 1 ? 0 : st.pag + 1; acomodar(); }
-    });
-    acomodar();
-    // las tapas cargan después y cambian el alto de cada fila
-    card.querySelectorAll('img').forEach(function (im) { im.addEventListener('load', acomodar); });
-  }
-  function paginas() { return Math.ceil((st.papers.length - 1) / 3); }
-  function acomodar() {
-    var win = $('ntPrevsWin'), list = $('ntPrevsList');
-    if (!win || !win.offsetParent) return;
-    var rows = [].slice.call(list.children), a = st.pag * 3;
-    var alto = function (desde, hasta) { return rows.slice(desde, hasta).reduce(function (s, r) { return s + r.offsetHeight; }, 0); };
-    win.style.height = alto(a, a + 3) + 'px';
-    list.style.transform = 'translateY(' + -alto(0, a) + 'px)';
-    rows.forEach(function (r, i) { r.tabIndex = i >= a && i < a + 3 ? 0 : -1; });
-    var more = $('ntPrevsMore');
-    if (more) {
-      var fin = st.pag === paginas() - 1;
-      more.classList.toggle('up', fin);
-      more.firstChild.textContent = fin ? 'Volver' : 'Ver más';
-    }
-  }
-  function cargarInformes() {
-    return fetch('papers/manifest.json').then(function (r) { return r.json(); }).then(function (list) {
-      st.papers = Array.isArray(list) ? list : [];
-      pintarInforme(); pintarAnteriores();
-    }).catch(function (e) { console.warn('[noticias] informes:', e.message); $('ntInforme').hidden = true; $('ntPrevs').hidden = true; });
-  }
-
   /* ------------------------------ cotizaciones ------------------------------ */
   function pintarCotizaciones() {
     var d = st.pulso, box = $('ntQuotes');
@@ -180,7 +118,7 @@
     // el ancho de cada filtro cambia cuando termina de cargar la tipografía
     marcarChip();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(marcarChip);
-    cargarNoticias(); cargarInformes(); cargarCotizaciones();
+    cargarNoticias(); cargarCotizaciones();
     setInterval(function () { if (visible()) { cargarNoticias(); cargarCotizaciones(); } }, 5 * 60000);
   }
 
@@ -201,9 +139,9 @@
     var b = e.target.closest('[data-r]');
     if (b && b.dataset.r !== st.region) { st.region = b.dataset.r; pintarCotizaciones(); }
   });
-  window.addEventListener('resize', function () { fijar(); acomodar(); marcarChip(); });
+  window.addEventListener('resize', function () { fijar(); marcarChip(); });
   // la pestaña puede abrirse más tarde: se carga recién cuando se ve
-  window.addEventListener('hashchange', function () { setTimeout(function () { iniciar(); acomodar(); marcarChip(); }, 50); });
-  document.addEventListener('click', function (e) { if (e.target.closest('[data-tab-target="informes"]')) setTimeout(function () { iniciar(); acomodar(); marcarChip(); }, 50); });
+  window.addEventListener('hashchange', function () { setTimeout(function () { iniciar(); marcarChip(); }, 50); });
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-tab-target="informes"]')) setTimeout(function () { iniciar(); marcarChip(); }, 50); });
   if (document.readyState === 'complete') iniciar(); else window.addEventListener('load', iniciar);
 })();

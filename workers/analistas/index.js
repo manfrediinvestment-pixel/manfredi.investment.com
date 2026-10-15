@@ -18,7 +18,7 @@
 const CREADORES = ['nachito2502@gmail.com'];
 const FIREBASE_PROJECT = 'manfrediinvestment-989c8';
 const SITIO = 'https://manfredinvestment.com';
-const CATEGORIAS = ['acciones', 'bonos', 'macro', 'politica', 'trading'];
+const CATEGORIAS = ['acciones', 'bonos', 'macro', 'politica', 'geopolitica', 'global', 'commodities', 'cripto', 'finanzas', 'trading'];
 const MAX_PDF = 20 * 1024 * 1024;
 const MAX_TAPA = 600 * 1024;
 // versión vigente de los Términos de colaboración (terminos-autores.html). Si cambia, los autores la aceptan de nuevo al enviar.
