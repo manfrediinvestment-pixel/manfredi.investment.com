@@ -70,8 +70,8 @@ export function mailBienvenida(email, a) {
 <tr><td class="px" bgcolor="${PAPEL}" style="background:${PAPEL};background-image:linear-gradient(170deg,#070c19 0%,#0f1b36 62%,#16274a 100%);padding:26px 34px 40px;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
     <td><table role="presentation" cellpadding="0" cellspacing="0"><tr>
-      <td><img src="${SITIO}/assets/img/logo-mark-512.png" width="28" height="28" alt="M" style="display:block;border:0;"></td>
-      <td style="padding-left:10px;font-family:${SANS};font-size:11px;font-weight:bold;letter-spacing:3px;color:${CHAMPAGNE};">MANFREDI INVESTMENT</td>
+      <td><img src="${SITIO}/assets/img/logo-mark-512.png" width="40" height="40" alt="Manfredi Investment" style="display:block;border:0;width:40px;height:40px;"></td>
+      <td style="padding-left:12px;font-family:${SANS};font-size:11px;font-weight:bold;letter-spacing:3px;color:${CHAMPAGNE};">MANFREDI INVESTMENT</td>
     </tr></table></td>
     <td align="right" style="font-family:${SANS};font-size:10px;letter-spacing:3px;color:${CHAMPAGNE};">AUTORES INVITADOS</td>
   </tr></table>
