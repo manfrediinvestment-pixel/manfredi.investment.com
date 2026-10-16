@@ -15,6 +15,8 @@
 //
 // Estados de un envío: subiendo → recibido → (cambios | rechazado | publicado → retirado)
 
+import { mailBienvenida } from './mail-bienvenida.js';
+
 const CREADORES = ['nachito2502@gmail.com'];
 const FIREBASE_PROJECT = 'manfrediinvestment-989c8';
 const SITIO = 'https://manfredinvestment.com';
@@ -433,10 +435,7 @@ async function creadorHabilitar(request, env, ctx) {
     return h;
   });
   await refrescarAutoresPublicados(env, hab);
-  if (nuevo || b.reenviar) ctx.waitUntil(mail(env, [email], 'Ya podés publicar en Manfredi Investment', plantilla('Bienvenido a Análisis e informes',
-    '<p>Hola ' + esc(nombre.split(' ')[0]) + ', habilitamos tu mail para publicar en la sección Análisis e informes.</p>' +
-    '<p>Iniciá sesión en el sitio con <b>' + esc(email) + '</b> y vas a ver el botón <b>Mi espacio de autor</b> junto a las pestañas de Noticias. Desde ahí subís tus análisis (PDF o texto) y completás tu perfil.</p>',
-    SITIO + '/#autor', 'Ir a Mi espacio de autor')));
+  if (nuevo || b.reenviar) { const m = mailBienvenida(email, hab[email]); ctx.waitUntil(mail(env, [email], m.asunto, m.html)); }
   return json({ ok: true, autor: { email, ...perfilPublico(hab[email]) } });
 }
 async function creadorDeshabilitar(request, env) {
