@@ -47,34 +47,30 @@
   }
 
   // ── datos: YTD 2026 de la cartera vs S&P 500 ───────────
-  // Antes del inicio real de la cartera (MF_INCEPTION_DATE) la curva es una
-  // SIMULACIÓN con la composición de ese día (se dibuja punteada y se rotula).
-  // Las dos líneas se rebasan a 0 en el inicio real, así el número final es el
-  // rendimiento real, igual que antes.
+  // Misma ventana y misma cuenta que la pestaña Portfolio (mfGetWindows 'ytd'):
+  //  - real: la curva desde que se armó la cartera (MF_INCEPTION_DATE);
+  //  - proyectado: Dietz modificado del YTD = el ritmo real llevado a todo el
+  //    año. NO es un rendimiento obtenido y así se rotula en la página;
+  //  - S&P 500: YTD real.
   var DATA = null, dataP = null, dataDone = false;
   function getData() {
     if (dataP) return dataP;
     dataP = (async function () {
-      if (typeof mfBuildPerformanceSeries !== 'function') return null;
+      if (typeof mfBuildPerformanceSeries !== 'function' || typeof mfGetWindows !== 'function') return null;
       try {
-        var inc = typeof MF_INCEPTION_DATE !== 'undefined' ? MF_INCEPTION_DATE : new Date('2026-05-22T00:00:00');
-        var n = typeof mfBizDaysBetween === 'function' ? Math.max(5, mfBizDaysBetween(new Date(2026, 0, 1), new Date())) : 210;
-        var m = await mfBuildPerformanceSeries(n, n, 'month');
+        var w = mfGetWindows().filter(function (x) { return x.key === 'ytd'; })[0];
+        var m = await mfBuildPerformanceSeries(w.portfolioDays, w.benchDays, w.granularity);
         if (!m || m.dataUnavailable) return null;
         var rows = [];
         for (var i = 0; i < m.dates.length; i++) {
-          if (m.portfolioPct[i] != null && m.benchPct[i] != null && m.dates[i] instanceof Date) rows.push({ d: m.dates[i], m: m.portfolioPct[i], s: m.benchPct[i] });
+          if (m.benchPct[i] == null || !(m.dates[i] instanceof Date)) continue;
+          rows.push({ d: m.dates[i], s: m.benchPct[i], m: m.portfolioPct[i] == null ? null : m.portfolioPct[i] });
         }
-        if (rows.length < 5) return null;
-        var k = rows.findIndex(function (r) { return r.d >= inc; });
-        if (k < 0) k = 0;
-        var m0 = rows[k].m, s0 = rows[k].s;
-        rows.forEach(function (r, idx) {
-          r.m = ((1 + r.m / 100) / (1 + m0 / 100) - 1) * 100;
-          r.s = ((1 + r.s / 100) / (1 + s0 / 100) - 1) * 100;
-          r.sim = idx < k;
-        });
-        DATA = { rows: rows, k: k, mine: rows[rows.length - 1].m, spx: rows[rows.length - 1].s };
+        var k = rows.findIndex(function (r) { return r.m != null; });
+        if (rows.length < 5 || k < 0) return null;
+        var t0 = new Date(2026, 0, 1).getTime(), t1 = rows[rows.length - 1].d.getTime(), proj = m.totalReturn;
+        rows.forEach(function (r) { r.p = proj * (r.d.getTime() - t0) / (t1 - t0); });
+        DATA = { rows: rows, k: k, inc: rows[k].d, mine: rows[rows.length - 1].m, proj: proj, spx: rows[rows.length - 1].s };
         return DATA;
       } catch (e) { console.warn('[asesoria] cartera:', e); return null; }
     })();
@@ -178,7 +174,7 @@
     var rows = data.rows, L = W < 560 ? 44 : 58, R = 16, T = 18, B = 34;
     var d0 = new Date(2026, 0, 1).getTime(), d1 = rows[rows.length - 1].d.getTime();
     var X = function (d) { return L + (W - L - R) * (d - d0) / (d1 - d0); };
-    var all = []; rows.forEach(function (r) { all.push(r.m, r.s); }); all.push(0);
+    var all = [data.proj, 0]; rows.forEach(function (r) { all.push(r.s); if (r.m != null) all.push(r.m); });
     var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all), span = hi - lo || 1;
     var step = [1, 2, 2.5, 5, 10, 20].find(function (s) { return span / s <= 6; }) || 20;
     lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
@@ -199,28 +195,25 @@
       el('line', { x1: xm, x2: xm, y1: H - B, y2: H - B + 5 }, g);
       if (W >= 560 || mo % 2 === 0) el('text', { class: 'x', x: xm + 4, y: H - 10 }, g).textContent = MESES[mo].toUpperCase();
     }
-    // simulación (punteada) hasta el inicio real; desde ahí, real
-    var k = data.k, xs = X(rows[k].d.getTime());
+    // la cartera se constituyó en data.inc: marca vertical rotulada
+    var k = data.k, xs = X(data.inc.getTime()), end = rows.length - 1, last = rows[end];
     var st = el('g', { class: 'as-start' }, plot);
-    if (k > 0) {
-      el('rect', { class: 'as-simzone', x: X(rows[0].d.getTime()), y: T, width: Math.max(0, xs - X(rows[0].d.getTime())), height: H - T - B }, plot);
-      el('line', { x1: xs, x2: xs, y1: T, y2: H - B }, st);
-      if (xs - L > 110) el('text', { x: xs - 8, y: T + 14, 'text-anchor': 'end' }, st).textContent = 'SIMULACIÓN';
-      el('text', { x: xs + 8, y: T + 14 }, st).textContent = 'REAL';
-    }
+    el('line', { x1: xs, x2: xs, y1: T, y2: H - B }, st);
+    el('text', { x: xs - 8, y: T + 14, 'text-anchor': 'end' }, st).textContent = W >= 560 ? 'SE CONSTITUYE LA CARTERA · ' + data.inc.getDate() + ' ' + MESES[data.inc.getMonth()].toUpperCase() : data.inc.getDate() + ' ' + MESES[data.inc.getMonth()].toUpperCase();
     var path = function (key, from, to) { var d = ''; for (var i = from; i <= to; i++) d += (i > from ? 'L' : 'M') + X(rows[i].d.getTime()).toFixed(1) + ' ' + Y(rows[i][key]).toFixed(1) + ' '; return d.trim(); };
-    var end = rows.length - 1, real = path('m', k, end);
+    var real = path('m', k, end);
     el('path', { d: real + ' L' + X(d1).toFixed(1) + ' ' + Y(lo).toFixed(1) + ' L' + xs.toFixed(1) + ' ' + Y(lo).toFixed(1) + ' Z', fill: 'url(#asArea)' }, plot);
     el('path', { class: 'as-pl-spx', d: path('s', 0, end) }, plot);
-    if (k > 0) el('path', { class: 'as-pl-sim', d: path('m', 0, k) }, plot);
+    el('path', { class: 'as-pl-sim', d: 'M' + X(d0).toFixed(1) + ' ' + Y(0).toFixed(1) + ' L' + X(d1).toFixed(1) + ' ' + Y(data.proj).toFixed(1) }, plot);
     el('path', { class: 'as-pl-mine', d: real }, plot);
-    var last = rows[end];
     el('circle', { class: 'as-pl-end', cx: X(d1), cy: Y(last.s), r: 4, fill: '#8fb0e6' }, plot);
+    el('circle', { class: 'as-pl-proj', cx: X(d1), cy: Y(data.proj), r: 5 }, plot);
     el('circle', { class: 'as-pl-end', cx: X(d1), cy: Y(last.m), r: 5, fill: '#f3e3bd' }, plot);
     var cross = el('g', { class: 'as-cross', visibility: 'hidden' }, plot);
     el('line', { x1: 0, x2: 0, y1: T, y2: H - B }, cross);
     el('circle', { r: 4.5, fill: '#f3e3bd', stroke: '#0a0f1e', 'stroke-width': 2 }, cross);
     el('circle', { r: 4, fill: '#8fb0e6', stroke: '#0a0f1e', 'stroke-width': 2 }, cross);
+    el('circle', { r: 4, fill: '#0a0f1e', stroke: '#e9d3a0', 'stroke-width': 1.5 }, cross);
     geo = { X: X, Y: Y, rows: rows, cross: cross, W: W };
   }
   // tooltip al recorrer la curva
@@ -231,13 +224,16 @@
     var row = geo.rows[best], px = geo.X(row.d.getTime()), c = geo.cross.childNodes;
     geo.cross.setAttribute('visibility', 'visible');
     c[0].setAttribute('x1', px); c[0].setAttribute('x2', px);
-    c[1].setAttribute('cx', px); c[1].setAttribute('cy', geo.Y(row.m));
+    c[1].setAttribute('visibility', row.m == null ? 'hidden' : 'visible');
+    if (row.m != null) { c[1].setAttribute('cx', px); c[1].setAttribute('cy', geo.Y(row.m)); }
     c[2].setAttribute('cx', px); c[2].setAttribute('cy', geo.Y(row.s));
+    c[3].setAttribute('cx', px); c[3].setAttribute('cy', geo.Y(row.p));
     tip.hidden = false;
     var half = (tip.offsetWidth || 180) / 2 + 4;
     tip.style.left = Math.min(Math.max(px, half), geo.W - half) + 'px';
     $('[data-tip="d"]', tip).textContent = fecha(row.d);
-    $('[data-tip="m"]', tip).textContent = fmt(row.m) + (row.sim ? ' · simulado' : '');
+    $('[data-tip="m"]', tip).textContent = row.m == null ? 'todavía no existía' : fmt(row.m);
+    $('[data-tip="p"]', tip).textContent = fmt(row.p);
     $('[data-tip="s"]', tip).textContent = fmt(row.s);
   }
   function out() { if (geo) geo.cross.setAttribute('visibility', 'hidden'); tip.hidden = true; }
@@ -248,7 +244,7 @@
   window.addEventListener('scroll', function () { if (!tip.hidden) out(); }, { passive: true });
 
   function setNums(d, animate) {
-    [['mine', d.mine], ['spx', d.spx]].forEach(function (p) {
+    [['mine', d.mine], ['proj', d.proj], ['spx', d.spx]].forEach(function (p) {
       $$('[data-as-l="' + p[0] + '"]').forEach(function (e) { e.textContent = fmt(p[1]); });
       var e = $('[data-as-n="' + p[0] + '"]');
       if (!e) return;
