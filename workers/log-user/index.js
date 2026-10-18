@@ -25,6 +25,11 @@ export default {
               return await enviarDiploma(request, env, headers);
           }
 
+          // Ruta para las consultas de la sección Asesoría (formulario de #asesoria)
+          if (pathname === '/asesoria-consulta') {
+              return await asesoriaConsulta(request, env, headers);
+          }
+
           // Ruta para marcar usuario como miembro
           if (new URL(request.url).pathname === '/marcar-miembro') {
                       const { email, accion, monto } = await request.json();
@@ -792,4 +797,72 @@ async function creadorUsuarios(request, env) {
     } catch (e) {
         return out({ error: e.message }, 500);
     }
+}
+
+// ─── Ruta "/asesoria-consulta": formulario de la sección Asesoría ──────────
+// Guarda la consulta en la hoja "Asesoria" (se crea sola la primera vez),
+// le avisa a Ignacio por mail (responder = responderle al cliente) y le manda
+// al cliente una copia de confirmación. Campo "web" = trampa para bots.
+const ASESORIA_AVISO_A = 'manfredi.investment@gmail.com';
+
+async function asesoriaConsulta(request, env, corsHeaders) {
+    const headers = { ...corsHeaders, 'Content-Type': 'application/json' };
+    let b;
+    try { b = await request.json(); } catch { return new Response(JSON.stringify({ ok: false, error: 'Body invalido' }), { status: 400, headers }); }
+
+    const cut = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
+    const d = {
+        nombre: cut(b.nombre, 120), email: cut(b.email, 160), whatsapp: cut(b.whatsapp, 40),
+        experiencia: cut(b.experiencia, 60), monto: cut(b.monto, 60), objetivo: cut(b.objetivo, 1200)
+    };
+    if (b.web) return new Response(JSON.stringify({ ok: true }), { status: 200, headers });
+    if (!d.nombre || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) {
+        return new Response(JSON.stringify({ ok: false, error: 'Nombre y mail validos son requeridos' }), { status: 400, headers });
+    }
+    const fecha = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+
+    try {
+        const token = await getGoogleAccessToken(env);
+        const sheetId = env.GOOGLE_SHEETS_ID;
+        const meta = await (await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties`, { headers: { Authorization: `Bearer ${token}` } })).json();
+        if (!(meta.sheets || []).some(s => s.properties && s.properties.title === 'Asesoria')) {
+            await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`, {
+                method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ requests: [{ addSheet: { properties: { title: 'Asesoria', gridProperties: { frozenRowCount: 1 } } } }] })
+            });
+            await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Asesoria!A1:J1?valueInputOption=RAW`, {
+                method: 'PUT', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ values: [['Fecha', 'Nombre', 'Email', 'WhatsApp', 'Ya invierte', 'Monto aprox.', 'Qué busca', 'Estado', 'Próximo paso', 'Notas']] })
+            });
+        }
+        // RAW: lo que escribe el cliente nunca se interpreta como fórmula
+        const app = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Asesoria!A:J:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`, {
+            method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ values: [[fecha, d.nombre, d.email, d.whatsapp, d.experiencia, d.monto, d.objetivo, 'Nuevo', 'Contactar en 24 h', '']] })
+        });
+        if (!app.ok) throw new Error('Sheets ' + app.status);
+    } catch (err) {
+        // si falla la planilla igual mandamos el mail: la consulta no se pierde
+        console.error('[asesoria] planilla:', err);
+    }
+
+    const esc = v => String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const fila = (k, v) => v ? `<tr><td style="padding:6px 14px 6px 0;color:#e9d3a0;font-size:12px;text-transform:uppercase;letter-spacing:1px;vertical-align:top;">${k}</td><td style="padding:6px 0;color:#f3f6fb;font-size:14px;">${esc(v).replace(/\n/g, '<br>')}</td></tr>` : '';
+    const marco = cuerpo => `<!DOCTYPE html><html lang="es"><body style="margin:0;background:#0a0e1a;font-family:'Helvetica Neue',Arial,sans-serif;"><table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px;"><tr><td align="center"><table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#0f1a30;border:1px solid rgba(233,211,160,.3);border-radius:10px;"><tr><td style="padding:28px 32px;">${cuerpo}</td></tr></table></td></tr></table></body></html>`;
+    const wa = d.whatsapp.replace(/[^\d]/g, '');
+
+    const aviso = marco(`<p style="margin:0 0 6px;color:#e9d3a0;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Asesoría · consulta nueva</p><h1 style="margin:0 0 18px;color:#f3f6fb;font-size:22px;font-weight:600;">${esc(d.nombre)}</h1><table cellpadding="0" cellspacing="0">${fila('Mail', d.email)}${fila('WhatsApp', d.whatsapp)}${fila('Ya invierte', d.experiencia)}${fila('Monto', d.monto)}${fila('Qué busca', d.objetivo)}${fila('Fecha', fecha)}</table>${wa ? `<p style="margin:22px 0 0;"><a href="https://wa.me/${wa}" style="color:#0b1629;background:#e9d3a0;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px;">Escribirle por WhatsApp</a></p>` : ''}<p style="margin:18px 0 0;color:#f3f6fb;font-size:13px;">Respondé este mail para contestarle directo. Quedó en la hoja "Asesoria" de la planilla.</p>`);
+    const confirma = marco(`<p style="margin:0 0 6px;color:#e9d3a0;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Manfredi Investment · Asesoría</p><h1 style="margin:0 0 14px;color:#f3f6fb;font-size:22px;font-weight:600;">Recibí tu consulta, ${esc(d.nombre.split(' ')[0])}</h1><p style="margin:0 0 12px;color:#f3f6fb;font-size:15px;line-height:1.6;">Gracias por escribir. Te contacto en menos de 24 horas hábiles para coordinar la primera charla: 30 minutos por videollamada, sin cargo y sin compromiso.</p><p style="margin:0 0 12px;color:#f3f6fb;font-size:15px;line-height:1.6;">Si querés adelantarme algo más, respondé este mail.</p><p style="margin:18px 0 0;color:#e9d3a0;font-size:14px;">Ignacio Manfredi</p>`);
+
+    const send = body => fetch('https://api.resend.com/emails', {
+        method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    });
+    const r = await send({ from: 'Manfredi Investment <hola@manfredinvestment.com>', to: ASESORIA_AVISO_A, reply_to: d.email, subject: `Asesoría: consulta de ${d.nombre}`, html: aviso });
+    if (!r.ok) {
+        console.error('[asesoria] aviso:', r.status, await r.text().catch(() => ''));
+        return new Response(JSON.stringify({ ok: false, error: 'No se pudo enviar' }), { status: 502, headers });
+    }
+    await send({ from: 'Ignacio Manfredi <hola@manfredinvestment.com>', to: d.email, reply_to: ASESORIA_AVISO_A, subject: 'Recibí tu consulta — Asesoría Manfredi Investment', html: confirma })
+        .catch(err => console.error('[asesoria] confirmacion:', err));
+    return new Response(JSON.stringify({ ok: true }), { status: 200, headers });
 }
