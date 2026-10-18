@@ -46,24 +46,35 @@
     return d;
   }
 
-  // ── datos reales: cartera vs S&P 500 desde el inicio de la cartera ──
+  // ── datos: YTD 2026 de la cartera vs S&P 500 ───────────
+  // Antes del inicio real de la cartera (MF_INCEPTION_DATE) la curva es una
+  // SIMULACIÓN con la composición de ese día (se dibuja punteada y se rotula).
+  // Las dos líneas se rebasan a 0 en el inicio real, así el número final es el
+  // rendimiento real, igual que antes.
   var DATA = null, dataP = null, dataDone = false;
   function getData() {
     if (dataP) return dataP;
     dataP = (async function () {
       if (typeof mfBuildPerformanceSeries !== 'function') return null;
       try {
-        var n = (typeof mfBizDaysBetween === 'function' && typeof MF_INCEPTION_DATE !== 'undefined') ? Math.max(5, mfBizDaysBetween(MF_INCEPTION_DATE, new Date())) : 100;
+        var inc = typeof MF_INCEPTION_DATE !== 'undefined' ? MF_INCEPTION_DATE : new Date('2026-05-22T00:00:00');
+        var n = typeof mfBizDaysBetween === 'function' ? Math.max(5, mfBizDaysBetween(new Date(2026, 0, 1), new Date())) : 210;
         var m = await mfBuildPerformanceSeries(n, n, 'month');
         if (!m || m.dataUnavailable) return null;
-        var s = m.portfolioPct.findIndex(function (v) { return v != null; });
-        var mine = m.portfolioPct.slice(s), bench = m.benchPct.slice(s), dates = m.dates.slice(s);
-        var b0 = bench[0] == null ? 0 : bench[0];
-        bench = bench.map(function (v) { return v == null ? null : ((1 + v / 100) / (1 + b0 / 100) - 1) * 100; });
         var rows = [];
-        for (var i = 0; i < mine.length; i++) if (mine[i] != null && bench[i] != null && dates[i] instanceof Date) rows.push({ d: dates[i], m: mine[i], s: bench[i] });
+        for (var i = 0; i < m.dates.length; i++) {
+          if (m.portfolioPct[i] != null && m.benchPct[i] != null && m.dates[i] instanceof Date) rows.push({ d: m.dates[i], m: m.portfolioPct[i], s: m.benchPct[i] });
+        }
         if (rows.length < 5) return null;
-        DATA = { rows: rows, mine: rows[rows.length - 1].m, spx: rows[rows.length - 1].s };
+        var k = rows.findIndex(function (r) { return r.d >= inc; });
+        if (k < 0) k = 0;
+        var m0 = rows[k].m, s0 = rows[k].s;
+        rows.forEach(function (r, idx) {
+          r.m = ((1 + r.m / 100) / (1 + m0 / 100) - 1) * 100;
+          r.s = ((1 + r.s / 100) / (1 + s0 / 100) - 1) * 100;
+          r.sim = idx < k;
+        });
+        DATA = { rows: rows, k: k, mine: rows[rows.length - 1].m, spx: rows[rows.length - 1].s };
         return DATA;
       } catch (e) { console.warn('[asesoria] cartera:', e); return null; }
     })();
@@ -80,7 +91,7 @@
     hero.innerHTML = '';
     var small = W < 1000;
     // si todavía no hay datos, una forma neutra que sube
-    var vals = data ? data.rows.map(function (r) { return r.m; }) : [0, 1.2, .6, 2.4, 1.8, 3.6, 3.1, 5.2, 4.4, 6.8, 6.1, 8.4, 7.6, 10.2, 9.4, 12.1, 11.8, 14.3];
+    var vals = data ? data.rows.slice(data.k).map(function (r) { return r.m; }) : [0, 1.2, .6, 2.4, 1.8, 3.6, 3.1, 5.2, 4.4, 6.8, 6.1, 8.4, 7.6, 10.2, 9.4, 12.1, 11.8, 14.3];
     // promedio por tramos: ~26 puntos para una línea limpia
     var N = Math.min(26, vals.length), pts = [];
     for (var k = 0; k < N; k++) {
@@ -131,7 +142,7 @@
       if (!small) el('text', { x: W - 28, y: yy - 6, 'text-anchor': 'end' }, g).textContent = fmt(t, 0);
     }
     if (data && !small) {
-      var rows = data.rows, last = -1;
+      var rows = data.rows.slice(data.k), last = -1;
       rows.forEach(function (r, i) {
         if (r.d.getMonth() === last) return; last = r.d.getMonth();
         var xi = x0 + (x1 - x0) * i / (rows.length - 1);
@@ -174,8 +185,6 @@
     var Y = function (v) { return T + (H - T - B) * (hi - v) / (hi - lo); };
 
     var defs = el('defs', {}, plot);
-    var pat = el('pattern', { id: 'asHatch', width: 7, height: 7, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, defs);
-    el('line', { x1: 0, y1: 0, x2: 0, y2: 7, stroke: 'rgba(233,211,160,.10)', 'stroke-width': 1 }, pat);
     var ga = el('linearGradient', { id: 'asArea', x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
     el('stop', { offset: 0, 'stop-color': '#e9d3a0', 'stop-opacity': .22 }, ga);
     el('stop', { offset: 1, 'stop-color': '#e9d3a0', 'stop-opacity': 0 }, ga);
@@ -190,19 +199,22 @@
       el('line', { x1: xm, x2: xm, y1: H - B, y2: H - B + 5 }, g);
       if (W >= 560 || mo % 2 === 0) el('text', { class: 'x', x: xm + 4, y: H - 10 }, g).textContent = MESES[mo].toUpperCase();
     }
-    // antes del inicio de la cartera: zona rayada y marca
-    var xs = X(rows[0].d.getTime());
-    el('rect', { x: L, y: T, width: Math.max(0, xs - L), height: H - T - B, fill: 'url(#asHatch)' }, plot);
+    // simulación (punteada) hasta el inicio real; desde ahí, real
+    var k = data.k, xs = X(rows[k].d.getTime());
     var st = el('g', { class: 'as-start' }, plot);
-    el('line', { x1: xs, x2: xs, y1: T, y2: H - B }, st);
-    if (xs - L > 170) el('text', { x: xs - 8, y: T + 14, 'text-anchor': 'end' }, st).textContent = 'INICIO DE LA CARTERA';
-
-    var path = function (key) { return rows.map(function (r, i) { return (i ? 'L' : 'M') + X(r.d.getTime()).toFixed(1) + ' ' + Y(r[key]).toFixed(1); }).join(' '); };
-    var pm = path('m');
-    el('path', { d: pm + ' L' + X(d1).toFixed(1) + ' ' + Y(lo).toFixed(1) + ' L' + xs.toFixed(1) + ' ' + Y(lo).toFixed(1) + ' Z', fill: 'url(#asArea)' }, plot);
-    el('path', { class: 'as-pl-spx', d: path('s') }, plot);
-    el('path', { class: 'as-pl-mine', d: pm }, plot);
-    var last = rows[rows.length - 1];
+    if (k > 0) {
+      el('rect', { class: 'as-simzone', x: X(rows[0].d.getTime()), y: T, width: Math.max(0, xs - X(rows[0].d.getTime())), height: H - T - B }, plot);
+      el('line', { x1: xs, x2: xs, y1: T, y2: H - B }, st);
+      if (xs - L > 110) el('text', { x: xs - 8, y: T + 14, 'text-anchor': 'end' }, st).textContent = 'SIMULACIÓN';
+      el('text', { x: xs + 8, y: T + 14 }, st).textContent = 'REAL';
+    }
+    var path = function (key, from, to) { var d = ''; for (var i = from; i <= to; i++) d += (i > from ? 'L' : 'M') + X(rows[i].d.getTime()).toFixed(1) + ' ' + Y(rows[i][key]).toFixed(1) + ' '; return d.trim(); };
+    var end = rows.length - 1, real = path('m', k, end);
+    el('path', { d: real + ' L' + X(d1).toFixed(1) + ' ' + Y(lo).toFixed(1) + ' L' + xs.toFixed(1) + ' ' + Y(lo).toFixed(1) + ' Z', fill: 'url(#asArea)' }, plot);
+    el('path', { class: 'as-pl-spx', d: path('s', 0, end) }, plot);
+    if (k > 0) el('path', { class: 'as-pl-sim', d: path('m', 0, k) }, plot);
+    el('path', { class: 'as-pl-mine', d: real }, plot);
+    var last = rows[end];
     el('circle', { class: 'as-pl-end', cx: X(d1), cy: Y(last.s), r: 4, fill: '#8fb0e6' }, plot);
     el('circle', { class: 'as-pl-end', cx: X(d1), cy: Y(last.m), r: 5, fill: '#f3e3bd' }, plot);
     var cross = el('g', { class: 'as-cross', visibility: 'hidden' }, plot);
@@ -225,7 +237,7 @@
     var half = (tip.offsetWidth || 180) / 2 + 4;
     tip.style.left = Math.min(Math.max(px, half), geo.W - half) + 'px';
     $('[data-tip="d"]', tip).textContent = fecha(row.d);
-    $('[data-tip="m"]', tip).textContent = fmt(row.m);
+    $('[data-tip="m"]', tip).textContent = fmt(row.m) + (row.sim ? ' · simulado' : '');
     $('[data-tip="s"]', tip).textContent = fmt(row.s);
   }
   function out() { if (geo) geo.cross.setAttribute('visibility', 'hidden'); tip.hidden = true; }

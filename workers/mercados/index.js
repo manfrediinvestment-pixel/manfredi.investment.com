@@ -35,7 +35,8 @@ async function kvPut(env, key, val, opts) {
 // cuando muchos usuarios calculan metricas de cartera (beta, volatilidad,
 // etc.) al mismo tiempo y varios comparten los mismos tickers populares.
 const HISTORICO_CACHE_TTL_SECONDS = 21600; // 6h
-const HISTORICO_MAX_N = 180;
+// 260 ruedas: alcanza para un YTD completo (Asesoría y la ventana YTD de Portfolio).
+const HISTORICO_MAX_N = 260;
 
 // Nombres de empresa conocidos - el resto del universo (miles de tickers de
 // data912) se muestra solo con el ticker hasta que se amplie este mapa.
@@ -590,7 +591,7 @@ async function fetchD912Closes(endpoint, symbol, n = 30) {
 async function fetchYahooCloses(symbol, n = 30) {
   // "range" tiene que cubrir al menos n dias habiles, si no Yahoo devuelve
   // menos velas de las pedidas y closes.slice(-n) queda corto en silencio.
-  const range = n <= 63 ? '3mo' : (n <= 126 ? '6mo' : '1y');
+  const range = n <= 63 ? '3mo' : (n <= 126 ? '6mo' : (n <= 250 ? '1y' : '2y'));
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=${range}`;
   const resp = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(10000) });
   if (!resp.ok) throw new Error(`Yahoo HTTP ${resp.status}`);
