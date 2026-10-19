@@ -70,7 +70,7 @@
         if (rows.length < 5 || k < 0) return null;
         var t0 = new Date(2026, 0, 1).getTime(), t1 = rows[rows.length - 1].d.getTime(), proj = m.totalReturn;
         rows.forEach(function (r) { r.p = proj * (r.d.getTime() - t0) / (t1 - t0); });
-        DATA = { rows: rows, k: k, inc: rows[k].d, mine: rows[rows.length - 1].m, proj: proj, spx: rows[rows.length - 1].s };
+        DATA = { rows: rows, k: k, inc: rows[k].d, mine: rows[rows.length - 1].m, proj: proj, spx: rows[rows.length - 1].s, raw: m };
         return DATA;
       } catch (e) { console.warn('[asesoria] cartera:', e); return null; }
     })();
@@ -254,6 +254,71 @@
     });
   }
 
+
+  // ── lo que tengo y por qué: posiciones reales de MF_HOLDINGS ──
+  // Peso = cantidad × último cierre en USD (misma serie que el gráfico).
+  // "Desde que entró" = valor hoy vs. lo pagado en cada compra (MF_OPERACIONES
+  // marca las compras posteriores al armado del 22-may).
+  var NOMBRES = { MSFT: 'Microsoft', META: 'Meta Platforms', MELI: 'MercadoLibre', IBIT: 'iShares Bitcoin Trust (BlackRock)', NU: 'Nu Holdings (Nubank)',
+    XOM: 'ExxonMobil', LLY: 'Eli Lilly', PEP: 'PepsiCo', AMZN: 'Amazon', AIG: 'American International Group', PAMP: 'Pampa Energía', GGAL: 'Grupo Financiero Galicia' };
+  var LOGOS = { MSFT: 1, META: 1, MELI: 1, LLY: 1, PEP: 1, AMZN: 1, GGAL: 1 };
+  var SECT_COL = { 'Tecnología': '#f3e3bd', 'Consumo discrecional': '#d9bb7d', 'Financiero': '#8fb0e6', 'Comunicación': '#b9a06a',
+    'Energía': '#4f6fa8', 'Salud': '#7fc4b4', 'Consumo básico': '#c9d6ee', 'Cripto': '#a98bd6' };
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function drawHold(data) {
+    var box = $('[data-as="hold"]');
+    if (!box || !data || !data.raw || typeof MF_HOLDINGS === 'undefined') { if (box && dataDone) box.hidden = true; return; }
+    var m = data.raw, dates = m.dates, ops = typeof MF_OPERACIONES !== 'undefined' ? MF_OPERACIONES : [];
+    var inc = typeof MF_INCEPTION_DATE !== 'undefined' ? MF_INCEPTION_DATE : data.inc;
+    function closeAt(c, d) {
+      var j = dates.findIndex(function (x) { return x >= d; }); if (j < 0) j = dates.length - 1;
+      var v = c[c.length - (dates.length - j)]; return v == null ? null : v;
+    }
+    var pos = [];
+    MF_HOLDINGS.forEach(function (h) {
+      var c = m.closesByTicker && m.closesByTicker[h.ticker];
+      if (!c || !c.length) return;
+      var last = c[c.length - 1], lots = [], later = 0;
+      ops.forEach(function (o) { if (o.ticker === h.ticker) { lots.push({ q: o.cantidad, d: new Date(o.fecha + 'T00:00:00') }); later += o.cantidad; } });
+      if (h.cantidad - later > 0) lots.push({ q: h.cantidad - later, d: inc });
+      var cost = 0, ok = true;
+      lots.forEach(function (l) { var p = closeAt(c, l.d); if (p == null) ok = false; else cost += l.q * p; });
+      var first = lots.reduce(function (a, l) { return l.d < a ? l.d : a; }, lots[0].d);
+      pos.push({ h: h, val: h.cantidad * last, ret: ok && cost ? (h.cantidad * last / cost - 1) * 100 : null, desde: first });
+    });
+    if (!pos.length) { box.hidden = true; return; }
+    var tot = pos.reduce(function (a, p) { return a + p.val; }, 0);
+    pos.forEach(function (p) { p.w = p.val / tot * 100; });
+    pos.sort(function (a, b) { return b.w - a.w; });
+
+    var sect = {};
+    pos.forEach(function (p) { var k = p.h.sector || 'Otros'; sect[k] = (sect[k] || 0) + p.w; });
+    var sk = Object.keys(sect).sort(function (a, b) { return sect[b] - sect[a]; });
+    $('.as-mix__bar', box).innerHTML = sk.map(function (k) { return '<i style="flex:' + sect[k].toFixed(2) + ';background:' + (SECT_COL[k] || '#e9d3a0') + '" title="' + esc(k) + '"></i>'; }).join('');
+    $('.as-mix__lg', box).innerHTML = sk.map(function (k) { return '<li><i style="background:' + (SECT_COL[k] || '#e9d3a0') + '"></i>' + esc(k) + ' <b>' + sect[k].toFixed(1).replace('.', ',') + '%</b></li>'; }).join('');
+
+    var maxW = pos[0].w;
+    $('.as-hold__list', box).innerHTML = pos.map(function (p) {
+      var t = p.h.ticker, mot = (p.h.motivo || '').trim();
+      var av = LOGOS[t] ? '<span class="as-pos__av"><img src="assets/logos/' + t.toLowerCase() + '.png" alt="" loading="lazy"></span>' : '<span class="as-pos__av is-mono">' + esc(t.slice(0, 4)) + '</span>';
+      var ret = p.ret == null ? '<span class="as-pos__r">—</span>' : '<span class="as-pos__r ' + (p.ret >= 0 ? 'up' : 'dn') + '">' + fmt(p.ret) + '</span>';
+      var desde = p.desde.getDate() + ' ' + MESES[p.desde.getMonth()] + ' 2026';
+      var why = mot ? mot.split(/\n+/).map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') : '<p>Posición sumada el ' + desde + '. Estoy terminando de escribir la tesis completa; la publico acá apenas esté.</p>';
+      return '<details class="as-pos"><summary>' +
+        '<span class="as-pos__id">' + av + '<span class="as-pos__nm"><b>' + esc(t) + '</b><span>' + esc(NOMBRES[t] || t) + ' · <em>' + esc(p.h.sector || '') + '</em></span></span></span>' +
+        '<span class="as-pos__w"><i><u style="--w:' + (p.w / maxW * 100).toFixed(1) + '%"></u></i><b>' + p.w.toFixed(1).replace('.', ',') + '%</b></span>' + ret +
+        '<span class="as-pos__x" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></span>' +
+        '</summary><div class="as-pos__why"><div><small>Por qué la tengo · en cartera desde el ' + desde + '</small>' + why + '</div></div></details>';
+    }).join('');
+    box.hidden = false;
+    if (window.gsap && !calm) {
+      gsap.from(box.querySelectorAll('.as-mix__bar i'), { scaleX: 0, duration: 1.1, ease: 'expo.out', stagger: .05, scrollTrigger: { trigger: box, start: 'top 80%' } });
+      gsap.from(box.querySelectorAll('.as-pos'), { y: 16, opacity: 0, duration: .8, ease: 'expo.out', stagger: .05, scrollTrigger: { trigger: box.querySelector('.as-hold__list'), start: 'top 85%' } });
+      gsap.from(box.querySelectorAll('.as-pos__w u'), { scaleX: 0, duration: 1.1, ease: 'expo.out', stagger: .05, scrollTrigger: { trigger: box.querySelector('.as-hold__list'), start: 'top 85%' } });
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
+    }
+  }
+
   // ── pasos: el activo se elige con el scroll ─────────────
   var steps = $$('.as-step');
   function setStep(i) { steps.forEach(function (s, k) { s.classList.toggle('is-on', k === i); }); }
@@ -318,7 +383,7 @@
     started = true;
     drawHero(null);
     getData().then(function (d) {
-      drawHero(d); drawPanel(d);
+      drawHero(d); drawPanel(d); drawHold(d);
       if (d && (calm || !window.gsap)) setNums(d, false);
       if (d && window.gsap && !calm) gsap.fromTo('#asesoria .as-hc-line', { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.8, ease: 'power3.inOut' });
       if (window.ScrollTrigger) ScrollTrigger.refresh();
