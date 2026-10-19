@@ -305,16 +305,17 @@
       var desde = p.desde.getDate() + ' ' + MESES[p.desde.getMonth()] + ' 2026';
       var why = mot ? mot.split(/\n+/).map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') : '<p>Posición sumada el ' + desde + '. Estoy terminando de escribir la tesis completa; la publico acá apenas esté.</p>';
       return '<details class="as-pos"><summary>' +
-        '<span class="as-pos__id">' + av + '<span class="as-pos__nm"><b>' + esc(t) + '</b><span>' + esc(NOMBRES[t] || t) + ' · <em>' + esc(p.h.sector || '') + '</em></span></span></span>' +
-        '<span class="as-pos__w"><i><u style="--w:' + (p.w / maxW * 100).toFixed(1) + '%"></u></i><b>' + p.w.toFixed(1).replace('.', ',') + '%</b></span>' + ret +
+        '<span class="as-pos__id">' + av + '<span class="as-pos__nm"><b>' + esc(t) + '</b><span>' + esc(NOMBRES[t] || t) + '</span>' +
+        '<i class="as-pos__bar"><u style="--w:' + (p.w / maxW * 100).toFixed(1) + '%"></u></i></span></span>' +
+        '<span class="as-pos__w">' + p.w.toFixed(1).replace('.', ',') + '%</span>' + ret +
         '<span class="as-pos__x" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></span>' +
         '</summary><div class="as-pos__why"><div><small>Por qué la tengo · en cartera desde el ' + desde + '</small>' + why + '</div></div></details>';
     }).join('');
     box.hidden = false;
     if (window.gsap && !calm) {
       gsap.from(box.querySelectorAll('.as-mix__bar i'), { scaleX: 0, duration: 1.1, ease: 'expo.out', stagger: .05, scrollTrigger: { trigger: box, start: 'top 80%' } });
-      gsap.from(box.querySelectorAll('.as-pos'), { y: 16, opacity: 0, duration: .8, ease: 'expo.out', stagger: .05, scrollTrigger: { trigger: box.querySelector('.as-hold__list'), start: 'top 85%' } });
-      gsap.from(box.querySelectorAll('.as-pos__w u'), { scaleX: 0, duration: 1.1, ease: 'expo.out', stagger: .05, scrollTrigger: { trigger: box.querySelector('.as-hold__list'), start: 'top 85%' } });
+      gsap.from(box.querySelectorAll('.as-pos'), { y: 16, opacity: 0, duration: .8, ease: 'expo.out', stagger: .05, scrollTrigger: { trigger: box, start: 'top 80%' } });
+      gsap.from(box.querySelectorAll('.as-pos__bar u'), { scaleX: 0, duration: 1.1, ease: 'expo.out', stagger: .05, scrollTrigger: { trigger: box, start: 'top 80%' } });
       if (window.ScrollTrigger) ScrollTrigger.refresh();
     }
   }
