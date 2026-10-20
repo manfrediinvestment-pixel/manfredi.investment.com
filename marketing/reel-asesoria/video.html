@@ -445,8 +445,8 @@ em { font-style:italic; color:var(--it); }
   var EIO = 'power3.inOut';
   gsap.set('.sc', { autoAlpha: 0 });
   // halos que respiran a lo largo de todo el video
-  tl.fromTo('.halo--a', { x: 0, y: 0 }, { x: 180, y: 260, duration: 23.4, ease: 'none' }, 0);
-  tl.fromTo('.halo--b', { x: 0, y: 0 }, { x: -160, y: -220, duration: 23.4, ease: 'none' }, 0);
+  tl.fromTo('.halo--a', { x: 0, y: 0 }, { x: 180, y: 260, duration: 26.25, ease: 'none' }, 0);
+  tl.fromTo('.halo--b', { x: 0, y: 0 }, { x: -160, y: -220, duration: 26.25, ease: 'none' }, 0);
 
   function maskIn(sel, at, stag) { tl.fromTo(sel, { yPercent: 108 }, { yPercent: 0, duration: 1.1, stagger: stag || .16 }, at); }
   function ruleIn(scope, at) {
@@ -460,83 +460,102 @@ em { font-style:italic; color:var(--it); }
     tl.fromTo(b, { y: 220, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .8, ease: EIO }, at + .12);
   }
 
-  // 1 · gancho (0 – 3.2)
+  // Grilla musical: 80 BPM (pulso = 0,75 s). Cada escena LLEGA en un pulso (A2…A6): el
+  // empuje arranca .45 s antes para que su punto medio caiga justo en el pulso.
+  // CUES guarda los momentos que usa audio.mjs para la música y los efectos.
+  var BEAT = .75, A2 = 3.75, A3 = 7.5, A4 = 11.25, A5 = 18.75, A6 = 23.25, END = 26.25;
+  var CUES = { bpm: 80, beat: BEAT, arrive: [0, A2, A3, A4, A5, A6], end: END, ticks: [], seals: [], steps: [], donut: [] };
+  var _type = type;
+  type = function (sel, at, per) { $$(sel + ' .ch').forEach(function (c, i) { if (c.textContent.trim()) CUES.ticks.push(+(at + i * per).toFixed(3)); }); _type(sel, at, per); };
+
+  // 1 · gancho
   tl.set('#s1', { autoAlpha: 1 }, 0);
   ruleIn('#s1', .15);
   tl.fromTo('#cvLine', { strokeDasharray: cLen, strokeDashoffset: cLen }, { strokeDashoffset: 0, duration: 2.4, ease: 'power2.inOut' }, .1);
   tl.fromTo('#cvArea', { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.4, ease: 'power2.out' }, 1.2);
-  tl.fromTo(['#cvDot', '#cvRing'], { autoAlpha: 0, scale: 0, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: .8 }, 2.35);
-  tl.fromTo('#cvRing', { attr: { r: 12 } }, { attr: { r: 30 }, autoAlpha: 0, duration: 1.4, ease: 'power2.out' }, 2.6);
+  tl.fromTo(['#cvDot', '#cvRing'], { autoAlpha: 0, scale: 0, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: .8 }, 2.4);
+  tl.fromTo('#cvRing', { attr: { r: 12 } }, { attr: { r: 30 }, autoAlpha: 0, duration: 1.4, ease: 'power2.out' }, 2.65);
+  CUES.curve = [.1, 2.4]; CUES.dot = 2.4;
   maskIn('#s1 .mask > span', .35, .22);
   type('#s1 [data-tw]', 1.35, .055);
 
-  // 2 · quién (3.2 – 6.4); la curva queda detrás de la foto
-  push('#s1', '#s2', 3.1);
-  tl.to('#cvG', { y: -560, autoAlpha: .55, duration: 1.1, ease: EIO }, 3.1);
-  tl.fromTo('#s2 .who__ring circle', { strokeDasharray: '0 1' }, { strokeDasharray: '1 0', duration: 1.4, ease: 'power2.inOut' }, 3.3);
-  tl.fromTo('#s2 .who__light', { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.2, ease: 'power2.out' }, 3.4);
-  tl.fromTo('#s2 .who__img img', { clipPath: 'inset(100% 0 0 0)', y: 40 }, { clipPath: 'inset(0% 0 0 0)', y: 0, duration: 1.4 }, 3.45);
-  maskIn('#s2 .cap .mask > span', 3.9);
-  tl.fromTo('#s2 .cap .label', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .9 }, 4.15);
-  tl.fromTo('#s2 .badge', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 1 }, 4.45);
+  // 2 · quién; la curva queda detrás de la foto
+  push('#s1', '#s2', A2 - .45);
+  tl.to('#cvG', { y: -560, autoAlpha: .55, duration: 1.1, ease: EIO }, A2 - .45);
+  tl.fromTo('#s2 .who__ring circle', { strokeDasharray: '0 1' }, { strokeDasharray: '1 0', duration: 1.4, ease: 'power2.inOut' }, A2 - .25);
+  tl.fromTo('#s2 .who__light', { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.2, ease: 'power2.out' }, A2 - .15);
+  tl.fromTo('#s2 .who__img img', { clipPath: 'inset(100% 0 0 0)', y: 40 }, { clipPath: 'inset(0% 0 0 0)', y: 0, duration: 1.4 }, A2 - .1);
+  maskIn('#s2 .cap .mask > span', A2 + .375);
+  tl.fromTo('#s2 .cap .label', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .9 }, A2 + .75);
+  tl.fromTo('#s2 .badge', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 1 }, A2 + 1.125);
+  CUES.badge = A2 + 1.125;
 
-  // 3 · credenciales (6.4 – 9.8)
-  push('#s2', '#s3', 6.3);
-  tl.to('#cvG', { autoAlpha: 0, duration: .8, ease: EIO }, 6.3);
-  ruleIn('#s3', 6.55);
-  maskIn('#s3 h2 .mask > span', 6.6);
+  // 3 · credenciales: un sello por cada medio pulso
+  push('#s2', '#s3', A3 - .45);
+  tl.to('#cvG', { autoAlpha: 0, duration: .8, ease: EIO }, A3 - .45);
+  ruleIn('#s3', A3 - .2);
+  maskIn('#s3 h2 .mask > span', A3 - .15);
   $$('#s3 .seal-cell').forEach(function (c, i) {
-    var at = 7.0 + i * .3;
+    var at = A3 + .375 * (i + 1);
+    CUES.seals.push(at);
     tl.fromTo(c.querySelector('.seal'), { autoAlpha: 0, scale: .86 }, { autoAlpha: 1, scale: 1, duration: .9 }, at);
     var ring = c.querySelector('svg circle');
     if (ring) tl.fromTo(ring, { strokeDasharray: '0 1' }, { strokeDasharray: '1 0', duration: 1, ease: 'power2.inOut' }, at);
     tl.fromTo(c.querySelectorAll('b, span'), { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .8, stagger: .08 }, at + .15);
   });
 
-  // 4 · cómo trabajamos (9.8 – 16)
-  push('#s3', '#s4', 9.7);
-  ruleIn('#s4', 9.95);
-  maskIn('#s4 h2 .mask > span', 10);
-  tl.fromTo('#s4 .prog', { autoAlpha: 0 }, { autoAlpha: 1, duration: .8 }, 10.2);
-  var ST = [10.35, 11.85, 13.35, 14.85], DUR = 1.5;
+  // 4 · cómo trabajamos: un paso cada 2 pulsos (llega en el pulso)
+  push('#s3', '#s4', A4 - .45);
+  ruleIn('#s4', A4 - .2);
+  maskIn('#s4 h2 .mask > span', A4 - .15);
+  tl.fromTo('#s4 .prog', { autoAlpha: 0 }, { autoAlpha: 1, duration: .8 }, A4 + .05);
+  var DUR = 2 * BEAT, ST = [0, 1, 2, 3].map(function (i) { return A4 + .375 + i * DUR; });
   ST.forEach(function (at, i) {
     var s = '#st' + (i + 1);
+    CUES.steps.push(at + .375);
     tl.fromTo(s, { autoAlpha: 0, x: 140 }, { autoAlpha: 1, x: 0, duration: .75, ease: EIO }, at);
     if (i < 3) tl.to(s, { autoAlpha: 0, x: -140, duration: .75, ease: EIO }, at + DUR - .1);
-    tl.fromTo('#s4 .prog div:nth-child(' + (i + 1) + ') i b', { scaleX: 0 }, { scaleX: 1, duration: DUR, ease: 'none' }, at);
+    tl.fromTo('#s4 .prog div:nth-child(' + (i + 1) + ') i b', { scaleX: 0 }, { scaleX: 1, duration: DUR, ease: 'none' }, at + .375);
   });
-  tl.fromTo('#slotPick .pick', { autoAlpha: 0, scale: .9 }, { autoAlpha: 1, scale: 1, duration: .6 }, ST[0] + .55);
-  tl.set('#slotPick', { attr: { class: 'is-pick' } }, ST[0] + .6);
-  tl.fromTo('#st2 .gauge__fill', { scaleX: .08 }, { scaleX: .5, duration: 1, ease: 'power3.out' }, ST[1] + .4);
-  tl.fromTo('#st2 .gauge__dot', { left: '8%' }, { left: '50%', duration: 1, ease: 'power3.out' }, ST[1] + .4);
-  type('#st3 [data-tw]', ST[2] + .55, .12);
-  $$('#st3 .own span').forEach(function (n, i) { tl.fromTo(n, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .6 }, ST[2] + .7 + i * .12); });
+  CUES.slot = ST[0] + .75;
+  tl.fromTo('#slotPick .pick', { autoAlpha: 0, scale: .9 }, { autoAlpha: 1, scale: 1, duration: .6 }, CUES.slot);
+  tl.set('#slotPick', { attr: { class: 'is-pick' } }, CUES.slot + .05);
+  CUES.gauge = [ST[1] + .375, 1];
+  tl.fromTo('#st2 .gauge__fill', { scaleX: .08 }, { scaleX: .5, duration: 1, ease: 'power3.out' }, CUES.gauge[0]);
+  tl.fromTo('#st2 .gauge__dot', { left: '8%' }, { left: '50%', duration: 1, ease: 'power3.out' }, CUES.gauge[0]);
+  type('#st3 [data-tw]', ST[2] + .5, .125);
+  $$('#st3 .own span').forEach(function (n, i) { tl.fromTo(n, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .6 }, ST[2] + .75 + i * .125); });
   $$('#st4 .seg').forEach(function (c, i) {
-    tl.fromTo(c, { strokeDasharray: '0 100', strokeDashoffset: +c.dataset.off }, { strokeDasharray: c.dataset.len + ' 100', duration: .8, ease: 'power3.out' }, ST[3] + .4 + i * .1);
+    var at = ST[3] + .375 + i * .1875;
+    CUES.donut.push(at);
+    tl.fromTo(c, { strokeDasharray: '0 100', strokeDashoffset: +c.dataset.off }, { strokeDasharray: c.dataset.len + ' 100', duration: .8, ease: 'power3.out' }, at);
   });
   $$('#st4 .time li').forEach(function (n, i) { tl.fromTo(n, { autoAlpha: 0, x: 20 }, { autoAlpha: 1, x: 0, duration: .6 }, ST[3] + .5 + i * .14); });
 
-  // 5 · cartera a la vista (16 – 20)
-  push('#s4', '#s5', 16.0);
-  ruleIn('#s5', 16.25);
-  maskIn('#s5 h2 .mask > span', 16.3);
-  tl.fromTo('#s5 .legend span', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .8, stagger: .1 }, 16.55);
-  tl.fromTo('#chGrid, #chX', { autoAlpha: 0 }, { autoAlpha: 1, duration: .8, ease: 'power2.out' }, 16.5);
-  tl.fromTo('#chClipR', { attr: { width: 0 } }, { attr: { width: 1080 }, duration: 1.8, ease: 'power2.inOut' }, 16.65);
+  // 5 · cartera a la vista: el gráfico se dibuja en 3 pulsos y los números llegan en el pulso
+  push('#s4', '#s5', A5 - .45);
+  ruleIn('#s5', A5 - .2);
+  maskIn('#s5 h2 .mask > span', A5 - .15);
+  tl.fromTo('#s5 .legend span', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .8, stagger: .1 }, A5 + .1);
+  tl.fromTo('#chGrid, #chX', { autoAlpha: 0 }, { autoAlpha: 1, duration: .8, ease: 'power2.out' }, A5 + .05);
+  CUES.chart = [A5, 3 * BEAT];
+  tl.fromTo('#chClipR', { attr: { width: 0 } }, { attr: { width: 1080 }, duration: CUES.chart[1], ease: 'power2.inOut' }, A5);
   var cnt = { m: 0, s: 0 };
-  tl.fromTo(cnt, { m: 0, s: 0 }, { m: DATA.mine, s: DATA.spx, duration: 1.8, ease: 'power2.inOut',
-    onUpdate: function () { tagM.textContent = pct(cnt.m); tagS.textContent = pct(cnt.s); } }, 16.65);
-  tl.fromTo([tagM, tagS], { autoAlpha: 0 }, { autoAlpha: 1, duration: .5, ease: 'power2.out' }, 16.8);
-  tl.fromTo('#s5 .note > *', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .8, stagger: .12 }, 17.6);
+  tl.fromTo(cnt, { m: 0, s: 0 }, { m: DATA.mine, s: DATA.spx, duration: CUES.chart[1], ease: 'power2.inOut',
+    onUpdate: function () { tagM.textContent = pct(cnt.m); tagS.textContent = pct(cnt.s); } }, A5);
+  tl.fromTo([tagM, tagS], { autoAlpha: 0 }, { autoAlpha: 1, duration: .5, ease: 'power2.out' }, A5 + .15);
+  tl.fromTo('#s5 .note > *', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .8, stagger: .12 }, A5 + 2 * BEAT);
 
-  // 6 · cierre (20 – 23.4); vuelve la curva abajo como hilo de unión
-  push('#s5', '#s6', 19.9);
-  tl.fromTo('#cvG', { y: 140, autoAlpha: 0 }, { y: 120, autoAlpha: .7, duration: 1.4, ease: EIO, immediateRender: false }, 20.1);
-  ruleIn('#s6', 20.2);
-  maskIn('#s6 h2 .mask > span', 20.3, .2);
-  tl.fromTo('#s6 .line', { scaleX: 0 }, { scaleX: 1, duration: 1 }, 21.2);
-  tl.fromTo('#s6 .url', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 1 }, 21.35);
-  tl.to({}, { duration: .01 }, 23.4); // cola: el cierre se sostiene
+  // 6 · cierre: cada línea en medio pulso; la web llega en el pulso y resuelve la música
+  push('#s5', '#s6', A6 - .45);
+  tl.fromTo('#cvG', { y: 140, autoAlpha: 0 }, { y: 120, autoAlpha: .7, duration: 1.4, ease: EIO, immediateRender: false }, A6 - .25);
+  ruleIn('#s6', A6 - .15);
+  maskIn('#s6 h2 .mask > span', A6, .375);
+  tl.fromTo('#s6 .line', { scaleX: 0 }, { scaleX: 1, duration: 1 }, A6 + 1.125);
+  CUES.url = A6 + 2 * BEAT;
+  tl.fromTo('#s6 .url', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 1 }, CUES.url);
+  tl.to({}, { duration: .01 }, END - .01); // cola: el cierre se sostiene
+  window.CUES = CUES;
 
   window.tl = tl;
   window.seek = function (t) { tl.seek(t, false); };
