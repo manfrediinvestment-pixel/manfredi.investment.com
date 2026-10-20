@@ -16,10 +16,9 @@
   // WhatsApp de Ignacio en formato internacional sin "+" ni espacios (ej. 5493411234567).
   // Vacío = los botones de WhatsApp quedan ocultos.
   var WA_NUM = '5493416547126';
-  // Links de Balanz de Ignacio: abrir cuenta nueva con él como asesor / asignarlo en una cuenta existente.
-  // Vacíos = los botones llevan al formulario de consulta.
-  var BZ_ABRIR = '';
-  var BZ_ASIGNAR = '';
+  // Link de Balanz de Ignacio para abrir una cuenta nueva con él como asesor (vacío = lleva al formulario).
+  // Para asignarlo en una cuenta existente se usa el formulario corto de la tarjeta (mail + comitente).
+  var BZ_ABRIR = 'https://balanz.com/abrir-cuenta-2.aspx?reference=ifa6596@balanz.work';
   var WA_TXT = 'Hola Ignacio, vi la asesoría en manfredinvestment.com y quiero coordinar una charla.';
 
   var sec = document.getElementById('asesoria');
@@ -28,7 +27,7 @@
   var $$ = function (s, r) { return Array.prototype.slice.call((r || sec).querySelectorAll(s)); };
   var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  [['abrir', BZ_ABRIR], ['asignar', BZ_ASIGNAR]].forEach(function (b) {
+  [['abrir', BZ_ABRIR]].forEach(function (b) {
     var a = $('[data-bz="' + b[0] + '"]');
     if (!a) return;
     if (b[1]) a.href = b[1]; else { a.removeAttribute('target'); a.removeAttribute('rel'); }
@@ -491,5 +490,34 @@
         msg.textContent = 'No se pudo enviar. Probá de nuevo o escribime a manfredi.investment@gmail.com.'; msg.classList.add('is-err');
       })
       .then(function () { btn.disabled = false; btnTxt.textContent = 'Enviar consulta'; });
+  });
+})();
+
+// ── "Asignarme como asesor": mail + cuenta comitente → mismo endpoint que la consulta ──
+(function () {
+  var sec = document.getElementById('asesoria');
+  var open = sec && sec.querySelector('[data-asg-open]'), form = sec && sec.querySelector('#asAsg');
+  if (!open || !form) return;
+  var done = sec.querySelector('.as-asg__done'), msg = form.querySelector('.as-msg'), btn = form.querySelector('button[type="submit"]'), btnTxt = btn.querySelector('span');
+  open.addEventListener('click', function () {
+    var on = form.hidden;
+    form.hidden = !on; open.setAttribute('aria-expanded', String(on)); open.classList.toggle('is-open', on);
+    if (on) form.nombre.focus();
+  });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    msg.textContent = ''; msg.classList.remove('is-err');
+    var cta = form.comitente.value.replace(/\D/g, '');
+    var d = { nombre: form.nombre.value.trim(), email: form.email.value.trim(), whatsapp: '', experiencia: 'Sí, en Balanz', monto: 'Prefiero no decir',
+      objetivo: 'ASIGNAR COMO ASESOR · Cuenta comitente N° ' + cta, web: form.web.value };
+    if (!d.nombre || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email) || cta.length < 3) {
+      msg.textContent = 'Completá tu nombre, el mail de tu cuenta y el número de comitente.'; msg.classList.add('is-err'); return;
+    }
+    btn.disabled = true; btnTxt.textContent = 'Enviando…';
+    fetch('https://log-user.nachito2502.workers.dev/asesoria-consulta', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.ok) throw new Error(j.error || r.status); }); })
+      .then(function () { form.hidden = true; open.hidden = true; done.hidden = false; })
+      .catch(function () { msg.textContent = 'No se pudo enviar. Probá de nuevo o escribime a manfredi.investment@gmail.com.'; msg.classList.add('is-err'); })
+      .then(function () { btn.disabled = false; btnTxt.textContent = 'Enviar para asignarme'; });
   });
 })();

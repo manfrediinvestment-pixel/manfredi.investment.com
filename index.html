@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="assets/analistas/analistas.css?v=20261015b" />
 <link rel="stylesheet" href="assets/portfolio/ratios.css?v=20261012" />
 <link rel="stylesheet" href="assets/pro/pro.css?v=20261012b" />
-<link rel="stylesheet" href="assets/asesoria/asesoria.css?v=20261020m" />
+<link rel="stylesheet" href="assets/asesoria/asesoria.css?v=20261020n" />
 <link rel="stylesheet" href="assets/calendario/calendario.css?v=20261010z" />
 <link rel="stylesheet" href="assets/informes/estanteria.css?v=20261010z" />
 <link rel="stylesheet" href="assets/portfolio/portfolio.css?v=20261010z" />
@@ -4104,7 +4104,7 @@
   <script src="assets/analistas/revision.js?v=20261015b" defer></script>
   <script src="assets/analistas/autor.js?v=20261015b" defer></script>
   <script src="assets/pro/pro.js?v=20261012b" defer></script>
-  <script src="assets/asesoria/asesoria.js?v=20261020f" defer></script>
+  <script src="assets/asesoria/asesoria.js?v=20261020g" defer></script>
   <!-- cartel con los pasos para postularse como analista -->
   <script src="assets/analistas/postular.js?v=20261010a" defer></script>
   <script src="assets/calendario/calendario.js?v=20261010z" defer></script>
@@ -10558,10 +10558,25 @@
             <span class="as-path__k">Ya ten&eacute;s cuenta en Balanz</span>
             <h4>Sumame como tu asesor.</h4>
             <p>Tu cuenta, tu plata y tus tenencias siguen igual. Solo quedo asignado como tu asesor para trabajar tu cartera con vos.</p>
-            <a class="as-btn2 as-btn2--full" data-bz="asignar" href="#asesoria-consulta" target="_blank" rel="noopener"><span>Asignarme como asesor</span><i class="as-btn2__ic"><svg viewBox="0 0 16 16"><path d="M5 11l6-6M6 5h5v5"/></svg></i></a>
+            <button type="button" class="as-btn2 as-btn2--full" data-asg-open aria-expanded="false" aria-controls="asAsg"><span>Asignarme como asesor</span><i class="as-btn2__ic"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg></i></button>
+            <form class="as-asg" id="asAsg" hidden novalidate>
+              <p class="as-asg__intro">Para asignarme necesito estos dos datos de tu cuenta. Con eso hago el pedido en Balanz y te aviso por mail.</p>
+              <div class="as-f"><label for="asgNombre">Nombre y apellido</label><input id="asgNombre" name="nombre" autocomplete="name" maxlength="120" required placeholder="Como figura en tu cuenta" /></div>
+              <div class="as-row">
+                <div class="as-f"><label for="asgEmail">Mail de tu cuenta Balanz</label><input id="asgEmail" name="email" type="email" autocomplete="email" maxlength="160" required placeholder="vos@mail.com" /></div>
+                <div class="as-f"><label for="asgCta">N&deg; de cuenta comitente</label><input id="asgCta" name="comitente" inputmode="numeric" autocomplete="off" maxlength="20" required placeholder="Ej.: 123456" /></div>
+              </div>
+              <div class="as-hp" aria-hidden="true"><label>Web <input name="web" tabindex="-1" autocomplete="off" /></label></div>
+              <button type="submit" class="as-btn as-btn--full"><span>Enviar para asignarme</span><i class="as-btn__ic"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></i></button>
+              <p class="as-msg" role="status" aria-live="polite"></p>
+            </form>
+            <div class="as-asg__done" hidden role="status">
+              <svg class="as-done__ic" viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-15"/></svg>
+              <p><b>Listo, recib&iacute; tus datos.</b> Hago el pedido en Balanz y te aviso por mail cuando quede asignado.</p>
+            </div>
           </article>
         </div>
-        <p class="as-bzk__note">Los links te llevan a la web oficial de Balanz. Nunca te voy a pedir tu clave ni tus datos de acceso.</p>
+        <p class="as-bzk__note">La apertura se hace en la web oficial de Balanz. Para asignarme solo necesito tu mail y tu n&uacute;mero de comitente: nunca te voy a pedir tu clave ni tus datos de acceso.</p>
       </div>
     </div>
 
