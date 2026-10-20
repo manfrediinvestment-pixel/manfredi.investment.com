@@ -80,6 +80,19 @@
 .as-who__cap { position:absolute; left:50%; bottom:2%; transform:translateX(-50%); display:grid; justify-items:center; gap:4px; white-space:nowrap; }
 .as-who__cap b { font:500 22px/1.2 var(--serif); color:#fff; }
 .as-who__cap span { font:600 11px/1.3 var(--sans); letter-spacing:.16em; text-transform:uppercase; color:var(--ch); }
+.as-who__link { position:absolute; inset:4% 8% 16%; z-index:2; border-radius:50%; }
+.as-who__cap { z-index:3; }
+.as-who__more { display:inline-flex; align-items:center; gap:7px; margin-top:10px; padding:7px 14px; border:1px solid var(--line2); border-radius:999px;
+  background:rgba(10,15,30,.6); font:500 13px var(--sans); color:#fff; text-decoration:none; transition:border-color .3s, background .3s; }
+.as-who__more svg { width:13px; height:13px; fill:none; stroke:var(--ch); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; transition:transform .45s var(--ease); }
+.as-who__img img { transition:transform .9s var(--ease); }
+@media (hover:hover) {
+  .as-who__more:hover, .as-who:has(.as-who__link:hover) .as-who__more { border-color:rgba(233,211,160,.6); background:rgba(233,211,160,.08); }
+  .as-who__more:hover svg, .as-who:has(.as-who__link:hover) .as-who__more svg { transform:translateY(3px); }
+  .as-who:has(.as-who__link:hover) .as-who__img img { transform:scale(1.025); }
+}
+.as-who__link:focus-visible { outline:1px solid var(--ch); outline-offset:6px; }
+.as-me, .as-port { scroll-margin-top:84px; }
 .as-hint { position:absolute; left:50%; bottom:22px; width:1px; height:44px; background:var(--line); overflow:hidden; }
 .as-hint i { position:absolute; left:0; top:0; width:1px; height:40%; background:var(--ch); animation:asHint 2.2s var(--ease) infinite; }
 @keyframes asHint { 0% { transform:translateY(-100%); } 100% { transform:translateY(260%); } }

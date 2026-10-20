@@ -328,6 +328,17 @@
     }
   }
 
+  // ── links internos (#asesoria-…): bajan con scroll suave sin pasar por el ruteo de pestañas ──
+  sec.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="#asesoria-"]');
+    if (!a) return;
+    var t = document.getElementById(a.getAttribute('href').slice(1));
+    if (!t) return;
+    e.preventDefault();
+    t.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
+    if (history.replaceState) history.replaceState(null, '', a.getAttribute('href'));
+  });
+
   // ── "Ver cartera completa": Portfolio, vista Cartera Manfredi ──
   var full = $('[data-as-full]');
   if (full) full.addEventListener('click', function (e) {
