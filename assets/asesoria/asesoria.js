@@ -16,6 +16,10 @@
   // WhatsApp de Ignacio en formato internacional sin "+" ni espacios (ej. 5493411234567).
   // Vacío = los botones de WhatsApp quedan ocultos.
   var WA_NUM = '5493416547126';
+  // Links de Balanz de Ignacio: abrir cuenta nueva con él como asesor / asignarlo en una cuenta existente.
+  // Vacíos = los botones llevan al formulario de consulta.
+  var BZ_ABRIR = '';
+  var BZ_ASIGNAR = '';
   var WA_TXT = 'Hola Ignacio, vi la asesoría en manfredinvestment.com y quiero coordinar una charla.';
 
   var sec = document.getElementById('asesoria');
@@ -23,6 +27,12 @@
   var $ = function (s, r) { return (r || sec).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || sec).querySelectorAll(s)); };
   var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  [['abrir', BZ_ABRIR], ['asignar', BZ_ASIGNAR]].forEach(function (b) {
+    var a = $('[data-bz="' + b[0] + '"]');
+    if (!a) return;
+    if (b[1]) a.href = b[1]; else { a.removeAttribute('target'); a.removeAttribute('rel'); }
+  });
 
   // ── WhatsApp: links + botón flotante (aparece pasado el hero, se esconde sobre el formulario) ──
   if (WA_NUM) {
@@ -398,6 +408,9 @@
       scrollTrigger: { trigger: '#asesoria .as-start', start: 'top 75%' } });
     gsap.from('#asesoria .as-offer', { y: 50, opacity: 0, duration: 1.3, ease: ease, delay: .2, scrollTrigger: { trigger: '#asesoria .as-start', start: 'top 75%' } });
     gsap.from('#asesoria .as-offer__inc li', { x: -10, opacity: 0, duration: .8, ease: ease, stagger: .07, delay: .6, scrollTrigger: { trigger: '#asesoria .as-start', start: 'top 75%' } });
+
+    gsap.from('#asesoria .as-bzk__head, #asesoria .as-bzk__card', { y: 34, opacity: 0, duration: 1.1, ease: ease, stagger: .1,
+      scrollTrigger: { trigger: '#asesoria .as-bzk', start: 'top 75%' } });
 
     gsap.fromTo('#asesoria .as-me__arch', { clipPath: 'inset(100% 0 0 0 round 999px 999px 22px 22px)' }, { clipPath: 'inset(0% 0 0 0 round 999px 999px 22px 22px)', duration: 1.6, ease: ease,
       scrollTrigger: { trigger: '#asesoria .as-me', start: 'top 70%' } });
