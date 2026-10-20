@@ -279,8 +279,6 @@
   var NOMBRES = { MSFT: 'Microsoft', META: 'Meta Platforms', MELI: 'MercadoLibre', IBIT: 'iShares Bitcoin Trust (BlackRock)', NU: 'Nu Holdings (Nubank)',
     XOM: 'ExxonMobil', LLY: 'Eli Lilly', PEP: 'PepsiCo', AMZN: 'Amazon', AIG: 'American International Group', PAMP: 'Pampa Energía', GGAL: 'Grupo Financiero Galicia' };
   var LOGOS = { MSFT: 1, META: 1, MELI: 1, LLY: 1, PEP: 1, AMZN: 1, GGAL: 1 };
-  var SECT_COL = { 'Tecnología': '#f3e3bd', 'Consumo discrecional': '#d9bb7d', 'Financiero': '#8fb0e6', 'Comunicación': '#b9a06a',
-    'Energía': '#4f6fa8', 'Salud': '#7fc4b4', 'Consumo básico': '#c9d6ee', 'Cripto': '#a98bd6' };
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function drawHold(data) {
     var box = $('[data-as="hold"]');
@@ -308,14 +306,8 @@
     pos.forEach(function (p) { p.w = p.val / tot * 100; });
     pos.sort(function (a, b) { return b.w - a.w; });
 
-    var sect = {};
-    pos.forEach(function (p) { var k = p.h.sector || 'Otros'; sect[k] = (sect[k] || 0) + p.w; });
-    var sk = Object.keys(sect).sort(function (a, b) { return sect[b] - sect[a]; });
-    $('.as-mix__bar', box).innerHTML = sk.map(function (k) { return '<i style="flex:' + sect[k].toFixed(2) + ';background:' + (SECT_COL[k] || '#e9d3a0') + '" title="' + esc(k) + '"></i>'; }).join('');
-    $('.as-mix__lg', box).innerHTML = sk.map(function (k) { return '<li><i style="background:' + (SECT_COL[k] || '#e9d3a0') + '"></i>' + esc(k) + ' <b>' + sect[k].toFixed(1).replace('.', ',') + '%</b></li>'; }).join('');
-
     var maxW = pos[0].w;
-    $('.as-hold__list', box).innerHTML = pos.map(function (p) {
+    $('.as-hold__list', box).innerHTML = pos.slice(0, 5).map(function (p) {
       var t = p.h.ticker, mot = (p.h.motivo || '').trim();
       var av = LOGOS[t] ? '<span class="as-pos__av"><img src="assets/logos/' + t.toLowerCase() + '.png" alt="" loading="lazy"></span>' : '<span class="as-pos__av is-mono">' + esc(t.slice(0, 4)) + '</span>';
       var ret = p.ret == null ? '<span class="as-pos__r">—</span>' : '<span class="as-pos__r ' + (p.ret >= 0 ? 'up' : 'dn') + '">' + fmt(p.ret) + '</span>';
@@ -330,12 +322,19 @@
     }).join('');
     box.hidden = false;
     if (window.gsap && !calm) {
-      gsap.from(box.querySelectorAll('.as-mix__bar i'), { scaleX: 0, duration: 1.1, ease: 'expo.out', stagger: .05, scrollTrigger: { trigger: box, start: 'top 80%' } });
       gsap.from(box.querySelectorAll('.as-pos'), { y: 16, opacity: 0, duration: .8, ease: 'expo.out', stagger: .05, scrollTrigger: { trigger: box, start: 'top 80%' } });
       gsap.from(box.querySelectorAll('.as-pos__bar u'), { scaleX: 0, duration: 1.1, ease: 'expo.out', stagger: .05, scrollTrigger: { trigger: box, start: 'top 80%' } });
       if (window.ScrollTrigger) ScrollTrigger.refresh();
     }
   }
+
+  // ── "Ver cartera completa": Portfolio, vista Cartera Manfredi ──
+  var full = $('[data-as-full]');
+  if (full) full.addEventListener('click', function (e) {
+    e.preventDefault();
+    location.hash = 'portfolio';
+    setTimeout(function () { if (window.pfShowView) pfShowView('manfredi'); window.scrollTo(0, 0); }, 80);
+  });
 
   // ── pasos: el activo se elige con el scroll ─────────────
   var steps = $$('.as-step');
@@ -345,6 +344,8 @@
   function motion() {
     var gsap = window.gsap, ST = window.ScrollTrigger, ease = 'expo.out';
     gsap.registerPlugin(ST);
+    // las fuentes de la sección cambian alturas: recalcular posiciones cuando terminan de cargar
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { ST.refresh(); });
 
     var tl = gsap.timeline({ defaults: { ease: ease } });
     tl.eventCallback('onStart', function () { sec.classList.remove('as-pre'); });
