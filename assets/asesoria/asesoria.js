@@ -15,7 +15,7 @@
   var NS = 'http://www.w3.org/2000/svg';
   // WhatsApp de Ignacio en formato internacional sin "+" ni espacios (ej. 5493411234567).
   // Vacío = los botones de WhatsApp quedan ocultos.
-  var WA_NUM = '';
+  var WA_NUM = '5493416547126';
   var WA_TXT = 'Hola Ignacio, vi la asesoría en manfredinvestment.com y quiero coordinar una charla.';
 
   var sec = document.getElementById('asesoria');
