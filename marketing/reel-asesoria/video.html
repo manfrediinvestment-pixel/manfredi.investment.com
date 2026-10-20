@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Reel Asesoría 1 a 1 · Próximamente</title>
+<link rel="stylesheet" href="fonts.css" />
+<style>
+/* Tokens copiados de assets/asesoria/asesoria.css. Sin texto gris. */
+:root { --ink:#f3f6fb; --white:#fff; --ch:#e9d3a0; --ch2:#f3e3bd; --it:#f6e2b2; --gold:#cfae6c; --blue:#8fb0e6;
+  --navy:#0a0f1e; --navy2:#0f1a30; --navy3:#13213d;
+  --line:rgba(233,211,160,.14); --line2:rgba(233,211,160,.28);
+  --mono:'IBM Plex Mono',monospace; --sans:'Instrument Sans',system-ui,sans-serif; --serif:'Newsreader',Georgia,serif; }
+* { box-sizing:border-box; margin:0; padding:0; }
+html, body { width:1080px; height:1920px; overflow:hidden; background:var(--navy); }
+#stage { position:relative; width:1080px; height:1920px; overflow:hidden; color:var(--ink); font-family:var(--sans);
+  background:linear-gradient(180deg, var(--navy) 0%, var(--navy2) 55%, var(--navy3) 100%); -webkit-font-smoothing:antialiased; }
+
+/* fondo: halos champagne muy suaves + curva dorada que une escenas */
+.halo { position:absolute; border-radius:50%; pointer-events:none; }
+.halo--a { width:1400px; height:1400px; left:-560px; top:-420px; background:radial-gradient(closest-side, rgba(233,211,160,.11), transparent 70%); }
+.halo--b { width:1300px; height:1300px; right:-620px; bottom:-380px; background:radial-gradient(closest-side, rgba(143,176,230,.08), rgba(233,211,160,.05) 45%, transparent 72%); }
+#curve { position:absolute; left:0; top:0; width:1080px; height:1920px; overflow:visible; }
+#curve .ln { fill:none; stroke:url(#cvStroke); stroke-width:3; stroke-linecap:round; }
+#curve .ar { fill:url(#cvAreaG); }
+#curve .dot { fill:var(--ch); }
+#curve .ring { fill:none; stroke:var(--ch); stroke-width:1.5; }
+
+/* escenas */
+.sc { position:absolute; inset:0; visibility:hidden; }
+.label { font:600 26px/1 var(--sans); letter-spacing:.16em; text-transform:uppercase; color:var(--ch); }
+.rule { display:flex; align-items:center; justify-content:center; gap:26px; }
+.rule i { display:block; width:90px; height:1px; background:var(--line2); transform-origin:center; }
+.serif { font-family:var(--serif); font-weight:500; color:var(--white); letter-spacing:-.01em; }
+em { font-style:italic; color:var(--it); }
+.mask { display:block; overflow:hidden; padding:0 0 .14em; margin-bottom:-.14em; }
+.mask > span { display:block; }
+.tw .ch { opacity:0; }
+
+/* 1 · gancho */
+#s1 .label { position:absolute; top:400px; left:0; right:0; }
+#s1 h1 { position:absolute; top:560px; left:90px; right:90px; font-size:132px; line-height:1.06; text-align:center; }
+
+/* 2 · quién */
+.who { position:absolute; left:50%; top:330px; width:720px; height:860px; margin-left:-360px; }
+.who__light { position:absolute; inset:8% -4% 18%; border-radius:50%; background:radial-gradient(closest-side, rgba(233,211,160,.22), rgba(143,176,230,.08) 55%, transparent 75%); filter:blur(14px); }
+.who__ring { position:absolute; left:5%; top:4%; width:90%; height:auto; overflow:visible; }
+.who__ring circle { fill:none; stroke:var(--line2); stroke-width:1.5; }
+.who__img { position:absolute; inset:0 0 13%; display:flex; align-items:flex-end; justify-content:center;
+  -webkit-mask-image:radial-gradient(115% 92% at 52% 30%, #000 62%, transparent 86%); mask-image:radial-gradient(115% 92% at 52% 30%, #000 62%, transparent 86%); }
+.who__img img { width:100%; height:auto; display:block; filter:saturate(.92) contrast(1.03); }
+#s2 .cap { position:absolute; left:0; right:0; top:1150px; text-align:center; }
+#s2 .cap h2 { font-size:92px; line-height:1.05; }
+#s2 .cap .label { margin-top:22px; }
+.badge { position:absolute; left:50%; top:1380px; transform:translateX(-50%); display:flex; align-items:center; gap:24px; padding:20px 34px 20px 20px;
+  border:1px solid var(--line2); border-radius:999px; background:linear-gradient(180deg, rgba(233,211,160,.08), rgba(233,211,160,.02)); white-space:nowrap; }
+.badge .bz { width:76px; height:76px; border-radius:20px; display:block; }
+.badge span { display:grid; gap:12px; }
+.badge small { font:600 22px/1 var(--sans); letter-spacing:.16em; text-transform:uppercase; color:var(--ch); }
+.badge .logo { width:176px; height:auto; display:block; }
+
+/* 3 · credenciales */
+#s3 .label { position:absolute; top:330px; left:0; right:0; }
+#s3 h2 { position:absolute; top:400px; left:0; right:0; text-align:center; font-size:90px; line-height:1.05; }
+.seals { position:absolute; left:80px; right:80px; top:660px; display:grid; grid-template-columns:1fr 1fr; row-gap:84px; column-gap:40px; }
+.seal-cell { display:grid; justify-items:center; text-align:center; gap:0; }
+.seal { position:relative; display:grid; place-items:center; width:200px; height:200px; border-radius:50%;
+  background:radial-gradient(circle at 32% 26%, rgba(246,226,178,.2), rgba(233,211,160,.03) 68%);
+  box-shadow:inset 0 0 0 12px var(--navy2), inset 0 0 0 13.5px rgba(233,211,160,.28), 0 24px 50px -24px rgba(0,0,0,.9);
+  font:500 54px/1 var(--serif); letter-spacing:.06em; color:var(--it); }
+.seal--n { font-size:84px; letter-spacing:-.01em; }
+.seal svg { position:absolute; inset:-1px; width:202px; height:202px; overflow:visible; transform:rotate(-90deg); }
+.seal svg circle { fill:none; stroke:rgba(233,211,160,.6); stroke-width:2; }
+.seal--bz { background:none; box-shadow:none; }
+.seal--bz img { width:200px; height:200px; border-radius:54px; display:block; }
+.seal-cell b { display:block; margin-top:34px; font:500 46px/1.15 var(--serif); color:#fff; }
+.seal-cell span { display:block; margin-top:10px; font:500 29px/1.35 var(--sans); color:var(--ink); }
+
+/* 4 · cómo trabajamos */
+#s4 .label { position:absolute; top:300px; left:0; right:0; }
+#s4 h2 { position:absolute; top:360px; left:0; right:0; text-align:center; font-size:112px; line-height:1.05; }
+.prog { position:absolute; top:552px; left:150px; right:150px; display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+.prog div { display:grid; gap:14px; justify-items:start; }
+.prog small { font:500 24px/1 var(--mono); color:var(--ch); }
+.prog i { position:relative; display:block; width:100%; height:2px; background:var(--line); overflow:hidden; }
+.prog i b { position:absolute; inset:0; background:var(--ch); transform:scaleX(0); transform-origin:left; }
+.steps { position:absolute; top:660px; left:80px; right:80px; height:860px; }
+.step { position:absolute; inset:0; padding:56px 56px 0; border:1px solid var(--line2); border-radius:40px;
+  background:linear-gradient(180deg, rgba(233,211,160,.06), rgba(233,211,160,.015)); visibility:hidden; }
+.step__n { font:500 30px/1 var(--mono); color:var(--ch); }
+.step h3 { margin-top:22px; font-size:76px; line-height:1.05; }
+.step p { margin-top:22px; font:400 34px/1.42 var(--sans); color:var(--ink); max-width:800px; }
+.ui { position:absolute; left:56px; right:56px; bottom:56px; padding:40px; border:1px solid var(--line); border-radius:28px; background:rgba(10,15,30,.55); }
+.ui__row { display:flex; align-items:center; gap:26px; margin-bottom:34px; }
+.ui__av { width:96px; height:96px; border-radius:50%; object-fit:cover; object-position:50% 12%; border:1px solid var(--line2); background:var(--navy3); }
+.ui b { display:block; font:500 42px/1.15 var(--serif); color:#fff; }
+.ui .sub { display:block; margin-top:6px; font:500 27px/1.3 var(--sans); color:var(--ink); }
+.slots { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.slots span { position:relative; padding:24px; border:1px solid var(--line); border-radius:18px; text-align:center; font:500 32px var(--mono); color:var(--ink); }
+.slots .pick { position:absolute; inset:-1px; border:1.5px solid var(--ch); border-radius:18px; background:rgba(233,211,160,.12); opacity:0; }
+.slots .is-pick { color:var(--ch2); }
+.gauge { position:relative; height:12px; margin:40px 0 30px; border-radius:12px; background:rgba(243,246,251,.08); }
+.gauge__fill { position:absolute; inset:0; border-radius:12px; background:linear-gradient(90deg, var(--blue), var(--ch)); transform-origin:left; }
+.gauge__dot { position:absolute; top:50%; width:32px; height:32px; margin:-16px 0 0 -16px; border-radius:50%; background:var(--ch); box-shadow:0 0 0 10px rgba(233,211,160,.18); }
+.gauge__lbl { display:flex; justify-content:space-between; font:600 23px/1.3 var(--sans); letter-spacing:.16em; text-transform:uppercase; color:var(--ink); }
+.gauge__lbl .mid { color:var(--ch); }
+.kv { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:36px; padding-top:30px; border-top:1px solid var(--line); }
+.kv small { display:block; font:600 21px/1 var(--sans); letter-spacing:.16em; text-transform:uppercase; color:var(--ch); }
+.kv span { display:block; margin-top:12px; font:500 34px/1.2 var(--serif); color:#fff; }
+.card { position:relative; height:330px; padding:36px 40px; border:1px solid var(--line2); border-radius:28px; overflow:hidden;
+  background:linear-gradient(135deg, #16244a 0%, #0f1a30 55%, #0a0f1e 100%); }
+.card::after { content:''; position:absolute; inset:0; background:radial-gradient(120% 90% at 100% 0%, rgba(233,211,160,.16), transparent 55%); }
+.card__top { display:flex; align-items:center; justify-content:space-between; }
+.card__top span { display:flex; align-items:center; gap:18px; font:600 23px/1 var(--sans); letter-spacing:.16em; text-transform:uppercase; color:var(--ch); }
+.card__top img { width:56px; height:56px; border-radius:15px; }
+.card__chip { width:76px; height:57px; fill:none; stroke:rgba(233,211,160,.6); stroke-width:1.2; }
+.card__holder { margin-top:44px; }
+.card__holder small { display:block; font:600 21px/1 var(--sans); letter-spacing:.16em; text-transform:uppercase; color:var(--ch); }
+.card__holder b { display:block; margin-top:12px; font:italic 500 92px/1 var(--serif); color:var(--it); min-height:92px; }
+.card__num { position:absolute; right:40px; bottom:40px; font:500 26px var(--mono); color:var(--ink); }
+.own { display:flex; gap:34px; margin-top:28px; }
+.own span { display:flex; align-items:center; gap:12px; font:500 28px var(--sans); color:var(--ink); }
+.own svg { width:34px; height:34px; padding:6px; border-radius:50%; border:1px solid var(--line2); fill:none; stroke:var(--ch); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.prop { display:flex; align-items:center; gap:40px; }
+.donut { width:230px; height:230px; flex:none; transform:rotate(-90deg); overflow:visible; }
+.donut circle { fill:none; stroke-width:12; }
+.donut .bg { stroke:rgba(243,246,251,.06); }
+.donut .s1 { stroke:#f3e3bd; } .donut .s2 { stroke:#d9bb7d; } .donut .s3 { stroke:#8fb0e6; } .donut .s4 { stroke:#4f6fa8; } .donut .s5 { stroke:#a98bd6; }
+.donut text { transform:rotate(90deg); transform-origin:60px 60px; text-anchor:middle; }
+.donut .t { font:500 17px var(--serif); fill:#fff; }
+.donut .u { font:500 6.4px var(--mono); letter-spacing:.06em; text-transform:uppercase; fill:var(--ch); }
+.time { list-style:none; display:grid; gap:24px; }
+.time li { display:grid; grid-template-columns:30px 1fr; column-gap:18px; align-items:center; }
+.time i { width:18px; height:18px; border-radius:50%; border:1.5px solid var(--ch); }
+.time li.done i { background:var(--ch); }
+.time b { font:500 34px/1.1 var(--serif); }
+.time span { grid-column:2; font:500 25px/1.2 var(--sans); color:var(--ink); margin-top:4px; }
+
+/* 5 · cartera a la vista */
+#s5 .label { position:absolute; top:300px; left:0; right:0; }
+#s5 h2 { position:absolute; top:360px; left:0; right:0; text-align:center; font-size:112px; line-height:1.05; }
+.legend { position:absolute; top:640px; left:80px; right:80px; display:flex; justify-content:center; gap:56px; font:500 30px var(--sans); color:var(--ink); }
+.legend span { display:flex; align-items:center; gap:16px; }
+.legend i { width:40px; height:4px; border-radius:4px; }
+#chart { position:absolute; left:0; top:720px; width:1080px; height:640px; overflow:visible; }
+#chart .grid line { stroke:var(--line); stroke-width:1.5; }
+#chart .grid text, #chart .xs text { font:500 24px var(--mono); fill:var(--ink); }
+#chart .zero { stroke:var(--line2); stroke-width:1.5; stroke-dasharray:6 8; }
+#chart .mine { fill:none; stroke:url(#chStroke); stroke-width:5; stroke-linecap:round; stroke-linejoin:round; }
+#chart .spx { fill:none; stroke:var(--blue); stroke-width:3.5; stroke-linecap:round; stroke-linejoin:round; }
+#chart .area { fill:url(#chArea); }
+.tag { position:absolute; display:flex; align-items:center; height:62px; padding:0 24px; border-radius:31px; font:500 34px var(--mono); white-space:nowrap; transform:translate(-100%,-50%); }
+.tag--mine { background:#f4eee2; color:#0b1428; }
+.tag--spx { border:1.5px solid rgba(143,176,230,.6); background:rgba(10,15,30,.85); color:var(--blue); }
+.note { position:absolute; left:80px; right:80px; top:1400px; text-align:center; }
+#s5 .note .label { position:static; font-size:24px; }
+.note p { margin-top:22px; font:400 23px/1.4 var(--sans); color:var(--ink); }
+
+/* 6 · cierre */
+#s6 .label { position:absolute; top:430px; left:0; right:0; }
+#s6 h2 { position:absolute; top:560px; left:90px; right:90px; text-align:center; font-size:132px; line-height:1.06; }
+#s6 .line { position:absolute; left:340px; right:340px; top:1110px; height:1px; background:var(--line2); transform-origin:center; }
+.url { position:absolute; left:50%; top:1180px; transform:translateX(-50%); display:flex; align-items:center; gap:28px; padding:12px 12px 12px 46px; white-space:nowrap;
+  border:1.5px solid #fbf7ee; border-radius:999px; background:#f4eee2; color:#0b1428; font:600 38px var(--sans); letter-spacing:.005em;
+  box-shadow:0 24px 60px -28px rgba(0,0,0,.75), inset 0 -2px 0 rgba(11,20,40,.08); }
+.url i { display:grid; place-items:center; width:84px; height:84px; border-radius:50%; background:#0b1428; }
+.url svg { width:32px; height:32px; fill:none; stroke:#f4eee2; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="halo halo--a"></div>
+  <div class="halo halo--b"></div>
+  <svg id="curve" viewBox="0 0 1080 1920">
+    <defs>
+      <linearGradient id="cvStroke" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#e9d3a0" stop-opacity="0" />
+        <stop offset=".3" stop-color="#cfae6c" stop-opacity=".6" />
+        <stop offset=".8" stop-color="#e9d3a0" />
+        <stop offset="1" stop-color="#fff6de" />
+      </linearGradient>
+      <linearGradient id="cvAreaG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#e9d3a0" stop-opacity=".16" />
+        <stop offset="1" stop-color="#e9d3a0" stop-opacity="0" />
+      </linearGradient>
+      <linearGradient id="cvFadeG" x1="40" y1="0" x2="1000" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#fff" stop-opacity="0" />
+        <stop offset=".35" stop-color="#fff" />
+        <stop offset=".9" stop-color="#fff" />
+        <stop offset="1" stop-color="#fff" stop-opacity=".6" />
+      </linearGradient>
+      <mask id="cvFade"><rect x="0" y="0" width="1080" height="3000" fill="url(#cvFadeG)" /></mask>
+    </defs>
+    <g id="cvG">
+      <path class="ar" id="cvArea" mask="url(#cvFade)" />
+      <path class="ln" id="cvLine" />
+      <circle class="ring" id="cvRing" r="12" />
+      <circle class="dot" id="cvDot" r="8" />
+    </g>
+  </svg>
+
+  <!-- 1 · gancho -->
+  <section class="sc" id="s1">
+    <div class="label rule"><i></i>Asesoría 1 a 1<i></i></div>
+    <h1 class="serif">
+      <span class="mask"><span>Una persona.</span></span>
+      <span class="mask"><span>Tu cartera.</span></span>
+      <em class="tw" data-tw>A tu nombre.</em>
+    </h1>
+  </section>
+
+  <!-- 2 · quién -->
+  <section class="sc" id="s2">
+    <div class="who">
+      <div class="who__light"></div>
+      <svg class="who__ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="49.5" pathLength="1" /></svg>
+      <div class="who__img"><img src="assets/ignacio.webp" alt="" /></div>
+    </div>
+    <div class="cap">
+      <h2 class="serif"><span class="mask"><span>Ignacio <em>Manfredi</em></span></span></h2>
+      <div class="label">Fundador · Manfredi Investment</div>
+    </div>
+    <div class="badge">
+      <img class="bz" src="assets/balanz-mark.svg" alt="" />
+      <span><small>Agente coproductor</small><img class="logo" src="assets/balanz.svg" alt="Balanz" /></span>
+    </div>
+  </section>
+
+  <!-- 3 · credenciales -->
+  <section class="sc" id="s3">
+    <div class="label rule"><i></i>Sobre mí<i></i></div>
+    <h2 class="serif"><span class="mask"><span>Quién está <em>del otro lado.</em></span></span></h2>
+    <div class="seals">
+      <div class="seal-cell"><div class="seal"><svg viewBox="0 0 202 202"><circle cx="101" cy="101" r="100" pathLength="1" /></svg>CNV</div><b>Idóneo CNV</b><span>Examen de idoneidad aprobado</span></div>
+      <div class="seal-cell"><div class="seal"><svg viewBox="0 0 202 202"><circle cx="101" cy="101" r="100" pathLength="1" /></svg>UNR</div><b>Lic. en Economía</b><span>Estudiante avanzado</span></div>
+      <div class="seal-cell"><div class="seal seal--n"><svg viewBox="0 0 202 202"><circle cx="101" cy="101" r="100" pathLength="1" /></svg>48</div><b>Informes publicados</b><span>Research propio, con valuación</span></div>
+      <div class="seal-cell"><div class="seal seal--bz"><img src="assets/balanz-mark.svg" alt="" /></div><b>Agente coproductor</b><span>Balanz Capital Valores</span></div>
+    </div>
+  </section>
+
+  <!-- 4 · cómo trabajamos -->
+  <section class="sc" id="s4">
+    <div class="label rule"><i></i>Paso a paso<i></i></div>
+    <h2 class="serif"><span class="mask"><span>Cómo <em>trabajamos.</em></span></span></h2>
+    <div class="prog">
+      <div><small>01</small><i><b></b></i></div>
+      <div><small>02</small><i><b></b></i></div>
+      <div><small>03</small><i><b></b></i></div>
+      <div><small>04</small><i><b></b></i></div>
+    </div>
+    <div class="steps">
+      <div class="step" id="st1">
+        <div class="step__n">01</div>
+        <h3 class="serif">Una charla primero</h3>
+        <p>30 minutos por videollamada, sin cargo, para conocernos.</p>
+        <div class="ui">
+          <div class="ui__row"><img class="ui__av" src="assets/ignacio.webp" alt="" /><div><b>Primera charla</b><span class="sub">Videollamada · 30 min · sin cargo</span></div></div>
+          <div class="slots"><span>Mar 10:00</span><span id="slotPick"><i class="pick"></i>Mié 18:30</span><span>Jue 12:00</span><span>Vie 17:00</span></div>
+        </div>
+      </div>
+      <div class="step" id="st2">
+        <div class="step__n">02</div>
+        <h3 class="serif">Tu perfil, en serio</h3>
+        <p>Test de perfil de inversor: objetivo, horizonte y cuánto riesgo querés tomar.</p>
+        <div class="ui">
+          <b>Perfil de inversor</b>
+          <div class="gauge"><i class="gauge__fill"></i><i class="gauge__dot"></i></div>
+          <div class="gauge__lbl"><span>Conservador</span><span class="mid">Moderado</span><span>Agresivo</span></div>
+          <div class="kv"><div><small>Horizonte</small><span>5 años</span></div><div><small>Objetivo</small><span>Ahorro en dólares</span></div></div>
+        </div>
+      </div>
+      <div class="step" id="st3">
+        <div class="step__n">03</div>
+        <h3 class="serif">Tu cuenta, a tu nombre</h3>
+        <p>Tu dinero y tus títulos quedan en Balanz: yo nunca los recibo ni los manejo.</p>
+        <div class="ui" style="padding:0;border:0;background:none">
+          <div class="card">
+            <div class="card__top"><span><img src="assets/balanz-mark.svg" alt="" />Balanz · Cuenta comitente</span><svg class="card__chip" viewBox="0 0 40 30"><rect x=".5" y=".5" width="39" height="29" rx="6" /><path d="M0 10h13M0 20h13M27 10h13M27 20h13M13 0v30M27 0v30" /></svg></div>
+            <div class="card__holder"><small>Titular</small><b class="tw" data-tw>Vos</b></div>
+            <div class="card__num">N° •••• •• 4821</div>
+          </div>
+          <div class="own">
+            <span><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" /></svg>Tu dinero</span>
+            <span><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" /></svg>Tus títulos</span>
+            <span><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" /></svg>Tus órdenes</span>
+          </div>
+        </div>
+      </div>
+      <div class="step" id="st4">
+        <div class="step__n">04</div>
+        <h3 class="serif">Propuesta y seguimiento</h3>
+        <p>Por escrito, con el porqué de cada decisión. La revisamos a los 30 días y cada trimestre.</p>
+        <div class="ui">
+          <div class="prop">
+            <svg class="donut" viewBox="0 0 120 120">
+              <circle class="bg" cx="60" cy="60" r="46" />
+              <circle class="seg s1" cx="60" cy="60" r="46" pathLength="100" data-len="44" data-off="0" />
+              <circle class="seg s2" cx="60" cy="60" r="46" pathLength="100" data-len="29" data-off="-45" />
+              <circle class="seg s3" cx="60" cy="60" r="46" pathLength="100" data-len="9" data-off="-75" />
+              <circle class="seg s4" cx="60" cy="60" r="46" pathLength="100" data-len="9" data-off="-85" />
+              <circle class="seg s5" cx="60" cy="60" r="46" pathLength="100" data-len="4" data-off="-95" />
+              <text x="60" y="58" class="t">Ejemplo</text><text x="60" y="73" class="u">propuesta</text>
+            </svg>
+            <ol class="time">
+              <li class="done"><i></i><b>Hoy</b><span>Propuesta escrita</span></li>
+              <li><i></i><b>30 días</b><span>Primera revisión</span></li>
+              <li><i></i><b>Cada trimestre</b><span>Seguimiento</span></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · cartera a la vista -->
+  <section class="sc" id="s5">
+    <div class="label rule"><i></i>Transparencia<i></i></div>
+    <h2 class="serif"><span class="mask"><span>Mi cartera,</span></span><span class="mask"><span><em>a la vista.</em></span></span></h2>
+    <div class="legend"><span><i style="background:#e9d3a0"></i>Cartera Manfredi</span><span><i style="background:#8fb0e6"></i>S&amp;P 500</span></div>
+    <svg id="chart" viewBox="0 0 1080 640">
+      <defs>
+        <linearGradient id="chStroke" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#cfae6c" />
+          <stop offset="1" stop-color="#f3e3bd" />
+        </linearGradient>
+        <linearGradient id="chArea" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#e9d3a0" stop-opacity=".22" />
+          <stop offset="1" stop-color="#e9d3a0" stop-opacity="0" />
+        </linearGradient>
+        <clipPath id="chClip"><rect id="chClipR" x="0" y="-60" width="0" height="760" /></clipPath>
+      </defs>
+      <g class="grid" id="chGrid"></g>
+      <g class="xs" id="chX"></g>
+      <g clip-path="url(#chClip)">
+        <path class="area" id="chA" />
+        <path class="spx" id="chS" />
+        <path class="mine" id="chM" />
+      </g>
+    </svg>
+    <div class="tag tag--mine" id="tagM">+0,0 %</div>
+    <div class="tag tag--spx" id="tagS">+0,0 %</div>
+    <div class="note">
+      <div class="label" id="noteLbl">Rendimiento real desde el 22 may 2026</div>
+      <p>Rendimientos pasados no garantizan resultados futuros.</p>
+    </div>
+  </section>
+
+  <!-- 6 · cierre -->
+  <section class="sc" id="s6">
+    <div class="label rule"><i></i>Asesoría 1 a 1 · Próximamente<i></i></div>
+    <h2 class="serif">
+      <span class="mask"><span>Una persona.</span></span>
+      <span class="mask"><span>Tu cartera.</span></span>
+      <span class="mask"><span><em>Muy pronto.</em></span></span>
+    </h2>
+    <i class="line"></i>
+    <div class="url">www.manfredinvestment.com<i><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" /></svg></i></div>
+  </section>
+</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script>
+// Todo el video vive en UNA línea de tiempo en pausa: cada cuadro depende solo de tl.seek(t).
+(async function () {
+  var DATA = await fetch('data.json').then(function (r) { return r.json(); });
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var NS = 'http://www.w3.org/2000/svg';
+  var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  var pct = function (v) { return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1).replace('.', ',') + ' %'; };
+  var el = function (tag, attrs, parent) { var n = document.createElementNS(NS, tag); for (var k in attrs) n.setAttribute(k, attrs[k]); parent.appendChild(n); return n; };
+  function smooth(P) {
+    var d = 'M' + P[0][0].toFixed(1) + ' ' + P[0][1].toFixed(1);
+    for (var i = 0; i < P.length - 1; i++) {
+      var p0 = P[i - 1] || P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] || p2;
+      d += ' C' + (p1[0] + (p2[0] - p0[0]) / 6).toFixed(1) + ' ' + (p1[1] + (p2[1] - p0[1]) / 6).toFixed(1) + ' ' +
+        (p2[0] - (p3[0] - p1[0]) / 6).toFixed(1) + ' ' + (p2[1] - (p3[1] - p1[1]) / 6).toFixed(1) + ' ' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1);
+    }
+    return d;
+  }
+  // promedio por tramos para una línea limpia (como el hero del sitio)
+  function bucket(vals, N) {
+    N = Math.min(N, vals.length); var out = [];
+    for (var k = 0; k < N; k++) {
+      var a = Math.floor(k * vals.length / N), b = Math.max(a + 1, Math.floor((k + 1) * vals.length / N)), s = 0;
+      for (var j = a; j < b; j++) s += vals[j];
+      out.push(s / (b - a));
+    }
+    out[0] = vals[0]; out[out.length - 1] = vals[vals.length - 1];
+    return out;
+  }
+  // typewriter: cada letra en un span; se prenden con tl.set
+  $$('[data-tw]').forEach(function (n) {
+    n.innerHTML = n.textContent.split('').map(function (c) { return '<span class="ch">' + (c === ' ' ? '&nbsp;' : c) + '</span>'; }).join('');
+  });
+
+  // ── curva dorada de fondo (forma real de la cartera, sin números) ──
+  var cv = bucket(DATA.rows.map(function (r) { return r[1]; }), 26);
+  var lo = Math.min.apply(null, cv), hi = Math.max.apply(null, cv);
+  var cx0 = 40, cx1 = 1000, cyT = 1180, cyB = 1500;
+  var CP = cv.map(function (v, i) { return [cx0 + (cx1 - cx0) * i / (cv.length - 1), cyB - (cyB - cyT) * (v - lo) / ((hi - lo) || 1)]; });
+  var cd = smooth(CP), cEnd = CP[CP.length - 1];
+  $('#cvLine').setAttribute('d', cd);
+  $('#cvArea').setAttribute('d', cd + ' L' + cx1 + ' 1920 L' + cx0 + ' 1920 Z');
+  ['#cvDot', '#cvRing'].forEach(function (s) { $(s).setAttribute('cx', cEnd[0]); $(s).setAttribute('cy', cEnd[1]); });
+  var cLen = $('#cvLine').getTotalLength();
+
+  // ── gráfico real: cartera vs S&P 500 desde el 22/05 ──
+  var rows = DATA.rows, chart = $('#chart');
+  var gx0 = 110, gx1 = 960, gyT = 40, gyB = 560;
+  var all = rows.map(function (r) { return r[1]; }).concat(rows.map(function (r) { return r[2]; }), [0]);
+  var vlo = Math.min.apply(null, all), vhi = Math.max.apply(null, all);
+  var step = (vhi - vlo) > 12 ? 5 : 2.5;
+  vlo = Math.floor(vlo / step) * step; vhi = Math.ceil(vhi / step) * step;
+  var X = function (i) { return gx0 + (gx1 - gx0) * i / (rows.length - 1); };
+  var Y = function (v) { return gyB - (gyB - gyT) * (v - vlo) / (vhi - vlo); };
+  for (var t = vlo; t <= vhi + .001; t += step) {
+    if (Math.abs(t) < .001) el('line', { class: 'zero', x1: gx0, x2: gx1 + 20, y1: Y(t), y2: Y(t) }, chart);
+    else el('line', { x1: gx0, x2: gx1 + 20, y1: Y(t), y2: Y(t) }, $('#chGrid'));
+    el('text', { x: gx0 - 22, y: Y(t) + 8, 'text-anchor': 'end' }, $('#chGrid')).textContent = (t > 0 ? '+' : '') + t.toFixed(0) + '%';
+  }
+  var lastM = -1, lastX = -1e9;
+  rows.forEach(function (r, i) {
+    var m = +r[0].slice(5, 7) - 1;
+    if (m === lastM) return; lastM = m;
+    if (X(i) - lastX < 110) return; // mayo arranca el 22: si junio queda pegado, no se rotula
+    lastX = X(i);
+    el('text', { x: X(i), y: gyB + 52, 'text-anchor': i === 0 ? 'start' : 'middle' }, $('#chX')).textContent = MESES[m].toUpperCase();
+  });
+  var PM = rows.map(function (r, i) { return [X(i), Y(r[1])]; }), PS = rows.map(function (r, i) { return [X(i), Y(r[2])]; });
+  var lineD = function (P) { return 'M' + P.map(function (p) { return p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' L'); };
+  $('#chM').setAttribute('d', lineD(PM));
+  $('#chS').setAttribute('d', lineD(PS));
+  $('#chA').setAttribute('d', lineD(PM) + ' L' + gx1 + ' ' + gyB + ' L' + gx0 + ' ' + gyB + ' Z');
+  var asOf = DATA.asOf.split('-');
+  $('#noteLbl').textContent = 'Rendimiento real · 22 may al ' + (+asOf[2]) + ' ' + MESES[+asOf[1] - 1] + ' ' + asOf[0];
+  // etiquetas al final de cada línea (coordenadas del svg = px del lienzo; el svg arranca en top:720)
+  var tagM = $('#tagM'), tagS = $('#tagS');
+  var eM = PM[PM.length - 1], eS = PS[PS.length - 1];
+  var yM = 720 + eM[1] - 46, yS = 720 + eS[1] + 46;
+  if (yS - yM < 80) yS = yM + 80;
+  gsap.set(tagM, { left: 1040, top: yM }); gsap.set(tagS, { left: 1040, top: yS });
+
+  // ── línea de tiempo ──
+  var tl = gsap.timeline({ paused: true, defaults: { ease: 'expo.out' } });
+  var EIO = 'power3.inOut';
+  gsap.set('.sc', { autoAlpha: 0 });
+  // halos que respiran a lo largo de todo el video
+  tl.fromTo('.halo--a', { x: 0, y: 0 }, { x: 180, y: 260, duration: 23.4, ease: 'none' }, 0);
+  tl.fromTo('.halo--b', { x: 0, y: 0 }, { x: -160, y: -220, duration: 23.4, ease: 'none' }, 0);
+
+  function maskIn(sel, at, stag) { tl.fromTo(sel, { yPercent: 108 }, { yPercent: 0, duration: 1.1, stagger: stag || .16 }, at); }
+  function ruleIn(scope, at) {
+    tl.fromTo(scope + ' .label', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .9 }, at);
+    tl.fromTo(scope + ' .rule i', { scaleX: 0 }, { scaleX: 1, duration: 1.1 }, at + .1);
+  }
+  function type(sel, at, per) { $$(sel + ' .ch').forEach(function (c, i) { tl.set(c, { opacity: 1 }, at + i * per); }); }
+  // transición con empuje: la escena que sale sube, la que entra viene de abajo
+  function push(a, b, at) {
+    tl.to(a, { y: -220, autoAlpha: 0, duration: .8, ease: EIO }, at);
+    tl.fromTo(b, { y: 220, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .8, ease: EIO }, at + .12);
+  }
+
+  // 1 · gancho (0 – 3.2)
+  tl.set('#s1', { autoAlpha: 1 }, 0);
+  ruleIn('#s1', .15);
+  tl.fromTo('#cvLine', { strokeDasharray: cLen, strokeDashoffset: cLen }, { strokeDashoffset: 0, duration: 2.4, ease: 'power2.inOut' }, .1);
+  tl.fromTo('#cvArea', { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.4, ease: 'power2.out' }, 1.2);
+  tl.fromTo(['#cvDot', '#cvRing'], { autoAlpha: 0, scale: 0, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: .8 }, 2.35);
+  tl.fromTo('#cvRing', { attr: { r: 12 } }, { attr: { r: 30 }, autoAlpha: 0, duration: 1.4, ease: 'power2.out' }, 2.6);
+  maskIn('#s1 .mask > span', .35, .22);
+  type('#s1 [data-tw]', 1.35, .055);
+
+  // 2 · quién (3.2 – 6.4); la curva queda detrás de la foto
+  push('#s1', '#s2', 3.1);
+  tl.to('#cvG', { y: -560, autoAlpha: .55, duration: 1.1, ease: EIO }, 3.1);
+  tl.fromTo('#s2 .who__ring circle', { strokeDasharray: '0 1' }, { strokeDasharray: '1 0', duration: 1.4, ease: 'power2.inOut' }, 3.3);
+  tl.fromTo('#s2 .who__light', { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.2, ease: 'power2.out' }, 3.4);
+  tl.fromTo('#s2 .who__img img', { clipPath: 'inset(100% 0 0 0)', y: 40 }, { clipPath: 'inset(0% 0 0 0)', y: 0, duration: 1.4 }, 3.45);
+  maskIn('#s2 .cap .mask > span', 3.9);
+  tl.fromTo('#s2 .cap .label', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .9 }, 4.15);
+  tl.fromTo('#s2 .badge', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 1 }, 4.45);
+
+  // 3 · credenciales (6.4 – 9.8)
+  push('#s2', '#s3', 6.3);
+  tl.to('#cvG', { autoAlpha: 0, duration: .8, ease: EIO }, 6.3);
+  ruleIn('#s3', 6.55);
+  maskIn('#s3 h2 .mask > span', 6.6);
+  $$('#s3 .seal-cell').forEach(function (c, i) {
+    var at = 7.0 + i * .3;
+    tl.fromTo(c.querySelector('.seal'), { autoAlpha: 0, scale: .86 }, { autoAlpha: 1, scale: 1, duration: .9 }, at);
+    var ring = c.querySelector('svg circle');
+    if (ring) tl.fromTo(ring, { strokeDasharray: '0 1' }, { strokeDasharray: '1 0', duration: 1, ease: 'power2.inOut' }, at);
+    tl.fromTo(c.querySelectorAll('b, span'), { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .8, stagger: .08 }, at + .15);
+  });
+
+  // 4 · cómo trabajamos (9.8 – 16)
+  push('#s3', '#s4', 9.7);
+  ruleIn('#s4', 9.95);
+  maskIn('#s4 h2 .mask > span', 10);
+  tl.fromTo('#s4 .prog', { autoAlpha: 0 }, { autoAlpha: 1, duration: .8 }, 10.2);
+  var ST = [10.35, 11.85, 13.35, 14.85], DUR = 1.5;
+  ST.forEach(function (at, i) {
+    var s = '#st' + (i + 1);
+    tl.fromTo(s, { autoAlpha: 0, x: 140 }, { autoAlpha: 1, x: 0, duration: .75, ease: EIO }, at);
+    if (i < 3) tl.to(s, { autoAlpha: 0, x: -140, duration: .75, ease: EIO }, at + DUR - .1);
+    tl.fromTo('#s4 .prog div:nth-child(' + (i + 1) + ') i b', { scaleX: 0 }, { scaleX: 1, duration: DUR, ease: 'none' }, at);
+  });
+  tl.fromTo('#slotPick .pick', { autoAlpha: 0, scale: .9 }, { autoAlpha: 1, scale: 1, duration: .6 }, ST[0] + .55);
+  tl.set('#slotPick', { attr: { class: 'is-pick' } }, ST[0] + .6);
+  tl.fromTo('#st2 .gauge__fill', { scaleX: .08 }, { scaleX: .5, duration: 1, ease: 'power3.out' }, ST[1] + .4);
+  tl.fromTo('#st2 .gauge__dot', { left: '8%' }, { left: '50%', duration: 1, ease: 'power3.out' }, ST[1] + .4);
+  type('#st3 [data-tw]', ST[2] + .55, .12);
+  $$('#st3 .own span').forEach(function (n, i) { tl.fromTo(n, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .6 }, ST[2] + .7 + i * .12); });
+  $$('#st4 .seg').forEach(function (c, i) {
+    tl.fromTo(c, { strokeDasharray: '0 100', strokeDashoffset: +c.dataset.off }, { strokeDasharray: c.dataset.len + ' 100', duration: .8, ease: 'power3.out' }, ST[3] + .4 + i * .1);
+  });
+  $$('#st4 .time li').forEach(function (n, i) { tl.fromTo(n, { autoAlpha: 0, x: 20 }, { autoAlpha: 1, x: 0, duration: .6 }, ST[3] + .5 + i * .14); });
+
+  // 5 · cartera a la vista (16 – 20)
+  push('#s4', '#s5', 16.0);
+  ruleIn('#s5', 16.25);
+  maskIn('#s5 h2 .mask > span', 16.3);
+  tl.fromTo('#s5 .legend span', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .8, stagger: .1 }, 16.55);
+  tl.fromTo('#chGrid, #chX', { autoAlpha: 0 }, { autoAlpha: 1, duration: .8, ease: 'power2.out' }, 16.5);
+  tl.fromTo('#chClipR', { attr: { width: 0 } }, { attr: { width: 1080 }, duration: 1.8, ease: 'power2.inOut' }, 16.65);
+  var cnt = { m: 0, s: 0 };
+  tl.fromTo(cnt, { m: 0, s: 0 }, { m: DATA.mine, s: DATA.spx, duration: 1.8, ease: 'power2.inOut',
+    onUpdate: function () { tagM.textContent = pct(cnt.m); tagS.textContent = pct(cnt.s); } }, 16.65);
+  tl.fromTo([tagM, tagS], { autoAlpha: 0 }, { autoAlpha: 1, duration: .5, ease: 'power2.out' }, 16.8);
+  tl.fromTo('#s5 .note > *', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .8, stagger: .12 }, 17.6);
+
+  // 6 · cierre (20 – 23.4); vuelve la curva abajo como hilo de unión
+  push('#s5', '#s6', 19.9);
+  tl.fromTo('#cvG', { y: 140, autoAlpha: 0 }, { y: 120, autoAlpha: .7, duration: 1.4, ease: EIO, immediateRender: false }, 20.1);
+  ruleIn('#s6', 20.2);
+  maskIn('#s6 h2 .mask > span', 20.3, .2);
+  tl.fromTo('#s6 .line', { scaleX: 0 }, { scaleX: 1, duration: 1 }, 21.2);
+  tl.fromTo('#s6 .url', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 1 }, 21.35);
+  tl.to({}, { duration: .01 }, 23.4); // cola: el cierre se sostiene
+
+  window.tl = tl;
+  window.seek = function (t) { tl.seek(t, false); };
+  window.DURATION = tl.duration();
+  // sin servidor de render: ?play reproduce en tiempo real para revisar
+  if (/[?&]play/.test(location.search)) tl.play();
+  window.READY = true;
+})();
+</script>
+</body>
+</html>
