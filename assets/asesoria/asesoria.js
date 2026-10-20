@@ -13,12 +13,29 @@
   var STJS = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js';
   var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
   var NS = 'http://www.w3.org/2000/svg';
+  // WhatsApp de Ignacio en formato internacional sin "+" ni espacios (ej. 5493411234567).
+  // Vacío = los botones de WhatsApp quedan ocultos.
+  var WA_NUM = '';
+  var WA_TXT = 'Hola Ignacio, vi la asesoría en manfredinvestment.com y quiero coordinar una charla.';
 
   var sec = document.getElementById('asesoria');
   if (!sec) return;
   var $ = function (s, r) { return (r || sec).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || sec).querySelectorAll(s)); };
   var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ── WhatsApp: links + botón flotante (aparece pasado el hero, se esconde sobre el formulario) ──
+  if (WA_NUM) {
+    $$('[data-wa]').forEach(function (a) { a.href = 'https://wa.me/' + WA_NUM + '?text=' + encodeURIComponent(WA_TXT); a.hidden = false; });
+    var fab = $('.as-fab'), seen = {};
+    if (fab && 'IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { seen[e.target.className.split(' ')[0]] = e.isIntersecting; });
+        fab.classList.toggle('is-on', !seen['as-hero'] && !seen['as-form']);
+      });
+      ['.as-hero', '.as-form'].forEach(function (s) { var t = $(s); if (t) io.observe(t); });
+    }
+  }
 
   // Estado "antes de la entrada": se oculta solo si va a haber animación, y si
   // GSAP no llega en 3 s se muestra todo igual.
@@ -343,6 +360,8 @@
       .fromTo('#asesoria .as-pts li', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .8, stagger: .08 }, .9)
       .fromTo('#asesoria .as-pts', { opacity: 0 }, { opacity: 1, duration: .01 }, .9)
       .fromTo('#asesoria .as-cta', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 1 }, 1.05)
+      .fromTo('#asesoria .as-cred > div', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: .9, stagger: .1 }, 1.2)
+      .fromTo('#asesoria .as-cred', { opacity: 0 }, { opacity: 1, duration: .01 }, 1.2)
       .fromTo('#asesoria .as-who__cap', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 1 }, 1.1);
 
     gsap.to('#asesoria .as-who', { yPercent: -10, ease: 'none', scrollTrigger: { trigger: '#asesoria .as-hero', start: 'top top', end: 'bottom top', scrub: true } });
@@ -363,7 +382,21 @@
       steps.forEach(function (s) { s.classList.add('is-on'); gsap.from(s, { y: 40, opacity: 0, duration: 1, ease: ease, scrollTrigger: { trigger: s, start: 'top 85%' } }); });
     });
 
+    gsap.from('#asesoria .as-start .as-eye, #asesoria .as-start .as-h3, #asesoria .as-path', { y: 30, opacity: 0, filter: 'blur(6px)', duration: 1.1, ease: ease, stagger: .1,
+      scrollTrigger: { trigger: '#asesoria .as-start', start: 'top 75%' } });
+    gsap.from('#asesoria .as-offer', { y: 50, opacity: 0, duration: 1.3, ease: ease, delay: .2, scrollTrigger: { trigger: '#asesoria .as-start', start: 'top 75%' } });
+    gsap.from('#asesoria .as-offer__inc li', { x: -10, opacity: 0, duration: .8, ease: ease, stagger: .07, delay: .6, scrollTrigger: { trigger: '#asesoria .as-start', start: 'top 75%' } });
+
+    gsap.fromTo('#asesoria .as-me__arch', { clipPath: 'inset(100% 0 0 0 round 999px 999px 22px 22px)' }, { clipPath: 'inset(0% 0 0 0 round 999px 999px 22px 22px)', duration: 1.6, ease: ease,
+      scrollTrigger: { trigger: '#asesoria .as-me', start: 'top 70%' } });
+    gsap.from('#asesoria .as-me__arch img', { scale: 1.12, duration: 2, ease: ease, scrollTrigger: { trigger: '#asesoria .as-me', start: 'top 70%' } });
+    gsap.from('#asesoria .as-me__badge', { y: 20, opacity: 0, duration: 1, ease: ease, delay: .7, scrollTrigger: { trigger: '#asesoria .as-me', start: 'top 70%' } });
+    gsap.from('#asesoria .as-me__txt > *', { y: 26, opacity: 0, filter: 'blur(6px)', duration: 1.1, ease: ease, stagger: .08, delay: .2,
+      scrollTrigger: { trigger: '#asesoria .as-me', start: 'top 70%' } });
+    gsap.to('#asesoria .as-me__arch img', { yPercent: -6, ease: 'none', scrollTrigger: { trigger: '#asesoria .as-me', start: 'top bottom', end: 'bottom top', scrub: true } });
+
     gsap.from('#asesoria .as-end__grid > *', { y: 40, opacity: 0, duration: 1.2, ease: ease, stagger: .15, scrollTrigger: { trigger: '#asesoria .as-end', start: 'top 75%' } });
+    gsap.from('#asesoria .as-frame__row > div', { y: 20, opacity: 0, duration: 1, ease: ease, stagger: .1, scrollTrigger: { trigger: '#asesoria .as-frame', start: 'top 88%' } });
   }
 
   function staticMode() {
