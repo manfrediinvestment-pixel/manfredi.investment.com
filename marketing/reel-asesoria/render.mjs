@@ -1,5 +1,5 @@
 // Render completo: seek cuadro por cuadro a 30 fps y PNG por stdin a ffmpeg (image2pipe).
-//   node render.mjs [--out output/reel-asesoria-v2.mp4] [--frames]   (--frames guarda además los PNG en frames/)
+//   node render.mjs [--out output/reel-asesoria-v3.mp4] [--frames]   (--frames guarda además los PNG en frames/)
 // Si existe output/audio.wav (node audio.mjs), se le suma como pista AAC.
 import { spawn } from 'node:child_process';
 import { access, mkdir, rename, rm, writeFile } from 'node:fs/promises';
@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { FPS, HERE, openVideo } from './lib.mjs';
 
 const arg = k => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : null; };
-const out = join(HERE, arg('--out') || 'output/reel-asesoria-v2.mp4');
+const out = join(HERE, arg('--out') || 'output/reel-asesoria-v3.mp4');
 const wav = join(HERE, 'output', 'audio.wav');
 const hasAudio = await access(wav).then(() => true, () => false);
 const silent = hasAudio ? out.replace(/\.mp4$/, '.sin-audio.mp4') : out;

@@ -160,10 +160,11 @@ em { font-style:italic; color:var(--it); }
 #s6 h2 { position:absolute; top:560px; left:90px; right:90px; text-align:center; font-size:132px; line-height:1.06; }
 #s6 .line { position:absolute; left:340px; right:340px; top:1110px; height:1px; background:var(--line2); transform-origin:center; }
 .url { position:absolute; left:50%; top:1180px; transform:translateX(-50%); display:flex; align-items:center; gap:28px; padding:12px 12px 12px 46px; white-space:nowrap;
-  border:1.5px solid #fbf7ee; border-radius:999px; background:#f4eee2; color:#0b1428; font:600 38px var(--sans); letter-spacing:.005em;
-  box-shadow:0 24px 60px -28px rgba(0,0,0,.75), inset 0 -2px 0 rgba(11,20,40,.08); }
+  border:1.5px solid #f3e3bd; border-radius:999px; background:#d9bb7d; color:#0b1428; font:600 38px var(--sans); letter-spacing:.005em;
+  box-shadow:0 24px 60px -28px rgba(0,0,0,.75), inset 0 -2px 0 rgba(11,20,40,.1); }
+.url__glow { position:absolute; inset:-18px; border-radius:999px; background:radial-gradient(closest-side, rgba(233,211,160,.45), transparent); z-index:-1; opacity:0; }
 .url i { display:grid; place-items:center; width:84px; height:84px; border-radius:50%; background:#0b1428; }
-.url svg { width:32px; height:32px; fill:none; stroke:#f4eee2; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.url svg { width:32px; height:32px; fill:none; stroke:#e9d3a0; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 </style>
 </head>
 <body>
@@ -353,7 +354,7 @@ em { font-style:italic; color:var(--it); }
       <span class="mask"><span><em>Muy pronto.</em></span></span>
     </h2>
     <i class="line"></i>
-    <div class="url">www.manfredinvestment.com<i><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" /></svg></i></div>
+    <div class="url"><span class="url__glow"></span>www.manfredinvestment.com<i><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" /></svg></i></div>
   </section>
 </div>
 
@@ -443,10 +444,10 @@ em { font-style:italic; color:var(--it); }
   // ── línea de tiempo ──
   var tl = gsap.timeline({ paused: true, defaults: { ease: 'expo.out' } });
   var EIO = 'power3.inOut';
-  gsap.set('.sc', { autoAlpha: 0 });
+  gsap.set('.sc', { autoAlpha: 0, scale: .985 });
   // halos que respiran a lo largo de todo el video
-  tl.fromTo('.halo--a', { x: 0, y: 0 }, { x: 180, y: 260, duration: 26.25, ease: 'none' }, 0);
-  tl.fromTo('.halo--b', { x: 0, y: 0 }, { x: -160, y: -220, duration: 26.25, ease: 'none' }, 0);
+  tl.fromTo('.halo--a', { x: 0, y: 0 }, { x: 180, y: 260, duration: 21, ease: 'none' }, 0);
+  tl.fromTo('.halo--b', { x: 0, y: 0 }, { x: -160, y: -220, duration: 21, ease: 'none' }, 0);
 
   function maskIn(sel, at, stag) { tl.fromTo(sel, { yPercent: 108 }, { yPercent: 0, duration: 1.1, stagger: stag || .16 }, at); }
   function ruleIn(scope, at) {
@@ -456,104 +457,126 @@ em { font-style:italic; color:var(--it); }
   function type(sel, at, per) { $$(sel + ' .ch').forEach(function (c, i) { tl.set(c, { opacity: 1 }, at + i * per); }); }
   // transición con empuje: la escena que sale sube, la que entra viene de abajo
   function push(a, b, at) {
-    tl.to(a, { y: -220, autoAlpha: 0, duration: .8, ease: EIO }, at);
-    tl.fromTo(b, { y: 220, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .8, ease: EIO }, at + .12);
+    tl.to(a, { y: -240, autoAlpha: 0, duration: .42, ease: 'power3.in' }, at - .3);
+    tl.fromTo(b, { y: 240, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .75, ease: 'expo.out' }, at - .12);
   }
+  // zoom lento y continuo mientras la escena está en pantalla (movimiento constante)
+  function drift(sel, a, b) { tl.fromTo(sel, { scale: .985 }, { scale: 1.025, duration: b - a, ease: 'none', immediateRender: false }, a); }
 
-  // Grilla musical: 80 BPM (pulso = 0,75 s). Cada escena LLEGA en un pulso (A2…A6): el
-  // empuje arranca .45 s antes para que su punto medio caiga justo en el pulso.
+  // Grilla musical: 120 BPM (pulso = 0,5 s; compás = 2 s, empieza en t = 1 s).
+  // Cada escena LLEGA en un pulso (A2…A6); push() la hace llegar justo ahí.
   // CUES guarda los momentos que usa audio.mjs para la música y los efectos.
-  var BEAT = .75, A2 = 3.75, A3 = 7.5, A4 = 11.25, A5 = 18.75, A6 = 23.25, END = 26.25;
-  var CUES = { bpm: 80, beat: BEAT, arrive: [0, A2, A3, A4, A5, A6], end: END, ticks: [], seals: [], steps: [], donut: [] };
+  var BEAT = .5, A2 = 3, A3 = 5, A4 = 7, A5 = 14, A6 = 17, END = 21;
+  var CUES = { bpm: 120, beat: BEAT, arrive: [0, A2, A3, A4, A5, A6], end: END, ticks: [], seals: [], steps: [], donut: [], bounce: [] };
   var _type = type;
   type = function (sel, at, per) { $$(sel + ' .ch').forEach(function (c, i) { if (c.textContent.trim()) CUES.ticks.push(+(at + i * per).toFixed(3)); }); _type(sel, at, per); };
+  // el fondo late con el bombo (desde el "drop" de la primera transición)
+  for (var kb = A2; kb < END - .2; kb += BEAT) {
+    if (kb >= A5 && kb < A5 + 1) continue; // en el gráfico el bombo se calla
+    tl.fromTo('.halo', { opacity: 1.25 }, { opacity: 1, duration: .45, ease: 'power2.out', immediateRender: false }, kb);
+  }
 
   // 1 · gancho
   tl.set('#s1', { autoAlpha: 1 }, 0);
-  ruleIn('#s1', .15);
-  tl.fromTo('#cvLine', { strokeDasharray: cLen, strokeDashoffset: cLen }, { strokeDashoffset: 0, duration: 2.4, ease: 'power2.inOut' }, .1);
-  tl.fromTo('#cvArea', { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.4, ease: 'power2.out' }, 1.2);
-  tl.fromTo(['#cvDot', '#cvRing'], { autoAlpha: 0, scale: 0, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: .8 }, 2.4);
-  tl.fromTo('#cvRing', { attr: { r: 12 } }, { attr: { r: 30 }, autoAlpha: 0, duration: 1.4, ease: 'power2.out' }, 2.65);
-  CUES.curve = [.1, 2.4]; CUES.dot = 2.4;
-  maskIn('#s1 .mask > span', .35, .22);
-  type('#s1 [data-tw]', 1.35, .055);
+  drift('#s1', 0, A2);
+  ruleIn('#s1', .1);
+  tl.fromTo('#cvLine', { strokeDasharray: cLen, strokeDashoffset: cLen }, { strokeDashoffset: 0, duration: 1.8, ease: 'power2.inOut' }, .1);
+  tl.fromTo('#cvArea', { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.2, ease: 'power2.out' }, .9);
+  tl.fromTo(['#cvDot', '#cvRing'], { autoAlpha: 0, scale: 0, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: .6 }, 1.9);
+  tl.fromTo('#cvRing', { attr: { r: 12 } }, { attr: { r: 30 }, autoAlpha: 0, duration: 1.1, ease: 'power2.out' }, 2.1);
+  CUES.curve = [.1, 1.8]; CUES.dot = 1.9;
+  maskIn('#s1 .mask > span', .25, .2);
+  type('#s1 [data-tw]', 1.0, .04);
 
   // 2 · quién; la curva queda detrás de la foto
-  push('#s1', '#s2', A2 - .45);
-  tl.to('#cvG', { y: -560, autoAlpha: .55, duration: 1.1, ease: EIO }, A2 - .45);
-  tl.fromTo('#s2 .who__ring circle', { strokeDasharray: '0 1' }, { strokeDasharray: '1 0', duration: 1.4, ease: 'power2.inOut' }, A2 - .25);
-  tl.fromTo('#s2 .who__light', { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.2, ease: 'power2.out' }, A2 - .15);
-  tl.fromTo('#s2 .who__img img', { clipPath: 'inset(100% 0 0 0)', y: 40 }, { clipPath: 'inset(0% 0 0 0)', y: 0, duration: 1.4 }, A2 - .1);
-  maskIn('#s2 .cap .mask > span', A2 + .375);
-  tl.fromTo('#s2 .cap .label', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .9 }, A2 + .75);
-  tl.fromTo('#s2 .badge', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 1 }, A2 + 1.125);
-  CUES.badge = A2 + 1.125;
+  push('#s1', '#s2', A2);
+  drift('#s2', A2 - .12, A3);
+  tl.to('#cvG', { y: -560, autoAlpha: .55, duration: .9, ease: EIO }, A2 - .3);
+  tl.fromTo('#s2 .who__ring circle', { strokeDasharray: '0 1' }, { strokeDasharray: '1 0', duration: 1.1, ease: 'power2.inOut' }, A2 - .1);
+  tl.fromTo('#s2 .who__light', { autoAlpha: 0 }, { autoAlpha: 1, duration: 1, ease: 'power2.out' }, A2 - .05);
+  tl.fromTo('#s2 .who__img img', { clipPath: 'inset(100% 0 0 0)', y: 40 }, { clipPath: 'inset(0% 0 0 0)', y: 0, duration: 1.1 }, A2 - .05);
+  maskIn('#s2 .cap .mask > span', A2 + .15);
+  tl.fromTo('#s2 .cap .label', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .8 }, A2 + .35);
+  tl.fromTo('#s2 .badge', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .8 }, A2 + .5);
+  CUES.badge = A2 + .5;
 
-  // 3 · credenciales: un sello por cada medio pulso
-  push('#s2', '#s3', A3 - .45);
-  tl.to('#cvG', { autoAlpha: 0, duration: .8, ease: EIO }, A3 - .45);
-  ruleIn('#s3', A3 - .2);
-  maskIn('#s3 h2 .mask > span', A3 - .15);
+  // 3 · credenciales: un sello por corchea
+  push('#s2', '#s3', A3);
+  drift('#s3', A3 - .12, A4);
+  tl.to('#cvG', { autoAlpha: 0, duration: .5, ease: EIO }, A3 - .3);
+  ruleIn('#s3', A3 - .1);
+  maskIn('#s3 h2 .mask > span', A3 - .05);
   $$('#s3 .seal-cell').forEach(function (c, i) {
-    var at = A3 + .375 * (i + 1);
+    var at = A3 + .125 + i * .25;
     CUES.seals.push(at);
-    tl.fromTo(c.querySelector('.seal'), { autoAlpha: 0, scale: .86 }, { autoAlpha: 1, scale: 1, duration: .9 }, at);
+    tl.fromTo(c.querySelector('.seal'), { autoAlpha: 0, scale: .8 }, { autoAlpha: 1, scale: 1, duration: .7 }, at);
     var ring = c.querySelector('svg circle');
-    if (ring) tl.fromTo(ring, { strokeDasharray: '0 1' }, { strokeDasharray: '1 0', duration: 1, ease: 'power2.inOut' }, at);
-    tl.fromTo(c.querySelectorAll('b, span'), { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .8, stagger: .08 }, at + .15);
+    if (ring) tl.fromTo(ring, { strokeDasharray: '0 1' }, { strokeDasharray: '1 0', duration: .8, ease: 'power2.inOut' }, at);
+    tl.fromTo(c.querySelectorAll('b, span'), { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .6, stagger: .06 }, at + .1);
   });
 
-  // 4 · cómo trabajamos: un paso cada 2 pulsos (llega en el pulso)
-  push('#s3', '#s4', A4 - .45);
-  ruleIn('#s4', A4 - .2);
-  maskIn('#s4 h2 .mask > span', A4 - .15);
-  tl.fromTo('#s4 .prog', { autoAlpha: 0 }, { autoAlpha: 1, duration: .8 }, A4 + .05);
-  var DUR = 2 * BEAT, ST = [0, 1, 2, 3].map(function (i) { return A4 + .375 + i * DUR; });
+  // 4 · cómo trabajamos: un paso cada 3 pulsos (llega en el pulso)
+  push('#s3', '#s4', A4);
+  drift('#s4', A4 - .12, A5);
+  ruleIn('#s4', A4 - .1);
+  maskIn('#s4 h2 .mask > span', A4 - .05);
+  tl.fromTo('#s4 .prog', { autoAlpha: 0 }, { autoAlpha: 1, duration: .6 }, A4);
+  var DUR = 3 * BEAT, ST = [0, 1, 2, 3].map(function (i) { return A4 + .2 + i * DUR; });
   ST.forEach(function (at, i) {
     var s = '#st' + (i + 1);
-    CUES.steps.push(at + .375);
-    tl.fromTo(s, { autoAlpha: 0, x: 140 }, { autoAlpha: 1, x: 0, duration: .75, ease: EIO }, at);
-    if (i < 3) tl.to(s, { autoAlpha: 0, x: -140, duration: .75, ease: EIO }, at + DUR - .1);
-    tl.fromTo('#s4 .prog div:nth-child(' + (i + 1) + ') i b', { scaleX: 0 }, { scaleX: 1, duration: DUR, ease: 'none' }, at + .375);
+    CUES.steps.push(at + .3);
+    tl.fromTo(s, { autoAlpha: 0, x: 160 }, { autoAlpha: 1, x: 0, duration: .6, ease: EIO }, at);
+    if (i < 3) tl.to(s, { autoAlpha: 0, x: -160, duration: .45, ease: 'power3.in' }, at + DUR - .15);
+    tl.fromTo('#s4 .prog div:nth-child(' + (i + 1) + ') i b', { scaleX: 0 }, { scaleX: 1, duration: DUR, ease: 'none' }, at + .3);
   });
-  CUES.slot = ST[0] + .75;
-  tl.fromTo('#slotPick .pick', { autoAlpha: 0, scale: .9 }, { autoAlpha: 1, scale: 1, duration: .6 }, CUES.slot);
+  CUES.slot = ST[0] + .8;
+  tl.fromTo('#slotPick .pick', { autoAlpha: 0, scale: .9 }, { autoAlpha: 1, scale: 1, duration: .5 }, CUES.slot);
   tl.set('#slotPick', { attr: { class: 'is-pick' } }, CUES.slot + .05);
-  CUES.gauge = [ST[1] + .375, 1];
-  tl.fromTo('#st2 .gauge__fill', { scaleX: .08 }, { scaleX: .5, duration: 1, ease: 'power3.out' }, CUES.gauge[0]);
-  tl.fromTo('#st2 .gauge__dot', { left: '8%' }, { left: '50%', duration: 1, ease: 'power3.out' }, CUES.gauge[0]);
-  type('#st3 [data-tw]', ST[2] + .5, .125);
-  $$('#st3 .own span').forEach(function (n, i) { tl.fromTo(n, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .6 }, ST[2] + .75 + i * .125); });
+  CUES.gauge = [ST[1] + .3, .9];
+  tl.fromTo('#st2 .gauge__fill', { scaleX: .08 }, { scaleX: .5, duration: .9, ease: 'power3.out' }, CUES.gauge[0]);
+  tl.fromTo('#st2 .gauge__dot', { left: '8%' }, { left: '50%', duration: .9, ease: 'power3.out' }, CUES.gauge[0]);
+  type('#st3 [data-tw]', ST[2] + .55, .1);
+  $$('#st3 .own span').forEach(function (n, i) { tl.fromTo(n, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .5 }, ST[2] + .7 + i * .1); });
   $$('#st4 .seg').forEach(function (c, i) {
-    var at = ST[3] + .375 + i * .1875;
+    var at = ST[3] + .3 + i * .125;
     CUES.donut.push(at);
-    tl.fromTo(c, { strokeDasharray: '0 100', strokeDashoffset: +c.dataset.off }, { strokeDasharray: c.dataset.len + ' 100', duration: .8, ease: 'power3.out' }, at);
+    tl.fromTo(c, { strokeDasharray: '0 100', strokeDashoffset: +c.dataset.off }, { strokeDasharray: c.dataset.len + ' 100', duration: .7, ease: 'power3.out' }, at);
   });
-  $$('#st4 .time li').forEach(function (n, i) { tl.fromTo(n, { autoAlpha: 0, x: 20 }, { autoAlpha: 1, x: 0, duration: .6 }, ST[3] + .5 + i * .14); });
+  $$('#st4 .time li').forEach(function (n, i) { tl.fromTo(n, { autoAlpha: 0, x: 20 }, { autoAlpha: 1, x: 0, duration: .5 }, ST[3] + .45 + i * .12); });
 
-  // 5 · cartera a la vista: el gráfico se dibuja en 3 pulsos y los números llegan en el pulso
-  push('#s4', '#s5', A5 - .45);
-  ruleIn('#s5', A5 - .2);
-  maskIn('#s5 h2 .mask > span', A5 - .15);
-  tl.fromTo('#s5 .legend span', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .8, stagger: .1 }, A5 + .1);
-  tl.fromTo('#chGrid, #chX', { autoAlpha: 0 }, { autoAlpha: 1, duration: .8, ease: 'power2.out' }, A5 + .05);
-  CUES.chart = [A5, 3 * BEAT];
+  // 5 · cartera a la vista: el gráfico se dibuja en 2 pulsos y los números llegan en el compás
+  push('#s4', '#s5', A5);
+  drift('#s5', A5 - .12, A6);
+  ruleIn('#s5', A5 - .1);
+  maskIn('#s5 h2 .mask > span', A5 - .05);
+  tl.fromTo('#s5 .legend span', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .6, stagger: .1 }, A5 + .05);
+  tl.fromTo('#chGrid, #chX', { autoAlpha: 0 }, { autoAlpha: 1, duration: .6, ease: 'power2.out' }, A5);
+  CUES.chart = [A5, 2 * BEAT];
   tl.fromTo('#chClipR', { attr: { width: 0 } }, { attr: { width: 1080 }, duration: CUES.chart[1], ease: 'power2.inOut' }, A5);
   var cnt = { m: 0, s: 0 };
   tl.fromTo(cnt, { m: 0, s: 0 }, { m: DATA.mine, s: DATA.spx, duration: CUES.chart[1], ease: 'power2.inOut',
     onUpdate: function () { tagM.textContent = pct(cnt.m); tagS.textContent = pct(cnt.s); } }, A5);
-  tl.fromTo([tagM, tagS], { autoAlpha: 0 }, { autoAlpha: 1, duration: .5, ease: 'power2.out' }, A5 + .15);
-  tl.fromTo('#s5 .note > *', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .8, stagger: .12 }, A5 + 2 * BEAT);
+  tl.fromTo([tagM, tagS], { autoAlpha: 0 }, { autoAlpha: 1, duration: .4, ease: 'power2.out' }, A5 + .1);
+  var LAND = A5 + CUES.chart[1];
+  tl.fromTo([tagM, tagS], { scale: 1.12 }, { scale: 1, duration: .5, ease: 'expo.out', immediateRender: false }, LAND);
+  tl.fromTo('#s5 .note > *', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .6, stagger: .1 }, LAND);
 
-  // 6 · cierre: cada línea en medio pulso; la web llega en el pulso y resuelve la música
-  push('#s5', '#s6', A6 - .45);
-  tl.fromTo('#cvG', { y: 140, autoAlpha: 0 }, { y: 120, autoAlpha: .7, duration: 1.4, ease: EIO, immediateRender: false }, A6 - .25);
-  ruleIn('#s6', A6 - .15);
-  maskIn('#s6 h2 .mask > span', A6, .375);
-  tl.fromTo('#s6 .line', { scaleX: 0 }, { scaleX: 1, duration: 1 }, A6 + 1.125);
+  // 6 · cierre: cada línea en corchea; la web llega en el pulso y resuelve la música
+  push('#s5', '#s6', A6);
+  drift('#s6', A6 - .12, END);
+  tl.fromTo('#cvG', { y: 140, autoAlpha: 0 }, { y: 120, autoAlpha: .7, duration: 1.2, ease: EIO, immediateRender: false }, A6 - .2);
+  ruleIn('#s6', A6 - .1);
+  maskIn('#s6 h2 .mask > span', A6, .25);
+  tl.fromTo('#s6 .line', { scaleX: 0 }, { scaleX: 1, duration: .8 }, A6 + .7);
   CUES.url = A6 + 2 * BEAT;
-  tl.fromTo('#s6 .url', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 1 }, CUES.url);
+  tl.fromTo('#s6 .url', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .8 }, CUES.url);
+  // la web dorada da un saltito suave cada 2 pulsos, con un brillo que acompaña
+  for (var bt = CUES.url + 1; bt < END - .4; bt += 2 * BEAT) {
+    CUES.bounce.push(bt);
+    tl.to('#s6 .url', { y: -9, duration: .16, ease: 'power2.out' }, bt);
+    tl.to('#s6 .url', { y: 0, duration: .34, ease: 'power2.in' }, bt + .16);
+    tl.fromTo('#s6 .url__glow', { opacity: .9 }, { opacity: 0, duration: .8, ease: 'power2.out', immediateRender: false }, bt);
+  }
   tl.to({}, { duration: .01 }, END - .01); // cola: el cierre se sostiene
   window.CUES = CUES;
 
