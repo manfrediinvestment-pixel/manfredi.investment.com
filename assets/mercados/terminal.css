@@ -16,10 +16,22 @@
 @keyframes mtPulse { 70% { box-shadow: 0 0 0 9px rgba(79,196,140,0); } 100% { box-shadow: 0 0 0 0 rgba(79,196,140,0); } }
 #mercados .mt-top { align-items: center; }
 #mercados .mt-top-r { display: flex; align-items: center; gap: 14px; flex: 1; justify-content: flex-end; min-width: 280px; }
-#mercados .mt-search { margin: 0; flex: 1; max-width: 460px; }
-#mercados .mt-search .mkt-search-input { background: var(--mt-p1); border: 1px solid var(--mt-line2); border-radius: 12px; height: 46px; font-size: 14.5px; color: var(--mt-ink); }
-#mercados .mt-search .mkt-search-input::placeholder { color: var(--mt-soft); }
-#mercados .mt-search .mkt-search-icon { color: var(--mt-soft); }
+/* buscador: va en la fila de pestañas, a la derecha, como una píldora fina;
+   "/" lo enfoca. Si las pestañas no entran, se esfuman en el borde (.mt-corta) */
+#mercados .mt-bar { display: flex; align-items: center; gap: 12px; margin: 26px 0 14px; }
+#mercados .mt-bar .mt-tabs { margin: 0; flex: 1 1 auto; min-width: 0; }
+#mercados .mt-bar .mt-tabs.mt-corta { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 48px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 48px), transparent); }
+#mercados .mt-search { position: relative; margin: 0; flex: 0 0 192px; }
+#mercados .mt-search .mkt-search-input { height: 40px; padding: 0 38px 0 38px; background: rgba(255,255,255,.03); border: 1px solid var(--mt-line2); border-radius: 999px; font-size: 13.5px; color: var(--mt-ink); transition: border-color .2s, background-color .2s, box-shadow .2s; -webkit-appearance: none; appearance: none; }
+#mercados .mt-search .mkt-search-input::-webkit-search-cancel-button { display: none; }
+#mercados .mt-search .mkt-search-input:hover { border-color: rgba(226,234,245,.26); }
+#mercados .mt-search .mkt-search-input:focus { outline: none; background: var(--mt-p1); border-color: rgba(242,201,76,.55); box-shadow: 0 0 0 4px rgba(242,201,76,.08); }
+#mercados .mt-search .mkt-search-input::placeholder { color: var(--mt-soft); opacity: .8; }
+#mercados .mt-search .mkt-search-icon { left: 15px; color: var(--mt-ink); opacity: .8; }
+#mercados .mt-search:focus-within .mkt-search-icon { color: var(--mt-gold2); opacity: 1; }
+#mercados .mt-kbd { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); min-width: 20px; height: 20px; display: grid; place-items: center; font: 500 11px/1 'IBM Plex Mono', monospace; color: var(--mt-ink); border: 1px solid var(--mt-line2); border-radius: 5px; pointer-events: none; transition: opacity .15s; }
+#mercados .mt-search:focus-within .mt-kbd, #mercados .mt-search.has-q .mt-kbd { opacity: 0; }
+#mercados .mt-search .mkt-search-clear { right: 10px; font-size: 17px; }
 #mercados #apiStatus { color: var(--mt-soft); white-space: nowrap; }
 
 /* carteles de arriba: líneas que se mueven y brillan */
@@ -154,7 +166,9 @@
   #mercados .mt-body, #mercados .mt-body.mt-wide { grid-template-columns: minmax(0, 1fr); }
   /* buscador y "Datos en vivo" bajan a su propio renglón (antes se aplastaban a 9px) */
   #mercados .mt-top-r { min-width: 0; width: 100%; flex: 1 1 100%; justify-content: space-between; }
-  #mercados .mt-search { max-width: none; }
+  #mercados .mt-bar { flex-wrap: wrap; gap: 12px; }
+  #mercados .mt-search { flex: 1 1 100%; order: -1; }
+  #mercados .mt-kbd { display: none; }
   #mercados .mt-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
   #mercados .mt-detail { position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 900; margin: 0; height: 90vh; height: 90dvh; min-height: 0; border-radius: 22px 22px 0 0; padding: 18px 16px calc(16px + env(safe-area-inset-bottom)); overflow-y: auto; transform: translateY(105%); transition: transform .45s cubic-bezier(.16,1,.3,1); box-shadow: 0 -30px 60px rgba(0,0,0,.6); }
   #mercados .mt-detail.open { transform: none; }
@@ -181,7 +195,6 @@
   #mercados .mt-dls { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 14px; }
   #mercados .mt-dl:nth-child(3) { padding-left: 0; border-left: 0; }
   #mercados .mt-top-r { flex-wrap: wrap; gap: 10px; }
-  #mercados .mt-search { flex: 1 1 100%; order: -1; }
   #mercados .mt-body .mkt-row > * { white-space: nowrap; }
 }
 @media (prefers-reduced-motion: reduce) { #mercados .mt-detail { transition: none; } #mercados .mt-sp-flow, #mercados .mt-sp-area, #mercados .mt-sp-dot, #mercados .mt-live { animation: none; } }

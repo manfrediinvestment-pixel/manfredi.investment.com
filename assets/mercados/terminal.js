@@ -27,11 +27,11 @@
     var ch = LC.createChart(el, {
       autoSize: true,
       layout: { background: { type: 'solid', color: 'transparent' }, textColor: 'rgba(238,242,248,.78)', fontFamily: "'IBM Plex Sans', system-ui, sans-serif", fontSize: 12, attributionLogo: true,
-        panes: { separatorColor: '#1c2b44', separatorHoverColor: 'rgba(242, 201, 76, 0.45)', enableResize: true } },
+        panes: { separatorColor: '#1c2b44', separatorHoverColor: 'rgba(238,242,248,.25)', enableResize: true } },
       grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(238,242,248,.05)' } },
       rightPriceScale: { borderVisible: false, scaleMargins: { top: .1, bottom: .06 } },
       timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false, fixLeftEdge: true, fixRightEdge: true },
-      crosshair: { mode: LC.CrosshairMode.Magnet, vertLine: { color: 'rgba(242,201,76,.5)', labelBackgroundColor: '#1d3357', style: 3 }, horzLine: { color: 'rgba(242,201,76,.35)', labelBackgroundColor: '#1d3357', style: 3 } },
+      crosshair: { mode: LC.CrosshairMode.Magnet, vertLine: { color: 'rgba(238,242,248,.35)', labelBackgroundColor: '#1d3357', style: 3 }, horzLine: { color: 'rgba(238,242,248,.25)', labelBackgroundColor: '#1d3357', style: 3 } },
       localization: { locale: 'es-AR',
         timeFormatter: function (t) { return new Date(t * 1000).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' }); } },
       handleScale: { mouseWheel: false, pinch: true }, handleScroll: { mouseWheel: false, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false }
@@ -39,8 +39,9 @@
     // formato de precio solo para las series de precio (el volumen usa el suyo)
     var fmt = { type: 'custom', minMove: 0.01, formatter: function (p) { return (usd ? 'US$ ' : '$ ') + Number(p).toLocaleString('es-AR', { maximumFractionDigits: Math.abs(p) >= 1000 ? 0 : 2 }); } };
     // las dos series de precio viven en el panel 0 y se alterna cuál se ve
-    var area = ch.addSeries(LC.AreaSeries, { priceFormat: fmt, lineColor: '#f2c94c', lineWidth: 2, topColor: 'rgba(242,201,76,.28)', bottomColor: 'rgba(242,201,76,0)', priceLineColor: 'rgba(242,201,76,.6)', crosshairMarkerBorderColor: '#0b1528', crosshairMarkerBackgroundColor: '#f2c94c', crosshairMarkerRadius: 5 }, 0);
-    var velas = ch.addSeries(LC.CandlestickSeries, { priceFormat: fmt, upColor: '#4fc48c', downColor: '#ee7369', borderVisible: false, wickUpColor: '#4fc48c', wickDownColor: '#ee7369', priceLineColor: 'rgba(242,201,76,.6)', visible: false }, 0);
+    // la línea toma verde o rojo según cómo le fue al activo en el período elegido (se pinta en datos())
+    var area = ch.addSeries(LC.AreaSeries, { priceFormat: fmt, lineWidth: 2, crosshairMarkerBorderColor: '#0b1528', crosshairMarkerRadius: 5 }, 0);
+    var velas = ch.addSeries(LC.CandlestickSeries, { priceFormat: fmt, upColor: '#4fc48c', downColor: '#ee7369', borderVisible: false, wickUpColor: '#4fc48c', wickDownColor: '#ee7369', visible: false }, 0);
     var volumen = ch.addSeries(LC.HistogramSeries, { priceFormat: { type: 'volume' }, priceLineVisible: false, lastValueVisible: false }, 1);
     // qué paneles se ven: ambos (precio grande, volumen chico), solo precio o
     // solo volumen. Se reparte el alto con stretch factors; el usuario además
@@ -61,6 +62,10 @@
       modo: function (m) { modo = m; aplicar(); },
       vista: function (v) { vista = v; aplicar(); },
       datos: function (pts) {
+        var sube = pts[pts.length - 1].c >= (pts[0].o || pts[0].c);
+        var rgb = sube ? '79,196,140' : '238,115,105', hex = sube ? '#4fc48c' : '#ee7369';
+        area.applyOptions({ lineColor: hex, topColor: 'rgba(' + rgb + ',.26)', bottomColor: 'rgba(' + rgb + ',0)', priceLineColor: 'rgba(' + rgb + ',.6)', crosshairMarkerBackgroundColor: hex });
+        velas.applyOptions({ priceLineColor: 'rgba(' + rgb + ',.6)' });
         area.setData(pts.map(function (p) { return { time: p.t, value: p.c }; }));
         velas.setData(pts.map(function (p) { return { time: p.t, open: p.o, high: p.h, low: p.l, close: p.c }; }));
         hayVol = pts.some(function (p) { return p.v > 0; });

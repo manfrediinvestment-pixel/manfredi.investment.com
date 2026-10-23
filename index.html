@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <!-- Mercados · diseño Terminal: gráfico con TradingView Lightweight Charts (v5) -->
-  <link rel="stylesheet" href="assets/mercados/terminal.css?v=20261010z" />
+  <link rel="stylesheet" href="assets/mercados/terminal.css?v=20261023b" />
 <link rel="stylesheet" href="assets/pulso/pulso.css?v=20261010z" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261010z" />
 <link rel="stylesheet" href="assets/analistas/analistas.css?v=20261015b" />
@@ -77,7 +77,7 @@
   .mi-promo-tag { display: inline-block; font: 600 11px/1 'IBM Plex Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #0a1322; background: #f2c94c; padding: 5px 8px; border-radius: 999px; vertical-align: middle; }
 </style>
   <script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js" defer></script>
-  <script src="assets/mercados/terminal.js"></script>
+  <script src="assets/mercados/terminal.js?v=20261023a"></script>
   <style>
     /* âââ RESET & BASE âââââââââââââââââââââââââââââââââââââââââââ */ 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -4193,11 +4193,6 @@
         <h2 class="mt-title"><span class="mt-live" aria-hidden="true"></span>Mercados <em>en vivo</em></h2>
         <div class="mt-top-r">
           <span class="api-status loading" id="apiStatus"><span class="api-status-dot"></span></span>
-          <div class="mkt-search-wrap mt-search">
-            <svg class="mkt-search-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <input type="search" id="mktSearchInput" name="q" spellcheck="false" aria-label="Buscar activo" aria-controls="mktSearchResults" class="mkt-search-input" placeholder="Buscar acción, CEDEAR, bono o cripto: GGAL, Apple, AL30…">
-            <button type="button" id="mktSearchClear" class="mkt-search-clear" hidden aria-label="Limpiar b&uacute;squeda">&times;</button>
-          </div>
         </div>
       </header>
 
@@ -4205,7 +4200,15 @@
         <div class="mt-strip-sk">Cargando cotizaciones&hellip;</div>
       </div>
 
-      <div class="mkt-tabs mt-tabs" id="mktTabs"></div>
+      <div class="mt-bar">
+        <div class="mkt-tabs mt-tabs" id="mktTabs"></div>
+        <div class="mkt-search-wrap mt-search">
+          <svg class="mkt-search-icon" aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7.5"/><path d="m20.5 20.5-4.2-4.2"/></svg>
+          <input type="search" id="mktSearchInput" name="q" spellcheck="false" autocomplete="off" aria-label="Buscar activo" aria-controls="mktSearchResults" class="mkt-search-input" placeholder="Buscar activo…">
+          <kbd class="mt-kbd" aria-hidden="true">/</kbd>
+          <button type="button" id="mktSearchClear" class="mkt-search-clear" hidden aria-label="Limpiar b&uacute;squeda">&times;</button>
+        </div>
+      </div>
       <div class="mt-body" id="mktBody">
         <div class="mt-left">
           <div id="mktSearchResults" class="mkt-search-results mt-results" hidden></div>
@@ -12036,14 +12039,35 @@
     const input = document.getElementById('mktSearchInput');
     const clearBtn = document.getElementById('mktSearchClear');
     if (!input || !clearBtn) return;
+    const wrap = input.closest('.mt-search');
+    const sync = () => { clearBtn.hidden = !input.value; if (wrap) wrap.classList.toggle('has-q', !!input.value); };
     input.addEventListener('input', () => {
-      clearBtn.hidden = !input.value;
+      sync();
       mktSearch(input.value);
     });
     clearBtn.addEventListener('click', () => {
       input.value = '';
-      clearBtn.hidden = true;
+      sync();
       mktSearch('');
+      input.focus();
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && input.value) { e.stopPropagation(); input.value = ''; sync(); mktSearch(''); }
+    });
+    // pestañas que no entran al lado del buscador: se esfuman en el borde derecho
+    const tabsEl = document.getElementById('mktTabs');
+    if (tabsEl && window.ResizeObserver) {
+      const corta = () => tabsEl.classList.toggle('mt-corta', tabsEl.scrollWidth - tabsEl.scrollLeft - tabsEl.clientWidth > 2);
+      new ResizeObserver(corta).observe(tabsEl);
+      tabsEl.addEventListener('scroll', corta, { passive: true });
+    }
+    // "/" enfoca el buscador mientras se ve la sección Mercados
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+      const t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      if (!input.offsetParent) return;
+      e.preventDefault();
       input.focus();
     });
   }
