@@ -26,9 +26,9 @@
     var LC = window.LightweightCharts;
     var ch = LC.createChart(el, {
       autoSize: true,
-      layout: { background: { type: 'solid', color: 'transparent' }, textColor: 'rgba(238,242,248,.78)', fontFamily: "'IBM Plex Sans', system-ui, sans-serif", fontSize: 12, attributionLogo: true,
+      layout: { background: { type: 'solid', color: 'transparent' }, textColor: 'rgba(238,242,248,.78)', fontFamily: "'IBM Plex Mono', ui-monospace, monospace", fontSize: 11, attributionLogo: true,
         panes: { separatorColor: '#1c2b44', separatorHoverColor: 'rgba(238,242,248,.25)', enableResize: true } },
-      grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(238,242,248,.05)' } },
+      grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(238,242,248,.04)' } },
       rightPriceScale: { borderVisible: false, scaleMargins: { top: .1, bottom: .06 } },
       timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false, fixLeftEdge: true, fixRightEdge: true },
       crosshair: { mode: LC.CrosshairMode.Magnet, vertLine: { color: 'rgba(238,242,248,.35)', labelBackgroundColor: '#1d3357', style: 3 }, horzLine: { color: 'rgba(238,242,248,.25)', labelBackgroundColor: '#1d3357', style: 3 } },
@@ -40,7 +40,7 @@
     var fmt = { type: 'custom', minMove: 0.01, formatter: function (p) { return (usd ? 'US$ ' : '$ ') + Number(p).toLocaleString('es-AR', { maximumFractionDigits: Math.abs(p) >= 1000 ? 0 : 2 }); } };
     // las dos series de precio viven en el panel 0 y se alterna cuál se ve
     // la línea toma verde o rojo según cómo le fue al activo en el período elegido (se pinta en datos())
-    var area = ch.addSeries(LC.AreaSeries, { priceFormat: fmt, lineWidth: 2, crosshairMarkerBorderColor: '#0b1528', crosshairMarkerRadius: 5 }, 0);
+    var area = ch.addSeries(LC.AreaSeries, { priceFormat: fmt, lineWidth: 1.6, crosshairMarkerBorderColor: '#060d19', crosshairMarkerRadius: 4 }, 0);
     var velas = ch.addSeries(LC.CandlestickSeries, { priceFormat: fmt, upColor: '#4fc48c', downColor: '#ee7369', borderVisible: false, wickUpColor: '#4fc48c', wickDownColor: '#ee7369', visible: false }, 0);
     var volumen = ch.addSeries(LC.HistogramSeries, { priceFormat: { type: 'volume' }, priceLineVisible: false, lastValueVisible: false }, 1);
     // qué paneles se ven: ambos (precio grande, volumen chico), solo precio o
@@ -64,12 +64,12 @@
       datos: function (pts) {
         var sube = pts[pts.length - 1].c >= (pts[0].o || pts[0].c);
         var rgb = sube ? '79,196,140' : '238,115,105', hex = sube ? '#4fc48c' : '#ee7369';
-        area.applyOptions({ lineColor: hex, topColor: 'rgba(' + rgb + ',.26)', bottomColor: 'rgba(' + rgb + ',0)', priceLineColor: 'rgba(' + rgb + ',.6)', crosshairMarkerBackgroundColor: hex });
+        area.applyOptions({ lineColor: hex, topColor: 'rgba(' + rgb + ',.16)', bottomColor: 'rgba(' + rgb + ',0)', priceLineColor: 'rgba(' + rgb + ',.6)', crosshairMarkerBackgroundColor: hex });
         velas.applyOptions({ priceLineColor: 'rgba(' + rgb + ',.6)' });
         area.setData(pts.map(function (p) { return { time: p.t, value: p.c }; }));
         velas.setData(pts.map(function (p) { return { time: p.t, open: p.o, high: p.h, low: p.l, close: p.c }; }));
         hayVol = pts.some(function (p) { return p.v > 0; });
-        volumen.setData(hayVol ? pts.map(function (p) { return { time: p.t, value: p.v, color: p.c >= p.o ? 'rgba(79,196,140,.45)' : 'rgba(238,115,105,.45)' }; }) : []);
+        volumen.setData(hayVol ? pts.map(function (p) { return { time: p.t, value: p.v, color: p.c >= p.o ? 'rgba(79,196,140,.32)' : 'rgba(238,115,105,.32)' }; }) : []);
         aplicar();
         ch.timeScale().fitContent();
         return hayVol;
