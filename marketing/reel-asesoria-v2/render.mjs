@@ -56,10 +56,12 @@ try {
     if (f % 120 === 0) process.stdout.write(`\r  cuadro ${f}/${N} · ${((Date.now() - t0) / 1000).toFixed(0)} s`);
   }
   ff.stdin.end(); await done;
-  // portada = cuadro final, quieto
+  // último cuadro (marca de agua quieta), para el loop
   await page.evaluate(t => window.seek(t), DURATION - 0.001);
-  await page.screenshot({ path: o('portada.png') });
+  await page.screenshot({ path: o('cuadro-final.png') });
 } finally { await close(); }
+// portada diseñada aparte (portada.html)
+await import('./portada.mjs');
 console.log(`\n  video listo en ${((Date.now() - t0) / 1000).toFixed(0)} s`);
 
 // ── 4 · audio ──

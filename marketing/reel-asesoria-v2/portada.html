@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Portada · Asesoría 1 a 1</title>
+<meta name="viewport" content="width=1080, height=1920">
+<style>
+@font-face { font-family: 'Newsreader'; font-style: normal; font-weight: 400; src: url(node_modules/@fontsource/newsreader/files/newsreader-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Newsreader'; font-style: italic; font-weight: 400; src: url(node_modules/@fontsource/newsreader/files/newsreader-latin-400-italic.woff2) format('woff2'); }
+@font-face { font-family: 'Newsreader'; font-style: normal; font-weight: 500; src: url(node_modules/@fontsource/newsreader/files/newsreader-latin-500-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Instrument Sans'; font-style: normal; font-weight: 600; src: url(node_modules/@fontsource/instrument-sans/files/instrument-sans-latin-600-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Instrument Sans'; font-style: normal; font-weight: 700; src: url(node_modules/@fontsource/instrument-sans/files/instrument-sans-latin-700-normal.woff2) format('woff2'); }
+:root { --ch: #e9d3a0; --ch2: #f6e2b2; --iv: #f4eee2; --gold: #c9ab6e; --serif: 'Newsreader', Georgia, serif; --sans: 'Instrument Sans', system-ui, sans-serif; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #04060c; }
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; color: #fff;
+  background: radial-gradient(ellipse 110% 60% at 50% 34%, #0d1424 0%, #080d1a 45%, #04060c 100%); }
+.halo { position: absolute; left: 540px; top: 640px; width: 1300px; height: 1300px; margin: -650px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,171,110,.16) 0%, rgba(201,171,110,.05) 36%, rgba(201,171,110,0) 66%); }
+#curve { position: absolute; left: 0; top: 1290px; width: 1080px; height: 520px; opacity: .8; }
+.frame { position: absolute; inset: 36px; border: 1px solid rgba(201,171,110,.24); }
+.corner { position: absolute; width: 46px; height: 46px; border-color: var(--gold); border-style: solid; border-width: 0; }
+.corner.tl { left: 36px; top: 36px; border-left-width: 2px; border-top-width: 2px; }
+.corner.tr { right: 36px; top: 36px; border-right-width: 2px; border-top-width: 2px; }
+.corner.bl { left: 36px; bottom: 36px; border-left-width: 2px; border-bottom-width: 2px; }
+.corner.br { right: 36px; bottom: 36px; border-right-width: 2px; border-bottom-width: 2px; }
+
+.kicker { position: absolute; left: 0; right: 0; top: 302px; display: flex; align-items: center; justify-content: center; gap: 24px;
+  font: 700 28px/1 var(--sans); letter-spacing: .32em; color: var(--ch); }
+.kicker i { width: 90px; height: 1px; background: linear-gradient(90deg, rgba(201,171,110,0), var(--gold)); }
+.kicker i:last-child { transform: scaleX(-1); }
+
+.me { position: absolute; left: 290px; top: 370px; width: 500px; height: 640px; }
+.me .glow { position: absolute; left: -300px; top: -220px; width: 1100px; height: 1000px; border-radius: 50%; background: radial-gradient(circle at 50% 42%, rgba(201,171,110,.2), rgba(201,171,110,0) 60%); }
+.me .arch { position: absolute; inset: 0; border-radius: 250px 250px 0 0; overflow: hidden; -webkit-mask: linear-gradient(180deg, #000 72%, transparent 100%);
+  background: radial-gradient(circle at 50% 28%, #2a2b35 0%, #121826 48%, #070b16 100%); }
+.me .arch::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 24%, rgba(201,171,110,.34), rgba(201,171,110,0) 62%); }
+.me .arch img { position: absolute; left: 50%; bottom: 0; width: 500px; transform: translateX(-50%); }
+.me .arch::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4,6,12,0) 60%, rgba(4,6,12,.5) 100%); }
+.me svg { position: absolute; left: -16px; top: -16px; width: 532px; height: 672px; overflow: visible; -webkit-mask: linear-gradient(180deg, #000 70%, transparent 96%); }
+.me svg path { fill: none; stroke: var(--gold); stroke-width: 2; }
+.me svg path.thin { stroke-width: 1; opacity: .45; }
+
+.head { position: absolute; left: 0; right: 0; top: 1040px; text-align: center; font-family: var(--serif); font-weight: 400; letter-spacing: -.025em; line-height: 1.02; }
+.head .a { display: block; font-size: 100px; color: #fff; }
+.head .b { display: block; font-size: 118px; font-style: italic; color: var(--ch2); margin-top: 4px; }
+.yo { position: absolute; left: 0; right: 0; top: 1400px; display: flex; align-items: center; justify-content: center; gap: 26px; }
+.yo i { width: 120px; height: 1px; background: var(--gold); opacity: .7; }
+.yo b { font: 500 58px/1 var(--serif); font-style: normal; color: var(--ch2); }
+.sig { position: absolute; left: 0; right: 0; top: 1500px; text-align: center; }
+.sig b { display: block; font: 600 34px/1 var(--sans); letter-spacing: .02em; color: #fff; }
+.sig span { display: block; margin-top: 14px; font: 600 26px/1 var(--sans); color: var(--iv); letter-spacing: .03em; }
+#grain { position: absolute; inset: 0; opacity: .035; mix-blend-mode: overlay; background-size: 256px 256px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="halo"></div>
+  <svg id="curve" viewBox="0 0 1080 560"></svg>
+  <div class="frame"></div>
+  <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+
+  <div class="kicker"><i></i>ASESORÍA 1 A 1 · MUY PRONTO<i></i></div>
+
+  <div class="me">
+    <div class="glow"></div>
+    <div class="arch"><img src="/assets/asesoria/ignacio.webp" alt=""></div>
+    <svg viewBox="-16 -16 532 672">
+      <path d="M-8 560 L-8 250 A258 258 0 0 1 508 250 L508 560"/>
+      <path class="thin" d="M-16 600 L-16 250 A266 266 0 0 1 516 250 L516 600"/>
+    </svg>
+  </div>
+
+  <h1 class="head">
+    <span class="a">¿Cuántos asesores</span>
+    <span class="a">te muestran</span>
+    <span class="b">su propia cartera?</span>
+  </h1>
+  <div class="yo"><i></i><b>Yo sí.</b><i></i></div>
+  <div class="sig"><b>Ignacio Manfredi</b><span>Agente coproductor de Balanz · Idóneo CNV</span></div>
+  <div id="grain"></div>
+</div>
+<script type="module">
+const NS = 'http://www.w3.org/2000/svg';
+const el = (t, a, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); p.appendChild(e); return e; };
+const D = await (await fetch('data/cartera.json')).json();
+// curva real de la cartera, muy tenue, como textura de fondo
+const v = D.serie.map(p => p.cartera), lo = Math.min(...v), hi = Math.max(...v);
+const P = v.map((y, i) => [-20 + 1120 * i / (v.length - 1), 500 - 380 * (y - lo) / (hi - lo)]);
+let d = 'M' + P[0].join(' ');
+for (let i = 0; i < P.length - 1; i++) { const p0 = P[i - 1] || P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] || p2;
+  d += ` C${p1[0] + (p2[0] - p0[0]) / 6} ${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6} ${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]} ${p2[1]}`; }
+const svg = document.getElementById('curve'), defs = el('defs', {}, svg);
+const g = el('linearGradient', { id: 'cg', x1: 0, y1: 0, x2: 1, y2: 0 }, defs);
+el('stop', { offset: 0, 'stop-color': '#c9ab6e', 'stop-opacity': 0 }, g);
+el('stop', { offset: .7, 'stop-color': '#c9ab6e', 'stop-opacity': .22 }, g);
+el('stop', { offset: 1, 'stop-color': '#e9d3a0', 'stop-opacity': .4 }, g);
+const a = el('linearGradient', { id: 'ca', x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+el('stop', { offset: 0, 'stop-color': '#c9ab6e', 'stop-opacity': .07 }, a);
+el('stop', { offset: 1, 'stop-color': '#c9ab6e', 'stop-opacity': 0 }, a);
+el('path', { d: d + ' L1100 560 L-20 560 Z', fill: 'url(#ca)' }, svg);
+el('path', { d, fill: 'none', stroke: 'url(#cg)', 'stroke-width': 3 }, svg);
+// grano fijo
+const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'), im = x.createImageData(256, 256);
+let s = 7; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+for (let i = 0; i < im.data.length; i += 4) { const q = r() * 255; im.data[i] = im.data[i + 1] = im.data[i + 2] = q; im.data[i + 3] = 255; }
+x.putImageData(im, 0, 0); document.getElementById('grain').style.backgroundImage = 'url(' + c.toDataURL() + ')';
+await document.fonts.load('italic 400 100px Newsreader'); await document.fonts.load('400 100px Newsreader'); await document.fonts.load('500 60px Newsreader');
+await document.fonts.load('600 30px "Instrument Sans"'); await document.fonts.load('700 30px "Instrument Sans"');
+await document.fonts.ready;
+await Promise.all([...document.images].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
+window.__ready = true;
+</script>
+</body>
+</html>
