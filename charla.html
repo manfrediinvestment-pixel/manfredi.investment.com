@@ -8,127 +8,170 @@
 <meta property="og:title" content="Tu primer portafolio, paso a paso">
 <meta property="og:description" content="La guía de la charla de Ignacio Manfredi: todo lo que vimos, para llevártelo.">
 <meta property="og:image" content="https://manfredinvestment.com/assets/img/og-image.png">
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
-<meta name="theme-color" content="#060d19">
+<meta name="theme-color" content="#ebe6da">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
 <style>
 /* Guía de la charla "Tu primer portafolio, paso a paso" (llega por el QR del final).
-   Mismo mundo que guia.html (azul noche + champagne), sin una sola letra gris. */
+   Formato documento: una hoja clara sobre un fondo apenas más oscuro, como un Word bien maquetado.
+   Sin letras grises: tinta azul noche y acentos dorados oscuros. */
 :root{
-  --bg:#060d19; --panel:#0b1729; --panel2:#10203a;
-  --line:rgba(226,234,245,.10); --line2:rgba(233,211,160,.30);
-  --ink:#f3f6fb; --champ:#e9d3a0; --gold-a:#c9a24f; --gold-b:#e6cb8a;
-  --pos:#5fd39b; --neg:#f2857b; --data:#8cc2f2;
-  --sans:'IBM Plex Sans',system-ui,sans-serif; --serif:'DM Serif Display',Georgia,serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
-  --gut:clamp(16px,4vw,40px);
+  --desk:#ebe6da; --paper:#fffdf8; --ink:#13213a; --accent:#7d5d1f; --accent-soft:#c9a24f;
+  --rule:#d9cfb8; --rule-soft:#ebe3d0; --tint:#f7f1e3; --link:#1d4f91; --pos:#1f7a4c; --neg:#b03a2e;
+  --serif-d:'DM Serif Display',Georgia,serif; --serif:'Source Serif 4',Georgia,serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:70px;background:var(--bg)}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:-12%;z-index:-1;pointer-events:none;background:
-  radial-gradient(38% 34% at 16% 8%,rgba(233,211,160,.08),transparent 70%),
-  radial-gradient(36% 42% at 86% 16%,rgba(64,128,232,.13),transparent 70%),
-  linear-gradient(180deg,#0a1730 0%,#070f1f 55%,#060d1a 100%)}
-a{color:var(--champ);text-decoration:none;border-bottom:1px solid var(--line2)}
-a:hover{border-color:var(--champ)}
-.wrap{width:min(860px,100% - var(--gut)*2);margin-inline:auto}
-.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
-em.s{font-family:var(--serif);font-style:italic;color:var(--champ)}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:24px;background:var(--desk)}
+body{background:var(--desk);color:var(--ink);font-family:var(--serif);font-size:17.5px;line-height:1.7;-webkit-font-smoothing:antialiased;padding:32px 16px 64px}
+.paper{max-width:820px;margin:0 auto;background:var(--paper);box-shadow:0 1px 2px rgba(19,33,58,.08),0 20px 60px rgba(19,33,58,.10);border-radius:4px;padding:72px 80px 64px}
+a{color:var(--link);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{text-decoration-thickness:2px}
+b,strong{font-weight:600}
+.mono{font-family:var(--mono);font-size:.92em}
 
-/* índice fijo */
-.nav{position:sticky;top:0;z-index:5;background:rgba(6,13,25,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.nav__in{display:flex;gap:6px;overflow-x:auto;padding:10px var(--gut);scrollbar-width:none}
-.nav__in::-webkit-scrollbar{display:none}
-.nav a{flex:none;border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
-.nav a:hover{border-color:var(--champ);color:var(--champ)}
+/* barra superior de acciones */
+.actions{max-width:820px;margin:0 auto 14px;display:flex;justify-content:flex-end;gap:10px}
+.btn{font-family:var(--sans);font-size:14px;font-weight:500;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:8px 14px;cursor:pointer;text-decoration:none}
+.btn:hover{border-color:var(--accent)}
 
-header{padding:64px 0 36px}
-.kick{font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--champ)}
-h1{font-family:var(--serif);font-weight:400;font-size:clamp(38px,8vw,64px);line-height:1.04;margin:14px 0 16px}
-.lead{font-size:18px}
-.who{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:22px;font-family:var(--mono);font-size:13px;color:var(--champ)}
-.note{margin-top:26px;border-left:2px solid var(--champ);padding:4px 0 4px 16px;font-size:15px}
+/* portada */
+.cover{border-bottom:2px solid var(--ink);padding-bottom:30px;margin-bottom:34px}
+.cover__kick{font-family:var(--sans);font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.cover h1{font-family:var(--serif-d);font-weight:400;font-size:clamp(36px,6vw,52px);line-height:1.08;margin:12px 0 10px}
+.cover h1 em{color:var(--accent)}
+.cover__sub{font-size:19px}
+.cover__meta{display:grid;grid-template-columns:auto 1fr;gap:4px 18px;margin-top:22px;font-family:var(--sans);font-size:14.5px}
+.cover__meta dt{font-weight:600;color:var(--accent)}
 
-section{padding:46px 0;border-top:1px solid var(--line)}
-h2{font-family:var(--serif);font-weight:400;font-size:clamp(28px,5.5vw,40px);line-height:1.1;margin:8px 0 18px}
-h3{font-family:var(--serif);font-weight:400;font-size:24px;margin:30px 0 10px;color:var(--champ)}
-p+p{margin-top:12px}
-ul.list{list-style:none;margin-top:12px}
-ul.list li{padding:10px 0 10px 22px;border-top:1px solid var(--line);position:relative}
-ul.list li::before{content:'';position:absolute;left:2px;top:21px;width:8px;height:1px;background:var(--champ)}
-b{font-weight:600}
+.disclaimer{background:var(--tint);border-left:3px solid var(--accent-soft);padding:14px 18px;font-size:15.5px;margin:0 0 36px}
 
-.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:20px 0}
-.big div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
-.big strong{display:block;font-family:var(--mono);font-weight:400;font-size:26px;color:var(--champ)}
-.big strong.neg{color:var(--neg)} .big strong.pos{color:var(--pos)}
-.big span{font-size:14px}
+/* índice */
+.toc{margin-bottom:40px}
+.toc h2::before{content:none}
+.toc h2{font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 10px;border:0;padding:0}
+.toc ol{list-style:none;counter-reset:t}
+.toc li{counter-increment:t;display:flex;align-items:baseline;gap:10px;padding:6px 0;border-bottom:1px dotted var(--rule)}
+.toc li::before{content:counter(t) '.';font-family:var(--mono);font-size:14px;color:var(--accent);min-width:24px}
+.toc a{color:var(--ink);text-decoration:none}
+.toc a:hover{color:var(--link);text-decoration:underline}
 
-.tbl{width:100%;border-collapse:collapse;margin:16px 0;font-size:15px}
-.tbl th{text-align:left;font-family:var(--mono);font-weight:400;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--champ);padding:8px 10px 8px 0;border-bottom:1px solid var(--line2)}
-.tbl td{padding:10px 10px 10px 0;border-bottom:1px solid var(--line);vertical-align:top}
-.tbl td.n{font-family:var(--mono);white-space:nowrap}
-.scroll{overflow-x:auto}
+/* secciones */
+section{counter-increment:sec;margin-top:46px}
+body{counter-reset:sec}
+h2{font-family:var(--serif-d);font-weight:400;font-size:30px;line-height:1.2;padding-bottom:8px;border-bottom:1px solid var(--rule);margin-bottom:16px}
+h2::before{content:counter(sec) '. ';color:var(--accent)}
+h3{font-family:var(--sans);font-size:17px;font-weight:600;margin:26px 0 8px}
+p{margin:10px 0}
+ul,ol{margin:10px 0 10px 24px}
+li{margin:6px 0}
+li::marker{color:var(--accent)}
 
-.steps{counter-reset:s;list-style:none;margin-top:14px}
-.steps li{counter-increment:s;display:grid;grid-template-columns:42px 1fr;gap:10px;padding:14px 0;border-top:1px solid var(--line)}
-.steps li::before{content:counter(s,decimal-leading-zero);font-family:var(--mono);color:var(--champ);padding-top:2px}
+/* tablas estilo documento */
+.tw{overflow-x:auto;margin:14px 0 6px}
+table{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:15px}
+caption{caption-side:top;text-align:left;font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--accent);padding-bottom:6px}
+th{background:var(--ink);color:#fffdf8;font-weight:500;text-align:left;padding:9px 12px}
+td{padding:9px 12px;border-bottom:1px solid var(--rule-soft)}
+tr:nth-child(even) td{background:#fcf9f1}
+td.n,th.n{text-align:right;font-family:var(--mono);white-space:nowrap}
+td.neg{color:var(--neg)} td.pos{color:var(--pos)}
+.src{font-family:var(--sans);font-size:13px;color:var(--accent);margin:4px 0 0}
 
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:16px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
-.card h4{font-family:var(--serif);font-weight:400;font-size:24px}
-.card .meta{font-family:var(--mono);font-size:12.5px;color:var(--champ);margin:2px 0 12px}
-.card .row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid var(--line);font-size:15px}
-.card .row b{font-family:var(--mono);font-weight:400;color:var(--champ)}
+.callout{border:1px solid var(--rule);border-radius:6px;padding:14px 18px;margin:16px 0;background:var(--paper)}
+.callout b:first-child{color:var(--accent)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0}
+.box{border:1px solid var(--rule);border-radius:6px;padding:16px 18px}
+.box h4{font-family:var(--serif-d);font-weight:400;font-size:22px}
+.box .who{font-family:var(--sans);font-size:13.5px;color:var(--accent);margin-bottom:8px}
+.box table{font-size:14.5px}
 
-.tools{display:grid;gap:10px;margin-top:16px}
-.tool{display:grid;grid-template-columns:1fr auto;gap:4px 14px;align-items:baseline;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.tool .q{font-size:15px}
-.tool a{font-family:var(--mono);font-size:14px;justify-self:end}
-.tool .d{grid-column:1/-1;font-size:14px}
+.links{list-style:none;margin:12px 0}
+.links li{display:grid;grid-template-columns:1fr auto;gap:2px 16px;padding:10px 0;border-bottom:1px solid var(--rule-soft)}
+.links .what{font-weight:600}
+.links .url{font-family:var(--mono);font-size:14px;text-align:right}
+.links .why{grid-column:1/-1;font-size:15.5px}
 
-.check{list-style:none;margin-top:14px}
-.check li{display:grid;grid-template-columns:28px 1fr;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
-.check li::before{content:'';width:18px;height:18px;border:1.5px solid var(--champ);border-radius:5px;margin-top:3px}
+.check{list-style:none;margin:12px 0}
+.check li{display:grid;grid-template-columns:30px 1fr;padding:9px 0;border-bottom:1px solid var(--rule-soft)}
+.check li::before{content:'';width:17px;height:17px;border:1.5px solid var(--accent);border-radius:3px;margin-top:5px}
 
-footer{padding:48px 0 70px;border-top:1px solid var(--line);font-size:14.5px}
-footer .sig{font-family:var(--serif);font-size:30px}
-@media (max-width:560px){ .tbl{font-size:14px} .tool{grid-template-columns:1fr} .tool a{justify-self:start} }
+.foot{margin-top:56px;padding-top:18px;border-top:2px solid var(--ink);font-family:var(--sans);font-size:14px}
+.foot .sig{font-family:var(--serif-d);font-size:26px;margin-bottom:4px}
+.foot p{margin:6px 0}
+
+@media (max-width:640px){
+  body{padding:0;font-size:17px}
+  .paper{border-radius:0;box-shadow:none;padding:36px 20px 44px}
+  .actions{padding:12px 16px 0;margin-bottom:0}
+  .two{grid-template-columns:1fr}
+  .links li{grid-template-columns:1fr}
+  .links .url{text-align:left}
+}
+@media print{
+  html,body{background:#fff;padding:0}
+  .paper{box-shadow:none;max-width:none;padding:0}
+  .actions{display:none}
+  section{break-inside:avoid-page}
+  a{color:var(--ink)}
+}
 </style>
 </head>
 <body>
 
-<nav class="nav" aria-label="Índice"><div class="nav__in">
-  <a href="#costo">El costo</a><a href="#ahorrar">Paso 0</a><a href="#horizonte">Paso 1</a><a href="#activos">Paso 2</a><a href="#diversificar">Paso 3</a><a href="#acciones">Acciones</a><a href="#carteras">Carteras</a><a href="#herramientas">Herramientas</a><a href="#checklist">Checklist</a>
-</div></nav>
+<div class="actions"><button class="btn" onclick="window.print()">Guardar en PDF</button></div>
 
-<div class="wrap">
-<header>
-  <p class="kick">La guía de la charla</p>
-  <h1>Tu primer portafolio, <em class="s">paso a paso.</em></h1>
-  <p class="lead">Todo lo que vimos, para que lo tengas a mano y lo puedas hacer solo.</p>
-  <div class="who"><span>Ignacio Manfredi</span><span>Economía · UNR</span><span>Idóneo en mercado de capitales · CNV</span></div>
-  <p class="note">Nada de esto es una recomendación de inversión. Cada persona tiene objetivos, plazos y tolerancia al riesgo distintos: son herramientas para que decidas vos. Rendimientos pasados no garantizan rendimientos futuros.</p>
+<main class="paper">
+
+<header class="cover">
+  <p class="cover__kick">Guía de la charla</p>
+  <h1>Tu primer portafolio, <em>paso a paso</em></h1>
+  <p class="cover__sub">Todo lo que vimos, ordenado para que lo tengas a mano y lo puedas hacer solo.</p>
+  <dl class="cover__meta">
+    <dt>Autor</dt><dd>Ignacio Manfredi · Economía (UNR) · Idóneo en mercado de capitales (CNV)</dd>
+    <dt>Fecha</dt><dd>26 de octubre de 2026</dd>
+  </dl>
 </header>
 
+<p class="disclaimer"><b>Importante.</b> Nada de este documento es una recomendación de inversión. Cada persona tiene objetivos, plazos y tolerancia al riesgo distintos: son herramientas para que decidas vos. Rendimientos pasados no garantizan rendimientos futuros.</p>
+
+<nav class="toc" aria-label="Índice">
+  <h2>Índice</h2>
+  <ol>
+    <li><a href="#costo">El costo de no invertir</a></li>
+    <li><a href="#ahorrar">Paso 0 · Ahorrar</a></li>
+    <li><a href="#horizonte">Paso 1 · Horizonte y riesgo</a></li>
+    <li><a href="#activos">Paso 2 · Conocer los activos</a></li>
+    <li><a href="#diversificar">Paso 3 · Estrategia: diversificar</a></li>
+    <li><a href="#acciones">Los tipos de acciones</a></li>
+    <li><a href="#carteras">Dos carteras de ejemplo</a></li>
+    <li><a href="#herramientas">Herramientas</a></li>
+    <li><a href="#checklist">Checklist: tu primer portafolio</a></li>
+  </ol>
+</nav>
+
 <section id="costo">
-  <p class="kick">01 · El costo de no invertir</p>
-  <h2>La plata quieta parece segura. <em class="s">No lo es.</em></h2>
+  <h2>El costo de no invertir</h2>
+  <p>La plata quieta parece segura, pero no lo es. No invertir tiene un costo que se ve, la inflación, y otro que no se ve y es mucho peor: el costo de oportunidad.</p>
   <h3>La inflación, en dólares</h3>
-  <p>Si guardás US$10.000 sin invertir, después de cada plazo compran lo mismo que…</p>
-  <div class="big">
-    <div><strong class="num">US$9.640</strong><span>después de 1 año</span></div>
-    <div><strong class="num">US$7.165</strong><span>después de 10 años</span></div>
-    <div><strong class="num neg">US$4.683</strong><span>después de 30 años: más de la mitad, perdida</span></div>
-  </div>
-  <h3>Algo peor: el costo de oportunidad</h3>
-  <p>No es lo que perdés: es lo que dejaste de ganar. US$10.000 durante 30 años (1996–2025):</p>
-  <div class="scroll"><table class="tbl">
-    <thead><tr><th>Dónde</th><th>Valor final</th><th>Riesgo</th></tr></thead>
+  <div class="tw"><table>
+    <caption>Qué compran hoy US$10.000 guardados sin invertir</caption>
+    <thead><tr><th>Tiempo guardados</th><th class="n">Poder de compra</th><th class="n">Pérdida</th></tr></thead>
+    <tbody>
+      <tr><td>1 año</td><td class="n">US$9.640</td><td class="n neg">−3,6%</td></tr>
+      <tr><td>10 años</td><td class="n">US$7.165</td><td class="n neg">−28,4%</td></tr>
+      <tr><td>30 años</td><td class="n">US$4.683</td><td class="n neg">−53,2%</td></tr>
+    </tbody>
+  </table></div>
+  <p class="src">Fuente: índice de precios al consumidor de EE.UU. (BLS), a septiembre de 2026.</p>
+
+  <h3>El costo de oportunidad: lo que dejaste de ganar</h3>
+  <div class="tw"><table>
+    <caption>US$10.000 durante 30 años (1996–2025)</caption>
+    <thead><tr><th>Dónde</th><th class="n">Valor final</th><th>Riesgo</th></tr></thead>
     <tbody>
       <tr><td>Colchón (en poder de compra de hoy)</td><td class="n">US$4.737</td><td>La inflación</td></tr>
       <tr><td>Letras del Tesoro de EE.UU.</td><td class="n">US$19.973</td><td>Muy bajo</td></tr>
@@ -136,172 +179,186 @@ footer .sig{font-family:var(--serif);font-size:30px}
       <tr><td>S&amp;P 500</td><td class="n">US$187.103</td><td>Alto en el corto plazo</td></tr>
     </tbody>
   </table></div>
+  <p class="src">Fuente: Damodaran (NYU Stern), rendimientos históricos con dividendos.</p>
+
   <h3>Lo que más importa: el tiempo</h3>
-  <p>Para llegar a US$1.000.000 a los 65 en el S&amp;P 500 (10% anual, el promedio histórico), cuánto hay que poner por mes según cuándo empezás:</p>
-  <div class="scroll"><table class="tbl">
-    <thead><tr><th>Empezás a los</th><th>Por mes</th><th>De tu bolsillo</th><th>Lo pone el interés compuesto</th></tr></thead>
+  <div class="tw"><table>
+    <caption>Para llegar a US$1.000.000 a los 65 en el S&amp;P 500 (10% anual, promedio histórico)</caption>
+    <thead><tr><th>Empezás a los</th><th class="n">Por mes</th><th class="n">De tu bolsillo</th><th class="n">Interés compuesto</th></tr></thead>
     <tbody>
-      <tr><td>60</td><td class="n">US$13.061</td><td class="n">US$783.686</td><td class="n">US$216.314</td></tr>
-      <tr><td>50</td><td class="n">US$2.510</td><td class="n">US$451.757</td><td class="n">US$548.243</td></tr>
-      <tr><td>40</td><td class="n">US$811</td><td class="n">US$243.245</td><td class="n">US$756.755</td></tr>
-      <tr><td>30</td><td class="n">US$294</td><td class="n">US$123.573</td><td class="n">US$876.427</td></tr>
-      <tr><td>20</td><td class="n">US$111</td><td class="n">US$59.897</td><td class="n">US$940.103</td></tr>
+      <tr><td>60 años</td><td class="n">US$13.061</td><td class="n">US$783.686</td><td class="n">US$216.314</td></tr>
+      <tr><td>50 años</td><td class="n">US$2.510</td><td class="n">US$451.757</td><td class="n">US$548.243</td></tr>
+      <tr><td>40 años</td><td class="n">US$811</td><td class="n">US$243.245</td><td class="n">US$756.755</td></tr>
+      <tr><td>30 años</td><td class="n">US$294</td><td class="n">US$123.573</td><td class="n">US$876.427</td></tr>
+      <tr><td>20 años</td><td class="n">US$111</td><td class="n">US$59.897</td><td class="n">US$940.103</td></tr>
     </tbody>
   </table></div>
-  <p>El que más tarde empieza, más necesita saber.</p>
+  <p>Las ganancias generan nuevas ganancias, y el combustible es el tiempo. <b>El que más tarde empieza, más necesita saber.</b></p>
 </section>
 
 <section id="ahorrar">
-  <p class="kick">Paso 0 · Antes que cualquier cosa</p>
-  <h2>Ahorrar. <em class="s">Pagate primero.</em></h2>
-  <ul class="list">
-    <li>Lo que hace casi todo el mundo: cobrás → gastás → ahorrás lo que sobra (casi nunca sobra).</li>
-    <li>Lo que funciona: cobrás → <b>separás un porcentaje fijo el mismo día</b> → gastás el resto.</li>
-    <li>Si lo podés automatizar, mejor: lo que no ves, no lo gastás. El ahorro es el combustible del interés compuesto.</li>
-  </ul>
+  <h2>Paso 0 · Ahorrar</h2>
+  <p>Antes que cualquier cosa, ahorrar. No hay activo ni estrategia que funcione si no hay plata para invertir.</p>
+  <div class="callout"><b>Pagate primero.</b> Lo que hace casi todo el mundo: cobrás, gastás y ahorrás lo que sobra (que casi nunca sobra). Lo que funciona: el día que cobrás, separás un porcentaje fijo, y vivís con el resto. Si lo podés automatizar, mejor.</div>
 </section>
 
 <section id="horizonte">
-  <p class="kick">Paso 1 · Horizonte y riesgo</p>
-  <h2>Definí tu objetivo con tres preguntas.</h2>
-  <ul class="list">
-    <li><b>¿Cuántos años tengo hasta usar esta plata?</b> Eso es tu horizonte.</li>
-    <li><b>¿Para qué la voy a usar?</b> Tu objetivo.</li>
-    <li><b>¿Cuánto estoy dispuesto a perder en el camino sin vender?</b> Tu tolerancia al riesgo.</li>
-  </ul>
-  <h3>El riesgo baja con el tiempo</h3>
-  <p>S&amp;P 500, 1928–2025: en cuántos de todos los períodos posibles perdiste plata según cuánto tiempo te quedaste.</p>
-  <div class="big">
-    <div><strong class="num neg">26,5%</strong><span>a 1 año</span></div>
-    <div><strong class="num">11,7%</strong><span>a 5 años</span></div>
-    <div><strong class="num">5,6%</strong><span>a 10 años</span></div>
-    <div><strong class="num pos">Nunca</strong><span>a 20 años</span></div>
-  </div>
-  <p>Todo esto se mide con el <b>test del inversor</b>. En Argentina, tu broker te lo tiene que hacer antes de que inviertas. También lo podés hacer gratis en la sección University de <a href="https://manfredinvestment.com/#university">manfredinvestment.com</a>.</p>
+  <h2>Paso 1 · Horizonte y riesgo</h2>
+  <p>Para definir tu objetivo, respondé tres preguntas:</p>
+  <ol>
+    <li><b>¿Cuántos años tengo hasta usar esta plata?</b> Es tu <i>horizonte</i>: el tiempo que falta hasta que la vas a necesitar.</li>
+    <li><b>¿Para qué la voy a usar?</b> Es tu <i>objetivo</i>.</li>
+    <li><b>¿Cuánto estoy dispuesto a perder en el camino sin vender?</b> Es tu <i>tolerancia al riesgo</i>.</li>
+  </ol>
+  <div class="tw"><table>
+    <caption>El riesgo baja con el tiempo: S&amp;P 500, 1928–2025</caption>
+    <thead><tr><th>Si lo mantenías</th><th class="n">Perdiste plata en</th></tr></thead>
+    <tbody>
+      <tr><td>1 año</td><td class="n">26,5% de los casos</td></tr>
+      <tr><td>5 años</td><td class="n">11,7% de los casos</td></tr>
+      <tr><td>10 años</td><td class="n">5,6% de los casos</td></tr>
+      <tr><td>20 años</td><td class="n pos">Nunca</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout"><b>El test del inversor.</b> Todo esto se mide con un cuestionario de perfil. En Argentina, tu broker te lo tiene que hacer antes de que inviertas. También lo podés hacer gratis en la sección University de <a href="https://manfredinvestment.com/#university">manfredinvestment.com</a>.</div>
 </section>
 
 <section id="activos">
-  <p class="kick">Paso 2 · Conocer los activos</p>
-  <h2>Dos grandes familias.</h2>
-  <ul class="list">
+  <h2>Paso 2 · Conocer los activos</h2>
+  <ul>
     <li><b>Renta fija:</b> le prestás tu plata a alguien. Sabés de antemano cuánto te van a pagar… si te pagan.</li>
     <li><b>Renta variable:</b> comprás un pedacito de una empresa. Nadie te promete nada: ganás si a la empresa le va bien.</li>
   </ul>
   <h3>El menú de la renta fija</h3>
-  <div class="scroll"><table class="tbl">
+  <div class="tw"><table>
     <thead><tr><th>Instrumento</th><th>A quién le prestás</th><th>Moneda</th><th>Plazo</th></tr></thead>
     <tbody>
       <tr><td>Plazo fijo</td><td>A un banco</td><td>Pesos</td><td>Desde 30 días</td></tr>
       <tr><td>Caución</td><td>A otro inversor, con garantía</td><td>Pesos o dólares</td><td>1 a 30 días</td></tr>
-      <tr><td>Fondo money market</td><td>A bancos, a través de un fondo</td><td>Pesos o dólares</td><td>Lo sacás en el día</td></tr>
+      <tr><td>Fondo money market</td><td>A bancos, a través de un fondo</td><td>Pesos o dólares</td><td>En el día</td></tr>
       <tr><td>Letras del Tesoro</td><td>Al Estado argentino</td><td>Pesos</td><td>Meses</td></tr>
       <tr><td>Bonos soberanos</td><td>Al Estado argentino</td><td>Dólares</td><td>Años</td></tr>
       <tr><td>Obligaciones negociables</td><td>A una empresa</td><td>Dólares, la mayoría</td><td>Años</td></tr>
     </tbody>
   </table></div>
-  <p><b>Renta fija no es riesgo cero.</b> Riesgo de crédito (que no te paguen), de tasa (si suben las tasas, tu bono vale menos) y de inflación (si la inflación le gana a la tasa, perdés).</p>
+  <p><b>Renta fija no es riesgo cero:</b> riesgo de crédito (que no te paguen), de tasa (si suben las tasas, tu bono vale menos) y de inflación (si la inflación le gana a la tasa, perdés).</p>
   <h3>La renta variable</h3>
-  <ul class="list">
+  <ul>
     <li><b>Acciones:</b> un pedacito de una empresa.</li>
     <li><b>CEDEARs:</b> acciones de empresas de afuera que comprás en pesos en la bolsa argentina. Siguen al dólar contado con liquidación.</li>
-    <li><b>ETFs:</b> una canasta de acciones en un solo papel (con el SPY tenés las 500 empresas del S&amp;P 500).</li>
-    <li><b>Fondos comunes:</b> un equipo profesional elige por vos, a cambio de una comisión.</li>
+    <li><b>ETFs:</b> una canasta de acciones en un solo papel. Con el SPY tenés las 500 empresas del S&amp;P 500.</li>
+    <li><b>Fondos comunes de inversión:</b> un equipo profesional elige por vos, a cambio de una comisión.</li>
   </ul>
-  <h3>Más rendimiento, más saltos (EE.UU., 1928–2025)</h3>
-  <div class="scroll"><table class="tbl">
-    <thead><tr><th>Activo</th><th>Mejor año</th><th>Promedio</th><th>Peor año</th></tr></thead>
+  <div class="tw"><table>
+    <caption>Más rendimiento, más saltos: EE.UU., 1928–2025</caption>
+    <thead><tr><th>Activo</th><th class="n">Mejor año</th><th class="n">Promedio</th><th class="n">Peor año</th></tr></thead>
     <tbody>
       <tr><td>Letras del Tesoro</td><td class="n">+14,0%</td><td class="n">3,4%</td><td class="n">0%</td></tr>
-      <tr><td>Bono del Tesoro a 10 años</td><td class="n">+32,8%</td><td class="n">4,5%</td><td class="n">−17,8%</td></tr>
-      <tr><td>Bonos de empresas (Baa)</td><td class="n">+29,1%</td><td class="n">6,6%</td><td class="n">−15,7%</td></tr>
-      <tr><td>S&amp;P 500</td><td class="n">+52,6%</td><td class="n">10,0%</td><td class="n">−43,8%</td></tr>
+      <tr><td>Bono del Tesoro a 10 años</td><td class="n">+32,8%</td><td class="n">4,5%</td><td class="n neg">−17,8%</td></tr>
+      <tr><td>Bonos de empresas (Baa)</td><td class="n">+29,1%</td><td class="n">6,6%</td><td class="n neg">−15,7%</td></tr>
+      <tr><td>S&amp;P 500</td><td class="n">+52,6%</td><td class="n">10,0%</td><td class="n neg">−43,8%</td></tr>
     </tbody>
   </table></div>
 </section>
 
 <section id="diversificar">
-  <p class="kick">Paso 3 · Estrategia</p>
-  <h2>Diversificar no es tener muchos activos. <em class="s">Es tener activos que no se mueven igual.</em></h2>
-  <ul class="list">
-    <li><b>Por tipo de activo:</b> renta fija y renta variable. La más conocida, pero no la única.</li>
+  <h2>Paso 3 · Estrategia: diversificar</h2>
+  <p><b>Diversificar no es tener muchos activos: es tener activos que no se mueven igual.</b> Hay tres formas:</p>
+  <ol>
+    <li><b>Por tipo de activo:</b> renta fija y renta variable.</li>
     <li><b>Por sector:</b> ningún sector gana siempre. En 2022, con el S&amp;P 500 en −18%, tecnología cayó −28% y energía subió +64%.</li>
     <li><b>Por región:</b> tampoco ningún país. En 2022, EE.UU. −18%, Japón −18%, Europa −16% y el Merval en dólares +46%.</li>
-  </ul>
-  <h3>El ratio para verlo: la correlación</h3>
-  <p>Va de −1 a +1. <b>+1</b>: se mueven igual (tener los dos es como tener uno). <b>0</b>: no tienen nada que ver. <b>−1</b>: cuando uno sube, el otro baja. Para diversificar, buscás correlaciones bajas. Ejemplos (2016–2026): EE.UU. y Europa 0,81; Argentina y Japón 0,28; tecnología y energía 0,26; industria y materiales 0,86. En Excel: <span class="num">=CORREL()</span> sobre los rendimientos mensuales.</p>
+  </ol>
+  <div class="callout"><b>El ratio para verlo: la correlación.</b> Va de −1 a +1. Con <b>+1</b> se mueven igual (tener los dos es como tener uno); con <b>0</b> no tienen nada que ver; con <b>−1</b>, cuando uno sube el otro baja. Para diversificar, buscá correlaciones bajas. En Excel se calcula con <span class="mono">=CORREL()</span> sobre los rendimientos mensuales.</div>
+  <div class="tw"><table>
+    <caption>Algunas correlaciones reales (mensuales, 2016–2026)</caption>
+    <thead><tr><th>Par</th><th class="n">Correlación</th><th>Lectura</th></tr></thead>
+    <tbody>
+      <tr><td>Industria y materiales</td><td class="n">0,86</td><td>Casi lo mismo</td></tr>
+      <tr><td>EE.UU. y Europa</td><td class="n">0,81</td><td>Diversifica poco</td></tr>
+      <tr><td>Argentina y Japón</td><td class="n">0,28</td><td>Se complementan</td></tr>
+      <tr><td>Tecnología y energía</td><td class="n">0,26</td><td>Se complementan</td></tr>
+    </tbody>
+  </table></div>
 </section>
 
 <section id="acciones">
-  <p class="kick">Una cosa más</p>
-  <h2>Cuatro preguntas para conocer una acción.</h2>
-  <ul class="list">
-    <li><b>Estilo:</b> ¿crece rápido o está barata? <em class="s">Growth</em> (pagás caro hoy por lo que puede ganar mañana), <em class="s">blend</em> (precio razonable por un crecimiento razonable) o <em class="s">value</em> (pagás barato por lo que ya gana hoy).</li>
-    <li><b>Tamaño:</b> grande (más de US$10.000 millones), mediana (2.000 a 10.000) o chica (menos de 2.000). Más chica, más riesgo y más potencial.</li>
-    <li><b>Dividendos:</b> ¿te paga mientras la tenés? Las que pagan buenos dividendos suelen ser value, pero no siempre.</li>
-    <li><b>Ciclo:</b> ¿depende de cómo ande la economía? Las cíclicas caen más en las crisis y suben más en las recuperaciones; las defensivas, al revés.</li>
-  </ul>
+  <h2>Los tipos de acciones</h2>
+  <p>Cuatro preguntas para conocer una acción. Son independientes: cada acción tiene una respuesta para cada una.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Pregunta</th><th>Respuestas</th><th>En una frase</th></tr></thead>
+    <tbody>
+      <tr><td><b>Estilo:</b> ¿crece rápido o está barata?</td><td>Growth · Blend · Value</td><td>Growth: pagás caro hoy por lo que puede ganar mañana. Value: pagás barato por lo que ya gana hoy.</td></tr>
+      <tr><td><b>Tamaño:</b> ¿qué tan grande es?</td><td>Grande · Mediana · Chica</td><td>Más de US$10.000 millones, de 2.000 a 10.000, menos de 2.000. Más chica, más riesgo.</td></tr>
+      <tr><td><b>Dividendos:</b> ¿te paga mientras la tenés?</td><td>Paga · Paga poco · No paga</td><td>Las que pagan buenos dividendos suelen ser value, pero no siempre.</td></tr>
+      <tr><td><b>Ciclo:</b> ¿depende de la economía?</td><td>Cíclica · Defensiva</td><td>En una crisis las defensivas caen menos; en la recuperación las cíclicas suben más.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="src">Definiciones: FINRA; grilla de estilo y tamaño: Morningstar.</p>
 </section>
 
 <section id="carteras">
-  <p class="kick">Vamos a la práctica</p>
-  <h2>Dos personas, dos carteras.</h2>
-  <div class="cards">
-    <div class="card">
+  <h2>Dos carteras de ejemplo</h2>
+  <div class="two">
+    <div class="box">
       <h4>Hugo, 60 años</h4>
-      <p class="meta">Conservador · mantener su riqueza · horizonte corto</p>
-      <div class="row"><span>Bonos del Tesoro de EE.UU.</span><b>25%</b></div>
-      <div class="row"><span>Obligaciones negociables</span><b>20%</b></div>
-      <div class="row"><span>Caución y money market</span><b>15%</b></div>
-      <div class="row"><span>Sectores defensivos</span><b>20%</b></div>
-      <div class="row"><span>Acciones que pagan dividendos</span><b>10%</b></div>
-      <div class="row"><span>Acciones value</span><b>10%</b></div>
+      <p class="who">Perfil conservador · mantener su riqueza · horizonte corto</p>
+      <table><tbody>
+        <tr><td>Bonos del Tesoro de EE.UU.</td><td class="n">25%</td></tr>
+        <tr><td>Obligaciones negociables</td><td class="n">20%</td></tr>
+        <tr><td>Caución y money market</td><td class="n">15%</td></tr>
+        <tr><td>Sectores defensivos</td><td class="n">20%</td></tr>
+        <tr><td>Acciones con dividendos</td><td class="n">10%</td></tr>
+        <tr><td>Acciones value</td><td class="n">10%</td></tr>
+      </tbody></table>
     </div>
-    <div class="card">
+    <div class="box">
       <h4>Victoria, 25 años</h4>
-      <p class="meta">Agresiva · hacer crecer su plata · horizonte de 40 años</p>
-      <div class="row"><span>Fondo en dólares</span><b>10%</b></div>
-      <div class="row"><span>S&amp;P 500</span><b>40%</b></div>
-      <div class="row"><span>Mercados emergentes</span><b>30%</b></div>
-      <div class="row"><span>Acciones growth</span><b>20%</b></div>
+      <p class="who">Perfil agresivo · hacer crecer su plata · horizonte de 40 años</p>
+      <table><tbody>
+        <tr><td>Fondo en dólares</td><td class="n">10%</td></tr>
+        <tr><td>S&amp;P 500</td><td class="n">40%</td></tr>
+        <tr><td>Mercados emergentes</td><td class="n">30%</td></tr>
+        <tr><td>Acciones growth</td><td class="n">20%</td></tr>
+      </tbody></table>
     </div>
   </div>
-  <p class="note">Carteras de ejemplo con fines educativos. No son una recomendación: hacé tu propio test del inversor.</p>
+  <p class="src">Carteras de ejemplo con fines educativos. No son una recomendación: hacé tu propio test del inversor.</p>
 </section>
 
 <section id="herramientas">
-  <p class="kick">Herramientas</p>
-  <h2>¿Qué querés hacer? Dónde buscarlo.</h2>
-  <div class="tools">
-    <div class="tool"><span class="q">Ver cotizaciones y gráficos</span><a href="https://www.tradingview.com">tradingview.com</a><span class="d">También en <a href="https://finance.yahoo.com">finance.yahoo.com</a>.</span></div>
-    <div class="tool"><span class="q">Ver el mercado de un vistazo</span><a href="https://finviz.com/map.ashx">finviz.com</a><span class="d">El mapa de calor: cada cuadrado es una empresa, agrupadas por sector.</span></div>
-    <div class="tool"><span class="q">Analizar una empresa: ratios y balances</span><a href="https://stockanalysis.com">stockanalysis.com</a><span class="d">O en Yahoo Finance, pestaña Statistics: P/E, dividendo, crecimiento.</span></div>
-    <div class="tool"><span class="q">Saber qué pasa esta semana</span><a href="https://es.investing.com/economic-calendar/">investing.com</a><span class="d">El calendario económico.</span></div>
-    <div class="tool"><span class="q">Argentina: CEDEARs, bonos y dólar</span><a href="https://www.rava.com">rava.com</a><span class="d">Y la fuente oficial, <a href="https://www.byma.com.ar">byma.com.ar</a>.</span></div>
-    <div class="tool"><span class="q">Comparar fondos comunes</span><a href="https://www.cafci.org.ar">cafci.org.ar</a><span class="d">El rendimiento de todos los fondos del país.</span></div>
-    <div class="tool"><span class="q">Chequear que tu broker sea legal</span><a href="https://www.cnv.gov.ar/SitioWeb/RegistrosPublicos/Agentes">cnv.gov.ar</a><span class="d"><b>Si no está registrado en la CNV, no le des un peso.</b></span></div>
-    <div class="tool"><span class="q">Todo en un solo lugar</span><a href="https://manfredinvestment.com">manfredinvestment.com</a><span class="d">Cotizaciones, calendario, noticias, informes, tu cartera contra el S&amp;P 500 y el test del inversor. Es mi proyecto.</span></div>
-  </div>
+  <h2>Herramientas</h2>
+  <ul class="links">
+    <li><span class="what">Ver cotizaciones y gráficos</span><a class="url" href="https://www.tradingview.com">tradingview.com</a><span class="why">El gráfico de cualquier activo. También en <a href="https://finance.yahoo.com">finance.yahoo.com</a>.</span></li>
+    <li><span class="what">Ver el mercado de un vistazo</span><a class="url" href="https://finviz.com/map.ashx">finviz.com</a><span class="why">El mapa de calor: cada cuadrado es una empresa, agrupadas por sector.</span></li>
+    <li><span class="what">Analizar una empresa</span><a class="url" href="https://stockanalysis.com">stockanalysis.com</a><span class="why">Ratios y balances. En Yahoo Finance, pestaña <i>Statistics</i>: P/E, dividendo y crecimiento.</span></li>
+    <li><span class="what">Saber qué pasa esta semana</span><a class="url" href="https://es.investing.com/economic-calendar/">investing.com</a><span class="why">El calendario económico.</span></li>
+    <li><span class="what">Argentina: CEDEARs, bonos y dólar</span><a class="url" href="https://www.rava.com">rava.com</a><span class="why">Cotizaciones locales. La fuente oficial es <a href="https://www.byma.com.ar">byma.com.ar</a>.</span></li>
+    <li><span class="what">Comparar fondos comunes</span><a class="url" href="https://www.cafci.org.ar">cafci.org.ar</a><span class="why">El rendimiento de todos los fondos del país.</span></li>
+    <li><span class="what">Chequear que tu broker sea legal</span><a class="url" href="https://www.cnv.gov.ar/SitioWeb/RegistrosPublicos/Agentes">cnv.gov.ar</a><span class="why"><b>Si no está registrado en la CNV, no le des un peso.</b></span></li>
+    <li><span class="what">Todo en un solo lugar</span><a class="url" href="https://manfredinvestment.com">manfredinvestment.com</a><span class="why">Cotizaciones, calendario, noticias, informes, tu cartera contra el S&amp;P 500 y el test del inversor. Es mi proyecto.</span></li>
+  </ul>
 </section>
 
 <section id="checklist">
-  <p class="kick">Para llevarte</p>
-  <h2>Tu primer portafolio, <em class="s">en siete pasos.</em></h2>
+  <h2>Checklist: tu primer portafolio</h2>
   <ul class="check">
     <li><span><b>Ahorrá primero:</b> separá un porcentaje fijo el día que cobrás.</span></li>
     <li><span><b>Hacé el test del inversor:</b> horizonte, objetivo y cuánto aguantás perder.</span></li>
     <li><span><b>Elegí un broker registrado en la CNV</b> y compará comisiones.</span></li>
     <li><span><b>Lo que vas a usar pronto, en renta fija corta;</b> lo del largo plazo, en renta variable.</span></li>
-    <li><span><b>Diversificá por tipo, sector y región,</b> buscando activos que no se muevan igual.</span></li>
+    <li><span><b>Diversificá por tipo, sector y región,</b> con activos que no se muevan igual.</span></li>
     <li><span><b>Aportá todos los meses</b> y dejá trabajar al interés compuesto.</span></li>
     <li><span><b>No vendas por miedo en una caída:</b> el riesgo baja con el tiempo.</span></li>
   </ul>
 </section>
-</div>
 
-<footer><div class="wrap">
+<footer class="foot">
   <p class="sig">Ignacio Manfredi</p>
   <p>Estudiante de Economía (UNR) · Idóneo en mercado de capitales certificado por la CNV.</p>
-  <p style="margin-top:14px">Fuentes de los datos: BLS (inflación de EE.UU.), Damodaran, NYU Stern (rendimientos históricos 1928–2025) y Yahoo Finance. Información con fines educativos; no constituye una recomendación de inversión ni asesoramiento personalizado.</p>
-</div></footer>
+  <p>Fuentes: BLS (inflación de EE.UU.), Damodaran, NYU Stern (rendimientos 1928–2025), FINRA, Morningstar y Yahoo Finance. Información con fines educativos; no constituye una recomendación de inversión ni asesoramiento personalizado.</p>
+</footer>
+
+</main>
 </body>
 </html>
