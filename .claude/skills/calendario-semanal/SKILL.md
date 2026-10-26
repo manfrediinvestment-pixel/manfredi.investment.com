@@ -90,6 +90,11 @@ El usuario lo pidió explícitamente: **"verificando en todo momento lo que hac�
   comisión, exposición de funcionarios, votación). Verificala en más de una fuente
   periodística y, si existe, en el sitio del Congreso. Sin fecha en la semana, no se
   inventa: se menciona en la entrega.
+- **Agenda oficial de comisiones de Diputados:** `https://www.hcdn.gob.ar/comisiones/agenda/`
+  se lee con `curl` (texto crudo, día por día, con hora y sala). Es la fuente primaria de
+  la fecha y hora de cada reunión; que una reunión sea "para firmar dictamen" sale de la
+  prensa y se escribe como intención ("el oficialismo busca…"). Ahí también aparecen otros
+  proyectos que mueven mercado (el 28/10/2026, la reforma de la Carta Orgánica del BCRA).
 - Fuente oficial: `https://www.mecon.gob.ar/onp/presupuestos/<año>` (mensaje, articulado y
   anexos) y el PDF `https://www.argentina.gob.ar/sites/default/files/proyecto_de_ley_de_presupuesto_<año>.pdf`.
   Si citás cifras (PIB, inflación, dólar), sacalas **del PDF**, no de la prensa.
@@ -120,6 +125,9 @@ calendario, que **no cambia los filtros guardados** de la cuenta del usuario.
    la pantalla. En ese caso **anotá los filtros originales antes de tocar nada** (al
    20-sep-2026: *Countries (3)* = EU, GB, US; *Importance* = High) y **restauralos al
    terminar**: es la cuenta del usuario.
+6. **Sin Chrome** (sesión sin la extensión): el mismo `POST` por `curl` da **403**. No lo
+   fuerces con headers falsos. Armá la semana desde las fuentes primarias del 4b, dejá
+   vacía la columna Consenso y avisalo en la entrega (pasó el 26-oct-2026).
 
 ### 4b. Cruzar cada evento contra el organismo
 
@@ -131,7 +139,10 @@ calendario, que **no cambia los filtros guardados** de la cuenta del usuario.
 | Sentimiento del consumidor | U. Michigan `https://www.sca.isr.umich.edu/` | Dice "Next data release: …" y el preliminar |
 | PMI flash | S&P Global `https://www.pmi.spglobal.com/Public/Release/ReleaseDates` | Horas en **UTC** (13:45 UTC = 10:45 ART) |
 | CPI, empleo, PPI, JOLTS | BLS | `curl` da **403**: abrir en Chrome |
-| Reclamos por desempleo | DOL | `curl` da 403: buscar la nota del jueves / Chrome |
+| Reclamos por desempleo | DOL | `curl` da 403: Chrome, o la serie del DOL en FRED: `fred.stlouisfed.org/graph/fredgraph.csv?id=ICSA` (iniciales) e `id=CCSA` (continuas) |
+| Confianza del consumidor | Conference Board: la nota del mes (`conference-board.org/topics/consumer-confidence/press/cci-<mes>-2026`) | `curl`. Al pie dice "The next release is …" |
+| Balanza de bienes adelantada | Census `census.gov/econ/indicators/advance_report.pdf` | PDF con PyMuPDF (`import pymupdf`) |
+| PCE (previo) | BEA `bea.gov/news/2026/personal-income-and-outlays-<mes>-2026` | `curl`; la tabla trae PCE y núcleo mes a mes |
 | FOMC, discursos | `https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm` | `curl` |
 
 - **Conversión horaria:** ART = UTC−3. ET = UTC−4 en verano (hasta el primer domingo de
@@ -179,6 +190,10 @@ sean centrales, y **solo dos tipos: `ar` y `us`**):
   semana después de publicado, `"dato": "56.1"`. Si faltan, la página los saca de la
   descripción ("a las 11:00 ART", "Previo 55.4", "consenso de Investing.com: 55.7") o usa
   la hora habitual (INDEC 16:00), así que ponelos siempre que estén verificados.
+  **Ojo:** la hora sale de "a las HH:MM **ART**". Sin el "ART" (p. ej. una reunión de
+  comisión "a las 14:00") el evento queda sin hora y como "pendiente". El previo se corta
+  en el primer número: para la tasa de la Fed escribí "Previo 4.00%" (el techo) y el
+  rango después, no "Previo 3.75%-4.00%".
 - **Los títulos deben contener las palabras que matchean `CAL_SOURCES`** (INDEC, BCRA,
   "Fed", "Michigan", "S&P Global", "Ventas Minoristas", …). El paso 6 lo comprueba.
 - Máximo razonable: ~5 eventos por día. Priorizá lo que mueve mercados.
@@ -227,9 +242,16 @@ Sirve el sitio real y, en `/preview.html`, reemplaza las respuestas del worker
 (`/calendario`, `/earnings`, `/dividends`) por los JSON de la semana, sin tocar ningún
 archivo. Abrí `http://localhost:8899/preview.html#calendario` en Chrome y comprobá con
 `javascript_tool`, pestaña por pestaña (`await calSetView('economico'|'earnings'|'dividendos')`):
-la semana en `#calSemanaLabel`, la cantidad de eventos y de `<a>` en `#calWeekGrid`, el chip
-de fuente en el económico y que earnings/dividendos linkeen a `informes/<ticker>.html`.
-Sacá una captura (`save_to_disk`) y **apagá el server** al terminar.
+la semana en `#calSemanaLabel`, las filas y los `<a>` de `#calTabla` (desde oct-2026 es
+**una sola tabla** con económico + earnings + dividendos; ya no existe `#calWeekGrid`), la
+columna Hora y Previo de cada fila, y que earnings/dividendos linkeen a
+`informes/<ticker>.html` (también en el lateral `#calEmpresas`).
+Sacá una captura (`save_to_disk`) y **apagá el server** al terminar. El server lee los JSON
+al arrancar: si los cambiás, reinicialo y recargá con `?v=`.
+
+**Sin Chrome:** Playwright de Python está instalado. Un script con `chromium.launch()` que
+abra `http://localhost:8899/preview.html?v=1#calendario`, espere ~4 s, vuelque
+`#calTabla tr` como texto y saque `screenshot` de `#calendario` hace la misma comprobación.
 
 ## Paso 8 — Earnings de la semana
 
@@ -324,6 +346,17 @@ Procedimiento completo, con las trampas del panel, en `references/worker.md` →
 5. Al final, `validar_semana.js` sobre **lo que devuelven los tres endpoints en vivo**, y
    una pasada por manfredinvestment.com (`#calendario`, las tres pestañas).
 
+**Método usado desde el 12-oct-2026 (más simple, sin panel):** wrangler desde la carpeta
+de los JSON, una clave por vez:
+
+```
+npx --yes wrangler kv key put eventos_semana --namespace-id=6d2171ac1fe748f5b30847dd21ffd455 --remote --path semana_<d>_<d>_calendario.json
+```
+
+(lo mismo con `earnings_semana` y `dividendos_semana`). El primer intento a veces da
+"Authentication error [code: 10000]" pasajero: reintentá y comprobá que entraron las tres.
+Después, mismo paso 4 y 5 de arriba (`curl` con `?nc=<random>` hasta que sean idénticos).
+
 **Nunca** uses rutas `/…/refresh` (ya no existen) ni despliegues código para cargar una
 semana: el código no se toca.
 
@@ -367,7 +400,14 @@ semana: el código no se toca.
 - Dar por buena una URL de Census sin mirar el `<title>`: `construction/c30/index.html`
   era "Page not found"; la buena es `construction/c30/c30index.html`.
 - Creer que el endpoint de dividendos de Nasdaq cubre todo: para JPM, V, JNJ… (NYSE)
-  devuelve "N/A" aunque paguen dividendo.
+  devuelve "N/A" aunque paguen dividendo. El 26-oct-2026 MS tenía ex-dividendo en la
+  semana y Nasdaq no lo mostraba: salió del 8-K.
+- Buscar "payable … record" en un 8-K con una regex `[^.]{0,250}`: el punto decimal del
+  monto ("$0.15") corta la frase y no encuentra nada. Usá `(?:[^.]|\.(?=\d))`.
+- Que "deuda externa" del BCRA (Informe sobre Deuda Externa Privada) caiga en la regla de
+  balanza de pagos del INDEC: ahora hay una regla propia antes.
+- Dar por buena una fecha ex-dividendo de Nasdaq que la empresa no publica (ASML, 26-oct):
+  sin fuente primaria, afuera.
 - Confiar en que el cron del worker actualizaba earnings/dividendos: estuvo roto semanas
   (llamaba a una función inexistente) y nadie lo notó. Ahora todo es manual y lo carga esta skill.
 - Tipear dentro del editor de código del panel de Cloudflare: los clics y atajos terminan

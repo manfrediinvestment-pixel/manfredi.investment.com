@@ -64,6 +64,9 @@ farmacéutica. Si el usuario o el sitio dan una URL mejor, agregá la regla.
 - Informe Monetario Mensual: `https://www.bcra.gob.ar/informe-monetario-mensual/` (200, `<title>` "Informe monetario mensual | BCRA", 04-oct-2026)
 - Boletín Estadístico: `https://www.bcra.gob.ar/boletin-estadistico/` (12-oct-2026, 200 + `<title>`)
 - Informe sobre Bancos: `https://www.bcra.gob.ar/informe-sobre-bancos/` (12-oct-2026, 200 + `<title>`)
+- Informe sobre Deuda Externa Privada: `https://www.bcra.gob.ar/informe-sobre-deuda-externa-privada/`
+  (26-oct-2026, 200 + `<title>`; `/informe-de-deuda-externa-privada/` da 404)
+- Informe de Inclusión Financiera: `https://www.bcra.gob.ar/informe-de-inclusion-financiera/` (26-oct-2026, 200 + `<title>`)
 - Otros: caen a
   `https://www.bcra.gob.ar/PublicacionesEstadisticas/Principales_variables.asp` (página general).
 
@@ -72,6 +75,11 @@ farmacéutica. Si el usuario o el sitio dan una URL mejor, agregá la regla.
 - Portal del año: `https://www.mecon.gob.ar/onp/presupuestos/2027`
 - PDF completo: `https://www.argentina.gob.ar/sites/default/files/proyecto_de_ley_de_presupuesto_2027.pdf`
   (Mensaje MEN-2026-43-APN-JGM del 15/9/2026; tiene las tablas de supuestos macro).
+
+### Congreso (Diputados)
+
+- Agenda de comisiones: `https://www.hcdn.gob.ar/comisiones/agenda/` (26-oct-2026, 200,
+  `<title>` "Agenda Parlamentaria"; se lee con `curl`). Regla `carta orgánica` → acá.
 
 ## Estados Unidos
 
