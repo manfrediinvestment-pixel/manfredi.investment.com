@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <!-- Mercados · diseño Terminal: gráfico con TradingView Lightweight Charts (v5) -->
-  <link rel="stylesheet" href="assets/mercados/terminal.css?v=20261023e" />
+  <link rel="stylesheet" href="assets/mercados/terminal.css?v=20261026a" />
 <link rel="stylesheet" href="assets/pulso/pulso.css?v=20261010z" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261010z" />
 <link rel="stylesheet" href="assets/analistas/analistas.css?v=20261015b" />
@@ -11533,6 +11533,7 @@
   // rápido cuanto más se movió el activo. Dólar: MEP, CCL, blue y oficial
   // juntos en un cartel ancho, cada uno con su línea.
   const MKT_SPARKS = {};
+  const MKT_SPARK_DIAS = {}; // fecha (AAAA-MM-DD) de cada punto de las series del dólar
   let mktSparksPedidas = false;
   const MKT_SPARK_SERIES = [
     ['dolares', 'BOLSA'], ['dolares', 'CONTADOCONLIQUI'], ['dolares', 'BLUE'], ['dolares', 'OFICIAL'],
@@ -11545,7 +11546,7 @@
     Promise.all(MKT_SPARK_SERIES.map(([c, sym]) =>
       fetch(base + '/serie?category=' + c + '&symbol=' + sym + '&tf=1M', { signal: AbortSignal.timeout(12000) })
         .then(r => r.ok ? r.json() : null)
-        .then(j => { if (j && j.points && j.points.length > 1) MKT_SPARKS[c + ':' + sym] = j.points.map(p => p.c); })
+        .then(j => { if (j && j.points && j.points.length > 1) { MKT_SPARKS[c + ':' + sym] = j.points.map(p => p.c); MKT_SPARK_DIAS[c + ':' + sym] = j.points.map(p => new Date(p.t * 1000).toISOString().slice(0, 10)); } })
         .catch(() => {})
     )).then(renderHeroCards);
   }
@@ -11586,8 +11587,20 @@
     const pctTxt = c => (c >= 0 ? '+' : '−') + Math.abs(c).toFixed(2).replace('.', ',') + '%';
     const pill = (c, txt) => c == null ? '' : `<span class="mt-c-pill ${c >= 0 ? 'up' : 'dn'}">${txt || pctTxt(c)}</span>`;
     const card = (cls, label, value, c, spark, txt) => `<div class="mt-card ${cls}"><div class="mt-c-top"><span>${label}</span>${pill(c, txt)}</div><b>${value}</b>${spark}</div>`;
+    // Variación del dólar: precio de ahora (dolarapi) contra el último cierre anterior a hoy.
+    // El histórico de ArgentinaDatos repite el último valor los fines de semana y en el día
+    // de hoy, así que comparar sus dos últimos puntos daba siempre 0%.
+    const hoyAR = new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10);
+    const dolarSerie = sym => {
+      const arr = MKT_SPARKS['dolares:' + sym], dias = MKT_SPARK_DIAS['dolares:' + sym];
+      const vivo = dol[sym] && dol[sym].price;
+      if (!arr || !dias) return { arr: arr, c: null };
+      const prev = arr.filter((v, i) => dias[i] < hoyAR);
+      if (!prev.length || vivo == null) return { arr: arr, c: null };
+      return { arr: prev.concat(vivo), c: (vivo / prev[prev.length - 1] - 1) * 100 };
+    };
     const dolar = (sym, label) => {
-      const arr = MKT_SPARKS['dolares:' + sym], c = mktVarSerie(arr);
+      const { arr, c } = dolarSerie(sym);
       return `<div class="mt-dl"><span class="mt-dl-l">${label}</span><b>${ars(dol[sym] && dol[sym].price)}</b><span class="mt-dl-p">${pill(c) || '&nbsp;'}</span>${mktSpark(arr, c)}</div>`;
     };
     const merv = MKT_SPARKS['indices:MERVAL'], spx = MKT_SPARKS['indices:SP500'], rp = MKT_SPARKS['riesgo:RP'];
