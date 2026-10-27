@@ -4382,64 +4382,76 @@
   </section>
 
   <!-- ââ UNIVERSITY âââââââââââââââââââââââââââââââââââââââââââââââââ -->
-  <section class="section section-alt" id="university" data-tab="university">
+  <section class="section section-alt uv" id="university" data-tab="university">
     <div class="container">
-      <div class="section-header">
-        <span class="section-label">Educación Financiera</span>
+      <div class="uv-head">
         <h2 class="section-title">Manfredi Investment University</h2>
-        <p class="section-sub">Repositorio gratuito para entender los mercados desde cero hasta nivel avanzado.</p>
+        <span class="uv-head__meta"><b>4</b> cursos <i></i> <b>32</b> lecciones <i></i> gratis, con diploma</span>
       </div>
-      <div class="courses-grid">
-        <div class="course-card" onclick="openQuiz()" style="cursor:pointer;border:2px solid var(--gold);">
-          <div class="course-number" style="background:var(--gold);color:var(--primary);font-family:'DM Serif Display',Georgia,serif;font-size:20px;">?</div>
-          <div class="course-content">
-            <h3 class="course-title">¿Qué tipo de inversor sos?</h3>
-            <p class="course-desc">Descubrí tu perfil de riesgo en 9 preguntas y obtené una estrategia personalizada para el mercado argentino.</p>
-            <div class="course-meta">
-              <span>9 preguntas · 3 min</span>
-              <span class="course-badge free">GRATIS</span>
-            </div>
-            <button type="button" class="course-btn" style="background:var(--gold);color:var(--primary);border-color:var(--gold);">Hacer el quiz →</button>
+
+      <!-- Test de perfil: el resultado queda en localStorage (mi_quiz_profile) y se marca en la escala -->
+      <div class="uv-test">
+        <div class="uv-test__l">
+          <span class="uv-k">Test de perfil</span>
+          <h3 class="uv-test__t">¿Qué tipo de inversor sos?</h3>
+          <div class="uv-test__cta">
+            <button type="button" class="uv-btn" onclick="openQuiz()" data-uv-test-cta>Hacer el test &rarr;</button>
+            <span class="uv-test__m">9 preguntas <i></i> 3 min</span>
           </div>
         </div>
-        <div class="course-card">
-          <div class="course-icon">I</div>
-          <h4>Finanzas Personales Básicas</h4>
-          <p>Presupuesto, ahorro, deudas, fondo de emergencia e inversión inicial.</p>
-          <div class="course-meta"><span>8 lecciones &middot; 3h</span><span class="free-badge">Gratis</span></div>
-          <button type="button" class="course-btn" onclick="openCourse('FP')">Comenzar curso &rarr;</button>
+        <div class="uv-test__r">
+          <div class="uv-esc" id="uvEscala">
+            <div class="uv-esc__seg" data-t="0"><b>Conservador</b></div>
+            <div class="uv-esc__seg" data-t="1"><b>Moderado-<br>conservador</b></div>
+            <div class="uv-esc__seg" data-t="2"><b>Moderado</b></div>
+            <div class="uv-esc__seg" data-t="3"><b>Moderado-<br>agresivo</b></div>
+            <div class="uv-esc__seg" data-t="4"><b>Agresivo</b></div>
+          </div>
+          <div class="uv-esc__pie" id="uvEscalaPie">Tu resultado se marca en la escala</div>
         </div>
-        <div class="course-card">
-          <div class="course-icon">II</div>
-          <h4>Introducción a la Bolsa</h4>
-          <p>Acciones, bonos, ETFs, riesgo y retorno. Todo lo que necesitás para invertir con criterio propio.</p>
-          <div class="course-meta"><span>8 lecciones &middot; 3.5h</span><span class="free-badge">Gratis</span></div>
-          <button type="button" class="course-btn" onclick="openCourse('IB')">Comenzar curso &rarr;</button>
-        </div>
-        <div class="course-card">
-          <div class="course-icon">III</div>
-          <h4>Análisis Fundamental</h4>
-          <p>Valor intrínseco, PER, EV/FCF y flujo de caja. Valuá empresas como un profesional.</p>
-          <div class="course-meta"><span>8 lecciones &middot; 4h</span><span class="free-badge">Gratis</span></div>
-          <button type="button" class="course-btn" onclick="openCourse('AF')">Comenzar curso &rarr;</button>
-        </div>
-        <div class="course-card">
-          <div class="course-icon">IV</div>
-          <h4>El Mercado Argentino</h4>
-          <p>CEDEARs, ONs, tipos de cambio y estrategias para el contexto local.</p>
-          <div class="course-meta"><span>8 lecciones &middot; 4h</span><span class="free-badge">Gratis</span></div>
-          <button type="button" class="course-btn" onclick="openCourse('MA')">Comenzar curso &rarr;</button>
-        </div>
-        <div class="course-card">
-          <div class="course-icon">V</div>
-          <h4>Análisis Técnico</h4>
-          <div class="course-meta"><span>Próximamente</span><span class="free-badge">Gratis</span></div>
-        </div>
-        <div class="course-card">
-          <div class="course-icon">VI</div>
-          <h4>Gestión de Riesgo</h4>
-          <div class="course-meta"><span>Próximamente</span><span class="free-badge">Gratis</span></div>
-        </div>
+      </div>
+
+      <!-- Cursos en el orden recomendado; el progreso sale de los quizzes de cada lección (mi_quiz_progress_<curso>) -->
+      <div class="uv-sub"><span class="uv-k">Cursos</span><span class="uv-sub__r" id="uvTotal"></span></div>
+      <div class="uv-ruta">
+        <article class="uv-c" data-uv="FP" style="--i:0">
+          <span class="uv-c__n">I</span>
+          <h3 class="uv-c__t">Finanzas Personales Básicas</h3>
+          <ul class="uv-c__temas"><li>Presupuesto</li><li>Fondo de emergencia</li><li>Deudas</li><li>Ahorro e inflación</li></ul>
+          <div class="uv-c__meta"><span>8 lecciones</span><span>3 h</span><span class="uv-c__est" data-uv-est>Sin empezar</span></div>
+          <div class="uv-c__bar" aria-hidden="true"><i data-uv-bar></i></div>
+          <button type="button" class="uv-c__btn" onclick="openCourse('FP')"><span data-uv-cta>Empezar</span> &rarr;</button>
+        </article>
+        <article class="uv-c" data-uv="IB" style="--i:1">
+          <span class="uv-c__n">II</span>
+          <h3 class="uv-c__t">Introducción a la Bolsa</h3>
+          <ul class="uv-c__temas"><li>Acciones y bonos</li><li>ETFs e índices</li><li>Riesgo y retorno</li><li>Cómo empezar</li></ul>
+          <div class="uv-c__meta"><span>8 lecciones</span><span>3,5 h</span><span class="uv-c__est" data-uv-est>Sin empezar</span></div>
+          <div class="uv-c__bar" aria-hidden="true"><i data-uv-bar></i></div>
+          <button type="button" class="uv-c__btn" onclick="openCourse('IB')"><span data-uv-cta>Empezar</span> &rarr;</button>
+        </article>
+        <article class="uv-c" data-uv="AF" style="--i:2">
+          <span class="uv-c__n">III</span>
+          <h3 class="uv-c__t">Análisis Fundamental</h3>
+          <ul class="uv-c__temas"><li>Valor intrínseco</li><li>PER y PEG</li><li>EV/FCF</li><li>DCF y WACC</li></ul>
+          <div class="uv-c__meta"><span>8 lecciones</span><span>4 h</span><span class="uv-c__est" data-uv-est>Sin empezar</span></div>
+          <div class="uv-c__bar" aria-hidden="true"><i data-uv-bar></i></div>
+          <button type="button" class="uv-c__btn" onclick="openCourse('AF')"><span data-uv-cta>Empezar</span> &rarr;</button>
+        </article>
+        <article class="uv-c" data-uv="MA" style="--i:3">
+          <span class="uv-c__n">IV</span>
+          <h3 class="uv-c__t">El Mercado Argentino</h3>
+          <ul class="uv-c__temas"><li>Tipos de cambio</li><li>CEDEARs</li><li>Renta fija local</li><li>ONs</li></ul>
+          <div class="uv-c__meta"><span>8 lecciones</span><span>4 h</span><span class="uv-c__est" data-uv-est>Sin empezar</span></div>
+          <div class="uv-c__bar" aria-hidden="true"><i data-uv-bar></i></div>
+          <button type="button" class="uv-c__btn" onclick="openCourse('MA')"><span data-uv-cta>Empezar</span> &rarr;</button>
+        </article>
+      </div>
+
+      <div class="uv-prox">
+        <span class="uv-k">Próximamente</span>
+        <span class="uv-prox__i"><em>V</em>Análisis Técnico</span>
+        <span class="uv-prox__i"><em>VI</em>Gestión de Riesgo</span>
       </div>
     </div>
   </section>
@@ -12794,9 +12806,9 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
     <div class="course-title">Finanzas Personales Básicas</div>
     <div class="course-subtitle">El dinero no se administra solo &mdash; aprendé a tomar el control de tu economía personal desde hoy</div>
     <div class="course-meta">
-      <div class="meta-item">&#128218; 8 lecciones</div>
-      <div class="meta-item">&#128202; Gráficos interactivos</div>
-      <div class="meta-item">&#127462;&#127479; Adaptado al contexto argentino</div>
+      <div class="meta-item">8 lecciones</div>
+      <div class="meta-item">Gráficos interactivos</div>
+      <div class="meta-item">Adaptado al contexto argentino</div>
     </div>
   </div>
 
@@ -12813,7 +12825,7 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
       <button type="button" class="lesson-tab" onclick="GLFP(5)">6. Metas financieras</button>
       <button type="button" class="lesson-tab" onclick="GLFP(6)">7. Primer inversión</button>
       <button type="button" class="lesson-tab" onclick="GLFP(7)">8. Plan de acción</button>
-      <button type="button" class="lesson-tab quiz-final-tab" onclick="GLFP(8)">🎓 Quiz Final</button>
+      <button type="button" class="lesson-tab quiz-final-tab" onclick="GLFP(8)">Quiz final</button>
     </div>
     <button type="button" class="carousel-btn lesson-nav-arrow" id="LNFPNext" aria-label="Lecciones siguientes">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
@@ -12832,9 +12844,9 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
     <div class="course-title">Introducción a la Bolsa</div>
     <div class="course-subtitle">Todo lo que necesitás saber para empezar a invertir con criterio propio</div>
     <div class="course-meta">
-      <div class="meta-item">&#128218; 8 lecciones</div>
-      <div class="meta-item">&#128202; Gráficos interactivos</div>
-      <div class="meta-item">&#127462;&#127479; Contexto argentino incluido</div>
+      <div class="meta-item">8 lecciones</div>
+      <div class="meta-item">Gráficos interactivos</div>
+      <div class="meta-item">Contexto argentino incluido</div>
     </div>
   </div>
 
@@ -12851,7 +12863,7 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
       <button type="button" class="lesson-tab" onclick="GLIB(5)">6. Bolsa argentina</button>
       <button type="button" class="lesson-tab" onclick="GLIB(6)">7. Cómo empezar</button>
       <button type="button" class="lesson-tab" onclick="GLIB(7)">8. Errores comunes</button>
-      <button type="button" class="lesson-tab quiz-final-tab" onclick="GLIB(8)">🎓 Quiz Final</button>
+      <button type="button" class="lesson-tab quiz-final-tab" onclick="GLIB(8)">Quiz final</button>
     </div>
     <button type="button" class="carousel-btn lesson-nav-arrow" id="LNIBNext" aria-label="Lecciones siguientes">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
@@ -12872,9 +12884,9 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
     <div class="course-title">Análisis Fundamental</div>
     <div class="course-subtitle">Cómo analizar empresas y tomar decisiones de inversión inteligentes</div>
     <div class="course-meta">
-      <div class="meta-item">&#128218; 8 lecciones</div>
-      <div class="meta-item">&#128202; Gráficos interactivos</div>
-      <div class="meta-item">&#127919; Nivel principiante a intermedio</div>
+      <div class="meta-item">8 lecciones</div>
+      <div class="meta-item">Gráficos interactivos</div>
+      <div class="meta-item">Nivel principiante a intermedio</div>
     </div>
   </div>
 
@@ -12892,7 +12904,7 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
       <button type="button" class="lesson-tab" onclick="GLAF(5)">6. Deuda financiera</button>
       <button type="button" class="lesson-tab" onclick="GLAF(6)">7. DCF y WACC</button>
       <button type="button" class="lesson-tab" onclick="GLAF(7)">8. Elegir una empresa</button>
-      <button type="button" class="lesson-tab quiz-final-tab" onclick="GLAF(8)">🎓 Quiz Final</button>
+      <button type="button" class="lesson-tab quiz-final-tab" onclick="GLAF(8)">Quiz final</button>
     </div>
     <button type="button" class="carousel-btn lesson-nav-arrow" id="LNAFNext" aria-label="Lecciones siguientes">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
@@ -12913,9 +12925,9 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
     <div class="course-title">El Mercado Argentino</div>
     <div class="course-subtitle">CEDEARs, bonos, tipos de cambio y cómo invertir inteligentemente en el contexto local</div>
     <div class="course-meta">
-      <div class="meta-item">&#128218; 8 lecciones</div>
-      <div class="meta-item">&#128202; Diagramas conceptuales</div>
-      <div class="meta-item">&#127462;&#127479; 100% contexto argentino</div>
+      <div class="meta-item">8 lecciones</div>
+      <div class="meta-item">Diagramas conceptuales</div>
+      <div class="meta-item">100% contexto argentino</div>
     </div>
   </div>
 
@@ -12932,7 +12944,7 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
       <button type="button" class="lesson-tab" onclick="GLMA(5)">6. Obligaciones Negociables</button>
       <button type="button" class="lesson-tab" onclick="GLMA(6)">7. Brokers y operatoria</button>
       <button type="button" class="lesson-tab" onclick="GLMA(7)">8. Estrategias para el inversor AR</button>
-      <button type="button" class="lesson-tab quiz-final-tab" onclick="GLMA(8)">🎓 Quiz Final</button>
+      <button type="button" class="lesson-tab quiz-final-tab" onclick="GLMA(8)">Quiz final</button>
     </div>
     <button type="button" class="carousel-btn lesson-nav-arrow" id="LNMANext" aria-label="Lecciones siguientes">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
@@ -18132,6 +18144,8 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
 </style>
   <!-- Fondo Aurora de todo el sitio (al final para ganarle a los estilos de cada sección; el título lo anima assets/aurora/aurora.js, junto al h1) -->
   <link rel="stylesheet" href="assets/aurora/aurora.css?v=20261010z" />
+  <link rel="stylesheet" href="assets/university/university.css?v=20261027a" />
+  <script defer src="assets/university/university.js?v=20261027a"></script>
   
 <style id="mi-auth-aurora">
   /* Login y avisos con el mismo mundo que el resto del sitio (Aurora). */
