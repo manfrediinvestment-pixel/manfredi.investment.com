@@ -22,36 +22,52 @@
 .uv i:empty { display:inline-block; width:3px; height:3px; border-radius:50%; background:rgba(214,226,244,.4); }
 .uv-k { font:600 11.5px/1 var(--uv-mono); letter-spacing:.16em; text-transform:uppercase; color:var(--uv-gold2); }
 
-/* test de perfil */
-.uv-test { position:relative; display:grid; grid-template-columns:minmax(0,5fr) minmax(0,7fr); gap:44px; align-items:center; padding:30px 32px; border-radius:20px; border:1px solid var(--uv-line2); overflow:hidden; isolation:isolate;
-  background:radial-gradient(55% 90% at 100% 0%, rgba(242,201,76,.10), transparent 70%), var(--uv-panel);
-  box-shadow:0 40px 80px -40px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.07); }
-.uv-test__t { font:400 34px/1.08 var(--uv-serif); letter-spacing:-.015em; color:var(--uv-ink); margin:16px 0 0; text-wrap:balance; }
-.uv-test__cta { display:flex; align-items:center; flex-wrap:wrap; gap:12px 18px; margin-top:24px; }
-.uv-test__m { display:inline-flex; align-items:center; gap:8px; font:500 13px var(--uv-mono); color:var(--uv-ink); }
-.uv-btn { white-space:nowrap; display:inline-flex; align-items:center; gap:8px; font:600 14px var(--uv-sans); border:0; border-radius:10px; padding:13px 20px; background:var(--uv-gold); color:#0a1322; cursor:pointer; transition:transform .12s var(--uv-ease), background-color .15s ease; }
+/* test de perfil: la carátula grande de la pestaña, con un medidor de riesgo */
+.uv-test { position:relative; display:grid; grid-template-columns:minmax(0,6fr) minmax(0,5fr); gap:48px; align-items:center; min-height:420px; padding:56px 60px; margin-bottom:72px; border-radius:28px; overflow:hidden; isolation:isolate;
+  background:
+    radial-gradient(60% 80% at 0% 100%, rgba(242,201,76,.22), transparent 65%),
+    radial-gradient(55% 75% at 100% 0%, rgba(91,141,239,.34), transparent 70%),
+    radial-gradient(40% 60% at 85% 100%, rgba(86,199,147,.16), transparent 70%),
+    linear-gradient(135deg, #14294d 0%, #0d1c38 50%, #0a1630 100%);
+  box-shadow:0 50px 100px -40px rgba(0,0,0,.95), 0 0 0 1px rgba(242,201,76,.28), inset 0 1px 0 rgba(255,255,255,.12); }
+.uv-test::before { content:''; position:absolute; inset:0; z-index:-1; opacity:.07; mix-blend-mode:overlay; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+.uv-test__k { display:inline-flex; align-items:center; gap:10px; font:600 12px/1 var(--uv-mono); letter-spacing:.16em; text-transform:uppercase; color:#0a1322; background:var(--uv-gold); border-radius:999px; padding:8px 14px; }
+.uv-test__dot { width:7px; height:7px; border-radius:50%; background:#0a1322; animation:uv-late 1.8s ease-in-out infinite; }
+@keyframes uv-late { 50% { opacity:.3; } }
+.uv-test__t { font:400 clamp(40px,4.6vw,62px)/1.02 var(--uv-serif); letter-spacing:-.022em; color:#fff; margin:22px 0 0; text-wrap:balance; }
+.uv-test__t em { font-style:italic; color:var(--uv-gold2); }
+.uv-test__ejes { list-style:none; display:flex; flex-wrap:wrap; gap:8px; padding:0; margin:24px 0 0; }
+.uv-test__ejes li { display:inline-flex; align-items:center; gap:8px; font:500 14px var(--uv-sans); color:var(--uv-ink); background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:999px; padding:8px 14px 8px 10px; }
+.uv-test__ejes li span { font-size:16px; line-height:1; }
+.uv-test__cta { display:flex; align-items:center; flex-wrap:wrap; gap:14px 20px; margin-top:32px; }
+.uv-test__m { display:inline-flex; align-items:center; gap:8px; font:500 13.5px var(--uv-mono); color:var(--uv-ink); }
+.uv-btn { white-space:nowrap; display:inline-flex; align-items:center; gap:8px; font:600 14px var(--uv-sans); border:0; border-radius:10px; padding:13px 20px; background:var(--uv-gold); color:#0a1322; cursor:pointer; transition:transform .12s var(--uv-ease), background-color .15s ease, box-shadow .2s ease; }
 .uv-btn:hover { background:var(--uv-gold2); }
 .uv-btn:active { transform:scale(.97); }
+.uv-btn--xl { font-size:16px; padding:17px 28px; border-radius:12px; box-shadow:0 14px 34px -10px rgba(242,201,76,.55); }
+.uv-btn--xl:hover { box-shadow:0 18px 40px -10px rgba(242,201,76,.7); }
 
-/* escala de 5 perfiles */
-.uv-esc { display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:6px; }
-.uv-esc__seg { position:relative; padding-top:16px; }
-.uv-esc__seg::before { content:''; position:absolute; left:0; right:0; top:0; height:6px; border-radius:3px; background:rgba(214,226,244,.12); transition:background-color .3s ease, box-shadow .3s ease; }
-.uv-esc__seg:nth-child(1)::before { background:rgba(127,176,255,.22); }
-.uv-esc__seg:nth-child(2)::before { background:rgba(127,176,255,.32); }
-.uv-esc__seg:nth-child(3)::before { background:rgba(242,201,76,.30); }
-.uv-esc__seg:nth-child(4)::before { background:rgba(86,199,147,.30); }
-.uv-esc__seg:nth-child(5)::before { background:rgba(86,199,147,.42); }
-.uv-esc__seg b { display:block; font:500 12.5px/1.3 var(--uv-sans); color:var(--uv-ink); }
-.uv-esc__seg.on::before { background:var(--uv-gold); box-shadow:0 0 14px rgba(242,201,76,.5); }
-.uv-esc__seg.on b { font-weight:700; color:var(--uv-gold2); }
-.uv-esc__seg.on::after { content:'Tu perfil'; position:absolute; top:-28px; left:0; font:700 11px/1 var(--uv-sans); color:#0a1322; background:var(--uv-gold); border-radius:999px; padding:5px 9px; white-space:nowrap; }
-.uv-esc.has { margin-top:28px; }
-.uv-esc__pie { margin-top:18px; padding-top:14px; border-top:1px solid var(--uv-line); font:500 13px var(--uv-sans); color:var(--uv-ink); }
-.uv-esc__pie b { color:var(--uv-gold2); font-weight:600; }
+/* medidor de riesgo: la aguja barre hasta que hay perfil, después apunta al tuyo */
+.uv-medidor { position:relative; max-width:420px; margin:0 auto; }
+.uv-g { display:block; width:100%; height:auto; overflow:visible; }
+.uv-g__ticks line { stroke:rgba(214,226,244,.35); stroke-width:1.5; stroke-linecap:round; }
+.uv-g__s { opacity:.9; transition:opacity .3s ease; }
+.uv-medidor.has .uv-g__s { opacity:.28; }
+.uv-medidor.has .uv-g__s.on { opacity:1; filter:drop-shadow(0 0 14px rgba(242,201,76,.55)); }
+.uv-g__aguja { transform-origin:160px 168px; transform:rotate(var(--rot, -60deg)); transition:transform 1.2s cubic-bezier(.34,1.4,.5,1); fill:#fff; }
+.uv-g__eje { fill:#0a1322; }
+@media (prefers-reduced-motion: no-preference) {
+  .uv-medidor:not(.has) .uv-g__aguja { animation:uv-aguja 4.5s ease-in-out infinite; }
+}
+@keyframes uv-aguja { 0%,100% { transform:rotate(-60deg); } 50% { transform:rotate(60deg); } }
+.uv-medidor__res { position:absolute; left:0; right:0; bottom:-56px; text-align:center; pointer-events:none; }
+.uv-medidor__res span { display:inline-block; font:400 28px/1 var(--uv-serif); color:var(--uv-gold2); }
+.uv-medidor__res small { display:block; font:600 11px/1 var(--uv-mono); letter-spacing:.16em; text-transform:uppercase; color:var(--uv-ink); margin-bottom:8px; }
+.uv-medidor__ext { display:flex; justify-content:space-between; margin-top:10px; font:600 12.5px var(--uv-sans); color:var(--uv-ink); }
+.uv-medidor { margin-bottom:60px; }
 
 /* ruta de cursos */
-.uv-sub { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin:46px 0 16px; }
+.uv-sub { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin:0 0 16px; }
 .uv-sub__r { font:500 13px var(--uv-sans); color:var(--uv-ink); }
 .uv-sub__r b { font:600 13.5px var(--uv-mono); color:var(--uv-gold2); }
 .uv-ruta { position:relative; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:16px; }
@@ -91,23 +107,16 @@
   .uv-ruta { grid-template-columns:repeat(2, minmax(0,1fr)); }
   .uv-c .uv-c__n::after { display:none; }
 }
-@media (max-width:760px) {
-  .uv-test { grid-template-columns:1fr; gap:28px; padding:24px 20px; }
-  .uv-test__t { font-size:28px; }
-  .uv-esc__seg b { font-size:11.5px; }
+@media (max-width:860px) {
+  .uv-test { grid-template-columns:1fr; gap:36px; padding:36px 24px 40px; min-height:0; margin-bottom:48px; border-radius:22px; }
+  .uv-test__t { font-size:40px; }
+  .uv-medidor { max-width:340px; }
 }
 @media (max-width:560px) {
   .uv-ruta { grid-template-columns:1fr; }
   .uv-c__t { min-height:0; }
-  .uv-esc { gap:4px; }
-  /* en el celular solo los extremos y el perfil propio llevan nombre */
-  .uv-esc__seg:not(:first-child):not(:last-child):not(.on) b { visibility:hidden; }
-  .uv-esc__seg:last-child b { text-align:right; }
-  .uv-esc__seg b { font-size:11.5px; white-space:nowrap; }
-  .uv-esc__seg b br { display:none; }
-  .uv-esc.has .uv-esc__seg:not(.on) b { visibility:hidden; }
-  .uv-esc__seg.on:nth-child(n+3) b { text-align:right; direction:rtl; }
-  .uv-esc__seg.on:nth-child(n+3)::after { left:auto; right:0; }
+  .uv-btn--xl { width:100%; justify-content:center; }
+  .uv-test__ejes li { font-size:13px; }
 }
 
 /* ── Visor de cursos ─────────────────────────────────────── */

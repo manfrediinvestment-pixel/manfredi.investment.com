@@ -35,14 +35,15 @@
 
   function pintarPerfil(p) {
     if (!p) { try { p = JSON.parse(localStorage.getItem('mi_quiz_profile')); } catch (e) { p = null; } }
-    var esc = document.getElementById('uvEscala');
-    if (!esc || !p || typeof p.tier !== 'number') return;
-    esc.classList.add('has');
-    esc.querySelectorAll('.uv-esc__seg').forEach(function (seg) {
-      seg.classList.toggle('on', +seg.getAttribute('data-t') === p.tier);
+    var med = document.getElementById('uvMedidor');
+    if (!med || !p || typeof p.tier !== 'number') return;
+    med.classList.add('has');
+    med.style.setProperty('--rot', (-72 + 36 * p.tier) + 'deg');
+    med.querySelectorAll('.uv-g__s').forEach(function (s) {
+      s.classList.toggle('on', +s.getAttribute('data-t') === p.tier);
     });
-    var pie = document.getElementById('uvEscalaPie');
-    if (pie) pie.innerHTML = 'Tu perfil: <b>' + (p.name || PERFILES[p.tier]) + '</b>';
+    var res = document.getElementById('uvMedidorRes');
+    if (res) res.innerHTML = '<small>Tu perfil</small><span>' + (p.name || PERFILES[p.tier]) + '</span>';
     var cta = document.querySelector('[data-uv-test-cta]');
     if (cta) cta.innerHTML = 'Repetir el test &rarr;';
   }

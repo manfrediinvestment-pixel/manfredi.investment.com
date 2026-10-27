@@ -4392,22 +4392,30 @@
       <!-- Test de perfil: el resultado queda en localStorage (mi_quiz_profile) y se marca en la escala -->
       <div class="uv-test">
         <div class="uv-test__l">
-          <span class="uv-k">Test de perfil</span>
-          <h3 class="uv-test__t">¿Qué tipo de inversor sos?</h3>
+          <span class="uv-test__k"><span class="uv-test__dot"></span>Test de perfil · gratis</span>
+          <h3 class="uv-test__t">¿Qué tipo de <em>inversor</em> sos?</h3>
+          <ul class="uv-test__ejes">
+            <li><span>🎢</span>Tolerancia al riesgo</li>
+            <li><span>💼</span>Capacidad financiera</li>
+            <li><span>🎯</span>Objetivos y plazos</li>
+          </ul>
           <div class="uv-test__cta">
-            <button type="button" class="uv-btn" onclick="openQuiz()" data-uv-test-cta>Hacer el test &rarr;</button>
+            <button type="button" class="uv-btn uv-btn--xl" onclick="openQuiz()" data-uv-test-cta>Descubrí tu perfil &rarr;</button>
             <span class="uv-test__m">9 preguntas <i></i> 3 min</span>
           </div>
         </div>
         <div class="uv-test__r">
-          <div class="uv-esc" id="uvEscala">
-            <div class="uv-esc__seg" data-t="0"><b>Conservador</b></div>
-            <div class="uv-esc__seg" data-t="1"><b>Moderado-<br>conservador</b></div>
-            <div class="uv-esc__seg" data-t="2"><b>Moderado</b></div>
-            <div class="uv-esc__seg" data-t="3"><b>Moderado-<br>agresivo</b></div>
-            <div class="uv-esc__seg" data-t="4"><b>Agresivo</b></div>
+          <div class="uv-medidor" id="uvMedidor">
+            <svg class="uv-g" viewBox="0 0 320 196" aria-hidden="true">
+              <defs><radialGradient id="uvGlow" cx="50%" cy="100%" r="70%"><stop offset="0" stop-color="#f2c94c" stop-opacity=".22"/><stop offset="1" stop-color="#f2c94c" stop-opacity="0"/></radialGradient></defs>
+              <circle cx="160" cy="168" r="156" fill="url(#uvGlow)"/>
+              <g class="uv-g__ticks"><line x1="300.0" y1="168.0" x2="306.0" y2="168.0"/><line x1="293.1" y1="124.7" x2="298.9" y2="122.9"/><line x1="273.3" y1="85.7" x2="278.1" y2="82.2"/><line x1="242.3" y1="54.7" x2="245.8" y2="49.9"/><line x1="203.3" y1="34.9" x2="205.1" y2="29.1"/><line x1="160.0" y1="28.0" x2="160.0" y2="22.0"/><line x1="116.7" y1="34.9" x2="114.9" y2="29.1"/><line x1="77.7" y1="54.7" x2="74.2" y2="49.9"/><line x1="46.7" y1="85.7" x2="41.9" y2="82.2"/><line x1="26.9" y1="124.7" x2="21.1" y2="122.9"/><line x1="20.0" y1="168.0" x2="14.0" y2="168.0"/></g>
+              <path class="uv-g__s" data-t="0" d="M28.1 164.3A132 132 0 0 1 51.1 93.4L80.8 113.8A96 96 0 0 0 64.0 165.3Z" fill="#5b8def"/><path class="uv-g__s" data-t="1" d="M55.4 87.5A132 132 0 0 1 115.7 43.6L127.8 77.6A96 96 0 0 0 83.9 109.4Z" fill="#7fb0ff"/><path class="uv-g__s" data-t="2" d="M122.7 41.4A132 132 0 0 1 197.3 41.4L187.1 75.9A96 96 0 0 0 132.9 75.9Z" fill="#f2c94c"/><path class="uv-g__s" data-t="3" d="M204.3 43.6A132 132 0 0 1 264.6 87.5L236.1 109.4A96 96 0 0 0 192.2 77.6Z" fill="#8fe0b5"/><path class="uv-g__s" data-t="4" d="M268.9 93.4A132 132 0 0 1 291.9 164.3L256.0 165.3A96 96 0 0 0 239.2 113.8Z" fill="#56c793"/>
+              <g class="uv-g__aguja" id="uvAguja"><path d="M155 168 L160 56 L165 168 Z"/><circle cx="160" cy="168" r="11"/><circle class="uv-g__eje" cx="160" cy="168" r="4"/></g>
+            </svg>
+            <div class="uv-medidor__res" id="uvMedidorRes"><small>Tu perfil</small><span>?</span></div>
+            <div class="uv-medidor__ext"><span>Conservador</span><span>Agresivo</span></div>
           </div>
-          <div class="uv-esc__pie" id="uvEscalaPie">Tu resultado se marca en la escala</div>
         </div>
       </div>
 
