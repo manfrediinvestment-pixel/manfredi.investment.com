@@ -576,19 +576,26 @@ async function fetchCommodities() {
 // A diferencia del resto de este worker, esto NO se cachea en KV: solo se
 // pide cuando alguien hace click en un activo puntual, así que el volumen
 // de pedidos es bajo y no vale la pena gastar el cupo de escrituras de KV.
-function closesFromD912History(rows, n) {
+// Los historicos se arman como puntos {d: 'YYYY-MM-DD', c: cierre}: Tu Portafolio
+// divide cierres en pesos por el CCL del MISMO dia, y alinear por posicion no sirve
+// (el CCL tiene 278 dias habiles en un año, BYMA 260 ruedas por los feriados).
+function isoDia(ts) { return new Date(ts * 1000).toISOString().slice(0, 10); }
+
+function pointsFromD912History(rows, n) {
   if (!Array.isArray(rows) || !rows.length) return [];
-  return rows.filter(r => r.c != null).slice(-n).map(r => r.c);
+  // mismo ajuste que los gráficos: sin él, el cambio de ratio del CEDEAR SPY (3:1 el
+  // 29-may-2026) aparecía en la curva de Tu Portafolio como una caída del 66%
+  return ajustarDesdoblamientos(rows.filter(r => r.c != null)).slice(-n).map(r => ({ d: r.date, c: r.c }));
 }
 
-async function fetchD912Closes(endpoint, symbol, n = 30) {
+async function fetchD912Points(endpoint, symbol, n = 30) {
   const resp = await fetch(`https://data912.com/historical/${endpoint}/${encodeURIComponent(symbol)}`, { signal: AbortSignal.timeout(10000) });
   if (!resp.ok) throw new Error(`data912 historical HTTP ${resp.status}`);
   const rows = await resp.json();
-  return closesFromD912History(rows, n);
+  return pointsFromD912History(rows, n);
 }
 
-async function fetchYahooCloses(symbol, n = 30) {
+async function fetchYahooPoints(symbol, n = 30) {
   // "range" tiene que cubrir al menos n dias habiles, si no Yahoo devuelve
   // menos velas de las pedidas y closes.slice(-n) queda corto en silencio.
   const range = n <= 63 ? '3mo' : (n <= 126 ? '6mo' : (n <= 250 ? '1y' : '2y'));
@@ -596,9 +603,15 @@ async function fetchYahooCloses(symbol, n = 30) {
   const resp = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(10000) });
   if (!resp.ok) throw new Error(`Yahoo HTTP ${resp.status}`);
   const json = await resp.json();
-  const closes = json?.chart?.result?.[0]?.indicators?.quote?.[0]?.close;
+  const result = json?.chart?.result?.[0];
+  const closes = result?.indicators?.quote?.[0]?.close;
   if (!Array.isArray(closes)) throw new Error('Yahoo: sin datos');
-  return closes.filter(v => v != null).slice(-n);
+  const ts = result.timestamp || [], off = result.meta?.gmtoffset || 0;
+  return closes.map((c, i) => ({ d: isoDia((ts[i] || 0) + off), c })).filter(p => p.c != null).slice(-n);
+}
+
+async function fetchYahooCloses(symbol, n = 30) {
+  return (await fetchYahooPoints(symbol, n)).map(p => p.c);
 }
 
 // Reverso de KRAKEN_LEGACY_SYMBOLS: "BTC" -> "XXBTZUSD", etc.
@@ -606,7 +619,7 @@ const KRAKEN_SYMBOL_TO_PAIR = Object.fromEntries(
   Object.entries(KRAKEN_LEGACY_SYMBOLS).map(([pair, symbol]) => [symbol, pair])
 );
 
-async function fetchKrakenCloses(symbol, n = 30) {
+async function fetchKrakenPoints(symbol, n = 30) {
   const pair = KRAKEN_SYMBOL_TO_PAIR[symbol] || `${symbol}USD`;
   const url = `https://api.kraken.com/0/public/OHLC?pair=${encodeURIComponent(pair)}&interval=1440`;
   const resp = await fetch(url, { signal: AbortSignal.timeout(10000) });
@@ -614,37 +627,47 @@ async function fetchKrakenCloses(symbol, n = 30) {
   const json = await resp.json();
   const series = json.result && Object.values(json.result)[0];
   if (!Array.isArray(series) || !series.length) throw new Error('Kraken: sin datos');
-  return series.slice(-n).map(row => parseFloat(row[4]));
+  return series.slice(-n).map(row => ({ d: isoDia(row[0]), c: parseFloat(row[4]) }));
 }
 
-async function fetchDolarCloses(casa, n = 30) {
+async function fetchKrakenCloses(symbol, n = 30) {
+  return (await fetchKrakenPoints(symbol, n)).map(p => p.c);
+}
+
+async function fetchDolarPoints(casa, n = 30) {
   const url = `https://api.argentinadatos.com/v1/cotizaciones/dolares/${encodeURIComponent(casa)}`;
   const resp = await fetch(url, { signal: AbortSignal.timeout(10000) });
   if (!resp.ok) throw new Error(`ArgentinaDatos HTTP ${resp.status}`);
   const rows = await resp.json();
   if (!Array.isArray(rows) || !rows.length) throw new Error('ArgentinaDatos: sin datos');
-  return rows.slice(-n).map(r => r.venta);
+  // ArgentinaDatos repite el último valor los sábados y domingos: se sacan
+  return rows.filter(r => { const d = new Date(r.fecha + 'T12:00:00Z').getUTCDay(); return d !== 0 && d !== 6; })
+    .slice(-n).map(r => ({ d: r.fecha, c: r.venta }));
 }
 
-async function fetchHistoricalCloses(category, symbol, n = 30) {
+async function fetchDolarCloses(casa, n = 30) {
+  return (await fetchDolarPoints(casa, n)).map(p => p.c);
+}
+
+async function fetchHistoricalPoints(category, symbol, n = 30) {
   const d912 = { arg_stocks: 'stocks', arg_cedears: 'cedears', arg_bonds: 'bonds' }[category];
   if (d912) {
     // lo que data912 no tiene (especies D/C, letras, A3…) sale de BYMA
     try {
-      const closes = await fetchD912Closes(d912, symbol, n);
-      if (closes.length >= 2) return closes;
+      const pts = await fetchD912Points(d912, symbol, n);
+      if (pts.length >= 2) return pts;
     } catch (e) { /* sigue con BYMA */ }
-    return (await bymaVelas(symbol)).slice(-n).map(p => p.c);
+    return ajustarDesdoblamientos(await bymaVelas(symbol)).slice(-n).map(p => ({ d: isoDia(p.t), c: p.c }));
   }
-  if (category === 'dolares' && DIVISAS.has(symbol)) return fetchYahooCloses(symbol + '=X', n);
-  if (category === 'usa_stocks' || category === 'usa_adrs') return fetchYahooCloses(symbol, n);
+  if (category === 'dolares' && DIVISAS.has(symbol)) return fetchYahooPoints(symbol + '=X', n);
+  if (category === 'usa_stocks' || category === 'usa_adrs') return fetchYahooPoints(symbol, n);
   if (category === 'commodities') {
     const ySymbol = COMMODITY_YAHOO_MAP[symbol];
     if (!ySymbol) throw new Error('Commodity desconocida');
-    return fetchYahooCloses(ySymbol, n);
+    return fetchYahooPoints(ySymbol, n);
   }
-  if (category === 'cripto') return fetchKrakenCloses(symbol, n);
-  if (category === 'dolares') return fetchDolarCloses(symbol.toLowerCase(), n);
+  if (category === 'cripto') return fetchKrakenPoints(symbol, n);
+  if (category === 'dolares') return fetchDolarPoints(symbol.toLowerCase(), n);
   throw new Error('Categoría desconocida');
 }
 
@@ -1197,7 +1220,7 @@ export default {
       if (!category || !symbol) {
         return new Response(JSON.stringify({ error: 'Faltan category y symbol' }), { status: 400, headers });
       }
-      const cacheKey = `historico_v1:${category}:${symbol}:${n}`;
+      const cacheKey = `historico_v2:${category}:${symbol}:${n}`;
       const forceRefresh = url.searchParams.get('refresh') === '1';
       try {
         if (!forceRefresh) {
@@ -1206,10 +1229,11 @@ export default {
           const cached = await env.MERCADOS_KV.get(cacheKey);
           if (cached) return new Response(cached, { headers });
         }
-        const closes = await fetchHistoricalCloses(category, symbol, n);
-        if (!closes.length) throw new Error('Sin datos históricos');
+        const pts = await fetchHistoricalPoints(category, symbol, n);
+        if (!pts.length) throw new Error('Sin datos históricos');
+        const closes = pts.map(p => p.c);
         const json = JSON.stringify({
-          symbol, category, closes,
+          symbol, category, closes, dates: pts.map(p => p.d),
           min: Math.min(...closes), max: Math.max(...closes),
         });
         memSet(cacheKey, json, HISTORICO_CACHE_TTL_SECONDS);

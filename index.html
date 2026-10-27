@@ -9104,6 +9104,8 @@
       if(res.status === 404){ pfHistMarkMissing(missId); return null; }
       var data = await res.json();
       if(!data || !data.closes || !data.closes.length) return null;
+      // el worker manda la fecha de cada cierre: viaja pegada al array (closes.dates)
+      if(Array.isArray(data.dates) && data.dates.length === data.closes.length) data.closes.dates = data.dates;
       pfHistoricoCache[key] = data.closes;
       return data.closes;
     }catch(e){ console.warn('pfFetchHistorico failed:', symbol, e); return null; }
@@ -9145,8 +9147,38 @@
   // en pesos por el cierre del CCL de ese mismo dia (misma cantidad de puntos, alineados
   // desde el final -- mismo nivel de rigor que la alineacion contra SPY de mas abajo, sin
   // matching de fechas exacto).
+  // Cierre de una serie con fechas (closes.dates) en el dia d ('YYYY-MM-DD'), o el ultimo
+  // anterior si ese dia no hubo rueda (feriado, hueco en la fuente). null si d es anterior
+  // al primer dato.
+  function pfCloseOn(closes, d){
+    var ds = closes.dates, lo = 0, hi = ds.length - 1, at = -1;
+    while(lo <= hi){ var mid = (lo + hi) >> 1; if(ds[mid] <= d){ at = mid; lo = mid + 1; } else hi = mid - 1; }
+    return at < 0 ? null : closes[at];
+  }
+  function pfIsoDay(d){
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  // Copia de los cierres reescalados conservando las fechas
+  function pfScaleCloses(closes, k){
+    var out = closes.map(function(v){ return v * k; });
+    if(closes.dates) out.dates = closes.dates;
+    return out;
+  }
+
   function pfCloseArsToUsd(arsCloses, cclCloses){
     if(!arsCloses || !cclCloses) return null;
+    // con fechas: cada cierre en pesos contra el CCL de ESE dia. Por posicion no sirve: el
+    // CCL tiene ~278 dias habiles por año y BYMA ~260 ruedas (feriados), se corria un mes.
+    if(arsCloses.dates && cclCloses.dates){
+      var outV = [], outD = [];
+      arsCloses.forEach(function(v, i){
+        var c = pfCloseOn(cclCloses, arsCloses.dates[i]);
+        if(c){ outV.push(v / c); outD.push(arsCloses.dates[i]); }
+      });
+      if(outV.length < 2) return null;
+      outV.dates = outD;
+      return outV;
+    }
     var n = Math.min(arsCloses.length, cclCloses.length);
     if(n < 2) return null;
     var a = arsCloses.slice(arsCloses.length-n), c = cclCloses.slice(cclCloses.length-n);
@@ -9173,8 +9205,7 @@
     var liveCcl = pfGetCclRate();
     if(liveArsPrice == null || !liveCcl) return null; // sin ancla real, mejor excluir que sobrepesar mal
     var liveCedearUsd = liveArsPrice / liveCcl;
-    var scale = liveCedearUsd / usdCloses[usdCloses.length-1];
-    return usdCloses.map(function(v){ return v*scale; });
+    return pfScaleCloses(usdCloses, liveCedearUsd / usdCloses[usdCloses.length-1]);
   }
 
   // Serie de cierres en USD para una posicion, sea CEDEAR/accion local (ARS), accion USA o
@@ -9192,8 +9223,7 @@
       var conv = await pfFetchUsdClosesForArs(base, cat, n);
       var live = pfGetCurrentPrice(ticker, 'USD');
       if(conv && conv.length && live){
-        var sc = live / conv[conv.length - 1];
-        return conv.map(function(v){ return v * sc; });
+        return pfScaleCloses(conv, live / conv[conv.length - 1]);
       }
     }
     return null;
@@ -9972,7 +10002,7 @@
   //  la ventana arranca en la primera compra.
   //    - Titular "Historico"       = (valor actual - costo) / costo  (== columna Resultado)
   //    - Titular ventanas cortas   = variacion de ese rendimiento dentro de la ventana
-  //  Backend: /historico del worker tope 180 ruedas (~8 meses). Ventanas mas
+  //  Backend: /historico del worker tope 260 ruedas (~1 año). Ventanas mas
   //  largas: se queda en el tope del worker y se avisa en la nota (Yahoo directo
   //  desde el navegador no sirve: CORS lo bloquea siempre).
   // ═══════════════════════════════════════════════════════════════════════════
@@ -10018,7 +10048,7 @@
       { key:'ytd', label:'YTD',       days:ytdDays },
       { key:'1y',  label:'1 año',     days:365 },
       { key:'all', label:'Histórico', days: inc ? Math.max(7, Math.round((today - inc) / 86400000)) : 365 },
-      // sin tab: respaldo del mapa de calor, entra en el tope de 180 ruedas del worker (sin Yahoo)
+      // sin tab: respaldo del mapa de calor, entra en el tope de 260 ruedas del worker (sin Yahoo)
       { key:'8m',  label:'8 meses',   days:245 }
     ];
   }
@@ -10045,8 +10075,9 @@
     if(inc && winStart < inc){ winStart = new Date(inc.getTime()); clamped = true; }
 
     var bizNeeded = mfBizDaysBetween(winStart, today) + 2;
-    var nFetch = Math.min(180, Math.max(8, bizNeeded));
-    var useYahoo = bizNeeded > 178; // ventana mas larga que el tope del worker
+    // +15 de margen: las ruedas son menos que los dias habiles (feriados de aca y de alla)
+    var nFetch = Math.min(260, Math.max(8, bizNeeded + 15));
+    var useYahoo = bizNeeded > 258; // ventana mas larga que el tope del worker
 
     await pfFetchMarketData(false);
 
@@ -10056,7 +10087,7 @@
     var closesByKey = {};
     var arsLimited = false;
     // (Antes las ventanas largas iban directo a Yahoo, que bloquea los pedidos del navegador
-    // por CORS y quedaban "sin datos". Se usa el worker con su tope de ~180 ruedas.)
+    // por CORS y quedaban "sin datos". Se usa el worker con su tope de ~260 ruedas.)
     if(useYahoo) arsLimited = true;
     await Promise.all(Object.keys(byKey).map(async function(k){
       var p = byKey[k];
@@ -10071,10 +10102,24 @@
       .filter(function(x){ return x >= 6; });
     if(!lens.length || !benchCloses || benchCloses.length < 6) return { unavailable:true };
 
-    var L = Math.min.apply(null, lens.concat([benchCloses.length]));
     // 1 dia = ultima rueda: cierre anterior vs ultimo cierre (el resto pide al menos 6 puntos)
-    L = Math.min(L, win.key === '1d' ? 2 : Math.max(6, mfBizDaysBetween(winStart, today)));
+    var L = win.key === '1d' ? 2 : Math.max(6, mfBizDaysBetween(winStart, today));
+    var series = Object.keys(closesByKey).map(function(k){ return closesByKey[k]; })
+      .filter(function(c){ return c && c.length >= 6; }).concat([benchCloses]);
+    if(series.every(function(c){ return c.dates; })){
+      // con fechas: la curva arranca el primer dia en que TODAS las series tienen precio
+      var firstAvail = series.reduce(function(m, c){ return c.dates[0] > m ? c.dates[0] : m; }, '');
+      var cand = mfBizDaysList(L, today).map(pfIsoDay);
+      var skip = 0;
+      while(skip < cand.length - 2 && cand[skip] < firstAvail) skip++;
+      L -= skip;
+    } else {
+      L = Math.min(L, Math.min.apply(null, lens.concat([benchCloses.length])));
+    }
     var dates = mfBizDaysList(L, today);
+    var isoDates = dates.map(pfIsoDay);
+    // precio del dia i: por fecha si la serie la trae, si no alineado desde el final
+    function pxAt(c, i){ return c.dates ? pfCloseOn(c, isoDates[i]) : c[c.length - L + i]; }
 
     var ccl = pfGetCclRate();
     var valSeries = [], costSeries = [];
@@ -10085,7 +10130,7 @@
         if(ld && ld > d) return; // lote todavia no comprado en esta fecha; sin fecha => se asume previo
         var c = closesByKey[p.ticker + '|' + (p.moneda === 'ARS' ? 'ARS' : 'USD')];
         if(!c) return;
-        var px = c[c.length - L + i];
+        var px = pxAt(c, i);
         if(px == null) return;
         // sin precio de compra no hay costo contra el cual medir: afuera de la curva (si no,
         // todo su valor aparecia como ganancia)
@@ -10103,7 +10148,10 @@
     var base = windowKey === 'all' ? 0 : retSeries[0];
     var curve = retSeries.map(function(r){ return r - base; });
 
-    var benchWin = benchCloses.slice(benchCloses.length - L);
+    var benchWin = isoDates.map(function(d, i){ return pxAt(benchCloses, i); });
+    // si el primer dia cae antes del primer dato de SPY, se arranca en el primero que haya
+    var b0 = benchWin.filter(function(v){ return v != null; })[0];
+    benchWin = benchWin.map(function(v){ return v == null ? b0 : v; });
     var benchPct = benchWin.map(function(v){ return (v / benchWin[0] - 1) * 100; });
 
     var headline = windowKey === 'all' ? retSeries[retSeries.length - 1] : curve[curve.length - 1];
@@ -10215,7 +10263,7 @@
     var bits = [];
     if(m.clamped) bits.push('La ventana arranca en tu primera compra (' + pfPerfFmtDate(m.inception) + '): la cartera todavía no tiene ' + m.label.toLowerCase() + ' de historia, así que no se proyecta nada.');
     bits.push('El rendimiento se mide sobre el costo invertido y netea los aportes — sumar un activo nuevo no cuenta como ganancia. En «Histórico» el número es el resultado total sobre el costo, igual que la columna Resultado de la tabla.');
-    if(m.arsLimited) bits.push('El histórico de precios llega hasta ~8 meses por ahora: la curva muestra ese tramo.');
+    if(m.arsLimited) bits.push('El histórico de precios llega hasta ~1 año por ahora: la curva muestra ese tramo.');
     var anyNoDate = lots.some(function(p){ return !pfPerfParseDate(p.fecha); });
     if(anyNoDate) bits.push('Hay posiciones sin fecha de compra: se asumen previas a la ventana. Borralas y volvé a cargarlas con fecha para el histórico exacto.');
     if(note) note.textContent = bits.join(' ');
