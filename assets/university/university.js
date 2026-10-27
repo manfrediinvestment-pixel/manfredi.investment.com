@@ -20,7 +20,7 @@
       var pct = Math.round(hechas / (s.lessonsTotal + 1) * 100);
       var st = s.finalPassed ? 'listo' : hechas > 0 ? 'curso' : 'nuevo';
       card.setAttribute('data-st', st);
-      card.querySelector('[data-uv-bar]').style.width = pct + '%';
+      card.querySelector('[data-uv-bar]').style.transform = 'scaleX(' + pct / 100 + ')';
       card.querySelector('[data-uv-est]').textContent =
         st === 'listo' ? 'Diploma listo' : st === 'curso' ? s.lessonsDone + ' de ' + s.lessonsTotal : 'Sin empezar';
       card.querySelector('[data-uv-cta]').textContent =
@@ -43,7 +43,7 @@
       s.classList.toggle('on', +s.getAttribute('data-t') === p.tier);
     });
     var res = document.getElementById('uvMedidorRes');
-    if (res) res.innerHTML = '<small>Tu perfil</small><span>' + (p.name || PERFILES[p.tier]) + '</span>';
+    if (res) res.innerHTML = 'Tu perfil: <b>' + (p.name || PERFILES[p.tier]) + '</b>';
     var cta = document.querySelector('[data-uv-test-cta]');
     if (cta) cta.innerHTML = 'Repetir el test &rarr;';
   }
