@@ -15,7 +15,7 @@
 
   var CAT = { macro: 'Macro', acciones: 'Acciones', bonos: 'Bonos', politica: 'Política', geopolitica: 'Geopolítica', global: 'Mercados globales', commodities: 'Commodities', cripto: 'Cripto', finanzas: 'Finanzas personales', trading: 'Trading' };
   var VER = { publicar: { t: 'Para publicar', c: 'ok' }, cambios: { t: 'Pide cambios', c: 'ojo' }, rechazar: { t: 'No publicar', c: 'mal' } };
-  var ESTADO = { recibido: 'pendiente', publicado: 'aprobado', cambios: 'cambios', rechazado: 'rechazado', retirado: 'aprobado' };
+  var ESTADO = { recibido: 'pendiente', publicado: 'aprobado', cambios: 'cambios', rechazado: 'rechazado', retirado: 'aprobado', reemplazado: 'reemplazado' }; // reemplazado: quedó la versión corregida, no se lista
   var ORDEN = { mal: 0, ojo: 1, ok: 2 };
   var st = { envios: [], autores: [], tab: 'pendiente', abierto: null, confirmar: null, ocupado: false, editando: null };
   var box = null, boxAut = null;

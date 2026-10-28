@@ -14,6 +14,7 @@
 // --var DEV:1 se acepta "Bearer dev:<email>" para probar sin Firebase; en producción no.
 //
 // Estados de un envío: subiendo → recibido → (cambios | rechazado | publicado → retirado)
+// y "reemplazado" cuando el autor manda la versión corregida (o se aprueba la que reemplaza a una publicada).
 
 import { mailBienvenida } from './mail-bienvenida.js';
 
@@ -220,6 +221,9 @@ async function crearEnvio(request, env, ctx) {
     reemplaza: /^[\w-]{6,80}$/.test(b.reemplaza || '') ? b.reemplaza : undefined
   };
   if (!e.titulo || !e.resumen || !e.categoria) return err('Faltan título, resumen o categoría');
+  // solo puede corregir un envío propio
+  const viejo = e.reemplaza ? await leer(env, 'envios/' + e.reemplaza + '/envio.json', null) : null;
+  if (e.reemplaza && (!viejo || viejo.email !== u.email)) return err('El envío que querés corregir no es tuyo', 403);
   if (!e.declaraciones.autoria || !e.declaraciones.sinRecomendaciones) return err('Faltan las confirmaciones');
   if (b.terminos !== TERMINOS) return err('Tenés que aceptar los Términos de colaboración (versión ' + TERMINOS + ')');
   e.terminos = { version: TERMINOS, aceptado: e.enviado };
@@ -235,6 +239,8 @@ async function crearEnvio(request, env, ctx) {
     if (t && t.length <= MAX_TAPA) await env.ANALISTAS.put('envios/' + e.id + '/tapa.jpg', t, { httpMetadata: { contentType: 'image/jpeg' } });
   }
   await guardarEnvio(env, e);
+  // la versión corregida cierra la anterior (si estaba publicada, sale recién cuando se aprueba la nueva)
+  if (viejo && ['cambios', 'rechazado'].includes(viejo.estado)) { viejo.estado = 'reemplazado'; viejo.reemplazadoPor = e.id; await guardarEnvio(env, viejo); }
   if (e.estado === 'recibido') ctx.waitUntil(avisarRecibido(env, e, a));
   return json({ ok: true, id: e.id, estado: e.estado });
 }
@@ -263,7 +269,7 @@ async function subirPdf(request, env, ctx, id) {
 async function misEnvios(request, env) {
   const { u, error } = await autor(request, env);
   if (error) return error;
-  const lista = (await leer(env, 'meta/envios.json', [])).filter(x => x.email === u.email && x.estado !== 'subiendo');
+  const lista = (await leer(env, 'meta/envios.json', [])).filter(x => x.email === u.email && !['subiendo', 'reemplazado'].includes(x.estado));
   // al autor no le mostramos la revisión interna, solo el mensaje que le mandaste
   return json({ envios: lista.map(({ revision, ...x }) => x) });
 }
@@ -348,10 +354,14 @@ async function creadorDecision(request, env, ctx) {
   if (b.accion === 'aprobar') {
     if (!['recibido', 'cambios'].includes(e.estado)) return err('Este envío no está pendiente');
     e.estado = 'publicado'; e.publicado = ahora; e.decision = { accion: 'aprobar', fecha: ahora };
+    if (e.formato === 'pdf') e.conTapa = !!(await env.ANALISTAS.head('envios/' + e.id + '/tapa.jpg'));
     await guardarEnvio(env, e);
+    // si reemplaza a una versión anterior del MISMO autor, sale la vieja
+    const viejo = e.reemplaza ? await leer(env, 'envios/' + e.reemplaza + '/envio.json', null) : null;
+    const pisa = viejo && viejo.email === e.email ? viejo.id : null;
+    if (pisa && viejo.estado === 'publicado') { viejo.estado = 'reemplazado'; viejo.reemplazadoPor = e.id; await guardarEnvio(env, viejo); }
     await actualizar(env, 'meta/publicados.json', { autores: [], publicaciones: [] }, d => {
-      // si reemplaza a una versión anterior, sale la vieja
-      d.publicaciones = d.publicaciones.filter(x => x.id !== e.id && x.id !== e.reemplaza);
+      d.publicaciones = d.publicaciones.filter(x => x.id !== e.id && x.id !== pisa);
       d.publicaciones.unshift(publicacion(e));
       return conAutores(d, hab);
     });
@@ -386,7 +396,7 @@ async function creadorDecision(request, env, ctx) {
 function publicacion(e) {
   const p = { id: e.id, autor: e.autor, categoria: e.categoria, titulo: e.titulo, resumen: e.resumen, fecha: e.publicado.slice(0, 10) };
   if (e.posiciones) p.posiciones = e.posiciones; // la declaración del autor se publica junto con la pieza
-  if (e.formato === 'pdf') { p.pdf = '/pub/' + e.id + '.pdf'; p.tapa = '/pub/' + e.id + '.jpg'; }
+  if (e.formato === 'pdf') { p.pdf = '/pub/' + e.id + '.pdf'; if (e.conTapa !== false) p.tapa = '/pub/' + e.id + '.jpg'; }
   else p.cuerpo = e.cuerpo; // los textos se leen en la página (#nota-<id>)
   return p;
 }

@@ -19,13 +19,14 @@
     ['cripto', 'Cripto', '#f2b880'], ['finanzas', 'Finanzas personales', '#7fd1ae'], ['trading', 'Trading', '#f29e8e']];
   var CAT = {}; CATS.forEach(function (c) { CAT[c[0]] = { n: c[1], c: c[2] }; });
   var MANFREDI = {
-    slug: 'manfredi', nombre: 'Manfredi Investment', rol: 'Research & Markets · Informes semanales y especiales', corto: 'Macro · Mercados',
+    slug: 'manfredi', nombre: 'Ignacio Manfredi', rol: 'Fundador de Manfredi Investment · Informes semanales y especiales', corto: 'Macro · Mercados',
     color: '#e9c46a', logo: 'assets/img/logo-mark-512.png', verificado: true, desde: '2026-05-18',
-    links: { instagram: 'https://www.instagram.com/manfredinvestment', x: 'https://x.com/ManfredInvest', linkedin: 'https://www.linkedin.com/in/ignacio-manfredi-816468250/' }
+    // las redes son las personales de Ignacio, no las de la marca
+    links: { instagram: 'https://www.instagram.com/nacho.finanzas/', tiktok: 'https://www.tiktok.com/@ignacio.manfredi', linkedin: 'https://www.linkedin.com/in/ignacio-manfredi-816468250/' },
+    negocio: { nombre: 'Asesoría personalizada', desc: 'Agente Coproductor de Balanz · Idóneo CNV', url: 'https://manfredinvestment.com/#asesoria' }
   };
   var st = { autores: {}, orden: [], pubs: [], cat: 'todo', autor: 'todos', listo: false };
   // hasta que se publique el primer autor invitado se muestra la guía con el botón de postularse
-  function hayInvitados() { return st.orden.some(function (s) { return s !== 'manfredi' && deAutor(s).length; }); }
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -99,7 +100,8 @@
   function minutos(p) { return Math.max(1, Math.round(String(p.cuerpo).split(/\s+/).length / 200)); }
   // los textos no tienen página 1: llevan el logo de Manfredi
   function tapa(p) {
-    if (!esTexto(p)) return '<span class="an-row__cv"><img src="' + esc(p.tapa) + '" alt="" loading="lazy"></span>';
+    // PDF sin tapa (no se pudo generar la página 1): va el logo, como los textos
+    if (!esTexto(p) && p.tapa) return '<span class="an-row__cv"><img src="' + esc(p.tapa) + '" alt="" loading="lazy"></span>';
     return '<span class="an-row__cv an-row__cv--txt"><img src="assets/img/logo-mark-512.png" alt=""><small>Análisis</small></span>';
   }
   // cuerpo: párrafos separados por línea en blanco, "## " subtítulo, "- " lista, **negrita**
@@ -208,12 +210,13 @@
     linkedin: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.5h4V21H3zM9.5 9.5h3.8v1.6h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1V21h-4v-5.1c0-1.22-.02-2.78-1.7-2.78-1.7 0-1.96 1.32-1.96 2.69V21h-4z"/></svg>',
     instagram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>',
     x: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.9 2H22l-7.2 8.2L23 22h-6.6l-5.2-6.8L5.3 22H2.2l7.7-8.8L1.6 2h6.8l4.7 6.2zm-1.1 18h1.7L7.3 3.9H5.5z"/></svg>',
+    tiktok: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 2h-3.3v13.2a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V9a6.3 6.3 0 1 0 5.3 6.2V8.6a7.9 7.9 0 0 0 4.4 1.3V6.6a4.5 4.5 0 0 1-4.4-4.6z"/></svg>',
     trabajo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg>'
   };
-  var NOMBRES = { linkedin: 'LinkedIn', instagram: 'Instagram', x: 'X' };
+  var NOMBRES = { linkedin: 'LinkedIn', instagram: 'Instagram', tiktok: 'TikTok', x: 'X' };
   function links(a) {
     var l = a.links || {};
-    return ['linkedin', 'instagram', 'x', 'trabajo'].filter(function (k) { return l[k]; }).map(function (k) {
+    return ['linkedin', 'instagram', 'tiktok', 'x', 'trabajo'].filter(function (k) { return l[k]; }).map(function (k) {
       var url = k === 'trabajo' ? l[k].url : l[k], txt = k === 'trabajo' ? l[k].nombre : NOMBRES[k];
       return '<a href="' + esc(url) + '" target="_blank" rel="noopener nofollow">' + ICONOS[k] + esc(txt) + '</a>';
     }).join('');
@@ -264,7 +267,8 @@
     $('ntDate').hidden = an;
     marcarSub();
     if (!an) { window.dispatchEvent(new Event('resize')); return; }
-    var guia = w.v === 'analisis' && st.listo && !hayInvitados();
+    // sección abierta: el cartel de la convocatoria solo aparece si no hay ninguna publicación
+    var guia = w.v === 'analisis' && st.listo && !st.pubs.length;
     $('anGuia').hidden = !guia;
     if (guia && !$('anGuiaBg').firstChild) $('anGuiaBg').innerHTML = '<div class="an-rows">' + st.pubs.slice(0, 5).map(function (p) { return fila(p); }).join('') + '</div>';
     $('anGrid').hidden = w.v !== 'analisis' || guia; $('anPerfil').hidden = w.v !== 'perfil'; $('anNota').hidden = w.v !== 'nota'; $('anAutor').hidden = w.v !== 'autor';
