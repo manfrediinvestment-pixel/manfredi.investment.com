@@ -1,0 +1,19 @@
+name = "manfredi-whatsapp"
+main = "index.js"
+compatibility_date = "2026-04-19"
+
+[vars]
+MERCADOS_URL = "https://manfredi-mercados.nachito2502.workers.dev"
+CALENDARIO_URL = "https://manfredi-calendario.nachito2502.workers.dev"
+SITE_URL = "https://manfredinvestment.com"
+
+# Aviso por mail cuando el resumen está listo para compartir (hora ART = UTC-3),
+# de lunes a viernes: apertura 10:15 ART y cierre 17:20 ART.
+[triggers]
+crons = ["15 13 * * MON-FRI", "20 20 * * MON-FRI"]
+
+# Secretos (nunca en este archivo):
+#   npx wrangler secret put GEMINI_KEY --config workers/whatsapp/wrangler.toml
+#     (clave de Google AI Studio SIN facturación: si se acaba el cupo gratis, Google
+#      corta en vez de cobrar y el resumen sale igual con la plantilla de datos)
+#   npx wrangler secret put RESEND_API_KEY --config workers/whatsapp/wrangler.toml   (opcional: aviso por mail)

@@ -9,7 +9,8 @@
   var API = {
     memb: LOCAL ? 'http://localhost:8787' : 'https://manfredi-memberships.nachito2502.workers.dev',
     users: LOCAL ? 'http://localhost:8788' : 'https://log-user.nachito2502.workers.dev',
-    admin: LOCAL ? 'http://localhost:8789' : 'https://manfredi-admin.nachito2502.workers.dev'
+    admin: LOCAL ? 'http://localhost:8789' : 'https://manfredi-admin.nachito2502.workers.dev',
+    wa: LOCAL ? 'http://localhost:8790' : 'https://manfredi-whatsapp.nachito2502.workers.dev'
   };
   var SALUD = [
     { nombre: 'Cotizaciones (Mercados)', url: 'https://manfredi-mercados.nachito2502.workers.dev/mercados', campo: 'updated', maxHoras: 2 },
@@ -140,6 +141,7 @@
     root.innerHTML =
       '<div class="pn-kpis" id="pnKpis"></div>' +
       '<div class="pn-grid">' +
+        bloque('whatsapp', 'WhatsApp · Comunidad', 'Resumen del día para compartir', true) +
         bloque('trafico', 'Tráfico del sitio · 30 días', 'Cloudflare', true) +
         bloque('ingresos', 'Ingresos', 'Mercado Pago') +
         bloque('socios', 'Socios', 'Membresías + Mercado Pago') +
@@ -185,6 +187,17 @@
 
     renderContenido();
     renderSalud();
+    renderWhatsapp();
+  }
+
+  // Resumen para la Comunidad de WhatsApp (assets/panel/whatsapp.js, worker manfredi-whatsapp)
+  function renderWhatsapp() {
+    var el = document.querySelector('#pn-whatsapp .pn-body'); if (!el) return;
+    var arrancar = function () { window.pnWhatsapp(el, get, API.wa); };
+    if (window.pnWhatsapp) return arrancar();
+    var s = document.createElement('script'); s.src = 'assets/panel/whatsapp.js?v=20261028a';
+    s.onload = arrancar; s.onerror = function () { error('whatsapp', 'No se pudo cargar el módulo'); };
+    document.body.appendChild(s);
   }
 
   function setupCloudflare(e) {
