@@ -195,7 +195,7 @@
     var el = document.querySelector('#pn-whatsapp .pn-body'); if (!el) return;
     var arrancar = function () { window.pnWhatsapp(el, get, API.wa); };
     if (window.pnWhatsapp) return arrancar();
-    var s = document.createElement('script'); s.src = 'assets/panel/whatsapp.js?v=20261028a';
+    var s = document.createElement('script'); s.src = 'assets/panel/whatsapp.js?v=20261028b';
     s.onload = arrancar; s.onerror = function () { error('whatsapp', 'No se pudo cargar el módulo'); };
     document.body.appendChild(s);
   }
