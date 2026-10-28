@@ -21,7 +21,9 @@
   var MANFREDI = {
     slug: 'manfredi', nombre: 'Manfredi Investment', rol: 'Research & Markets · Informes semanales y especiales', corto: 'Macro · Mercados',
     color: '#e9c46a', logo: 'assets/img/logo-mark-512.png', verificado: true, desde: '2026-05-18',
-    links: { instagram: 'https://www.instagram.com/manfredinvestment', x: 'https://x.com/ManfredInvest', linkedin: 'https://www.linkedin.com/in/ignacio-manfredi-816468250/' }
+    // las redes son las personales de Ignacio, no las de la marca
+    links: { instagram: 'https://www.instagram.com/nacho.finanzas/', tiktok: 'https://www.tiktok.com/@ignacio.manfredi', linkedin: 'https://www.linkedin.com/in/ignacio-manfredi-816468250/' },
+    negocio: { nombre: 'Asesoría personalizada', desc: 'Agente Coproductor de Balanz · Idóneo CNV', url: 'https://manfredinvestment.com/#asesoria' }
   };
   var st = { autores: {}, orden: [], pubs: [], cat: 'todo', autor: 'todos', listo: false };
   // hasta que se publique el primer autor invitado se muestra la guía con el botón de postularse
@@ -207,12 +209,13 @@
     linkedin: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.5h4V21H3zM9.5 9.5h3.8v1.6h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1V21h-4v-5.1c0-1.22-.02-2.78-1.7-2.78-1.7 0-1.96 1.32-1.96 2.69V21h-4z"/></svg>',
     instagram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>',
     x: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.9 2H22l-7.2 8.2L23 22h-6.6l-5.2-6.8L5.3 22H2.2l7.7-8.8L1.6 2h6.8l4.7 6.2zm-1.1 18h1.7L7.3 3.9H5.5z"/></svg>',
+    tiktok: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 2h-3.3v13.2a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V9a6.3 6.3 0 1 0 5.3 6.2V8.6a7.9 7.9 0 0 0 4.4 1.3V6.6a4.5 4.5 0 0 1-4.4-4.6z"/></svg>',
     trabajo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg>'
   };
-  var NOMBRES = { linkedin: 'LinkedIn', instagram: 'Instagram', x: 'X' };
+  var NOMBRES = { linkedin: 'LinkedIn', instagram: 'Instagram', tiktok: 'TikTok', x: 'X' };
   function links(a) {
     var l = a.links || {};
-    return ['linkedin', 'instagram', 'x', 'trabajo'].filter(function (k) { return l[k]; }).map(function (k) {
+    return ['linkedin', 'instagram', 'tiktok', 'x', 'trabajo'].filter(function (k) { return l[k]; }).map(function (k) {
       var url = k === 'trabajo' ? l[k].url : l[k], txt = k === 'trabajo' ? l[k].nombre : NOMBRES[k];
       return '<a href="' + esc(url) + '" target="_blank" rel="noopener nofollow">' + ICONOS[k] + esc(txt) + '</a>';
     }).join('');
