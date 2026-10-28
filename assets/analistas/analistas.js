@@ -25,7 +25,6 @@
   };
   var st = { autores: {}, orden: [], pubs: [], cat: 'todo', autor: 'todos', listo: false };
   // hasta que se publique el primer autor invitado se muestra la guía con el botón de postularse
-  function hayInvitados() { return st.orden.some(function (s) { return s !== 'manfredi' && deAutor(s).length; }); }
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -264,7 +263,8 @@
     $('ntDate').hidden = an;
     marcarSub();
     if (!an) { window.dispatchEvent(new Event('resize')); return; }
-    var guia = w.v === 'analisis' && st.listo && !hayInvitados();
+    // sección abierta: el cartel de la convocatoria solo aparece si no hay ninguna publicación
+    var guia = w.v === 'analisis' && st.listo && !st.pubs.length;
     $('anGuia').hidden = !guia;
     if (guia && !$('anGuiaBg').firstChild) $('anGuiaBg').innerHTML = '<div class="an-rows">' + st.pubs.slice(0, 5).map(function (p) { return fila(p); }).join('') + '</div>';
     $('anGrid').hidden = w.v !== 'analisis' || guia; $('anPerfil').hidden = w.v !== 'perfil'; $('anNota').hidden = w.v !== 'nota'; $('anAutor').hidden = w.v !== 'autor';
