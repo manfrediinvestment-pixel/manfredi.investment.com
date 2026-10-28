@@ -568,6 +568,12 @@
       document.addEventListener('visibilitychange', function () { if (!document.hidden) tic(); });
       window.addEventListener('resize', medir);
       requestAnimationFrame(encuadrar);
+      // en la web real el sitio puede volver a subir la página después (router, fuentes, avisos):
+      // se encuadra otra vez cuando terminó de cargar, salvo que la persona ya se haya movido
+      var y0 = null;
+      var otraVez = function () { if (y0 === null || Math.abs(window.scrollY - y0) < 5) { encuadrar(); y0 = window.scrollY; } };
+      setTimeout(function () { y0 = window.scrollY; otraVez(); }, 700);
+      window.addEventListener('load', function () { setTimeout(otraVez, 200); }, { once: true });
       S.root.querySelector('.ch-lb').addEventListener('click', function (e) { if (e.target === e.currentTarget || e.target.closest('.ch-lb-x')) e.currentTarget.hidden = true; });
       S.root.addEventListener('submit', function (e) { if (e.target.matches('.ch-comp')) { e.preventDefault(); enviar(); } });
     }
