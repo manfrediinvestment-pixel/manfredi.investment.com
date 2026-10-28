@@ -523,11 +523,8 @@
   }
   function medir() {
     var app = S && S.root.querySelector('.ch-app'); if (!app || app.offsetParent === null) return;
-    var top = document.querySelector('#inversiones .pro-top'), menu = menuFijo();
-    document.documentElement.style.setProperty('--ch-menu', menu + 'px');
-    // ¿el encabezado de Pro está arriba del chat o al costado? (al costado en pantallas grandes)
-    var encima = top && top.getBoundingClientRect().bottom <= app.getBoundingClientRect().top + 1;
-    var arriba = menu + (encima ? top.offsetHeight + 14 : 0) + 12;
+    var top = document.querySelector('#inversiones .pro-top');
+    var arriba = menuFijo() + (top ? top.offsetHeight + 14 : 0) + 12;
     app.style.setProperty('--ch-h', Math.max(520, window.innerHeight - arriba - 12) + 'px');
   }
   // Lleva la página hasta las pestañas de Pro, así se ven enteros el chat y la barra para escribir.
