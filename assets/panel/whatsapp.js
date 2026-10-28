@@ -6,17 +6,12 @@
  * sistema -> WhatsApp -> el grupo de avisos.
  */
 (function () {
-  var MOMENTOS = [
-    { id: 'apertura', hora: '10:15', desde: 10 * 60 + 15 },
-    { id: 'cierre', hora: '17:20', desde: 17 * 60 + 20 }
-  ];
+  var MOMENTOS = [{ id: 'apertura' }, { id: 'cierre' }]; // horario: MiTarjeta.horarios (el de Wall Street)
   var st = { el: null, get: null, base: '', datos: {}, blobs: {}, cargando: {} };
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  // *negrita* y _cursiva_ como las muestra WhatsApp
-  function waHtml(t) {
-    return esc(t).replace(/\*([^*\n]+)\*/g, '<b>$1</b>').replace(/(^|[\s(])_([^_\n]+)_/g, '$1<i>$2</i>').replace(/\n/g, '<br>');
-  }
+  // negrita, cursiva, citas, listas y tablas como las muestra WhatsApp (assets/comunidad/tarjeta.js)
+  function waHtml(t) { return window.MiTarjeta.waHtml(t, false); }
   function minutosART() { var d = new Date(); return ((d.getUTCHours() + 21) % 24) * 60 + d.getUTCMinutes(); }
   function hhmm(iso) { return new Date(iso).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }); }
   var TILDES = '<svg class="wa-tick" viewBox="0 0 18 11" width="16" height="10" aria-hidden="true"><path d="M1 5.6l3 3L11 1.5M7.2 8.6L8 9.4 15.5 1.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -60,9 +55,9 @@
 
   // El cierre todavía no pasó: en vez de mensaje, un aviso para armarlo antes si hace falta.
   function pendiente(m) {
-    var mo = MOMENTOS.filter(function (x) { return x.id === m; })[0];
+    var h = window.MiTarjeta.horarios(new Date());
     document.getElementById('waMsg-' + m).innerHTML =
-      '<div class="wa-aviso">El resumen del cierre se arma a las ' + mo.hora + ' · <button type="button" data-a="armar" data-m="' + m + '">Armarlo ahora</button></div>';
+      '<div class="wa-aviso">El resumen del cierre se arma a las ' + h[m].hora + ' · <button type="button" data-a="armar" data-m="' + m + '">Armarlo ahora</button></div>';
   }
 
   function pintar(m, d) {
@@ -126,6 +121,8 @@
       '@media (prefers-reduced-motion:reduce){.wa-escribiendo i{animation:none}}' +
       '.wa-aviso{align-self:center;padding:6px 12px;border-radius:8px;background:#182229;font-size:12.5px;color:#e9edef;text-align:center}' +
       '.wa-aviso button{border:0;background:none;padding:0;color:#e9d3a0;font:inherit;text-decoration:underline;cursor:pointer}' +
+      '.wa-bubble .wa-mono,.wa-bub .wa-mono{margin:6px 0;padding:8px 10px;border-radius:6px;background:rgba(0,0,0,.22);font:500 12px/1.55 "IBM Plex Mono",monospace;white-space:pre;overflow-x:auto}' +
+      '.wa-bub .wa-cita{margin:4px 0;padding-left:9px;border-left:3px solid #e9edef}.wa-bub .wa-lista{margin:2px 0;padding-left:18px}.wa-bub .wa-sep{display:block;height:8px}' +
       '.wa-acc{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;margin-top:2px}' +
       '.wa-btn{padding:5px 11px;border-radius:14px;border:1px solid rgba(233,211,160,.3);background:#111b21;color:#e9edef;font:500 12px "IBM Plex Sans",sans-serif;cursor:pointer;transition:background .2s}' +
       '.wa-btn.wa-main{border-color:#e9d3a0;color:#e9d3a0}' +
@@ -144,9 +141,9 @@
     }
     st = { el: el, get: get, base: base, datos: {}, blobs: {}, cargando: {} };
     estilos(); esqueleto();
-    var ahora = minutosART();
+    var ahora = minutosART(), h = window.MiTarjeta.horarios(new Date());
     MOMENTOS.forEach(function (m) {
-      if (m.id === 'apertura' || ahora >= m.desde) cargar(m.id, false);
+      if (m.id === 'apertura' || ahora >= h[m.id].min) cargar(m.id, false);
       else pendiente(m.id);
     });
   };

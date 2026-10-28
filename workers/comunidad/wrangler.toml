@@ -21,11 +21,13 @@ database_id = "00000000-0000-0000-0000-000000000000"
 binding = "MEMBERSHIPS"
 service = "manfredi-memberships"
 
-# Resumen del día de lunes a viernes (hora ART = UTC-3): apertura 10:15 y cierre 17:20, se
-# publica en el chat gratis. 10 minutos después (10:25 / 17:30) se reintenta la IA si no
-# respondió y sale el mail para compartirlo en WhatsApp.
+# Resúmenes con el horario de Wall Street: 30 min antes de la apertura (9:00 NY) y 30 min
+# después del cierre (16:30 NY, o 13:30 los días de cierre temprano); 10 min más tarde se
+# reintenta la IA si hizo falta y sale el mail. Nueva York cambia de horario de verano en otras
+# fechas que la Argentina, así que el cron corre en todas las horas posibles (UTC) y el worker
+# decide (ver turnoDeResumen). Una sola expresión: el plan gratis tiene pocas por cuenta.
 [triggers]
-crons = ["15 13 * * MON-FRI", "25 13 * * MON-FRI", "20 20 * * MON-FRI", "30 20 * * MON-FRI"]
+crons = ["0,10,30,40 13,14,17,18,20,21 * * MON-FRI"]
 
 # Secretos (nunca en este archivo):
 #   npx wrangler secret put GEMINI_KEY --config workers/comunidad/wrangler.toml

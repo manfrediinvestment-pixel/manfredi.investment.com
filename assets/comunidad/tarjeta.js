@@ -4,6 +4,8 @@
  *
  * window.MiTarjeta.dibujar(canvas, resumen) -> Promise<Blob PNG>
  * window.MiTarjeta.compartirImagen(blob, resumen, texto?) / .compartirTexto(texto)
+ * window.MiTarjeta.waHtml(texto, conLinks)  -> el formato de WhatsApp en HTML
+ * window.MiTarjeta.horarios(fecha)          -> a qué hora (Argentina) sale cada resumen ese día
  */
 (function () {
   if (window.MiTarjeta) return;
@@ -25,6 +27,52 @@
     new Promise(function (ok) { if (logo.complete) ok(); else { logo.onload = logo.onerror = ok; } })
   ]).catch(function () {});
 
+  // ---------- formato de WhatsApp en HTML ----------
+  // *negrita*, _cursiva_, > cita, - lista y ```bloque de ancho fijo``` (las tablas de cotizaciones).
+  function esc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function enLinea(t, links) {
+    var h = esc(t).replace(/\*([^*\n]+)\*/g, '<b>$1</b>').replace(/(^|[\s(])_([^_\n]+)_/g, '$1<i>$2</i>');
+    if (links) h = h.replace(/(https?:\/\/[^\s<]+|\bmanfredinvestment\.com\b)/g, function (u) {
+      return '<a href="' + (/^http/.test(u) ? u : 'https://' + u) + '" target="_blank" rel="noopener">' + u + '</a>';
+    });
+    return h;
+  }
+  function waHtml(texto, links) {
+    var partes = String(texto || '').split('```'), html = '';
+    partes.forEach(function (parte, i) {
+      if (i % 2) { html += '<pre class="wa-mono">' + esc(parte.replace(/^\n|\n$/g, '')) + '</pre>'; return; }
+      var lineas = parte.split('\n'), lista = false;
+      lineas.forEach(function (l, j) {
+        var esLista = /^- /.test(l);
+        if (esLista && !lista) { html += '<ul class="wa-lista">'; lista = true; }
+        if (!esLista && lista) { html += '</ul>'; lista = false; }
+        if (esLista) html += '<li>' + enLinea(l.slice(2), links) + '</li>';
+        else if (/^> /.test(l)) html += '<blockquote class="wa-cita">' + enLinea(l.slice(2), links) + '</blockquote>';
+        else if (l.trim()) html += enLinea(l, links) + ((lineas[j + 1] || '').trim() && !/^(- |> )/.test(lineas[j + 1]) ? '<br>' : '');
+        else if (j > 0 && j < lineas.length - 1) html += '<span class="wa-sep"></span>';
+      });
+      if (lista) html += '</ul>';
+    });
+    return html;
+  }
+
+  // ---------- horario de los resúmenes (el de Wall Street, en hora argentina) ----------
+  // 30 min antes de la apertura (9:00 NY) y 30 min después del cierre (16:30 NY; 13:30 los días
+  // de cierre temprano). Mismas fechas que workers/comunidad (NYSE_FERIADOS / NYSE_MEDIO_DIA).
+  var FERIADOS = ['2026-11-26', '2026-12-25', '2027-01-01', '2027-01-18', '2027-02-15', '2027-03-26', '2027-05-31', '2027-06-18', '2027-07-05', '2027-09-06', '2027-11-25', '2027-12-24'];
+  var MEDIO_DIA = ['2026-11-27', '2026-12-24', '2027-11-26'];
+  function horarios(fecha) {
+    var iso = new Date(fecha.getTime() - 3 * 3600e3).toISOString().slice(0, 10);
+    var dia = new Date(iso + 'T15:00:00Z');
+    var nyHora = +new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: '2-digit', hourCycle: 'h23' }).format(dia);
+    var dif = 12 - nyHora;                       // 15:00 UTC = 12:00 en Argentina: horas que va adelantada a NY (1 o 2)
+    var wd = dia.getUTCDay(), cierreNY = MEDIO_DIA.indexOf(iso) > -1 ? 13 * 60 + 30 : 16 * 60 + 30;
+    var hm = function (m) { return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+    var ap = 9 * 60 + dif * 60, ci = cierreNY + dif * 60;
+    return { iso: iso, hay: wd !== 0 && wd !== 6 && FERIADOS.indexOf(iso) < 0,
+      apertura: { min: ap, hora: hm(ap) }, cierre: { min: ci, hora: hm(ci) } };
+  }
+
   function dibujar(cv, d) {
     return listo.then(function () {
       var x = cv.getContext('2d'), W = 1080, H = 1350, L = 84, R = W - 84;
@@ -43,11 +91,19 @@
       x.textAlign = 'left';
       x.fillStyle = C.ink; x.font = '400 70px "DM Serif Display"';
       x.fillText(d.momento === 'apertura' ? 'Antes de la apertura' : 'Cierre del mercado', L, 215);
-      linea(x, L, R, 278);
+      var y = 278;
+      if (d.clave) {
+        // la clave del día, en hasta 2 líneas
+        x.font = '400 30px "IBM Plex Sans"'; x.fillStyle = C.ch;
+        var lineas = partir(x, d.clave, R - L).slice(0, 2);
+        lineas.forEach(function (t, i) { x.fillText(t, L, 282 + i * 42); });
+        y = 282 + lineas.length * 42 + 8;
+      }
+      linea(x, L, R, y);
 
-      var y = 330;
-      y = seccion(x, 'ARGENTINA', d.datos.argentina, L, R, y);
-      y = seccion(x, d.momento === 'apertura' ? 'MUNDO · ÚLTIMO CIERRE' : 'MUNDO', d.datos.mundo, L, R, y + 24);
+      y += 52;
+      y = seccion(x, d.momento === 'apertura' ? 'ARGENTINA · ÚLTIMO CIERRE' : 'ARGENTINA', d.datos.argentina, L, R, y);
+      y = seccion(x, d.momento === 'apertura' ? 'MUNDO · ÚLTIMO CIERRE' : 'MUNDO', d.datos.mundo, L, R, y + 20);
 
       // cierre: panel líder · apertura: agenda de hoy
       var extra = [], p = d.datos.panel;
@@ -84,12 +140,18 @@
       x.font = '500 31px "IBM Plex Mono"'; x.textAlign = 'right'; x.fillText(precio(f), R - 190, y);
       x.fillStyle = v.s > 0 ? C.up : v.s < 0 ? C.dn : C.ink; x.fillText(v.t, R, y);
       x.textAlign = 'left';
-      y += 54;
+      y += 50;
     });
     return y;
   }
   function linea(x, L, R, y) { x.strokeStyle = C.line; x.lineWidth = 1.5; x.beginPath(); x.moveTo(L, y); x.lineTo(R, y); x.stroke(); }
   function spaced(x, t, px, py, sp) { for (var i = 0; i < t.length; i++) { x.fillText(t[i], px, py); px += x.measureText(t[i]).width + sp; } }
+  function partir(x, t, max) {
+    var out = [], l = '';
+    t.split(' ').forEach(function (w) { var p = l ? l + ' ' + w : w; if (x.measureText(p).width > max && l) { out.push(l); l = w; } else l = p; });
+    if (l) out.push(l);
+    return out;
+  }
   function cortar(x, t, max, font) {
     x.font = font; if (x.measureText(t).width <= max) return t;
     while (t.length && x.measureText(t + '…').width > max) t = t.slice(0, -1);
@@ -114,5 +176,5 @@
     window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank', 'noopener');
   }
 
-  window.MiTarjeta = { dibujar: dibujar, compartirImagen: compartirImagen, compartirTexto: compartirTexto, movil: MOVIL };
+  window.MiTarjeta = { dibujar: dibujar, compartirImagen: compartirImagen, compartirTexto: compartirTexto, waHtml: waHtml, horarios: horarios, movil: MOVIL };
 })();

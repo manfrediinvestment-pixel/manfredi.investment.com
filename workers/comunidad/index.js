@@ -15,8 +15,9 @@
 //    - Texto: Gemini (cupo gratis, clave SIN facturación) redacta un párrafo corto SOLO con los
 //      números que se le pasan; si inventa un número, falla o no hay cupo, sale la plantilla.
 //    - Se publican como mensaje oficial del chat gratis (1 por día y momento: regenerar lo reemplaza).
-//    - Cron de lunes a viernes: genera y publica; 10 min después reintenta la IA si hizo falta
-//      y avisa por mail (si hay RESEND_API_KEY).
+//    - Horario de Wall Street: 30 min antes de la apertura (9:00 NY) y 30 min después del cierre
+//      (16:30 NY; 13:30 los días que cierra temprano). Sin resumen los feriados de la NYSE.
+//      10 min después se reintenta la IA si hizo falta y sale el mail (si hay RESEND_API_KEY).
 //    GET /wa/apertura · /wa/cierre  (?regenerar=1)  -> solo creadores (Panel de creador)
 
 const CREADORES = ['nachito2502@gmail.com'];
@@ -64,19 +65,46 @@ export default {
     }
   },
 
-  // 10:15 / 17:20 ART: se arma y se publica en el chat. 10:25 / 17:30: si la IA no respondió
-  // (Gemini gratis a veces está saturado), se reintenta; recién ahí sale el mail para WhatsApp.
+  // El cron corre cada 10/30 min en las horas posibles (UTC) y acá se decide con la hora de
+  // Nueva York, que cambia de horario de verano en fechas distintas que la Argentina.
   async scheduled(event, env, ctx) {
-    const [min, hora] = event.cron.split(' ');
-    const momento = hora === '13' ? 'apertura' : 'cierre';
-    const segundo = min === '25' || min === '30';
+    const turno = turnoDeResumen(new Date(event.scheduledTime));
+    if (!turno) return;
     ctx.waitUntil((async () => {
-      let r = await resumen(env, momento, !segundo);
-      if (segundo && !r.ia) r = await resumen(env, momento, true);
-      if (segundo) await avisarPorMail(env, r);
+      let r = await resumen(env, turno.momento, !turno.reintento);
+      if (turno.reintento && !r.ia) r = await resumen(env, turno.momento, true);
+      if (turno.reintento) await avisarPorMail(env, r);
     })());
   },
 };
+
+// ─── Horario de Wall Street ──────────────────────────────────────────────────
+
+// NYSE: feriados y días de cierre temprano (13:00 NY). Actualizar una vez por año.
+const NYSE_FERIADOS = new Set([
+  '2026-11-26', '2026-12-25',
+  '2027-01-01', '2027-01-18', '2027-02-15', '2027-03-26', '2027-05-31', '2027-06-18',
+  '2027-07-05', '2027-09-06', '2027-11-25', '2027-12-24',
+]);
+const NYSE_MEDIO_DIA = new Set(['2026-11-27', '2026-12-24', '2027-11-26']);
+
+function horaNY(d) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York', hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', weekday: 'short',
+  }).formatToParts(d).map(x => [x.type, x.value]));
+  return { iso: `${p.year}-${p.month}-${p.day}`, min: +p.hour * 60 + +p.minute, finde: p.weekday === 'Sat' || p.weekday === 'Sun' };
+}
+// apertura: 9:00 NY (30 min antes de las 9:30) · cierre: 30 min después de las 16:00 (o 13:00)
+function turnoDeResumen(d) {
+  const ny = horaNY(d);
+  if (ny.finde || NYSE_FERIADOS.has(ny.iso)) return null;
+  const cierre = NYSE_MEDIO_DIA.has(ny.iso) ? 13 * 60 + 30 : 16 * 60 + 30;
+  if (ny.min === 9 * 60) return { momento: 'apertura', reintento: false };
+  if (ny.min === 9 * 60 + 10) return { momento: 'apertura', reintento: true };
+  if (ny.min === cierre) return { momento: 'cierre', reintento: false };
+  if (ny.min === cierre + 10) return { momento: 'cierre', reintento: true };
+  return null;
+}
 
 // ─── Resumen del día ─────────────────────────────────────────────────────────
 
@@ -98,7 +126,8 @@ async function resumen(env, momento, regenerar) {
     fechaLarga: hoy.larga,
     generado: new Date().toISOString(),
     ia: !!ia,
-    intro: ia || introPlantilla(momento, datos),
+    clave: ia ? ia.clave : null,             // "La clave del día": una frase, solo con IA
+    intro: ia ? ia.parrafo : introPlantilla(momento, datos),
     datos,
   };
   r.texto = textoWhatsApp(r, env.SITE_URL);
@@ -154,7 +183,7 @@ async function juntarDatos(env, momento, hoy) {
       panel = { suben: lider.filter(a => a.c > 0).slice(0, 3), bajan: lider.filter(a => a.c < 0).slice(-3).reverse() };
     }
     const ced = cat('arg_cedears').filter(c => c.change != null && c.volume)
-      .sort((a, b) => b.volume - a.volume).slice(0, 8).map(c => ({ n: c.symbol, c: c.change }));
+      .sort((a, b) => b.volume - a.volume).slice(0, 6).map(c => ({ n: c.symbol, c: c.change }));
     if (ced.length) cedears = ced;
   }
 
@@ -174,10 +203,21 @@ async function juntarDatos(env, momento, hoy) {
     ? { titulo: 'Agenda de hoy', eventos: agendaDe(hoy.ddmm) }
     : { titulo: hoy.d.getUTCDay() === 5 ? 'Agenda del lunes' : 'Agenda de mañana', eventos: agendaDe(ddmmProx) };
 
-  const noticias = [...(pulso.argentina.noticias || []).slice(0, 3), ...(pulso.mundo.noticias || []).slice(0, 2)]
-    .map(n => ({ t: n.titulo, f: n.fuente, r: (n.resumen || '').slice(0, 200) }));
+  // En el mensaje van 5 titulares; la IA recibe además las bajadas de todos para explicar el porqué.
+  const nota = n => ({ t: n.titulo, f: n.fuente, r: (n.resumen || '').slice(0, 260) });
+  const ar = pulso.argentina.noticias || [], mu = pulso.mundo.noticias || [];
+  const noticias = [...ar.slice(0, 3), ...mu.slice(0, 2)].map(nota);
+  const contexto = [...ar, ...mu].map(nota);
 
-  return { argentina, bonos, mundo, panel, cedears, agenda, noticias };
+  // Brecha (MEP contra oficial) y canje (CCL contra MEP), en %.
+  const v = id => (argentina.find(f => f.id === id) || {}).v;
+  const of = v('oficial'), mep = v('bolsa'), ccl = v('contadoconliqui');
+  const derivados = {
+    brecha: of && mep ? (mep / of - 1) * 100 : null,
+    canje: mep && ccl ? (ccl / mep - 1) * 100 : null,
+  };
+
+  return { argentina, derivados, bonos, mundo, panel, cedears, agenda, noticias, contexto };
 }
 
 // ─── Redacción con IA (Gemini, cupo gratis) ─────────────────────────────────
@@ -185,18 +225,27 @@ async function juntarDatos(env, momento, hoy) {
 async function redactar(env, momento, datos) {
   if (!env.GEMINI_KEY) return null;
   const consigna = momento === 'apertura'
-    ? 'Escribí la introducción del resumen de la MAÑANA, antes de que abra el mercado argentino (11 h). Contá en qué quedó el último cierre y qué hay que mirar hoy (agenda y titulares).'
-    : 'Escribí la introducción del resumen de CIERRE del día. Contá qué pasó hoy en el mercado argentino y en el mundo, y por qué, apoyándote en los titulares.';
-  const prompt = `Sos el redactor de "Manfredi Investment", una comunidad de inversores argentinos en WhatsApp.
+    ? `Es el resumen de la MAÑANA, media hora antes de que abra Wall Street. Los precios son del último cierre.
+"clave": lo que define el día que empieza (un dato de la agenda, una noticia o el último movimiento importante).
+"parrafo": 1) en qué quedó el último cierre en la Argentina y por qué, 2) cómo viene el mundo, 3) qué hay que mirar hoy en la agenda.`
+    : `Es el resumen del CIERRE, media hora después de que cerró Wall Street.
+"clave": lo que definió la rueda de hoy.
+"parrafo": 1) qué pasó en la Argentina y por qué, 2) qué pasó en Wall Street y el mundo y por qué, 3) qué hay en la agenda de mañana, si es relevante.`;
+  const prompt = `Sos el analista que escribe el resumen diario de "Manfredi Investment" para una comunidad de inversores argentinos (chat del sitio y WhatsApp).
 ${consigna}
 
+Respondé SOLO un JSON: {"clave": "...", "parrafo": "..."}
+
+"clave": una sola frase, de 8 a 16 palabras, tipo titular de diario financiero serio. Sin punto final.
+"parrafo": de 50 a 85 palabras, 3 oraciones como máximo.
+
 Reglas estrictas:
-- Entre 45 y 75 palabras, 2 o 3 oraciones, en español rioplatense neutro y profesional (sin voseo exagerado, sin emojis, sin hashtags, sin saludos).
-- Usá SOLO números que aparezcan en los DATOS, con formato argentino: punto de miles y coma decimal, máximo 1 decimal (ej.: $1.560,9; 753 puntos; 1,1%). Si un dato no está, no lo menciones.
-- Las variaciones (campo "c") son porcentajes del día; en riesgo país "d" son puntos básicos de diferencia.
-- Nada de recomendaciones de compra o venta, ni predicciones. Solo describir.
-- Sin adjetivos exagerados ("explosivo", "brutal", "histórico").
-- Devolvé solo el párrafo, en texto plano.
+- Español rioplatense neutro y profesional, con tildes y ortografía correctas. Sin emojis, hashtags, saludos ni signos de exclamación.
+- Interpretá: conectá los movimientos con lo que dicen los titulares y sus bajadas ("contexto"). Si ninguna noticia explica un movimiento, describilo sin inventar causas.
+- Usá SOLO números que estén en los DATOS, con formato argentino: punto de miles, coma decimal, máximo 1 decimal (ej.: $1.560,9; 753 puntos; 1,1%). Si un dato no está, no lo menciones.
+- "c" es la variación del día en %; en riesgo país, "d" es la diferencia en puntos básicos. "derivados.brecha" es la brecha del MEP con el oficial y "derivados.canje" la del CCL con el MEP, en %.
+- Nada de recomendaciones de compra o venta ni predicciones de precios.
+- Sin adjetivos exagerados ("explosivo", "brutal", "histórico", "sangría").
 
 DATOS:
 ${JSON.stringify(datos)}`;
@@ -208,17 +257,27 @@ ${JSON.stringify(datos)}`;
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': env.GEMINI_KEY },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 2048 },
+          generationConfig: { temperature: 0.4, maxOutputTokens: 2048, responseMimeType: 'application/json' },
         }),
         signal: AbortSignal.timeout(30000),
       });
       if (!r.ok) { console.warn(`[resumen] ${modelo} HTTP ${r.status}`); continue; } // sin cupo (429) u otro error: siguiente
       const d = await r.json();
-      const txt = ((d.candidates?.[0]?.content?.parts || []).filter(p => !p.thought).map(p => p.text || '').join('') || '').replace(/\s+/g, ' ').trim();
-      if (txt.length < 80 || txt.length > 700) { console.warn(`[resumen] ${modelo} largo ${txt.length}`); continue; }
-      const malos = numerosInvalidos(txt, datos);
+      const crudo = (d.candidates?.[0]?.content?.parts || []).filter(p => !p.thought).map(p => p.text || '').join('');
+      let o;
+      try { o = JSON.parse(crudo.replace(/^```(?:json)?|```$/g, '').trim()); } catch (e) { console.warn(`[resumen] ${modelo} no devolvió JSON`); continue; }
+      const limpio = t => String(t || '').replace(/\s+/g, ' ').replace(/[*_~`]/g, '').trim();
+      const clave = limpio(o.clave).replace(/\.$/, ''), parrafo = limpio(o.parrafo);
+      if (clave.length < 25 || clave.length > 140 || parrafo.length < 120 || parrafo.length > 700) {
+        console.warn(`[resumen] ${modelo} largo clave ${clave.length} / párrafo ${parrafo.length}`); continue;
+      }
+      // a veces el modelo liviano escribe sin tildes: mejor el siguiente modelo o la plantilla
+      if (/(dolar|pais|decision|indices|politica|economia|tecnologico|atencion|mas alla|segun)/i.test(clave + ' ' + parrafo)) {
+        console.warn(`[resumen] ${modelo} sin tildes`); continue;
+      }
+      const malos = numerosInvalidos(clave + ' ' + parrafo, datos);
       if (malos.length) { console.warn(`[resumen] ${modelo} números fuera de los datos: ${malos.join(', ')}`); continue; } // inventó o redondeó mal
-      return txt;
+      return { clave, parrafo };
     } catch (e) { console.warn(`[resumen] ${modelo} ${e.message}`); }
   }
   return null;
@@ -243,7 +302,7 @@ function numerosInvalidos(txt, datos) {
   };
   recorrer(datos);
   const hoy = hoyART();
-  [hoy.d.getUTCDate(), hoy.d.getUTCFullYear(), 11, 17].forEach(agregar);
+  [hoy.d.getUTCDate(), hoy.d.getUTCFullYear(), 11, 16, 17].forEach(agregar);
   return (txt.match(/\d+(?:[.,]\d+)*/g) || []).filter(n => +sinSep(n) >= 10 && !ok.has(sinSep(n)));
 }
 
@@ -260,46 +319,70 @@ function introPlantilla(momento, datos) {
   return (momento === 'apertura' ? 'En el último cierre, ' : 'Hoy ') + cuerpo + '.';
 }
 
-// ─── Formato WhatsApp (*negrita*, _cursiva_) ────────────────────────────────
+// ─── Formato WhatsApp ────────────────────────────────────────────────────────
+// *negrita*, _cursiva_, > cita, - lista y ```bloque``` de ancho fijo para que las cotizaciones
+// queden en columnas (el chat del sitio lo muestra igual). En los bloques, solo caracteres de
+// ancho fijo seguro: "-" común en vez de "−" y sin flechas.
 
 function num(v, dec) {
   const d = dec != null ? dec : Math.abs(v) >= 10000 ? 0 : 2;
   return v.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
 }
-// Todo se decide sobre el valor ya redondeado a 1 decimal (−0,04% es "0,0%", sin flecha).
+// Todo se decide sobre el valor ya redondeado a 1 decimal (−0,04% es "0,0%").
 const r1 = c => Math.round(c * 10) / 10;
-function pct(c, signo = true) {
+function pct(c, signo = true, menos = '−') {
   const s = Math.abs(r1(c)).toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
-  return signo ? (r1(c) > 0 ? '+' : r1(c) < 0 ? '−' : '') + s : s;
+  return signo ? (r1(c) > 0 ? '+' : r1(c) < 0 ? menos : '') + s : s;
 }
 function verbo(c) { return r1(c) > 0 ? 'subió' : r1(c) < 0 ? 'bajó' : 'quedó estable,'; }
-function flecha(c) { return r1(c) > 0 ? '▲' : r1(c) < 0 ? '▼' : '='; }
-function precio(f) {
+function precio(f, sinUsd) {
   if (f.u === 'pb') return num(f.v, 0) + ' pb';
+  if (sinUsd && f.u === 'US$') return num(f.v);
   return (f.u === '$' ? '$' : f.u ? f.u + ' ' : '') + num(f.v);
 }
-function variacion(f) {
-  if (f.d != null) return `${flecha(f.d)} ${f.d > 0 ? '+' : f.d < 0 ? '−' : ''}${Math.abs(f.d)} pb`;
-  return f.c != null ? `${flecha(f.c)} ${pct(f.c)}` : '';
+const CORTOS = { 'Dólar oficial': 'Oficial', 'Dólar MEP': 'MEP', 'Dólar CCL': 'CCL', 'Dólar blue': 'Blue', 'Petróleo WTI': 'Petróleo' };
+// Columnas: nombre 12 · precio 10 · variación 8 (en dólares sin "US$": el título ya lo dice).
+function filaTabla(nombre, valor, vari) { return nombre.padEnd(12) + valor.padStart(10) + vari.padStart(8); }
+function tabla(filas, extra) {
+  const lineas = filas.map(f => {
+    const vari = f.d != null ? (f.d > 0 ? '+' : f.d < 0 ? '-' : '') + Math.abs(f.d) + ' pb' : f.c != null ? pct(f.c, true, '-') : '';
+    return filaTabla(CORTOS[f.n] || f.n, precio(f, true), vari);
+  });
+  return ['```', ...lineas, ...(extra || []), '```'];
 }
-function linea(f) { return `${f.n}: *${precio(f)}* ${variacion(f)}`.trim(); }
 
 function textoWhatsApp(r, site) {
-  const d = r.datos;
-  const titulo = r.momento === 'apertura' ? 'ANTES DE LA APERTURA' : 'CIERRE DEL MERCADO';
-  const out = [`*MANFREDI · ${titulo}*`, `_${r.fechaLarga.charAt(0).toUpperCase() + r.fechaLarga.slice(1)}_`, '', r.intro, ''];
-  out.push('*🇦🇷 Argentina*', ...d.argentina.map(linea));
-  if (d.bonos.length) out.push('', '*Bonos en dólares*', d.bonos.map(b => `${b.n} ${flecha(b.c)} ${pct(b.c)}`).join(' · '));
+  const d = r.datos, ape = r.momento === 'apertura';
+  const fecha = r.fechaLarga.charAt(0).toUpperCase() + r.fechaLarga.slice(1);
+  const out = [`*MANFREDI · ${ape ? 'ANTES DE LA APERTURA' : 'CIERRE DEL MERCADO'}*`, `_${fecha}_`, ''];
+  if (r.clave) out.push(`> *${r.clave}*`, '');
+  out.push(r.intro, '');
+
+  // Argentina (a la mañana es el último cierre)
+  out.push(`*🇦🇷 Argentina*${ape ? ' _· último cierre_' : ''}`);
+  const der = d.derivados || {}, extra = [];
+  if (der.brecha != null) extra.push(filaTabla('Brecha MEP', '', pct(der.brecha, true, '-')));
+  if (der.canje != null) extra.push(filaTabla('Canje CCL', '', pct(der.canje, true, '-')));
+  out.push(...tabla(d.argentina, extra));
+
+  if (d.bonos.length) {
+    out.push('', '*Bonos en dólares*', '```');
+    for (let i = 0; i < d.bonos.length; i += 2) {
+      out.push(d.bonos.slice(i, i + 2).map(b => (b.n.padEnd(6) + pct(b.c, true, '-').padStart(7))).join('   '));
+    }
+    out.push('```');
+  }
   if (d.panel) {
-    out.push('', '*Panel líder*',
-      ...(d.panel.suben.length ? ['Suben: ' + d.panel.suben.map(a => `${a.n} ${pct(a.c)}`).join(' · ')] : []),
-      ...(d.panel.bajan.length ? ['Bajan: ' + d.panel.bajan.map(a => `${a.n} ${pct(a.c)}`).join(' · ')] : []));
+    out.push('', '*Panel líder*');
+    if (d.panel.suben.length) out.push('▲ ' + d.panel.suben.map(a => `${a.n} ${pct(a.c)}`).join(' · '));
+    if (d.panel.bajan.length) out.push('▼ ' + d.panel.bajan.map(a => `${a.n} ${pct(a.c)}`).join(' · '));
   }
   if (d.cedears) out.push('', '*CEDEARs más operados*', d.cedears.map(c => `${c.n} ${pct(c.c)}`).join(' · '));
-  out.push('', r.momento === 'apertura' ? '*🌎 Mundo · último cierre*' : '*🌎 Mundo*', ...d.mundo.map(linea));
-  if (d.agenda.eventos.length) out.push('', `*📅 ${d.agenda.titulo}*`, ...d.agenda.eventos.map(e => `• ${e.t}`));
-  if (d.noticias.length) out.push('', '*📰 Titulares*', ...d.noticias.map(n => `• ${n.t} _(${n.f})_`));
-  out.push('', `Cotizaciones en vivo, calendario y noticias: ${site.replace(/^https?:\/\//, '')}`);
+
+  out.push('', `*🇺🇸 Wall Street y el mundo* _· ${ape ? 'último cierre, ' : ''}en US$_`, ...tabla(d.mundo));
+  if (d.agenda.eventos.length) out.push('', `*📅 ${d.agenda.titulo}*`, ...d.agenda.eventos.map(e => `- ${e.t}`));
+  if (d.noticias.length) out.push('', '*📰 Lo que se lee*', ...d.noticias.map(n => `- ${n.t} _(${n.f})_`));
+  out.push('', `_Cotizaciones en vivo y la Comunidad: ${site.replace(/^https?:\/\//, '')}_`);
   return out.join('\n');
 }
 

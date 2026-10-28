@@ -20,8 +20,8 @@
   var EMOJIS = ['👍', '🔥', '📈', '📉', '🤔'];
   var COLORES = ['#e9d3a0', '#8ec5ff', '#9be3c4', '#f0a8b8', '#c9b6ff', '#ffc58f'];
   var SALAS = {
-    gratis: { nombre: 'Mercados', tag: 'Gratis', sub: 'Comunidad abierta · resúmenes 10:15 y 17:20',
-      fijado: 'Resúmenes del mercado antes de la apertura y al cierre. Las opiniones de los miembros no son recomendaciones de inversión. Nadie del equipo te va a escribir por privado ni a pedirte dinero.' },
+    gratis: { nombre: 'Mercados', tag: 'Gratis', sub: 'Comunidad abierta · resúmenes antes y después de Wall Street',
+      fijado: 'Resúmenes del mercado media hora antes de que abra Wall Street y media hora después del cierre. Las opiniones de los miembros no son recomendaciones de inversión. Nadie del equipo te va a escribir por privado ni a pedirte dinero.' },
     ideas: { nombre: 'Ideas de Ignacio', pro: true, soloCreador: true, sub: 'Publica solo Ignacio · ideas, seguimientos y cierres',
       fijado: 'Las ideas son análisis generales: no consideran tu situación particular. Antes de operar, mirá si encajan con tu perfil.' },
     socios: { nombre: 'Charla de socios', pro: true, sub: 'Solo socios Pro',
@@ -61,13 +61,9 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function leer(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
   function guardar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-  function formato(t, oficial) {
-    var h = esc(t).replace(/\*([^*\n]+)\*/g, '<b>$1</b>').replace(/(^|[\s(])_([^_\n]+)_/g, '$1<i>$2</i>');
-    if (oficial) h = h.replace(/(https?:\/\/[^\s<]+|\bmanfredinvestment\.com\b)/g, function (u) {
-      return '<a href="' + (/^http/.test(u) ? u : 'https://' + u) + '" target="_blank" rel="noopener">' + u + '</a>';
-    });
-    return h.replace(/\n/g, '<br>');
-  }
+  // El formato de WhatsApp (negrita, cursiva, citas, listas y tablas): el mismo del mensaje que va
+  // a la Comunidad. Los links se pueden tocar solo en los mensajes oficiales (anti-estafa).
+  function formato(t, oficial) { return window.MiTarjeta.waHtml(t, oficial); }
   function hora(ms) { return new Date(ms).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }); }
   function diaClave(ms) { var d = new Date(ms); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); }
   function diaTexto(ms) {
@@ -245,16 +241,16 @@
   }
 
   // Guía a los resúmenes de hoy: siempre a la vista, lleva al mensaje aunque haya quedado lejos.
-  var RES = [{ k: 'apertura', t: 'Antes de la apertura', h: '10:15' }, { k: 'cierre', t: 'Cierre del mercado', h: '17:20' }];
+  var RES = [{ k: 'apertura', t: 'Antes de la apertura' }, { k: 'cierre', t: 'Cierre del mercado' }];
   function pintarHoy() {
     var el = S.root.querySelector('.ch-hoy'); if (!el) return;
-    var z = S.salas.gratis, ahora = new Date(Date.now() - 3 * 3600e3), finde = ahora.getUTCDay() === 0 || ahora.getUTCDay() === 6;
+    var z = S.salas.gratis, hoy = window.MiTarjeta.horarios(new Date());
     var vistos = leer('mi-res-visto', {});
-    if (finde && !(z.hoy || []).length) { el.hidden = true; return; }
+    if (!hoy.hay && !(z.hoy || []).length) { el.hidden = true; return; }
     el.hidden = false;
     el.innerHTML = '<span class="ch-hoy-k">Resúmenes de hoy</span>' + RES.map(function (r) {
       var m = (z.hoy || []).filter(function (x) { return x.momento === r.k; })[0];
-      if (!m) return '<span class="ch-hoy-b pend">' + IC.clock + '<span>' + r.t + '</span><time>' + r.h + '</time></span>';
+      if (!m) return '<span class="ch-hoy-b pend">' + IC.clock + '<span>' + r.t + '</span><time>' + hoy[r.k].hora + '</time></span>';
       return '<button type="button" class="ch-hoy-b" data-a="ir-res" data-id="' + m.id + '">' + (vistos[m.id] ? '' : '<i class="ch-hoy-dot" aria-label="Nuevo"></i>') +
         '<span>' + r.t + '</span><time>' + hora(m.creado) + '</time>' + IC.down + '</button>';
     }).join('');
@@ -358,10 +354,12 @@
   function resumen(m) {
     var d = m.datos, t = tarjeta(m);
     // el texto completo es el mismo de WhatsApp: arriba la introducción, el resto se despliega
-    var cuerpo = d.texto.split('\n').slice(3).join('\n').replace(d.intro, '').trim();
+    // el texto completo es el mismo de WhatsApp: arriba la clave y el párrafo, el resto se despliega
+    var k = d.texto.indexOf(d.intro), cuerpo = (k > -1 ? d.texto.slice(k + d.intro.length) : d.texto).trim();
     return '<button type="button" class="ch-card' + (t.url ? ' on' : '') + '" data-a="ver" aria-label="Ver la tarjeta en grande">' +
         '<img data-card="' + m.id + '" src="' + (t.url || '') + '" alt="Tarjeta: ' + (d.momento === 'apertura' ? 'antes de la apertura' : 'cierre del mercado') + '"></button>' +
       '<div class="ch-res-k">' + (d.momento === 'apertura' ? 'Antes de la apertura' : 'Cierre del mercado') + '</div>' +
+      (d.clave ? '<p class="ch-res-clave">' + esc(d.clave) + '</p>' : '') +
       '<div class="ch-txt">' + formato(d.intro, true) + '</div>' +
       '<details class="ch-det"><summary><span>Ver el resumen completo</span>' + IC.down + '</summary><div class="ch-txt">' + formato(cuerpo, true) + '</div></details>' +
       '<div class="ch-res-pie"><button type="button" class="ch-share" data-a="compartir">' + IC.share + 'Compartir</button><span class="ch-time">' + hora(m.creado) + '</span></div>';
@@ -489,21 +487,25 @@
     if ((z.vistos[S.sala] || 0) < ult) { z.vistos[S.sala] = ult; var v = leer('mi-chat-visto', {}); v[S.sala] = ult; guardar('mi-chat-visto', v); }
   }
 
-  // Próximo resumen (lunes a viernes 10:15 y 17:20, hora argentina) con cuenta regresiva.
+  // Próximo resumen (horario de Wall Street en hora argentina) con cuenta regresiva.
   function pintarProximo() {
     var el = S.root.querySelector('.ch-next'); if (!el) return;
-    var ahora = new Date(Date.now() - 3 * 3600e3), dia = ahora.getUTCDay(), min = ahora.getUTCHours() * 60 + ahora.getUTCMinutes();
-    var cuales = [[615, 'Antes de la apertura', '10:15'], [1040, 'Cierre del mercado', '17:20']], prox = null, dias = 0;
-    for (var d = 0; d < 8 && !prox; d++) {
-      var wd = (dia + d) % 7;
-      if (wd === 0 || wd === 6) continue;
-      for (var i = 0; i < cuales.length; i++) if (d > 0 || cuales[i][0] > min) { prox = cuales[i]; dias = d; break; }
+    var ahora = Date.now(), artMin = Math.floor(((ahora - 3 * 3600e3) % 864e5) / 6e4), prox = null;
+    for (var d = 0; d < 10 && !prox; d++) {
+      var h = window.MiTarjeta.horarios(new Date(ahora + d * 864e5));
+      if (!h.hay) continue;
+      [['apertura', 'Antes de la apertura'], ['cierre', 'Cierre del mercado']].some(function (x) {
+        if (d === 0 && h[x[0]].min <= artMin) return false;
+        prox = { d: d, t: x[1], hora: h[x[0]].hora, min: h[x[0]].min, iso: h.iso }; return true;
+      });
     }
-    var falta = dias * 1440 + prox[0] - min, h = Math.floor(falta / 60), m = falta % 60;
-    var cuando = dias === 0 ? 'Hoy' : dias === 1 ? 'Mañana' : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][(dia + dias) % 7];
+    if (!prox) { el.innerHTML = ''; return; }
+    var falta = prox.d * 1440 + prox.min - artMin, hh = Math.floor(falta / 60), mm = falta % 60;
+    var nombre = new Date(prox.iso + 'T12:00:00Z').toLocaleDateString('es-AR', { weekday: 'long', timeZone: 'UTC' });
+    var cuando = prox.d === 0 ? 'Hoy' : prox.d === 1 ? 'Mañana' : nombre.charAt(0).toUpperCase() + nombre.slice(1);
     el.innerHTML = '<span class="ch-kick">Próximo resumen</span>' +
-      '<b>' + prox[1] + '</b>' +
-      '<span class="ch-next-t"><time>' + cuando + ' · ' + prox[2] + '</time><em>' + (h >= 24 ? Math.round(h / 24) + ' d' : (h ? h + ' h ' : '') + m + ' min') + '</em></span>';
+      '<b>' + prox.t + '</b>' +
+      '<span class="ch-next-t"><time>' + cuando + ' · ' + prox.hora + '</time><em>' + (hh >= 24 ? Math.round(hh / 24) + ' d' : (hh ? hh + ' h ' : '') + mm + ' min') + '</em></span>';
   }
 
   // ---------- ciclo ----------
