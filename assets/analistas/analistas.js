@@ -19,7 +19,7 @@
     ['cripto', 'Cripto', '#f2b880'], ['finanzas', 'Finanzas personales', '#7fd1ae'], ['trading', 'Trading', '#f29e8e']];
   var CAT = {}; CATS.forEach(function (c) { CAT[c[0]] = { n: c[1], c: c[2] }; });
   var MANFREDI = {
-    slug: 'manfredi', nombre: 'Manfredi Investment', rol: 'Research & Markets · Informes semanales y especiales', corto: 'Macro · Mercados',
+    slug: 'manfredi', nombre: 'Ignacio Manfredi', rol: 'Fundador de Manfredi Investment · Informes semanales y especiales', corto: 'Macro · Mercados',
     color: '#e9c46a', logo: 'assets/img/logo-mark-512.png', verificado: true, desde: '2026-05-18',
     // las redes son las personales de Ignacio, no las de la marca
     links: { instagram: 'https://www.instagram.com/nacho.finanzas/', tiktok: 'https://www.tiktok.com/@ignacio.manfredi', linkedin: 'https://www.linkedin.com/in/ignacio-manfredi-816468250/' },
@@ -100,7 +100,8 @@
   function minutos(p) { return Math.max(1, Math.round(String(p.cuerpo).split(/\s+/).length / 200)); }
   // los textos no tienen página 1: llevan el logo de Manfredi
   function tapa(p) {
-    if (!esTexto(p)) return '<span class="an-row__cv"><img src="' + esc(p.tapa) + '" alt="" loading="lazy"></span>';
+    // PDF sin tapa (no se pudo generar la página 1): va el logo, como los textos
+    if (!esTexto(p) && p.tapa) return '<span class="an-row__cv"><img src="' + esc(p.tapa) + '" alt="" loading="lazy"></span>';
     return '<span class="an-row__cv an-row__cv--txt"><img src="assets/img/logo-mark-512.png" alt=""><small>Análisis</small></span>';
   }
   // cuerpo: párrafos separados por línea en blanco, "## " subtítulo, "- " lista, **negrita**
