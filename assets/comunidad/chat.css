@@ -55,8 +55,19 @@
 .ch-av.sm { width:30px; height:30px; font-size:11.5px; align-self:flex-start; margin-top:2px; }
 .ch-av--of { background:#0b1629; box-shadow:0 0 0 1px var(--ch-line2); }
 .ch-av--sala { box-shadow:0 0 0 1px var(--ch-line2); background:#0b1629; }
-.ch-av--pro { background:radial-gradient(circle at 30% 25%, #f3e3bd, #c9ab6c 70%); box-shadow:none; }
+.ch-av--pro { background:radial-gradient(circle at 30% 25%, #f3e3bd, #c9ab6c 70%); box-shadow:none; color:#0b1629; }
 .ch-av--pro span { font:400 15px var(--ch-serif); color:#0b1629; letter-spacing:.02em; }
+
+/* Manfredi Pro como Comunidad: encabezado del grupo y sus chats colgando de una línea */
+.ch-grupo { margin-top:14px; padding-top:14px; border-top:1px solid var(--ch-line); }
+.ch-grupo-h { display:flex; align-items:center; gap:10px; padding:2px 12px 8px; }
+.ch-grupo-h b { font:400 17px var(--ch-serif); color:var(--ch-ink); }
+.ch-av--grupo { width:30px; height:30px; border-radius:9px; }
+.ch-av--grupo span { font-size:11px; }
+.ch-grupo > ul { list-style:none; margin:0 0 0 26px; padding:0 0 0 10px; border-left:1px solid var(--ch-line2); }
+.ch-item--sub { grid-template-columns:38px minmax(0,1fr); padding:9px 10px; }
+.ch-item--sub .ch-av { width:38px; height:38px; }
+.ch-item--sub .ch-item-t b { font-size:14px; }
 .ch-av-sp { flex:none; width:30px; }
 
 /* ---------- conversación ---------- */
@@ -65,6 +76,7 @@
 .ch-head .ch-av { width:40px; height:40px; }
 .ch-head-t { display:grid; gap:2px; min-width:0; }
 .ch-head-t b { font-size:15.5px; font-weight:600; }
+.ch-head-t small { display:block; margin-bottom:1px; font:500 9.5px var(--ch-mono); letter-spacing:.16em; text-transform:uppercase; color:var(--ch-ch); }
 .ch-head-t span { font-size:12.5px; color:var(--ch-ch); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .ch-back { display:none; border:0; background:none; padding:4px; margin-left:-6px; cursor:pointer; color:var(--ch-ch); }
 
@@ -72,6 +84,22 @@
 .ch-pin svg { flex:none; margin-top:2px; color:var(--ch-ch); }
 .ch-pin span { overflow:hidden; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; }
 .ch-pin[aria-expanded="true"] span { -webkit-line-clamp:unset; }
+
+/* guía a los resúmenes de hoy */
+.ch-hoy { display:flex; align-items:center; gap:8px; padding:8px 20px; border-bottom:1px solid var(--ch-line); background:rgba(13,26,49,.92); overflow-x:auto; scrollbar-width:none; }
+.ch-hoy[hidden] { display:none; }
+.ch-hoy::-webkit-scrollbar { display:none; }
+.ch-hoy-k { flex:none; margin-right:4px; font:500 10px var(--ch-mono); letter-spacing:.16em; text-transform:uppercase; color:var(--ch-ch); }
+.ch-hoy-b { position:relative; flex:none; display:inline-flex; align-items:center; gap:7px; padding:6px 12px; border-radius:18px; border:1px solid var(--ch-ch); background:rgba(233,211,160,.1); font-size:12.8px; font-weight:500; color:var(--ch-ink); cursor:pointer; transition:background .2s, transform .15s var(--ch-ease); }
+.ch-hoy-b time { font:500 11px var(--ch-mono); color:var(--ch-ch); }
+.ch-hoy-b svg { color:var(--ch-ch); }
+@media (hover:hover) { button.ch-hoy-b:hover { background:rgba(233,211,160,.18); } }
+button.ch-hoy-b:active { transform:scale(.97); }
+.ch-hoy-b.pend { border-style:dashed; border-color:var(--ch-line2); background:none; cursor:default; }
+.ch-hoy-b.pend svg { color:var(--ch-ch); }
+.ch-hoy-dot { position:absolute; top:-2px; right:-2px; width:9px; height:9px; border-radius:50%; background:var(--ch-ch); box-shadow:0 0 0 2px #0d1a31; animation:chDot 2s var(--ch-ease) infinite; }
+@keyframes chDot { 0%,100% { box-shadow:0 0 0 2px #0d1a31, 0 0 0 2px rgba(233,211,160,.5); } 50% { box-shadow:0 0 0 2px #0d1a31, 0 0 0 7px rgba(233,211,160,0); } }
+@media (prefers-reduced-motion:reduce) { .ch-hoy-dot { animation:none; } }
 
 .ch-feedwrap { position:relative; flex:1; min-height:0; }
 .ch-feed { position:absolute; inset:0; overflow-y:auto; overscroll-behavior:contain; scroll-behavior:auto;
@@ -223,5 +251,7 @@
   .ch-bub { max-width:86%; }
   .ch-head { padding:10px 12px; }
   .ch-pin { padding:8px 14px; }
+  .ch-hoy { padding:8px 14px; }
+  .ch-hoy-k { display:none; }
   .ch-comp { padding:10px 10px 12px; }
 }

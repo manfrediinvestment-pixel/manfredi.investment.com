@@ -2,8 +2,9 @@
 // Worker "manfredi-comunidad": los chats de Manfredi Pro y los resúmenes del día.
 //
 // 1) Chats (pestaña Chat de Manfredi Pro, assets/comunidad/chat.js), mensajes en D1:
-//    - "gratis": lo lee cualquiera; escribe cualquiera con sesión iniciada.
-//    - "pro":    solo socios (verificado contra workers/memberships) y creadores.
+//    - "gratis" (Mercados): lo lee cualquiera; escribe cualquiera con sesión iniciada.
+//    - "ideas", "socios", "preguntas" (Manfredi Pro): solo socios (verificado contra
+//      workers/memberships) y creadores. En "ideas" publica solo el creador.
 //    GET  /chat/:sala?ts=&antes=   mensajes (los últimos, los cambiados desde ts o los anteriores)
 //    POST /chat/:sala              { texto, responde }           -> mensaje nuevo
 //    POST /chat/:sala/:id/reaccion { emoji }                      -> pone/saca la reacción
@@ -26,7 +27,14 @@ const MODELOS = ['gemini-3.5-flash-lite', 'gemini-flash-latest', 'gemini-flash-l
 const PANEL_LIDER = ['ALUA', 'BBAR', 'BMA', 'BYMA', 'CEPU', 'COME', 'CRES', 'EDN', 'GGAL', 'IRSA', 'LOMA', 'METR', 'PAMP', 'SUPV', 'TECO2', 'TGNO4', 'TGSU2', 'TRAN', 'TXAR', 'VALO', 'YPFD'];
 const BONOS = ['AL30D', 'GD30D', 'GD35D', 'AE38D', 'GD41D'];
 const MEMBERSHIPS_BASE = 'https://manfredi-memberships.nachito2502.workers.dev';
-const SALAS = ['gratis', 'pro'];
+// Salas: "gratis" (Mercados) y los chats de Manfredi Pro (solo socios).
+// soloCreador: los socios leen y reaccionan, pero publica solo Ignacio.
+const SALAS = {
+  gratis:    { pro: false },
+  ideas:     { pro: true, soloCreador: true },
+  socios:    { pro: true },
+  preguntas: { pro: true },
+};
 const EMOJIS = ['👍', '🔥', '📈', '📉', '🤔'];
 const MAX_TEXTO = 800;
 const CORS = {
@@ -42,7 +50,7 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
     const url = new URL(request.url);
     try {
-      const c = url.pathname.match(/^\/chat\/(gratis|pro)(?:\/(\d+)\/(reaccion|borrar))?$/);
+      const c = url.pathname.match(/^\/chat\/(gratis|ideas|socios|preguntas)(?:\/(\d+)\/(reaccion|borrar))?$/);
       if (c) return await chat(request, env, url, c[1], c[2] ? +c[2] : null, c[3] || null);
 
       const m = url.pathname.match(/^\/wa\/(apertura|cierre)$/);
@@ -318,9 +326,11 @@ async function esquema(env) {
   const ahora = Date.now();
   const bienvenida = {
     gratis: 'Bienvenidos a la Comunidad de *Manfredi Investment*. Acá se publica el resumen del mercado antes de la apertura y al cierre, todos los días hábiles, y se charla de mercados con respeto. Nadie del equipo te va a escribir por privado ni a pedirte dinero.',
-    pro: 'Este es el chat de los socios de *Manfredi Pro*. Acá van las ideas, los seguimientos y las preguntas para Ignacio. Lo que se comparte acá queda entre socios.',
+    ideas: 'Acá publica Ignacio sus *ideas*, los *seguimientos* y los *cierres*, con resultado. Para comentar, usá la Charla de socios; para consultar, Preguntas a Ignacio.',
+    socios: 'La *charla de los socios* de Manfredi Pro. Lo que se comparte acá queda entre socios.',
+    preguntas: 'Dejá tu pregunta para Ignacio: te responde citando tu mensaje. Una pregunta por mensaje ayuda a que nada quede sin respuesta.',
   };
-  await env.DB.batch(SALAS.map(sala => env.DB.prepare(
+  await env.DB.batch(Object.keys(SALAS).map(sala => env.DB.prepare(
     `INSERT OR IGNORE INTO mensajes (sala, h, nombre, rol, tipo, texto, clave, creado, editado)
      VALUES (?, 'oficial', 'Manfredi Investment', 'oficial', 'texto', ?, ?, ?, ?)`
   ).bind(sala, bienvenida[sala], 'bienvenida:' + sala, ahora, ahora)));
@@ -366,7 +376,7 @@ async function chat(request, env, url, sala, id, accion) {
   const creador = !!(u && CREADORES.includes(u.email));
   const socio = !!(u && await esSocio(env, u.email));
   const yo = u ? { h: await hashUid(u.uid), nombre: u.nombre || u.email.split('@')[0], rol: creador ? 'creador' : socio ? 'socio' : 'usuario' } : null;
-  if (sala === 'pro' && !socio) return json({ error: u ? 'solo_socios' : 'sin_sesion', yo }, u ? 403 : 401);
+  if (SALAS[sala].pro && !socio) return json({ error: u ? 'solo_socios' : 'sin_sesion', yo }, u ? 403 : 401);
 
   // ── leer
   if (request.method === 'GET' && !id) {
@@ -380,7 +390,15 @@ async function chat(request, env, url, sala, id, accion) {
       filas = (await env.DB.prepare('SELECT * FROM mensajes WHERE sala = ? ORDER BY id DESC LIMIT 80').bind(sala).all()).results.reverse();
     }
     const hayMas = antes ? filas.length >= 60 : !ts && filas.length >= 80;
-    return json({ sala, ahora: Date.now(), mensajes: filas.map(publico), yo, hayMas });
+    // Resúmenes de hoy: la guía de arriba del chat lleva a ellos aunque la charla los deje lejos.
+    let hoy = [];
+    if (sala === 'gratis') {
+      const f = hoyART().iso;
+      hoy = (await env.DB.prepare('SELECT id, clave, creado FROM mensajes WHERE clave IN (?, ?) AND borrado = 0')
+        .bind(`resumen:${f}:apertura`, `resumen:${f}:cierre`).all()).results
+        .map(r => ({ id: r.id, momento: r.clave.split(':')[2], creado: r.creado }));
+    }
+    return json({ sala, ahora: Date.now(), mensajes: filas.map(publico), yo, hayMas, hoy });
   }
   if (request.method !== 'POST') return json({ error: 'Método no permitido' }, 405);
   if (!u) return json({ error: 'sin_sesion' }, 401);
@@ -389,6 +407,7 @@ async function chat(request, env, url, sala, id, accion) {
 
   // ── mensaje nuevo
   if (!id) {
+    if (SALAS[sala].soloCreador && !creador) return json({ error: 'En este chat publica solo Ignacio' }, 403);
     const texto = String(body.texto || '').replace(/\r/g, '').replace(/\n{3,}/g, '\n\n').trim();
     if (!texto) return json({ error: 'El mensaje está vacío' }, 400);
     if (texto.length > MAX_TEXTO) return json({ error: `Máximo ${MAX_TEXTO} caracteres` }, 400);

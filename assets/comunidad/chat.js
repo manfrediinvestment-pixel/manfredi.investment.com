@@ -2,7 +2,10 @@
  *
  * - "Mercados" (gratis): lo lee cualquiera, escribe quien inició sesión. Ahí se publican solos
  *   los resúmenes de apertura y cierre: el mismo mensaje que va a la Comunidad de WhatsApp.
- * - "Manfredi Pro": solo socios (el worker lo valida); al resto se le muestra la invitación.
+ * - Manfredi Pro, dividido en chats como una Comunidad de WhatsApp: Ideas de Ignacio (publica
+ *   solo él), Charla de socios y Preguntas a Ignacio. Solo socios (el worker lo valida); al
+ *   resto se le muestra la invitación.
+ * - Arriba del chat gratis, una guía lleva a los resúmenes de hoy aunque la charla los deje lejos.
  *
  * Mensajes nuevos por consulta cada pocos segundos (solo con la pestaña a la vista).
  * Anti-estafa: los links de los usuarios se muestran como texto; solo los oficiales se tocan.
@@ -19,9 +22,15 @@
   var SALAS = {
     gratis: { nombre: 'Mercados', tag: 'Gratis', sub: 'Comunidad abierta · resúmenes 10:15 y 17:20',
       fijado: 'Resúmenes del mercado antes de la apertura y al cierre. Las opiniones de los miembros no son recomendaciones de inversión. Nadie del equipo te va a escribir por privado ni a pedirte dinero.' },
-    pro: { nombre: 'Manfredi Pro', tag: 'Pro', sub: 'Solo socios',
-      fijado: 'Chat de socios. Las ideas de Ignacio son análisis generales: antes de operar, mirá si encajan con tu perfil. Lo que se comparte acá queda entre socios.' }
+    ideas: { nombre: 'Ideas de Ignacio', pro: true, soloCreador: true, sub: 'Publica solo Ignacio · ideas, seguimientos y cierres',
+      fijado: 'Las ideas son análisis generales: no consideran tu situación particular. Antes de operar, mirá si encajan con tu perfil.' },
+    socios: { nombre: 'Charla de socios', pro: true, sub: 'Solo socios Pro',
+      fijado: 'Lo que se comparte acá queda entre socios. Las opiniones de los miembros no son recomendaciones de inversión.' },
+    preguntas: { nombre: 'Preguntas a Ignacio', pro: true, sub: 'Ignacio responde citando tu mensaje',
+      fijado: 'Una pregunta por mensaje: Ignacio responde citándola, así nada queda sin respuesta.' }
   };
+  var PRO = ['ideas', 'socios', 'preguntas'];
+  var TODAS = ['gratis'].concat(PRO);
   var IC = {
     send: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12l16-8-6 16-2.5-6.5z" fill="currentColor"/></svg>',
     back: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -33,11 +42,20 @@
     check: '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 2l2.4 2.2 3.2-.4.9 3.1 2.9 1.5-1 3.1 1 3.1-2.9 1.5-.9 3.1-3.2-.4L12 22l-2.4-2.2-3.2.4-.9-3.1-2.9-1.5 1-3.1-1-3.1 2.9-1.5.9-3.1 3.2.4z" fill="currentColor"/><path d="M8.5 12.2l2.3 2.3 4.7-4.8" fill="none" stroke="#0b1629" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     lock: '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
     down: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    x: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+    x: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    ideas: '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4 19l5-6 4 3 7-9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 7h5v5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    socios: '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h7A2.5 2.5 0 0 1 16 6.5v4A2.5 2.5 0 0 1 13.5 13H9l-3.5 3v-3H6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M19 9.5a2 2 0 0 1 1 1.7v3.6a2 2 0 0 1-2 2h-.5V19L15 16.8h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+    preguntas: '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M9.2 9a2.9 2.9 0 1 1 4.1 2.6c-.8.4-1.3 1-1.3 1.9v.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="17.6" r="1.15" fill="currentColor"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
   };
+  function avatarSala(k, cls) {
+    if (k === 'gratis') return '<span class="ch-av ch-av--sala ' + (cls || '') + '"><img src="assets/img/icon-192.png" alt=""></span>';
+    return '<span class="ch-av ch-av--sala ch-av--pro ' + (cls || '') + '">' + IC[k] + '</span>';
+  }
 
   var S = null;
-  function nuevaSala() { return { msgs: {}, orden: [], ts: 0, hayMas: false, estado: 'cargando', error: '', vistos: leer('mi-chat-visto', {}) }; }
+  function nuevaSala() { return { msgs: {}, orden: [], ts: 0, hayMas: false, estado: 'cargando', error: '', hoy: [], vistos: leer('mi-chat-visto', {}) }; }
+  function nuevasSalas() { var o = {}; TODAS.forEach(function (k) { o[k] = nuevaSala(); }); return o; }
 
   // ---------- utilidades ----------
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -105,12 +123,21 @@
   function cargar(sala) {
     var z = S.salas[sala];
     return api('/chat/' + sala).then(function (d) {
-      z.msgs = {}; z.orden = []; z.ts = d.ahora; z.hayMas = d.hayMas; z.estado = 'ok'; S.yo = d.yo || S.yo;
+      z.msgs = {}; z.orden = []; z.ts = d.ahora; z.hayMas = d.hayMas; z.estado = 'ok'; z.hoy = d.hoy || []; S.yo = d.yo || S.yo;
       aplicar(sala, d.mensajes, false);
     }).catch(function (e) {
       z.estado = e.code === 'solo_socios' || e.code === 'sin_sesion' ? 'bloqueada' : 'error';
       z.motivo = e.code; z.error = e.message;
     }).then(function () { if (sala === S.sala) pintarSala(true); pintarLista(); });
+  }
+  // Los chats de Pro: sin sesión no hace falta preguntar, quedan con la invitación.
+  function cargarTodas() {
+    cargar('gratis');
+    PRO.forEach(function (k) {
+      if (usuario()) cargar(k);
+      else { S.salas[k].estado = 'bloqueada'; S.salas[k].motivo = 'sin_sesion'; }
+    });
+    pintarLista();
   }
   function consultar(sala) {
     var z = S.salas[sala];
@@ -118,6 +145,8 @@
     z.consultando = true;
     return api('/chat/' + sala + '?ts=' + z.ts).then(function (d) {
       z.ts = d.ahora;
+      var hoyAntes = JSON.stringify(z.hoy || []); z.hoy = d.hoy || [];
+      if (sala === S.sala && JSON.stringify(z.hoy) !== hoyAntes) pintarHoy();
       if (aplicar(sala, d.mensajes, true)) { if (sala === S.sala) pintarFeed(false); pintarLista(); }
     }).catch(function () {}).then(function () { z.consultando = false; });
   }
@@ -171,34 +200,38 @@
     S.root.addEventListener('input', function (e) { if (e.target.matches('.ch-ta')) ajustar(e.target); });
   }
 
+  function itemSala(k) {
+    var z = S.salas[k], info = SALAS[k], ult = null;
+    for (var i = z.orden.length - 1; i >= 0; i--) { var m = z.msgs[z.orden[i]]; if (m && !m.borrado) { ult = m; break; } }
+    var noLeidos = z.estado === 'ok' && k !== S.sala ? z.orden.filter(function (id) { return id < 1e14 && id > (z.vistos[k] || 0) && z.msgs[id].h !== (S.yo && S.yo.h); }).length : 0;
+    var prev = z.estado === 'bloqueada' ? '<span class="ch-lock">' + IC.lock + ' Solo socios</span>'
+      : ult ? esc((ult.rol === 'oficial' ? '' : ult.nombre.split(' ')[0] + ': ') + (ult.tipo === 'resumen' ? (ult.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : ult.texto.replace(/[*_]/g, '')))
+      : z.estado === 'cargando' ? 'Cargando…' : '';
+    return '<li><button type="button" class="ch-item' + (info.pro ? ' ch-item--sub' : '') + '" data-ir="' + k + '"' + (k === S.sala ? ' aria-current="true"' : '') + '>' +
+      avatarSala(k) +
+      '<span class="ch-item-b"><span class="ch-item-t"><b>' + esc(info.nombre) + '</b>' + (info.tag ? '<em class="ch-tag">' + info.tag + '</em>' : '') +
+      (ult ? '<time>' + (diaTexto(ult.creado) === 'Hoy' ? hora(ult.creado) : diaTexto(ult.creado)) + '</time>' : '') + '</span>' +
+      '<span class="ch-item-p"><span>' + prev + '</span>' + (noLeidos ? '<i class="ch-unread">' + (noLeidos > 99 ? '99+' : noLeidos) + '</i>' : '') + '</span></span>' +
+    '</button></li>';
+  }
   function pintarLista() {
     var ul = S.root.querySelector('.ch-list'); if (!ul) return;
-    ul.innerHTML = ['gratis', 'pro'].map(function (k) {
-      var z = S.salas[k], info = SALAS[k], ult = null;
-      for (var i = z.orden.length - 1; i >= 0; i--) { var m = z.msgs[z.orden[i]]; if (m && !m.borrado) { ult = m; break; } }
-      var noLeidos = z.estado === 'ok' && k !== S.sala ? z.orden.filter(function (id) { return id > (z.vistos[k] || 0) && z.msgs[id].h !== (S.yo && S.yo.h); }).length : 0;
-      var prev = z.estado === 'bloqueada' ? '<span class="ch-lock">' + IC.lock + ' Exclusivo para socios</span>'
-        : ult ? esc((ult.rol === 'oficial' ? '' : ult.nombre.split(' ')[0] + ': ') + (ult.tipo === 'resumen' ? (ult.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : ult.texto.replace(/[*_]/g, '')))
-        : z.estado === 'cargando' ? 'Cargando…' : '';
-      return '<li><button type="button" class="ch-item" data-ir="' + k + '"' + (k === S.sala ? ' aria-current="true"' : '') + '>' +
-        '<span class="ch-av ch-av--sala ch-av--' + k + '">' + (k === 'pro' ? '<span>Pro</span>' : '<img src="assets/img/icon-192.png" alt="">') + '</span>' +
-        '<span class="ch-item-b"><span class="ch-item-t"><b>' + esc(info.nombre) + '</b><em class="ch-tag ch-tag--' + k + '">' + info.tag + '</em>' +
-        (ult ? '<time>' + (diaTexto(ult.creado) === 'Hoy' ? hora(ult.creado) : diaTexto(ult.creado)) + '</time>' : '') + '</span>' +
-        '<span class="ch-item-p"><span>' + prev + '</span>' + (noLeidos ? '<i class="ch-unread">' + (noLeidos > 99 ? '99+' : noLeidos) + '</i>' : '') + '</span></span>' +
-      '</button></li>';
-    }).join('');
+    ul.innerHTML = itemSala('gratis') +
+      '<li class="ch-grupo"><div class="ch-grupo-h"><span class="ch-av ch-av--pro ch-av--grupo"><span>Pro</span></span><b>Manfredi Pro</b><em class="ch-tag ch-tag--pro">Pro</em></div>' +
+      '<ul role="list">' + PRO.map(itemSala).join('') + '</ul></li>';
   }
 
   function pintarSala(alFondo) {
     var main = S.root.querySelector('.ch-main'), k = S.sala, z = S.salas[k], info = SALAS[k];
     var cab = '<header class="ch-head">' +
       '<button type="button" class="ch-back" data-a="lista" aria-label="Volver a los chats">' + IC.back + '</button>' +
-      '<span class="ch-av ch-av--sala ch-av--' + k + '">' + (k === 'pro' ? '<span>Pro</span>' : '<img src="assets/img/icon-192.png" alt="">') + '</span>' +
-      '<div class="ch-head-t"><b>' + esc(info.nombre) + '</b><span>' + esc(info.sub) + '</span></div>' +
+      avatarSala(k) +
+      '<div class="ch-head-t"><b>' + (info.pro ? '<small>Manfredi Pro</small>' : '') + esc(info.nombre) + '</b><span>' + esc(info.sub) + '</span></div>' +
     '</header>';
     if (z.estado === 'bloqueada') { main.innerHTML = cab + bloqueo(); return; }
     main.innerHTML = cab +
       '<button type="button" class="ch-pin" data-a="pin" aria-expanded="false">' + IC.pin + '<span>' + esc(info.fijado) + '</span></button>' +
+      (k === 'gratis' ? '<div class="ch-hoy" aria-label="Resúmenes de hoy"></div>' : '') +
       '<div class="ch-feedwrap"><div class="ch-feed" role="log" aria-live="polite" aria-label="Mensajes"><div class="ch-feed-in"></div></div>' +
       '<button type="button" class="ch-nuevos" data-a="bajar" hidden>' + IC.down + '<span>Mensajes nuevos</span></button></div>' +
       compositor();
@@ -208,10 +241,46 @@
       if (alFondoDe(feed)) { main.querySelector('.ch-nuevos').hidden = true; marcarVisto(); }
     }, { passive: true });
     pintarFeed(alFondo !== false);
+    pintarHoy();
+  }
+
+  // Guía a los resúmenes de hoy: siempre a la vista, lleva al mensaje aunque haya quedado lejos.
+  var RES = [{ k: 'apertura', t: 'Antes de la apertura', h: '10:15' }, { k: 'cierre', t: 'Cierre del mercado', h: '17:20' }];
+  function pintarHoy() {
+    var el = S.root.querySelector('.ch-hoy'); if (!el) return;
+    var z = S.salas.gratis, ahora = new Date(Date.now() - 3 * 3600e3), finde = ahora.getUTCDay() === 0 || ahora.getUTCDay() === 6;
+    var vistos = leer('mi-res-visto', {});
+    if (finde && !(z.hoy || []).length) { el.hidden = true; return; }
+    el.hidden = false;
+    el.innerHTML = '<span class="ch-hoy-k">Resúmenes de hoy</span>' + RES.map(function (r) {
+      var m = (z.hoy || []).filter(function (x) { return x.momento === r.k; })[0];
+      if (!m) return '<span class="ch-hoy-b pend">' + IC.clock + '<span>' + r.t + '</span><time>' + r.h + '</time></span>';
+      return '<button type="button" class="ch-hoy-b" data-a="ir-res" data-id="' + m.id + '">' + (vistos[m.id] ? '' : '<i class="ch-hoy-dot" aria-label="Nuevo"></i>') +
+        '<span>' + r.t + '</span><time>' + hora(m.creado) + '</time>' + IC.down + '</button>';
+    }).join('');
+  }
+  // Mueve solo el chat (no la página) hasta el mensaje y lo destaca un instante.
+  function resaltar(o) {
+    var feed = S.root.querySelector('.ch-feed');
+    feed.scrollTo({ top: Math.max(0, o.offsetTop - 14), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    o.classList.remove('flash'); void o.offsetWidth; o.classList.add('flash');
+  }
+  // Lleva a un mensaje: si todavía no está cargado, trae los anteriores hasta encontrarlo.
+  function irA(id, intentos) {
+    var feed = S.root.querySelector('.ch-feed'), z = S.salas[S.sala];
+    var o = S.root.querySelector('.ch-row[data-id="' + id + '"]');
+    if (o) { resaltar(o); return; }
+    if (!feed || !z.hayMas || (intentos || 0) > 10 || !z.orden.length) return;
+    api('/chat/' + S.sala + '?antes=' + z.orden[0]).then(function (d) {
+      z.hayMas = d.hayMas; aplicar(S.sala, d.mensajes, false); pintarFeed(false, true);
+      irA(id, (intentos || 0) + 1);
+    }).catch(function () {});
   }
 
   function compositor() {
     if (!usuario()) return '<div class="ch-login"><span>Iniciá sesión para escribir en el chat.</span><button type="button" class="ch-btn ch-btn--gold" data-a="login">Iniciar sesión</button></div>';
+    if (SALAS[S.sala].soloCreador && !(S.yo && S.yo.rol === 'creador'))
+      return '<div class="ch-login"><span>Acá publica solo Ignacio. Para comentar una idea:</span><button type="button" class="ch-btn" data-ir="socios">Ir a Charla de socios</button></div>';
     var r = S.responde;
     return (r ? '<div class="ch-reply"><div><b>' + esc(r.nombre) + '</b><span>' + esc(r.texto) + '</span></div><button type="button" data-a="sin-reply" aria-label="Cancelar respuesta">' + IC.x + '</button></div>' : '') +
       '<form class="ch-comp" data-a="enviar">' +
@@ -254,7 +323,12 @@
     feed.querySelector('.ch-feed-in').innerHTML = html;
     if (sinAnim) S.recien = {};
     if (alFondo || estaba) { feed.scrollTop = feed.scrollHeight; marcarVisto(); }
-    else if (Object.keys(S.recien).length) S.root.querySelector('.ch-nuevos').hidden = false;
+    else if (Object.keys(S.recien).length) {
+      var res = Object.keys(S.recien).map(function (id) { return z.msgs[id]; }).filter(function (m) { return m && m.tipo === 'resumen'; })[0];
+      var pill = S.root.querySelector('.ch-nuevos');
+      pill.querySelector('span').textContent = res ? 'Nuevo: ' + (res.datos.momento === 'apertura' ? 'resumen antes de la apertura' : 'resumen del cierre') : 'Mensajes nuevos';
+      pill.hidden = false;
+    }
     S.recien = {};
   }
 
@@ -297,7 +371,7 @@
     var puedeBorrar = S.yo && (mio || S.yo.rol === 'creador');
     if (!usuario() && !puedeBorrar) return '';
     return '<div class="ch-tools" role="toolbar" aria-label="Acciones">' +
-      (usuario() ? '<button type="button" data-a="responder" title="Responder" aria-label="Responder">' + IC.reply + '</button>' +
+      (usuario() ? (SALAS[S.sala].soloCreador && !(S.yo && S.yo.rol === 'creador') ? '' : '<button type="button" data-a="responder" title="Responder" aria-label="Responder">' + IC.reply + '</button>') +
         '<button type="button" data-a="emojis" title="Reaccionar" aria-label="Reaccionar">' + IC.smile + '</button>' : '') +
       (puedeBorrar ? '<button type="button" data-a="borrar" title="Eliminar" aria-label="Eliminar">' + IC.trash + '</button>' : '') +
       '<span class="ch-emojis">' + EMOJIS.map(function (e) { return '<button type="button" data-a="reaccion" data-e="' + e + '">' + e + '</button>'; }).join('') + '</span>' +
@@ -336,7 +410,11 @@
       api('/chat/' + S.sala + '/' + m.id + '/borrar', { method: 'POST' }).then(function (d) { aplicar(S.sala, [d.mensaje]); pintarFeed(false); pintarLista(); }).catch(function (err) { toast(err.message); });
       return;
     }
-    if (a === 'ir') { var o = S.root.querySelector('.ch-row[data-id="' + b.dataset.irId + '"]'); if (o) { o.scrollIntoView({ behavior: 'smooth', block: 'center' }); o.classList.remove('flash'); void o.offsetWidth; o.classList.add('flash'); } return; }
+    if (a === 'ir-res') {
+      var v = leer('mi-res-visto', {}); v[b.dataset.id] = 1; guardar('mi-res-visto', v);
+      pintarHoy(); irA(+b.dataset.id); return;
+    }
+    if (a === 'ir') { var o = S.root.querySelector('.ch-row[data-id="' + b.dataset.irId + '"]'); if (o) resaltar(o); return; }
     if (a === 'ver' && m) { var t = tarjeta(m); if (!t.url) return; var lb = S.root.querySelector('.ch-lb'); lb.querySelector('img').src = t.url; lb.hidden = false; return; }
     if (a === 'compartir' && m) {
       var tj = tarjeta(m);
@@ -433,14 +511,15 @@
   function tic() {
     if (!aLaVista()) return;
     consultar(S.sala);
-    var otra = S.sala === 'gratis' ? 'pro' : 'gratis';
-    if (++S.vuelta % 3 === 0) consultar(otra);
+    // las demás, de a una por vuelta (cada ~15 s alguna)
+    var otras = TODAS.filter(function (k) { return k !== S.sala; });
+    if (++S.vuelta % 3 === 0) consultar(otras[(S.vuelta / 3) % otras.length]);
   }
   function sesion() { var u = usuario(); return u ? (u.email || u.uid) : ''; }
   function reiniciar() {
-    S.yo = null; S.salas = { gratis: nuevaSala(), pro: nuevaSala() };
+    S.yo = null; S.salas = nuevasSalas();
     pintarLista(); pintarSala(true);
-    cargar('gratis'); cargar('pro');
+    cargarTodas();
   }
 
   window.ProChat = {
@@ -450,9 +529,9 @@
         if (sesion() !== S.sesion) { S.sesion = sesion(); reiniciar(); }
         return;
       }
-      S = { root: el, sala: 'gratis', salas: { gratis: nuevaSala(), pro: nuevaSala() }, yo: null, responde: null, borrador: {}, recien: {}, vuelta: 0, sesion: sesion() };
+      S = { root: el, sala: 'gratis', salas: nuevasSalas(), yo: null, responde: null, borrador: {}, recien: {}, vuelta: 0, sesion: sesion() };
       esqueleto(); pintarLista(); pintarSala(true); pintarProximo();
-      cargar('gratis'); cargar('pro');
+      cargarTodas();
       setInterval(tic, 5000);
       setInterval(pintarProximo, 30000);
       setInterval(function () { if (sesion() !== S.sesion) { S.sesion = sesion(); reiniciar(); } }, 1500);
