@@ -7,15 +7,16 @@
 #reportes.nt-head--top { border-bottom:0; padding-bottom:0; } /* regla vieja del sitio para #reportes */
 
 /* ── Noticias / Análisis e informes ──────────────────────────────── */
-.nt-switch { position:relative; display:flex; gap:30px; margin:0; border-bottom:1px solid var(--nt-line); }
-.nt-switch button { position:relative; border:0; background:none; padding:0 0 13px; cursor:pointer; color:var(--nt-ink);
-  font:400 15px var(--nt-sans); letter-spacing:.01em; transition:color .25s ease, transform .25s var(--nt-ease); }
-/* al pasar: sube un pelo y se dibuja una línea tenue desde el centro */
-.nt-switch button::after { content:''; position:absolute; left:0; right:0; bottom:-1px; height:1px; background:rgba(233,211,160,.45); transform:scaleX(0); transition:transform .35s var(--nt-ease); }
-@media (hover:hover) { .nt-switch button:not(.on):hover { color:var(--an-champ2); transform:translateY(-1px); } .nt-switch button:not(.on):hover::after { transform:scaleX(1); } }
+/* Noticias · Análisis e informes: mismo lenguaje que los filtros de Noticias (Argentina, Dólar,
+   Bonos…): texto medio, la elegida en negrita y una línea dorada de 2 px que se desliza. */
+.nt-switch { position:relative; display:flex; gap:30px; margin:0; border-bottom:1px solid var(--nt-line2); }
+.nt-switch button { position:relative; border:0; background:none; padding:0 0 15px; cursor:pointer; color:var(--nt-ink);
+  font:500 16px/1 var(--nt-sans); letter-spacing:.005em; transition:color .18s ease; }
+@media (hover:hover) { .nt-switch button:not(.on):hover { color:var(--nt-ink2); } }
 .nt-switch button:active { transform:scale(.97); }
 .nt-switch button.on { color:var(--nt-ink); font-weight:600; }
-.nt-switch__ind { position:absolute; left:0; bottom:-1px; width:0; height:1px; z-index:1; pointer-events:none; background:var(--an-champ); transition:left .45s var(--nt-ease), width .45s var(--nt-ease); }
+.nt-switch__ind { position:absolute; left:0; bottom:-1px; width:0; height:2px; z-index:1; pointer-events:none; border-radius:2px 2px 0 0;
+  background:var(--nt-gold); box-shadow:0 0 12px rgba(242,201,76,.45); transition:left .38s var(--nt-ease), width .38s var(--nt-ease); }
 .nt-head--top .nt-date { margin-top:16px; color:var(--nt-ink); }
 
 /* ── categorías: índice editorial, sin pastillas ───────────────────── */

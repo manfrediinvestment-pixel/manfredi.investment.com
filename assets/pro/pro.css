@@ -10,15 +10,18 @@
 .nav-pro { display:inline-block; margin-left:3px; padding:1px 6px 2px; border-radius:5px; border:1px solid rgba(233,211,160,.5); font:600 10px/1.3 var(--pro-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--pro-ch); vertical-align:1px; }
 
 /* cabecera y sub-pestañas */
-.pro-top { display:flex; align-items:flex-end; justify-content:flex-start; gap:44px; flex-wrap:wrap; margin-bottom:30px; border-bottom:1px solid var(--pro-line); }
+.pro-top { display:flex; align-items:flex-end; justify-content:flex-start; gap:44px; flex-wrap:wrap; margin-bottom:30px; border-bottom:1px solid rgba(214,226,244,.16); }
 .pro-brand { padding-bottom:13px; font:400 26px/1 var(--pro-serif); color:var(--pro-ink); }
 .pro-brand .nav-pro { font-size:11px; vertical-align:5px; }
-.pro-nav { display:flex; gap:28px; }
-.pro-nav button { position:relative; border:0; background:none; padding:0 0 13px; cursor:pointer; font:400 15px var(--pro-sans); color:var(--pro-ink); transition:color .2s; }
-.pro-nav button::after { content:''; position:absolute; left:0; right:0; bottom:-1px; height:1px; background:var(--pro-ch); transform:scaleX(0); transition:transform .35s var(--pro-ease); }
+/* pestañas: mismo lenguaje que los filtros de Noticias (texto medio, la elegida en negrita y una
+   línea dorada de 2 px con brillo) */
+.pro-nav { display:flex; gap:30px; }
+.pro-nav button { position:relative; border:0; background:none; padding:0 0 15px; cursor:pointer; font:500 16px/1 var(--pro-sans); letter-spacing:.005em; color:var(--pro-ink); transition:color .18s ease; }
+.pro-nav button::after { content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px; border-radius:2px 2px 0 0; background:#f2c94c; box-shadow:0 0 12px rgba(242,201,76,.45); transform:scaleX(0); transition:transform .38s var(--pro-ease); }
+.pro-nav button:active { transform:scale(.97); }
 .pro-nav button[aria-selected="true"] { font-weight:600; }
 .pro-nav button[aria-selected="true"]::after { transform:scaleX(1); }
-@media (hover:hover) { .pro-nav button:hover { color:var(--pro-ch2); } }
+@media (hover:hover) { .pro-nav button:not([aria-selected="true"]):hover { color:var(--pro-ink); } }
 .section-inversiones.pro-v-mesa > .container > :not(.pro-top):not(.pro-mesa) { display:none !important; }
 .section-inversiones.pro-v-informes .pro-mesa { display:none; }
 
