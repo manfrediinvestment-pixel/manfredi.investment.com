@@ -515,6 +515,26 @@
       '<span class="ch-next-t"><time>' + cuando + ' · ' + prox.hora + '</time><em>' + (hh >= 24 ? Math.round(hh / 24) + ' d' : (hh ? hh + ' h ' : '') + mm + ' min') + '</em></span>';
   }
 
+  // ---------- alto: el chat ocupa la pantalla, como WhatsApp Web ----------
+  // Debajo del menú fijo y de las pestañas de Pro, hasta el borde de abajo de la ventana.
+  function menuFijo() {
+    var n = document.querySelector('.navbar');
+    return n && getComputedStyle(n).position === 'sticky' ? n.offsetHeight : 0;
+  }
+  function medir() {
+    var app = S && S.root.querySelector('.ch-app'); if (!app || app.offsetParent === null) return;
+    var top = document.querySelector('#inversiones .pro-top');
+    var arriba = menuFijo() + (top ? top.offsetHeight + 14 : 0) + 12;
+    app.style.setProperty('--ch-h', Math.max(520, window.innerHeight - arriba - 12) + 'px');
+  }
+  // Lleva la página hasta las pestañas de Pro, así se ven enteros el chat y la barra para escribir.
+  function encuadrar() {
+    medir();
+    var top = document.querySelector('#inversiones .pro-top'); if (!top || S.root.offsetParent === null) return;
+    var y = top.getBoundingClientRect().top + window.scrollY - menuFijo() - 12;
+    window.scrollTo({ top: Math.max(0, y), behavior: 'auto' });
+  }
+
   // ---------- ciclo ----------
   function aLaVista() { return S && S.root.offsetParent !== null && !document.hidden; }
   function tic() {
@@ -532,6 +552,7 @@
   }
 
   window.ProChat = {
+    encuadrar: function () { if (S) encuadrar(); },
     montar: function (el) {
       if (S && S.root === el) {
         // pro.js vuelve a llamar cuando cambia la sesión o la membresía
@@ -545,6 +566,8 @@
       setInterval(pintarProximo, 30000);
       setInterval(function () { if (sesion() !== S.sesion) { S.sesion = sesion(); reiniciar(); } }, 1500);
       document.addEventListener('visibilitychange', function () { if (!document.hidden) tic(); });
+      window.addEventListener('resize', medir);
+      requestAnimationFrame(encuadrar);
       S.root.querySelector('.ch-lb').addEventListener('click', function (e) { if (e.target === e.currentTarget || e.target.closest('.ch-lb-x')) e.currentTarget.hidden = true; });
       S.root.addEventListener('submit', function (e) { if (e.target.matches('.ch-comp')) { e.preventDefault(); enviar(); } });
     }

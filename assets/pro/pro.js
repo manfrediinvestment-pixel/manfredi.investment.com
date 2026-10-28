@@ -214,10 +214,17 @@
     if (!b) return;
     var h = HASH[b.dataset.proTab];
     if (location.hash !== h) history.replaceState(null, '', h);
-    mostrar(); window.scrollTo({ top: 0 });
+    mostrar();
+    if (vista() === 'mesa' && window.ProChat) requestAnimationFrame(window.ProChat.encuadrar);
+    else window.scrollTo({ top: 0 });
   });
   // el router del sitio cambia de pestaña después del hashchange: esperamos un cuadro
-  window.addEventListener('hashchange', function () { requestAnimationFrame(mostrar); });
+  window.addEventListener('hashchange', function () {
+    requestAnimationFrame(function () {
+      mostrar();
+      if (vista() === 'mesa' && window.ProChat) setTimeout(window.ProChat.encuadrar, 60);
+    });
+  });
 
   root.addEventListener('click', function (e) {
     var t = e.target.closest('[data-pro-seguir],[data-pro-voto],[data-pro-ir]');
