@@ -115,8 +115,8 @@ async function resumen(env, momento, regenerar) {
   const clave = `resumen:${hoy.iso}:${momento}`;
   await esquema(env);
   if (!regenerar) {
-    const fila = await env.DB.prepare('SELECT datos FROM mensajes WHERE clave = ?').bind(clave).first();
-    if (fila) return JSON.parse(fila.datos);
+    const fila = await env.DB.prepare('SELECT id, datos FROM mensajes WHERE clave = ?').bind(clave).first();
+    if (fila) return { ...JSON.parse(fila.datos), id: fila.id };
   }
   const datos = await juntarDatos(env, momento, hoy);
   const ia = await redactar(env, momento, datos);
@@ -132,12 +132,14 @@ async function resumen(env, momento, regenerar) {
   };
   r.texto = textoWhatsApp(r, env.SITE_URL);
   const ahora = Date.now();
-  await env.DB.prepare(
+  const fila = await env.DB.prepare(
     `INSERT INTO mensajes (sala, h, nombre, rol, tipo, texto, datos, clave, creado, editado)
      VALUES ('gratis', 'oficial', 'Manfredi Investment', 'oficial', 'resumen', ?, ?, ?, ?, ?)
-     ON CONFLICT(clave) DO UPDATE SET texto = excluded.texto, datos = excluded.datos, editado = excluded.editado, borrado = 0`
-  ).bind(r.texto, JSON.stringify(r), clave, ahora, ahora).run();
-  return r;
+     ON CONFLICT(clave) DO UPDATE SET texto = excluded.texto, datos = excluded.datos, editado = excluded.editado, borrado = 0
+     RETURNING id`
+  ).bind(r.texto, JSON.stringify(r), clave, ahora, ahora).first();
+  // el id del mensaje arma el link del epígrafe de WhatsApp (abre el chat en este resumen)
+  return { ...r, id: fila.id };
 }
 
 function hoyART() {

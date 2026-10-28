@@ -5,6 +5,7 @@
  * window.MiTarjeta.dibujar(canvas, resumen) -> Promise<Blob PNG>
  * window.MiTarjeta.compartirImagen(blob, resumen, texto?) / .compartirTexto(texto)
  * window.MiTarjeta.waHtml(texto, conLinks)  -> el formato de WhatsApp en HTML
+ * window.MiTarjeta.epigrafe(resumen, id)     -> lo que acompaña a la tarjeta en WhatsApp
  * window.MiTarjeta.horarios(fecha)          -> a qué hora (Argentina) sale cada resumen ese día
  */
 (function () {
@@ -71,6 +72,18 @@
     var ap = 9 * 60 + dif * 60, ci = cierreNY + dif * 60;
     return { iso: iso, hay: wd !== 0 && wd !== 6 && FERIADOS.indexOf(iso) < 0,
       apertura: { min: ap, hora: hm(ap) }, cierre: { min: ci, hora: hm(ci) } };
+  }
+
+  // ---------- epígrafe ----------
+  // En WhatsApp va un solo mensaje, como se ve en la página: la tarjeta y, abajo, el título, la
+  // clave y el párrafo. El link abre el chat de la página justo en este resumen (tablas, bonos,
+  // agenda y titulares completos).
+  function epigrafe(d, id) {
+    var fecha = d.fechaLarga.charAt(0).toUpperCase() + d.fechaLarga.slice(1);
+    var out = ['*MANFREDI · ' + (d.momento === 'apertura' ? 'ANTES DE LA APERTURA' : 'CIERRE DEL MERCADO') + '*', '_' + fecha + '_', ''];
+    if (d.clave) out.push('> *' + d.clave + '*', '');
+    out.push(d.intro, '', 'El resumen completo, con bonos, agenda y titulares:', 'manfredinvestment.com/' + (id ? '?r=' + id : '') + '#pro');
+    return out.join('\n');
   }
 
   function dibujar(cv, d) {
@@ -163,6 +176,7 @@
   // tarjeta. El blob tiene que estar listo antes del toque: Safari pide que share() salga directo.
   function compartirImagen(blob, d, texto) {
     if (!blob) return Promise.resolve('sin');
+    if (texto && navigator.clipboard) navigator.clipboard.writeText(texto).catch(function () {});
     var file = new File([blob], 'manfredi-' + d.momento + '-' + d.fecha + '.png', { type: 'image/png' });
     if (MOVIL && navigator.canShare && navigator.canShare({ files: [file] })) {
       return navigator.share(texto ? { files: [file], text: texto } : { files: [file] }).then(function () { return 'ok'; }, function () { return 'cancelado'; });
@@ -176,5 +190,5 @@
     window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank', 'noopener');
   }
 
-  window.MiTarjeta = { dibujar: dibujar, compartirImagen: compartirImagen, compartirTexto: compartirTexto, waHtml: waHtml, horarios: horarios, movil: MOVIL };
+  window.MiTarjeta = { dibujar: dibujar, compartirImagen: compartirImagen, compartirTexto: compartirTexto, waHtml: waHtml, horarios: horarios, epigrafe: epigrafe, movil: MOVIL };
 })();

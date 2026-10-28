@@ -128,7 +128,13 @@
   }
   // Los chats de Pro: sin sesión no hace falta preguntar, quedan con la invitación.
   function cargarTodas() {
-    cargar('gratis');
+    // ?r=<id>: viene del link del epígrafe de WhatsApp -> abre Mercados en ese resumen
+    var r = +new URLSearchParams(location.search).get('r');
+    cargar('gratis').then(function () {
+      if (!r) return;
+      if (S.sala === 'gratis') setTimeout(function () { irA(r); }, 300);
+      try { var q = new URLSearchParams(location.search); q.delete('r'); history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash); } catch (e) {}
+    });
     PRO.forEach(function (k) {
       if (usuario()) cargar(k);
       else { S.salas[k].estado = 'bloqueada'; S.salas[k].motivo = 'sin_sesion'; }
@@ -416,8 +422,9 @@
     if (a === 'ver' && m) { var t = tarjeta(m); if (!t.url) return; var lb = S.root.querySelector('.ch-lb'); lb.querySelector('img').src = t.url; lb.hidden = false; return; }
     if (a === 'compartir' && m) {
       var tj = tarjeta(m);
-      window.MiTarjeta.compartirImagen(tj.blob, m.datos, m.datos.texto).then(function (r) {
-        if (r === 'descargada') { window.MiTarjeta.compartirTexto(m.datos.texto); toast('Tarjeta descargada. El texto se abrió en WhatsApp.'); }
+      var epi = window.MiTarjeta.epigrafe(m.datos, m.id);
+      window.MiTarjeta.compartirImagen(tj.blob, m.datos, epi).then(function (r) {
+        if (r === 'descargada') { window.MiTarjeta.compartirTexto(epi); toast('Tarjeta descargada. El texto se abrió en WhatsApp.'); }
       });
     }
   }

@@ -30,7 +30,7 @@
         '</div>' +
         '<div class="wa-pie">Solo los administradores pueden enviar mensajes</div>' +
       '</div>' +
-      '<p class="wa-nota">Así lo ven en la Comunidad. Debajo de cada resumen: <b>Tarjeta</b> y después <b>Texto</b> abren el menú de compartir del celular (WhatsApp → grupo de avisos). En la compu, la tarjeta se descarga y el texto abre WhatsApp Web.</p>';
+      '<p class="wa-nota">Así lo ven en la Comunidad: un solo mensaje, la tarjeta con su epígrafe, como en la página. <b>Compartir en WhatsApp</b> abre el menú del celular (WhatsApp → grupo de avisos) y deja el epígrafe copiado por si hay que pegarlo. En la compu, la tarjeta se descarga y el epígrafe se abre en WhatsApp Web.</p>';
     st.el.addEventListener('click', function (ev) {
       var b = ev.target.closest('button[data-a]'); if (!b) return;
       var m = b.dataset.m;
@@ -64,9 +64,9 @@
     var hora = hhmm(d.generado);
     document.getElementById('waMsg-' + m).innerHTML =
       '<div class="wa-bub wa-img"><canvas id="waCv-' + m + '" width="1080" height="1350" aria-label="Tarjeta del resumen"></canvas>' +
-        '<span class="wa-meta wa-meta-img">' + esc(hora) + TILDES + '</span></div>' +
-      '<div class="wa-bub">' + waHtml(d.texto) + '<span class="wa-meta">' + esc(hora) + TILDES + '</span></div>' +
+        '<div class="wa-cap">' + waHtml(window.MiTarjeta.epigrafe(d, d.id)) + '<span class="wa-meta">' + esc(hora) + TILDES + '</span></div></div>' +
       acciones(m) +
+      '<details class="wa-full"><summary>Texto completo (opcional, como mensaje aparte)</summary><div class="wa-bub">' + waHtml(d.texto) + '</div></details>' +
       '<div class="wa-origen">' + (d.ia ? 'Introducción redactada con IA' : 'Introducción con plantilla (la IA no respondió)') + '</div>';
     dibujar(m, d);
     var feed = document.getElementById('waFeed'); if (feed) feed.scrollTop = feed.scrollHeight; // como WhatsApp: abre en lo último
@@ -75,7 +75,7 @@
   function acciones(m, soloRegenerar) {
     var b = function (a, t, cls) { return '<button type="button" class="wa-btn' + (cls ? ' ' + cls : '') + '" data-a="' + a + '" data-m="' + m + '">' + t + '</button>'; };
     return '<div class="wa-acc">' + (soloRegenerar ? '' :
-      b('imagen', '1 · Tarjeta', 'wa-main') + b('texto', '2 · Texto', 'wa-main') + b('copiar', 'Copiar')) +
+      b('imagen', 'Compartir en WhatsApp', 'wa-main') + b('copiar', 'Copiar epígrafe') + b('texto', 'Texto completo')) +
       b('regenerar', '&#8635; Regenerar') + '</div>';
   }
 
@@ -87,12 +87,15 @@
   }
   function compartirImagen(m, btn) {
     var d = st.datos[m]; if (!d) return;
-    window.MiTarjeta.compartirImagen(st.blobs[m], d).then(function (r) { if (r === 'descargada') aviso(btn, 'Descargada'); });
+    var epi = window.MiTarjeta.epigrafe(d, d.id);
+    window.MiTarjeta.compartirImagen(st.blobs[m], d, epi).then(function (r) {
+      if (r === 'descargada') { window.MiTarjeta.compartirTexto(epi); aviso(btn, 'Tarjeta descargada'); }
+    });
   }
   function compartirTexto(m) { var d = st.datos[m]; if (d) window.MiTarjeta.compartirTexto(d.texto); }
   function copiar(m, btn) {
     var d = st.datos[m]; if (!d || !navigator.clipboard) return;
-    navigator.clipboard.writeText(d.texto).then(function () { aviso(btn, 'Copiado'); });
+    navigator.clipboard.writeText(window.MiTarjeta.epigrafe(d, d.id)).then(function () { aviso(btn, 'Copiado'); });
   }
   function aviso(btn, t) { var o = btn.innerHTML; btn.textContent = t; setTimeout(function () { btn.innerHTML = o; }, 1600); }
 
@@ -122,6 +125,8 @@
       '.wa-aviso{align-self:center;padding:6px 12px;border-radius:8px;background:#182229;font-size:12.5px;color:#e9edef;text-align:center}' +
       '.wa-aviso button{border:0;background:none;padding:0;color:#e9d3a0;font:inherit;text-decoration:underline;cursor:pointer}' +
       '.wa-bubble .wa-mono,.wa-bub .wa-mono{margin:6px 0;padding:8px 10px;border-radius:6px;background:rgba(0,0,0,.22);font:500 12px/1.55 "IBM Plex Mono",monospace;white-space:pre;overflow-x:auto}' +
+      '.wa-img .wa-cap{padding:6px 7px 2px;font-size:14.2px;line-height:1.45}.wa-img .wa-cap .wa-meta{float:right;margin:6px 0 -2px 12px}' +
+      '.wa-full{margin-top:6px;align-self:flex-end;max-width:88%}.wa-full summary{cursor:pointer;font:500 12px "IBM Plex Sans",sans-serif;color:#e9d3a0;text-align:right;list-style:none}.wa-full .wa-bub{margin-top:6px;max-width:100%}' +
       '.wa-bub .wa-cita{margin:4px 0;padding-left:9px;border-left:3px solid #e9edef}.wa-bub .wa-lista{margin:2px 0;padding-left:18px}.wa-bub .wa-sep{display:block;height:8px}' +
       '.wa-acc{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;margin-top:2px}' +
       '.wa-btn{padding:5px 11px;border-radius:14px;border:1px solid rgba(233,211,160,.3);background:#111b21;color:#e9edef;font:500 12px "IBM Plex Sans",sans-serif;cursor:pointer;transition:background .2s}' +
@@ -136,7 +141,7 @@
 
   window.pnWhatsapp = function (el, get, base) {
     if (!window.MiTarjeta) {
-      var t = document.createElement('script'); t.src = 'assets/comunidad/tarjeta.js?v=20261028c';
+      var t = document.createElement('script'); t.src = 'assets/comunidad/tarjeta.js?v=20261028i';
       t.onload = function () { window.pnWhatsapp(el, get, base); }; document.body.appendChild(t); return;
     }
     st = { el: el, get: get, base: base, datos: {}, blobs: {}, cargando: {} };
