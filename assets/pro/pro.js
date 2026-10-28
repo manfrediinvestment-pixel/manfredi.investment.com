@@ -16,12 +16,6 @@
   var sec = document.getElementById('inversiones'), root = document.getElementById('proMesa');
   if (!sec || !root) return;
 
-  // Link de invitación de la Comunidad gratis de WhatsApp (resúmenes de apertura y cierre,
-  // ver workers/whatsapp). Vacío = el acceso no se muestra.
-  var WA_COMUNIDAD = '';
-  var wa = document.getElementById('proWa');
-  if (wa && WA_COMUNIDAD) { wa.href = WA_COMUNIDAD; wa.hidden = false; }
-
   var st = { data: null, precios: {}, seguidas: leer('pro-seguidas', {}), voto: leer('pro-voto', null), abiertos: {} };
 
   function leer(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
@@ -178,6 +172,8 @@
       '<a class="pro-a" href="#inversiones">Mientras tanto, mirá los informes</a></section>';
   }
   function pintar() {
+    // La pestaña es el Chat (assets/comunidad/chat.js): Mercados gratis + Manfredi Pro.
+    if (window.ProChat) return window.ProChat.montar(root);
     root.innerHTML = !st.data ? vistaPronto() : socio() ? vistaSocio() : vistaVisitante();
     if (window.AnSocial && st.data && socio()) window.AnSocial.montar(st.data.posts.map(function (p) { return 'pro-' + p.id; }));
   }

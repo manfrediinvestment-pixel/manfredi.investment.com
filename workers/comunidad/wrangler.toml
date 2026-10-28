@@ -1,0 +1,34 @@
+name = "manfredi-comunidad"
+main = "index.js"
+compatibility_date = "2026-04-19"
+
+[vars]
+MERCADOS_URL = "https://manfredi-mercados.nachito2502.workers.dev"
+CALENDARIO_URL = "https://manfredi-calendario.nachito2502.workers.dev"
+SITE_URL = "https://manfredinvestment.com"
+
+# Mensajes de los chats de Manfredi Pro (Comunidad gratis + Pro). D1 y no KV: KV tiene
+# cupo diario de escrituras compartido con todo el sitio (ver workers/mercados).
+# Crear una vez:  npx wrangler d1 create manfredi-comunidad  -> pegar el id acá.
+# Las tablas se crean solas en el primer pedido (ver esquema() en index.js).
+[[d1_databases]]
+binding = "DB"
+database_name = "manfredi-comunidad"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+# Para saber quién es socio (mismo esquema que workers/warren).
+[[services]]
+binding = "MEMBERSHIPS"
+service = "manfredi-memberships"
+
+# Resumen del día de lunes a viernes (hora ART = UTC-3): apertura 10:15 y cierre 17:20, se
+# publica en el chat gratis. 10 minutos después (10:25 / 17:30) se reintenta la IA si no
+# respondió y sale el mail para compartirlo en WhatsApp.
+[triggers]
+crons = ["15 13 * * MON-FRI", "25 13 * * MON-FRI", "20 20 * * MON-FRI", "30 20 * * MON-FRI"]
+
+# Secretos (nunca en este archivo):
+#   npx wrangler secret put GEMINI_KEY --config workers/comunidad/wrangler.toml
+#     (clave de Google AI Studio SIN facturación: si se acaba el cupo gratis, Google
+#      corta en vez de cobrar y el resumen sale igual con la plantilla de datos)
+#   npx wrangler secret put RESEND_API_KEY --config workers/comunidad/wrangler.toml   (opcional: aviso por mail)
