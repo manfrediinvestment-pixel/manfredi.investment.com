@@ -3196,7 +3196,14 @@
       const accesos = (creador ? '<a class="np-item np-item--gold" href="#panel">&#10022; Panel de creador</a>' : '')
         + (analista ? '<a class="np-item" href="#autor">Mi espacio de analista</a>' : '')
         + '<a class="np-item" href="#portfolio">Mi portfolio</a>';
-      el.innerHTML = '<button type="button" class="np-btn" aria-haspopup="true" aria-expanded="' + abierto + '" aria-label="Tu perfil">'
+      const seg = npSeguir();
+      const avisarme = '<div class="np-sep"></div><div class="np-follow"><span class="np-follow__t">Avisarme cuando salga</span>'
+        + [['noticias', 'Una noticia'], ['analisis', 'Un análisis de analistas'], ['informes', 'Un informe nuevo']].map(function(o){
+            return '<label class="np-sw"><span>' + o[1] + '</span><input type="checkbox" data-seguir="' + o[0] + '"' + (seg[o[0]] ? ' checked' : '') + '><i></i></label>';
+          }).join('')
+        + '</div>';
+      el.innerHTML = npCampana(creador)
+        + '<button type="button" class="np-btn" aria-haspopup="true" aria-expanded="' + abierto + '" aria-label="Tu perfil">'
         + av('') + '<span class="np-name">' + npEsc(corto) + '</span>'
         + '<svg class="np-chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button>'
         + '<div class="np-menu" role="menu"' + (abierto ? '' : ' hidden') + '>'
@@ -3208,13 +3215,13 @@
         +     '<button type="submit">Guardar</button></div>'
         +     '<small class="np-msg" aria-live="polite"></small>'
         +   '</form>'
-        +   '<div class="np-sep"></div>' + accesos
+        +   '<div class="np-sep"></div>' + accesos + avisarme
         +   '<div class="np-sep"></div>'
         +   (window._tieneSuscripcion ? '<button type="button" class="np-item" data-np="cancelar">Cancelar membresía</button>' : '')
         +   '<button type="button" class="np-item" data-np="salir">Salir</button>'
         + '</div>';
       const btn = el.querySelector('.np-btn'), menu = el.querySelector('.np-menu');
-      btn.onclick = function(e){ e.stopPropagation(); const ver = menu.hidden; menu.hidden = !ver; btn.setAttribute('aria-expanded', ver); };
+      btn.onclick = function(e){ e.stopPropagation(); const ver = menu.hidden; menu.hidden = !ver; btn.setAttribute('aria-expanded', ver); if (ver) npUbicar(menu); };
       menu.onclick = function(e){
         e.stopPropagation();
         const t = e.target.closest('a, [data-np]'); if (!t) return;
@@ -3234,17 +3241,112 @@
           const m2 = el.querySelector('.np-msg'); if (m2) m2.textContent = 'Listo, guardado.';
         } catch (er) { msg.textContent = 'No se pudo guardar. Probá de nuevo.'; }
       };
+      menu.querySelectorAll('[data-seguir]').forEach(function(c){
+        c.onchange = function(){ const s2 = npSeguir(); s2[c.dataset.seguir] = c.checked; try { localStorage.setItem('mi_avisos_seguir', JSON.stringify(s2)); } catch (e) {} npPintarAvisos(); };
+      });
+      const nb = el.querySelector('.nb-btn'), nm = el.querySelector('.nb-menu');
+      nb.onclick = function(e){
+        e.stopPropagation();
+        const ver = nm.hidden; npCerrar(); nm.hidden = !ver; nb.setAttribute('aria-expanded', ver); if (ver) npUbicar(nm);
+      };
+      btn.addEventListener('click', function(){ nm.hidden = true; nb.setAttribute('aria-expanded', 'false'); });
+      nm.onclick = function(e){
+        e.stopPropagation();
+        if (e.target.closest('[data-nb="leer"]')) { npAvisos.items.forEach(function(a){ if (!a.pendiente) a.leido = true; }); npPintarAvisos(); return; }
+        const a = e.target.closest('a[data-aviso]'); if (!a) return;
+        const it = npAvisos.items.find(function(x){ return x.id === a.dataset.aviso; }); if (it && !it.pendiente) it.leido = true;
+        npCerrar(); npPintarAvisos();
+      };
     }
     window.miNavPerfil = function(){ if (window._currentUser) updateNavUser(window._currentUser); };
-    document.addEventListener('click', function(){
-      const m = document.querySelector('#navUserArea .np-menu'); if (!m || m.hidden) return;
-      m.hidden = true; const b = document.querySelector('#navUserArea .np-btn'); if (b) b.setAttribute('aria-expanded', 'false');
-    });
+
+    // ── Notificaciones (campanita al lado del perfil) ──
+    // Avisos para todos (noticias / análisis / informes, según lo que cada uno
+    // sigue) + avisos privados del creador (análisis para revisar, suscripciones).
+    const npAvisos = { items: [] };
+    window.miAvisos = npAvisos;
+    function npSeguir() {
+      let s2 = null; try { s2 = JSON.parse(localStorage.getItem('mi_avisos_seguir') || 'null'); } catch (e) {}
+      return s2 || { noticias: true, analisis: true, informes: true };
+    }
+    const NP_TIPOS = { noticia: ['Noticia', 'noticias'], analisis: ['Análisis', 'analisis'], informe: ['Informe', 'informes'],
+      envio: ['Análisis enviado', null], suscripcion: ['Suscripción', null], pedido: ['Pedido de informe', null] };
+    function npHace(ts) {
+      const m = Math.round((Date.now() - ts) / 60000);
+      if (m < 1) return 'recién'; if (m < 60) return 'hace ' + m + ' min';
+      const h = Math.round(m / 60); if (h < 24) return 'hace ' + h + ' h';
+      const d = Math.round(h / 24); return d === 1 ? 'ayer' : 'hace ' + d + ' días';
+    }
+    function npVisibles(creador) {
+      const seg = npSeguir();
+      return npAvisos.items.filter(function(a){ const t = NP_TIPOS[a.tipo]; return t[1] ? seg[t[1]] : creador; })
+        .sort(function(a, b){ return b.ts - a.ts; });
+    }
+    function npItem(a) {
+      return '<a class="nb-item' + (a.leido ? '' : ' nb-item--nuevo') + '" href="' + npEsc(a.href || '#') + '" data-aviso="' + npEsc(a.id) + '">'
+        + '<span class="nb-kind">' + NP_TIPOS[a.tipo][0] + '</span>'
+        + '<b>' + npEsc(a.titulo) + '</b>'
+        + (a.detalle ? '<span class="nb-det">' + npEsc(a.detalle) + '</span>' : '')
+        + '<span class="nb-when">' + npHace(a.ts) + '</span></a>';
+    }
+    function npCampana(creador) {
+      const vis = npVisibles(creador);
+      const pend = vis.filter(function(a){ return a.pendiente; });
+      const resto = vis.filter(function(a){ return !a.pendiente; });
+      const sinLeer = vis.filter(function(a){ return !a.leido; }).length;
+      const abierto = !!document.querySelector('#navUserArea .nb-menu:not([hidden])');
+      return '<button type="button" class="nb-btn" aria-haspopup="true" aria-expanded="' + abierto + '" aria-label="Notificaciones' + (sinLeer ? ', ' + sinLeer + ' sin leer' : '') + '">'
+        + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>'
+        + (sinLeer ? '<span class="nb-count">' + (sinLeer > 9 ? '9+' : sinLeer) + '</span>' : '') + '</button>'
+        + '<div class="nb-menu" role="menu"' + (abierto ? '' : ' hidden') + '>'
+        +   '<div class="nb-head"><b>Notificaciones</b>' + (resto.some(function(a){ return !a.leido; }) ? '<button type="button" data-nb="leer">Marcar todo como leído</button>' : '') + '</div>'
+        +   (pend.length ? '<div class="nb-group">Para revisar · ' + pend.length + '</div>' + pend.map(npItem).join('') : '')
+        +   (pend.length && resto.length ? '<div class="nb-group">Novedades</div>' : '')
+        +   (resto.length ? resto.map(npItem).join('') : (pend.length ? '' : '<p class="nb-empty">No tenés notificaciones todavía. Elegí de qué te avisamos en tu perfil.</p>'))
+        + '</div>';
+    }
+    // En el celular los menús van a lo ancho, justo debajo de la barra.
+    function npUbicar(m) {
+      if (window.innerWidth > 600) { m.style.top = ''; return; }
+      const nav = document.querySelector('.navbar');
+      m.style.top = Math.round((nav ? nav.getBoundingClientRect().bottom : 68) + 8) + 'px';
+    }
+    function npPintarAvisos() { if (window._currentUser) updateNavUser(window._currentUser); }
+    function npCerrar() {
+      document.querySelectorAll('#navUserArea .np-menu, #navUserArea .nb-menu').forEach(function(m){ m.hidden = true; });
+      document.querySelectorAll('#navUserArea .np-btn, #navUserArea .nb-btn').forEach(function(b){ b.setAttribute('aria-expanded', 'false'); });
+    }
+    document.addEventListener('click', npCerrar);
     document.addEventListener('keydown', function(e){
-      if (e.key !== 'Escape') return;
-      const m = document.querySelector('#navUserArea .np-menu'); if (!m || m.hidden) return;
-      m.hidden = true; const b = document.querySelector('#navUserArea .np-btn'); if (b) { b.setAttribute('aria-expanded', 'false'); b.focus(); }
+      if (e.key !== 'Escape' || !document.querySelector('#navUserArea .np-menu:not([hidden]), #navUserArea .nb-menu:not([hidden])')) return;
+      npCerrar();
     });
+
+    // Vista previa con datos de ejemplo: ?demo-avisos=usuario | ?demo-avisos=creador
+    function npDemo() {
+      const modo = new URLSearchParams(location.search).get('demo-avisos');
+      if (modo !== 'usuario' && modo !== 'creador') return false;
+      const H = 3600000, ahora = Date.now();
+      npAvisos.items = [
+        { id: 'n1', tipo: 'noticia', titulo: 'El BCRA bajó la tasa de referencia', detalle: 'Pulso del día', href: '#reportes', ts: ahora - 0.6 * H },
+        { id: 'a1', tipo: 'analisis', titulo: 'Resumen semanal de mercados', detalle: 'Ignacio Manfredi · Análisis e informes', href: '#analisis', ts: ahora - 3 * H },
+        { id: 'i1', tipo: 'informe', titulo: 'Informe nuevo: Walmart (WMT)', detalle: 'Fair value y tesis completa', href: '#pro', ts: ahora - 26 * H },
+        { id: 'n2', tipo: 'noticia', titulo: 'Riesgo país por debajo de 600 puntos', detalle: 'Pulso del día', href: '#reportes', ts: ahora - 50 * H, leido: true },
+        { id: 'a2', tipo: 'analisis', titulo: 'YPF después del balance', detalle: 'Analista invitado', href: '#analisis', ts: ahora - 72 * H, leido: true }
+      ];
+      if (modo === 'creador') npAvisos.items = npAvisos.items.concat([
+        { id: 'e1', tipo: 'envio', pendiente: true, titulo: 'Te enviaron un análisis: “Bancos argentinos en 2027”', detalle: 'Analista invitado · esperando tu revisión', href: '#panel', ts: ahora - 1.2 * H },
+        { id: 'e2', tipo: 'envio', pendiente: true, titulo: 'Te enviaron un análisis: “Vista: el costo de crecer”', detalle: 'Analista invitado · esperando tu revisión', href: '#panel', ts: ahora - 20 * H },
+        { id: 's1', tipo: 'suscripcion', titulo: 'Nueva suscripción a Manfredi Pro', detalle: 'Plan mensual · mart***@gmail.com', href: '#panel', ts: ahora - 0.3 * H },
+        { id: 'p1', tipo: 'pedido', titulo: 'Te pidieron un informe de MELI', detalle: 'Socio Pro · plazo 48 hs', href: '#pro', ts: ahora - 5 * H }
+      ]);
+      const u = modo === 'creador'
+        ? { displayName: 'Ignacio Manfredi', email: (window.MI_CREADORES && window.MI_CREADORES[0]) || 'creador@demo' }
+        : { displayName: 'Lucía Fernández', email: 'lucia.demo@gmail.com' };
+      window._currentUser = u; window._isMiembro = modo === 'usuario';
+      updateNavUser(u);
+      return true;
+    }
 
     async function cancelarMiSuscripcion() {
       if (!window._currentUser || !window._currentUser.email) return;
@@ -3285,6 +3387,7 @@
       // Sin bloqueo de pagina completa: el login solo se pide al entrar a
       // contenido premium (Informes, Warren) via los gates propios de esas
       // secciones/paneles. Aca solo dejamos un acceso discreto y voluntario.
+      if (npDemo()) return;
       const navEl = document.getElementById('navUserArea');
       if (navEl) {
         navEl.innerHTML = '<button class="nav-login-btn" onclick="window.showLoginOverlay && window.showLoginOverlay()">Ingresar</button>';
@@ -18134,12 +18237,42 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
   .np-item { display:block; width:100%; padding:9px 8px; border:0; border-radius:7px; background:none; text-align:left; font:500 13.5px 'IBM Plex Sans',sans-serif; color:var(--primary); text-decoration:none; cursor:pointer; }
   .np-item:hover { background:var(--bg-alt); }
   .np-item--gold { color:#8a6d1f; font-weight:600; }
+  .nb-btn { position:relative; display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; flex:none; margin-right:8px; border:1px solid var(--border); border-radius:50%; background:#fff; color:var(--primary); cursor:pointer; transition:border-color .15s; }
+  .nb-btn:hover, .nb-btn[aria-expanded="true"] { border-color:var(--gold-dark); }
+  .nb-btn svg { width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .nb-count { position:absolute; top:-4px; right:-5px; min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:var(--primary); color:#e9d9a6; font:600 10.5px/18px 'IBM Plex Sans',sans-serif; text-align:center; box-shadow:0 0 0 2px #fff; }
+  .nb-menu { position:absolute; right:0; top:calc(100% + 10px); z-index:120; width:360px; max-height:min(560px, calc(100vh - 100px)); overflow-y:auto; padding:6px; background:#fff; border:1px solid var(--border); border-radius:12px; box-shadow:0 18px 40px -16px rgba(10,15,30,.35); color:var(--primary); font-family:'IBM Plex Sans',sans-serif; animation:npIn .16s cubic-bezier(.2,.8,.2,1); }
+  .nb-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 10px 10px; border-bottom:1px solid var(--border); margin-bottom:4px; }
+  .nb-head b { font-size:14px; font-weight:600; }
+  .nb-head button { border:0; background:none; padding:0; font:500 12px 'IBM Plex Sans',sans-serif; color:#8a6d1f; cursor:pointer; }
+  .nb-head button:hover { text-decoration:underline; }
+  .nb-group { padding:10px 10px 4px; font:600 10.5px/1 'IBM Plex Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:#8a6d1f; }
+  .nb-item { position:relative; display:grid; grid-template-columns:1fr auto; column-gap:10px; row-gap:3px; padding:10px 10px 10px 22px; border-radius:8px; text-decoration:none; color:var(--primary); }
+  .nb-item:hover { background:var(--bg-alt); }
+  .nb-item--nuevo::before { content:""; position:absolute; left:9px; top:16px; width:6px; height:6px; border-radius:50%; background:var(--gold-dark); }
+  .nb-kind { grid-column:1; font:600 10px/1.2 'IBM Plex Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#8a6d1f; }
+  .nb-when { grid-column:2; grid-row:1; font-size:11.5px; white-space:nowrap; }
+  .nb-item b { grid-column:1 / -1; font-size:13.5px; font-weight:500; line-height:1.35; }
+  .nb-item--nuevo b { font-weight:600; }
+  .nb-det { grid-column:1 / -1; font-size:12px; line-height:1.35; }
+  .nb-empty { padding:18px 10px; font-size:13px; line-height:1.45; }
+  .np-follow { padding:6px 8px 4px; }
+  .np-follow__t { display:block; font-size:12px; font-weight:600; margin-bottom:4px; }
+  .np-sw { position:relative; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:6px 0; font-size:13.5px; cursor:pointer; }
+  .np-sw input { position:absolute; opacity:0; pointer-events:none; }
+  .np-sw i { position:relative; width:30px; height:18px; flex:none; border-radius:9px; background:var(--border); transition:background .15s; }
+  .np-sw i::after { content:""; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(10,15,30,.25); transition:transform .15s; }
+  .np-sw input:checked + i { background:var(--primary); }
+  .np-sw input:checked + i::after { transform:translateX(12px); }
+  .np-sw input:focus-visible + i { outline:2px solid var(--gold-dark); outline-offset:2px; }
+  #navUserArea { display:flex; align-items:center; }
   @media (max-width:1000px) { #navUserArea { margin-left:auto; } }
   @media (max-width:600px) {
-    #navUserArea { margin-left:4px; }
+    #navUserArea { margin-left:auto; }
     .np-btn { padding:0 4px; gap:0; border-color:transparent; }
     .np-name, .np-chev { display:none; }
-    .np-menu { position:fixed; left:12px; right:12px; top:var(--mi-nav-bottom, 68px); width:auto; }
+    .np-menu, .nb-menu { position:fixed; left:12px; right:12px; top:var(--mi-nav-bottom, 68px); width:auto; }
+    .nb-btn { margin-right:4px; }
     .np-namerow input { font-size:16px; }
   }
   @media (prefers-reduced-motion:reduce) { .np-menu { animation:none; } }
