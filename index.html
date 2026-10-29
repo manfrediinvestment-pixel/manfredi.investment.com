@@ -3033,6 +3033,7 @@
                 window._currentUser = user;
             if (typeof window._miCheckMembership === 'function') window._miCheckMembership();
             if (typeof window._miOnAuth === 'function') window._miOnAuth(user);
+            if (typeof window._npCuenta === 'function') window._npCuenta(userData);
         // Registrar login en Google Sheets
       } else {
         window._isMiembro = false;
@@ -3051,6 +3052,7 @@
         document.querySelectorAll('.mi-paywall-overlay').forEach(function(el) { el.remove(); });
         if (typeof window._miCheckMembership === 'function') window._miCheckMembership();
         if (typeof window._miOnAuth === 'function') window._miOnAuth(null);
+        if (typeof window._npCuenta === 'function') window._npCuenta(null);
         setupGuestMode();
       }
     });
@@ -3247,39 +3249,126 @@
       const nb = el.querySelector('.nb-btn'), nm = el.querySelector('.nb-menu');
       nb.onclick = function(e){
         e.stopPropagation();
-        const ver = nm.hidden; npCerrar(); nm.hidden = !ver; nb.setAttribute('aria-expanded', ver); if (ver) npUbicar(nm);
+        const ver = nm.hidden; npCerrar(); nm.hidden = !ver; nb.setAttribute('aria-expanded', ver); if (ver) { npUbicar(nm); npCargarCreador(); }
       };
       btn.addEventListener('click', function(){ nm.hidden = true; nb.setAttribute('aria-expanded', 'false'); });
       nm.onclick = function(e){
         e.stopPropagation();
-        if (e.target.closest('[data-nb="leer"]')) { npAvisos.items.forEach(function(a){ if (!a.pendiente) a.leido = true; }); npPintarAvisos(); return; }
+        if (e.target.closest('[data-nb="leer"]')) { npLeer(npAvisos.items.filter(function(a){ return !a.pendiente && !a.leido; }).map(function(a){ return a.id; })); return; }
         const a = e.target.closest('a[data-aviso]'); if (!a) return;
-        const it = npAvisos.items.find(function(x){ return x.id === a.dataset.aviso; }); if (it && !it.pendiente) it.leido = true;
-        npCerrar(); npPintarAvisos();
+        const it = npAvisos.items.find(function(x){ return x.id === a.dataset.aviso; });
+        npCerrar(); if (it && !it.pendiente && !it.leido) npLeer([it.id]);
       };
     }
     window.miNavPerfil = function(){ if (window._currentUser) updateNavUser(window._currentUser); };
 
     // ── Notificaciones (campanita al lado del perfil) ──
-    // Avisos para todos (noticias / análisis / informes, según lo que cada uno
-    // sigue) + avisos privados del creador (análisis para revisar, suscripciones).
-    const npAvisos = { items: [] };
+    // Sin mails ni workers nuevos: todo sale de datos que ya existen.
+    //  · Gente común: publicaciones nuevas de los analistas que sigue (worker analistas
+    //    /publicados + papers/manifest.json para los resúmenes de Ignacio).
+    //  · Creador: análisis recibidos sin revisar (/creador/envios?estado=recibido) y pagos
+    //    aprobados de membresía (memberships /creador/resumen).
+    // A quién sigue y qué leyó se guarda en Firestore: users/{uid}.avisos = { analistas, leidos }.
+    const npAvisos = { items: [], seguidos: [], leidos: [], pubs: [], envios: [], pagos: [], demo: false };
     window.miAvisos = npAvisos;
-    // Analistas que la persona sigue: se activa desde el perfil de cada analista.
-    function npSeguidos() {
-      let l = null; try { l = JSON.parse(localStorage.getItem('mi_avisos_analistas') || 'null'); } catch (e) {}
-      return Array.isArray(l) ? l : [];
+    const NP_DIAS = 30;
+    function npSeguidos() { return npAvisos.seguidos; }
+    function npGuardar(campos) {
+      if (npAvisos.demo || !auth.currentUser) return;
+      updateDoc(doc(db, 'users', auth.currentUser.uid), campos).catch(function(e){ console.warn('[avisos]', e.message); });
     }
-    window.miAvisosSigo = function(slug){ return npSeguidos().some(function(a){ return a.slug === slug; }); };
+    window.miAvisosSigo = function(slug){ return npAvisos.seguidos.some(function(a){ return a.slug === slug; }); };
     window.miAvisosSeguir = function(slug, nombre, on){
       if (!window._currentUser) { if (window.showLoginOverlay) window.showLoginOverlay(); return false; }
-      const l = npSeguidos().filter(function(a){ return a.slug !== slug; });
-      if (on) l.push({ slug: slug, nombre: nombre });
-      try { localStorage.setItem('mi_avisos_analistas', JSON.stringify(l)); } catch (e) {}
-      npPintarAvisos();
+      const l = npAvisos.seguidos.filter(function(a){ return a.slug !== slug; });
+      if (on) l.push({ slug: slug, nombre: nombre, desde: new Date().toISOString().slice(0, 10) });
+      npAvisos.seguidos = l;
+      npGuardar({ 'avisos.analistas': l });
+      if (on && !npAvisos.pubs.length) npCargarPubs(); else npArmar();
       window.dispatchEvent(new CustomEvent('mi:seguidos'));
       return true;
     };
+    function npLeer(ids) {
+      if (!ids.length) return;
+      npAvisos.leidos = npAvisos.leidos.concat(ids).slice(-300);
+      npGuardar({ 'avisos.leidos': npAvisos.leidos });
+      npArmar();
+    }
+    function npMask(m) { m = String(m || ''); const k = m.indexOf('@'); return k > 0 ? m.slice(0, Math.min(4, k)) + '***' + m.slice(k) : m; }
+    // Arma la lista de la campanita con lo que haya cargado hasta ahora.
+    function npArmar() {
+      const leidos = npAvisos.leidos, lim = Date.now() - NP_DIAS * 864e5, items = [];
+      npAvisos.seguidos.forEach(function(seg){
+        npAvisos.pubs.forEach(function(pb){
+          if (pb.autor !== seg.slug || pb.ts < lim) return;
+          items.push({ id: 'pub:' + pb.id, tipo: 'analisis', autor: pb.autor, titulo: pb.titulo, detalle: pb.nombre + ' publicó un análisis', href: '#analista-' + pb.autor, ts: pb.ts,
+            leido: leidos.indexOf('pub:' + pb.id) > -1 || pb.dia < (seg.desde || '') });
+        });
+      });
+      npAvisos.envios.forEach(function(e){
+        items.push({ id: 'env:' + e.id, tipo: 'envio', pendiente: true, titulo: '“' + e.titulo + '”', detalle: 'Te lo envió ' + e.nombre + ' · esperando tu revisión', href: '#panel', ts: e.ts });
+      });
+      npAvisos.pagos.forEach(function(pg){
+        if (pg.ts < lim) return;
+        items.push({ id: 'pago:' + pg.id, tipo: 'suscripcion', titulo: 'Nueva suscripción a Manfredi Pro', detalle: pg.plan + ' · ' + npMask(pg.email), href: '#panel', ts: pg.ts, leido: leidos.indexOf('pago:' + pg.id) > -1 });
+      });
+      npAvisos.items = items;
+      npPintarAvisos();
+    }
+    function npJson(u) { return fetch(u, { cache: 'no-cache' }).then(function(r){ if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); }); }
+    const NP_ANAPI = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && !new URLSearchParams(location.search).get('anapi')
+      ? 'https://manfredi-analistas.nachito2502.workers.dev' : null;
+    function npAnGet(ruta) {
+      if (NP_ANAPI) return (auth.currentUser ? auth.currentUser.getIdToken() : Promise.resolve(null)).then(function(t){
+        return fetch(NP_ANAPI + ruta, { headers: t ? { Authorization: 'Bearer ' + t } : {} }).then(function(r){ if (!r.ok) throw new Error(ruta + ' ' + r.status); return r.json(); });
+      });
+      return window.AnApi ? window.AnApi.get(ruta) : npJson('https://manfredi-analistas.nachito2502.workers.dev' + ruta);
+    }
+    function npCargarPubs() {
+      if (!npAvisos.seguidos.length) { npArmar(); return; }
+      const dia = function(f){ return String(f || '').slice(0, 10); };
+      Promise.all([
+        npAnGet('/publicados').catch(function(){ return {}; }),
+        npJson('papers/manifest.json').catch(function(){ return []; })
+      ]).then(function(r){
+        const d = r[0] || {}, nombres = { manfredi: 'Ignacio Manfredi' };
+        (d.autores || []).forEach(function(a){ nombres[a.slug] = a.nombre; });
+        const pubs = (d.publicaciones || []).map(function(pb){ return { id: pb.id, autor: pb.autor, titulo: pb.titulo, dia: dia(pb.fecha) }; });
+        (Array.isArray(r[1]) ? r[1] : []).forEach(function(pb){ if (pb.publishedAt) pubs.push({ id: 'manfredi-' + pb.num, autor: 'manfredi', titulo: pb.title, dia: dia(pb.publishedAt) }); });
+        npAvisos.pubs = pubs.filter(function(pb){ return pb.dia; }).map(function(pb){
+          pb.nombre = nombres[pb.autor] || 'Un analista'; pb.ts = new Date(pb.dia + 'T12:00:00-03:00').getTime(); return pb;
+        });
+        npArmar();
+      });
+    }
+    let npCreadorT = 0;
+    function npCargarCreador() {
+      if (npAvisos.demo || !(window.miEsCreador && window.miEsCreador()) || Date.now() - npCreadorT < 5 * 60e3) return;
+      npCreadorT = Date.now();
+      npAnGet('/creador/envios?estado=recibido').then(function(d){
+        npAvisos.envios = (d.envios || []).map(function(e){ return { id: e.id, titulo: e.titulo, nombre: (e.autorPerfil && e.autorPerfil.nombre) || e.email || 'Un analista', ts: new Date(e.enviado).getTime() }; });
+        npArmar();
+      }).catch(function(e){ console.warn('[avisos] envios', e.message); });
+      auth.currentUser.getIdToken().then(function(t){
+        return fetch('https://manfredi-memberships.nachito2502.workers.dev/creador/resumen', { headers: { Authorization: 'Bearer ' + t } });
+      }).then(function(r){ return r.json(); }).then(function(d){
+        npAvisos.pagos = (d.pagos || []).filter(function(pg){ return pg.estado === 'approved'; }).map(function(pg){
+          return { id: pg.id || (pg.fecha + pg.email), email: pg.email, ts: new Date(pg.fecha).getTime(),
+            plan: pg.meses ? (pg.meses == 1 ? 'Plan mensual' : 'Plan de ' + pg.meses + ' meses') : (pg.concepto || 'Membresía') };
+        });
+        npArmar();
+      }).catch(function(e){ console.warn('[avisos] pagos', e.message); });
+    }
+    // Lo llama el login con los datos de la cuenta (users/{uid}).
+    window._npCuenta = function(userData){
+      const a = (userData && userData.avisos) || {};
+      npAvisos.seguidos = Array.isArray(a.analistas) ? a.analistas : [];
+      npAvisos.leidos = Array.isArray(a.leidos) ? a.leidos : [];
+      npAvisos.pubs = []; npAvisos.envios = []; npAvisos.pagos = []; npCreadorT = 0;
+      window.dispatchEvent(new CustomEvent('mi:seguidos'));
+      npCargarPubs(); npCargarCreador();
+    };
+    setInterval(function(){ if (window._currentUser && !document.hidden) { npCargarCreador(); } }, 5 * 60e3);
     const NP_TIPOS = { analisis: ['Análisis', true], envio: ['Análisis recibido', false], suscripcion: ['Suscripción', false] };
     function npHace(ts) {
       const m = Math.round((Date.now() - ts) / 60000);
@@ -3331,29 +3420,34 @@
       npCerrar();
     });
 
-    // Vista previa con datos de ejemplo: ?demo-avisos=usuario | ?demo-avisos=creador
+    // Vista previa con datos de ejemplo (solo en local): ?demo-avisos=usuario | ?demo-avisos=creador
     function npDemo() {
+      if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return false;
       const modo = new URLSearchParams(location.search).get('demo-avisos');
       if (modo !== 'usuario' && modo !== 'creador') return false;
-      const H = 3600000, ahora = Date.now();
-      npAvisos.items = [
-        { id: 'a1', tipo: 'analisis', autor: 'manfredi', titulo: 'Resumen semanal de mercados', detalle: 'Ignacio Manfredi publicó un análisis', href: '#analista-manfredi', ts: ahora - 0.8 * H },
-        { id: 'a2', tipo: 'analisis', autor: 'demo-martina', titulo: 'Bancos argentinos: qué esperar del crédito en 2027', detalle: 'Martina Ríos publicó un análisis', href: '#analisis', ts: ahora - 5 * H },
-        { id: 'a3', tipo: 'analisis', autor: 'demo-martina', titulo: 'YPF después del balance', detalle: 'Martina Ríos publicó un análisis', href: '#analisis', ts: ahora - 50 * H, leido: true },
-        { id: 'a4', tipo: 'analisis', autor: 'manfredi', titulo: 'Resumen semanal de mercados (semana anterior)', detalle: 'Ignacio Manfredi publicó un análisis', href: '#analista-manfredi', ts: ahora - 7 * 24 * H, leido: true }
+      const H = 3600000, ahora = Date.now(), dia = function(h){ return new Date(ahora - h * H).toISOString().slice(0, 10); };
+      npAvisos.demo = true;
+      npAvisos.seguidos = [{ slug: 'manfredi', nombre: 'Ignacio Manfredi', desde: dia(24 * 20) }, { slug: 'demo-martina', nombre: 'Martina Ríos', desde: dia(24 * 20) }];
+      npAvisos.leidos = ['pub:d3'];
+      npAvisos.pubs = [
+        { id: 'd1', autor: 'manfredi', nombre: 'Ignacio Manfredi', titulo: 'Resumen semanal de mercados', dia: dia(1), ts: ahora - 0.8 * H },
+        { id: 'd2', autor: 'demo-martina', nombre: 'Martina Ríos', titulo: 'Bancos argentinos: qué esperar del crédito en 2027', dia: dia(5), ts: ahora - 5 * H },
+        { id: 'd3', autor: 'demo-martina', nombre: 'Martina Ríos', titulo: 'YPF después del balance', dia: dia(50), ts: ahora - 50 * H }
       ];
-      if (modo === 'creador') npAvisos.items = [
-        { id: 'e1', tipo: 'envio', pendiente: true, titulo: '“Bancos argentinos en 2027”', detalle: 'Te lo envió Martina Ríos · esperando tu revisión', href: '#panel', ts: ahora - 0.5 * H },
-        { id: 'e2', tipo: 'envio', pendiente: true, titulo: '“Vista Energy: el costo de crecer”', detalle: 'Te lo envió Tomás Herrera · esperando tu revisión', href: '#panel', ts: ahora - 4 * H },
-        { id: 'e3', tipo: 'envio', pendiente: true, titulo: '“Bonos CER vs. tasa fija: dónde está el valor”', detalle: 'Te lo envió Sofía Navarro · esperando tu revisión', href: '#panel', ts: ahora - 22 * H },
-        { id: 's1', tipo: 'suscripcion', titulo: 'Nueva suscripción a Manfredi Pro', detalle: 'Plan mensual · mart***@gmail.com', href: '#panel', ts: ahora - 2 * H }
-      ];
-      if (modo === 'usuario') try { localStorage.setItem('mi_avisos_analistas', JSON.stringify([{ slug: 'manfredi', nombre: 'Ignacio Manfredi' }, { slug: 'demo-martina', nombre: 'Martina Ríos' }])); } catch (e) {}
+      if (modo === 'creador') {
+        npAvisos.seguidos = [];
+        npAvisos.envios = [
+          { id: 'e1', titulo: 'Bancos argentinos en 2027', nombre: 'Martina Ríos', ts: ahora - 0.5 * H },
+          { id: 'e2', titulo: 'Vista Energy: el costo de crecer', nombre: 'Tomás Herrera', ts: ahora - 4 * H },
+          { id: 'e3', titulo: 'Bonos CER vs. tasa fija: dónde está el valor', nombre: 'Sofía Navarro', ts: ahora - 22 * H }
+        ];
+        npAvisos.pagos = [{ id: 'p1', email: 'martina@gmail.com', plan: 'Plan mensual', ts: ahora - 2 * H }];
+      }
       const u = modo === 'creador'
         ? { displayName: 'Ignacio Manfredi', email: (window.MI_CREADORES && window.MI_CREADORES[0]) || 'creador@demo' }
         : { displayName: 'Lucía Fernández', email: 'lucia.demo@gmail.com' };
       window._currentUser = u; window._isMiembro = modo === 'usuario';
-      updateNavUser(u);
+      npArmar();
       return true;
     }
 
