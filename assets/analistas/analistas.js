@@ -229,6 +229,20 @@
     return n.url ? '<a class="an-neg" href="' + esc(n.url) + '" target="_blank" rel="noopener nofollow">' + cuerpo + '<i aria-hidden="true">↗</i></a>'
       : '<div class="an-neg">' + cuerpo + '</div>';
   }
+  // Avisos: la persona elige de qué analistas quiere enterarse (campanita del sitio, sin mail)
+  var BELL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
+  function seguirBtn(a) {
+    var on = !!(window.miAvisosSigo && window.miAvisosSigo(a.slug));
+    return '<button type="button" class="an-seguir" data-seguir="' + esc(a.slug) + '" aria-pressed="' + on + '">' + BELL +
+      (on ? 'Avisos activados' : 'Activar avisos') + '</button>' +
+      '<p class="an-seguir__n">' + (on ? 'Te avisamos en la campanita cuando ' + esc(a.nombre.split(' ')[0]) + ' publique.' : 'Te avisamos en la campanita cuando publique algo nuevo.') + '</p>';
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.an-seguir'); if (!b || !window.miAvisosSeguir) return;
+    var a = st.autores[b.dataset.seguir]; if (!a) return;
+    window.miAvisosSeguir(a.slug, a.nombre, b.getAttribute('aria-pressed') !== 'true');
+  });
+  window.addEventListener('mi:seguidos', function () { var w = vista(); if (w.v === 'perfil') pintarPerfil(w.slug); });
   function pintarPerfil(slug) {
     var a = st.autores[slug], box = $('anPerfil');
     if (!a) { box.innerHTML = '<a class="an-back" href="#analisis">← Análisis e informes</a><p class="nt-empty">No encontramos a este autor.</p>'; return; }
@@ -239,7 +253,7 @@
       '<section class="an-prof" style="--c:' + esc(a.color) + '">' + av(a, 'lg') +
       '<div><span class="an-tag">' + cats.map(function (c) { return CAT[c].n; }).join(' · ') + '</span>' +
       '<h3 class="an-prof__n">' + esc(a.nombre) + (a.verificado ? TILDE : '') + '</h3>' +
-      '<div class="an-prof__r">' + esc(a.rol || '') + '</div>' + registro(a) + (a.bio ? '<p class="an-prof__bio">' + esc(a.bio) + '</p>' : '') + negocio(a) + '<div class="an-links">' + links(a) + '</div></div>' +
+      '<div class="an-prof__r">' + esc(a.rol || '') + '</div>' + registro(a) + (a.bio ? '<p class="an-prof__bio">' + esc(a.bio) + '</p>' : '') + negocio(a) + '<div class="an-links">' + links(a) + '</div>' + seguirBtn(a) + '</div>' +
       '<div class="an-pstats"><span><strong>' + pubs.length + '</strong>publicaciones</span>' +
       (lect ? '<span><strong>' + miles(lect) + '</strong>lecturas</span>' : '') +
       (desde ? '<span><strong>' + esc(desde) + '</strong>desde</span>' : '') + '</div></section>' +

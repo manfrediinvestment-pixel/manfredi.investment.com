@@ -33,7 +33,7 @@
   <link rel="stylesheet" href="assets/mercados/terminal.css?v=20261026a" />
 <link rel="stylesheet" href="assets/pulso/pulso.css?v=20261010z" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261010z" />
-<link rel="stylesheet" href="assets/analistas/analistas.css?v=20261028l" />
+<link rel="stylesheet" href="assets/analistas/analistas.css?v=20261029a" />
 <link rel="stylesheet" href="assets/portfolio/ratios.css?v=20261012" />
 <link rel="stylesheet" href="assets/pro/pro.css?v=20261028l" />
 <link rel="stylesheet" href="assets/comunidad/chat.css?v=20261028m" />
@@ -3196,11 +3196,11 @@
       const accesos = (creador ? '<a class="np-item np-item--gold" href="#panel">&#10022; Panel de creador</a>' : '')
         + (analista ? '<a class="np-item" href="#autor">Mi espacio de analista</a>' : '')
         + '<a class="np-item" href="#portfolio">Mi portfolio</a>';
-      const seg = npSeguir();
-      const avisarme = '<div class="np-sep"></div><div class="np-follow"><span class="np-follow__t">Avisarme cuando salga</span>'
-        + [['noticias', 'Una noticia'], ['analisis', 'Un análisis de analistas'], ['informes', 'Un informe nuevo']].map(function(o){
-            return '<label class="np-sw"><span>' + o[1] + '</span><input type="checkbox" data-seguir="' + o[0] + '"' + (seg[o[0]] ? ' checked' : '') + '><i></i></label>';
-          }).join('')
+      const seg = npSeguidos();
+      const avisarme = '<div class="np-sep"></div><div class="np-follow"><span class="np-follow__t">Avisos de analistas</span>'
+        + (seg.length
+          ? seg.map(function(a){ return '<div class="np-fol"><a href="#analista-' + npEsc(a.slug) + '">' + npEsc(a.nombre) + '</a><button type="button" data-dejar="' + npEsc(a.slug) + '">Dejar de seguir</button></div>'; }).join('')
+          : '<p class="np-fol-empty">Entrá al perfil de un analista y tocá <b>Activar avisos</b> para enterarte cuando publique.</p>')
         + '</div>';
       el.innerHTML = npCampana(creador)
         + '<button type="button" class="np-btn" aria-haspopup="true" aria-expanded="' + abierto + '" aria-label="Tu perfil">'
@@ -3241,8 +3241,8 @@
           const m2 = el.querySelector('.np-msg'); if (m2) m2.textContent = 'Listo, guardado.';
         } catch (er) { msg.textContent = 'No se pudo guardar. Probá de nuevo.'; }
       };
-      menu.querySelectorAll('[data-seguir]').forEach(function(c){
-        c.onchange = function(){ const s2 = npSeguir(); s2[c.dataset.seguir] = c.checked; try { localStorage.setItem('mi_avisos_seguir', JSON.stringify(s2)); } catch (e) {} npPintarAvisos(); };
+      menu.querySelectorAll('[data-dejar]').forEach(function(b){
+        b.onclick = function(e){ e.stopPropagation(); window.miAvisosSeguir(b.dataset.dejar, '', false); };
       });
       const nb = el.querySelector('.nb-btn'), nm = el.querySelector('.nb-menu');
       nb.onclick = function(e){
@@ -3265,12 +3265,22 @@
     // sigue) + avisos privados del creador (análisis para revisar, suscripciones).
     const npAvisos = { items: [] };
     window.miAvisos = npAvisos;
-    function npSeguir() {
-      let s2 = null; try { s2 = JSON.parse(localStorage.getItem('mi_avisos_seguir') || 'null'); } catch (e) {}
-      return s2 || { noticias: true, analisis: true, informes: true };
+    // Analistas que la persona sigue: se activa desde el perfil de cada analista.
+    function npSeguidos() {
+      let l = null; try { l = JSON.parse(localStorage.getItem('mi_avisos_analistas') || 'null'); } catch (e) {}
+      return Array.isArray(l) ? l : [];
     }
-    const NP_TIPOS = { noticia: ['Noticia', 'noticias'], analisis: ['Análisis', 'analisis'], informe: ['Informe', 'informes'],
-      envio: ['Análisis enviado', null], suscripcion: ['Suscripción', null], pedido: ['Pedido de informe', null] };
+    window.miAvisosSigo = function(slug){ return npSeguidos().some(function(a){ return a.slug === slug; }); };
+    window.miAvisosSeguir = function(slug, nombre, on){
+      if (!window._currentUser) { if (window.showLoginOverlay) window.showLoginOverlay(); return false; }
+      const l = npSeguidos().filter(function(a){ return a.slug !== slug; });
+      if (on) l.push({ slug: slug, nombre: nombre });
+      try { localStorage.setItem('mi_avisos_analistas', JSON.stringify(l)); } catch (e) {}
+      npPintarAvisos();
+      window.dispatchEvent(new CustomEvent('mi:seguidos'));
+      return true;
+    };
+    const NP_TIPOS = { analisis: ['Análisis', true], envio: ['Análisis recibido', false], suscripcion: ['Suscripción', false] };
     function npHace(ts) {
       const m = Math.round((Date.now() - ts) / 60000);
       if (m < 1) return 'recién'; if (m < 60) return 'hace ' + m + ' min';
@@ -3278,8 +3288,7 @@
       const d = Math.round(h / 24); return d === 1 ? 'ayer' : 'hace ' + d + ' días';
     }
     function npVisibles(creador) {
-      const seg = npSeguir();
-      return npAvisos.items.filter(function(a){ const t = NP_TIPOS[a.tipo]; return t[1] ? seg[t[1]] : creador; })
+      return npAvisos.items.filter(function(a){ return NP_TIPOS[a.tipo][1] ? window.miAvisosSigo(a.autor) : creador; })
         .sort(function(a, b){ return b.ts - a.ts; });
     }
     function npItem(a) {
@@ -3302,7 +3311,7 @@
         +   '<div class="nb-head"><b>Notificaciones</b>' + (resto.some(function(a){ return !a.leido; }) ? '<button type="button" data-nb="leer">Marcar todo como leído</button>' : '') + '</div>'
         +   (pend.length ? '<div class="nb-group">Para revisar · ' + pend.length + '</div>' + pend.map(npItem).join('') : '')
         +   (pend.length && resto.length ? '<div class="nb-group">Novedades</div>' : '')
-        +   (resto.length ? resto.map(npItem).join('') : (pend.length ? '' : '<p class="nb-empty">No tenés notificaciones todavía. Elegí de qué te avisamos en tu perfil.</p>'))
+        +   (resto.length ? resto.map(npItem).join('') : (pend.length ? '' : '<p class="nb-empty">Todavía no tenés avisos. Entrá al perfil de un analista y tocá <b>Activar avisos</b>: cuando publique, te llega acá.</p>'))
         + '</div>';
     }
     // En el celular los menús van a lo ancho, justo debajo de la barra.
@@ -3328,18 +3337,18 @@
       if (modo !== 'usuario' && modo !== 'creador') return false;
       const H = 3600000, ahora = Date.now();
       npAvisos.items = [
-        { id: 'n1', tipo: 'noticia', titulo: 'El BCRA bajó la tasa de referencia', detalle: 'Pulso del día', href: '#reportes', ts: ahora - 0.6 * H },
-        { id: 'a1', tipo: 'analisis', titulo: 'Resumen semanal de mercados', detalle: 'Ignacio Manfredi · Análisis e informes', href: '#analisis', ts: ahora - 3 * H },
-        { id: 'i1', tipo: 'informe', titulo: 'Informe nuevo: Walmart (WMT)', detalle: 'Fair value y tesis completa', href: '#pro', ts: ahora - 26 * H },
-        { id: 'n2', tipo: 'noticia', titulo: 'Riesgo país por debajo de 600 puntos', detalle: 'Pulso del día', href: '#reportes', ts: ahora - 50 * H, leido: true },
-        { id: 'a2', tipo: 'analisis', titulo: 'YPF después del balance', detalle: 'Analista invitado', href: '#analisis', ts: ahora - 72 * H, leido: true }
+        { id: 'a1', tipo: 'analisis', autor: 'manfredi', titulo: 'Resumen semanal de mercados', detalle: 'Ignacio Manfredi publicó un análisis', href: '#analista-manfredi', ts: ahora - 0.8 * H },
+        { id: 'a2', tipo: 'analisis', autor: 'demo-martina', titulo: 'Bancos argentinos: qué esperar del crédito en 2027', detalle: 'Martina Ríos publicó un análisis', href: '#analisis', ts: ahora - 5 * H },
+        { id: 'a3', tipo: 'analisis', autor: 'demo-martina', titulo: 'YPF después del balance', detalle: 'Martina Ríos publicó un análisis', href: '#analisis', ts: ahora - 50 * H, leido: true },
+        { id: 'a4', tipo: 'analisis', autor: 'manfredi', titulo: 'Resumen semanal de mercados (semana anterior)', detalle: 'Ignacio Manfredi publicó un análisis', href: '#analista-manfredi', ts: ahora - 7 * 24 * H, leido: true }
       ];
-      if (modo === 'creador') npAvisos.items = npAvisos.items.concat([
-        { id: 'e1', tipo: 'envio', pendiente: true, titulo: 'Te enviaron un análisis: “Bancos argentinos en 2027”', detalle: 'Analista invitado · esperando tu revisión', href: '#panel', ts: ahora - 1.2 * H },
-        { id: 'e2', tipo: 'envio', pendiente: true, titulo: 'Te enviaron un análisis: “Vista: el costo de crecer”', detalle: 'Analista invitado · esperando tu revisión', href: '#panel', ts: ahora - 20 * H },
-        { id: 's1', tipo: 'suscripcion', titulo: 'Nueva suscripción a Manfredi Pro', detalle: 'Plan mensual · mart***@gmail.com', href: '#panel', ts: ahora - 0.3 * H },
-        { id: 'p1', tipo: 'pedido', titulo: 'Te pidieron un informe de MELI', detalle: 'Socio Pro · plazo 48 hs', href: '#pro', ts: ahora - 5 * H }
-      ]);
+      if (modo === 'creador') npAvisos.items = [
+        { id: 'e1', tipo: 'envio', pendiente: true, titulo: '“Bancos argentinos en 2027”', detalle: 'Te lo envió Martina Ríos · esperando tu revisión', href: '#panel', ts: ahora - 0.5 * H },
+        { id: 'e2', tipo: 'envio', pendiente: true, titulo: '“Vista Energy: el costo de crecer”', detalle: 'Te lo envió Tomás Herrera · esperando tu revisión', href: '#panel', ts: ahora - 4 * H },
+        { id: 'e3', tipo: 'envio', pendiente: true, titulo: '“Bonos CER vs. tasa fija: dónde está el valor”', detalle: 'Te lo envió Sofía Navarro · esperando tu revisión', href: '#panel', ts: ahora - 22 * H },
+        { id: 's1', tipo: 'suscripcion', titulo: 'Nueva suscripción a Manfredi Pro', detalle: 'Plan mensual · mart***@gmail.com', href: '#panel', ts: ahora - 2 * H }
+      ];
+      if (modo === 'usuario') try { localStorage.setItem('mi_avisos_analistas', JSON.stringify([{ slug: 'manfredi', nombre: 'Ignacio Manfredi' }, { slug: 'demo-martina', nombre: 'Martina Ríos' }])); } catch (e) {}
       const u = modo === 'creador'
         ? { displayName: 'Ignacio Manfredi', email: (window.MI_CREADORES && window.MI_CREADORES[0]) || 'creador@demo' }
         : { displayName: 'Lucía Fernández', email: 'lucia.demo@gmail.com' };
@@ -4258,7 +4267,7 @@
   <script src="assets/portfolio/ratios.js?v=20261012" defer></script>
   <script src="assets/analistas/api.js?v=20261012" defer></script>
   <script src="assets/analistas/social.js?v=20261012soc" defer></script>
-  <script src="assets/analistas/analistas.js?v=20261028a" defer></script>
+  <script src="assets/analistas/analistas.js?v=20261029a" defer></script>
   <script src="assets/analistas/revision.js?v=20261028a" defer></script>
   <script src="assets/analistas/autor.js?v=20261029a" defer></script>
   <script src="assets/comunidad/tarjeta.js?v=20261028m" defer></script>
@@ -18266,6 +18275,11 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
   .np-sw input:checked + i::after { transform:translateX(12px); }
   .np-sw input:focus-visible + i { outline:2px solid var(--gold-dark); outline-offset:2px; }
   #navUserArea { display:flex; align-items:center; }
+  .np-fol { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:6px 0; font-size:13.5px; }
+  .np-fol a { color:var(--primary); font-weight:500; text-decoration:none; }
+  .np-fol a:hover { text-decoration:underline; }
+  .np-fol button { border:0; background:none; padding:0; font:500 12px 'IBM Plex Sans',sans-serif; color:#8a6d1f; cursor:pointer; }
+  .np-fol-empty { font-size:12.5px; line-height:1.45; padding:2px 0 4px; }
   @media (max-width:1000px) { #navUserArea { margin-left:auto; } }
   @media (max-width:600px) {
     #navUserArea { margin-left:auto; }
