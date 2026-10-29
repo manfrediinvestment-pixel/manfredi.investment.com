@@ -2923,7 +2923,7 @@
   <!-- Firebase SDK (Authentication + Firestore) -->
   <script type="module">
     import { initializeApp }           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut }
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, updateProfile }
                                         from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
     import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp }
                                         from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -3174,17 +3174,77 @@
     };
 
     // ââ Navbar User Area âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+    // Menú de perfil (arriba a la derecha): nombre editable, rol (Socio /
+    // Analista / Creador) y los accesos propios de cada rol (Panel de creador,
+    // espacio de analista), así no ocupan lugar en la barra.
+    function npEsc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+    function npIniciales(n) { return n.replace(/@.*/, '').split(/[\s._-]+/).filter(Boolean).map(function(p){ return p[0]; }).slice(0, 2).join('').toUpperCase() || '·'; }
     function updateNavUser(user) {
       const el = document.getElementById('navUserArea');
-      if (!el) return;
-      const cancelBtn = window._tieneSuscripcion
-        ? '<button onclick="window.cancelarMiSuscripcion()" style="font-size:11.5px;padding:4px 10px;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:var(--bg-alt);color:var(--text-sec);margin-left:6px">Cancelar membresía</button>'
-        : '';
-      const creadorBadge = (window.miEsCreador && window.miEsCreador(user)) ? '<span class="mi-creator-badge" title="Cuenta de creador">Creador</span>' : '';
-      el.innerHTML = '<span style="font-size:12.5px;color:var(--text-sec)">' + (user.displayName || user.email) + '</span>' + creadorBadge
-        + cancelBtn
-        + '<button onclick="window.signOutUser()" style="font-size:11.5px;padding:4px 10px;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:var(--bg-alt);color:var(--text-sec);margin-left:6px">Salir</button>';
+      if (!el || !user) return;
+      const abierto = !!el.querySelector('.np-menu:not([hidden])');
+      const nombre = user.displayName || user.email.replace(/@.*/, '');
+      const corto = nombre.split(' ')[0];
+      const creador = !!(window.miEsCreador && window.miEsCreador(user));
+      const analista = !!(window.AnAutor && window.AnAutor.habilitado);
+      const av = function(cls){ return user.photoURL
+        ? '<span class="np-av ' + cls + '"><img src="' + npEsc(user.photoURL) + '" alt="" referrerpolicy="no-referrer"></span>'
+        : '<span class="np-av ' + cls + '">' + npEsc(npIniciales(nombre)) + '</span>'; };
+      const roles = (creador ? '<span class="np-tag">&#10022; Creador</span>' : '')
+        + (analista ? '<span class="np-tag">Analista</span>' : '')
+        + (window._isMiembro ? '<span class="np-tag">Socio Pro</span>' : '');
+      const accesos = (creador ? '<a class="np-item np-item--gold" href="#panel">&#10022; Panel de creador</a>' : '')
+        + (analista ? '<a class="np-item" href="#autor">Mi espacio de analista</a>' : '')
+        + '<a class="np-item" href="#portfolio">Mi portfolio</a>';
+      el.innerHTML = '<button type="button" class="np-btn" aria-haspopup="true" aria-expanded="' + abierto + '" aria-label="Tu perfil">'
+        + av('') + '<span class="np-name">' + npEsc(corto) + '</span>'
+        + '<svg class="np-chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button>'
+        + '<div class="np-menu" role="menu"' + (abierto ? '' : ' hidden') + '>'
+        +   '<div class="np-head">' + av('np-av--lg') + '<div class="np-who"><b>' + npEsc(nombre) + '</b><span>' + npEsc(user.email) + '</span></div></div>'
+        +   (roles ? '<div class="np-roles">' + roles + '</div>' : '')
+        +   '<form class="np-nameform" novalidate>'
+        +     '<label for="npNombre">Nombre de perfil</label>'
+        +     '<div class="np-namerow"><input id="npNombre" name="nombre" maxlength="40" autocomplete="name" value="' + npEsc(user.displayName || '') + '" placeholder="Cómo querés que te vean">'
+        +     '<button type="submit">Guardar</button></div>'
+        +     '<small class="np-msg" aria-live="polite"></small>'
+        +   '</form>'
+        +   '<div class="np-sep"></div>' + accesos
+        +   '<div class="np-sep"></div>'
+        +   (window._tieneSuscripcion ? '<button type="button" class="np-item" data-np="cancelar">Cancelar membresía</button>' : '')
+        +   '<button type="button" class="np-item" data-np="salir">Salir</button>'
+        + '</div>';
+      const btn = el.querySelector('.np-btn'), menu = el.querySelector('.np-menu');
+      btn.onclick = function(e){ e.stopPropagation(); const ver = menu.hidden; menu.hidden = !ver; btn.setAttribute('aria-expanded', ver); };
+      menu.onclick = function(e){
+        e.stopPropagation();
+        const t = e.target.closest('a, [data-np]'); if (!t) return;
+        if (t.dataset.np === 'cancelar') window.cancelarMiSuscripcion();
+        if (t.dataset.np === 'salir') window.signOutUser();
+        menu.hidden = true; btn.setAttribute('aria-expanded', 'false');
+      };
+      menu.querySelector('.np-nameform').onsubmit = async function(e){
+        e.preventDefault();
+        const msg = this.querySelector('.np-msg'), v = this.nombre.value.trim().replace(/\s+/g, ' ');
+        if (v.length < 2) { msg.textContent = 'Escribí al menos 2 letras.'; return; }
+        msg.textContent = 'Guardando…';
+        try {
+          await updateProfile(auth.currentUser, { displayName: v });
+          updateDoc(doc(db, 'users', auth.currentUser.uid), { nombre: v }).catch(function(){});
+          updateNavUser(auth.currentUser);
+          const m2 = el.querySelector('.np-msg'); if (m2) m2.textContent = 'Listo, guardado.';
+        } catch (er) { msg.textContent = 'No se pudo guardar. Probá de nuevo.'; }
+      };
     }
+    window.miNavPerfil = function(){ if (window._currentUser) updateNavUser(window._currentUser); };
+    document.addEventListener('click', function(){
+      const m = document.querySelector('#navUserArea .np-menu'); if (!m || m.hidden) return;
+      m.hidden = true; const b = document.querySelector('#navUserArea .np-btn'); if (b) b.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key !== 'Escape') return;
+      const m = document.querySelector('#navUserArea .np-menu'); if (!m || m.hidden) return;
+      m.hidden = true; const b = document.querySelector('#navUserArea .np-btn'); if (b) { b.setAttribute('aria-expanded', 'false'); b.focus(); }
+    });
 
     async function cancelarMiSuscripcion() {
       if (!window._currentUser || !window._currentUser.email) return;
@@ -3552,7 +3612,6 @@
         <li><a href="#reportes" class="nav-link" data-tab-target="informes">Noticias<span class="nav-pronto" title="Próximamente: Análisis e informes" aria-hidden="true"></span></a></li>
         <li><a href="#portfolio" class="nav-link" data-tab-target="portfolio">Portfolio</a></li>
         <li><a href="#pro" class="nav-link nav-link-pro" data-tab-target="inversiones">Manfredi <span class="nav-pro">Pro</span><span class="mi-nav-count" id="navPedidosCount" hidden></span></a></li>
-        <li id="navPanelItem" hidden><a href="#panel" class="nav-link nav-link-panel" data-tab-target="panel">&#10022; Panel</a></li>
         <li>
           <button type="button" class="nav-link nav-more-btn" id="navMoreBtn" data-tab-group="herramientas" aria-expanded="false" aria-controls="navMore">
             <svg class="nav-more-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>
@@ -3562,12 +3621,12 @@
       </ul>
 
 
-      <div id="navUserArea"></div>
       <button type="button" class="nav-notify-btn" id="notifyNavBtn" aria-label="Notificate de todo" onclick="window.showNotifyOverlay && window.showNotifyOverlay()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         Notificate de todo
         <span class="nav-notify-dot"></span>
       </button>
+      <div id="navUserArea"></div>
       <button type="button" class="nav-burger" id="navBurger" aria-label="Abrir men&uacute;" aria-expanded="false" aria-controls="navSheet">
         <span></span><span></span><span></span>
       </button>
@@ -4103,7 +4162,7 @@
   <script src="assets/analistas/social.js?v=20261012soc" defer></script>
   <script src="assets/analistas/analistas.js?v=20261028a" defer></script>
   <script src="assets/analistas/revision.js?v=20261028a" defer></script>
-  <script src="assets/analistas/autor.js?v=20261015b" defer></script>
+  <script src="assets/analistas/autor.js?v=20261029a" defer></script>
   <script src="assets/comunidad/tarjeta.js?v=20261028m" defer></script>
   <script src="assets/comunidad/chat.js?v=20261028n" defer></script>
   <script src="assets/pro/pro.js?v=20261028j" defer></script>
@@ -5550,7 +5609,7 @@
     window._miOnAuth = function(user){
       if (prev) prev(user);
       var cr = window.miEsCreador && window.miEsCreador(user);
-      var li = document.getElementById('navPanelItem'); if (li) li.hidden = !cr;
+      if (window.miNavPerfil) window.miNavPerfil();
       if (cr && enPanel()) cargarPanel();
     };
     window.addEventListener('hashchange', function(){ if (enPanel()) cargarPanel(); });
@@ -18050,6 +18109,46 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
   @media (max-width:900px) { .tools-grid { grid-template-columns:1fr 1fr; } }
   @media (max-width:520px) { .tools-grid { grid-template-columns:1fr; } }
 
+  /* ── Menú de perfil (arriba a la derecha) ── */
+  #navUserArea { position:relative; margin-left:12px; }
+  .np-btn { display:inline-flex; align-items:center; gap:8px; height:38px; padding:0 10px 0 4px; border:1px solid var(--border); border-radius:20px; background:#fff; color:var(--primary); font:500 13px/1 'IBM Plex Sans',sans-serif; cursor:pointer; transition:border-color .15s; }
+  .np-btn:hover, .np-btn[aria-expanded="true"] { border-color:var(--gold-dark); }
+  .np-av { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; flex:none; border-radius:50%; overflow:hidden; background:var(--primary); color:#e9d9a6; font:600 11.5px/1 'IBM Plex Sans',sans-serif; letter-spacing:.04em; }
+  .np-av img { width:100%; height:100%; object-fit:cover; }
+  .np-av--lg { width:40px; height:40px; font-size:14px; }
+  .np-name { max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .np-chev { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; transition:transform .15s; }
+  .np-btn[aria-expanded="true"] .np-chev { transform:rotate(180deg); }
+  .np-menu { position:absolute; right:0; top:calc(100% + 10px); z-index:120; width:290px; padding:8px; background:#fff; border:1px solid var(--border); border-radius:12px; box-shadow:0 18px 40px -16px rgba(10,15,30,.35); color:var(--primary); font-family:'IBM Plex Sans',sans-serif; transform-origin:top right; animation:npIn .16s cubic-bezier(.2,.8,.2,1); }
+  @keyframes npIn { from { opacity:0; transform:translateY(-4px) scale(.98); } }
+  .np-head { display:flex; align-items:center; gap:10px; padding:8px 8px 10px; }
+  .np-who { min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .np-who b { font-size:14px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .np-who span { font-size:12px; color:var(--primary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .np-roles { display:flex; flex-wrap:wrap; gap:6px; padding:0 8px 10px; }
+  .np-tag { font:600 10.5px/1 'IBM Plex Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:#8a6d1f; border:1px solid rgba(184,148,63,.45); border-radius:4px; padding:4px 7px; }
+  .np-nameform { padding:10px 8px 6px; border-top:1px solid var(--border); }
+  .np-nameform label { display:block; font-size:12px; font-weight:600; margin-bottom:6px; }
+  .np-namerow { display:flex; gap:6px; }
+  .np-namerow input { flex:1; min-width:0; height:34px; padding:0 10px; border:1px solid var(--border); border-radius:8px; font:14px 'IBM Plex Sans',sans-serif; color:var(--primary); background:#fff; }
+  .np-namerow input:focus { outline:none; border-color:var(--gold-dark); }
+  .np-namerow button { height:34px; padding:0 12px; border:1px solid var(--primary); border-radius:8px; background:var(--primary); color:#fff; font:600 12.5px 'IBM Plex Sans',sans-serif; cursor:pointer; }
+  .np-msg { display:block; min-height:14px; margin-top:5px; font-size:11.5px; color:var(--primary); }
+  .np-msg:empty { min-height:0; margin:0; }
+  .np-sep { height:1px; margin:6px 0; background:var(--border); }
+  .np-item { display:block; width:100%; padding:9px 8px; border:0; border-radius:7px; background:none; text-align:left; font:500 13.5px 'IBM Plex Sans',sans-serif; color:var(--primary); text-decoration:none; cursor:pointer; }
+  .np-item:hover { background:var(--bg-alt); }
+  .np-item--gold { color:#8a6d1f; font-weight:600; }
+  @media (max-width:1000px) { .nav-notify-btn { margin-left:auto; } }
+  @media (max-width:600px) {
+    #navUserArea { margin-left:4px; }
+    .np-btn { padding:0 4px; gap:0; border-color:transparent; }
+    .np-name, .np-chev { display:none; }
+    .np-menu { position:fixed; left:12px; right:12px; top:var(--mi-nav-bottom, 68px); width:auto; }
+    .np-namerow input { font-size:16px; }
+  }
+  @media (prefers-reduced-motion:reduce) { .np-menu { animation:none; } }
+
   /* ── Menú de celular y tablet (≤1000px) ── */
   .nav-burger { display:none; width:42px; height:42px; margin-left:6px; border:0; border-radius:10px; background:transparent; cursor:pointer; flex-direction:column; align-items:center; justify-content:center; gap:5px; flex:none; }
   .nav-burger span { display:block; width:20px; height:2px; border-radius:2px; background:var(--primary); transition:transform .22s var(--mi-ease-out), opacity .15s ease; }
@@ -18080,7 +18179,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
     html.mi-sheet-open, html.mi-sheet-open body { overflow:hidden; }
   }
   @media (max-width:600px) {
-    .nav-login-btn, #navUserArea button { padding:8px 12px; font-size:13px; }
+    .nav-login-btn { padding:8px 12px; font-size:13px; }
   }
 
   /* Aviso de informe nuevo en celular: compacto y nunca encima del menú */
@@ -18207,7 +18306,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
     .nav-notify-btn svg { width:18px; height:18px; }
     .logo-text { display:none; }
     .btn-cta { padding:8px 12px; font-size:13px; }
-    #navUserArea .btn-login, #navUserArea button { padding:8px 12px; font-size:13px; }
+    #navUserArea .btn-login, #navUserArea .nav-login-btn { padding:8px 12px; font-size:13px; }
     .nav-inner { padding:0 16px; gap:8px; }
   }
   .modal { max-width:calc(100vw - 32px); }

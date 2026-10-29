@@ -345,6 +345,7 @@
     var btn = $('anMio');
     cargar().then(function () {
       window.AnAutor.habilitado = true;
+      if (window.miNavPerfil) window.miNavPerfil();
       if (btn) btn.hidden = false;
       montarEventos();
       if (location.hash === '#autor') pintar();
