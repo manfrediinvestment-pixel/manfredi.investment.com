@@ -8,6 +8,7 @@
 //   meta/publicados.json    { autores:[...], publicaciones:[...] }   ← lo que lee el sitio
 //   envios/<id>/envio.json  el envío completo (incluye el texto si es formato texto)
 //   envios/<id>/analisis.pdf · tapa.jpg · revision.json (la escribe la skill revisar-analisis)
+//   fotos/<slug>.jpg        foto de perfil del autor (400x400, la recorta su navegador)
 //
 // Identidad: SIEMPRE del ID token de Firebase (Authorization: Bearer ...). La skill
 // entra como creador con X-Admin-Key = ADMIN_KEY (secret). En `wrangler dev` con
@@ -24,6 +25,7 @@ const SITIO = 'https://manfredinvestment.com';
 const CATEGORIAS = ['acciones', 'bonos', 'macro', 'politica', 'geopolitica', 'global', 'commodities', 'cripto', 'finanzas', 'trading'];
 const MAX_PDF = 20 * 1024 * 1024;
 const MAX_TAPA = 600 * 1024;
+const MAX_FOTO = 400 * 1024;
 // versión vigente de los Términos de colaboración (terminos-autores.html). Si cambia, los autores la aceptan de nuevo al enviar.
 const TERMINOS = '1.1';
 const COLORES = ['#c3a6f2', '#7fd1ae', '#8fb4ff', '#f29e8e', '#e9c46a', '#9fd3e6', '#f2b880'];
@@ -46,6 +48,8 @@ export default {
       if (m === 'GET' && p === '/publicados') return publicados(env);
       let r = /^\/pub\/([\w-]+)\.(pdf|jpg)$/.exec(p);
       if (m === 'GET' && r) return archivoPublico(env, r[1], r[2]);
+      r = /^\/foto\/([\w-]+)\.jpg$/.exec(p);
+      if (m === 'GET' && r) return fotoPublica(env, r[1]);
 
       // ── autores ───────────────────────────────────────────────
       if (m === 'GET' && p === '/yo') return yo(request, env);
@@ -174,6 +178,13 @@ async function archivoPublico(env, id, ext) {
   return new Response(o.body, { headers: { ...CORS, 'Content-Type': ext === 'pdf' ? 'application/pdf' : 'image/jpeg', 'Cache-Control': 'public, max-age=86400', ETag: o.httpEtag } });
 }
 
+async function fotoPublica(env, slug) {
+  const o = await env.ANALISTAS.get('fotos/' + slug + '.jpg');
+  if (!o) return err('No encontrado', 404);
+  // la URL lleva ?v=<fecha>: cuando el autor la cambia, cambia la URL
+  return new Response(o.body, { headers: { ...CORS, 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=31536000, immutable', ETag: o.httpEtag } });
+}
+
 /* ══════════════════════════════ autores ══════════════════════════════ */
 async function yo(request, env) {
   const u = await usuario(request, env);
@@ -185,6 +196,7 @@ async function yo(request, env) {
 }
 function perfilPublico(a) {
   const p = { slug: a.slug, nombre: a.nombre, rol: a.rol || '', corto: a.corto || '', bio: a.bio || '', color: a.color, verificado: true, desde: a.desde, links: a.links || {}, asesor: !!a.registro };
+  if (a.foto) p.foto = a.foto;
   // matrícula para asesorar: la carga el creador después de ver la constancia (Términos, cl. 5)
   if (a.registro) p.registro = { organismo: a.registro.organismo, categoria: a.registro.categoria, numero: a.registro.numero };
   if (a.negocio) p.negocio = { nombre: a.negocio.nombre, desc: a.negocio.desc || '', url: a.negocio.url || '' };
@@ -287,12 +299,22 @@ async function pedirRetiro(request, env, ctx, id) {
 }
 
 async function guardarPerfil(request, env) {
-  const { u, error } = await autor(request, env);
+  const { u, a, error } = await autor(request, env);
   if (error) return error;
   const b = await request.json().catch(() => ({}));
   const url = v => { v = txt(v, 200); return /^https:\/\/[^\s"<>]+$/.test(v) ? v : ''; };
+  // foto nueva: JPEG en base64 que ya viene recortado a 400x400 desde el navegador
+  let foto = null;
+  if (b.foto) {
+    const bytes = b64aBytes(b.foto);
+    if (!bytes || bytes.length > MAX_FOTO) return err('La foto no es válida o pesa demasiado');
+    const slug = a.slug;
+    await env.ANALISTAS.put('fotos/' + slug + '.jpg', bytes, { httpMetadata: { contentType: 'image/jpeg' } });
+    foto = new URL(request.url).origin + '/foto/' + slug + '.jpg?v=' + Date.now();
+  }
   const hab = await actualizar(env, 'meta/habilitados.json', {}, h => {
     const a = h[u.email];
+    if (foto) a.foto = foto;
     a.nombre = txt(b.nombre, 60) || a.nombre;
     a.rol = txt(b.rol, 90); a.corto = txt(b.corto, 40) || a.corto; a.bio = txt(b.bio, 280);
     a.links = { linkedin: url(b.linkedin), instagram: url(b.instagram), x: url(b.x) };

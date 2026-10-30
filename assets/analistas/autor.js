@@ -182,7 +182,7 @@
     var a = st.autor, l = a.links || {}, t = l.trabajo || {}, n = a.negocio || {};
     return '<form class="au-up" id="auPerfil">' +
       '<div class="au-main">' +
-      '<div class="au-foto">' + av(a, 'lg') + '<div><b>Foto de perfil</b><small class="au-help">Cuadrada, mínimo 400 px.</small><label class="au-link">Cambiar foto<input type="file" accept="image/*" hidden></label></div></div>' +
+      '<div class="au-foto">' + av(a, 'lg') + '<div><b>Foto de perfil</b><small class="au-help">Cuadrada, mínimo 400 px.</small><label class="au-link">' + (st.subiendoFoto ? 'Subiendo…' : 'Cambiar foto') + '<input type="file" id="auFoto" accept="image/*" hidden></label></div></div>' +
       '<div class="au-two"><div class="au-field"><label>Nombre</label><input name="nombre" value="' + esc(a.nombre) + '"></div>' +
       '<div class="au-field"><label>Cómo te presentás</label><input name="rol" value="' + esc(a.rol || '') + '" placeholder="Ej.: Economista (UNR) · Analista macro"></div></div>' +
       '<div class="au-field"><label>Bio corta <small>opcional</small></label><textarea name="bio" rows="3" maxlength="280" placeholder="Dos o tres líneas sobre tu formación y lo que analizás.">' + esc(a.bio || '') + '</textarea></div>' +
@@ -284,6 +284,7 @@
     });
     box.addEventListener('change', function (e) {
       if (e.target.id === 'auPdf') leerPdf(e.target.files[0]);
+      else if (e.target.id === 'auFoto') cambiarFoto(e.target.files[0]);
       else validar();
     });
     box.addEventListener('input', validar);
@@ -327,10 +328,46 @@
       aviso('No se pudo enviar: ' + er.message);
     });
   }
+  function datosPerfil(f) {
+    var d = {}; ['nombre', 'rol', 'bio', 'linkedin', 'instagram', 'x', 'trabajo', 'negocio', 'negocioUrl', 'negocioDesc'].forEach(function (k) { d[k] = f.elements[k] ? f.elements[k].value : ''; });
+    return d;
+  }
   function guardarPerfil(f) {
     if (DEMO) { aviso('Vista previa: acá se guardaría tu perfil.'); return; }
-    var d = {}; ['nombre', 'rol', 'bio', 'linkedin', 'instagram', 'x', 'trabajo', 'negocio', 'negocioUrl', 'negocioDesc'].forEach(function (k) { d[k] = f.elements[k] ? f.elements[k].value : ''; });
-    API.post('/perfil', d).then(function (r) { st.autor = r.autor; pintar(); aviso('Perfil guardado.'); }).catch(function (er) { aviso('No se pudo guardar: ' + er.message); });
+    API.post('/perfil', datosPerfil(f)).then(function (r) { st.autor = r.autor; pintar(); aviso('Perfil guardado.'); }).catch(function (er) { aviso('No se pudo guardar: ' + er.message); });
+  }
+  // la foto se recorta al centro en 400x400 (JPEG) y se guarda en el momento, con lo que haya en el formulario
+  function recortarFoto(file) {
+    return new Promise(function (ok, mal) {
+      var img = new Image(), u = URL.createObjectURL(file);
+      img.onload = function () {
+        var lado = Math.min(img.naturalWidth, img.naturalHeight), c = document.createElement('canvas');
+        c.width = c.height = 400;
+        c.getContext('2d').drawImage(img, (img.naturalWidth - lado) / 2, (img.naturalHeight - lado) / 2, lado, lado, 0, 0, 400, 400);
+        URL.revokeObjectURL(u); ok(c.toDataURL('image/jpeg', .86));
+      };
+      img.onerror = function () { URL.revokeObjectURL(u); mal(new Error('No se pudo leer la imagen. Probá con un JPG o PNG.')); };
+      img.src = u;
+    });
+  }
+  function cambiarFoto(file) {
+    if (!file) return;
+    if (!/^image\//.test(file.type)) { aviso('Tiene que ser una imagen.'); return; }
+    var f = $('auPerfil'), d = f ? datosPerfil(f) : {};
+    st.subiendoFoto = true; pintar(); restaurarPerfil(d);
+    recortarFoto(file).then(function (foto) {
+      if (DEMO) { st.autor.foto = foto; return null; }
+      d.foto = foto;
+      return API.post('/perfil', d).then(function (r) { st.autor = r.autor; });
+    }).then(function () {
+      st.subiendoFoto = false; pintar(); aviso('Foto actualizada.');
+    }).catch(function (er) {
+      st.subiendoFoto = false; var g = $('auPerfil') ? datosPerfil($('auPerfil')) : d; pintar(); restaurarPerfil(g); aviso('No se pudo subir la foto: ' + er.message);
+    });
+  }
+  function restaurarPerfil(d) {
+    var f = $('auPerfil'); if (!f || !d) return;
+    Object.keys(d).forEach(function (k) { if (f.elements[k]) f.elements[k].value = d[k]; });
   }
 
   window.AnAutor = {
