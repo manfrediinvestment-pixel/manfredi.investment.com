@@ -88,7 +88,9 @@ function b64urlBytes(s) {
   s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '=';
   return Uint8Array.from(atob(s), c => c.charCodeAt(0));
 }
-async function usuario(request, env) {
+// opts.sinVerificar: devuelve también sesiones con el mail sin verificar (marcadas), solo para /yo,
+// así el sitio le puede decir al autor por qué no ve su espacio. Para todo lo demás siguen sin valer.
+async function usuario(request, env, opts) {
   const auth = request.headers.get('Authorization') || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
   if (env.DEV === '1' && token.startsWith('dev:')) return { email: token.slice(4).toLowerCase(), nombre: '' };
@@ -99,12 +101,16 @@ async function usuario(request, env) {
     const q = JSON.parse(new TextDecoder().decode(b64urlBytes(parts[1])));
     const now = Math.floor(Date.now() / 1000);
     if (header.alg !== 'RS256' || q.aud !== FIREBASE_PROJECT || q.iss !== 'https://securetoken.google.com/' + FIREBASE_PROJECT) return null;
-    if (!q.exp || q.exp < now || !q.email || q.email_verified === false) return null;
+    if (!q.exp || q.exp < now || !q.email) return null;
+    if (q.email_verified === false && !(opts && opts.sinVerificar)) return null;
     const jwk = (await firebaseKeys()).find(k => k.kid === header.kid);
     if (!jwk) return null;
     const key = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
     const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64urlBytes(parts[2]), new TextEncoder().encode(parts[0] + '.' + parts[1]));
-    return ok ? { email: String(q.email).toLowerCase(), nombre: q.name || '' } : null;
+    if (!ok) return null;
+    const u = { email: String(q.email).toLowerCase(), nombre: q.name || '' };
+    if (q.email_verified === false) u.sinVerificar = true;
+    return u;
   } catch (e) { return null; }
 }
 function esAdmin(request, env) {
@@ -176,8 +182,9 @@ async function archivoPublico(env, id, ext) {
 
 /* ══════════════════════════════ autores ══════════════════════════════ */
 async function yo(request, env) {
-  const u = await usuario(request, env);
+  const u = await usuario(request, env, { sinVerificar: true });
   if (!u) return json({ sesion: false });
+  if (u.sinVerificar) return json({ sesion: true, email: u.email, sinVerificar: true, creador: false, habilitado: false, autor: null });
   const hab = await leer(env, 'meta/habilitados.json', {});
   const a = hab[u.email];
   return json({ sesion: true, email: u.email, creador: CREADORES.includes(u.email), habilitado: !!(a && !a.baja), autor: a && !a.baja ? perfilPublico(a) : null,
