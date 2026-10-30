@@ -518,6 +518,8 @@
 .an-mio::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--an-champ); box-shadow:0 0 8px rgba(233,211,160,.7); }
 @media (hover:hover) { .an-mio:hover { background:rgba(233,211,160,.06); border-color:rgba(233,211,160,.65); transform:translateY(-1px); } }
 .an-mio:active { transform:scale(.97); }
+/* celular: no entra al lado de las sub-pestañas → arriba, en su propia fila (antes quedaba fuera de pantalla) */
+@media (max-width:600px) { .nt-switch { flex-wrap:wrap; } .an-mio { order:-1; flex:0 0 100%; justify-content:center; margin:0 0 14px; padding:9px 13px; } }
 
 .au { max-width:1100px; }
 .au-head { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:22px; align-items:center; padding-bottom:24px; }

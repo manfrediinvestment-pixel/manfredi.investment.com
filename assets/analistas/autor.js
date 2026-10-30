@@ -370,23 +370,64 @@
     Object.keys(d).forEach(function (k) { if (f.elements[k]) f.elements[k].value = d[k]; });
   }
 
+  // Por qué no ve su espacio: sin sesión, mail sin verificar (cuenta con email y contraseña) o mail distinto al habilitado
+  function noHabilitado(yo) {
+    var box = $('anAutor');
+    if (!box) return;
+    var txt, acc = '';
+    if (yo && yo.sinVerificar) {
+      txt = 'Entraste con <b>' + esc(yo.email) + '</b>, pero ese mail todavía no está verificado. Entrá con Google con ese mismo mail, o pedí el mail de verificación, tocá el link y volvé acá.';
+      acc = '<div class="au-send"><button type="button" class="an-gold au-btn" id="auVerif">Mandarme el mail de verificación</button><button type="button" class="au-link" id="auYaVerif">Ya lo verifiqué</button></div>';
+    } else if (yo && yo.sesion) {
+      txt = 'Entraste con <b>' + esc(yo.email) + '</b>, que no es el mail que habilitamos. Cerrá sesión y entrá con el mail con el que te invitamos.';
+    } else {
+      txt = 'Esta sección es para autores habilitados. Iniciá sesión con el mail que te habilitamos.';
+    }
+    box.innerHTML = '<a class="an-back" href="#analisis">← Análisis e informes</a><p class="nt-empty">' + txt + '</p>' + acc;
+    var v = $('auVerif'), ya = $('auYaVerif');
+    if (v) v.onclick = function () {
+      v.disabled = true;
+      (window._miVerificarMail ? window._miVerificarMail() : Promise.reject(new Error('no disponible')))
+        .then(function () { v.textContent = 'Listo, revisá tu correo'; }, function (e) { v.disabled = false; aviso('No se pudo mandar: ' + e.message); });
+    };
+    if (ya) ya.onclick = function () {
+      var u = window._currentUser;
+      if (!u || !u.reload) return;
+      u.reload().then(function () { return u.getIdToken(true); }).then(function () {
+        window.AnAutor.mostrar();
+      });
+    };
+  }
+
   window.AnAutor = {
     habilitado: false,
     mostrar: function () {
       if (st.autor) { cargarEnvios().then(pintar, pintar); return; }
       var box = $('anAutor');
-      if (box) box.innerHTML = '<a class="an-back" href="#analisis">← Análisis e informes</a><p class="nt-empty">Esta sección es para autores habilitados. Iniciá sesión con el mail que te habilitamos.</p>';
+      if (DEMO || !API) { noHabilitado(null); return; }
+      if (box) box.innerHTML = '<a class="an-back" href="#analisis">← Análisis e informes</a><p class="nt-empty">Cargando…</p>';
+      // pregunta de nuevo: en el celu Firebase puede tardar y la primera respuesta quedar vieja
+      API.olvidar();
+      API.yo().then(function (yo) { if (yo.habilitado) iniciar(); else noHabilitado(yo); });
     }
   };
+  var eventosListos = false;
   function iniciar() {
     var btn = $('anMio');
     cargar().then(function () {
       window.AnAutor.habilitado = true;
       if (window.miNavPerfil) window.miNavPerfil();
       if (btn) btn.hidden = false;
-      montarEventos();
+      if (!eventosListos) { eventosListos = true; montarEventos(); }
       if (location.hash === '#autor') pintar();
-    }).catch(function (e) { console.warn('[autor]', e.message); });
+    }).catch(function (e) {
+      console.warn('[autor]', e.message);
+      st.autor = null; window.AnAutor.habilitado = false;
+      if (btn) btn.hidden = true;
+      if (e.message === 'no habilitado' && location.hash === '#autor') window.AnAutor.mostrar();
+    });
   }
+  // login/logout después de cargar la página: volver a preguntar al worker
+  window.addEventListener('mi:auth', function () { if (!DEMO) iniciar(); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
 })();

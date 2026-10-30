@@ -49,7 +49,11 @@
     get: function (r, o) { return pedir('GET', r, null, o); },
     post: function (r, b) { return pedir('POST', r, b || {}); },
     put: function (r, blob) { return pedir('PUT', r, blob); },
-    // /yo, una sola vez por carga (lo comparten el espacio del autor y el Panel)
-    yo: (function () { var p = null; return function () { return p || (p = sesion().then(function (u) { return u ? pedir('GET', '/yo') : { sesion: false }; }).catch(function () { return { sesion: false }; })); }; })()
+    // /yo se comparte entre el espacio del autor y el Panel; se vuelve a pedir cuando cambia
+    // la sesión (evento mi:auth de index.html), si no un login tardío quedaba como "sin sesión"
+    yo: function () { return yoP || (yoP = sesion().then(function (u) { return u ? pedir('GET', '/yo') : { sesion: false }; }).catch(function () { return { sesion: false }; })); },
+    olvidar: function () { yoP = null; }
   };
+  var yoP = null;
+  window.addEventListener('mi:auth', function () { yoP = null; });
 })();

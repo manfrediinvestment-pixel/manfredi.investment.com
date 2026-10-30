@@ -33,7 +33,7 @@
   <link rel="stylesheet" href="assets/mercados/terminal.css?v=20261026a" />
 <link rel="stylesheet" href="assets/pulso/pulso.css?v=20261010z" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261010z" />
-<link rel="stylesheet" href="assets/analistas/analistas.css?v=20261029a" />
+<link rel="stylesheet" href="assets/analistas/analistas.css?v=20261030" />
 <link rel="stylesheet" href="assets/portfolio/ratios.css?v=20261012" />
 <link rel="stylesheet" href="assets/pro/pro.css?v=20261028l" />
 <link rel="stylesheet" href="assets/comunidad/chat.css?v=20261028m" />
@@ -2923,7 +2923,7 @@
   <!-- Firebase SDK (Authentication + Firestore) -->
   <script type="module">
     import { initializeApp }           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, updateProfile }
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, updateProfile, sendEmailVerification }
                                         from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
     import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp }
                                         from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -3033,6 +3033,7 @@
                 window._currentUser = user;
             if (typeof window._miCheckMembership === 'function') window._miCheckMembership();
             if (typeof window._miOnAuth === 'function') window._miOnAuth(user);
+            window.dispatchEvent(new CustomEvent('mi:auth')); // espacio de autor y Panel vuelven a preguntar al worker
             if (typeof window._npCuenta === 'function') window._npCuenta(userData);
         // Registrar login en Google Sheets
       } else {
@@ -3052,6 +3053,7 @@
         document.querySelectorAll('.mi-paywall-overlay').forEach(function(el) { el.remove(); });
         if (typeof window._miCheckMembership === 'function') window._miCheckMembership();
         if (typeof window._miOnAuth === 'function') window._miOnAuth(null);
+        window.dispatchEvent(new CustomEvent('mi:auth')); // espacio de autor y Panel vuelven a preguntar al worker
         if (typeof window._npCuenta === 'function') window._npCuenta(null);
         setupGuestMode();
       }
@@ -3081,6 +3083,8 @@
 
     // ââ Sign Out âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
     window.signOutUser = async function() { await signOut(auth); };
+    // Espacio de autor: si entró con email y contraseña sin verificar, le mandamos el mail de verificación
+    window._miVerificarMail = function() { return auth.currentUser ? sendEmailVerification(auth.currentUser) : Promise.reject(new Error('Sin sesión')); };
 
     // ââ Email Sign In ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
     window.signInWithEmail = async function() {
@@ -4359,11 +4363,11 @@
   <!-- Pestaña Noticias (usa window.MIPulso de pulso.js: va después) -->
   <script src="assets/noticias/noticias.js?v=20261015" defer></script>
   <script src="assets/portfolio/ratios.js?v=20261012" defer></script>
-  <script src="assets/analistas/api.js?v=20261012" defer></script>
+  <script src="assets/analistas/api.js?v=20261030" defer></script>
   <script src="assets/analistas/social.js?v=20261012soc" defer></script>
   <script src="assets/analistas/analistas.js?v=20261029a" defer></script>
   <script src="assets/analistas/revision.js?v=20261028a" defer></script>
-  <script src="assets/analistas/autor.js?v=20261029a" defer></script>
+  <script src="assets/analistas/autor.js?v=20261030" defer></script>
   <script src="assets/comunidad/tarjeta.js?v=20261028m" defer></script>
   <script src="assets/comunidad/chat.js?v=20261028n" defer></script>
   <script src="assets/pro/pro.js?v=20261028j" defer></script>
