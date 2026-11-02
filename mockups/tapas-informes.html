@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Tapas de informes · 3 ideas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#f3f6fb; --gold:#e6cf96; --up:#56c793; --dn:#f07b70;
+    --serif:'DM Serif Display',Georgia,serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:48px 56px 72px; color:var(--ink); font-family:var(--sans);
+    background:radial-gradient(70% 50% at 80% 0%, rgba(40,70,130,.25), transparent 70%), #070f22; }
+  h1 { font:400 30px/1 var(--serif); margin:0; }
+  .intro { font:400 14px/1.5 var(--sans); margin:10px 0 0; max-width:640px; }
+  .idea { margin-top:56px; padding-top:28px; border-top:1px solid rgba(230,207,150,.18); }
+  .idea__h { display:flex; align-items:baseline; gap:14px; }
+  .idea__n { font:500 12px var(--mono); letter-spacing:.16em; color:var(--gold); }
+  .idea__t { font:400 22px var(--serif); }
+  .idea__d { font:400 13.5px/1.5 var(--sans); margin:8px 0 0; max-width:640px; }
+  .row { display:grid; grid-template-columns:repeat(5, 190px); gap:28px; margin-top:24px; }
+  .meta { margin-top:12px; display:flex; justify-content:space-between; font:600 13px var(--sans); }
+  .meta time { font:500 12px var(--mono); }
+
+  /* base de tapa (misma proporción que la actual) */
+  .cv { position:relative; display:block; aspect-ratio:5/7; border-radius:3px 10px 10px 3px; overflow:hidden; isolation:isolate; container-type:inline-size;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.07), 0 26px 40px -22px rgba(0,0,0,.95), 0 3px 8px rgba(0,0,0,.4); }
+  .cv::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4%; z-index:5; background:linear-gradient(90deg, rgba(0,0,0,.45), rgba(255,255,255,.07) 65%, rgba(0,0,0,.25)); }
+
+  /* ===== A · Dos tendencias (la del user) ===== */
+  .a { background:linear-gradient(175deg, #0f1f3d 0%, #0a1630 55%, #070f22 100%); }
+  .a svg.tr { position:absolute; inset:0; width:100%; height:100%; z-index:1; }
+  .a .lg { position:absolute; z-index:2; left:50%; top:43%; transform:translate(-50%,-50%); width:42cqw; height:42cqw; border-radius:10cqw; background:#fff; padding:6cqw; object-fit:contain;
+    box-shadow:0 0 0 1px rgba(255,255,255,.5), 0 18px 36px -12px rgba(0,0,0,.85), 0 0 0 7cqw rgba(7,15,34,.55); }
+  .a .ft { position:absolute; z-index:3; left:12cqw; right:9cqw; bottom:9cqw; display:flex; justify-content:space-between; align-items:baseline; }
+  .a .ft b { font:500 7.4cqw/1 var(--mono); letter-spacing:.08em; }
+  .a .ft span { font:500 5cqw/1 var(--mono); color:var(--gold); letter-spacing:.06em; }
+  .a .tp { position:absolute; z-index:3; left:12cqw; top:9cqw; font:500 4.4cqw/1 var(--mono); letter-spacing:.22em; color:var(--gold); text-transform:uppercase; }
+
+  /* ===== B · Monocromo ===== */
+  .b { background:#0b1630; }
+  .b .lg { position:absolute; left:50%; top:42%; transform:translate(-50%,-50%); width:58cqw; height:58cqw; object-fit:contain;
+    filter:grayscale(1) invert(1) brightness(1.15) contrast(1.6); mix-blend-mode:screen; }
+  .b .ln { position:absolute; left:12cqw; right:9cqw; bottom:27cqw; height:1px; background:rgba(230,207,150,.35); }
+  .b .tk { position:absolute; left:12cqw; bottom:13cqw; font:400 12cqw/1 var(--serif); letter-spacing:-.01em; }
+  .b .q { position:absolute; right:9cqw; bottom:14.5cqw; font:500 5cqw/1 var(--mono); color:var(--gold); }
+
+  /* ===== C · Sello ===== */
+  .c { background:radial-gradient(80% 55% at 50% 40%, rgba(230,207,150,.07), transparent 70%), linear-gradient(180deg, #0d1b36, #081227); }
+  .c .ring { position:absolute; left:50%; top:40%; transform:translate(-50%,-50%); width:64cqw; height:64cqw; border-radius:50%; border:1px solid rgba(230,207,150,.4); display:grid; place-items:center; }
+  .c .ring::before { content:''; position:absolute; inset:3.5cqw; border-radius:50%; border:1px solid rgba(230,207,150,.14); }
+  .c .lg { width:34cqw; height:34cqw; border-radius:50%; background:#fff; padding:5cqw; object-fit:contain; }
+  .c .tk { position:absolute; left:0; right:0; bottom:20cqw; text-align:center; font:500 8cqw/1 var(--mono); letter-spacing:.32em; padding-left:.32em; }
+  .c .nm { position:absolute; left:0; right:0; bottom:11cqw; text-align:center; font:500 5.2cqw/1 var(--sans); color:var(--gold); }
+
+  /* ===== Hoy ===== */
+  .h { background:radial-gradient(110% 60% at 100% 0%, rgba(91,141,239,.3), transparent 62%), linear-gradient(170deg, #152c52 0%, #0c1a36 48%, #070f22 100%); }
+  .h .in { position:absolute; inset:0; padding:11cqw 11cqw 10cqw 16cqw; display:flex; flex-direction:column; }
+  .h .tp { font:600 4.4cqw/1 var(--mono); letter-spacing:.2em; color:#f6d77e; text-transform:uppercase; }
+  .h .lg { width:21cqw; height:21cqw; border-radius:5cqw; background:#fff; padding:3cqw; object-fit:contain; margin-top:auto; }
+  .h .tk { font:400 23cqw/.92 var(--serif); margin-top:6cqw; }
+  .h .nm { font:500 6.4cqw/1.25 var(--sans); margin-top:3cqw; }
+  .h .bt { margin-top:9cqw; padding-top:5cqw; border-top:1px solid rgba(246,215,126,.25); font:500 5.2cqw/1 var(--mono); }
+</style>
+</head>
+<body>
+  <h1>Tapas de los informes · 3 ideas</h1>
+  <p class="intro">Mismos logos reales del sitio, mismo tamaño que hoy en la estantería (190 px). Arriba de todo, cómo se ven hoy para comparar.</p>
+
+  <section class="idea"><div class="idea__h"><span class="idea__n">HOY</span><span class="idea__t">La tapa actual</span></div>
+    <div class="row" data-tipo="h"></div></section>
+
+  <section class="idea"><div class="idea__h"><span class="idea__n">IDEA 1</span><span class="idea__t">Dos tendencias</span></div>
+    <p class="idea__d">La tuya. Logo grande en el centro y, atrás, dos líneas finas que se cruzan detrás del logo: una verde que sube y una roja que baja. Sin título grande: solo el ticker abajo y el trimestre.</p>
+    <div class="row" data-tipo="a"></div></section>
+
+  <section class="idea"><div class="idea__h"><span class="idea__n">IDEA 2</span><span class="idea__t">Monocromo</span></div>
+    <p class="idea__d">El logo pasado a blanco, sin el cuadrito, directo sobre el azul noche. Una línea champagne y el ticker en serif. Lo más sobrio de las tres: toda la colección se ve igual de pareja.</p>
+    <div class="row" data-tipo="b"></div></section>
+
+  <section class="idea"><div class="idea__h"><span class="idea__n">IDEA 3</span><span class="idea__t">Sello</span></div>
+    <p class="idea__d">El logo dentro de un doble anillo fino, como un sello o una moneda. Ticker espaciado abajo y el nombre de la empresa en champagne. Más institucional.</p>
+    <div class="row" data-tipo="c"></div></section>
+
+<script>
+  var L = [
+    { t:'JPM', n:'JPMorgan Chase', q:'2T FY2026', f:'11 sep' },
+    { t:'NVDA', n:'NVIDIA', q:'2T FY2027', f:'28 ago' },
+    { t:'AAPL', n:'Apple', q:'3T FY2026', f:'2 ago' },
+    { t:'KO', n:'Coca-Cola', q:'2T FY2026', f:'30 sep' },
+    { t:'MELI', n:'MercadoLibre', q:'2T FY2026', f:'8 ago' }
+  ];
+  // dos tendencias: verde sube, roja baja; se cruzan detrás del logo (centro ~ 50,60)
+  var VERDE = 'M-2 112 L10 106 L18 109 L27 99 L35 101 L44 88 L52 64 L60 58 L68 61 L77 46 L85 44 L94 33 L102 30';
+  var ROJA  = 'M-2 34 L9 40 L17 37 L26 49 L34 46 L43 57 L51 63 L60 74 L68 71 L77 86 L85 84 L94 97 L102 103';
+  function svg(i) {
+    return '<svg class="tr" viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true"><defs>' +
+      '<linearGradient id="gu' + i + '" x1="0" x2="1"><stop offset="0" stop-color="#56c793" stop-opacity="0"/><stop offset=".35" stop-color="#56c793" stop-opacity=".55"/><stop offset="1" stop-color="#56c793" stop-opacity=".95"/></linearGradient>' +
+      '<linearGradient id="gd' + i + '" x1="0" x2="1"><stop offset="0" stop-color="#f07b70" stop-opacity="0"/><stop offset=".35" stop-color="#f07b70" stop-opacity=".5"/><stop offset="1" stop-color="#f07b70" stop-opacity=".9"/></linearGradient>' +
+      '</defs><path d="' + ROJA + '" fill="none" stroke="url(#gd' + i + ')" stroke-width="1.1" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>' +
+      '<path d="' + VERDE + '" fill="none" stroke="url(#gu' + i + ')" stroke-width="1.1" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>';
+  }
+  var T = {
+    h: function (d) { return '<div class="in"><span class="tp">Equity Research</span><img class="lg" src="../assets/logos/' + d.t.toLowerCase() + '.png"><span class="tk">' + d.t + '</span><span class="nm">' + d.n + '</span><span class="bt">' + d.q + '</span></div>'; },
+    a: function (d, i) { return svg(i) + '<span class="tp">Equity Research</span><img class="lg" src="../assets/logos/' + d.t.toLowerCase() + '.png"><div class="ft"><b>' + d.t + '</b><span>' + d.q + '</span></div>'; },
+    b: function (d) { return '<img class="lg" src="../assets/logos/' + d.t.toLowerCase() + '.png"><span class="ln"></span><span class="tk">' + d.t + '</span><span class="q">' + d.q + '</span>'; },
+    c: function (d) { return '<div class="ring"><img class="lg" src="../assets/logos/' + d.t.toLowerCase() + '.png"></div><span class="tk">' + d.t + '</span><span class="nm">' + d.n + '</span>'; }
+  };
+  document.querySelectorAll('.row').forEach(function (row, r) {
+    var k = row.getAttribute('data-tipo');
+    row.innerHTML = L.map(function (d, i) {
+      return '<div><span class="cv ' + k + '">' + T[k](d, r * 10 + i) + '</span><div class="meta"><span>' + d.n + '</span><time>' + d.f + '</time></div></div>';
+    }).join('');
+  });
+</script>
+</body>
+</html>
