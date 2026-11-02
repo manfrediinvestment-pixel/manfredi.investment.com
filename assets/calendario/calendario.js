@@ -88,7 +88,7 @@
 
   function imp(n) { return '<span class="cal-imp n' + n + '" title="Relevancia ' + ['', 'baja', 'media', 'alta'][n] + '" aria-label="Relevancia ' + ['', 'baja', 'media', 'alta'][n] + '"><i></i><i></i><i></i></span>'; }
   function logo(tk) { return '<img class="cal-logo" src="assets/logos/' + tk.replace('.', '-') + '.png" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">'; }
-  function bandera(t) { return '<img class="cal-logo" src="assets/calendario/flag-' + (t === 'ar' ? 'ar' : 'us') + '.svg" alt="' + (t === 'ar' ? 'Argentina' : 'Estados Unidos') + '" title="' + (t === 'ar' ? 'Argentina' : 'Estados Unidos') + '" loading="lazy">'; }
+  function bandera(t) { return '<img class="cal-flag" src="assets/calendario/flag-' + (t === 'ar' ? 'ar' : 'us') + '.svg" alt="' + (t === 'ar' ? 'Argentina' : 'Estados Unidos') + '" title="' + (t === 'ar' ? 'Argentina' : 'Estados Unidos') + '" loading="lazy">'; }
   function esEmpresa(e) { return e.tipo === 'earnings' || e.tipo === 'dividend'; }
   function linkInforme(tk) { return 'informes/' + tk + '.html'; }
   function cuenta(f) { var n = 0; dias.forEach(function (d) { d.eventos.forEach(function (e) { if (f === 'todo' || e.tipo === f) n++; }); }); return n; }
