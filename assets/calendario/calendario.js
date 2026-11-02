@@ -88,6 +88,7 @@
 
   function imp(n) { return '<span class="cal-imp n' + n + '" title="Relevancia ' + ['', 'baja', 'media', 'alta'][n] + '" aria-label="Relevancia ' + ['', 'baja', 'media', 'alta'][n] + '"><i></i><i></i><i></i></span>'; }
   function logo(tk) { return '<img class="cal-logo" src="assets/logos/' + tk.replace('.', '-') + '.png" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">'; }
+  function bandera(t) { return '<img class="cal-logo" src="assets/calendario/flag-' + (t === 'ar' ? 'ar' : 'us') + '.svg" alt="' + (t === 'ar' ? 'Argentina' : 'Estados Unidos') + '" title="' + (t === 'ar' ? 'Argentina' : 'Estados Unidos') + '" loading="lazy">'; }
   function esEmpresa(e) { return e.tipo === 'earnings' || e.tipo === 'dividend'; }
   function linkInforme(tk) { return 'informes/' + tk + '.html'; }
   function cuenta(f) { var n = 0; dias.forEach(function (d) { d.eventos.forEach(function (e) { if (f === 'todo' || e.tipo === f) n++; }); }); return n; }
@@ -120,7 +121,7 @@
         var a1 = url ? '<a href="' + esc(url) + '"' + (ext ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' : '', a2 = url ? '</a>' : '';
         var ev = esEmpresa(e)
           ? '<div class="co">' + logo(e.ticker) + '<div>' + a1 + '<b>' + esc(e.titulo) + '</b>' + a2 + '<small>' + esc(e.sub) + '</small></div></div>'
-          : a1 + '<b>' + esc(e.titulo) + '</b>' + a2 + '<span class="cal-fl ' + e.tipo + '">' + (e.tipo === 'ar' ? 'Argentina' : 'EE.UU.') + '</span>' + (e.src && e.src.fuente ? ' <small>· ' + esc(e.src.fuente) + '</small>' : '');
+          : '<div class="co">' + bandera(e.tipo) + '<div>' + a1 + '<b>' + esc(e.titulo) + '</b>' + a2 + '<small>' + (e.tipo === 'ar' ? 'Argentina' : 'EE.UU.') + (e.src && e.src.fuente ? ' · ' + esc(e.src.fuente) : '') + '</small></div></div>';
         var t = /\d/.test(e.hora) ? esc(e.hora) : '<small>' + (e.hora === 'Ex' ? 'Ex-div.' : esc(e.hora) || '—') + '</small>';
         h += '<tr class="row' + (d.rel === 'pasado' ? ' ps' : '') + '" data-k="' + k + '" tabindex="0" aria-expanded="false"><td class="t">' + t + '</td><td class="e">' + ev + '</td><td class="hide-m">' + imp(e.imp) + '</td>' +
           '<td class="r n hide-m">' + (esc(e.previo) || '—') + '</td><td class="r n hide-m">' + (esc(e.consenso) || '—') + '</td><td class="r">' + celdaDato(e, d) + '</td></tr>' +
