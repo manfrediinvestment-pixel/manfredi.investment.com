@@ -1,0 +1,243 @@
+<template>
+  <style>
+    @font-face { font-family: "Plex Sans"; src: url("assets/fonts/plexsans-var.woff2") format("woff2"); font-weight: 100 700; }
+    @font-face { font-family: "Plex Mono"; src: url("assets/fonts/plexmono-700.woff2") format("woff2"); font-weight: 700; }
+    @font-face { font-family: "Plex Mono"; src: url("assets/fonts/plexmono-600.woff2") format("woff2"); font-weight: 600; }
+    #root {
+      position: absolute; inset: 0; overflow: hidden;
+      --cream: #F6F3EC; --ink: #07101E; --navy: #0C1828; --red: #E5484D; --green: #10B981;
+      --champ: #B8943F; --champ-ink: #8A6A22;
+      background: radial-gradient(120% 70% at 50% 38%, #FBF9F4 0%, var(--cream) 55%, #EEE8DA 100%);
+      font-family: "Plex Sans", sans-serif; color: var(--ink);
+    }
+    .grid { position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(12,24,40,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(12,24,40,.045) 1px, transparent 1px);
+      background-size: 90px 90px; }
+    #g-shake { position: absolute; inset: 0; }
+    /* ---------- karaoke header ---------- */
+    .hdr { position: absolute; left: 60px; right: 60px; top: 236px; text-align: center;
+      font-weight: 700; font-size: 54px; letter-spacing: -0.02em; line-height: 1.1; }
+    .hdr .w { display: inline-block; color: var(--champ); opacity: .55; margin: 0 .12em; }
+    /* ---------- date pill ---------- */
+    #g-pill { position: absolute; top: 334px; left: 0; right: 0; margin: 0 auto; width: fit-content; display: flex; align-items: center; gap: 14px;
+      background: var(--ink); color: var(--cream); padding: 12px 26px; border-radius: 99px;
+      font-family: "Plex Mono"; font-weight: 600; font-size: 24px; letter-spacing: .08em; white-space: nowrap; }
+    #g-pill i { width: 12px; height: 12px; border-radius: 50%; background: var(--red); display: block; }
+    #g-pill-sub { position: absolute; top: 398px; width: 100%; text-align: center; font-family: "Plex Mono"; font-weight: 600;
+      font-size: 21px; letter-spacing: .14em; color: var(--champ-ink); }
+    /* ---------- odometer ---------- */
+    #g-num { position: absolute; top: 432px; left: 0; right: 0; display: flex; justify-content: center;
+      font-family: "Plex Mono"; font-weight: 700; font-size: 196px; line-height: 1; color: var(--red); letter-spacing: -0.04em; height: 200px; }
+    .odo-col { display: inline-block; height: 1em; overflow: hidden; position: relative; }
+    .odo-strip { display: flex; flex-direction: column; will-change: transform; }
+    .odo-strip span { height: 1em; display: block; text-align: center; }
+    .odo-fix { display: inline-block; }
+    #g-under { position: absolute; top: 650px; left: 170px; width: 740px; height: 8px; border-radius: 8px; background: var(--red); transform-origin: left center; }
+    /* ---------- chart ---------- */
+    #g-chart { position: absolute; top: 690px; left: 70px; width: 940px; height: 330px; }
+    #g-chart svg { overflow: visible; }
+    #g-tag { position: absolute; top: 0; left: 0; background: var(--ink); color: var(--cream); font-family: "Plex Mono"; font-weight: 700;
+      font-size: 26px; padding: 8px 14px; border-radius: 10px; white-space: nowrap; will-change: transform; }
+    #g-axis { position: absolute; top: 1030px; left: 70px; right: 70px; display: flex; justify-content: space-between;
+      font-family: "Plex Mono"; font-weight: 600; font-size: 20px; letter-spacing: .1em; color: var(--champ-ink); }
+    /* ---------- worst-day stamp + ruler ---------- */
+    #g-stamp { position: absolute; top: 1086px; width: 100%; text-align: center; font-weight: 700; font-size: 74px; letter-spacing: -0.03em; }
+    #g-stamp b { color: var(--red); }
+    #g-ruler { position: absolute; top: 1192px; left: 90px; width: 900px; height: 70px; }
+    #g-ticks { position: absolute; left: 0; right: 0; top: 34px; height: 22px;
+      background-image: repeating-linear-gradient(90deg, rgba(12,24,40,.55) 0 3px, transparent 3px 41px);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
+    #g-baseline { position: absolute; left: 0; right: 0; top: 56px; height: 3px; background: rgba(12,24,40,.35); transform-origin: center; }
+    #g-year { position: absolute; left: 50%; top: -8px; width: 130px; margin-left: -65px; text-align: center; background: var(--red); color: #fff; font-family: "Plex Mono";
+      font-weight: 700; font-size: 30px; padding: 4px 16px; border-radius: 8px; }
+    #g-src { position: absolute; top: 1290px; width: 100%; text-align: center; font-family: "Plex Mono"; font-weight: 600; font-size: 19px; color: var(--champ-ink); letter-spacing: .04em; }
+    /* ---------- chip ---------- */
+    #g-chipwrap { position: absolute; left: 50%; top: 1370px; width: 360px; height: 360px; margin-left: -180px; }
+    .chip { position: absolute; inset: 0; }
+    .chip .pins { position: absolute; inset: 0;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 66px, #9AA6B8 66px 82px, transparent 82px 112px) 40px 0 / 280px 34px no-repeat,
+        repeating-linear-gradient(90deg, transparent 0 66px, #9AA6B8 66px 82px, transparent 82px 112px) 40px 326px / 280px 34px no-repeat,
+        repeating-linear-gradient(0deg, transparent 0 66px, #9AA6B8 66px 82px, transparent 82px 112px) 0 40px / 34px 280px no-repeat,
+        repeating-linear-gradient(0deg, transparent 0 66px, #9AA6B8 66px 82px, transparent 82px 112px) 326px 40px / 34px 280px no-repeat; }
+    .chip .body { position: absolute; inset: 30px; border-radius: 46px; background: linear-gradient(145deg, #1A2F4A, #07101E);
+      box-shadow: 0 34px 60px -18px rgba(7,16,30,.55), inset 0 2px 0 rgba(255,255,255,.12); }
+    .chip .plate { position: absolute; inset: 66px; border-radius: 26px; background: linear-gradient(160deg, #FFFFFF, #EEF0F4);
+      display: flex; align-items: center; justify-content: center; box-shadow: inset 0 -4px 0 rgba(12,24,40,.08); }
+    .chip .plate svg { width: 132px; height: 132px; }
+    #g-halfL { clip-path: polygon(0 0, 53% 0, 47% 21%, 56% 39%, 45% 57%, 54% 76%, 47% 100%, 0 100%); }
+    #g-halfR { clip-path: polygon(53% 0, 100% 0, 100% 100%, 47% 100%, 54% 76%, 45% 57%, 56% 39%, 47% 21%); }
+    .deb { position: absolute; width: 18px; height: 18px; background: #0C1828; border-radius: 4px; left: 172px; top: 170px; opacity: 0; }
+    #g-flash { position: absolute; inset: 0; pointer-events: none; opacity: 0;
+      box-shadow: inset 0 0 260px 40px rgba(229,72,77,.55); background: radial-gradient(80% 60% at 50% 50%, transparent 60%, rgba(229,72,77,.18)); }
+  </style>
+  <div id="root" data-composition-id="golpe" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="grid"></div>
+    <div id="g-shake">
+      <div class="hdr" id="g-h1"><span class="w">Google</span><span class="w">tuvo</span><span class="w">el</span><span class="w" data-acc="red">peor</span><span class="w" data-acc="red">día</span></div>
+      <div class="hdr" id="g-h2"><span class="w">de</span><span class="w">su</span><span class="w" data-acc="red">historia.</span></div>
+
+      <div id="g-pill"><i></i>JUE · 29 OCT 2026</div>
+      <div id="g-pill-sub">GOOGL · CIERRE · NASDAQ</div>
+
+      <div id="g-num" data-layout-ignore></div>
+      <div id="g-under"></div>
+
+      <div id="g-chart">
+        <svg width="940" height="330" viewBox="0 0 940 330">
+          <defs>
+            <linearGradient id="g-area-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#E5484D" stop-opacity=".22" />
+              <stop offset="1" stop-color="#E5484D" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <path id="g-area" d="" fill="url(#g-area-grad)" />
+          <path id="g-line" d="" fill="none" stroke="#07101E" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
+          <circle id="g-dot" r="11" fill="#E5484D" stroke="#F6F3EC" stroke-width="5" />
+        </svg>
+        <div id="g-tag">US$ 339,35</div>
+      </div>
+      <div id="g-axis"><span>31 AGO</span><span>29 OCT</span></div>
+
+      <div id="g-stamp">el <b>peor día</b> desde</div>
+      <div id="g-ruler"><div id="g-ticks"></div><div id="g-baseline"></div><div id="g-year">2026</div></div>
+      <div id="g-src">GOOGL, cierres diarios desde ago-2004 (Nasdaq)</div>
+
+      <div id="g-chipwrap" data-layout-allow-overflow>
+        <div class="chip" id="g-halfL"><div class="pins"></div><div class="body"></div><div class="plate"><svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></div></div>
+        <div class="chip" id="g-halfR"><div class="pins"></div><div class="body"></div><div class="plate"><svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.570-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.730-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></div></div>
+        <div class="deb" id="g-d1"></div><div class="deb" id="g-d2"></div><div class="deb" id="g-d3"></div><div class="deb" id="g-d4"></div>
+      </div>
+    </div>
+    <div id="g-flash"></div>
+  </div>
+  <script>
+    (function () {
+      // Cierres reales GOOGL 31-ago → 29-oct-2026 (Yahoo Finance)
+      const P = [339.35,335.02,337.12,342.48,338.46,338.36,330.65,332.6,338.5,349.39,344.98,342.87,347.33,349.54,354.97,351.16,337.83,342.36,343.92,342.75,340.92,344.08,338.24,343.5,346.47,347.68,350.5,348.29,351.66,352.72,353.78,347.64,349.22,340.59,344.18,340.28,334.76,324.22,320.21,316.8,320.58,324.89,283.82];
+      const W = 940, H = 330, lo = 276, hi = 360;
+      const X = (i) => (i / (P.length - 1)) * (W - 250);           // deja aire a la derecha para la etiqueta
+      const Y = (p) => H - ((p - lo) / (hi - lo)) * H;
+
+      const R = document.querySelector('[data-composition-id="golpe"]');
+      const $ = (s) => R.querySelector(s);
+      const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+      const fmt = (v, d) => v.toFixed(d).replace(".", ",");
+
+      // ---------- odómetro: − [d][d] , [d][d] % ----------
+      const num = $("#g-num");
+      const mk = (txt) => { const s = document.createElement("span"); s.className = "odo-fix"; s.textContent = txt; return s; };
+      const cols = [];
+      const addCol = (place) => {
+        const c = document.createElement("span"); c.className = "odo-col";
+        const st = document.createElement("span"); st.className = "odo-strip";
+        for (let k = 0; k <= 10; k++) { const d = document.createElement("span"); d.textContent = k % 10; st.appendChild(d); }
+        c.appendChild(st); num.appendChild(c); cols.push({ c, st, place });
+      };
+      num.appendChild(mk("−")); addCol(10); addCol(1); num.appendChild(mk(",")); addCol(0.1); addCol(0.01); num.appendChild(mk("%"));
+      function setOdo(v) {
+        v = Math.round(v * 1e6) / 1e6;
+        for (const { c, st, place } of cols) {
+          const q = v / place, base = Math.floor(q + 1e-9);
+          let pos;
+          if (place === 0.01) pos = q % 10;
+          else { const lowFrac = q - base; pos = (base % 10) + Math.max(0, lowFrac * 10 - 9); }
+          st.style.transform = `translateY(${-pos}em)`;
+          if (place === 10) c.style.width = clamp((v - 9.4) / 0.6, 0, 1) * 0.6 + "em";
+          else c.style.width = "0.6em";
+        }
+      }
+
+      // ---------- gráfico ----------
+      const line = $("#g-line"), area = $("#g-area"), dot = $("#g-dot"), tag = $("#g-tag");
+      function drawChart(prog) {               // prog 0..(n-1) fraccional
+        const n = Math.floor(prog), f = prog - n;
+        let d = "", px = 0, py = 0;
+        for (let i = 0; i <= n && i < P.length; i++) { px = X(i); py = Y(P[i]); d += (i ? "L" : "M") + px.toFixed(1) + " " + py.toFixed(1); }
+        let price = P[Math.min(n, P.length - 1)];
+        if (n < P.length - 1 && f > 0) {
+          price = P[n] + (P[n + 1] - P[n]) * f;
+          px = X(n + f); py = Y(price); d += "L" + px.toFixed(1) + " " + py.toFixed(1);
+        }
+        line.setAttribute("d", d);
+        area.setAttribute("d", d + `L${px.toFixed(1)} ${H} L0 ${H} Z`);
+        dot.setAttribute("cx", px); dot.setAttribute("cy", py);
+        tag.style.transform = `translate(${px + 22}px, ${py - 26}px)`;
+        tag.textContent = "US$ " + fmt(price, 2);
+        tag.style.background = prog > P.length - 1.6 ? "#E5484D" : "#07101E";
+        area.style.opacity = clamp((prog - (P.length - 2)) / 0.8, 0, 1);
+      }
+
+      // curvas propias (deterministas)
+      const eInOut3 = (x) => (x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+      const eOut4 = (x) => 1 - Math.pow(1 - x, 4);
+      const yearEl = $("#g-year"), ticks = $("#g-ticks");
+      function render(t) {
+        // número: arranca en −2,10 (frame 0 ya es gancho) y aterriza en −12,64 a 1,95 s
+        const u = clamp(t / 1.95, 0, 1);
+        setOdo(2.1 + (12.64 - 2.1) * eInOut3(u));
+        // línea: 41 tramos tranquilos hasta 1,45 s; el desplome en 1,45→1,9
+        let prog;
+        if (t < 1.45) prog = 9 + (P.length - 2 - 9) * eInOut3(clamp(t / 1.45, 0, 1));
+        else prog = (P.length - 2) + eOut4(clamp((t - 1.45) / 0.45, 0, 1));
+        if (t >= 1.45) prog = Math.max(prog, P.length - 2);
+        drawChart(Math.min(prog, P.length - 1));
+        // regla de años 2026 → 2004
+        const r = eOut4(clamp((t - 2.2) / 0.55, 0, 1));
+        yearEl.textContent = Math.round(2026 - 22 * r);
+        ticks.style.backgroundPosition = `${r * 22 * 41}px 0`;
+      }
+
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: 3.3, ease: "none", onUpdate() { render(this.time()); } }, 0);
+
+      // ---------- karaoke ----------
+      function karaoke(sel, tIn, tOut, step, instant) {
+        const words = R.querySelectorAll(sel + " .w");
+        tl.fromTo(sel, { opacity: instant ? 1 : 0, filter: instant ? "blur(0px)" : "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.16, ease: "power3.out" }, tIn);
+        words.forEach((w, i) => {
+          const col = w.dataset.acc === "red" ? "#E5484D" : w.dataset.acc === "green" ? "#10B981" : "#07101E";
+          tl.fromTo(w, { color: "#B8943F", opacity: 0.55 }, { color: col, opacity: 1, duration: 0.09, ease: "none" }, tIn + 0.04 + i * step);
+        });
+        if (tOut != null) tl.to(sel, { opacity: 0, filter: "blur(8px)", duration: 0.12, ease: "power3.in" }, tOut);
+      }
+      karaoke("#g-h1", -0.04, 1.38, 0.24, true);
+      karaoke("#g-h2", 1.42, null, 0.3);
+
+      // pill + underline
+            tl.fromTo("#g-under", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 1.92);
+      
+      // golpe al aterrizar el número: el número se agranda un pelo y vuelve
+      tl.fromTo("#g-num", { scale: 1 }, { scale: 1.08, duration: 0.08, ease: "power2.out" }, 1.9);
+      tl.to("#g-num", { scale: 1, duration: 0.45, ease: "back.out(2.2)" }, 1.98);
+
+      // chip: cae desde arriba con blur y se parte
+      tl.fromTo("#g-chipwrap", { y: -1800, rotation: -8, filter: "blur(14px)" }, { y: 0, rotation: 0, filter: "blur(0px)", duration: 0.42, ease: "power3.in" }, 1.5);
+      tl.fromTo("#g-chipwrap", { scaleY: 1, scaleX: 1 }, { scaleY: 0.9, scaleX: 1.06, duration: 0.06, ease: "power2.out" }, 1.92);
+      tl.to("#g-chipwrap", { scaleY: 1, scaleX: 1, duration: 0.4, ease: "elastic.out(1, 0.45)" }, 1.98);
+      tl.fromTo("#g-halfL", { x: 0, rotation: 0 }, { x: -34, y: 10, rotation: -7, duration: 0.55, ease: "expo.out" }, 1.97);
+      tl.fromTo("#g-halfR", { x: 0, rotation: 0 }, { x: 34, y: 14, rotation: 8, duration: 0.55, ease: "expo.out" }, 1.97);
+      [["#g-d1", -120, -160, 0.9], ["#g-d2", 90, -200, 0.8], ["#g-d3", -60, -110, 0.6], ["#g-d4", 140, -90, 0.7]].forEach(([s, dx, dy, sc], i) => {
+        tl.fromTo(s, { opacity: 1, x: 0, y: 0, rotation: 0, scale: sc }, { x: dx, y: dy, rotation: 160 + i * 40, duration: 0.32, ease: "power2.out" }, 1.97);
+        tl.to(s, { y: 260, opacity: 0, duration: 0.5, ease: "power2.in" }, 2.29);
+      });
+
+      // flash rojo + temblor de cámara
+      tl.fromTo("#g-flash", { opacity: 0 }, { opacity: 1, duration: 0.05, ease: "none" }, 1.92);
+      tl.to("#g-flash", { opacity: 0, duration: 0.6, ease: "power2.out" }, 1.99);
+      const sh = [[14, -10], [-12, 8], [9, -6], [-5, 4], [2, -1], [0, 0]];
+      sh.forEach(([x, y], i) => tl.to("#g-shake", { x, y, duration: 0.032, ease: "none" }, 1.92 + i * 0.032));
+
+      // "el peor día desde" + regla 2026 → 2004
+      tl.fromTo("#g-stamp", { opacity: 0, scale: 1.35, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.32, ease: "expo.out" }, 2.04);
+      tl.fromTo("#g-ruler", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: "expo.out" }, 2.14);
+      tl.fromTo("#g-baseline", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "expo.out" }, 2.14);
+      tl.fromTo("#g-year", { scale: 1 }, { scale: 1.18, duration: 0.1, ease: "power2.out" }, 2.74);
+      tl.to("#g-year", { scale: 1, duration: 0.3, ease: "back.out(2)" }, 2.84);
+      tl.fromTo("#g-src", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 2.4);
+
+      render(0);
+      window.__timelines["golpe"] = tl;
+    })();
+  </script>
+</template>

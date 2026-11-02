@@ -1,0 +1,171 @@
+<template>
+  <style>
+    @font-face { font-family: "Plex Sans"; src: url("assets/fonts/plexsans-var.woff2") format("woff2"); font-weight: 100 700; }
+    @font-face { font-family: "Plex Mono"; src: url("assets/fonts/plexmono-700.woff2") format("woff2"); font-weight: 700; }
+    @font-face { font-family: "Plex Mono"; src: url("assets/fonts/plexmono-600.woff2") format("woff2"); font-weight: 600; }
+    #root {
+      position: absolute; inset: 0; overflow: hidden;
+      --cream: #F6F3EC; --red: #E5484D; --champ: #CDB57A; --champ-d: #B8943F;
+      background: radial-gradient(90% 60% at 50% 40%, #1E3756 0%, #12233A 45%, #07101E 100%);
+      font-family: "Plex Sans", sans-serif; color: var(--cream);
+    }
+    .bgchart { position: absolute; left: -40px; right: -40px; top: 500px; height: 700px; opacity: .10; }
+    .hdr { position: absolute; left: 60px; right: 60px; top: 236px; text-align: center; font-weight: 700; font-size: 54px; letter-spacing: -0.02em; line-height: 1.1; }
+    .hdr .w { display: inline-block; color: var(--champ-d); opacity: .6; margin: 0 .12em; }
+    #r-group { position: absolute; left: 0; right: 0; top: 0; height: 1000px; transform-origin: 50% 360px; }
+    #r-kicker { position: absolute; top: 352px; width: 100%; text-align: center; font-family: "Plex Mono"; font-weight: 600; font-size: 22px; letter-spacing: .16em; color: var(--champ); }
+    .row { position: absolute; left: 70px; right: 70px; height: 150px; }
+    .row .date { position: absolute; left: 0; top: 18px; font-family: "Plex Mono"; font-weight: 700; font-size: 34px; color: var(--cream); }
+    .row .ev { position: absolute; left: 0; top: 64px; font-family: "Plex Mono"; font-weight: 600; font-size: 21px; letter-spacing: .12em; color: var(--champ); }
+    .row .track { position: absolute; left: 0; right: 0; top: 104px; height: 30px; border-radius: 6px; background: rgba(246,243,236,.06); }
+    .row .bar { position: absolute; left: 0; top: 104px; height: 30px; border-radius: 6px; background: linear-gradient(90deg, #2C4A70, #4A6C96); transform-origin: left center; }
+    .row .val { position: absolute; right: 0; top: 6px; font-family: "Plex Mono"; font-weight: 700; font-size: 62px; letter-spacing: -0.03em; color: var(--cream); display: flex; }
+    #r-row26 .bar { background: linear-gradient(90deg, #B8333A, #E5484D); box-shadow: 0 0 40px rgba(229,72,77,.45); }
+    #r-row26 .val { color: var(--red); }
+    #r-row26 .date { color: #fff; }
+    #r-badge { position: absolute; left: -6px; top: -30px; background: var(--red); color: #fff; font-family: "Plex Mono"; font-weight: 700; font-size: 24px; padding: 4px 14px; border-radius: 8px; letter-spacing: .06em; }
+    .odo-col { display: inline-block; height: 1em; overflow: hidden; }
+    .odo-strip { display: flex; flex-direction: column; will-change: transform; }
+    .odo-strip span { height: 1em; display: block; text-align: center; line-height: 1em; }
+    .odo-fix { display: inline-block; line-height: 1em; }
+    #r-money-lab { position: absolute; top: 905px; width: 100%; text-align: center; font-family: "Plex Mono"; font-weight: 600; font-size: 23px; letter-spacing: .16em; color: var(--champ); }
+    #r-money { position: absolute; top: 950px; left: 0; right: 0; display: flex; justify-content: center; font-family: "Plex Mono"; font-weight: 700; font-size: 132px; line-height: 1; letter-spacing: -0.04em; color: var(--red); height: 140px; }
+    #r-money .unit { font-size: .55em; align-self: flex-end; margin: 0 .12em .12em; color: var(--red); }
+    #r-borr { position: absolute; top: 1112px; left: 0; right: 0; display: flex; justify-content: center; align-items: center; gap: 22px; }
+    #r-borr .stamp { font-weight: 700; font-size: 58px; letter-spacing: .06em; color: var(--red); display: flex; }
+    #r-borr .stamp span { display: inline-block; }
+    #r-pill { background: var(--cream); color: #07101E; font-family: "Plex Mono"; font-weight: 700; font-size: 26px; padding: 10px 22px; border-radius: 99px; white-space: nowrap; }
+    #r-src { position: absolute; top: 1290px; width: 100%; text-align: center; font-family: "Plex Mono"; font-weight: 600; font-size: 19px; color: var(--champ); letter-spacing: .04em; }
+    #r-tape { position: absolute; top: 1372px; left: 0; height: 64px; border-top: 1px solid rgba(205,181,122,.25); border-bottom: 1px solid rgba(205,181,122,.25); width: 100%; overflow: hidden; }
+    #r-tape-in { position: absolute; top: 14px; left: 0; white-space: nowrap; font-family: "Plex Mono"; font-weight: 700; font-size: 28px; color: var(--cream); }
+    #r-tape-in .dn { color: var(--red); } #r-tape-in .up { color: #10B981; } #r-tape-in .tk { color: var(--champ); margin-left: 34px; }
+  </style>
+  <div id="root" data-composition-id="ranking" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <svg class="bgchart" viewBox="0 0 1160 700" preserveAspectRatio="none" data-layout-ignore>
+      <path d="M0 300 L60 320 L120 280 L180 300 L240 240 L300 260 L360 220 L420 250 L480 200 L540 230 L600 180 L660 210 L720 170 L780 190 L840 230 L900 260 L960 250 L1020 280 L1080 560 L1160 590" fill="none" stroke="#CDB57A" stroke-width="5" />
+    </svg>
+
+    <div class="hdr" id="r-h3"><span class="w">Peor</span><span class="w">que</span><span class="w">en</span><span class="w" data-acc="red">2008.</span></div>
+    <div class="hdr" id="r-h4"><span class="w">Peor</span><span class="w">que</span><span class="w">en</span><span class="w">el</span><span class="w" data-acc="red">COVID.</span></div>
+    <div class="hdr" id="r-h5"><span class="w">Casi</span><span class="w" data-acc="red">medio</span><span class="w" data-acc="red">billón</span></div>
+    <div class="hdr" id="r-h6"><span class="w">de</span><span class="w">dólares,</span><span class="w" data-acc="red">borrados.</span></div>
+
+    <div id="r-group">
+      <div id="r-kicker">LAS 3 PEORES CAÍDAS DE GOOGL EN UN DÍA</div>
+      <div class="row" id="r-row26" style="top: 420px" data-layout-allow-overflow>
+        <div class="date">29 OCT 2026</div><div class="ev">RESULTADOS 3T26</div>
+        <div class="track"></div><div class="bar" style="width: 940px"></div>
+        <div class="val" id="r-v26" data-layout-ignore></div>
+        <div id="r-badge">#1</div>
+      </div>
+      <div class="row" id="r-row20" style="top: 580px">
+        <div class="date">16 MAR 2020</div><div class="ev">PÁNICO COVID</div>
+        <div class="track"></div><div class="bar" style="width: 865px"></div>
+        <div class="val" id="r-v20" data-layout-ignore></div>
+      </div>
+      <div class="row" id="r-row08" style="top: 740px">
+        <div class="date">29 SEP 2008</div><div class="ev">CRISIS FINANCIERA</div>
+        <div class="track"></div><div class="bar" style="width: 863px"></div>
+        <div class="val" id="r-v08" data-layout-ignore></div>
+      </div>
+    </div>
+
+    <div id="r-money-lab">VALOR EN BOLSA PERDIDO EN UN DÍA</div>
+    <div id="r-money" data-layout-ignore></div>
+    <div id="r-borr"><div class="stamp" id="r-stamp"><span>B</span><span>O</span><span>R</span><span>R</span><span>A</span><span>D</span><span>O</span><span>S</span></div><div id="r-pill">en un solo día</div></div>
+    <div id="r-src">GOOGL, cierres diarios Nasdaq · valor perdido al cierre: Yahoo Finance</div>
+
+    <div id="r-tape" data-layout-allow-overflow><div id="r-tape-in">
+      <span class="tk">GOOGL</span> <span class="dn">▼ 12,64%</span><span class="tk">AMZN</span> <span class="dn">▼ 4,25%</span><span class="tk">NVDA</span> <span class="dn">▼ 0,80%</span><span class="tk">MSFT</span> <span class="dn">▼ 0,16%</span><span class="tk">AAPL</span> <span class="up">▲ 1,48%</span><span class="tk">META</span> <span class="up">▲ 1,96%</span>
+      <span class="tk">GOOGL</span> <span class="dn">▼ 12,64%</span><span class="tk">AMZN</span> <span class="dn">▼ 4,25%</span><span class="tk">NVDA</span> <span class="dn">▼ 0,80%</span><span class="tk">MSFT</span> <span class="dn">▼ 0,16%</span><span class="tk">AAPL</span> <span class="up">▲ 1,48%</span><span class="tk">META</span> <span class="up">▲ 1,96%</span>
+      <span class="tk">GOOGL</span> <span class="dn">▼ 12,64%</span><span class="tk">AMZN</span> <span class="dn">▼ 4,25%</span><span class="tk">NVDA</span> <span class="dn">▼ 0,80%</span>
+    </div></div>
+  </div>
+  <script>
+    (function () {
+      const R = document.querySelector('[data-composition-id="ranking"]');
+      const $ = (s) => R.querySelector(s);
+      const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+      const eOut4 = (x) => 1 - Math.pow(1 - x, 4);
+
+      // odómetro genérico: parts = ["−", 10, 1, ",", 0.1, 0.01, "%"]
+      function odo(el, parts) {
+        const cols = [], seps = [];
+        parts.forEach((p) => {
+          if (typeof p === "string") { const s = document.createElement("span"); s.className = p.startsWith("~") ? "odo-fix unit" : "odo-fix"; s.textContent = p.replace("~", ""); el.appendChild(s); if (p === ".") seps.push(s); return; }
+          const c = document.createElement("span"); c.className = "odo-col";
+          const st = document.createElement("span"); st.className = "odo-strip";
+          for (let k = 0; k <= 10; k++) { const d = document.createElement("span"); d.textContent = k % 10; st.appendChild(d); }
+          c.appendChild(st); el.appendChild(c); cols.push({ c, st, place: p });
+        });
+        const lowest = Math.min(...cols.map((c) => c.place)), top = Math.max(...cols.map((c) => c.place));
+        return function set(v) {
+          v = Math.round(v * 1e6) / 1e6;
+          for (const { c, st, place } of cols) {
+            const q = v / place, base = Math.floor(q + 1e-9);
+            const pos = place === lowest ? q % 10 : (base % 10) + Math.max(0, (q - base) * 10 - 9);
+            st.style.transform = `translateY(${-pos}em)`;
+            c.style.width = (place >= 10 ? clamp((v - place * 0.94) / (place * 0.06), 0, 1) : 1) * 0.6 + "em";
+          }
+          for (const s of seps) { const k = clamp((v - 940) / 60, 0, 1); s.style.width = k * 0.6 + "em"; s.style.opacity = k; s.style.overflow = "hidden"; }
+        };
+      }
+      const pct = ["−", 10, 1, ",", 0.1, 0.01, "%"];
+      const s26 = odo($("#r-v26"), pct), s20 = odo($("#r-v20"), pct), s08 = odo($("#r-v08"), pct);
+      const sM = odo($("#r-money"), ["US$ ", 100000, 10000, 1000, ".", 100, 10, 1, "~M"]);
+
+      const tape = $("#r-tape-in");
+      function render(t) {
+        s08(11.61 * eOut4(clamp((t - 0.3) / 0.6, 0, 1)));
+        s20(11.63 * eOut4(clamp((t - 1.4) / 0.6, 0, 1)));
+        s26(12.64 * eOut4(clamp((t - 2.18) / 0.5, 0, 1)));
+        sM(475000 * eOut4(clamp((t - 2.55) / 0.9, 0, 1)));
+        tape.style.transform = `translateX(${-140 * t}px)`;
+      }
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: 4.4, ease: "none", onUpdate() { render(this.time()); } }, 0);
+
+      function karaoke(sel, tIn, tOut, step) {
+        const words = R.querySelectorAll(sel + " .w");
+        tl.fromTo(sel, { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.16, ease: "power3.out" }, tIn);
+        words.forEach((w, i) => {
+          const col = w.dataset.acc === "red" ? "#E5484D" : "#F6F3EC";
+          tl.fromTo(w, { color: "#B8943F", opacity: 0.6 }, { color: col, opacity: 1, duration: 0.09, ease: "none" }, tIn + 0.04 + i * step);
+        });
+        if (tOut != null) tl.to(sel, { opacity: 0, filter: "blur(8px)", duration: 0.12, ease: "power3.in" }, tOut);
+      }
+      karaoke("#r-h3", 0.1, 1.14, 0.2);
+      karaoke("#r-h4", 1.2, 2.24, 0.17);
+      karaoke("#r-h5", 2.3, 3.04, 0.22);
+      karaoke("#r-h6", 3.1, null, 0.22);
+
+      tl.fromTo("#r-kicker", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 0.12);
+      // 2008 entra desde la izquierda
+      tl.fromTo("#r-row08", { x: -120, opacity: 0, filter: "blur(10px)" }, { x: 0, opacity: 1, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 0.2);
+      tl.fromTo("#r-row08 .bar", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "expo.out" }, 0.3);
+      // COVID
+      tl.fromTo("#r-row20", { x: -120, opacity: 0, filter: "blur(10px)" }, { x: 0, opacity: 1, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 1.3);
+      tl.fromTo("#r-row20 .bar", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "expo.out" }, 1.4);
+      // 2026 cae desde arriba y golpea
+      tl.fromTo("#r-row26", { y: -900, opacity: 1, filter: "blur(16px)" }, { y: 0, filter: "blur(0px)", duration: 0.3, ease: "power3.in" }, 1.88);
+      tl.fromTo("#r-row26 .bar", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "expo.out" }, 2.18);
+      tl.fromTo(["#r-row20", "#r-row08"], { y: 0 }, { y: 14, duration: 0.06, ease: "power2.out", stagger: 0.03 }, 2.18);
+      tl.to(["#r-row20", "#r-row08"], { y: 0, duration: 0.5, ease: "elastic.out(1, 0.4)", stagger: 0.03 }, 2.26);
+      tl.fromTo("#r-badge", { scale: 0, rotation: -20 }, { scale: 1, rotation: -6, duration: 0.4, ease: "back.out(2.6)" }, 2.3);
+
+      // el ranking se achica y sube para dar lugar al contador
+      tl.to("#r-group", { scale: 0.8, y: -40, duration: 0.5, ease: "power3.inOut" }, 2.4);
+      tl.fromTo("#r-money-lab", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, 2.5);
+      tl.fromTo("#r-money", { opacity: 0, scale: 0.85, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.35, ease: "expo.out" }, 2.5);
+      tl.to("#r-money", { scale: 1.06, duration: 0.07, ease: "power2.out" }, 3.45);
+      tl.to("#r-money", { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 3.52);
+      tl.fromTo("#r-stamp span", { opacity: 0, y: 26, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.2, ease: "expo.out", stagger: 0.035 }, 3.25);
+      tl.fromTo("#r-pill", { opacity: 0, x: 40, scale: 0.9 }, { opacity: 1, x: 0, scale: 1, duration: 0.4, ease: "back.out(1.8)" }, 3.55);
+      tl.fromTo("#r-src", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.6);
+      tl.fromTo("#r-tape", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.1);
+
+      render(0);
+      window.__timelines["ranking"] = tl;
+    })();
+  </script>
+</template>
