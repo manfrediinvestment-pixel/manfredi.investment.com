@@ -1,6 +1,6 @@
 # Guion para grabar — Reel "Google: el peor día de su historia"
 
-**Duración:** ~61 s de voz + 3,5 s de logo final (65 s en total).
+**Duración:** ~67 s de voz + 3,5 s de logo final (70,6 s en total).
 **Ritmo:** natural, con energía, como si se lo contaras a un amigo. Unas 2,7 palabras por segundo.
 **No te preocupes por clavar los tiempos:** cuando me pases el audio, yo ajusto cada escena a tu voz.
 
@@ -31,7 +31,8 @@
 | 15 | 44,5 | "En agosto, en nuestro informe, calculamos que Google valía doscientos ochenta y siete dólares. Cotizaba a trescientos cincuenta y seis. Hoy está en doscientos ochenta y tres." | Orgullo tranquilo, sin agrandarse. Pausa antes de "Hoy". |
 | 16 | 52,5 | "El mercado no castigó a Google por vender poco. Lo castigó por gastar mucho." | La frase para recordar. Lenta y clara. |
 | 17 | 57,6 | "Guardalo y mandáselo a ese amigo que el jueves vio todo en rojo." | Cierre con sonrisa. |
-| — | 61,5 | (silencio: logo de Manfredi) | |
+| 18 | 61,5 | "Y si querés el informe completo, comentá GOOGLE y te mando la guía para conseguirlo." | Invitación directa, mirando a cámara. "GOOGLE" bien claro. |
+| — | 67,1 | (silencio: logo de Manfredi) | |
 
 ## Texto corrido (para leer de un tirón)
 
@@ -44,6 +45,7 @@ Mientras tanto, la nube de Google duplicó sus ventas. Los hornos nuevos ya est�
 En agosto, en nuestro informe, calculamos que Google valía doscientos ochenta y siete dólares. Cotizaba a trescientos cincuenta y seis. Hoy está en doscientos ochenta y tres.
 El mercado no castigó a Google por vender poco. Lo castigó por gastar mucho.
 Guardalo y mandáselo a ese amigo que el jueves vio todo en rojo.
+Y si querés el informe completo, comentá GOOGLE y te mando la guía para conseguirlo.
 
 ## Texto para la publicación de Instagram
 
@@ -57,7 +59,9 @@ Mientras tanto, Google Cloud duplicó sus ventas: de US$ 15.157 millones a US$ 3
 
 En agosto, nuestro informe de GOOGL calculó un valor justo de US$ 286,95 cuando la acción cotizaba a US$ 356,13. Hoy está en US$ 283,82.
 
-Guardalo y mandáselo a ese amigo que el jueves vio todo en rojo 👇
+Guardalo y mandáselo a ese amigo que el jueves vio todo en rojo.
+
+💬 Comentá GOOGLE y te mando por mensaje la guía para leer el informe completo de Alphabet (actualizado con el 3T26).
 
 Fuentes: Alphabet (8-K 3T26), Yahoo Finance, Nasdaq. Contenido informativo y educativo, no es recomendación de inversión.
 
@@ -69,3 +73,7 @@ Fuentes: Alphabet (8-K 3T26), Yahoo Finance, Nasdaq. Contenido informativo y edu
 - Alphabet 8-K 3T26: ventas 127.577 vs 102.346; Cloud 30.709 vs 15.157; capex 51.355 vs 23.953; flujo operativo 42.290; flujo libre −9.065; pérdida en acciones de otras empresas −8.664 (CNBC: incluye SpaceX y Anthropic).
 - 2T26: ganancia de US$ 99.000 M por SpaceX/Anthropic (informe Manfredi GOOGL, sección 01).
 - Valor justo US$ 286,95 publicado en informes/googl.html desde el 5-ago-2026 (commit 8955a881), precio de referencia del informe US$ 356,13.
+
+## Disparador de Instagram (SendPulse)
+- Palabra: **GOOGLE** (contiene, cualquier publicación). Flujo: mensaje + botón "Quiero la guía" → filtro "sigue tu página" → mensaje con botón URL **"Ver la guía"** → https://manfredinvestment.com/guia-google
+- Prenderlo recién cuando /guia-google esté en vivo.

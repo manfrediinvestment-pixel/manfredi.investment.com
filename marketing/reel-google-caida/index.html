@@ -11,12 +11,12 @@
       html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #060d1a; }
       #root { position: relative; width: 100%; height: 100%; overflow: hidden; }
       .scene { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
-      #golpe { z-index: 10; } #ranking { z-index: 9; } #ventas { z-index: 8; } #gasto { z-index: 7; } #panaderia { z-index: 6; } #ironia { z-index: 5; } #nube { z-index: 4; } #informe { z-index: 3; } #final { z-index: 2; } #logo { z-index: 1; }
+      #golpe { z-index: 11; } #ranking { z-index: 10; } #ventas { z-index: 9; } #gasto { z-index: 8; } #panaderia { z-index: 7; } #ironia { z-index: 6; } #nube { z-index: 5; } #informe { z-index: 4; } #final { z-index: 3; } #comenta { z-index: 2; } #logo { z-index: 1; }
     </style>
   </head>
   <body>
-    <!-- Reel "Google −12,64%": 10 escenas, guion en GUION.md. Transición latigazo vertical entre todas (referencia Portiv). -->
-    <div id="root" data-composition-id="main" data-start="0" data-duration="65.0" data-width="1080" data-height="1920"
+    <!-- Generado por build_index.py: no editar a mano. Guion en GUION.md. -->
+    <div id="root" data-composition-id="main" data-start="0" data-duration="70.6" data-width="1080" data-height="1920"
       data-motion-blur="on" data-motion-blur-shutter="300">
       <div id="golpe" class="scene" data-composition-id="golpe" data-composition-src="compositions/golpe.html"
         data-start="0" data-duration="3.3" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
@@ -36,12 +36,14 @@
         data-start="44.46" data-duration="8.34" data-track-index="8" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
       <div id="final" class="scene" data-composition-id="final" data-composition-src="compositions/final.html"
         data-start="52.46" data-duration="9.34" data-track-index="9" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+      <div id="comenta" class="scene" data-composition-id="comenta" data-composition-src="compositions/comenta.html"
+        data-start="61.46" data-duration="5.94" data-track-index="10" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
       <div id="logo" class="scene" data-composition-id="logo" data-composition-src="compositions/logo.html"
-        data-start="61.46" data-duration="3.54" data-track-index="10" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+        data-start="67.06" data-duration="3.54" data-track-index="11" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
     </div>
     <script>
       const tl = gsap.timeline({ paused: true });
-      // toda la escena sube y la siguiente entra pegada desde abajo, borde duro, lo más rápido en el medio
+      // latigazo vertical: toda la escena sube y la siguiente entra pegada desde abajo, borde duro
       function whip(outSel, inSel, at) {
         tl.fromTo(outSel, { y: 0 }, { y: -1920, duration: 0.3, ease: "expo.inOut" }, at);
         tl.fromTo(inSel, { y: 1920 }, { y: 0, duration: 0.3, ease: "expo.inOut" }, at);
@@ -54,6 +56,7 @@
       tl.set("#nube", { y: 1920 }, 0);
       tl.set("#informe", { y: 1920 }, 0);
       tl.set("#final", { y: 1920 }, 0);
+      tl.set("#comenta", { y: 1920 }, 0);
       tl.set("#logo", { y: 1920 }, 0);
       whip("#golpe", "#ranking", 2.96);
       whip("#ranking", "#ventas", 6.96);
@@ -63,7 +66,8 @@
       whip("#ironia", "#nube", 38.96);
       whip("#nube", "#informe", 44.46);
       whip("#informe", "#final", 52.46);
-      whip("#final", "#logo", 61.46);
+      whip("#final", "#comenta", 61.46);
+      whip("#comenta", "#logo", 67.06);
       window.__timelines["main"] = tl;
       tl.seek(0);
     </script>
