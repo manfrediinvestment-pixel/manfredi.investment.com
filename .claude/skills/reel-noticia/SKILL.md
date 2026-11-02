@@ -140,8 +140,37 @@ estado inicial es visible, usar `immediateRender:false`. Revisar siempre el prim
    `ffmpeg -ss <t-0.1> -i video.mp4 -t 0.42 -vf "fps=36,scale=180:-1,tile=15x1" -frames:v 1 seam.jpg`
    y una vista general a 1 fps. Buscar: objetos que asoman antes de entrar, números cortados, texto encimado.
 9. Copiar el mp4 al Escritorio y abrirlo (`start ""`).
+10. **El mp4 NUNCA va al repo** (`output/*.mp4` en `.gitignore`): Cloudflare Pages rechaza archivos de más de 25 MiB y
+    un reel de 70 s a 60 fps pesa ~28 MB. Pasó con el merge `2f46b99c` (deploy fallido, arreglado en `2177253f`).
+    Después de cada merge, verificar el deploy: `curl -s https://api.github.com/repos/manfrediinvestment-pixel/manfredi.investment.com/commits/<sha>/check-runs`
+    → "Cloudflare Pages" tiene que estar en `success`, y la página nueva tiene que responder con su propio `<title>`.
 
 ---
+
+## 6b. Sonido (lo hacemos nosotros; el user solo pone la voz)
+
+Pedido del user (02-nov-2026): "yo hago la voz, pero no le pongo los sonidos, hacelos vos". Piloto: 73 efectos.
+
+- **Fuentes gratis y sin cuenta** (no invocar la skill `media-use` por el tema HeyGen: usar sus archivos y la API pública):
+  biblioteca local `~/.claude/skills/media-use/audio/assets/sfx/` (Pixabay, sin atribución) y Freesound **CC0** vía
+  `https://api.openverse.org/v1/audio/?q=<efecto>&license=cc0` (el preview mp3 está en `results[].url`). Openverse limita
+  la frecuencia: `curl -m 30`, pocas búsquedas, y si se traba seguir con lo que hay. Ojo: en la biblioteca `whoosh` =
+  `whoosh-short` y `click` = `click-soft` (son el mismo archivo).
+- Ya armados en el piloto (copiar `marketing/reel-google-caida/assets/sfx/` + `CREDITS.md`): 3 latigazos que rotan
+  (`swoosh-a/b/c`), vidrio (`crack-a/b`), golpes graves (`impact-bass-1`, `impact-bass-2` con crecida), `pop`, `click`,
+  `key-press`, `ping`, `sparkle`, `notification`, `typing`, `whoosh-cinematic`. Todos normalizados a pico −3 dBTP con ffmpeg.
+- **Qué suena** (solo acciones visibles): latigazo en cada transición; golpe grave + vidrio cuando algo se parte o choca;
+  pop cuando aterriza un badge o un número; golpes graves bajitos (0,13-0,2) en cada objeto que cae en serie; tecla por
+  letra tipeada; clic en cada toque del cursor; notificación cuando llega el DM; golpe con crecida en el remate (nuestro
+  valor justo) y en el logo. Nada de música salvo que la pida.
+- **Sincronía**: en `build_index.py`, `SFX = [(archivo, escena, segundo_local_del_cuadro, volumen, extra)]`, `PEAK` (pico
+  medido con `npx hyperframes audio <archivo> --only moments --json`) y `DUR`. El script calcula
+  `inicio = escena + segundo − pico + 1 cuadro`, pone `data-duration` (sin eso el audio "ocupa" hasta el final y el lint
+  tira cientos de avisos) y reparte en pistas 30+ sin superposición. Al cambiar los tiempos de escena por la voz, los
+  sonidos se mueven solos.
+- **Verificar midiendo** (no se puede escuchar): `npx hyperframes audio output/<video>.mp4 --only loudness,onsets --json`
+  → mezcla −16 a −14 LUFS, pico ≤ −1 dBTP, y cada onset fuerte a ±1-2 cuadros de su imagen. Cuando entre la voz, bajar
+  los efectos ~6 dB para que queden debajo.
 
 ## 7. Sincronizar con la voz del user
 
