@@ -1,0 +1,141 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #s-shake { position: absolute; inset: 0; }
+    /* A: chip + billetes que se van */
+    #s-a { position: absolute; inset: 0; }
+    #s-chipwrap { position: absolute; left: 50%; top: 520px; width: 360px; height: 360px; margin-left: -180px; }
+    #s-okpill { position: absolute; top: 930px; left: 0; right: 0; margin: 0 auto; width: fit-content; border-color: rgba(16,185,129,.5); }
+    #s-okpill b { color: #10B981; }
+    .bill { position: absolute; left: 465px; top: 660px; width: 150px; height: 74px; border-radius: 10px; opacity: 0;
+      background: linear-gradient(135deg, #34D399, #0E8F65); border: 2px solid rgba(255,255,255,.35); box-shadow: 0 16px 30px -12px rgba(0,0,0,.6);
+      display: flex; align-items: center; justify-content: center; font-family: "Plex Mono"; font-weight: 700; font-size: 30px; color: #063b2a; }
+    .bill::before { content: ""; position: absolute; inset: 7px; border-radius: 6px; border: 1.5px solid rgba(6,59,42,.35); }
+    /* B: racks + contador */
+    #s-b { position: absolute; left: 0; right: 0; top: 0; height: 1200px; transform-origin: 50% 380px; }
+    .rack { position: absolute; width: 200px; height: 270px; border-radius: 14px; background: linear-gradient(180deg, #1c3354, #0b1830);
+      border: 1px solid rgba(226,234,245,.2); box-shadow: 0 30px 50px -20px rgba(0,0,0,.7); padding: 16px 14px; display: flex; flex-direction: column; gap: 9px; }
+    .rack .u { height: 24px; border-radius: 5px; background: rgba(6,13,26,.7); border: 1px solid rgba(226,234,245,.08); position: relative; }
+    .rack .u::before { content: ""; position: absolute; left: 10px; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: #f2c94c; box-shadow: 0 0 8px #f2c94c; }
+    .rack .u::after { content: ""; position: absolute; left: 24px; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 8px #10B981; }
+    .rack .u i { position: absolute; right: 10px; top: 10px; width: 70px; height: 3px; background: rgba(234,217,164,.35); border-radius: 2px; }
+    .rack .ia { position: absolute; left: 12px; bottom: -42px; font-family: "Plex Mono"; font-weight: 700; font-size: 20px; color: #ead9a4; letter-spacing: .1em; }
+    #s-kick { top: 1000px; }
+    #s-num { position: absolute; top: 1040px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 128px; letter-spacing: -0.04em; color: #EF4444; height: 140px;
+      filter: drop-shadow(0 0 30px rgba(239,68,68,.3)); }
+    /* C: barras de comparación */
+    #s-c { position: absolute; inset: 0; }
+    .ccol { position: absolute; bottom: 700px; width: 240px; height: 520px; }
+    .ccol .val { position: absolute; left: -90px; right: -90px; font-family: "Plex Mono"; font-weight: 700; font-size: 44px; letter-spacing: -0.03em; }
+    .ccol .lab { position: absolute; bottom: -58px; left: 0; right: 0; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 28px; color: #ead9a4; }
+    #s-c25 { left: 220px; } #s-c25 .vbar { height: 219px; } #s-c25 .val { bottom: 232px; color: #f6f8fc; }
+    #s-c26 { left: 620px; } #s-c26 .vbar { height: 470px; } #s-c26 .val { bottom: 484px; color: #EF4444; }
+    #s-cbase { position: absolute; left: 160px; right: 160px; top: 1218px; height: 3px; background: rgba(234,217,164,.6); transform-origin: center; }
+    #s-x2 { position: absolute; left: 470px; top: 880px; font-size: 48px; }
+  </style>
+  <div id="root" data-composition-id="gasto" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-panel"></div><div class="grid"></div>
+    <div id="s-shake">
+      <div class="hdr" id="s-h1"><span class="w">El</span><span class="w">problema</span><span class="w">no</span><span class="w">fueron</span><span class="w">las</span><span class="w em" data-acc="gold">ventas:</span></div>
+      <div class="hdr" id="s-h2"><span class="w">fue</span><span class="w">lo</span><span class="w">que</span><span class="w em" data-acc="red">gasta.</span></div>
+      <div class="hdr" id="s-h3"><span class="w">En</span><span class="w">tres</span><span class="w">meses</span><span class="w">metió</span></div>
+      <div class="hdr" id="s-h4"><span class="w em" data-acc="red">51</span><span class="w em" data-acc="red">mil</span><span class="w em" data-acc="red">millones</span><span class="w">de</span><span class="w">dólares</span></div>
+      <div class="hdr" id="s-h5"><span class="w">en</span><span class="w">centros</span><span class="w">de</span><span class="w">datos</span><span class="w">para</span><span class="w em" data-acc="gold">IA.</span></div>
+      <div class="hdr" id="s-h6"><span class="w">Más</span><span class="w">del</span><span class="w em" data-acc="red">doble</span></div>
+      <div class="hdr" id="s-h7"><span class="w">que</span><span class="w">hace</span><span class="w">un</span><span class="w">año.</span></div>
+
+      <div id="s-a">
+        <div id="s-chipwrap" data-layout-allow-overflow>
+          <div class="chip half-l" id="s-halfL"><div class="pins"></div><div class="body"></div><div class="plate" data-g></div></div>
+          <div class="chip half-r" id="s-halfR"><div class="pins"></div><div class="body"></div><div class="plate" data-g></div></div>
+        </div>
+        <div id="s-okpill" class="pill">VENTAS <b>+25%</b> ✓</div>
+        <div class="bill" id="s-b1">$</div><div class="bill" id="s-b2">$</div><div class="bill" id="s-b3">$</div><div class="bill" id="s-b4">$</div>
+        <div class="bill" id="s-b5">$</div><div class="bill" id="s-b6">$</div><div class="bill" id="s-b7">$</div><div class="bill" id="s-b8">$</div>
+      </div>
+
+      <div id="s-b">
+        <div class="kicker" style="top: 360px" id="s-bk">CENTROS DE DATOS PARA IA</div>
+        <div class="rack" id="s-r1" style="left: 110px; top: 430px"><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div></div>
+        <div class="rack" id="s-r2" style="left: 440px; top: 430px"><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div></div>
+        <div class="rack" id="s-r3" style="left: 770px; top: 430px"><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div></div>
+        <div class="rack" id="s-r4" style="left: 275px; top: 710px"><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div></div>
+        <div class="rack" id="s-r5" style="left: 605px; top: 710px"><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div></div>
+        <div id="s-kick" class="kicker">INVERSIÓN EN 3 MESES · 3T 2026</div>
+        <div id="s-num" class="odo" data-layout-ignore></div>
+      </div>
+
+      <div id="s-c">
+        <div class="ccol" id="s-c25"><div class="vbar navy"></div><div class="val odo" id="s-v25" data-layout-ignore></div><div class="lab">3T 2025</div></div>
+        <div class="ccol" id="s-c26"><div class="vbar red"></div><div class="val odo" id="s-v26" data-layout-ignore></div><div class="lab">3T 2026</div></div>
+        <div id="s-cbase"></div>
+        <div id="s-x2" class="badge red">×2,1</div>
+      </div>
+      <div class="src" id="s-src">Alphabet 8-K: compras de propiedades y equipos (capex) 3T26 vs 3T25</div>
+    </div>
+    <div class="flash" id="s-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4, eInOut3 } = MF;
+      const R = document.querySelector('[data-composition-id="gasto"]');
+      const $ = (s) => R.querySelector(s);
+      R.querySelectorAll("[data-g]").forEach((p) => (p.innerHTML = MF.G_SVG));
+      const money = ["US$ ", 10000, 1000, ".", 100, 10, 1, "~M"];
+      const sN = MF.odo($("#s-num"), money), s25 = MF.odo($("#s-v25"), money), s26 = MF.odo($("#s-v26"), money);
+      const leds = R.querySelectorAll(".rack .u");
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 10.2, (t) => {
+        sN(51355 * eInOut3(clamp((t - 3.2) / 2.7, 0, 1)));
+        s25(12000 + 11953 * eOut4(clamp((t - 7.75) / 0.7, 0, 1)));
+        s26(20000 + 31355 * eOut4(clamp((t - 7.95) / 0.8, 0, 1)));
+        leds.forEach((u, i) => { u.style.opacity = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(t * 9 + i * 1.7)); });
+      });
+      MF.captions(tl, R, [["#s-h1", 0.04, 1.84], ["#s-h2", 1.84, 2.94], ["#s-h3", 2.94, 4.24], ["#s-h4", 4.24, 5.94], ["#s-h5", 5.94, 7.64], ["#s-h6", 7.64, 8.64], ["#s-h7", 8.64, 9.8]]);
+
+      // A — el chip entra, "ventas +25% ✓", y a "gasta" los billetes salen disparados
+      tl.set("#s-halfL", { x: -26, y: 8, rotation: -7 }, 0);
+      tl.set("#s-halfR", { x: 26, y: 12, rotation: 8 }, 0);
+      tl.fromTo("#s-chipwrap", { y: 700, filter: "blur(12px)" }, { y: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 0.05);
+      tl.fromTo("#s-okpill", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 0.9);
+      const dirs = [[-430, -360, -40], [380, -420, 35], [-470, 60, -70], [460, 40, 60], [-300, 460, -20], [320, 480, 25], [-60, -560, 10], [80, 600, -30]];
+      dirs.forEach(([dx, dy, rot], i) => {
+        const at = 1.95 + i * 0.07;
+        tl.fromTo("#s-b" + (i + 1), { opacity: 1, x: 0, y: 0, rotation: 0, scale: 0.4, filter: "blur(0px)" },
+          { x: dx * 1.6, y: dy * 1.6, rotation: rot * 4, scale: 1.1, filter: "blur(3px)", duration: 0.75, ease: "power3.out", immediateRender: false }, at);
+        tl.to("#s-b" + (i + 1), { opacity: 0, duration: 0.2 }, at + 0.55);
+      });
+      tl.fromTo("#s-chipwrap", { scale: 1 }, { scale: 0.9, duration: 0.07, ease: "power2.out", immediateRender: false }, 1.93);
+      tl.to("#s-chipwrap", { scale: 1, duration: 0.45, ease: "elastic.out(1, 0.45)" }, 2.0);
+      tl.to("#s-okpill", { opacity: 0, y: 30, duration: 0.2, ease: "power3.in" }, 1.9);
+      tl.to("#s-a", { y: -1100, filter: "blur(10px)", duration: 0.35, ease: "power3.in" }, 2.9);
+
+      // B — los racks caen uno por uno, el contador sube a 51.355
+      tl.fromTo("#s-bk", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 3.0);
+      ["#s-r1", "#s-r2", "#s-r3", "#s-r4", "#s-r5"].forEach((s, i) => {
+        tl.fromTo(s, { y: -1300, rotation: i % 2 ? 6 : -6, filter: "blur(14px)" }, { y: 0, rotation: 0, filter: "blur(0px)", duration: 0.34, ease: "power3.in" }, 3.0 + i * 0.22);
+        tl.to(s, { scaleY: 0.92, duration: 0.05, ease: "power2.out", transformOrigin: "50% 100%" }, 3.34 + i * 0.22);
+        tl.to(s, { scaleY: 1, duration: 0.35, ease: "elastic.out(1, 0.45)" }, 3.39 + i * 0.22);
+      });
+      tl.fromTo("#s-kick", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, 3.15);
+      tl.fromTo("#s-num", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, 3.15);
+      tl.to("#s-num", { scale: 1.07, duration: 0.07, ease: "power2.out" }, 5.9);
+      tl.to("#s-num", { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 5.97);
+      MF.flash(tl, "#s-flash", 5.9);
+      MF.shake(tl, "#s-shake", 5.9, 9);
+
+      // C — más del doble que hace un año
+      tl.to("#s-b", { y: -1300, filter: "blur(12px)", duration: 0.4, ease: "power3.in" }, 7.5);
+      tl.to("#s-num", { opacity: 0, duration: 0.2 }, 7.55);
+      tl.to("#s-kick", { opacity: 0, duration: 0.2 }, 7.55);
+      tl.fromTo("#s-cbase", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 7.7);
+      tl.fromTo("#s-c25 .vbar", { scaleY: 0 }, { scaleY: 1, duration: 0.6, ease: "expo.out" }, 7.75);
+      tl.fromTo("#s-c26 .vbar", { scaleY: 0 }, { scaleY: 1, duration: 0.75, ease: "expo.out" }, 7.95);
+      tl.fromTo("#s-c .val, #s-c .lab", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 7.75);
+      tl.fromTo("#s-x2", { opacity: 0, scale: 0.3, rotation: -14 }, { opacity: 1, scale: 1, rotation: -4, duration: 0.45, ease: "back.out(2.6)" }, 8.45);
+      tl.fromTo("#s-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 3.3);
+      window.__timelines["gasto"] = tl;
+    })();
+  </script>
+</template>

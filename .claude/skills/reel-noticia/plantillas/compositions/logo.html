@@ -1,0 +1,37 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #l-mark { position: absolute; left: 50%; top: 470px; width: 230px; height: 230px; margin-left: -115px; filter: drop-shadow(0 30px 60px rgba(242,201,76,.25)); }
+    #l-word { position: absolute; top: 740px; width: 100%; text-align: center; font-family: "DM Serif"; font-size: 84px; line-height: 1; }
+    #l-word span { display: inline-block; }
+    #l-word em { font-style: italic; color: #f2c94c; }
+    #l-tag { position: absolute; top: 900px; width: 100%; text-align: center; font-weight: 700; font-size: 58px; letter-spacing: -0.02em; line-height: 1.08; }
+    #l-tag em { font-family: "DM Serif"; font-style: italic; font-weight: 400; font-size: 1.12em; color: #f6d77e; position: relative; display: inline-block; }
+    #l-line { position: absolute; left: .04em; right: .1em; bottom: -.04em; height: 3px; background: linear-gradient(90deg, rgba(242,201,76,.9), rgba(242,201,76,0)); transform-origin: left center; }
+    #l-url { position: absolute; top: 1110px; left: 0; right: 0; margin: 0 auto; width: fit-content; font-size: 26px; color: #0a1322; background: #f2c94c; border-color: #f2c94c; font-weight: 700; }
+    #l-disc { top: 1292px; }
+  </style>
+  <div id="root" data-composition-id="logo" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-panel"></div><div class="grid"></div>
+    <img id="l-mark" src="assets/logo-manfredi.svg" alt="Manfredi Investment" />
+    <div id="l-word"><span id="l-w1">Manfredi</span> <span id="l-w2"><em>Investment</em></span></div>
+    <div id="l-tag"><span id="l-t1">Tu mundo financiero,</span><br /><em id="l-t2">en un solo lugar.<i id="l-line"></i></em></div>
+    <div id="l-url" class="pill">manfredinvestment.com</div>
+    <div class="src" id="l-disc">Contenido informativo y educativo. No es recomendación de inversión.</div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#l-mark", { scale: 0.3, rotation: -25, opacity: 0, filter: "blur(10px)" }, { scale: 1, rotation: 0, opacity: 1, filter: "blur(0px)", duration: 0.7, ease: "back.out(1.7)" }, 0.12);
+      tl.fromTo("#l-w1", { opacity: 0, y: 30, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 0.45);
+      tl.fromTo("#l-w2", { opacity: 0, y: 30, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 0.58);
+      tl.fromTo("#l-t1", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "expo.out" }, 0.95);
+      tl.fromTo("#l-t2", { opacity: 0, y: 24, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 1.15);
+      tl.fromTo("#l-line", { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "expo.out" }, 1.55);
+      tl.fromTo("#l-url", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 1.75);
+      tl.fromTo("#l-disc", { opacity: 0 }, { opacity: 0.8, duration: 0.4 }, 2.0);
+      window.__timelines["logo"] = tl;
+    })();
+  </script>
+</template>

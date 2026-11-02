@@ -1,0 +1,122 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #g-shake { position: absolute; inset: 0; }
+    #g-pill { position: absolute; top: 340px; left: 0; right: 0; margin: 0 auto; width: fit-content; }
+    #g-pill-sub { top: 404px; }
+    #g-num { position: absolute; top: 440px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 196px; color: #EF4444; letter-spacing: -0.04em; height: 200px;
+      filter: drop-shadow(0 0 30px rgba(239,68,68,.35)); }
+    #g-under { position: absolute; top: 656px; left: 170px; width: 740px; height: 6px; border-radius: 6px; transform-origin: left center;
+      background: linear-gradient(90deg, rgba(239,68,68,.95), rgba(239,68,68,.15)); }
+    #g-chart { position: absolute; top: 696px; left: 70px; width: 940px; height: 330px; }
+    #g-chart svg { overflow: visible; }
+    #g-tag { position: absolute; top: 0; left: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 26px; padding: 8px 14px; border-radius: 10px;
+      white-space: nowrap; color: #f6f8fc; border: 1px solid rgba(226,234,245,.2); will-change: transform; }
+    #g-axis { position: absolute; top: 1036px; left: 70px; right: 70px; display: flex; justify-content: space-between; font-family: "Plex Mono"; font-weight: 600;
+      font-size: 20px; letter-spacing: .1em; color: #ead9a4; }
+    #g-stamp { position: absolute; top: 1084px; width: 100%; text-align: center; font-weight: 700; font-size: 70px; letter-spacing: -0.02em; }
+    #g-stamp em { font-family: "DM Serif"; font-style: italic; font-weight: 400; font-size: 1.12em; color: #EF4444; }
+    #g-ruler { position: absolute; top: 1196px; left: 90px; width: 900px; height: 70px; }
+    #g-ticks { position: absolute; left: 0; right: 0; top: 34px; height: 22px;
+      background-image: repeating-linear-gradient(90deg, rgba(234,217,164,.6) 0 3px, transparent 3px 41px);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
+    #g-baseline { position: absolute; left: 0; right: 0; top: 56px; height: 2px; background: rgba(234,217,164,.45); transform-origin: center; }
+    #g-year { position: absolute; left: 50%; top: -8px; width: 130px; margin-left: -65px; text-align: center; background: #EF4444; color: #fff; font-family: "Plex Mono";
+      font-weight: 700; font-size: 30px; padding: 4px 0; border-radius: 8px; }
+    #g-chipwrap { position: absolute; left: 50%; top: 1380px; width: 360px; height: 360px; margin-left: -180px; }
+    .deb { position: absolute; width: 18px; height: 18px; background: #23396a; border: 1px solid rgba(226,234,245,.3); border-radius: 4px; left: 172px; top: 170px; opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="golpe" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div id="g-shake">
+      <div class="hdr" id="g-h1"><span class="w">Google</span><span class="w">tuvo</span><span class="w">el</span><span class="w em" data-acc="red">peor</span><span class="w em" data-acc="red">día</span></div>
+      <div class="hdr" id="g-h2"><span class="w">de</span><span class="w">su</span><span class="w em" data-acc="red">historia.</span></div>
+      <div id="g-pill" class="pill"><i></i>JUE · 29 OCT 2026</div>
+      <div id="g-pill-sub" class="kicker">GOOGL · CIERRE · NASDAQ</div>
+      <div id="g-num" class="odo" data-layout-ignore></div>
+      <div id="g-under"></div>
+      <div id="g-chart">
+        <svg width="940" height="330" viewBox="0 0 940 330">
+          <defs><linearGradient id="g-area-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EF4444" stop-opacity=".30" /><stop offset="1" stop-color="#EF4444" stop-opacity="0" /></linearGradient></defs>
+          <path id="g-area" d="" fill="url(#g-area-grad)" />
+          <path id="g-line" d="" fill="none" stroke="#f6f8fc" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
+          <circle id="g-dot" r="11" fill="#EF4444" stroke="#070f1f" stroke-width="5" />
+        </svg>
+        <div id="g-tag">US$ 339,35</div>
+      </div>
+      <div id="g-axis"><span>31 AGO</span><span>29 OCT</span></div>
+      <div id="g-stamp">el <em>peor día</em> desde</div>
+      <div id="g-ruler"><div id="g-ticks"></div><div id="g-baseline"></div><div id="g-year">2026</div></div>
+      <div class="src" id="g-src">GOOGL, cierres diarios desde ago-2004 (Nasdaq)</div>
+      <div id="g-chipwrap" data-layout-allow-overflow>
+        <div class="chip half-l" id="g-halfL"><div class="pins"></div><div class="body"></div><div class="plate" data-g></div></div>
+        <div class="chip half-r" id="g-halfR"><div class="pins"></div><div class="body"></div><div class="plate" data-g></div></div>
+        <div class="deb" id="g-d1"></div><div class="deb" id="g-d2"></div><div class="deb" id="g-d3"></div><div class="deb" id="g-d4"></div>
+      </div>
+    </div>
+    <div class="flash" id="g-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4, eInOut3 } = MF;
+      const R = document.querySelector('[data-composition-id="golpe"]');
+      const $ = (s) => R.querySelector(s);
+      R.querySelectorAll("[data-g]").forEach((p) => (p.innerHTML = MF.G_SVG));
+      const P = [339.35,335.02,337.12,342.48,338.46,338.36,330.65,332.6,338.5,349.39,344.98,342.87,347.33,349.54,354.97,351.16,337.83,342.36,343.92,342.75,340.92,344.08,338.24,343.5,346.47,347.68,350.5,348.29,351.66,352.72,353.78,347.64,349.22,340.59,344.18,340.28,334.76,324.22,320.21,316.8,320.58,324.89,283.82];
+      const W = 940, H = 330, lo = 276, hi = 360;
+      const X = (i) => (i / (P.length - 1)) * (W - 250);
+      const Y = (p) => H - ((p - lo) / (hi - lo)) * H;
+      const fmt = (v) => v.toFixed(2).replace(".", ",");
+      const setNum = MF.odo($("#g-num"), ["−", 10, 1, ",", 0.1, 0.01, "%"]);
+      const line = $("#g-line"), area = $("#g-area"), dot = $("#g-dot"), tag = $("#g-tag");
+      function drawChart(prog) {
+        const n = Math.floor(prog), f = prog - n;
+        let d = "", px = 0, py = 0;
+        for (let i = 0; i <= n && i < P.length; i++) { px = X(i); py = Y(P[i]); d += (i ? "L" : "M") + px.toFixed(1) + " " + py.toFixed(1); }
+        let price = P[Math.min(n, P.length - 1)];
+        if (n < P.length - 1 && f > 0) { price = P[n] + (P[n + 1] - P[n]) * f; px = X(n + f); py = Y(price); d += "L" + px.toFixed(1) + " " + py.toFixed(1); }
+        line.setAttribute("d", d);
+        area.setAttribute("d", d + `L${px.toFixed(1)} ${H} L0 ${H} Z`);
+        dot.setAttribute("cx", px); dot.setAttribute("cy", py);
+        tag.style.transform = `translate(${px + 22}px, ${py - 26}px)`;
+        tag.textContent = "US$ " + fmt(price);
+        tag.style.background = prog > P.length - 1.6 ? "#EF4444" : "#12233b";
+        area.style.opacity = clamp((prog - (P.length - 2)) / 0.8, 0, 1);
+      }
+      const yearEl = $("#g-year"), ticks = $("#g-ticks");
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 3.4, (t) => {
+        setNum(2.1 + (12.64 - 2.1) * eInOut3(clamp(t / 1.95, 0, 1)));
+        let prog = t < 1.45 ? 9 + (P.length - 2 - 9) * eInOut3(clamp(t / 1.45, 0, 1)) : (P.length - 2) + eOut4(clamp((t - 1.45) / 0.45, 0, 1));
+        drawChart(Math.min(prog, P.length - 1));
+        const r = eOut4(clamp((t - 2.2) / 0.55, 0, 1));
+        yearEl.textContent = Math.round(2026 - 22 * r);
+        ticks.style.backgroundPosition = `${r * 22 * 41}px 0`;
+      });
+      MF.karaoke(tl, R, "#g-h1", -0.04, 1.38, 0.24, true);
+      MF.karaoke(tl, R, "#g-h2", 1.42, null, 0.3);
+      tl.fromTo("#g-under", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 1.92);
+      tl.fromTo("#g-num", { scale: 1 }, { scale: 1.08, duration: 0.08, ease: "power2.out" }, 1.9);
+      tl.to("#g-num", { scale: 1, duration: 0.45, ease: "back.out(2.2)" }, 1.98);
+      tl.fromTo("#g-chipwrap", { y: -1800, rotation: -8, filter: "blur(14px)" }, { y: 0, rotation: 0, filter: "blur(0px)", duration: 0.42, ease: "power3.in" }, 1.5);
+      tl.fromTo("#g-chipwrap", { scaleY: 1, scaleX: 1 }, { scaleY: 0.9, scaleX: 1.06, duration: 0.06, ease: "power2.out" }, 1.92);
+      tl.to("#g-chipwrap", { scaleY: 1, scaleX: 1, duration: 0.4, ease: "elastic.out(1, 0.45)" }, 1.98);
+      tl.fromTo("#g-halfL", { x: 0, rotation: 0 }, { x: -34, y: 10, rotation: -7, duration: 0.55, ease: "expo.out" }, 1.97);
+      tl.fromTo("#g-halfR", { x: 0, rotation: 0 }, { x: 34, y: 14, rotation: 8, duration: 0.55, ease: "expo.out" }, 1.97);
+      [["#g-d1", -120, -160, 0.9], ["#g-d2", 90, -200, 0.8], ["#g-d3", -60, -110, 0.6], ["#g-d4", 140, -90, 0.7]].forEach(([s, dx, dy, sc], i) => {
+        tl.fromTo(s, { opacity: 1, x: 0, y: 0, rotation: 0, scale: sc }, { x: dx, y: dy, rotation: 160 + i * 40, duration: 0.32, ease: "power2.out" }, 1.97);
+        tl.to(s, { y: 260, opacity: 0, duration: 0.5, ease: "power2.in" }, 2.29);
+      });
+      MF.flash(tl, "#g-flash", 1.92);
+      MF.shake(tl, "#g-shake", 1.92, 14);
+      tl.fromTo("#g-stamp", { opacity: 0, scale: 1.35, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.32, ease: "expo.out" }, 2.04);
+      tl.fromTo("#g-ruler", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: "expo.out" }, 2.14);
+      tl.fromTo("#g-baseline", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "expo.out" }, 2.14);
+      tl.fromTo("#g-year", { scale: 1 }, { scale: 1.18, duration: 0.1, ease: "power2.out" }, 2.74);
+      tl.to("#g-year", { scale: 1, duration: 0.3, ease: "back.out(2)" }, 2.84);
+      tl.fromTo("#g-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 2.4);
+      window.__timelines["golpe"] = tl;
+    })();
+  </script>
+</template>

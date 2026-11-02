@@ -1,0 +1,124 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #p-shake { position: absolute; inset: 0; }
+    #p-sign { position: absolute; left: 50%; top: 350px; width: 520px; height: 150px; margin-left: -260px; transform-origin: 50% -40px; }
+    #p-sign .chain { position: absolute; top: -50px; width: 3px; height: 54px; background: linear-gradient(#ead9a4, #B8943F); }
+    #p-sign .board { position: absolute; inset: 0; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, #1c3354, #0b1830); border: 2px solid #B8943F; box-shadow: 0 30px 50px -20px rgba(0,0,0,.7), inset 0 0 0 6px rgba(242,201,76,.08); }
+    #p-sign .t { font-family: "DM Serif"; font-size: 76px; line-height: 1; color: #f2c94c; letter-spacing: .04em; }
+    #p-sign .s { font-family: "Plex Mono"; font-weight: 600; font-size: 18px; letter-spacing: .3em; color: #ead9a4; margin-top: 8px; }
+    #p-counter { position: absolute; left: 70px; width: 440px; top: 820px; height: 16px; border-radius: 8px; background: linear-gradient(180deg, #2C4A70, #12233b); border: 1px solid rgba(226,234,245,.2); }
+    .loaf { position: absolute; width: 150px; height: 84px; border-radius: 50% 50% 42% 42% / 64% 64% 36% 36%;
+      background: radial-gradient(70% 60% at 45% 30%, #f3c27a, #d48b3f 60%, #9a5a22); box-shadow: 0 14px 20px -10px rgba(0,0,0,.6); }
+    .loaf::before, .loaf::after { content: ""; position: absolute; top: 24px; width: 30px; height: 6px; border-radius: 4px; background: rgba(120,64,20,.6); transform: rotate(-28deg); }
+    .loaf::before { left: 40px; } .loaf::after { left: 82px; }
+    .plus { position: absolute; font-family: "Plex Mono"; font-weight: 700; font-size: 40px; color: #10B981; opacity: 0; }
+    .oven { position: absolute; width: 200px; height: 250px; border-radius: 16px; background: linear-gradient(180deg, #34465f, #1a2638); border: 2px solid rgba(226,234,245,.25);
+      box-shadow: 0 30px 50px -18px rgba(0,0,0,.8); }
+    .oven .knobs { position: absolute; left: 18px; right: 18px; top: 14px; height: 24px; display: flex; gap: 14px; }
+    .oven .knobs i { width: 22px; height: 22px; border-radius: 50%; background: #0b1830; border: 2px solid #ead9a4; }
+    .oven .win { position: absolute; left: 18px; right: 18px; top: 54px; bottom: 22px; border-radius: 10px;
+      background: radial-gradient(80% 70% at 50% 60%, #ffb24a, #e0601c 55%, #5a1a08); box-shadow: inset 0 0 22px rgba(0,0,0,.6); }
+    .tag { position: absolute; top: -70px; left: 50%; margin-left: -70px; width: 140px; padding: 8px 0; border-radius: 10px; text-align: center; transform-origin: 50% -26px;
+      background: #EF4444; color: #fff; font-family: "Plex Mono"; font-weight: 700; font-size: 26px; box-shadow: 0 12px 24px -10px rgba(239,68,68,.7); }
+    .tag::before { content: ""; position: absolute; left: 50%; top: -26px; width: 2px; height: 26px; background: #ead9a4; }
+    #p-reg { position: absolute; left: 110px; right: 110px; top: 900px; height: 360px; padding: 26px 34px; }
+    #p-reg .hd { font-family: "Plex Mono"; font-weight: 600; font-size: 22px; letter-spacing: .16em; color: #ead9a4; display: flex; justify-content: space-between; }
+    #p-reg .row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 22px; }
+    #p-reg .row .k { font-size: 30px; font-weight: 600; color: #f6f8fc; }
+    #p-reg .row .k small { display: block; font-family: "Plex Mono"; font-size: 18px; font-weight: 600; letter-spacing: .08em; color: #ead9a4; }
+    #p-reg .row .v { font-family: "Plex Mono"; font-weight: 700; font-size: 50px; letter-spacing: -0.03em; }
+    #p-in .v { color: #10B981; } #p-out .v { color: #EF4444; }
+    #p-reg .div { height: 2px; background: rgba(234,217,164,.35); margin-top: 18px; transform-origin: left center; }
+    #p-res { position: absolute; left: 0; right: 0; top: 1150px; text-align: center; }
+    #p-res .badge { font-size: 64px; padding: 10px 30px; }
+  </style>
+  <div id="root" data-composition-id="panaderia" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div id="p-shake">
+      <div class="hdr" id="p-h1"><span class="w">Es</span><span class="w">como</span><span class="w">una</span><span class="w em" data-acc="gold">panadería</span></div>
+      <div class="hdr" id="p-h2"><span class="w">que</span><span class="w">vende</span><span class="w">cada</span><span class="w">vez</span><span class="w em" data-acc="green">más</span><span class="w em" data-acc="green">pan,</span></div>
+      <div class="hdr" id="p-h3"><span class="w">pero</span><span class="w">gasta</span><span class="w">tanto</span><span class="w">en</span><span class="w em" data-acc="red">hornos</span><span class="w em" data-acc="red">nuevos</span></div>
+      <div class="hdr" id="p-h4"><span class="w">que</span><span class="w">la</span><span class="w">caja</span><span class="w">le</span><span class="w">da</span><span class="w em" data-acc="red">negativa:</span></div>
+      <div class="hdr" id="p-h5"><span class="w">entraron</span><span class="w em" data-acc="green">42</span><span class="w em" data-acc="green">mil</span><span class="w em" data-acc="green">millones,</span></div>
+      <div class="hdr" id="p-h6"><span class="w">salieron</span><span class="w em" data-acc="red">51.</span></div>
+
+      <div id="p-sign"><div class="chain" style="left: 80px"></div><div class="chain" style="right: 80px"></div>
+        <div class="board"><div class="t">Panadería</div><div class="s">GOOGLE · DESDE 1998</div></div></div>
+
+      <div id="p-shop">
+        <div id="p-counter"></div>
+        <div class="loaf" id="p-l1" style="left: 80px; top: 740px"></div>
+        <div class="loaf" id="p-l2" style="left: 220px; top: 740px"></div>
+        <div class="loaf" id="p-l3" style="left: 360px; top: 740px"></div>
+        <div class="loaf" id="p-l4" style="left: 150px; top: 668px"></div>
+        <div class="loaf" id="p-l5" style="left: 290px; top: 668px"></div>
+        <div class="plus" id="p-p1" style="left: 120px; top: 640px">+</div>
+        <div class="plus" id="p-p2" style="left: 400px; top: 620px">+</div>
+        <div class="plus" id="p-p3" style="left: 260px; top: 590px">+</div>
+        <div class="oven" id="p-o1" style="left: 560px; top: 590px"><div class="knobs"><i></i><i></i><i></i></div><div class="win"></div><div class="tag" id="p-t1">US$</div></div>
+        <div class="oven" id="p-o2" style="left: 790px; top: 590px"><div class="knobs"><i></i><i></i><i></i></div><div class="win"></div><div class="tag" id="p-t2">US$</div></div>
+      </div>
+
+      <div id="p-reg" class="glass">
+        <div class="hd"><span>CAJA · 3T 2026</span><span>EN MILLONES</span></div>
+        <div class="row" id="p-in"><div class="k">Entró<small>VENTA DE PAN (OPERACIÓN)</small></div><div class="v odo" id="p-vin" data-layout-ignore></div></div>
+        <div class="row" id="p-out"><div class="k">Salió<small>HORNOS NUEVOS (CAPEX)</small></div><div class="v odo" id="p-vout" data-layout-ignore></div></div>
+        <div class="div" id="p-div"></div>
+      </div>
+      <div id="p-res"><span class="badge red" id="p-resb">Quedó −US$ 9.065 M</span></div>
+      <div class="src" id="p-src">Alphabet 8-K 3T26: flujo operativo US$ 42.290 M − capex US$ 51.355 M = flujo libre −US$ 9.065 M</div>
+    </div>
+    <div class="flash" id="p-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
+      const R = document.querySelector('[data-composition-id="panaderia"]');
+      const $ = (s) => R.querySelector(s);
+      const money = ["+US$ ", 10000, 1000, ".", 100, 10, 1];
+      const sIn = MF.odo($("#p-vin"), money);
+      const sOut = MF.odo($("#p-vout"), ["−US$ ", 10000, 1000, ".", 100, 10, 1]);
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 10.4, (t) => {
+        sIn(30000 + 12290 * eOut4(clamp((t - 6.3) / 1.0, 0, 1)));
+        sOut(30000 + 21355 * eOut4(clamp((t - 7.95) / 0.8, 0, 1)));
+      });
+      MF.captions(tl, R, [["#p-h1", 0.04, 1.24], ["#p-h2", 1.24, 2.84], ["#p-h3", 2.84, 4.64], ["#p-h4", 4.64, 6.24], ["#p-h5", 6.24, 7.94], ["#p-h6", 7.94, 10.0]]);
+
+      // cartel que baja y se balancea
+      tl.fromTo("#p-sign", { y: -500, rotation: 0 }, { y: 0, duration: 0.45, ease: "power3.in" }, 0.08);
+      tl.fromTo("#p-sign", { rotation: 0 }, { rotation: 6, duration: 0.18, ease: "power2.out", immediateRender: false }, 0.53);
+      tl.to("#p-sign", { rotation: 0, duration: 1.1, ease: "elastic.out(1, 0.3)" }, 0.71);
+      // panes
+      tl.fromTo("#p-counter", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out", transformOrigin: "left center" }, 1.2);
+      ["#p-l1", "#p-l2", "#p-l3", "#p-l4", "#p-l5"].forEach((s, i) => tl.fromTo(s, { scale: 0, y: -60 }, { scale: 1, y: 0, duration: 0.45, ease: "back.out(2.4)" }, 1.35 + i * 0.22));
+      ["#p-p1", "#p-p2", "#p-p3"].forEach((s, i) => {
+        tl.fromTo(s, { opacity: 0, y: 0 }, { opacity: 1, y: -40, duration: 0.3, ease: "power2.out" }, 1.6 + i * 0.3);
+        tl.to(s, { opacity: 0, y: -80, duration: 0.3, ease: "power2.in" }, 1.95 + i * 0.3);
+      });
+      // hornos que llegan pesados, con la etiqueta de precio balanceándose
+      [["#p-o1", "#p-t1", 2.95], ["#p-o2", "#p-t2", 3.35]].forEach(([o, tg, at]) => {
+        tl.fromTo(o, { x: 700, rotation: 8, filter: "blur(12px)" }, { x: 0, rotation: 0, filter: "blur(0px)", duration: 0.4, ease: "power3.in" }, at);
+        tl.to(o, { scaleY: 0.9, scaleX: 1.05, duration: 0.06, ease: "power2.out", transformOrigin: "50% 100%" }, at + 0.4);
+        tl.to(o, { scaleY: 1, scaleX: 1, duration: 0.4, ease: "elastic.out(1, 0.4)" }, at + 0.46);
+        tl.fromTo(tg, { rotation: 0 }, { rotation: -22, duration: 0.15, ease: "power2.out", immediateRender: false }, at + 0.4);
+        tl.to(tg, { rotation: 0, duration: 1.2, ease: "elastic.out(1, 0.25)" }, at + 0.55);
+        MF.shake(tl, "#p-shake", at + 0.4, 7);
+      });
+      // la caja
+      tl.fromTo("#p-shop", { y: 0, scale: 1 }, { y: -40, scale: 0.94, duration: 0.5, ease: "power3.inOut", transformOrigin: "50% 0%" }, 4.6);
+      tl.fromTo("#p-reg", { y: 1100, filter: "blur(12px)" }, { y: 0, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, 4.66);
+      tl.fromTo("#p-in", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 6.25);
+      tl.fromTo("#p-out", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 7.92);
+      tl.fromTo("#p-div", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "expo.out" }, 8.5);
+      tl.fromTo("#p-res", { opacity: 0, scale: 1.8, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.32, ease: "power4.in" }, 8.62);
+      MF.flash(tl, "#p-flash", 8.94);
+      MF.shake(tl, "#p-shake", 8.94, 14);
+      tl.fromTo("#p-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 6.3);
+      window.__timelines["panaderia"] = tl;
+    })();
+  </script>
+</template>
