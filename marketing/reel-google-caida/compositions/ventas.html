@@ -1,154 +1,83 @@
 <template>
   <style>
-    @font-face { font-family: "Plex Sans"; src: url("assets/fonts/plexsans-var.woff2") format("woff2"); font-weight: 100 700; }
-    @font-face { font-family: "Plex Mono"; src: url("assets/fonts/plexmono-700.woff2") format("woff2"); font-weight: 700; }
-    @font-face { font-family: "Plex Mono"; src: url("assets/fonts/plexmono-600.woff2") format("woff2"); font-weight: 600; }
-    #root {
-      position: absolute; inset: 0; overflow: hidden;
-      --cream: #F6F3EC; --ink: #07101E; --red: #E5484D; --green: #10B981; --champ: #B8943F; --champ-ink: #8A6A22;
-      background: radial-gradient(120% 70% at 50% 38%, #FBF9F4 0%, var(--cream) 55%, #EEE8DA 100%);
-      font-family: "Plex Sans", sans-serif; color: var(--ink);
-    }
-    .grid { position: absolute; inset: 0;
-      background-image: linear-gradient(rgba(12,24,40,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(12,24,40,.045) 1px, transparent 1px);
-      background-size: 90px 90px; }
-    .hdr { position: absolute; left: 60px; right: 60px; top: 236px; text-align: center; font-weight: 700; font-size: 54px; letter-spacing: -0.02em; line-height: 1.1; }
-    .hdr .w { display: inline-block; color: var(--champ); opacity: .55; margin: 0 .12em; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
     #v-bars { position: absolute; left: 0; right: 0; top: 0; height: 1100px; transform-origin: 50% 400px; }
-    #v-kicker { position: absolute; top: 352px; width: 100%; text-align: center; font-family: "Plex Mono"; font-weight: 600; font-size: 22px; letter-spacing: .16em; color: var(--champ-ink); }
-    .col { position: absolute; bottom: 160px; width: 260px; }
-    .col .bar { position: absolute; bottom: 0; left: 0; right: 0; border-radius: 18px 18px 6px 6px; transform-origin: 50% 100%; }
-    .col .val { position: absolute; left: -60px; right: -60px; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 44px; letter-spacing: -0.03em; display: flex; justify-content: center; }
-    .col .lab { position: absolute; bottom: -62px; left: 0; right: 0; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 28px; color: var(--ink); }
-    #v-c25 { left: 190px; } #v-c25 .bar { height: 385px; background: linear-gradient(180deg, #2C4A70, #12233A); }
-    #v-c25 .val { bottom: 400px; color: var(--ink); }
-    #v-c26 { left: 630px; } #v-c26 .bar { height: 480px; background: linear-gradient(180deg, #34D399, #0E8F65); box-shadow: 0 24px 50px -20px rgba(16,185,129,.6); }
-    #v-c26 .val { bottom: 495px; color: #0B7A55; }
-    #v-base { position: absolute; left: 130px; right: 130px; bottom: 158px; height: 4px; border-radius: 4px; background: var(--ink); transform-origin: center; }
+    #v-kicker { top: 352px; }
+    .col { position: absolute; bottom: 160px; width: 260px; height: 600px; }
+    .col .val { position: absolute; left: -80px; right: -80px; font-family: "Plex Mono"; font-weight: 700; font-size: 44px; letter-spacing: -0.03em; }
+    .col .lab { position: absolute; bottom: -62px; left: 0; right: 0; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 28px; color: #ead9a4; }
+    #v-c25 { left: 190px; } #v-c25 .vbar { height: 385px; top: auto; }
+    #v-c25 .val { bottom: 400px; color: #f6f8fc; }
+    #v-c26 { left: 630px; } #v-c26 .vbar { height: 480px; top: auto; }
+    #v-c26 .val { bottom: 495px; color: #10B981; }
+    #v-base { position: absolute; left: 130px; right: 130px; bottom: 158px; height: 3px; border-radius: 3px; background: rgba(234,217,164,.6); transform-origin: center; }
     #v-plus { position: absolute; left: 447px; top: 500px; width: 180px; text-align: center; }
-    #v-plus .p { display: inline-block; background: var(--green); color: #fff; font-family: "Plex Mono"; font-weight: 700; font-size: 44px; padding: 8px 20px; border-radius: 14px; box-shadow: 0 14px 30px -12px rgba(16,185,129,.7); }
+    #v-plus .badge { font-size: 44px; }
     #v-plus svg { display: block; margin: 10px auto 0; }
-    .odo-col { display: inline-block; height: 1em; overflow: hidden; }
-    .odo-strip { display: flex; flex-direction: column; will-change: transform; }
-    .odo-strip span { height: 1em; display: block; text-align: center; line-height: 1em; }
-    .odo-fix { display: inline-block; line-height: 1em; }
-    .odo-fix.unit { font-size: .7em; align-self: flex-end; margin-left: .12em; }
-    #v-src { position: absolute; top: 1290px; width: 100%; text-align: center; font-family: "Plex Mono"; font-weight: 600; font-size: 19px; color: var(--champ-ink); letter-spacing: .04em; }
-    /* chip roto + lupa */
-    #v-chipwrap { position: absolute; left: 50%; top: 900px; width: 300px; height: 300px; margin-left: -150px; }
-    .chip { position: absolute; inset: 0; }
-    .chip .body { position: absolute; inset: 24px; border-radius: 40px; background: linear-gradient(145deg, #1A2F4A, #07101E); box-shadow: 0 30px 50px -16px rgba(7,16,30,.5); }
-    .chip .pins { position: absolute; inset: 0;
-      background:
-        repeating-linear-gradient(90deg, transparent 0 54px, #9AA6B8 54px 68px, transparent 68px 92px) 34px 0 / 232px 28px no-repeat,
-        repeating-linear-gradient(90deg, transparent 0 54px, #9AA6B8 54px 68px, transparent 68px 92px) 34px 272px / 232px 28px no-repeat,
-        repeating-linear-gradient(0deg, transparent 0 54px, #9AA6B8 54px 68px, transparent 68px 92px) 0 34px / 28px 232px no-repeat,
-        repeating-linear-gradient(0deg, transparent 0 54px, #9AA6B8 54px 68px, transparent 68px 92px) 272px 34px / 28px 232px no-repeat; }
-    .chip .plate { position: absolute; inset: 56px; border-radius: 22px; background: linear-gradient(160deg, #FFFFFF, #EEF0F4); display: flex; align-items: center; justify-content: center; }
-    .chip .plate svg { width: 108px; height: 108px; }
-    #v-halfL { clip-path: polygon(0 0, 53% 0, 47% 21%, 56% 39%, 45% 57%, 54% 76%, 47% 100%, 0 100%); }
-    #v-halfR { clip-path: polygon(53% 0, 100% 0, 100% 100%, 47% 100%, 54% 76%, 45% 57%, 56% 39%, 47% 21%); }
+    #v-chipwrap { position: absolute; left: 50%; top: 900px; width: 360px; height: 360px; margin-left: -180px; }
     #v-lens { position: absolute; left: 0; top: 0; width: 250px; height: 250px; }
-    #v-q { position: absolute; left: 700px; top: 860px; font-weight: 700; font-size: 230px; line-height: 1; color: var(--red); text-shadow: 0 18px 40px rgba(229,72,77,.35); }
+    #v-q { position: absolute; left: 720px; top: 860px; font-family: "DM Serif"; font-style: italic; font-size: 260px; line-height: 1; color: #EF4444; filter: drop-shadow(0 18px 40px rgba(239,68,68,.35)); }
   </style>
   <div id="root" data-composition-id="ventas" data-width="1080" data-height="1920" data-layout-allow-overlap>
-    <div class="grid"></div>
+    <div class="bg-aurora"></div><div class="grid"></div>
     <div class="hdr" id="v-h7"><span class="w">Y</span><span class="w">eso</span><span class="w">que</span><span class="w">vendió</span></div>
-    <div class="hdr" id="v-h8"><span class="w" data-acc="green">25%</span><span class="w" data-acc="green">más.</span></div>
-    <div class="hdr" id="v-h9"><span class="w">¿Entonces</span><span class="w">por</span><span class="w">qué</span><span class="w" data-acc="red">cayó?</span></div>
-
+    <div class="hdr" id="v-h8"><span class="w em" data-acc="green">25%</span><span class="w em" data-acc="green">más.</span></div>
+    <div class="hdr" id="v-h9"><span class="w">¿Entonces</span><span class="w">por</span><span class="w">qué</span><span class="w em" data-acc="red">cayó?</span></div>
     <div id="v-bars">
-      <div id="v-kicker">VENTAS DE ALPHABET · TERCER TRIMESTRE</div>
-      <div class="col" id="v-c25"><div class="bar"></div><div class="val" id="v-val25" data-layout-ignore></div><div class="lab">3T 2025</div></div>
-      <div class="col" id="v-c26"><div class="bar"></div><div class="val" id="v-val26" data-layout-ignore></div><div class="lab">3T 2026</div></div>
+      <div id="v-kicker" class="kicker">VENTAS DE ALPHABET · TERCER TRIMESTRE</div>
+      <div class="col" id="v-c25"><div class="vbar navy"></div><div class="val odo" id="v-val25" data-layout-ignore></div><div class="lab">3T 2025</div></div>
+      <div class="col" id="v-c26"><div class="vbar green"></div><div class="val odo" id="v-val26" data-layout-ignore></div><div class="lab">3T 2026</div></div>
       <div id="v-base"></div>
-      <div id="v-plus"><div class="p">+25%</div>
+      <div id="v-plus"><div class="badge green">+25%</div>
         <svg width="120" height="60" viewBox="0 0 120 60"><path id="v-arrow" d="M8 50 C 40 50, 70 40, 104 12" fill="none" stroke="#10B981" stroke-width="6" stroke-linecap="round" /><path d="M86 10 L106 10 L102 30" fill="none" stroke="#10B981" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </div>
     </div>
-    <div id="v-src">Alphabet, resultados 3T 2026 (8-K, 28-oct-2026)</div>
-
+    <div class="src" id="v-src">Alphabet, resultados 3T 2026 (8-K, 28-oct-2026)</div>
     <div id="v-chipwrap" data-layout-allow-overflow>
-      <div class="chip" id="v-halfL"><div class="pins"></div><div class="body"></div><div class="plate"><svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.220-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></div></div>
-      <div class="chip" id="v-halfR"><div class="pins"></div><div class="body"></div><div class="plate"><svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></div></div>
+      <div class="chip half-l" id="v-halfL"><div class="pins"></div><div class="body"></div><div class="plate" data-g></div></div>
+      <div class="chip half-r" id="v-halfR"><div class="pins"></div><div class="body"></div><div class="plate" data-g></div></div>
       <svg id="v-lens" viewBox="0 0 250 250">
-        <defs><radialGradient id="v-glass" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".55"/><stop offset="1" stop-color="#CDB57A" stop-opacity=".18"/></radialGradient></defs>
-        <line x1="150" y1="150" x2="232" y2="232" stroke="#07101E" stroke-width="22" stroke-linecap="round" />
-        <circle cx="96" cy="96" r="78" fill="url(#v-glass)" stroke="#B8943F" stroke-width="16" />
+        <defs><radialGradient id="v-glass" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".4"/><stop offset="1" stop-color="#f2c94c" stop-opacity=".14"/></radialGradient></defs>
+        <line x1="150" y1="150" x2="232" y2="232" stroke="#ead9a4" stroke-width="22" stroke-linecap="round" />
+        <circle cx="96" cy="96" r="78" fill="url(#v-glass)" stroke="#f2c94c" stroke-width="16" />
         <path d="M54 70 A 50 50 0 0 1 90 40" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".8" />
       </svg>
     </div>
     <div id="v-q">?</div>
+    <div class="grain"></div>
   </div>
   <script>
     (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
       const R = document.querySelector('[data-composition-id="ventas"]');
       const $ = (s) => R.querySelector(s);
-      const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-      const eOut4 = (x) => 1 - Math.pow(1 - x, 4);
-      function odo(el, parts) {
-        const cols = [], seps = [];
-        parts.forEach((p) => {
-          if (typeof p === "string") { const s = document.createElement("span"); s.className = p.startsWith("~") ? "odo-fix unit" : "odo-fix"; s.textContent = p.replace("~", ""); el.appendChild(s); if (p === ".") seps.push(s); return; }
-          const c = document.createElement("span"); c.className = "odo-col";
-          const st = document.createElement("span"); st.className = "odo-strip";
-          for (let k = 0; k <= 10; k++) { const d = document.createElement("span"); d.textContent = k % 10; st.appendChild(d); }
-          c.appendChild(st); el.appendChild(c); cols.push({ c, st, place: p });
-        });
-        const lowest = Math.min(...cols.map((c) => c.place)), top = Math.max(...cols.map((c) => c.place));
-        return function set(v) {
-          v = Math.round(v * 1e6) / 1e6;
-          for (const { c, st, place } of cols) {
-            const q = v / place, base = Math.floor(q + 1e-9);
-            const pos = place === lowest ? q % 10 : (base % 10) + Math.max(0, (q - base) * 10 - 9);
-            st.style.transform = `translateY(${-pos}em)`;
-            c.style.width = (place >= 10 ? clamp((v - place * 0.94) / (place * 0.06), 0, 1) : 1) * 0.6 + "em";
-          }
-          for (const s of seps) { const k = clamp((v - 940) / 60, 0, 1); s.style.width = k * 0.6 + "em"; s.style.opacity = k; s.style.overflow = "hidden"; }
-        };
-      }
+      R.querySelectorAll("[data-g]").forEach((p) => (p.innerHTML = MF.G_SVG));
       const money = ["US$ ", 100000, 10000, 1000, ".", 100, 10, 1, "~M"];
-      const s25 = odo($("#v-val25"), money), s26 = odo($("#v-val26"), money);
-      function render(t) {
-        s25(61000 + 41300 * eOut4(clamp((t - 0.2) / 0.7, 0, 1)));
-        s26(70000 + 57580 * eOut4(clamp((t - 0.45) / 0.8, 0, 1)));
-      }
+      const s25 = MF.odo($("#v-val25"), money), s26 = MF.odo($("#v-val26"), money);
       const tl = gsap.timeline({ paused: true });
-      tl.to({}, { duration: 3.1, ease: "none", onUpdate() { render(this.time()); } }, 0);
-
-      function karaoke(sel, tIn, tOut, step) {
-        const words = R.querySelectorAll(sel + " .w");
-        tl.fromTo(sel, { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.16, ease: "power3.out" }, tIn);
-        words.forEach((w, i) => {
-          const col = w.dataset.acc === "red" ? "#E5484D" : w.dataset.acc === "green" ? "#10B981" : "#07101E";
-          tl.fromTo(w, { color: "#B8943F", opacity: 0.55 }, { color: col, opacity: 1, duration: 0.09, ease: "none" }, tIn + 0.04 + i * step);
-        });
-        if (tOut != null) tl.to(sel, { opacity: 0, filter: "blur(8px)", duration: 0.12, ease: "power3.in" }, tOut);
-      }
-      karaoke("#v-h7", 0.1, 0.84, 0.17);
-      karaoke("#v-h8", 0.9, 1.66, 0.22);
-      karaoke("#v-h9", 1.72, null, 0.2);
-
+      MF.clock(tl, 3.1, (t) => {
+        s25(61000 + 41346 * eOut4(clamp((t - 0.2) / 0.7, 0, 1)));
+        s26(70000 + 57577 * eOut4(clamp((t - 0.45) / 0.8, 0, 1)));
+      });
+      MF.karaoke(tl, R, "#v-h7", 0.1, 0.84, 0.17);
+      MF.karaoke(tl, R, "#v-h8", 0.9, 1.66, 0.22);
+      MF.karaoke(tl, R, "#v-h9", 1.72, null, 0.2);
       tl.fromTo("#v-kicker", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 0.1);
       tl.fromTo("#v-base", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 0.12);
-      tl.fromTo("#v-c25 .bar", { scaleY: 0 }, { scaleY: 1, duration: 0.7, ease: "expo.out" }, 0.2);
-      tl.fromTo("#v-c26 .bar", { scaleY: 0 }, { scaleY: 1, duration: 0.8, ease: "expo.out" }, 0.45);
+      tl.fromTo("#v-c25 .vbar", { scaleY: 0 }, { scaleY: 1, duration: 0.7, ease: "expo.out" }, 0.2);
+      tl.fromTo("#v-c26 .vbar", { scaleY: 0 }, { scaleY: 1, duration: 0.8, ease: "expo.out" }, 0.45);
       tl.fromTo(".lab", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.2);
       tl.fromTo("#v-plus", { opacity: 0, scale: 0.4, rotation: -12 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.45, ease: "back.out(2.4)" }, 0.95);
       tl.fromTo("#v-arrow", { strokeDasharray: 140, strokeDashoffset: 140 }, { strokeDashoffset: 0, duration: 0.4, ease: "power2.out" }, 1.05);
-      tl.fromTo("#v-src", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.5);
-
-      // giro: las barras se achican y suben, entra el chip roto con la lupa
+      tl.fromTo("#v-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 0.5);
       tl.to("#v-bars", { scale: 0.62, y: -70, duration: 0.5, ease: "power3.inOut" }, 1.7);
       tl.to("#v-src", { opacity: 0, duration: 0.15 }, 1.7);
       tl.fromTo("#v-chipwrap", { y: 1300, rotation: 10, filter: "blur(14px)" }, { y: 0, rotation: 0, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, 1.78);
-      tl.fromTo("#v-halfL", { x: -26, y: 8, rotation: -7 }, { x: -26, y: 8, rotation: -7, duration: 0.01 }, 0);
-      tl.fromTo("#v-halfR", { x: 26, y: 12, rotation: 8 }, { x: 26, y: 12, rotation: 8, duration: 0.01 }, 0);
+      tl.set("#v-halfL", { x: -26, y: 8, rotation: -7 }, 0);
+      tl.set("#v-halfR", { x: 26, y: 12, rotation: 8 }, 0);
       tl.fromTo("#v-lens", { x: -420, y: 120, rotation: -20, opacity: 0 }, { x: 70, y: 40, rotation: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 2.0);
       tl.to("#v-lens", { x: 20, y: 30, duration: 0.5, ease: "power2.inOut" }, 2.7);
       tl.fromTo("#v-q", { opacity: 0, scale: 0.2, rotation: 25 }, { opacity: 1, scale: 1, rotation: 8, duration: 0.5, ease: "back.out(2.8)" }, 2.42);
-
-      render(0);
       window.__timelines["ventas"] = tl;
     })();
   </script>

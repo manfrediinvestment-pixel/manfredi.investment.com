@@ -1,0 +1,116 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #i-shake { position: absolute; inset: 0; }
+    .colhd { position: absolute; top: 352px; width: 440px; text-align: center; }
+    #i-ql { left: 70px; } #i-qr { left: 570px; }
+    #i-mid { position: absolute; left: 539px; top: 420px; width: 2px; height: 820px; background: linear-gradient(rgba(234,217,164,.4), transparent); transform-origin: top; }
+    .val { position: absolute; top: 470px; width: 520px; font-family: "Plex Mono"; font-weight: 700; font-size: 76px; letter-spacing: -0.04em; }
+    #i-vl { left: 30px; color: #10B981; filter: drop-shadow(0 0 24px rgba(16,185,129,.35)); }
+    #i-vr { left: 530px; color: #EF4444; filter: drop-shadow(0 0 24px rgba(239,68,68,.35)); }
+    .vlab { position: absolute; top: 566px; width: 440px; text-align: center; font-family: "Plex Mono"; font-weight: 600; font-size: 20px; letter-spacing: .12em; color: #ead9a4; }
+    #i-ll { left: 70px; } #i-lr { left: 570px; }
+    .rocket { position: absolute; width: 140px; height: 300px; }
+    #i-r1 { left: 220px; top: 900px; }
+    #i-r2 { left: 720px; top: 820px; }
+    .flame { transform-origin: 50% 0%; }
+    #i-trail { position: absolute; left: 286px; top: 680px; width: 8px; height: 560px; border-radius: 8px; transform-origin: 50% 100%;
+      background: linear-gradient(rgba(242,201,76,0), rgba(242,201,76,.75)); }
+    #i-smoke { position: absolute; left: 760px; top: 420px; width: 60px; height: 520px; border-radius: 60px; transform-origin: 50% 0%;
+      background: linear-gradient(rgba(239,68,68,0), rgba(239,68,68,.35)); filter: blur(6px); }
+    .stake { position: absolute; font-size: 22px; }
+    #i-s1 { left: 70px; top: 1240px; } #i-s2 { left: 300px; top: 1240px; }
+    #i-pad { position: absolute; left: 150px; top: 1206px; width: 280px; height: 12px; border-radius: 6px; background: rgba(234,217,164,.5); }
+    #i-crater { position: absolute; left: 650px; top: 1204px; width: 280px; height: 16px; border-radius: 50%; background: radial-gradient(rgba(239,68,68,.6), transparent 70%); }
+  </style>
+  <div id="root" data-composition-id="ironia" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-panel"></div><div class="grid"></div>
+    <div id="i-shake">
+      <div class="hdr" id="i-h1"><span class="w">Y</span><span class="w">lo</span><span class="w em" data-acc="gold">irónico:</span></div>
+      <div class="hdr" id="i-h2"><span class="w">hace</span><span class="w">tres</span><span class="w">meses,</span></div>
+      <div class="hdr" id="i-h3"><span class="w">sus</span><span class="w">acciones</span><span class="w">en</span><span class="w em" data-acc="gold">SpaceX</span><span class="w">y</span><span class="w em" data-acc="gold">Anthropic</span></div>
+      <div class="hdr" id="i-h4"><span class="w">le</span><span class="w em" data-acc="green">inflaron</span><span class="w">la</span><span class="w">ganancia</span></div>
+      <div class="hdr" id="i-h5"><span class="w">en</span><span class="w em" data-acc="green">99</span><span class="w em" data-acc="green">mil</span><span class="w em" data-acc="green">millones.</span></div>
+      <div class="hdr" id="i-h6"><span class="w">Esta</span><span class="w">vez,</span></div>
+      <div class="hdr" id="i-h7"><span class="w">le</span><span class="w em" data-acc="red">restaron</span><span class="w">casi</span><span class="w em" data-acc="red">9</span><span class="w em" data-acc="red">mil.</span></div>
+
+      <div class="colhd" id="i-ql"><span class="pill" id="i-pl">2T 2026 · HACE 3 MESES</span></div>
+      <div class="colhd" id="i-qr"><span class="pill" id="i-pr">3T 2026 · AHORA</span></div>
+      <div id="i-mid"></div>
+      <div class="val odo" id="i-vl" data-layout-ignore></div>
+      <div class="val odo" id="i-vr" data-layout-ignore></div>
+      <div class="vlab" id="i-ll">GANANCIA POR PARTICIPACIONES</div>
+      <div class="vlab" id="i-lr">PÉRDIDA POR PARTICIPACIONES</div>
+
+      <div id="i-pad"></div><div id="i-crater"></div>
+      <div id="i-trail"></div><div id="i-smoke"></div>
+      <svg class="rocket" id="i-r1" viewBox="0 0 140 300">
+        <path class="flame" id="i-f1" d="M52 232 Q70 300 88 232 Z" fill="#f2c94c" />
+        <path d="M70 6 C 100 40, 108 90, 106 200 L 34 200 C 32 90, 40 40, 70 6 Z" fill="#f6f8fc" stroke="#B8943F" stroke-width="3" />
+        <circle cx="70" cy="92" r="20" fill="#12233b" stroke="#f2c94c" stroke-width="5" />
+        <path d="M34 150 L 8 214 L 36 206 Z M106 150 L 132 214 L 104 206 Z" fill="#1A2F4A" stroke="#B8943F" stroke-width="3" />
+        <rect x="44" y="198" width="52" height="34" rx="6" fill="#1A2F4A" stroke="#B8943F" stroke-width="3" />
+      </svg>
+      <svg class="rocket" id="i-r2" viewBox="0 0 140 300">
+        <path d="M70 6 C 100 40, 108 90, 106 200 L 34 200 C 32 90, 40 40, 70 6 Z" fill="#f6f8fc" stroke="#EF4444" stroke-width="3" />
+        <circle cx="70" cy="92" r="20" fill="#12233b" stroke="#EF4444" stroke-width="5" />
+        <path d="M34 150 L 8 214 L 36 206 Z M106 150 L 132 214 L 104 206 Z" fill="#1A2F4A" stroke="#EF4444" stroke-width="3" />
+        <rect x="44" y="198" width="52" height="34" rx="6" fill="#1A2F4A" stroke="#EF4444" stroke-width="3" />
+      </svg>
+      <span class="pill stake" id="i-s1">SpaceX</span><span class="pill stake" id="i-s2">Anthropic</span>
+      <div class="src" id="i-src">2T26: +US$ 99.000 M (informe Manfredi GOOGL) · 3T26: −US$ 8.664 M en acciones de otras empresas (8-K)</div>
+    </div>
+    <div class="flash" id="i-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
+      const R = document.querySelector('[data-composition-id="ironia"]');
+      const $ = (s) => R.querySelector(s);
+      const sL = MF.odo($("#i-vl"), ["+US$ ", 10000, 1000, ".", 100, 10, 1, "~M"]);
+      const sR = MF.odo($("#i-vr"), ["−US$ ", 1000, ".", 100, 10, 1, "~M"]);
+      const f1 = $("#i-f1");
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 9.6, (t) => {
+        sL(99000 * eOut4(clamp((t - 3.95) / 2.2, 0, 1)));
+        sR(8664 * eOut4(clamp((t - 7.15) / 1.4, 0, 1)));
+        const s = 0.75 + 0.25 * Math.sin(t * 38) * Math.sin(t * 13);   // llama que tiembla
+        f1.style.transform = `scaleY(${(t > 3.7 ? 1.6 : 0.7) * s})`;
+      });
+      MF.captions(tl, R, [["#i-h1", 0.04, 1.14], ["#i-h2", 1.14, 2.04], ["#i-h3", 2.04, 3.84], ["#i-h4", 3.84, 5.04], ["#i-h5", 5.04, 6.44], ["#i-h6", 6.44, 7.14], ["#i-h7", 7.14, 9.2]]);
+
+      tl.fromTo("#i-ql", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, 1.1);
+      tl.fromTo("#i-qr", { opacity: 0, y: -20 }, { opacity: 0.5, y: 0, duration: 0.35, ease: "expo.out" }, 1.25);
+      tl.fromTo("#i-mid", { scaleY: 0 }, { scaleY: 1, duration: 0.6, ease: "expo.out" }, 1.2);
+      // cohete en la plataforma con las dos participaciones
+      tl.fromTo("#i-pad", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "expo.out" }, 1.9);
+      tl.fromTo("#i-r1", { y: 1200, filter: "blur(10px)" }, { y: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 2.0);
+      tl.fromTo("#i-s1", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 2.6);
+      tl.fromTo("#i-s2", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 3.2);
+      // despegue
+      tl.to("#i-r1", { x: -3, duration: 0.03, ease: "none", repeat: 5, yoyo: true }, 3.55);
+      tl.to("#i-r1", { y: -1500, duration: 1.2, ease: "power3.in" }, 3.8);
+      tl.fromTo("#i-trail", { scaleY: 0, opacity: 1 }, { scaleY: 1, duration: 1.1, ease: "power3.inOut" }, 3.8);
+      tl.to("#i-trail", { opacity: 0.35, duration: 0.6 }, 5.2);
+      tl.to(["#i-s1", "#i-s2"], { opacity: 0.35, duration: 0.3 }, 4.0);
+      tl.fromTo("#i-vl", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, 3.9);
+      tl.fromTo("#i-ll", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 4.1);
+      tl.to("#i-pl", { borderColor: "rgba(16,185,129,.8)", color: "#10B981", duration: 0.2 }, 4.0);
+      // esta vez: el cohete cae
+      tl.to("#i-ql", { opacity: 0.5, duration: 0.3 }, 6.4);
+      tl.to("#i-qr", { opacity: 1, duration: 0.3 }, 6.4);
+      tl.to("#i-pr", { borderColor: "rgba(239,68,68,.8)", color: "#EF4444", duration: 0.2 }, 6.5);
+      tl.fromTo("#i-r2", { y: -1300, rotation: 180, filter: "blur(14px)" }, { y: 0, rotation: 168, filter: "blur(0px)", duration: 1.05, ease: "power3.in" }, 6.95);
+      tl.fromTo("#i-smoke", { scaleY: 0, opacity: 0 }, { scaleY: 1, opacity: 1, duration: 1.05, ease: "power3.in" }, 6.95);
+      tl.to("#i-r2", { rotation: 150, y: 30, duration: 0.5, ease: "elastic.out(1, 0.4)" }, 8.0);
+      tl.fromTo("#i-crater", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.3, ease: "expo.out" }, 8.0);
+      MF.flash(tl, "#i-flash", 8.0);
+      MF.shake(tl, "#i-shake", 8.0, 16);
+      tl.fromTo("#i-vr", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, 7.1);
+      tl.fromTo("#i-lr", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 7.3);
+      tl.fromTo("#i-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 4.2);
+      window.__timelines["ironia"] = tl;
+    })();
+  </script>
+</template>
