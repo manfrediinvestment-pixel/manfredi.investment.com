@@ -40,17 +40,33 @@
     if (sec.libros.length) sectores.push(sec);
   });
   sectores.sort(function (a, b) { var ia = ORDEN.indexOf(a.key), ib = ORDEN.indexOf(b.key); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
-  var CAT = {};
+  var CAT = {}, NUM = {};
   var filtro = 'todos';
+  // color de la palabra del sector en la tapa, según cómo lo "ve" el mercado:
+  // semis = cian eléctrico (silicio, hardware); software = violeta (nube, SaaS);
+  // big tech = azul (blue chips, la "tech" por excelencia); bancos y pagos = verde dólar;
+  // defensivos = ámbar/oro (refugio, dividendos); Argentina = celeste de la bandera.
+  var SECTOR_TINTA = { semis: '#6fd6df', software: '#ad9ff7', bigtech: '#86aef7', bancos: '#78cf9e', defensivos: '#e9b56c', argentina: '#9fd0f2' };
+  var CORTO_SEC = { semis: 'Semis', software: 'Software', bigtech: 'Big Tech', bancos: 'Bancos', defensivos: 'Defensivos', argentina: 'Argentina' };
 
+  // N° de la colección: orden en que se publicó cada informe (fecha del catálogo)
+  function numerar() {
+    NUM = {};
+    todos.filter(function (d) { return !d.soon && CAT[d.t] && CAT[d.t].f; })
+      .sort(function (a, b) { return String(CAT[a.t].f).localeCompare(String(CAT[b.t].f)) || a.t.localeCompare(b.t); })
+      .forEach(function (d, i) { NUM[d.t] = String(i + 1).padStart(2, '0'); });
+  }
+  // tapa "Monocromo": logo en blanco (assets/logos/mono, lo genera scripts/logos-mono.py)
   function cover(d) {
     var c = CAT[d.t] || {};
-    var pie = d.soon ? 'Próximamente' : esc(String(c.q || '').replace(/\s*\(.*$/, ''));
-    return '<span class="est-cover" style="--acc:' + (ACENTO[d.sec] || '#5b8def') + '"><span class="est-cover__frame"></span>' +
-      '<span class="est-cover__in"><span class="est-cover__top">Equity Research</span>' +
-      (d.logo ? '<img class="est-cover__logo" src="' + esc(d.logo) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' : '<span style="margin-top:auto"></span>') +
-      '<span class="est-cover__tk' + (d.t.length > 4 ? ' largo' : '') + '">' + esc(d.t) + '</span><span class="est-cover__name">' + esc(corto(d.n)) + '</span>' +
-      '<span class="est-cover__bot"><span>' + pie + '</span>' + (!d.soon && nuevo(c.f) ? '<span class="est-cover__new">Nuevo</span>' : '<i></i>') + '</span></span></span>';
+    var q = d.soon ? 'Próximamente' : esc(String(c.q || '').replace(/\s*\(.*$/, '').replace(/\bFY(?=\d{4})/, ''));
+    var der = !d.soon && nuevo(c.f) ? '<em class="est-cover__new">Nuevo</em>' : (NUM[d.t] ? '<span>N° ' + NUM[d.t] + '</span>' : '');
+    var mono = d.logo ? d.logo.replace(/assets\/logos\/([^\/]+)$/, 'assets/logos/mono/$1') : '';
+    return '<span class="est-cover" style="--acc:' + (SECTOR_TINTA[d.sec] || '#e6cf96') + '"><i class="est-cover__frame"></i><i class="est-cover__sheen"></i>' +
+      '<span class="est-cover__in"><span class="est-cover__top"><span>Manfredi Research</span>' + der + '</span>' +
+      '<span class="est-cover__mark">' + (mono ? '<img class="est-cover__logo" src="' + esc(mono) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' : '') + '</span>' +
+      '<i class="est-cover__rule"></i><span class="est-cover__tk' + (d.t.length > 4 ? ' largo' : '') + '">' + esc(d.t) + '</span><span class="est-cover__name">' + esc(corto(d.n)) + '</span>' +
+      '<span class="est-cover__bot"><b>' + q + '</b><span class="est-cover__sec">' + esc(CORTO_SEC[d.sec] || '') + '</span></span></span></span>';
   }
   function libro(d) {
     var c = CAT[d.t] || {};
@@ -164,7 +180,7 @@
     .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
     .then(function (cat) {
       CAT = cat || {};
-      pintar(); pintarFicha();
+      numerar(); pintar(); pintarFicha();
       DESTACADOS.forEach(function (f) {
         fetch(MERCADOS + f.t, { signal: AbortSignal.timeout(8000) })
           .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
