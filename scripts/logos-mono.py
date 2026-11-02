@@ -1,6 +1,8 @@
 # Genera assets/logos/mono/*.png: cada logo de assets/logos en blanco con fondo
 # transparente, recortado a su contorno (para las tapas de Informes).
 # Uso: python scripts/logos-mono.py assets/logos assets/logos/mono hoja.png
+# A MANO (no se regeneran): nvda.png sale del SVG de Simple Icons (CC0), en alta.
+A_MANO = {'nvda.png'}
 import sys, os
 from PIL import Image, ImageChops
 src, out, sheet = sys.argv[1], sys.argv[2], sys.argv[3]
@@ -18,7 +20,7 @@ def stretch(a):
     return a if p >= 230 else a.point(lambda v: min(255,int(v*255/max(p,1))))
 tiles=[]; boxed=[]
 for f in sorted(os.listdir(src)):
-    if not f.endswith('.png'): continue
+    if not f.endswith('.png') or f in A_MANO: continue
     im = Image.open(os.path.join(src,f)).convert('RGBA')
     comp = Image.alpha_composite(Image.new('RGBA', im.size, (255,255,255,255)), im).convert('RGB')
     a = dist(comp, (255,255,255)); bb = a.getbbox()

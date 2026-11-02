@@ -17,6 +17,14 @@
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function corto(n) { return String(n || '').replace(/,? Inc\.?$|,? Inc\.,? | Corporation$| Incorporated$| plc$| N\.V\.$| S\.A\.$| SE$|,? Co\.$| Company$| Holdings?$/g, '').replace(/^The /, '').trim(); }
+  // los informes escriben el trimestre de mil formas ("Q3 FY2026", "3Q/FY2026", "2T2026",
+  // "3T fiscal 2026", "Q2 y H1 2026"): en la estantería siempre "3T 2026" (o "Año 2026")
+  function trimestre(q) {
+    q = String(q || '');
+    var a = q.match(/20\d\d/), n = q.match(/\b[QT]\s*([1-4])\b|\b([1-4])\s*[QT]/i);
+    if (!a) return q.trim();
+    return n ? (n[1] || n[2]) + 'T ' + a[0] : 'Año ' + a[0];
+  }
   function fmtF(iso) { if (!iso) return ''; var p = iso.split('-'); return +p[2] + ' ' + MES[+p[1] - 1]; }
   function hoyISO() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function nuevo(iso) { return iso && (new Date(hoyISO()) - new Date(iso)) / 864e5 <= 10; }
@@ -59,7 +67,7 @@
   // tapa "Monocromo": logo en blanco (assets/logos/mono, lo genera scripts/logos-mono.py)
   function cover(d) {
     var c = CAT[d.t] || {};
-    var q = d.soon ? 'Próximamente' : esc(String(c.q || '').replace(/\s*\(.*$/, '').replace(/\bFY(?=\d{4})/, ''));
+    var q = d.soon ? 'Próximamente' : esc(trimestre(c.q));
     var der = !d.soon && nuevo(c.f) ? '<em class="est-cover__new">Nuevo</em>' : (NUM[d.t] ? '<span>N° ' + NUM[d.t] + '</span>' : '');
     var mono = d.logo ? d.logo.replace(/assets\/logos\/([^\/]+)$/, 'assets/logos/mono/$1') : '';
     return '<span class="est-cover" style="--acc:' + (SECTOR_TINTA[d.sec] || '#e6cf96') + '"><i class="est-cover__frame"></i><i class="est-cover__sheen"></i>' +
