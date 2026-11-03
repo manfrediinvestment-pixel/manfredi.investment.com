@@ -596,7 +596,7 @@
   <p class="footnote">Fuentes: 10-K de Apple; pares según los informes de MSFT (1T FY2027) y GOOGL (3T 2026) de este desk. Las cifras de Meta y Amazon no se actualizaron con sus reportes de fines de octubre de 2026.</p>
   <div class="chartbox">
     <canvas id="capexChart" height="280"></canvas>
-    <p class="chartcap">Capex anual de Apple (real, FY2026) y piso de la guía de cada par (MSFT: año fiscal 2027) contra el resto de las mega-caps tecnológicas. Escala logarítmica por la magnitud de la brecha.</p>
+    <p class="chartcap">Capex anual de Apple (real, FY2026) y piso de la guía de cada par (MSFT: año fiscal 2027) contra el resto de las mega-caps tecnológicas.</p>
   </div>
   <p>
     Esta divergencia sigue siendo la decisión estratégica más importante de Apple. La lectura optimista es que no necesita
@@ -1237,7 +1237,7 @@
     ctx.strokeStyle = PALETTE.navy;
     ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(W-padR, padT+plotH); ctx.stroke();
 
-    series.forEach(function(s){
+    series.forEach(function(s, si){
       ctx.strokeStyle = s.color; ctx.lineWidth = 2.2;
       ctx.beginPath();
       s.values.forEach(function(v,i){
@@ -1250,6 +1250,16 @@
         ctx.fillStyle = s.color;
         ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
       });
+      if(opts.pointLabels){
+        var slotL = plotW/(labels.length-1);
+        ctx.fillStyle = s.color === PALETTE.blueLight ? PALETTE.blue : s.color;
+        ctx.font = (slotL < 46 ? '8.5px' : '10px') + ' "IBM Plex Mono", monospace';
+        ctx.textAlign = 'center';
+        s.values.forEach(function(v,i){
+          var x = scaleX(i), y = scaleY(v);
+          ctx.fillText(v.toFixed(1)+'%', x, si===0 ? y-8 : y+15);
+        });
+      }
     });
 
     // x labels
@@ -1300,14 +1310,14 @@
       series:[
         {name:'Margen bruto', color:PALETTE.navy, values:[46.9,47.1,46.5,47.2,48.2,49.3,50.1,47.9]},
         {name:'Margen operativo', color:PALETTE.blueLight, values:[34.5,31.0,30.0,31.6,35.4,32.3,32.6,31.1]}
-      ]
+      ],
+      pointLabels:true
     });
 
     drawVBars(document.getElementById('capexChart'), {
       labels:['AAPL FY26','META','GOOGL','AMZN','MSFT FY27'],
       values:[9.04,125,195,200,255],
       colors:[PALETTE.red,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight],
-      log:true,
       valueFmt:function(v){ return '$'+v.toFixed(0)+'B'; }
     });
 
