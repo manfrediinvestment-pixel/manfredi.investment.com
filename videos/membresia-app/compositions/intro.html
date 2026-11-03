@@ -1,0 +1,123 @@
+<template id="intro-template">
+  <div id="root" data-composition-id="intro" data-start="0" data-duration="4.6" data-width="1920" data-height="1080">
+    <style>
+      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+      
+    </style>
+    <div class="bg"></div><div class="grid"></div><div class="halo"></div>
+
+      <div class="pw">
+      <div class="phone" id="intro-phone">
+        <div class="bezel"></div>
+        <div class="screen" id="intro-screen">
+          <div class="app"></div>
+          <div id="intro-home" style="position:absolute;inset:0;background:
+            radial-gradient(70% 40% at 30% 18%, rgba(242,201,76,.22), transparent 70%),
+            radial-gradient(80% 50% at 90% 70%, rgba(64,128,232,.35), transparent 70%),
+            linear-gradient(180deg,#132b52,#0a1630 60%,#071022);">
+            <div style="position:absolute;top:120px;width:100%;text-align:center;font:400 96px/1 'DM Serif';color:#f6f8fc;letter-spacing:-.02em">9:41</div>
+            <div style="position:absolute;top:226px;width:100%;text-align:center;font:500 17px/1 'Plex Sans';color:#ead9a4">Lunes 3 de noviembre</div>
+            <div id="intro-icon" style="position:absolute;left:149px;top:521px;width:78px;height:78px;border-radius:20px;overflow:hidden;
+              background:linear-gradient(160deg,#16294f,#0a1430);border:1px solid rgba(242,201,76,.35);box-shadow:0 18px 40px -12px rgba(0,0,0,.7);
+              display:flex;align-items:center;justify-content:center"><img src="assets/img/emblem.svg" style="width:58px;height:58px" alt=""></div>
+            <div id="intro-iconlbl" style="position:absolute;top:610px;width:100%;text-align:center;font:500 14px/1 'Plex Sans';color:#f6f8fc">Manfredi</div>
+          </div>
+          <div id="intro-launch" style="position:absolute;left:149px;top:521px;width:78px;height:78px;border-radius:20px;opacity:0;
+            background:linear-gradient(180deg,#0c1a33,#081224 60%,#070f1e);transform-origin:39px 39px"></div>
+          <div id="intro-splash" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;opacity:0">
+            <img src="assets/img/emblem.svg" style="width:112px;height:112px" alt="">
+            <div style="font:400 30px/1 'DM Serif';color:#f6f8fc">Manfredi <em style="color:#f7dc8a">Investment</em></div>
+          </div>
+          <div id="intro-chrome" style="position:absolute;inset:0;opacity:0">
+            <div class="ahead"><div class="brand"><img src="assets/img/emblem.svg" alt="">Manfredi <em>Investment</em></div><div class="av">IM</div></div>
+            <div class="tabs" id="intro-tabs"><div class="pill" id="intro-pill" style="left:4.67px"></div><div class="tab on"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg>Informes</div><div class="tab"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H10l-6 4z"/><path d="M9 10.5h6"/></svg>Warren IA</div><div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Pedidos</div></div>
+          </div>
+          <div class="sbar"><span>9:41</span><span class="ic"><b style="height:5px"></b><b style="height:8px"></b><b style="height:11px"></b><b style="height:14px"></b><span class="bat"></span></span></div>
+          <div class="island"></div>
+          <div class="homeind"></div>
+          <div class="touch" id="intro-touch"></div>
+        </div>
+      </div>
+      </div>
+      <div class="side side-l" id="intro-sl">
+        <div class="kick" id="intro-k">Manfredi Investment<i></i></div>
+        <div class="ttl"><span class="ln" id="intro-l1">Todo el</span><span class="ln" id="intro-l2">análisis,</span></div>
+      </div>
+      <div class="side side-r" id="intro-sr">
+        <div class="kick" id="intro-kr"><i></i>Manfredi Pro</div>
+        <div class="ttl"><span class="ln" id="intro-r1"><em>en tu</em></span><span class="ln" id="intro-r2"><em>bolsillo.</em></span></div>
+      </div>
+    <div class="grain"></div>
+    <script>
+      (function () {
+      const R = document.querySelector('[data-composition-id="intro"]');
+      const tl = gsap.timeline({ paused: true });
+      const TAB0 = 0;
+      const DUR = 4.6;
+      const TABX = [4.67, 122.0, 239.33];
+
+      const $ = (s) => R.querySelector(s);
+      function sidesIn(t0) {
+        tl.fromTo(["#intro-k", "#intro-l1", "#intro-l2", "#intro-pr", "#intro-nt"], { opacity: 0, y: 70, filter: "blur(14px)" },
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "expo.out", stagger: 0.07 }, t0);
+        tl.fromTo("#intro-kr", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: "expo.out" }, t0 + 0.1);
+      }
+      function featsIn(t0, step) {
+        R.querySelectorAll("#intro-sr li").forEach((li, i) => {
+          tl.fromTo(li, { opacity: 0, x: 60, filter: "blur(10px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, t0 + i * step);
+          tl.fromTo(li.querySelector(".ck"), { scale: 0.3 }, { scale: 1, duration: 0.45, ease: "back.out(2.6)" }, t0 + i * step + 0.06);
+        });
+      }
+      function sidesOut(t) {
+        tl.to(["#intro-sl", "#intro-sr"], { y: -160, opacity: 0, filter: "blur(18px)", duration: 0.3, ease: "power3.in" }, t);
+      }
+      function pageIn(sel, t) { tl.fromTo(sel, { x: 376 }, { x: 0, duration: 0.6, ease: "expo.out" }, t); }
+      function pageOut(sel, t) { tl.to(sel, { x: -376, opacity: 0.2, duration: 0.3, ease: "power3.in" }, t); }
+      function tap(x, y, t) {
+        const el = "#intro-touch";
+        tl.set(el, { x: x, y: y }, t - 0.3);
+        tl.fromTo(el, { opacity: 0, scale: 1.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power2.out", immediateRender: false }, t - 0.26);
+        tl.to(el, { scale: 0.78, duration: 0.08, ease: "power2.in" }, t - 0.04);
+        tl.to(el, { scale: 1.35, opacity: 0, duration: 0.32, ease: "power2.out" }, t + 0.05);
+      }
+      function at(sel) {  // centro de un elemento en coordenadas de la pantalla del celular (sin transforms)
+        let el = R.querySelector(sel), x = el.offsetWidth / 2, y = el.offsetHeight / 2;
+        const scr = R.querySelector("#intro-screen");
+        while (el && el !== scr) { x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
+        return [x, y];
+      }
+      const pillEl = R.querySelector("#intro-pill");
+      if (pillEl) tl.set(pillEl, { x: TABX[TAB0] - TABX[0] }, 0);
+      function tabTo(i, t) {
+        tl.to("#intro-pill", { x: TABX[i] - TABX[0], duration: 0.42, ease: "back.out(1.6)" }, t);
+        R.querySelectorAll("#intro-tabs .tab").forEach((tb, k) => {
+          tl.to(tb, { color: k === i ? "#f2c94c" : "#ead9a4", duration: 0.2, ease: "none" }, t + 0.05);
+        });
+      }
+      function drift(deg) {  // giro 3D suave que vuelve a 0 justo al final (el corte con la escena siguiente no se nota)
+        tl.fromTo("#intro-phone", { rotationY: 0, y: 0 }, { rotationY: deg, y: -10, duration: DUR / 2, ease: "sine.inOut", transformPerspective: 2000 }, 0);
+        tl.to("#intro-phone", { rotationY: 0, y: 0, duration: DUR / 2, ease: "sine.inOut" }, DUR / 2);
+      }
+
+
+      // cuadro 0 = portada: títulos ya legibles, se terminan de asentar
+      tl.fromTo("#intro-phone", { y: 60, rotationX: 14, scale: 0.96 }, { y: 0, rotationX: 0, scale: 1, duration: 1.1, ease: "expo.out", transformPerspective: 1600 }, 0);
+      tl.fromTo(["#intro-k", "#intro-l1", "#intro-l2"], { y: 18 }, { y: 0, duration: 0.9, ease: "expo.out", stagger: 0.08 }, 0);
+      tl.fromTo(["#intro-kr", "#intro-r1", "#intro-r2"], { y: 18 }, { y: 0, duration: 0.9, ease: "expo.out", stagger: 0.08 }, 0);
+      tl.fromTo("#intro-icon", { scale: 1 }, { scale: 1.08, duration: 0.5, ease: "sine.inOut", yoyo: true, repeat: 1 }, 0.4);
+      // toque en el ícono y la app se abre desde el ícono
+      tap(188, 560, 1.5);
+      tl.to("#intro-icon", { scale: 0.86, duration: 0.08, ease: "power2.in" }, 1.46);
+      tl.set("#intro-launch", { opacity: 1 }, 1.58);
+      tl.fromTo("#intro-launch", { scale: 1, borderRadius: 20 }, { scale: 13, borderRadius: 4, duration: 0.5, ease: "expo.inOut" }, 1.58);
+      tl.fromTo("#intro-splash", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.45, ease: "expo.out" }, 1.98);
+      tl.to("#intro-splash", { opacity: 0, scale: 1.06, filter: "blur(8px)", duration: 0.35, ease: "power2.in" }, 2.85);
+      tl.to("#intro-chrome", { opacity: 1, duration: 0.3, ease: "power2.out" }, 3.05);
+      tl.fromTo("#intro-tabs", { y: 120 }, { y: 0, duration: 0.6, ease: "expo.out" }, 3.05);
+      sidesOut(3.95);
+
+      window.__timelines["intro"] = tl;
+      })();
+    </script>
+  </div>
+</template>

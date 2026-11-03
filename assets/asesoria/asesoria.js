@@ -24,17 +24,6 @@
   var sec = document.getElementById('asesoria');
   if (!sec) return;
 
-  // ── Próximamente: el público ve la tapa; la sección completa solo con ?preview=asesoria ──
-  var PREVIEW_KEY = 'mf_asesoria_preview', preview = false;
-  try {
-    if (/[?&]preview=asesoria\b/.test(location.search)) localStorage.setItem(PREVIEW_KEY, '1');
-    preview = localStorage.getItem(PREVIEW_KEY) === '1';
-  } catch (e) { preview = /[?&]preview=asesoria\b/.test(location.search); }
-  if (!preview) {
-    sec.classList.add('as-is-soon');
-    var soon = sec.querySelector('.as-soon'); if (soon) soon.hidden = false;
-    return;
-  }
   var $ = function (s, r) { return (r || sec).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || sec).querySelectorAll(s)); };
   var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;

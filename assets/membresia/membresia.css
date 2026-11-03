@@ -1,0 +1,179 @@
+/* Membresía: sección de la home (#membresia) y cartel de pago (#paymentOverlay).
+   Tres planes simétricos (Gratis · Manfredi Pro · Asesoría): nombre, precio, botón y
+   lista quedan a la misma altura en las tres columnas (CSS subgrid).
+   Reglas del proyecto: nada de texto gris (blanco + champagne), líneas finas, dorado apagado. */
+:root {
+  --mb-ink: #f3f6fb;
+  --mb-champ: #e9d3a0;
+  --mb-champ2: #f3e3bd;
+  --mb-gold-a: #c9a24f;
+  --mb-gold-b: #e6cb8a;
+  --mb-line: rgba(255,255,255,.09);
+  --mb-line-c: rgba(233,211,160,.26);
+  --mb-ease: cubic-bezier(.22,1,.36,1);
+  --mb-serif: 'DM Serif Display', Georgia, serif;
+  --mb-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --mb-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+}
+
+/* ───────── sello de Mercado Pago ───────── */
+.mb-mp { display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 11px 0 8px; border-radius: 999px; background: #fff; flex-shrink: 0;
+  font: 700 12.5px/1 var(--mb-sans); letter-spacing: -.01em; color: #2d3277; white-space: nowrap; }
+.mb-mp svg { width: 22px; height: 22px; color: #00b1ea; }
+.mb-mp b { font-weight: 700; color: #00b1ea; }
+
+/* ───────── los tres planes ───────── */
+/* 6 filas compartidas: nombre · frase · precio · aclaración · botón · lista */
+.mb-plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(6, auto); column-gap: 18px; }
+.mb-plan { position: relative; display: grid; grid-row: span 6; grid-template-rows: subgrid; row-gap: 0;
+  padding: 32px 30px 32px; border: 1px solid var(--mb-line); border-radius: 14px; background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.008)); color: var(--mb-ink);
+  transition: border-color .25s ease, transform .35s var(--mb-ease); }
+.mb-plan--pro { border-color: var(--mb-line-c); background: radial-gradient(120% 60% at 50% 0%, rgba(233,211,160,.11), transparent 62%), linear-gradient(180deg, rgba(233,211,160,.05), rgba(233,211,160,.012)); }
+.mb-plan--pro::before { content: ''; position: absolute; left: 22px; right: 22px; top: -1px; height: 1px; background: linear-gradient(90deg, transparent, var(--mb-gold-b) 50%, transparent); }
+
+/* fila 1: nombre + etiqueta */
+.mb-plan__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 34px; margin: 0; }
+.mb-plan__nm { margin: 0; font: 400 29px/1.1 var(--mb-serif); letter-spacing: -.012em; color: var(--mb-ink); white-space: nowrap; }
+.mb-plan__nm em { font-style: italic; color: var(--mb-champ2); }
+.mb-plan--pro .mb-plan__nm em { background: linear-gradient(180deg, #f6e6bf, #d8b46a); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: .06em; }
+.mb-plan__tag { display: inline-flex; align-items: center; gap: 6px; font: 500 9.5px/1 var(--mb-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--mb-champ2);
+  border: 1px solid var(--mb-line-c); border-radius: 999px; padding: 6px 10px; white-space: nowrap; }
+.mb-plan__tag img { width: 12px; height: 12px; border-radius: 3px; }
+/* fila 2: frase */
+.mb-plan__lede { margin: 8px 0 26px; font: italic 400 16.5px/1.4 'Newsreader', Georgia, serif; color: var(--mb-champ); }
+/* fila 3: precio */
+.mb-plan__pr { display: flex; align-items: baseline; gap: 8px; margin: 0; }
+.mb-plan__cur { align-self: flex-start; margin-top: 7px; font: 500 12px/1 var(--mb-mono); letter-spacing: .12em; color: var(--mb-champ2); }
+.mb-plan__amt, .mb-plan__pr .pay-price-amount { font: 400 58px/.95 var(--mb-serif); letter-spacing: -.02em; color: var(--mb-ink); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.mb-plan__amt--w { font-size: 40px; line-height: 1.38; }
+.mb-plan__amt .mi-was { font-size: .5em; margin-right: 4px; color: var(--mb-champ); }
+.mb-plan--pro .mb-plan__amt, .mb-plan--pro .pay-price-amount { color: var(--mb-gold-b); }
+.mb-plan__per, .mb-plan__pr .pay-price-period { font: 400 15px/1 'Newsreader', Georgia, serif; font-style: italic; color: var(--mb-ink); }
+/* fila 4: aclaración */
+.mb-plan__fine { margin: 12px 0 24px; font: 400 12.5px/1.5 'Instrument Sans', var(--mb-sans); letter-spacing: .01em; color: var(--mb-champ); }
+/* fila 4: botón */
+.mb-btn { position: relative; display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; height: 46px; padding: 0 16px; cursor: pointer; align-self: start;
+  font: 600 14px/1 'Instrument Sans', var(--mb-sans); letter-spacing: .01em; text-decoration: none; border-radius: 999px; overflow: hidden; box-sizing: border-box;
+  transition: transform .2s var(--mb-ease), box-shadow .2s ease, border-color .2s ease; }
+.mb-btn--gold { border: 0; color: #0b1322; background: linear-gradient(180deg, var(--mb-gold-b), var(--mb-gold-a)); box-shadow: 0 0 0 1px rgba(255,240,205,.35) inset; }
+.mb-btn--gold::after { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%); transform: translateX(-100%); transition: transform .7s var(--mb-ease); }
+.mb-btn--line { border: 1px solid rgba(255,255,255,.2); background: transparent; color: var(--mb-ink); }
+.mb-btn[disabled], .mb-btn.is-current { cursor: default; border: 1px solid var(--mb-line); color: var(--mb-champ); background: transparent; box-shadow: none; }
+.mb-btn--gold:disabled:not(.is-current) { opacity: .7; cursor: wait; }
+.mb-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .mb-plan:hover { border-color: rgba(255,255,255,.16); transform: translateY(-2px); }
+  .mb-plan--pro:hover { border-color: rgba(233,211,160,.42); }
+  .mb-btn--gold:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 0 0 1px rgba(255,240,205,.45) inset, 0 10px 26px -10px rgba(201,162,79,.55); }
+  .mb-btn--gold:not(:disabled):hover::after { transform: translateX(100%); }
+  .mb-btn--line:not(:disabled):not(.is-current):hover { border-color: var(--mb-champ); }
+}
+.mb-btn:not(:disabled):active { transform: scale(.985); }
+.mb-btn:focus-visible { outline: 1px solid var(--mb-champ); outline-offset: 3px; }
+/* fila 6: lo que incluye (5 puntos en cada plan) */
+.mb-plan__list { list-style: none; margin: 24px 0 0; padding: 22px 0 0; border-top: 1px solid var(--mb-line); display: flex; flex-direction: column; gap: 13px; }
+.mb-plan__list li { display: grid; grid-template-columns: 16px 1fr; gap: 10px; font: 400 14.5px/1.45 'Instrument Sans', var(--mb-sans); color: var(--mb-ink); }
+.mb-plan__list li::before { content: ''; width: 9px; height: 5px; margin: 6px 0 0 2px; border-left: 1.4px solid var(--mb-champ); border-bottom: 1.4px solid var(--mb-champ); transform: rotate(-45deg); }
+.mb-plan__list li.mb-plan__all { color: var(--mb-champ2); font-style: italic; font-family: 'Newsreader', Georgia, serif; font-size: 15.5px; }
+
+/* ───────── HOME: sección #membresia ───────── */
+.htx-member { background: #0a0f1e; padding: 0; border-top: 1px solid var(--mb-line); }
+.mbr { max-width: 1200px; margin: 0 auto; padding: 80px 32px 76px; color: var(--mb-ink); }
+.mbr__head { text-align: center; margin: 0 auto 36px; max-width: 760px; }
+.mbr__t { margin: 0; font: 400 clamp(30px, 3.2vw, 40px)/1.1 var(--mb-serif); letter-spacing: -.012em; color: var(--mb-ink); }
+.mbr__t em { font-style: italic; color: var(--mb-champ2); }
+.mbr__s { margin: 14px auto 0; max-width: 56ch; font: 400 15px/1.6 var(--mb-sans); color: var(--mb-ink); }
+
+/* video de Manfredi Pro (16:9) */
+.mbr__film { position: relative; margin: 0 0 40px; aspect-ratio: 16 / 9; border: 1px solid var(--mb-line-c); background: #07101e; overflow: hidden; }
+.mbr__film video { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.mbr__pay { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px 20px; margin-top: 28px; font: 400 13px/1.4 var(--mb-sans); color: var(--mb-ink); text-align: center; }
+.mbr__pay .sep { width: 1px; height: 14px; background: var(--mb-line-c); }
+.mbr__pay a { color: var(--mb-champ2); text-decoration: none; border-bottom: 1px solid var(--mb-line-c); }
+.mbr__pay a:hover { border-color: var(--mb-champ); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .mbr.mb-pre .mbr__head, .mbr.mb-pre .mbr__film, .mbr.mb-pre .mb-plan, .mbr.mb-pre .mbr__pay { opacity: 0; transform: translateY(10px); }
+  .mbr.mb-in .mbr__head, .mbr.mb-in .mbr__film, .mbr.mb-in .mb-plan, .mbr.mb-in .mbr__pay { opacity: 1; transform: none; transition: opacity .7s var(--mb-ease), transform .7s var(--mb-ease); }
+  .mbr.mb-in .mbr__film { transition-delay: .08s; }
+  .mbr.mb-in .mb-plan:nth-child(1) { transition-delay: .16s; }
+  .mbr.mb-in .mb-plan:nth-child(2) { transition-delay: .22s; }
+  .mbr.mb-in .mb-plan:nth-child(3) { transition-delay: .28s; }
+  .mbr.mb-in .mbr__pay { transition-delay: .34s; }
+}
+
+/* ───────── CARTEL DE PAGO (#paymentOverlay) ───────── */
+.payment-overlay { position: fixed; inset: 0; z-index: 3000; display: none !important; padding: 24px;
+  background: rgba(4,7,14,.8); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.payment-overlay.open { display: flex !important; align-items: center; justify-content: center; }
+.payment-modal-box { position: relative; width: 100%; max-width: 1120px; max-height: calc(100vh - 48px); overflow: auto; overscroll-behavior: contain;
+  padding: 40px 40px 28px; color: var(--mb-ink); border: 1px solid var(--mb-line-c);
+  background: radial-gradient(90% 60% at 50% -10%, rgba(233,211,160,.08), transparent 60%), #0b1322;
+  box-shadow: 0 40px 100px -20px rgba(0,0,0,.7); scrollbar-width: thin; scrollbar-color: rgba(233,211,160,.25) transparent; }
+.payment-overlay.open .payment-modal-box { animation: mbIn .38s var(--mb-ease) both; }
+@keyframes mbIn { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .payment-overlay.open .payment-modal-box { animation: none; } }
+
+.pay-close { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+  background: transparent; border: 1px solid transparent; border-radius: 50%; color: var(--mb-ink); font-size: 20px; line-height: 1; transition: border-color .15s ease; }
+.pay-close:hover { border-color: var(--mb-line-c); }
+.pay-head { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; margin-bottom: 30px; }
+.pay-mark { width: 44px; height: 44px; margin: 0; }
+.pay-mark svg { width: 100%; height: 100%; }
+.payment-modal-box h2 { margin: 0; font: 400 34px/1.15 var(--mb-serif); letter-spacing: -.012em; color: var(--mb-ink); }
+.payment-modal-box h2 em { font-style: italic; color: var(--mb-champ2); }
+
+.pay-trust { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px 14px; margin-top: 24px; text-align: center; }
+.pay-trust p { margin: 0; font: 400 13px/1.5 var(--mb-sans); color: var(--mb-ink); }
+.pay-trust p b { font-weight: 600; }
+.pay-note { margin: 12px 0 0; text-align: center; font: 400 12px/1.6 var(--mb-sans); color: var(--mb-champ); }
+.pay-note a { color: var(--mb-champ2); text-decoration: none; border-bottom: 1px solid var(--mb-line-c); }
+.pay-note a:hover { border-color: var(--mb-champ); }
+
+/* código de descuento / prepagos */
+.pay-discount-toggle { display: block; margin: 8px auto 0; padding: 4px 0; background: none; border: 0; cursor: pointer;
+  font: 400 12px/1.4 var(--mb-sans); color: var(--mb-champ2); text-decoration: underline; text-decoration-color: var(--mb-line-c); text-underline-offset: 3px; }
+.pay-discount-toggle:hover { text-decoration-color: var(--mb-champ); }
+.pay-discount-panel { max-width: 520px; margin: 16px auto 0; padding-top: 18px; border-top: 1px solid var(--mb-line); }
+.pay-discount-panel.hidden { display: none; }
+.pay-plan-label { font: 500 10.5px/1 var(--mb-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--mb-champ); margin-bottom: 12px; }
+.pay-plan-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-bottom: 14px; }
+.pay-plan-pill { position: relative; padding: 11px 6px; text-align: center; cursor: pointer; background: transparent; border: 1px solid var(--mb-line); border-radius: 0; transition: border-color .15s ease, background-color .15s ease; }
+.pay-plan-pill + .pay-plan-pill { margin-left: -1px; }
+.pay-plan-pill:hover { border-color: var(--mb-line-c); z-index: 1; }
+.pay-plan-pill.selected { border-color: var(--mb-champ); background: rgba(233,211,160,.06); z-index: 2; }
+.pay-plan-pill .pp-meses { display: block; font: 600 13px/1.2 var(--mb-sans); color: var(--mb-ink); }
+.pay-plan-pill .pp-usd { display: block; margin-top: 3px; font: 500 11.5px/1.2 var(--mb-mono); color: var(--mb-champ); font-variant-numeric: tabular-nums; }
+.pay-discount-row { display: flex; gap: 8px; margin-bottom: 12px; }
+#payDiscountCode { flex: 1; min-width: 0; height: 42px; padding: 0 12px; background: transparent; border: 1px solid rgba(255,255,255,.16); border-radius: 0;
+  font: 500 13px/1 var(--mb-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--mb-ink); }
+#payDiscountCode::placeholder { color: var(--mb-champ); font-family: var(--mb-sans); letter-spacing: normal; text-transform: none; }
+#payDiscountCode:focus { outline: none; border-color: var(--mb-champ); }
+.pay-discount-price { min-height: 18px; margin-bottom: 14px; font: 400 13px/1.4 var(--mb-sans); color: var(--mb-ink); }
+.pay-discount-price strong { color: var(--mb-champ2); font-variant-numeric: tabular-nums; }
+.pay-discount-price .pdp-before { margin-right: 6px; text-decoration: line-through; font-variant-numeric: tabular-nums; }
+.pay-discount-error { min-height: 16px; margin-top: 10px; text-align: center; font: 400 12px/1.4 var(--mb-sans); color: #f2877a; }
+
+/* ───────── responsive ───────── */
+@media (max-width: 1040px) {
+  .mbr { padding: 56px 24px 52px; }
+  .mb-plans { grid-template-columns: 1fr; grid-template-rows: none; row-gap: 14px; }
+  .mb-plan { grid-row: auto; grid-template-rows: none; display: flex; flex-direction: column; }
+  .mb-plan--pro { order: -1; }
+  .payment-modal-box { max-width: 560px; }
+}
+@media (max-width: 720px) {
+  .mbr { padding: 48px 20px 44px; }
+  .mbr__film { margin-bottom: 28px; }
+  .mbr__pay .sep { display: none; }
+  .payment-overlay { padding: 0; align-items: flex-end !important; }
+  .payment-modal-box { max-height: 94vh; padding: 30px 18px 22px; border-left: 0; border-right: 0; border-bottom: 0; }
+  .payment-overlay.open .payment-modal-box { animation-name: mbUp; }
+  @keyframes mbUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .mb-plan { padding: 26px 22px 26px; }
+  .mb-plan__amt, .mb-plan__pr .pay-price-amount { font-size: 50px; }
+  .pay-plan-grid { grid-template-columns: repeat(2, 1fr); }
+  .pay-plan-pill:nth-child(3) { margin-left: 0; }
+  .pay-plan-pill:nth-child(n+3) { margin-top: -1px; }
+}

@@ -37,12 +37,13 @@
 <link rel="stylesheet" href="assets/portfolio/ratios.css?v=20261012" />
 <link rel="stylesheet" href="assets/pro/pro.css?v=20261028l" />
 <link rel="stylesheet" href="assets/comunidad/chat.css?v=20261028m" />
-<link rel="stylesheet" href="assets/asesoria/asesoria.css?v=20261020o" />
+<link rel="stylesheet" href="assets/asesoria/asesoria.css?v=20261103a" />
 <link rel="stylesheet" href="assets/calendario/calendario.css?v=20261102b" />
 <link rel="stylesheet" href="assets/informes/estanteria.css?v=20261103d" />
 <link rel="stylesheet" href="assets/portfolio/portfolio.css?v=20261010z" />
 <link rel="stylesheet" href="assets/lector/lector.css?v=20261010z" />
 <link rel="stylesheet" href="assets/warren/warren.css?v=20261010z" />
+<link rel="stylesheet" href="assets/membresia/membresia.css?v=20261103a" />
 <script>
   // Promo de lanzamiento de Warren: USD 10 por mes hasta el 31-oct-2026 (hora
   // Argentina); despues vuelve a USD 15 solo. Misma fecha en workers/memberships.
@@ -3031,7 +3032,7 @@
 
                 window._authChecked = true;
                 window._currentUser = user;
-            if (typeof window._miCheckMembership === 'function') window._miCheckMembership();
+            if (typeof window._miCheckMembership === 'function') window._miCheckMembership(); document.dispatchEvent(new Event('mi:auth'));
             if (typeof window._miOnAuth === 'function') window._miOnAuth(user);
             window.dispatchEvent(new CustomEvent('mi:auth')); // espacio de autor y Panel vuelven a preguntar al worker
             if (typeof window._npCuenta === 'function') window._npCuenta(userData);
@@ -3051,7 +3052,7 @@
           el.style.filter = ''; el.style.opacity = ''; el.style.pointerEvents = ''; el.style.userSelect = '';
         });
         document.querySelectorAll('.mi-paywall-overlay').forEach(function(el) { el.remove(); });
-        if (typeof window._miCheckMembership === 'function') window._miCheckMembership();
+        if (typeof window._miCheckMembership === 'function') window._miCheckMembership(); document.dispatchEvent(new Event('mi:auth'));
         if (typeof window._miOnAuth === 'function') window._miOnAuth(null);
         window.dispatchEvent(new CustomEvent('mi:auth')); // espacio de autor y Panel vuelven a preguntar al worker
         if (typeof window._npCuenta === 'function') window._npCuenta(null);
@@ -3707,6 +3708,7 @@
 </head>
 <body>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="mpLogo" viewBox="0 0 24 24"><path fill="currentColor" d="M11.115 16.479a.93.927 0 0 1-.939-.886c-.002-.042-.006-.155-.103-.155-.04 0-.074.023-.113.059-.112.103-.254.206-.46.206a.816.814 0 0 1-.305-.066c-.535-.214-.542-.578-.521-.725.006-.038.007-.08-.02-.11l-.032-.03h-.034c-.027 0-.055.012-.093.039a.788.786 0 0 1-.454.16.7.699 0 0 1-.253-.05c-.708-.27-.65-.928-.617-1.126.005-.041-.005-.072-.03-.092l-.05-.04-.047.043a.728.726 0 0 1-.505.203.73.728 0 0 1-.732-.725c0-.4.328-.722.732-.722.364 0 .675.27.721.63l.026.195.11-.165c.01-.018.307-.46.852-.46.102 0 .21.016.316.05.434.13.508.52.519.68.008.094.075.1.09.1.037 0 .064-.024.083-.045a.746.744 0 0 1 .54-.225c.128 0 .263.03.402.09.69.293.379 1.158.374 1.167-.058.144-.061.207-.005.244l.027.013h.02c.03 0 .07-.014.134-.035.093-.032.235-.08.367-.08a.944.942 0 0 1 .94.93.936.934 0 0 1-.94.928zm7.302-4.171c-1.138-.98-3.768-3.24-4.481-3.77-.406-.302-.685-.462-.928-.533a1.559 1.554 0 0 0-.456-.07c-.182 0-.376.032-.58.095-.46.145-.918.505-1.362.854l-.023.018c-.414.324-.84.66-1.164.73a1.986 1.98 0 0 1-.43.049c-.362 0-.687-.104-.81-.258-.02-.025-.007-.066.04-.125l.008-.008 1-1.067c.783-.774 1.525-1.506 3.23-1.545h.085c1.062 0 2.12.469 2.24.524a7.03 7.03 0 0 0 3.056.724c1.076 0 2.188-.263 3.354-.795a9.135 9.11 0 0 0-.405-.317c-1.025.44-2.003.66-2.946.66-.962 0-1.925-.229-2.858-.68-.05-.022-1.22-.567-2.44-.57-.032 0-.065 0-.096.002-1.434.033-2.24.536-2.782.976-.528.013-.982.138-1.388.25-.361.1-.673.186-.979.185-.125 0-.35-.01-.37-.012-.35-.01-2.115-.437-3.518-.962-.143.1-.28.203-.415.31 1.466.593 3.25 1.053 3.812 1.089.157.01.323.027.491.027.372 0 .744-.103 1.104-.203.213-.059.446-.123.692-.17l-.196.194-1.017 1.087c-.08.08-.254.294-.14.557a.705.703 0 0 0 .268.292c.243.162.677.27 1.08.271.152 0 .297-.015.43-.044.427-.095.874-.448 1.349-.82.377-.296.913-.672 1.323-.782a1.494 1.49 0 0 1 .37-.05.611.61 0 0 1 .095.005c.27.034.533.125 1.003.472.835.62 4.531 3.815 4.566 3.846.002.002.238.203.22.537-.007.186-.11.352-.294.466a.902.9 0 0 1-.484.15.804.802 0 0 1-.428-.124c-.014-.01-1.28-1.157-1.746-1.543-.074-.06-.146-.115-.22-.115a.122.122 0 0 0-.096.045c-.073.09.01.212.105.294l1.48 1.47c.002 0 .184.17.204.395.012.244-.106.447-.35.606a.957.955 0 0 1-.526.171.766.764 0 0 1-.42-.127l-.214-.206a21.035 20.978 0 0 0-1.08-1.009c-.072-.058-.148-.112-.221-.112a.127.127 0 0 0-.094.038c-.033.037-.056.103.028.212a.698.696 0 0 0 .075.083l1.078 1.198c.01.01.222.26.024.511l-.038.048a1.18 1.178 0 0 1-.1.096c-.184.15-.43.164-.527.164a.8.798 0 0 1-.147-.012c-.106-.018-.178-.048-.212-.089l-.013-.013c-.06-.06-.602-.609-1.054-.98-.059-.05-.133-.11-.21-.11a.128.128 0 0 0-.096.042c-.09.096.044.24.1.293l.92 1.003a.204.204 0 0 1-.033.062c-.033.044-.144.155-.479.196a.91.907 0 0 1-.122.007c-.345 0-.712-.164-.902-.264a1.343 1.34 0 0 0 .13-.576 1.368 1.365 0 0 0-1.42-1.357c.024-.342-.025-.99-.697-1.274a1.455 1.452 0 0 0-.575-.125c-.146 0-.287.025-.42.075a1.153 1.15 0 0 0-.671-.564 1.52 1.515 0 0 0-.494-.085c-.28 0-.537.08-.767.242a1.168 1.165 0 0 0-.903-.43 1.173 1.17 0 0 0-.82.335c-.287-.217-1.425-.93-4.467-1.613a17.39 17.344 0 0 1-.692-.189 4.822 4.82 0 0 0-.077.494l.67.157c3.108.682 4.136 1.391 4.309 1.525a1.145 1.142 0 0 0-.09.442 1.16 1.158 0 0 0 1.378 1.132c.096.467.406.821.879 1.003a1.165 1.162 0 0 0 .415.08c.09 0 .179-.012.266-.034.086.22.282.493.722.668a1.233 1.23 0 0 0 .457.094c.122 0 .241-.022.355-.063a1.373 1.37 0 0 0 1.269.841c.37.002.726-.147.985-.41.221.121.688.341 1.163.341.06 0 .118-.002.175-.01.47-.059.689-.24.789-.382a.571.57 0 0 0 .048-.078c.11.032.234.058.373.058.255 0 .501-.086.75-.265.244-.174.418-.424.444-.637v-.01c.083.017.167.026.251.026.265 0 .527-.082.773-.242.48-.31.562-.715.554-.98a1.28 1.279 0 0 0 .978-.194 1.04 1.04 0 0 0 .502-.808 1.088 1.085 0 0 0-.16-.653c.804-.342 2.636-1.003 4.795-1.483a4.734 4.721 0 0 0-.067-.492 27.742 27.667 0 0 0-5.049 1.62zm5.123-.763c0 4.027-5.166 7.293-11.537 7.293-6.372 0-11.538-3.266-11.538-7.293 0-4.028 5.165-7.293 11.539-7.293 6.371 0 11.537 3.265 11.537 7.293zm.46.004c0-4.272-5.374-7.755-12-7.755S.002 7.277.002 11.55L0 12.004c0 4.533 4.695 8.203 11.999 8.203 7.347 0 12-3.67 12-8.204z"/></symbol>
     <symbol id="miMark" viewBox="0 0 100 100">
       <defs>
         <linearGradient id="miMarkNv" x1="0" y1="0" x2=".16" y2="1">
@@ -3852,7 +3854,7 @@
         <a href="#finanzas" onclick="miNavSheetClose();miOpenFinView('gastos');return false;">Gastos del mes</a>
         <a href="#finanzas" onclick="miNavSheetClose();miOpenFinView('calculadora');return false;">Calculadora de objetivos</a>
         <a href="#university" data-tab-target="university">University</a>
-        <a href="#asesoria" data-tab-target="asesoria" class="nav-sheet__gold">Asesor&iacute;a personalizada<span class="nav-pronto" title="Pr&oacute;ximamente" aria-hidden="true"></span></a>
+        <a href="#asesoria" data-tab-target="asesoria" class="nav-sheet__gold">Asesor&iacute;a personalizada</a>
       </div>
     </nav>
     <div class="nav-mega" id="navMore" aria-hidden="true">
@@ -3875,7 +3877,7 @@
         </a>
         <a class="nav-mega__card nav-mega__card--gold" href="#asesoria" data-tab-target="asesoria">
           <span class="nav-mega__t">Asesor&iacute;a personalizada</span>
-          <span class="nav-mega__d">Pr&oacute;ximamente: una charla uno a uno sobre tu patrimonio.</span>
+          <span class="nav-mega__d">Tu cartera, uno a uno, con tu cuenta en Balanz.</span>
         </a>
       </div>
     </div>
@@ -4104,10 +4106,6 @@
   .htx-cal2__src { font-size:12px; letter-spacing:0; text-transform:none; color:var(--htx-ink3); }
   .htx-cal2__newsempty { font-size:13px; color:var(--htx-ink3); padding:20px 0; }
 
-  /* membresia: el cartel (carrusel de 3 secciones) vive en assets/cartel/cartel.js, dentro de un Shadow DOM */
-  .htx-member { background:#0a0f1e; padding:40px 32px 44px; }
-  #mcHost { display:block; min-height:520px; }
-  @media (max-width:1040px) { .htx-member { padding:24px 14px 36px; } #mcHost { min-height:0; } }
 
   /* hover con movimiento solo en dispositivos con mouse */
   @media (hover:hover) and (pointer:fine) {
@@ -4192,14 +4190,67 @@
       </div>
     </div>
 
-    <!-- membresia: carrusel Warren IA / Informes / Portfolio (assets/cartel/cartel.js) -->
+    <!-- membresia: video "la membresía en la app" + 3 planes simétricos (assets/membresia/membresia.{css,js}; video en videos/membresia-app) -->
     <div class="htx-member" id="membresia">
-      <div id="mcHost">
-        <!-- Contenido de respaldo (se ve solo si el JS no carga; el componente lo reemplaza) -->
-        <h2 style="font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:24px;font-weight:600;color:var(--htx-ink);margin:0 0 10px">Membres&iacute;a Manfredi Investment</h2>
-        <p style="font-size:13.5px;line-height:1.6;color:var(--htx-ink2);max-width:60ch;margin:0 0 16px">Warren IA, nuestro asesor de inversiones con inteligencia artificial; los informes institucionales de cada acci&oacute;n, con cuatro m&eacute;todos de valuaci&oacute;n y fair value; y Manfredi Investment Portfolio, para armar tu cartera y ver sus ratios de riesgo. <span data-mi-precio="frase">USD 15 por mes</span>, cancel&aacute;s cuando quieras.</p>
-        <button type="button" class="htx-btn" onclick="openPaymentModal()">Suscribirme &rarr;</button>
-      </div>
+      <section class="mbr" aria-labelledby="mbrT">
+        <div class="mbr__head">
+          <h2 class="mbr__t" id="mbrT">Elegí cómo querés <em>invertir.</em></h2>
+          <p class="mbr__s">Seguí el mercado gratis, sumá el análisis con Manfredi Pro o armá tu cartera conmigo, uno a uno.</p>
+        </div>
+        <div class="mbr__film">
+          <video id="mbrFilm" src="assets/membresia/membresia-app.mp4" poster="assets/membresia/membresia-app.jpg" muted loop playsinline preload="none" aria-label="Video: Manfredi Pro en la app — el informe de Apple, Warren IA comparando Apple y Microsoft y el pedido de un informe de Boeing"></video>
+        </div>
+        <div class="mb-plans">
+          <article class="mb-plan mb-plan--free">
+            <div class="mb-plan__top"><h3 class="mb-plan__nm">Plan <em>Gratis</em></h3></div>
+            <p class="mb-plan__lede">Para seguir el mercado todos los días.</p>
+            <div class="mb-plan__pr"><span class="mb-plan__cur">USD</span><span class="mb-plan__amt">0</span><span class="mb-plan__per">para siempre</span></div>
+            <p class="mb-plan__fine">Sin tarjeta y sin vencimiento.</p>
+            <button type="button" class="mb-btn mb-btn--line" data-mb-free>Crear cuenta gratis</button>
+            <ul class="mb-plan__list">
+              <li>Mercados y dólares en vivo</li>
+              <li>Calendario económico y Noticias</li>
+              <li>Portfolio con rendimiento y riesgo</li>
+              <li>University: cursos y test de perfil</li>
+              <li>Chat de Mercados</li>
+            </ul>
+          </article>
+          <article class="mb-plan mb-plan--pro">
+            <div class="mb-plan__top"><h3 class="mb-plan__nm">Manfredi <em>Pro</em></h3><span class="mb-plan__tag" data-mb-tag="Recomendado">Recomendado</span></div>
+            <p class="mb-plan__lede">Para decidir con análisis de verdad.</p>
+            <div class="mb-plan__pr"><span class="mb-plan__cur">USD</span><span class="mb-plan__amt pay-price-amount">15</span><span class="mb-plan__per pay-price-period">por mes</span></div>
+            <p class="mb-plan__fine">Con Mercado Pago. Cancelás cuando quieras.</p>
+            <button type="button" class="mb-btn mb-btn--gold" data-mb-pro="Suscribirme">Suscribirme</button>
+            <ul class="mb-plan__list">
+              <li class="mb-plan__all">Todo lo del plan Gratis</li>
+              <li>Informes con fair value</li>
+              <li>Warren IA: 100 consultas por mes</li>
+              <li>1 informe a pedido por mes</li>
+              <li>Chats Pro con Ignacio y socios</li>
+            </ul>
+          </article>
+          <article class="mb-plan mb-plan--ase">
+            <div class="mb-plan__top"><h3 class="mb-plan__nm">Asesoría <em>1 a 1</em></h3><span class="mb-plan__tag mb-plan__tag--bz"><img src="assets/asesoria/balanz-mark.svg" alt="" width="12" height="12" />Balanz</span></div>
+            <p class="mb-plan__lede">Tu cartera, armada conmigo.</p>
+            <div class="mb-plan__pr"><span class="mb-plan__amt mb-plan__amt--w">Sin costo</span><span class="mb-plan__per">adicional</span></div>
+            <p class="mb-plan__fine">Como agente coproductor de Balanz.</p>
+            <a class="mb-btn mb-btn--line" href="#asesoria" data-mb-ase>Conocé la asesoría <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <ul class="mb-plan__list">
+              <li>Primera charla sin cargo</li>
+              <li>Tu perfil, objetivo y horizonte</li>
+              <li>Propuesta por escrito</li>
+              <li>Revisión cada trimestre</li>
+              <li>Consultas por mail o WhatsApp</li>
+            </ul>
+          </article>
+        </div>
+        <div class="mbr__pay">
+          <span class="mb-mp" aria-label="Mercado Pago"><svg aria-hidden="true"><use href="#mpLogo"/></svg>mercado <b>pago</b></span>
+          <span>Manfredi Pro se paga con tarjeta o dinero en tu cuenta de Mercado Pago.</span>
+          <i class="sep" aria-hidden="true"></i>
+          <a href="#" onclick="event.preventDefault();window.showLoginOverlay&amp;&amp;window.showLoginOverlay();">¿Ya sos socio? Iniciá sesión</a>
+        </div>
+      </section>
     </div>
 
     <!-- mercados ahora -->
@@ -4354,7 +4405,7 @@
     </div>
 
   </section>
-  <script src="assets/cartel/cartel.js?v=20261010z" defer></script>
+  <script src="assets/membresia/membresia.js?v=20261103a" defer></script>
   <script src="assets/promo/wall.js?v=20261010z" defer></script>
   <!-- ayuda: preguntas frecuentes + consulta al equipo (assets/ayuda/ayuda.js, Shadow DOM) -->
   <script src="assets/ayuda/ayuda.js" defer></script>
@@ -4373,7 +4424,7 @@
   <script src="assets/comunidad/tarjeta.js?v=20261028m" defer></script>
   <script src="assets/comunidad/chat.js?v=20261028n" defer></script>
   <script src="assets/pro/pro.js?v=20261028j" defer></script>
-  <script src="assets/asesoria/asesoria.js?v=20261020h" defer></script>
+  <script src="assets/asesoria/asesoria.js?v=20261103a" defer></script>
   <!-- cartel con los pasos para postularse como analista -->
   <script src="assets/analistas/postular.js?v=20261010a" defer></script>
   <script src="assets/calendario/calendario.js?v=20261102b" defer></script>
@@ -10725,7 +10776,7 @@
         <p class="as-eye">Asesor&iacute;a 1 a 1 &middot; Pr&oacute;ximamente</p>
         <h2 class="as-soon__h">Una persona. Tu&nbsp;cartera.<br /><em>Muy pronto.</em></h2>
         <p class="as-soon__p">Estoy terminando de preparar todo para acompa&ntilde;arte uno a uno, con tu cuenta en Balanz y tu perfil de inversor.</p>
-        <div class="as-soon__bz"><img class="as-bz" src="assets/asesoria/balanz-mark.svg" alt="" width="28" height="28" /><img class="as-logo" src="assets/asesoria/balanz.svg" alt="Balanz" width="84" height="16" /><span>Agente productor</span></div>
+        <div class="as-soon__bz"><img class="as-bz" src="assets/asesoria/balanz-mark.svg" alt="" width="28" height="28" /><img class="as-logo" src="assets/asesoria/balanz.svg" alt="Balanz" width="84" height="16" /><span>Agente coproductor</span></div>
         <a class="as-btn2" href="https://wa.me/5493416547126?text=Hola%20Ignacio%2C%20quiero%20saber%20cu%C3%A1ndo%20abre%20la%20asesor%C3%ADa." target="_blank" rel="noopener"><span>&iquest;Quer&eacute;s empezar antes? Escribime</span><i class="as-btn2__ic"><svg viewBox="0 0 16 16"><path d="M5 11l6-6M6 5h5v5"/></svg></i></a>
       </div>
     </div>
@@ -10750,7 +10801,7 @@
           <a class="as-btn2" href="#asesoria-cartera"><span>Ver mi cartera</span><i class="as-btn2__ic"><svg viewBox="0 0 16 16"><path d="M8 3v10M4 9l4 4 4-4"/></svg></i></a>
         </div>
         <dl class="as-cred">
-          <div class="as-cred__bz"><dt><img class="as-bz" src="assets/asesoria/balanz-mark.svg" alt="" width="28" height="28" /><img class="as-logo" src="assets/asesoria/balanz.svg" alt="Balanz" width="92" height="18" /></dt><dd>Agente productor</dd></div>
+          <div class="as-cred__bz"><dt><img class="as-bz" src="assets/asesoria/balanz-mark.svg" alt="" width="28" height="28" /><img class="as-logo" src="assets/asesoria/balanz.svg" alt="Balanz" width="92" height="18" /></dt><dd>Agente coproductor</dd></div>
           <div><dt>48</dt><dd>Informes publicados</dd></div>
           <div><dt>1 a 1</dt><dd>Atenci&oacute;n personal</dd></div>
         </dl>
@@ -10882,23 +10933,25 @@
             <div class="as-step__txt"><span class="as-step__n">04</span><h4>Propuesta y seguimiento</h4><p>Te paso una propuesta por escrito con el porqu&eacute; de cada decisi&oacute;n, y la revisamos peri&oacute;dicamente o cuando algo cambia.</p></div>
             <div class="as-scene" aria-hidden="true">
               <div class="as-ui as-prop">
-                <div class="as-prop__head"><b>Propuesta</b><small>Ejemplo &middot; riesgo medio-alto</small></div>
+                <div class="as-prop__head"><b>Propuesta</b><small>Ejemplo &middot; perfil moderado</small></div>
                 <div class="as-prop__body">
                   <svg class="as-donut" viewBox="0 0 120 120">
                     <circle class="as-donut__bg" cx="60" cy="60" r="46"/>
-                    <circle class="as-donut__s s1" cx="60" cy="60" r="46" pathLength="100" style="--len:44;--off:0"/>
-                    <circle class="as-donut__s s2" cx="60" cy="60" r="46" pathLength="100" style="--len:29;--off:-45"/>
-                    <circle class="as-donut__s s3" cx="60" cy="60" r="46" pathLength="100" style="--len:9;--off:-75"/>
-                    <circle class="as-donut__s s4" cx="60" cy="60" r="46" pathLength="100" style="--len:9;--off:-85"/>
-                    <circle class="as-donut__s s5" cx="60" cy="60" r="46" pathLength="100" style="--len:4;--off:-95"/>
-                    <text x="60" y="57" class="as-donut__t">5</text><text x="60" y="73" class="as-donut__u">tipos de activo</text>
+                    <circle class="as-donut__s s1" cx="60" cy="60" r="46" pathLength="100" style="--len:39;--off:0"/>
+                    <circle class="as-donut__s s2" cx="60" cy="60" r="46" pathLength="100" style="--len:29;--off:-40"/>
+                    <circle class="as-donut__s s3" cx="60" cy="60" r="46" pathLength="100" style="--len:9;--off:-70"/>
+                    <circle class="as-donut__s s4" cx="60" cy="60" r="46" pathLength="100" style="--len:9;--off:-80"/>
+                    <circle class="as-donut__s s5" cx="60" cy="60" r="46" pathLength="100" style="--len:4;--off:-90"/>
+                    <circle class="as-donut__s s6" cx="60" cy="60" r="46" pathLength="100" style="--len:4;--off:-95"/>
+                    <text x="60" y="57" class="as-donut__t">6</text><text x="60" y="73" class="as-donut__u">tipos de activo</text>
                   </svg>
                   <ul class="as-prop__lg">
-                    <li><i class="s1"></i>CEDEARs<em>45%</em></li>
-                    <li><i class="s2"></i>Obligaciones negociables<em>30%</em></li>
-                    <li><i class="s3"></i>Acciones argentinas<em>10%</em></li>
-                    <li><i class="s4"></i>Liquidez<em>10%</em></li>
-                    <li><i class="s5"></i>Cripto<em>5%</em></li>
+                    <li><i class="s1"></i>Renta fija en d&oacute;lares<em>40%</em></li>
+                    <li><i class="s2"></i>CEDEARs<em>30%</em></li>
+                    <li><i class="s3"></i>Liquidez<em>10%</em></li>
+                    <li><i class="s4"></i>Renta fija en pesos<em>10%</em></li>
+                    <li><i class="s5"></i>Acciones argentinas<em>5%</em></li>
+                    <li><i class="s6"></i>Cripto<em>5%</em></li>
                   </ul>
                 </div>
                 <ol class="as-time"><li class="is-done"><i></i><b>Hoy</b><span>Propuesta escrita</span></li><li><i></i><b>30 d&iacute;as</b><span>Primera revisi&oacute;n</span></li><li><i></i><b>Cada trimestre</b><span>Seguimiento</span></li></ol>
@@ -10955,21 +11008,21 @@
       <div class="as-wrap as-me__grid">
         <figure class="as-me__ph">
           <div class="as-me__arch"><img src="assets/asesoria/ignacio.webp" alt="Ignacio Manfredi" width="430" height="452" loading="lazy" decoding="async" /></div>
-          <figcaption class="as-me__badge"><img class="as-bz" src="assets/asesoria/balanz-mark.svg" alt="" width="38" height="38" /><span><small>Agente productor</small><img class="as-logo" src="assets/asesoria/balanz.svg" alt="Balanz" width="96" height="19" /></span></figcaption>
+          <figcaption class="as-me__badge"><img class="as-bz" src="assets/asesoria/balanz-mark.svg" alt="" width="38" height="38" /><span><small>Agente coproductor</small><img class="as-logo" src="assets/asesoria/balanz.svg" alt="Balanz" width="96" height="19" /></span></figcaption>
         </figure>
         <div class="as-me__txt">
           <p class="as-eye">Sobre m&iacute;</p>
           <h3 class="as-me__name">Ignacio Manfredi</h3>
-          <p class="as-me__role">Agente Productor de Balanz &middot; Fundador de Manfredi Investment</p>
+          <p class="as-me__role">Agente Coproductor de Balanz &middot; Fundador de Manfredi Investment</p>
           <ul class="as-me__cred">
             <li><i class="as-seal">CNV</i><div><b>Id&oacute;neo CNV</b><span>Examen de idoneidad aprobado</span></div></li>
             <li><i class="as-seal">UNR</i><div><b>Lic. en Econom&iacute;a</b><span>Estudiante avanzado</span></div></li>
             <li><i class="as-seal as-seal--n">48</i><div><b>Informes publicados</b><span>Research propio, con valuaci&oacute;n</span></div></li>
-            <li><i class="as-seal as-seal--bz"><img class="as-bz" src="assets/asesoria/balanz-mark.svg" alt="" width="30" height="30" /></i><div><b>Agente Productor</b><span>Balanz Capital Valores</span></div></li>
+            <li><i class="as-seal as-seal--bz"><img class="as-bz" src="assets/asesoria/balanz-mark.svg" alt="" width="30" height="30" /></i><div><b>Agente Coproductor</b><span>Balanz Capital Valores</span></div></li>
           </ul>
           <div class="as-me__bio">
             <p>Fund&eacute; Manfredi Investment para hacer research de inversiones en serio y en castellano: hoy hay 48 informes publicados sobre empresas de Estados Unidos y Argentina, con valuaci&oacute;n propia y fuentes a la vista.</p>
-            <p>Soy id&oacute;neo CNV, Agente Productor de Balanz y estudiante avanzado de la Licenciatura en Econom&iacute;a en la Universidad Nacional de Rosario. Mi trabajo es ayudarte a ordenar tus inversiones seg&uacute;n tu objetivo, tu plazo y tu perfil de riesgo, y explicarte cada decisi&oacute;n para que sepas d&oacute;nde est&aacute; tu plata y por qu&eacute;.</p>
+            <p>Soy id&oacute;neo CNV, Agente Coproductor de Balanz y estudiante avanzado de la Licenciatura en Econom&iacute;a en la Universidad Nacional de Rosario. Mi trabajo es ayudarte a ordenar tus inversiones seg&uacute;n tu objetivo, tu plazo y tu perfil de riesgo, y explicarte cada decisi&oacute;n para que sepas d&oacute;nde est&aacute; tu plata y por qu&eacute;.</p>
             <p>Invierto con las mismas reglas que te propongo. Por eso mi cartera est&aacute; publicada m&aacute;s arriba, con el peso y el motivo de cada posici&oacute;n.</p>
           </div>
           <blockquote class="as-me__q">&ldquo;Si no pod&eacute;s explicar por qu&eacute; ten&eacute;s algo, no deber&iacute;as tenerlo. Con esa regla armo cada propuesta.&rdquo;</blockquote>
@@ -11045,7 +11098,7 @@
         <div class="as-frame__row">
           <div><small>Tu cuenta</small><span class="as-frame__brand"><img class="as-bz" src="assets/asesoria/balanz-mark.svg" alt="" width="30" height="30" /><img class="as-logo" src="assets/asesoria/balanz.svg" alt="Balanz" width="96" height="19" /></span><span>Balanz Capital Valores S.A.U., Agente de Liquidaci&oacute;n y Compensaci&oacute;n registrado ante la CNV</span></div>
           <div><small>Tu dinero y tus t&iacute;tulos</small><b>Siempre a tu nombre</b><span>Yo no recibo fondos ni opero sin tu orden</span></div>
-          <div><small>Asesor</small><b>Ignacio Manfredi</b><span>Agente Productor de Balanz &middot; Id&oacute;neo CNV</span></div>
+          <div><small>Asesor</small><b>Ignacio Manfredi</b><span>Agente Coproductor de Balanz &middot; Id&oacute;neo CNV</span></div>
         </div>
       </div>
       <p class="as-wrap as-legal">El asesoramiento se brinda seg&uacute;n tu perfil de inversor, con tu cuenta en Balanz. Invertir implica riesgos, incluida la posible p&eacute;rdida del capital; los rendimientos pasados no garantizan resultados futuros.</p>
@@ -11184,7 +11237,7 @@
       var OFF = '<span class="mi-off"><b>' + P.off + '%</b> OFF</span>';
       var quedan = P.dias === 1 ? 'último día' : 'quedan ' + P.dias + ' días';
       set('frase', '<s>USD 15</s> <b>USD 10 por mes</b> <span class="mi-off sm"><b>' + P.off + '%</b> OFF</span> hasta el 31 de octubre');
-      set('modal', '<span class="pay-price-amount"><s class="mi-was">$15</s>$10</span><span class="pay-price-period">USD/mes</span><span class="mi-off lg" style="margin-left:12px;align-self:center"><b>' + P.off + '%</b> OFF</span>');
+      set('modal', '<span class="mb-plan__cur">USD</span><span class="mb-plan__amt pay-price-amount"><s class="mi-was">15</s> 10</span><span class="mb-plan__per pay-price-period">por mes</span><span class="mi-off sm" style="margin-left:8px;align-self:center"><b>' + P.off + '%</b> OFF</span>');
       set('modal-fine', 'Precio de lanzamiento de Warren hasta el 31 de octubre · facturación mensual · cancelás cuando quieras');
       [1, 3, 6, 12].forEach(function(m){ set('x' + m, '<s class="mi-was">USD ' + 15 * m + '</s><br>USD ' + 10 * m + '<i class="mi-pill-off">-' + P.off + '%</i>'); });
       set('ap', OFF + '<div style="margin-top:12px"><s class="mi-was">$15</s><span>$10</span> USD</div>');
@@ -13016,95 +13069,6 @@ try{var des=await indec('45.2_ECTDT_0_T_33');el('ar-desemp-val').textContent=(de
 
     /* ===== MEMBRESIA: gate real lo maneja el JS de applyPaywall/paywallCardHTML mas abajo ===== */
     .member-protected { position: relative; }
-        /* ===== MODAL PAGO ===== */
-    .payment-overlay {
-      position: fixed; inset: 0; z-index: 3000;
-      background: rgba(5,8,16,.82);
-      backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
-      display: none !important; transition: opacity .3s;
-      padding: 24px;
-    }
-    .payment-overlay.open { display: flex !important; align-items: center; justify-content: center; opacity: 1; pointer-events: auto; }
-    .payment-modal-box {
-      background: linear-gradient(180deg, #101B2E 0%, #0C1526 100%);
-      border: 1px solid rgba(242,201,76,.18);
-      border-radius: 18px; padding: 40px 36px 32px;
-      width: 100%; max-width: 440px; position: relative;
-      box-shadow: 0 24px 70px rgba(0,0,0,.55);
-    }
-    .pay-close {
-      position: absolute; top: 16px; right: 16px; width: 30px; height: 30px;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(255,255,255,.06); border: none; border-radius: 50%;
-      color: rgb(255,255,255); font-size: 18px; line-height: 1; cursor: pointer;
-      transition: background .15s, color .15s;
-    }
-    .pay-close:hover { background: rgba(255,255,255,.12); color: #fff; }
-    .pay-mark {
-      width: 48px; height: 48px; margin-bottom: 20px;
-    }
-    .pay-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
-    .payment-modal-box h2 { font-family: var(--font-display); font-weight: 400; font-size: 26px; letter-spacing: -0.01em; color: #fff; line-height: 1.18; margin-bottom: 10px; }
-    .payment-modal-box .pay-sub { color: rgb(255,255,255); font-size: 14px; line-height: 1.55; margin-bottom: 26px; }
-    .pay-price-row { display: flex; align-items: baseline; gap: 6px; }
-    .pay-price-amount { font-family: var(--font-display); font-size: 46px; font-weight: 400; color: var(--gold); line-height: 1; font-variant-numeric: tabular-nums; }
-    .pay-price-period { font-size: 15px; color: rgb(255,255,255); font-weight: 500; }
-    .pay-price-fine { font-size: 12px; color: rgb(255,255,255); margin-top: 6px; margin-bottom: 24px; }
-    .pay-benefits {
-      list-style: none; margin: 0 0 26px; padding: 18px 0;
-      border-top: 1px solid rgba(255,255,255,.08); border-bottom: 1px solid rgba(255,255,255,.08);
-      display: flex; flex-direction: column; gap: 12px;
-    }
-    .pay-benefits li { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; color: rgb(255,255,255); line-height: 1.5; }
-    .pay-benefits svg { flex-shrink: 0; margin-top: 2px; }
-    .pay-cta {
-      display: block; width: 100%; text-align: center; padding: 15px 0;
-      background: var(--gold); color: var(--primary); font-weight: 700; font-size: 15px;
-      letter-spacing: .01em; border: none; border-radius: 10px; cursor: pointer;
-      transition: transform .15s, box-shadow .15s, background .15s;
-    }
-    .pay-cta:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 10px 24px rgba(242,201,76,.22); }
-    .pay-cta:disabled { opacity: .6; cursor: wait; transform: none; box-shadow: none; }
-    .pay-secondary {
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      margin-top: 16px; font-size: 11.5px; color: rgb(255,255,255); letter-spacing: .01em;
-    }
-    .pay-note { text-align: center; color: rgb(255,255,255); font-size: 11.5px; margin-top: 18px; line-height: 1.6; }
-    .pay-note a { color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(242,201,76,.3); }
-    .pay-note a:hover { border-color: var(--gold); }
-    /* ===== CODIGO DE DESCUENTO / PLANES PREPAGOS ===== */
-    .pay-discount-toggle {
-      display: block; width: 100%; text-align: center; background: none; border: none;
-      margin-top: 14px; padding: 4px; font-size: 12px; color: rgb(255,255,255);
-      text-decoration: underline; text-decoration-color: rgba(255,255,255,.2); cursor: pointer;
-    }
-    .pay-discount-toggle:hover { color: var(--gold); text-decoration-color: rgba(242,201,76,.4); }
-    .pay-discount-panel {
-      margin-top: 16px; padding-top: 18px; border-top: 1px dashed rgba(255,255,255,.12);
-    }
-    .pay-discount-panel.hidden { display: none; }
-    .pay-plan-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgb(255,255,255); margin-bottom: 10px; }
-    .pay-plan-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px; }
-    .pay-plan-pill {
-      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); border-radius: 8px;
-      padding: 9px 4px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s;
-    }
-    .pay-plan-pill:hover { border-color: rgba(242,201,76,.4); }
-    .pay-plan-pill.selected { border-color: var(--gold); background: rgba(242,201,76,.08); }
-    .pay-plan-pill .pp-meses { display: block; font-size: 13px; font-weight: 700; color: #fff; }
-    .pay-plan-pill .pp-usd { display: block; font-size: 11px; color: rgb(255,255,255); margin-top: 2px; font-variant-numeric: tabular-nums; }
-    .pay-discount-row { display: flex; gap: 8px; margin-bottom: 12px; }
-    #payDiscountCode {
-      flex: 1; min-width: 0; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.14);
-      border-radius: 8px; padding: 11px 12px; color: #fff; font-size: 13.5px; letter-spacing: .03em;
-      text-transform: uppercase;
-    }
-    #payDiscountCode::placeholder { color: rgb(255,255,255); text-transform: none; letter-spacing: normal; }
-    #payDiscountCode:focus { outline: none; border-color: var(--gold); }
-    .pay-discount-price { font-size: 13px; color: rgb(255,255,255); margin-bottom: 14px; min-height: 18px; }
-    .pay-discount-price strong { color: var(--gold); font-variant-numeric: tabular-nums; }
-    .pay-discount-price .pdp-before { color: rgb(255,255,255); text-decoration: line-through; margin-right: 6px; font-variant-numeric: tabular-nums; }
-    .pay-discount-error { font-size: 12px; color: #ef4444; margin-top: 10px; text-align: center; min-height: 16px; }
 
   
   /* === SCROLL ANIMATIONS === */
@@ -17178,32 +17142,63 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
   </script>
 
 
-  <div id="paymentOverlay" class="payment-overlay" style="display:none !important">
+  <div id="paymentOverlay" class="payment-overlay" style="display:none !important" role="dialog" aria-modal="true" aria-labelledby="payTitle">
     <div class="payment-modal-box">
       <button type="button" class="pay-close" onclick="closePaymentModal()" aria-label="Cerrar">&times;</button>
-      <div class="pay-mark"><svg class="mi-mark"><use href="#miMark"/></svg></div>
-      <div class="pay-eyebrow">Membresía Manfredi Investment</div>
-      <h2>Todo el análisis, sin límites.</h2>
-      <div class="pay-price-row" data-mi-precio="modal">
-        <span class="pay-price-amount">$15</span>
-        <span class="pay-price-period">USD/mes</span>
+      <div class="pay-head">
+        <div class="pay-mark"><svg class="mi-mark"><use href="#miMark"/></svg></div>
+        <span class="pay-eyebrow">Membresía Manfredi Investment</span>
+        <h2 id="payTitle">Elegí cómo querés <em>invertir.</em></h2>
       </div>
-      <p class="pay-price-fine" data-mi-precio="modal-fine">Facturación mensual · cancelás cuando quieras</p>
-      <ul class="pay-benefits">
-        <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Warren, tu asesor IA &mdash; 100 consultas por mes, disponible 24/7</li>
-        <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Picks y tesis de inversión completos, sin blur</li>
-        <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Manfredi Investment Portfolio &mdash; armá tu cartera y comparala con la nuestra y el S&amp;P 500</li>
-        <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Cancelás cuando quieras, sin permanencia</li>
-      </ul>
-      <button type="button" class="pay-cta" onclick="handlePayment('mercadopago')">Suscribirme ahora &rarr;</button>
-      <div class="pay-secondary">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V8a5 5 0 0 1 10 0v3"/></svg>
-        Pago seguro procesado por Mercado Pago
+      <div class="mb-plans">
+        <article class="mb-plan mb-plan--free">
+          <div class="mb-plan__top"><h3 class="mb-plan__nm">Plan <em>Gratis</em></h3></div>
+          <p class="mb-plan__lede">Para seguir el mercado todos los días.</p>
+          <div class="mb-plan__pr"><span class="mb-plan__cur">USD</span><span class="mb-plan__amt">0</span><span class="mb-plan__per">para siempre</span></div>
+          <p class="mb-plan__fine">Sin tarjeta y sin vencimiento.</p>
+          <button type="button" class="mb-btn mb-btn--line" data-mb-free>Crear cuenta gratis</button>
+          <ul class="mb-plan__list">
+            <li>Mercados y dólares en vivo</li>
+            <li>Calendario económico y Noticias</li>
+            <li>Portfolio con rendimiento y riesgo</li>
+            <li>University: cursos y test de perfil</li>
+            <li>Chat de Mercados</li>
+          </ul>
+        </article>
+        <article class="mb-plan mb-plan--pro">
+          <div class="mb-plan__top"><h3 class="mb-plan__nm">Manfredi <em>Pro</em></h3><span class="mb-plan__tag" data-mb-tag="Recomendado">Recomendado</span></div>
+          <p class="mb-plan__lede">Para decidir con análisis de verdad.</p>
+          <div class="mb-plan__pr pay-price-row" data-mi-precio="modal"><span class="mb-plan__cur">USD</span><span class="mb-plan__amt pay-price-amount">15</span><span class="mb-plan__per pay-price-period">por mes</span></div>
+          <p class="mb-plan__fine pay-price-fine" data-mi-precio="modal-fine">Con Mercado Pago. Cancelás cuando quieras.</p>
+          <button type="button" class="mb-btn mb-btn--gold pay-cta pay-btn" data-mb-pro="Suscribirme" data-mb-pay>Suscribirme</button>
+          <ul class="mb-plan__list">
+            <li class="mb-plan__all">Todo lo del plan Gratis</li>
+            <li>Informes con fair value</li>
+            <li>Warren IA: 100 consultas por mes</li>
+            <li>1 informe a pedido por mes</li>
+            <li>Chats Pro con Ignacio y socios</li>
+          </ul>
+        </article>
+        <article class="mb-plan mb-plan--ase">
+          <div class="mb-plan__top"><h3 class="mb-plan__nm">Asesoría <em>1 a 1</em></h3><span class="mb-plan__tag mb-plan__tag--bz"><img src="assets/asesoria/balanz-mark.svg" alt="" width="12" height="12" />Balanz</span></div>
+          <p class="mb-plan__lede">Tu cartera, armada conmigo.</p>
+          <div class="mb-plan__pr"><span class="mb-plan__amt mb-plan__amt--w">Sin costo</span><span class="mb-plan__per">adicional</span></div>
+          <p class="mb-plan__fine">Como agente coproductor de Balanz.</p>
+          <a class="mb-btn mb-btn--line" href="#asesoria" data-mb-ase>Conocé la asesoría <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <ul class="mb-plan__list">
+            <li>Primera charla sin cargo</li>
+            <li>Tu perfil, objetivo y horizonte</li>
+            <li>Propuesta por escrito</li>
+            <li>Revisión cada trimestre</li>
+            <li>Consultas por mail o WhatsApp</li>
+          </ul>
+        </article>
       </div>
-      <p class="pay-note">
-        ⚠️ Asegurate de pagar con el mismo email con el que iniciaste sesión en la página.<br>
-        ¿Ya tenés membresía? <a href="#" onclick="closePaymentModal()">Iniciá sesión</a>
-      </p>
+      <div class="pay-trust">
+        <span class="mb-mp" aria-label="Mercado Pago"><svg aria-hidden="true"><use href="#mpLogo"/></svg>mercado <b>pago</b></span>
+        <p><b>Pago seguro con Mercado Pago.</b> Tarjeta o dinero en tu cuenta. Sin permanencia.</p>
+      </div>
+      <p class="pay-note">Pagá con el mismo email con el que iniciaste sesión, así Manfredi Pro se activa solo. ¿Ya sos socio? <a href="#" onclick="event.preventDefault();closePaymentModal();window.showLoginOverlay&amp;&amp;window.showLoginOverlay();">Iniciá sesión</a></p>
       <button type="button" class="pay-discount-toggle" id="payDiscountToggleBtn" onclick="toggleDiscountPanel()">¿Tenés un código de descuento?</button>
       <div class="pay-discount-panel hidden" id="payDiscountPanel">
         <div class="pay-plan-label">Elegí cuántos meses pagar de una vez</div>
@@ -17217,9 +17212,9 @@ document.querySelectorAll('.course-modal-overlay').forEach(function(el){el.addEv
           <input type="text" id="payDiscountCode" placeholder="Código de descuento" maxlength="30" oninput="updateDiscountPriceDisplay()">
         </div>
         <div class="pay-discount-price" id="payDiscountPrice"></div>
-        <button type="button" class="pay-cta" id="payDiscountBtn" onclick="handleDiscountPayment()">Pagar con código &rarr;</button>
+        <button type="button" class="mb-btn mb-btn--gold pay-cta" id="payDiscountBtn" onclick="handleDiscountPayment()">Pagar con código</button>
         <div class="pay-discount-error" id="payDiscountError"></div>
-        <p class="pay-note" style="margin-top:12px">Pago único, sin renovación automática. Al vencer el período elegido podés volver a suscribirte cuando quieras.</p>
+        <p class="pay-note">Pago único, sin renovación automática. Al vencer el período elegido podés volver a suscribirte cuando quieras.</p>
       </div>
     </div>
   </div>

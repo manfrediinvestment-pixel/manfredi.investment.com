@@ -1,5 +1,5 @@
 /* Ayuda de Manfredi: preguntas frecuentes con buscador y derivación al mail del equipo.
-   Vive en un Shadow DOM (igual que assets/cartel/cartel.js) para no chocar con el CSS global.
+   Vive en un Shadow DOM (igual que lo hacía el viejo cartel de membresía) para no chocar con el CSS global.
    Botón fijo arriba a la derecha, debajo del menú; Warren sigue abajo a la derecha.
    Las preguntas están en assets/ayuda/faq.json y se cargan recién al abrir.
    Lo que no está en las preguntas se manda por mail (mailto) a MAIL_EQUIPO. */
