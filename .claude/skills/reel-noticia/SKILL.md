@@ -201,6 +201,34 @@ Cuando pase el audio:
 
 ---
 
+## 8b. Modo nube (Claude Code en la web / rutinas)
+
+Probado el 03-nov-2026 en el entorno `env_01DMYtiRM7Vk37xoE5mPdX5L` (Linux, 4 núcleos): ya vienen Node 22, Python 3.11,
+**ffmpeg** y **Chrome** (`/usr/bin/google-chrome`), hay `sudo`, y `npx -y hyperframes@0.9.4` se instala desde npm.
+La red está **restringida**: pasan npm, PyPI y Anthropic; están BLOQUEADOS jsDelivr, Yahoo Finance, la SEC, Openverse
+y manfredinvestment.com. Si el user pasa el entorno a acceso "Completo", ignorar las restricciones de abajo.
+
+- **GSAP**: nunca desde CDN. Copiar `plantillas/vendor/gsap.min.js` a `assets/gsap.min.js` (el `build_index.py` de
+  plantillas ya lo carga de ahí). Las fuentes ya son locales (`assets/fonts/`). Ningún `<script>` o `<link>` externo.
+- **Sonido**: copiar `plantillas/sfx/` a `assets/sfx/` (no buscar en Openverse).
+- **Datos**: la fuente principal es **nuestro informe** `informes/<ticker>.html` (cifras del 8-K, valor justo, precio de
+  referencia). Para la reacción de la acción, cierres diarios y ranking histórico, usar **WebSearch / WebFetch** (corren
+  fuera del sandbox): p. ej. WebFetch a `https://query1.finance.yahoo.com/v8/finance/chart/<TICKER>?period1=...&interval=1d`
+  o a stockanalysis.com / la web de relaciones con inversores. Nada de `curl` a Yahoo/SEC desde Bash.
+- **Render**: `npx -y hyperframes@0.9.4 render -o output/<nombre>.mp4 --fps 30 --quality high` (en la nube, 30 fps para
+  que no tarde). Si el render no encuentra navegador, revisar `npx hyperframes render --help` para indicar
+  `/usr/bin/google-chrome`.
+- **Revisión sin ver**: `npx hyperframes snapshot --at <tiempos> -o snaps` y leer las imágenes con Read; tiras de
+  ffmpeg como en la sección 6.
+- **Entrega**: no hay Escritorio. Comprimir a menos de 20 MB
+  (`ffmpeg -i output/x.mp4 -c:v libx264 -crf 26 -preset slow -c:a aac -b:a 128k entrega/<ticker>-reel.mp4`), guardar en
+  `marketing/<proyecto>/entrega/` y commitearlo **solo en la rama del video** (nunca mergear ese mp4 a main: al traer la
+  rama a la PC se copia al Escritorio y se borra del repo antes de mergear). Commitear también `GUION.md` y el proyecto.
+- **Guía y palabra**: crear `guia-<ticker>.html` desde `plantillas/guia-ticker.html` en la misma rama. El disparador de
+  SendPulse NO se puede crear desde la nube (necesita el Chrome del user): dejarlo anotado en `GUION.md`.
+- **Mensaje final de la sesión**: rama, commit, ruta del mp4, palabra para comentar, y cualquier dato que no se pudo
+  verificar.
+
 ## 9. Entregables y cierre
 
 - `marketing/reel-<ticker>-<evento>/` con `SPEC.md` (datos y fuentes), `GUION.md`, `build_index.py`, escenas, `output/*.mp4`.
