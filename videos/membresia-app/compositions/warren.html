@@ -6,36 +6,39 @@
       #warren-scroll { position:absolute; left:16px; right:16px; top:64px; bottom:64px; overflow:hidden; }
       #warren-chat { position:absolute; left:0; right:0; top:0; padding-bottom:14px; }
       #warren-q { margin:12px 0 0 auto; max-width:250px; width:fit-content; padding:11px 14px; border-radius:18px 18px 4px 18px;
-        background:linear-gradient(180deg,#f7dc8a,#e2b94f); font:500 14px/1.35 "Plex Sans"; color:#0a1322; }
+        background:linear-gradient(180deg,#f7dc8a,#e2b94f); font:500 14px/1.35 "Instrument"; color:#0a1322; }
       .stp { margin-top:10px; display:flex; align-items:center; gap:8px; font:600 11px/1 "Plex Mono"; letter-spacing:.03em; color:#ead9a4; }
       .stp i { width:14px; height:14px; border-radius:50%; border:2px solid rgba(242,201,76,.25); border-top-color:#f2c94c; display:block; flex:none; }
       .stp.ok i { border-color:#10B981; background:#10B981; }
-      #warren-a { margin-top:12px; padding:13px 14px; border-radius:18px 18px 18px 4px; border:1px solid rgba(226,234,245,.16); background:rgba(18,35,62,.88);
-        font:400 13px/1.5 "Plex Sans"; color:#f6f8fc; }
+      #warren-a { margin-top:12px; padding:13px 14px; border-radius:18px 18px 18px 4px; box-shadow:inset 0 0 0 1px rgba(226,234,245,.16); background:rgba(18,35,62,.9);
+        font:400 13px/1.5 "Instrument"; color:#f6f8fc; }
       #warren-a p { margin:0 0 10px; } #warren-a p:last-child { margin:0; }
       #warren-a .w { opacity:0; }
-      #warren-a b.r, #warren-a .r { color:#f87171; font-weight:700; } #warren-a b.g, #warren-a .g { color:#34d399; font-weight:700; }
+      #warren-a .r { color:#f87171; font-weight:700; } #warren-a .g { color:#34d399; font-weight:700; }
       #warren-a b.y { color:#f7dc8a; }
-      .co { margin:0 0 10px; border-radius:12px; padding:10px 11px; border:1px solid rgba(226,234,245,.12); background:rgba(255,255,255,.03); }
+      .co { margin:0 0 10px; border-radius:12px; padding:10px 11px; box-shadow:inset 0 0 0 1px rgba(226,234,245,.12); background:rgba(255,255,255,.03); }
       .coh { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-      .coh b { font:400 17px/1 "DM Serif"; font-weight:400; color:#f6f8fc; flex:1; }
-      .lg2 { width:24px; height:24px; border-radius:7px; background:#0a1322; display:flex; align-items:center; justify-content:center; border:1px solid rgba(226,234,245,.18); }
+      .coh b { font:400 17px/1 "DM Serif"; color:#f6f8fc; flex:1; }
+      .lg2 { width:24px; height:24px; border-radius:7px; background:#0a1322; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 0 1px rgba(226,234,245,.18); }
       .lg2 img { width:14px; height:14px; object-fit:contain; }
       .cp { font:700 9px/1 "Plex Mono"; letter-spacing:.08em; padding:5px 7px; border-radius:6px; }
       .cp.red { color:#fca5a5; background:rgba(239,68,68,.14); } .cp.gold { color:#f7dc8a; background:rgba(242,201,76,.14); }
       .co ul { margin:0; padding-left:14px; } .co li { margin:3px 0; font-size:12.5px; line-height:1.42; }
       .co li::marker { color:#f2c94c; }
-      .tbl { margin:0 0 10px; border-radius:12px; overflow:hidden; border:1px solid rgba(226,234,245,.14); font:600 11.5px/1 "Plex Sans"; }
+      .tbl { margin:0 0 10px; border-radius:12px; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(226,234,245,.14); font:600 11.5px/1 "Instrument"; }
       .tr { display:grid; grid-template-columns:1.5fr 1fr 1fr; padding:8px 10px; border-top:1px solid rgba(226,234,245,.08); }
       .tr span:not(:first-child) { text-align:right; font-family:"Plex Mono"; font-weight:700; }
       .tr.th { border-top:0; background:rgba(242,201,76,.10); color:#f7dc8a; font:700 10px/1 "Plex Mono"; letter-spacing:.08em; text-transform:uppercase; }
       .disc { font-size:10.5px !important; line-height:1.4 !important; color:#ead9a4; }
 
     </style>
-    <div class="bg"></div><div class="grid"></div><div class="halo"></div>
+    <svg width="0" height="0" style="position:absolute"><defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbecc4"/><stop offset=".55" stop-color="#f2c94c"/><stop offset="1" stop-color="#c99a2e"/></linearGradient></defs></svg>
+    <div class="halo"></div>
 
+      <div class="cshadow" id="warren-cs"></div>
       <div class="pw">
       <div class="phone" id="warren-phone">
+        <i class="pbtn a"></i><i class="pbtn v1"></i><i class="pbtn v2"></i><i class="pbtn p"></i>
         <div class="bezel"></div>
         <div class="screen" id="warren-screen">
           <div class="app"></div>
@@ -44,8 +47,8 @@
             <div class="pg" id="warren-pg" style="padding:6px 16px 0">
               <div class="row" style="padding:2px 4px 12px;border-bottom:1px solid rgba(226,234,245,.08)">
                 <div style="display:flex;align-items:center;gap:10px">
-                  <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(160deg,#f7dc8a,#d8a93a);display:flex;align-items:center;justify-content:center;font:italic 400 22px/1 'DM Serif';color:#0a1322">W</div>
-                  <div><div style="font:400 21px/1 'DM Serif';color:#f6f8fc">Warren <em style="color:#f7dc8a">IA</em></div><div style="font:500 11.5px/1 'Plex Sans';color:#ead9a4;margin-top:4px">Lee los informes de Manfredi</div></div>
+                  <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(160deg,#f7dc8a,#d8a93a);display:flex;align-items:center;justify-content:center;font:italic 400 22px/1 'DM Serif';color:#0a1322;box-shadow:0 0 22px rgba(242,201,76,.35)">W</div>
+                  <div><div style="font:400 21px/1 'DM Serif';color:#f6f8fc">Warren <em style="color:#f7dc8a">IA</em></div><div style="font:500 11.5px/1 'Instrument';color:#ead9a4;margin-top:4px">Lee los informes de Manfredi</div></div>
                 </div>
                 <span style="font:600 10px/1 'Plex Mono';color:#ead9a4;letter-spacing:.08em">96/100</span>
               </div>
@@ -59,77 +62,90 @@
       <p><span class="tk w">No</span> <span class="tk w">te</span> <span class="tk w">puedo</span> <span class="tk w">decir</span> <span class="tk w">cuál</span> <span class="tk w">comprar,</span> <span class="tk w">pero</span> <span class="tk w">sí</span> <span class="tk w">cómo</span> <span class="tk w">se</span> <span class="tk w">comparan</span> <span class="tk w">según</span> <span class="tk w">nuestros</span> <span class="tk w">informes:</span></p>
       <div class="co tk">
         <div class="coh"><span class="lg2"><img src="assets/img/apple.svg" alt=""></span><b>Apple</b><span class="cp red">EXIGENTE</span></div>
-        <ul><li><span class="tk w">Fair</span> <span class="tk w">value</span> <span class="tk w">US$</span> <span class="tk w">257,08</span> <span class="tk w">vs.</span> <span class="tk w">US$</span> <span class="tk w">306,07</span> <span class="tk w">→</span> <b class="tk w r">−16,0%</b></li><li><span class="tk w">Q3</span> <span class="tk w">récord</span> <span class="tk w">de</span> <span class="tk w">junio:</span> <span class="tk w">US$</span> <span class="tk w">109.400</span> <span class="tk w">M</span> <span class="tk w">(+16%).</span></li><li><span class="tk w">Ojo:</span> <span class="tk w">parte</span> <span class="tk w">del</span> <span class="tk w">margen</span> <span class="tk w">vino</span> <span class="tk w">de</span> <span class="tk w">reembolsos</span> <span class="tk w">de</span> <span class="tk w">aranceles</span> <span class="tk w">y</span> <span class="tk w">la</span> <span class="tk w">guía</span> <span class="tk w">es</span> <span class="tk w">de</span> <span class="tk w">+9%</span> <span class="tk w">a</span> <span class="tk w">11%.</span></li></ul></div>
+        <ul><li><span class="tk w">Fair</span> <span class="tk w">value</span> <span class="tk w">US$</span> <span class="tk w">263,56</span> <span class="tk w">vs.</span> <span class="tk w">US$</span> <span class="tk w">338,32</span> <span class="tk w">→</span> <b class="tk w r">−22,1%</b></li><li><span class="tk w">Año</span> <span class="tk w">fiscal</span> <span class="tk w">récord:</span> <span class="tk w">US$</span> <span class="tk w">478.800</span> <span class="tk w">M</span> <span class="tk w">(+15%)</span> <span class="tk w">y</span> <span class="tk w">EPS</span> <span class="tk w">+20%.</span></li><li><span class="tk w">Ojo:</span> <span class="tk w">la</span> <span class="tk w">guía</span> <span class="tk w">baja</span> <span class="tk w">el</span> <span class="tk w">margen</span> <span class="tk w">bruto</span> <span class="tk w">a</span> <span class="tk w">45%-46%</span> <span class="tk w">(desde</span> <span class="tk w">48,8%).</span></li></ul></div>
       <div class="co tk">
         <div class="coh"><span class="lg2"><img src="assets/img/mono-msft.png" alt=""></span><b>Microsoft</b><span class="cp gold">CONSTRUCTIVA</span></div>
         <ul><li><span class="tk w">Fair</span> <span class="tk w">value</span> <span class="tk w">US$</span> <span class="tk w">540,66</span> <span class="tk w">vs.</span> <span class="tk w">US$</span> <span class="tk w">507,12</span> <span class="tk w">→</span> <b class="tk w g">+6,6%</b></li><li><span class="tk w">1T</span> <span class="tk w">FY27:</span> <span class="tk w">ventas</span> <span class="tk w">US$</span> <span class="tk w">92.300</span> <span class="tk w">M</span> <span class="tk w">(+18,8%)</span> <span class="tk w">y</span> <span class="tk w">Azure</span> <span class="tk w">+48%.</span></li><li><span class="tk w">Ojo:</span> <span class="tk w">el</span> <span class="tk w">capex</span> <span class="tk w">del</span> <span class="tk w">año</span> <span class="tk w">fiscal</span> <span class="tk w">2027</span> <span class="tk w">deja</span> <span class="tk w">el</span> <span class="tk w">flujo</span> <span class="tk w">de</span> <span class="tk w">caja</span> <span class="tk w">libre</span> <span class="tk w">en</span> <span class="tk w">negativo.</span></li></ul></div>
       <div class="tbl tk">
         <div class="tr th"><span>Lado a lado</span><span>AAPL</span><span>MSFT</span></div>
-        <div class="tr"><span>Vs. fair value</span><span class="r">−16,0%</span><span class="g">+6,6%</span></div>
-        <div class="tr"><span>Ventas último trim.</span><span>+16%</span><span>+18,8%</span></div>
-        <div class="tr"><span>Tiene que salir bien</span><span>iPhone</span><span>IA</span></div>
+        <div class="tr"><span>Vs. fair value</span><span class="r">−22,1%</span><span class="g">+6,6%</span></div>
+        <div class="tr"><span>Ventas último trim.</span><span>+11,7%</span><span>+18,8%</span></div>
+        <div class="tr"><span>Tiene que salir bien</span><span>Margen</span><span>IA</span></div>
       </div>
       <p><b class="tk w y">En</b> <b class="tk w y">síntesis:</b> <span class="tk w">según</span> <span class="tk w">nuestros</span> <span class="tk w">informes,</span> <span class="tk w">Microsoft</span> <span class="tk w">cotiza</span> <span class="tk w">por</span> <span class="tk w">debajo</span> <span class="tk w">de</span> <span class="tk w">su</span> <span class="tk w">valor</span> <span class="tk w">justo</span> <span class="tk w">y</span> <span class="tk w">Apple</span> <span class="tk w">por</span> <span class="tk w">encima.</span> <span class="tk w">La</span> <span class="tk w">decisión</span> <span class="tk w">depende</span> <span class="tk w">de</span> <span class="tk w">tu</span> <span class="tk w">perfil</span> <span class="tk w">y</span> <span class="tk w">de</span> <span class="tk w">tu</span> <span class="tk w">horizonte.</span></p>
       <p class="disc"><span class="tk w">Precios</span> <span class="tk w">a</span> <span class="tk w">la</span> <span class="tk w">fecha</span> <span class="tk w">de</span> <span class="tk w">cada</span> <span class="tk w">informe.</span> <span class="tk w">Análisis</span> <span class="tk w">informativo,</span> <span class="tk w">no</span> <span class="tk w">es</span> <span class="tk w">una</span> <span class="tk w">recomendación</span> <span class="tk w">de</span> <span class="tk w">inversión.</span></p></div>
                 </div>
               </div>
             </div>
-            <div id="warren-in" style="position:absolute;left:14px;right:14px;bottom:8px;height:48px;border-radius:24px;border:1px solid rgba(226,234,245,.18);background:rgba(10,20,38,.97);display:flex;align-items:center;padding:0 6px 0 16px;gap:8px;z-index:3">
-              <div style="flex:1;font:500 13.5px/1 'Plex Sans';color:#f6f8fc;white-space:nowrap;overflow:hidden"><span id="warren-typed"></span><span id="warren-caret" style="display:inline-block;width:1.5px;height:16px;background:#f2c94c;vertical-align:middle;margin-left:1px"></span><span id="warren-ph" style="color:#ead9a4">Preguntale a Warren…</span></div>
+            <div id="warren-in" style="position:absolute;left:14px;right:14px;bottom:8px;height:48px;border-radius:24px;box-shadow:inset 0 0 0 1px rgba(226,234,245,.18);background:rgba(10,20,38,.97);display:flex;align-items:center;padding:0 6px 0 16px;gap:8px;z-index:3">
+              <div style="flex:1;font:500 13.5px/1 'Instrument';color:#f6f8fc;white-space:nowrap;overflow:hidden"><span id="warren-typed"></span><span id="warren-caret" style="display:inline-block;width:1.5px;height:16px;background:#f2c94c;vertical-align:middle;margin-left:1px"></span><span id="warren-ph" style="color:#ead9a4">Preguntale a Warren…</span></div>
               <div id="warren-send" style="width:36px;height:36px;border-radius:50%;background:#f2c94c;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" style="width:18px;height:18px" fill="none" stroke="#0a1322" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div>
             </div></div>
-          <div class="tabs" id="warren-tabs"><div class="pill" id="warren-pill" style="left:4.67px"></div><div class="tab" id="warren-t0"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg>Informes</div><div class="tab on" id="warren-t1"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H10l-6 4z"/><path d="M9 10.5h6"/></svg>Warren IA</div><div class="tab" id="warren-t2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Pedidos</div></div>
-          <div class="sbar"><span>9:41</span><span class="ic"><b style="height:5px"></b><b style="height:8px"></b><b style="height:11px"></b><b style="height:14px"></b><span class="bat"></span></span></div>
+          <div class="tabs" id="warren-tabs"><div class="pill" id="warren-pill" style="left:4.33px"></div><div class="tab" id="warren-t0" style="color:#ead9a4"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg>Informes</div><div class="tab" id="warren-t1" style="color:#f2c94c"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H10l-6 4z"/><path d="M9 10.5h6"/></svg>Warren IA</div><div class="tab" id="warren-t2" style="color:#ead9a4"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Pedidos</div></div>
+          <div class="sbar" id="warren-sbar"><span>9:41</span><span class="ic"><b style="height:5px"></b><b style="height:8px"></b><b style="height:11px"></b><b style="height:14px"></b><span class="bat"></span></span></div>
           <div class="island"></div>
-          <div class="homeind"></div>
+          <div class="homeind" id="warren-home"></div>
           <div class="touch" id="warren-touch"></div>
         </div>
+        <div class="glare"><i id="warren-glare"></i></div>
       </div>
       </div>
       <div class="side side-l" id="warren-sl">
-        <div class="kick" id="warren-k">Manfredi Pro · Warren IA<i></i></div>
-        <div class="ttl"><span class="ln" id="warren-l1">Warren</span><span class="ln" id="warren-l2"><em>IA</em></span></div>
-        <div class="price" id="warren-pr"><span class="amt ">100</span><span class="per">consultas por mes</span></div>
-        <div class="note" id="warren-nt">Lee nuestros informes y te responde.</div>
+        <div class="kick" id="warren-k"><b>02</b> · Warren IA<i></i></div>
+        <div class="ttl"><span class="ln" id="warren-l1">Warren</span><span class="ln" id="warren-l2"><em>IA.</em></span></div>
+        <div class="rule" id="warren-rl"></div>
+        <div class="desc" id="warren-ds">Tu analista personal: 100 consultas por mes.</div>
       </div>
       <div class="side side-r" id="warren-sr">
-        <div class="kick" id="warren-kr"><i></i>Qué le podés preguntar</div>
-        <ul class="feats"><li class="" id="warren-f0"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Comparar dos empresas</li><li class="" id="warren-f1"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Si una acción está cara</li><li class="" id="warren-f2"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Los riesgos de cada una</li><li class="" id="warren-f3"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Cómo viene tu portafolio</li></ul>
+        <div class="kick" id="warren-kr"><i></i>Lo que podés hacer</div>
+        <ul class="acts">
+          <li class="act" id="warren-a0"><span class="tile" id="warren-ti0"><svg viewBox="0 0 24 24"><path d="M5 8h13l-3-3"/><path d="M19 16H6l3 3"/></svg></span>
+            <div><div class="t" id="warren-at0">Comparar empresas</div><div class="s" id="warren-as0">Apple vs. Microsoft, lado a lado</div></div></li>
+          <li class="act" id="warren-a1"><span class="tile" id="warren-ti1"><svg viewBox="0 0 24 24"><path d="M3 12l9-9h8v8l-9 9z"/><circle cx="16" cy="8" r="1.5"/></svg></span>
+            <div><div class="t" id="warren-at1">Saber si algo está caro</div><div class="s" id="warren-as1">Contra nuestro fair value</div></div></li>
+          <li class="act" id="warren-a2"><span class="tile" id="warren-ti2"><svg viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.4"/></svg></span>
+            <div><div class="t" id="warren-at2">Ver los riesgos</div><div class="s" id="warren-as2">Lo que tiene que salir bien</div></div></li>
+          <li class="act" id="warren-a3"><span class="tile" id="warren-ti3"><svg viewBox="0 0 24 24"><path d="M12 3v9h9"/><path d="M21 12a9 9 0 1 1-9-9"/></svg></span>
+            <div><div class="t" id="warren-at3">Analizar tu portafolio</div><div class="s" id="warren-as3">Con tus posiciones reales</div></div></li>
+        </ul>
       </div>
-    <div class="grain"></div>
     <script>
       (function () {
       const R = document.querySelector('[data-composition-id="warren"]');
       const tl = gsap.timeline({ paused: true });
       const TAB0 = 1;
       const DUR = 18.0;
-      const TABX = [4.67, 122.0, 239.33];
+      const TABX = [4.33, 121.0, 237.67];
 
-      const $ = (s) => R.querySelector(s);
       function sidesIn(t0) {
-        tl.fromTo(["#warren-k", "#warren-l1", "#warren-l2", "#warren-pr", "#warren-nt"], { opacity: 0, y: 70, filter: "blur(14px)" },
-          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "expo.out", stagger: 0.07 }, t0);
-        tl.fromTo("#warren-kr", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: "expo.out" }, t0 + 0.1);
+        tl.fromTo("#warren-k", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, t0);
+        tl.fromTo(["#warren-l1", "#warren-l2"], { opacity: 0, yPercent: 60, filter: "blur(16px)" },
+          { opacity: 1, yPercent: 0, filter: "blur(0px)", duration: 0.75, ease: "expo.out", stagger: 0.09 }, t0 + 0.05);
+        tl.fromTo("#warren-rl", { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "expo.inOut" }, t0 + 0.25);
+        tl.fromTo("#warren-ds", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, t0 + 0.4);
+        tl.fromTo("#warren-kr", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, t0 + 0.1);
       }
-      function featsIn(t0, step) {
-        R.querySelectorAll("#warren-sr li").forEach((li, i) => {
-          tl.fromTo(li, { opacity: 0, x: 60, filter: "blur(10px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, t0 + i * step);
-          tl.fromTo(li.querySelector(".ck"), { scale: 0.3 }, { scale: 1, duration: 0.45, ease: "back.out(2.6)" }, t0 + i * step + 0.06);
+      function actsIn(t0, step) {
+        R.querySelectorAll("#warren-sr .act").forEach((li, i) => {
+          const t = t0 + i * step;
+          tl.fromTo(li.querySelector(".tile"), { opacity: 0, scale: 0.4, rotation: -14 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.7, ease: "back.out(2.2)" }, t);
+          tl.fromTo(li.querySelector(".t"), { opacity: 0, x: 46, filter: "blur(8px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, t + 0.08);
+          tl.fromTo(li.querySelector(".s"), { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, t + 0.16);
         });
       }
       function sidesOut(t) {
-        tl.to(["#warren-sl", "#warren-sr"], { y: -160, opacity: 0, filter: "blur(18px)", duration: 0.3, ease: "power3.in" }, t);
+        tl.to(["#warren-sl", "#warren-sr"], { y: -170, opacity: 0, filter: "blur(18px)", duration: 0.32, ease: "power3.in" }, t);
       }
-      function pageIn(sel, t) { tl.fromTo(sel, { x: 376 }, { x: 0, duration: 0.6, ease: "expo.out" }, t); }
-      function pageOut(sel, t) { tl.to(sel, { x: -376, opacity: 0.2, duration: 0.3, ease: "power3.in" }, t); }
+      function pageIn(sel, t) { tl.fromTo(sel, { x: 374 }, { x: 0, duration: 0.65, ease: "expo.out" }, t); }
+      function pageOut(sel, t) { tl.to(sel, { x: -374, opacity: 0.2, duration: 0.3, ease: "power3.in" }, t); }
       function tap(x, y, t) {
         const el = "#warren-touch";
         tl.set(el, { x: x, y: y }, t - 0.3);
         tl.fromTo(el, { opacity: 0, scale: 1.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power2.out", immediateRender: false }, t - 0.26);
         tl.to(el, { scale: 0.78, duration: 0.08, ease: "power2.in" }, t - 0.04);
-        tl.to(el, { scale: 1.35, opacity: 0, duration: 0.32, ease: "power2.out" }, t + 0.05);
+        tl.to(el, { scale: 1.4, opacity: 0, duration: 0.34, ease: "power2.out" }, t + 0.05);
       }
-      function at(sel) {  // centro de un elemento en coordenadas de la pantalla del celular (sin transforms)
+      function at(sel) {  // centro de un elemento en coordenadas de la pantalla (sin transforms)
         let el = R.querySelector(sel), x = el.offsetWidth / 2, y = el.offsetHeight / 2;
         const scr = R.querySelector("#warren-screen");
         while (el && el !== scr) { x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
@@ -138,25 +154,25 @@
       const pillEl = R.querySelector("#warren-pill");
       if (pillEl) tl.set(pillEl, { x: TABX[TAB0] - TABX[0] }, 0);
       function tabTo(i, t) {
-        tl.to("#warren-pill", { x: TABX[i] - TABX[0], duration: 0.42, ease: "back.out(1.6)" }, t);
-        R.querySelectorAll("#warren-tabs .tab").forEach((tb, k) => {
-          tl.to(tb, { color: k === i ? "#f2c94c" : "#ead9a4", duration: 0.2, ease: "none" }, t + 0.05);
-        });
+        tl.to("#warren-pill", { x: TABX[i] - TABX[0], duration: 0.45, ease: "back.out(1.6)" }, t);
+        R.querySelectorAll("#warren-tabs .tab").forEach((tb, k) => tl.to(tb, { color: k === i ? "#f2c94c" : "#ead9a4", duration: 0.2, ease: "none" }, t + 0.05));
       }
-      function drift(deg) {  // giro 3D suave que vuelve a 0 justo al final (el corte con la escena siguiente no se nota)
-        tl.fromTo("#warren-phone", { rotationY: 0, y: 0 }, { rotationY: deg, y: -10, duration: DUR / 2, ease: "sine.inOut", transformPerspective: 2000 }, 0);
-        tl.to("#warren-phone", { rotationY: 0, y: 0, duration: DUR / 2, ease: "sine.inOut" }, DUR / 2);
+      function drift(deg, from, to) {  // giro 3D suave que vuelve a 0 (el corte con la escena siguiente no se nota)
+        const a = from || 0, b = to || DUR, h = (b - a) / 2;
+        tl.fromTo("#warren-phone", { rotationY: 0, y: 0 }, { rotationY: deg, y: -12, duration: h, ease: "sine.inOut", transformPerspective: 2200 }, a);
+        tl.to("#warren-phone", { rotationY: 0, y: 0, duration: h, ease: "sine.inOut" }, a + h);
+        tl.fromTo("#warren-glare", { x: 0 }, { x: deg > 0 ? 300 : 140, duration: h, ease: "sine.inOut" }, a);
+        tl.to("#warren-glare", { x: 0, duration: h, ease: "sine.inOut" }, a + h);
       }
 
 
       drift(6);
       pageIn("#warren-pg", 0.02);
       tl.fromTo("#warren-in", { y: 90 }, { y: 0, duration: 0.6, ease: "expo.out" }, 0.1);
-      sidesIn(0.12);
-      featsIn(0.6, 0.45);
+      sidesIn(0.1);
+      actsIn(0.55, 0.36);
       const Q = '¿Me conviene invertir en Apple o en Microsoft?';
       const typed = R.querySelector("#warren-typed"), ph = R.querySelector("#warren-ph"), caret = R.querySelector("#warren-caret");
-      // pregunta -> pasos -> respuesta larga que se escribe sola y el chat se desplaza
       tl.fromTo("#warren-q", { opacity: 0, y: 24, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(2)", transformOrigin: "100% 100%" }, 2.55);
       const STEP_T = [2.95, 3.55, 4.15];
       STEP_T.forEach((t, i) => tl.fromTo("#warren-s" + i, { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, t));
@@ -172,9 +188,7 @@
       const bottoms = TK.map((el) => { let y = el.classList.contains("co") ? 38 : el.offsetHeight, e = el; while (e && e !== chat) { y += e.offsetTop; e = e.offsetParent; } return y; });
       TK.forEach((el, i) => {
         if (el.classList.contains("w")) tl.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.1, ease: "none" }, times[i]);
-        else {
-          tl.fromTo(el, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, times[i]);
-        }
+        else tl.fromTo(el, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, times[i]);
       });
       const qBottom = R.querySelector("#warren-s2").offsetTop + 30;
       const ansEl = R.querySelector("#warren-a"), A_BOT = ansEl.offsetTop + ansEl.offsetHeight;
@@ -198,12 +212,11 @@
         let rb = 0; for (let i = 0; i < TK.length; i++) { if (times[i] <= t + 0.05) rb = Math.max(rb, bottoms[i]); else break; }
         const cut = Math.max(0, A_BOT - (rb + 14));
         ansEl.style.clipPath = "inset(0 0 " + cut.toFixed(1) + "px 0 round 18px 18px 18px 4px)";
-        let y = 0; for (let j = 0; j < 8; j++) y += target(t - j * 0.05); y /= 8;   // desplazamiento suave
+        let y = 0; for (let j = 0; j < 8; j++) y += target(t - j * 0.05); y /= 8;
         chat.style.transform = "translateY(" + y.toFixed(1) + "px)";
       });
       tap(...at("#warren-send"), 2.45);
-      // a Pedidos
-      tap(305.3, 749, 17.2);
+      tap(303.7, 747, 17.2);
       tabTo(2, 17.25);
       pageOut("#warren-pg", 17.55);
       tl.to("#warren-in", { y: 90, duration: 0.3, ease: "power3.in" }, 17.55);

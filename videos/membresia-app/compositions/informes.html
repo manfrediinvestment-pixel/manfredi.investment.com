@@ -1,56 +1,37 @@
 <template id="informes-template">
-  <div id="root" data-composition-id="informes" data-start="0" data-duration="11.6" data-width="1920" data-height="1080">
+  <div id="root" data-composition-id="informes" data-start="0" data-duration="14.0" data-width="1920" data-height="1080">
     <style>
       #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
       
-      .srch { display:flex; align-items:center; gap:8px; height:38px; border-radius:12px; padding:0 12px; margin-bottom:12px; border:1px solid rgba(226,234,245,.16);
-        background:rgba(255,255,255,.04); font:500 13px/1 "Plex Sans"; color:#ead9a4; }
+      .srch { display:flex; align-items:center; gap:8px; height:38px; border-radius:12px; padding:0 12px; margin-bottom:12px; box-shadow:inset 0 0 0 1px rgba(226,234,245,.16);
+        background:rgba(255,255,255,.04); font:500 13px/1 "Instrument"; color:#ead9a4; }
       .srch svg { width:16px; height:16px; fill:none; stroke:#ead9a4; stroke-width:2; }
       .covs { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-      .cov { height:128px; border-radius:14px; padding:12px; display:flex; flex-direction:column; border:1px solid rgba(226,234,245,.14);
-        background:radial-gradient(90% 70% at 100% 0%, rgba(242,201,76,.10), transparent 60%), linear-gradient(160deg,#16294f,#0a1430); }
+      .cov { height:128px; border-radius:15px; padding:12px; display:flex; flex-direction:column; box-shadow:inset 0 0 0 1px rgba(226,234,245,.15), 0 14px 26px -16px rgba(0,0,0,.8);
+        background:radial-gradient(90% 70% at 100% 0%, rgba(242,201,76,.12), transparent 60%), linear-gradient(160deg,#18305c,#0a1430); }
       .cov img { height:26px; width:auto; max-width:70px; object-fit:contain; }
       .cov .no { font:600 9.5px/1 "Plex Mono"; color:#ead9a4; letter-spacing:.08em; }
       .cov .tk { margin-top:auto; font:700 11px/1 "Plex Mono"; color:#f7dc8a; letter-spacing:.1em; }
       .cov .nm { font:400 21px/1.1 "DM Serif"; color:#f6f8fc; margin-top:3px; }
-      .cov .sec { display:flex; align-items:center; gap:6px; margin-top:6px; font:600 10px/1 "Plex Sans"; color:#ead9a4; }
+      .cov .sec { display:flex; align-items:center; gap:6px; margin-top:6px; font:600 10px/1 "Instrument"; color:#ead9a4; }
       .cov .sec i { width:7px; height:7px; border-radius:50%; display:block; }
-      #informes-doc { position:absolute; left:0; right:0; top:0; padding:0 16px 30px; }
-      .rcov { border-radius:18px; padding:16px; border:1px solid rgba(242,201,76,.35);
-        background:radial-gradient(100% 60% at 100% 0%, rgba(242,201,76,.14), transparent 60%), linear-gradient(170deg,#1a3360,#0a1530); }
-      .eyb { font:600 9.5px/1 "Plex Mono"; letter-spacing:.14em; color:#ead9a4; }
-      .lg { width:46px; height:46px; border-radius:12px; background:#0a1322; border:1px solid rgba(226,234,245,.18); display:flex; align-items:center; justify-content:center; }
-      .lg img { width:24px; height:24px; }
-      .cn { font:400 27px/1 "DM Serif"; color:#f6f8fc; } .cn em { color:#f7dc8a; }
-      .cm { font:600 10.5px/1 "Plex Mono"; color:#ead9a4; margin-top:6px; letter-spacing:.04em; }
-      .post { margin-top:14px; display:inline-block; font:700 10px/1 "Plex Mono"; letter-spacing:.1em; color:#fca5a5; padding:7px 10px; border-radius:8px;
-        border:1px solid rgba(239,68,68,.45); background:rgba(239,68,68,.10); }
-      .blk { margin-top:14px; border-radius:16px; padding:14px; border:1px solid rgba(226,234,245,.14); background:linear-gradient(180deg, rgba(25,45,78,.7), rgba(12,24,44,.85)); }
-      .bh { font:400 20px/1 "DM Serif"; color:#f6f8fc; display:flex; align-items:baseline; gap:8px; margin-bottom:12px; }
-      .bh b { font:700 11px/1 "Plex Mono"; color:#f2c94c; letter-spacing:.06em; }
-      .kpis { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-      .kpi { border-radius:12px; padding:10px; background:rgba(255,255,255,.035); border:1px solid rgba(226,234,245,.08); display:flex; flex-direction:column; gap:5px; }
-      .kpi small { font:600 9.5px/1 "Plex Mono"; color:#ead9a4; letter-spacing:.06em; text-transform:uppercase; }
-      .kpi b { font:700 14.5px/1.1 "Plex Mono"; color:#f6f8fc; }
-      .kpi span { font:600 10.5px/1 "Plex Sans"; color:#ead9a4; } .kpi span.up { color:#10B981; }
-      .secs { display:grid; grid-template-columns:1fr 1fr; gap:6px 10px; }
-      .sc { font:500 11.5px/1.2 "Plex Sans"; color:#f6f8fc; display:flex; gap:6px; } .sc b { font:700 10px/1.3 "Plex Mono"; color:#f2c94c; }
-      .ff { position:relative; padding-top:26px; }
-      .ffr { display:grid; grid-template-columns:96px 1fr 50px; align-items:center; gap:8px; height:30px; }
-      .ffn { font:600 11px/1.1 "Plex Sans"; color:#f6f8fc; }
-      .fft { position:relative; height:8px; border-radius:4px; background:rgba(226,234,245,.08); }
-      .ffd { position:absolute; top:-3px; width:14px; height:14px; margin-left:-7px; border-radius:50%; background:#f2c94c; box-shadow:0 0 12px rgba(242,201,76,.6); }
-      .ffv { font-size:10.5px; color:#f6f8fc; text-align:right; }
-      .ffl { position:absolute; top:0; bottom:0; width:2px; margin-left:calc(96px + 8px); transform-origin:50% 0; }
-      .ffl em { position:absolute; top:0; left:5px; font:700 9.5px/1 "Plex Mono"; font-style:normal; white-space:nowrap; letter-spacing:.04em; }
-      .ffl.mk { background:#EF4444; } .ffl.mk em { color:#fca5a5; }
-      .ffl.bl { background:#6ea0ff; } .ffl.bl em { color:#b9d0ff; top:12px; left:auto; right:5px; }
+      #informes-land { position:absolute; left:-220.0px; top:220.0px; width:814px; height:374px; transform:rotate(90deg); z-index:20; overflow:hidden; background:#fff; }
+      .lbar { position:absolute; left:0; right:0; top:0; height:40px; display:flex; align-items:center; justify-content:space-between; padding:0 22px 0 58px;
+        background:linear-gradient(180deg,#0f2142,#0a1730); font:600 12.5px/1 "Instrument"; color:#f6f8fc; z-index:2; }
+      .lb-back { color:#f2c94c; } .lb-t em { font-family:"Newsreader"; font-style:italic; font-weight:400; color:#ead9a4; font-size:13.5px; }
+      .lb-tk { font:700 10.5px/1 "Plex Mono"; letter-spacing:.1em; color:#0a1322; background:#f2c94c; padding:5px 8px; border-radius:6px; }
+      .lview { position:absolute; left:0; right:0; top:40px; bottom:0; overflow:hidden; background:#fff; }
+      #informes-doc { position:absolute; left:0; top:0; width:814px; height:auto; display:block; }
+      .lscroll { position:absolute; right:3px; top:4px; width:4px; height:46px; border-radius:2px; background:rgba(10,19,34,.35); }
 
     </style>
-    <div class="bg"></div><div class="grid"></div><div class="halo"></div>
+    <svg width="0" height="0" style="position:absolute"><defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbecc4"/><stop offset=".55" stop-color="#f2c94c"/><stop offset="1" stop-color="#c99a2e"/></linearGradient></defs></svg>
+    <div class="halo"></div>
 
+      <div class="cshadow" id="informes-cs"></div>
       <div class="pw">
       <div class="phone" id="informes-phone">
+        <i class="pbtn a"></i><i class="pbtn v1"></i><i class="pbtn v2"></i><i class="pbtn p"></i>
         <div class="bezel"></div>
         <div class="screen" id="informes-screen">
           <div class="app"></div>
@@ -58,7 +39,7 @@
           <div class="view" id="informes-view">
             <div class="pg" id="informes-lib">
               <h4>Informes <em>Pro</em></h4>
-              <div class="sub">48 empresas analizadas · fair value propio</div>
+              <div class="sub">+50 informes de distintos sectores y regiones</div>
               <div class="srch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Buscar empresa o ticker…</div>
               <div class="covs">
                 <div class="cov" id="informes-cv0">
@@ -92,106 +73,76 @@
                   <div class="sec"><i style="background:#10B981"></i>Bancos</div>
                 </div>
               </div>
-            </div>
-            <div class="pg" id="informes-rep" style="padding:0">
-              <div id="informes-doc">
-                <div class="rcov">
-                  <div class="eyb">EQUITY RESEARCH · INFORME INSTITUCIONAL</div>
-                  <div class="row" style="justify-content:flex-start;gap:12px;margin-top:14px">
-                    <div class="lg"><img src="assets/img/apple.svg" alt=""></div>
-                    <div><div class="cn">Apple <em>Inc.</em></div><div class="cm">AAPL · NASDAQ · Datos a Q3 FY2026</div></div>
-                  </div>
-                  <div class="eyb" style="margin-top:18px">FAIR VALUE · BLEND PROPIO</div>
-                  <div style="display:flex;align-items:flex-end;gap:10px;margin-top:8px">
-                    <div style="display:flex;align-items:baseline;font:700 40px/1 'Plex Mono';color:#f7dc8a;filter:drop-shadow(0 0 14px rgba(242,201,76,.35))"><span style="font-size:19px;margin-right:6px;align-self:flex-start;margin-top:4px">US$</span><div class="odo" id="informes-odo" data-layout-ignore></div></div>
-                  </div>
-                  <div class="row" style="justify-content:flex-start;gap:10px;margin-top:10px">
-                    <span style="font:500 12.5px/1 'Plex Sans';color:#f6f8fc">vs. <span class="mono">US$ 306,07</span> mercado</span>
-                    <span class="chg dn" id="informes-dn">▼ 16,0%</span>
-                  </div>
-                  <div class="post" id="informes-post">POSTURA · VALUACIÓN EXIGENTE</div>
-                </div>
-                <div class="blk">
-                  <div class="bh"><b>01</b>Resumen</div>
-                  <div class="kpis">
-                    <div class="kpi"><small>Ingresos Q3</small><b>US$ 109,4 mil M</b><span class="up">▲ 16% interanual</span></div>
-                    <div class="kpi"><small>Margen bruto TTM</small><b>48,7%</b><span>Récord de junio</span></div>
-                    <div class="kpi"><small>Caja neta</small><b>US$ 64,2 mil M</b><span>Sin deuda neta</span></div>
-                    <div class="kpi"><small>Ingresos TTM</small><b>US$ 466,8 mil M</b><span class="up">▲ 15,1%</span></div>
-                  </div>
-                </div>
-                <div class="blk">
-                  <div class="bh"><b>14</b>secciones</div>
-                  <div class="secs"><div class="sc"><b>01</b>Resumen Ejecutivo</div><div class="sc"><b>02</b>Historia y Evolución</div><div class="sc"><b>03</b>Modelo de Negocio</div><div class="sc"><b>04</b>Desarrollos Recientes</div><div class="sc"><b>05</b>Estados Financieros</div><div class="sc"><b>06</b>Deuda y Balance</div><div class="sc"><b>07</b>Flujo de Caja</div><div class="sc"><b>08</b>Comparables de Industria</div><div class="sc"><b>09</b>Gobierno Corporativo</div><div class="sc"><b>10</b>Registro de Riesgos</div><div class="sc"><b>11</b>Catalizadores</div><div class="sc"><b>12</b>Modelo Proyectado</div><div class="sc"><b>13</b>Valuación: 4 métodos</div><div class="sc"><b>14</b>Limitaciones del Modelo</div></div>
-                </div>
-                <div class="blk" id="informes-val">
-                  <div class="bh"><b>13</b>Valuación: 4 métodos</div>
-                  <div class="ff">
-                    <i class="ffl mk" id="informes-mk" style="left:132.2px"><em>Mercado 306,07</em></i>
-                    <i class="ffl bl" id="informes-bl" style="left:100.8px"><em>Blend 257,08</em></i>
-                    
-                  <div class="ffr"><span class="ffn">DCF Bear</span><span class="fft"><i class="ffd" id="informes-d0" style="left:5.7%"></i></span><span class="ffv mono">113,68</span></div>
-                  <div class="ffr"><span class="ffn">DCF Base</span><span class="fft"><i class="ffd" id="informes-d1" style="left:35.24%"></i></span><span class="ffv mono">184,58</span></div>
-                  <div class="ffr"><span class="ffn">DCF Bull</span><span class="fft"><i class="ffd" id="informes-d2" style="left:80.49%"></i></span><span class="ffv mono">293,17</span></div>
-                  <div class="ffr"><span class="ffn">Comparables</span><span class="fft"><i class="ffd" id="informes-d3" style="left:51.71%"></i></span><span class="ffv mono">224,11</span></div>
-                  <div class="ffr"><span class="ffn">Reversión histórica</span><span class="fft"><i class="ffd" id="informes-d4" style="left:81.5%"></i></span><span class="ffv mono">295,60</span></div>
-                  <div class="ffr"><span class="ffn">Consenso</span><span class="fft"><i class="ffd" id="informes-d5" style="left:93.34%"></i></span><span class="ffv mono">324,01</span></div>
-                  </div>
-                </div>
-              </div>
             </div></div>
-          <div class="tabs" id="informes-tabs"><div class="pill" id="informes-pill" style="left:4.67px"></div><div class="tab on" id="informes-t0"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg>Informes</div><div class="tab" id="informes-t1"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H10l-6 4z"/><path d="M9 10.5h6"/></svg>Warren IA</div><div class="tab" id="informes-t2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Pedidos</div></div>
-          <div class="sbar"><span>9:41</span><span class="ic"><b style="height:5px"></b><b style="height:8px"></b><b style="height:11px"></b><b style="height:14px"></b><span class="bat"></span></span></div>
+          <div class="tabs" id="informes-tabs"><div class="pill" id="informes-pill" style="left:4.33px"></div><div class="tab" id="informes-t0" style="color:#f2c94c"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg>Informes</div><div class="tab" id="informes-t1" style="color:#ead9a4"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H10l-6 4z"/><path d="M9 10.5h6"/></svg>Warren IA</div><div class="tab" id="informes-t2" style="color:#ead9a4"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Pedidos</div></div>
+          <div class="sbar" id="informes-sbar"><span>9:41</span><span class="ic"><b style="height:5px"></b><b style="height:8px"></b><b style="height:11px"></b><b style="height:14px"></b><span class="bat"></span></span></div>
           <div class="island"></div>
-          <div class="homeind"></div>
+          <div class="homeind" id="informes-home"></div>
           <div class="touch" id="informes-touch"></div>
+          <div id="informes-land">
+            <div class="lbar"><span class="lb-back">‹ Informes</span><span class="lb-t">Apple Inc. <em>· Informe institucional</em></span><span class="lb-tk">AAPL</span></div>
+            <div class="lview"><img id="informes-doc" src="assets/img/aapl-informe.jpg" alt=""><i class="lscroll" id="informes-sc"></i></div>
+          </div>
         </div>
+        <div class="glare"><i id="informes-glare"></i></div>
       </div>
       </div>
       <div class="side side-l" id="informes-sl">
-        <div class="kick" id="informes-k">Manfredi Pro · Informes<i></i></div>
+        <div class="kick" id="informes-k"><b>01</b> · Informes<i></i></div>
         <div class="ttl"><span class="ln" id="informes-l1">Informes</span><span class="ln" id="informes-l2"><em>a fondo.</em></span></div>
-        <div class="price" id="informes-pr"><span class="amt ">48</span><span class="per">empresas</span></div>
-        <div class="note" id="informes-nt">Con fair value propio.</div>
+        <div class="rule" id="informes-rl"></div>
+        <div class="desc" id="informes-ds">+50 informes de distintos sectores y regiones.</div>
       </div>
       <div class="side side-r" id="informes-sr">
-        <div class="kick" id="informes-kr"><i></i>Cada informe</div>
-        <ul class="feats"><li class="" id="informes-f0"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>14 secciones de análisis</li><li class="" id="informes-f1"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Datos oficiales de la SEC</li><li class="" id="informes-f2"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Fair value con 4 métodos</li><li class="" id="informes-f3"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Escenarios Bear, Base y Bull</li><li class="" id="informes-f4"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Riesgos y catalizadores</li></ul>
+        <div class="kick" id="informes-kr"><i></i>Lo que podés hacer</div>
+        <ul class="acts">
+          <li class="act" id="informes-a0"><span class="tile" id="informes-ti0"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg></span>
+            <div><div class="t" id="informes-at0">Leer el informe completo</div><div class="s" id="informes-as0">14 secciones, como un analista</div></div></li>
+          <li class="act" id="informes-a1"><span class="tile" id="informes-ti1"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></svg></span>
+            <div><div class="t" id="informes-at1">Ver el fair value</div><div class="s" id="informes-as1">4 métodos, un solo número</div></div></li>
+          <li class="act" id="informes-a2"><span class="tile" id="informes-ti2"><svg viewBox="0 0 24 24"><path d="M4 20V11M10 20V5M16 20v-6M3 20h18"/></svg></span>
+            <div><div class="t" id="informes-at2">Entender los números</div><div class="s" id="informes-as2">Datos oficiales de la SEC</div></div></li>
+          <li class="act" id="informes-a3"><span class="tile" id="informes-ti3"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span>
+            <div><div class="t" id="informes-at3">Conocer los riesgos</div><div class="s" id="informes-as3">Y los catalizadores que vienen</div></div></li>
+        </ul>
       </div>
-    <div class="grain"></div>
     <script>
       (function () {
       const R = document.querySelector('[data-composition-id="informes"]');
       const tl = gsap.timeline({ paused: true });
       const TAB0 = 0;
-      const DUR = 11.6;
-      const TABX = [4.67, 122.0, 239.33];
+      const DUR = 14.0;
+      const TABX = [4.33, 121.0, 237.67];
 
-      const $ = (s) => R.querySelector(s);
       function sidesIn(t0) {
-        tl.fromTo(["#informes-k", "#informes-l1", "#informes-l2", "#informes-pr", "#informes-nt"], { opacity: 0, y: 70, filter: "blur(14px)" },
-          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "expo.out", stagger: 0.07 }, t0);
-        tl.fromTo("#informes-kr", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: "expo.out" }, t0 + 0.1);
+        tl.fromTo("#informes-k", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, t0);
+        tl.fromTo(["#informes-l1", "#informes-l2"], { opacity: 0, yPercent: 60, filter: "blur(16px)" },
+          { opacity: 1, yPercent: 0, filter: "blur(0px)", duration: 0.75, ease: "expo.out", stagger: 0.09 }, t0 + 0.05);
+        tl.fromTo("#informes-rl", { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "expo.inOut" }, t0 + 0.25);
+        tl.fromTo("#informes-ds", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, t0 + 0.4);
+        tl.fromTo("#informes-kr", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, t0 + 0.1);
       }
-      function featsIn(t0, step) {
-        R.querySelectorAll("#informes-sr li").forEach((li, i) => {
-          tl.fromTo(li, { opacity: 0, x: 60, filter: "blur(10px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, t0 + i * step);
-          tl.fromTo(li.querySelector(".ck"), { scale: 0.3 }, { scale: 1, duration: 0.45, ease: "back.out(2.6)" }, t0 + i * step + 0.06);
+      function actsIn(t0, step) {
+        R.querySelectorAll("#informes-sr .act").forEach((li, i) => {
+          const t = t0 + i * step;
+          tl.fromTo(li.querySelector(".tile"), { opacity: 0, scale: 0.4, rotation: -14 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.7, ease: "back.out(2.2)" }, t);
+          tl.fromTo(li.querySelector(".t"), { opacity: 0, x: 46, filter: "blur(8px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, t + 0.08);
+          tl.fromTo(li.querySelector(".s"), { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, t + 0.16);
         });
       }
       function sidesOut(t) {
-        tl.to(["#informes-sl", "#informes-sr"], { y: -160, opacity: 0, filter: "blur(18px)", duration: 0.3, ease: "power3.in" }, t);
+        tl.to(["#informes-sl", "#informes-sr"], { y: -170, opacity: 0, filter: "blur(18px)", duration: 0.32, ease: "power3.in" }, t);
       }
-      function pageIn(sel, t) { tl.fromTo(sel, { x: 376 }, { x: 0, duration: 0.6, ease: "expo.out" }, t); }
-      function pageOut(sel, t) { tl.to(sel, { x: -376, opacity: 0.2, duration: 0.3, ease: "power3.in" }, t); }
+      function pageIn(sel, t) { tl.fromTo(sel, { x: 374 }, { x: 0, duration: 0.65, ease: "expo.out" }, t); }
+      function pageOut(sel, t) { tl.to(sel, { x: -374, opacity: 0.2, duration: 0.3, ease: "power3.in" }, t); }
       function tap(x, y, t) {
         const el = "#informes-touch";
         tl.set(el, { x: x, y: y }, t - 0.3);
         tl.fromTo(el, { opacity: 0, scale: 1.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power2.out", immediateRender: false }, t - 0.26);
         tl.to(el, { scale: 0.78, duration: 0.08, ease: "power2.in" }, t - 0.04);
-        tl.to(el, { scale: 1.35, opacity: 0, duration: 0.32, ease: "power2.out" }, t + 0.05);
+        tl.to(el, { scale: 1.4, opacity: 0, duration: 0.34, ease: "power2.out" }, t + 0.05);
       }
-      function at(sel) {  // centro de un elemento en coordenadas de la pantalla del celular (sin transforms)
+      function at(sel) {  // centro de un elemento en coordenadas de la pantalla (sin transforms)
         let el = R.querySelector(sel), x = el.offsetWidth / 2, y = el.offsetHeight / 2;
         const scr = R.querySelector("#informes-screen");
         while (el && el !== scr) { x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
@@ -200,48 +151,62 @@
       const pillEl = R.querySelector("#informes-pill");
       if (pillEl) tl.set(pillEl, { x: TABX[TAB0] - TABX[0] }, 0);
       function tabTo(i, t) {
-        tl.to("#informes-pill", { x: TABX[i] - TABX[0], duration: 0.42, ease: "back.out(1.6)" }, t);
-        R.querySelectorAll("#informes-tabs .tab").forEach((tb, k) => {
-          tl.to(tb, { color: k === i ? "#f2c94c" : "#ead9a4", duration: 0.2, ease: "none" }, t + 0.05);
-        });
+        tl.to("#informes-pill", { x: TABX[i] - TABX[0], duration: 0.45, ease: "back.out(1.6)" }, t);
+        R.querySelectorAll("#informes-tabs .tab").forEach((tb, k) => tl.to(tb, { color: k === i ? "#f2c94c" : "#ead9a4", duration: 0.2, ease: "none" }, t + 0.05));
       }
-      function drift(deg) {  // giro 3D suave que vuelve a 0 justo al final (el corte con la escena siguiente no se nota)
-        tl.fromTo("#informes-phone", { rotationY: 0, y: 0 }, { rotationY: deg, y: -10, duration: DUR / 2, ease: "sine.inOut", transformPerspective: 2000 }, 0);
-        tl.to("#informes-phone", { rotationY: 0, y: 0, duration: DUR / 2, ease: "sine.inOut" }, DUR / 2);
+      function drift(deg, from, to) {  // giro 3D suave que vuelve a 0 (el corte con la escena siguiente no se nota)
+        const a = from || 0, b = to || DUR, h = (b - a) / 2;
+        tl.fromTo("#informes-phone", { rotationY: 0, y: 0 }, { rotationY: deg, y: -12, duration: h, ease: "sine.inOut", transformPerspective: 2200 }, a);
+        tl.to("#informes-phone", { rotationY: 0, y: 0, duration: h, ease: "sine.inOut" }, a + h);
+        tl.fromTo("#informes-glare", { x: 0 }, { x: deg > 0 ? 300 : 140, duration: h, ease: "sine.inOut" }, a);
+        tl.to("#informes-glare", { x: 0, duration: h, ease: "sine.inOut" }, a + h);
       }
 
 
-      drift(-6);
       pageIn("#informes-lib", 0.02);
-      sidesIn(0.12);
-      featsIn(0.6, 0.42);
+      sidesIn(0.1);
+      actsIn(0.55, 0.32);
+      tl.set("#informes-land", { opacity: 0 }, 0);
       for (let i = 0; i < 6; i++) tl.fromTo("#informes-cv" + i, { opacity: 0, y: 30, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "expo.out" }, 0.35 + i * 0.08);
-      // toca la tapa de Apple y el informe se abre desde la tapa
-      tap(...at("#informes-cv0"), 2.3);
-      tl.to("#informes-cv0", { scale: 0.95, duration: 0.08, ease: "power2.in" }, 2.26);
-      tl.fromTo("#informes-rep", { opacity: 0, scale: 0.42 }, { opacity: 1, scale: 1, duration: 0.55, ease: "expo.inOut", transformOrigin: "25% 32%" }, 2.42);
-      tl.to("#informes-lib", { opacity: 0, scale: 1.08, duration: 0.4, ease: "power2.in", transformOrigin: "25% 32%" }, 2.42);
-      // valor justo con odómetro + baja contra el mercado
-      const set = MF.odo(R.querySelector("#informes-odo"), [100, 10, 1, ",", 0.1, 0.01]);
-      const o = { v: 0 }; set(0);
-      tl.to(o, { v: 257.08, duration: 1.3, ease: "expo.out", onUpdate: () => set(o.v) }, 2.9);
-      tl.fromTo("#informes-dn", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(2.6)" }, 4.0);
-      tl.fromTo("#informes-post", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, 4.2);
-      // recorre el informe hacia abajo (rápido, con frenadas en cada bloque)
-      const doc = R.querySelector("#informes-doc"), val = R.querySelector("#informes-val");
-      const maxY = Math.max(0, doc.offsetHeight - 590);
-      const blocks = R.querySelectorAll("#informes-doc .blk");
-      const stops = [blocks[0].offsetTop - 12, blocks[1].offsetTop - 12, maxY].map((v) => -Math.min(maxY, v));
-      tl.to(doc, { y: stops[0], duration: 0.6, ease: "power3.inOut" }, 4.9);
-      tl.to(doc, { y: stops[1], duration: 0.6, ease: "power3.inOut" }, 6.1);
-      tl.to(doc, { y: stops[2], duration: 0.7, ease: "power3.inOut" }, 7.2);
-      for (let i = 0; i < 6; i++) tl.fromTo("#informes-d" + i, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(3)" }, 7.8 + i * 0.12);
-      tl.fromTo(["#informes-mk", "#informes-bl"], { scaleY: 0 }, { scaleY: 1, duration: 0.5, ease: "expo.out", stagger: 0.25 }, 8.6);
+      tl.fromTo("#informes-phone", { rotationY: 0 }, { rotationY: -6, duration: 1.3, ease: "sine.inOut", transformPerspective: 2200 }, 0);
+      tl.to("#informes-phone", { rotationY: 0, duration: 1.0, ease: "sine.inOut" }, 1.3);
+      // toca Apple
+      tap(...at("#informes-cv0"), 2.55);
+      tl.to("#informes-cv0", { scale: 0.95, duration: 0.08, ease: "power2.in" }, 2.51);
+      tl.to("#informes-cv0", { scale: 1.04, duration: 0.25, ease: "power2.out" }, 2.6);
+      sidesOut(2.7);
+      // el celular gira a horizontal y se agranda: se abre el informe original, como en la compu
+      tl.to("#informes-phone", { rotation: -90, scale: 1.82, duration: 1.0, ease: "expo.inOut" }, 2.85);
+      tl.to("#informes-cs", { opacity: 0, duration: 0.4, ease: "power2.out" }, 2.85);
+      tl.to(["#informes-head", "#informes-view", "#informes-tabs", "#informes-sbar", "#informes-home"], { opacity: 0, duration: 0.3, ease: "power2.in" }, 2.95);
+      tl.fromTo("#informes-land", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.55, ease: "expo.out", immediateRender: false }, 3.3);
+      tl.fromTo("#informes-glare", { x: 0 }, { x: 280, duration: 1.4, ease: "sine.inOut" }, 2.85);
+      // recorre el informe: tapa → resumen → segmentos y gráfico → valuación
+      tl.set(["#informes-doc", "#informes-sc"], { y: 0 }, 0);
+      tl.to("#informes-doc", { y: -324.1, duration: 1.2, ease: "power2.inOut" }, 4.6);
+      tl.to("#informes-sc", { y: 42.7, duration: 1.2, ease: "power2.inOut" }, 4.6);
+      tl.to("#informes-doc", { y: -798.9, duration: 1.1, ease: "power2.inOut" }, 6.2);
+      tl.to("#informes-sc", { y: 105.4, duration: 1.1, ease: "power2.inOut" }, 6.2);
+      tl.to("#informes-doc", { y: -1130.6, duration: 0.8, ease: "power2.inOut" }, 7.6);
+      tl.to("#informes-sc", { y: 149.1, duration: 0.8, ease: "power2.inOut" }, 7.6);
+      tl.to("#informes-doc", { y: -1514.9, duration: 0.9, ease: "power2.inOut" }, 8.8);
+      tl.to("#informes-sc", { y: 199.8, duration: 0.9, ease: "power2.inOut" }, 8.8);
+      tl.to("#informes-doc", { y: -1861.6, duration: 0.9, ease: "power2.inOut" }, 10.0);
+      tl.to("#informes-sc", { y: 245.5, duration: 0.9, ease: "power2.inOut" }, 10.0);
+      tl.to("#informes-doc", { y: -2123.1, duration: 0.8, ease: "power2.inOut" }, 11.2);
+      tl.to("#informes-sc", { y: 280, duration: 0.8, ease: "power2.inOut" }, 11.2);
+
+      // vuelve a vertical, de nuevo en la biblioteca
+      tl.to("#informes-land", { opacity: 0, duration: 0.3, ease: "power2.in" }, 12.15);
+      tl.to("#informes-phone", { rotation: 0, scale: 1, duration: 0.9, ease: "expo.inOut" }, 12.2);
+      tl.to("#informes-glare", { x: 0, duration: 0.9, ease: "sine.inOut" }, 12.2);
+      tl.to("#informes-cs", { opacity: 1, duration: 0.4, ease: "power2.out" }, 12.8);
+      tl.to(["#informes-head", "#informes-view", "#informes-tabs", "#informes-sbar", "#informes-home"], { opacity: 1, duration: 0.35, ease: "power2.out" }, 12.6);
+      tl.to("#informes-cv0", { scale: 1, duration: 0.3, ease: "power2.out" }, 12.6);
       // a Warren IA
-      tap(188.0, 749, 10.85);
-      tabTo(1, 10.9);
-      pageOut("#informes-rep", 11.2);
-      sidesOut(11.2);
+      tap(187.0, 747, 13.35);
+      tabTo(1, 13.4);
+      pageOut("#informes-lib", 13.65);
 
       window.__timelines["informes"] = tl;
       })();
