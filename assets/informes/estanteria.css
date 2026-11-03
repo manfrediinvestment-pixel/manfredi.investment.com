@@ -75,9 +75,15 @@
 #inversiones .col-search .inv-search-box:focus-within { border-color:var(--es-gold); background:rgba(230,207,150,.05); box-shadow:none; }
 #inversiones .col-search .inv-search-box input { font:400 14px var(--es-sans); color:var(--es-ink); }
 #inversiones .col-search .inv-search-box input::placeholder { color:var(--es-ink); opacity:.75; }
-.col-pedir { height:44px; display:inline-flex; align-items:center; gap:10px; padding:0 18px; border-radius:999px; border:1px solid var(--es-line2); background:transparent; color:var(--es-ink); font:600 14px var(--es-sans); cursor:pointer; white-space:nowrap; transition:border-color .2s ease, transform .16s var(--es-ease); }
-.col-pedir span { font:500 12px var(--es-mono); color:var(--es-gold); }
-.col-pedir:hover { border-color:var(--es-gold); }
+.col-pedir { position:relative; overflow:hidden; isolation:isolate; height:48px; display:inline-flex; align-items:center; gap:10px; padding:0 8px 0 18px; border-radius:999px; border:0; cursor:pointer; white-space:nowrap;
+  background:linear-gradient(180deg, #f7dc6f, #f2c94c 55%, #e3b53a); color:#0a1322; font:700 15px var(--es-sans);
+  box-shadow:0 0 0 1px rgba(247,220,111,.6), 0 10px 28px -8px rgba(242,201,76,.55), 0 0 40px -6px rgba(242,201,76,.35), inset 0 1px 0 rgba(255,255,255,.55);
+  transition:transform .18s var(--es-ease), box-shadow .3s ease; }
+.col-pedir svg { flex:none; color:#0a1322; }
+.col-pedir span { font:600 12px/1 var(--es-mono); color:#f7dc6f; background:#0a1322; border-radius:999px; padding:8px 11px; }
+.col-pedir::after { content:''; position:absolute; z-index:-1; top:0; bottom:0; left:-40%; width:30%; transform:skewX(-20deg); background:linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent); animation:pedir-brillo 4.5s ease-in-out infinite 1.2s; }
+@keyframes pedir-brillo { 0%, 62% { left:-40%; } 100% { left:130%; } }
+.col-pedir:hover { transform:translateY(-1px); box-shadow:0 0 0 1px rgba(247,220,111,.8), 0 14px 34px -8px rgba(242,201,76,.7), 0 0 56px -4px rgba(242,201,76,.45), inset 0 1px 0 rgba(255,255,255,.6); }
 .col-pedir:active { transform:scale(.97); }
 
 .col { display:flex; flex-wrap:wrap; row-gap:44px; margin:34px 0 24px; }
@@ -139,6 +145,38 @@
 
 
 
+
+/* sello "Gratis" (informes sin _preview-gate.js) */
+.lec__gratis { display:inline-flex; align-items:center; gap:11px; margin-top:20px; padding:9px 18px 9px 14px; border-radius:999px; text-decoration:none;
+  background:linear-gradient(180deg, #34d399, #10b981); color:#03140d !important; font:700 15px var(--es-sans); letter-spacing:.01em;
+  box-shadow:0 0 0 1px rgba(52,211,153,.55), 0 10px 26px -10px rgba(16,185,129,.7), inset 0 1px 0 rgba(255,255,255,.4); transition:transform .18s var(--es-ease), box-shadow .3s ease; }
+.lec__gratis i { position:relative; width:9px; height:9px; border-radius:50%; background:#03140d; }
+.lec__gratis i::after { content:''; position:absolute; inset:-5px; border-radius:50%; border:2px solid rgba(3,20,13,.55); animation:gratis-pulso 2.2s ease-out infinite; }
+@keyframes gratis-pulso { from { transform:scale(.4); opacity:1; } to { transform:scale(1.5); opacity:0; } }
+.lec__gratis span { font:500 13px var(--es-sans); color:#03140d; opacity:.8; padding-left:11px; border-left:1px solid rgba(3,20,13,.25); }
+.lec__gratis:hover { transform:translateY(-1px); box-shadow:0 0 0 1px rgba(52,211,153,.8), 0 14px 30px -10px rgba(16,185,129,.85), inset 0 1px 0 rgba(255,255,255,.45); }
+.col .spn.gratis { box-shadow:inset 0 1px 0 rgba(255,255,255,.14), inset 0 -4px 0 #10b981, 0 1px 0 rgba(0,0,0,.7), 2px 0 4px -1px rgba(0,0,0,.6); }
+.col .spn.gratis::before { content:''; position:absolute; z-index:2; top:5px; left:5px; width:6px; height:6px; border-radius:50%; background:#34d399; box-shadow:0 0 8px #34d399; }
+
+/* serie clara (Argentina): champagne con letra marino */
+.spn.claro { color:#0a1322; }
+.spn.claro .spn__tk { color:#0a1322; text-shadow:none; }
+.spn.claro .spn__gilt { border-color:rgba(10,19,34,.55); }
+.spn.claro .spn__no { color:#4a3810; }
+.spn.claro .spn__cap img, .est-cover.claro .est-cover__logo { filter:invert(1) brightness(.12) sepia(.2); }
+.col .spn.claro { background:
+    linear-gradient(90deg, rgba(0,0,0,.28) 0, rgba(255,255,255,.35) 16%, rgba(255,255,255,.05) 38%, rgba(0,0,0,.06) 76%, rgba(0,0,0,.3) 100%),
+    linear-gradient(180deg, #e9d9ad 0%, #d8c493 30%, #b9a370 100%); }
+.bk3__s.spn.claro { background:linear-gradient(90deg, rgba(0,0,0,.25), rgba(255,255,255,.25) 30%, rgba(0,0,0,.2)), linear-gradient(180deg, #e9d9ad, #c9b37f); }
+.est-cover.claro { color:#0a1322; background:radial-gradient(70% 45% at 50% 38%, rgba(255,255,255,.35), transparent 70%), linear-gradient(180deg, #ecdcb2 0%, #d8c493 50%, #bfa874 100%); }
+.est-cover.claro .est-cover__top, .est-cover.claro .est-cover__bot { color:#3d2f0e; border-color:rgba(10,19,34,.25); }
+.est-cover.claro .est-cover__bot b { color:#0a1322; }
+.est-cover.claro .est-cover__frame { border-color:rgba(10,19,34,.22); }
+.est-cover.claro .est-cover__rule { background:#0a1322; }
+.est-cover.claro .est-cover__tk { text-shadow:none; }
+.est-cover.claro .est-cover__sec { color:#4a3810; }
+.est-cover.claro .est-cover__sec::before { background:#4a3810; box-shadow:none; }
+
 @media (max-width:980px) {
   .lec { grid-template-columns:1fr; gap:8px; padding:8px 0 56px; }
   .lec__stage { height:440px; }
@@ -153,9 +191,10 @@
   .lec__stats dd { font-size:18px; }
   .lec__stats div + div { padding-left:12px; }
   .lec__btn { flex:1; justify-content:center; }
-  .col-acts { width:100%; }
-  #inversiones .col-search { flex:1; width:auto; min-width:0; }
-  .col-pedir span { display:none; }
+  .col-acts { width:100%; flex-direction:column-reverse; align-items:stretch; gap:10px; }
+  #inversiones .col-search { width:100%; }
+  .col-pedir { justify-content:center; }
+
   .col { flex-wrap:nowrap; overflow-x:auto; scroll-snap-type:x proximity; margin-left:-20px; margin-right:-20px; padding:0 4px; scrollbar-width:none; }
   .col::-webkit-scrollbar { display:none; }
   .col-grp { scroll-snap-align:start; }
@@ -163,4 +202,5 @@
 @media (prefers-reduced-motion: reduce) {
   .bk3 { animation:none; }
   .bk3, .spn, .lec__txt, .lec__btn { transition:none !important; }
+  .col-pedir::after, .lec__gratis i::after { animation:none; }
 }
