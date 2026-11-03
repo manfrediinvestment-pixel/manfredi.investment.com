@@ -3,92 +3,98 @@
     <style>
       #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
       
-      #cierre-card { position:absolute; left:400px; top:250px; width:1120px; height:540px; border-radius:32px; padding:58px 64px; display:flex; flex-direction:column;
-        border:1px solid rgba(242,201,76,.5);
-        background:radial-gradient(110% 60% at 50% 0%, rgba(242,201,76,.16), transparent 62%), linear-gradient(180deg, rgba(25,45,78,.82), rgba(10,20,38,.94));
-        box-shadow:0 50px 110px -30px rgba(0,0,0,.8), 0 0 110px -20px rgba(242,201,76,.35); }
+      #cierre-card { position:absolute; left:400px; top:250px; width:1120px; height:540px; border-radius:34px; padding:60px 66px; display:flex; flex-direction:column;
+        box-shadow:inset 0 0 0 1px rgba(242,201,76,.5), inset 0 1px 0 rgba(255,255,255,.08), 0 60px 120px -30px rgba(0,0,0,.85), 0 0 120px -20px rgba(242,201,76,.35);
+        background:radial-gradient(110% 60% at 50% 0%, rgba(242,201,76,.16), transparent 62%), linear-gradient(180deg, rgba(25,45,78,.85), rgba(10,20,38,.95)); }
       .cc-top { display:flex; justify-content:space-between; align-items:center; }
-      .cc-n { font:400 96px/1 "DM Serif"; color:#f6f8fc; letter-spacing:-.02em; white-space:nowrap; }
-      .cc-n em { font-style:italic; background:linear-gradient(180deg,#f9e7b5,#f2c94c 55%,#c99a2e); -webkit-background-clip:text; background-clip:text; color:transparent; padding-right:.06em; }
+      .cc-n { font:400 100px/1 "DM Serif"; color:#f6f8fc; letter-spacing:-.025em; white-space:nowrap; }
+      .cc-n em { font-style:italic; background:linear-gradient(180deg,#fbecc4,#f2c94c 52%,#b98a28); -webkit-background-clip:text; background-clip:text; color:transparent; padding-right:.08em; }
       .cc-p { display:flex; align-items:baseline; gap:12px; white-space:nowrap; }
-      .cc-p .cur { font:600 22px/1 "Plex Mono"; letter-spacing:.14em; color:#ead9a4; align-self:flex-start; margin-top:10px; }
-      .cc-p .amt { font:400 110px/1 "DM Serif"; color:#f7dc8a; }
-      .cc-p .per { font:italic 400 32px/1 "DM Serif"; color:#ead9a4; }
-      .cc-g { margin-top:auto; display:grid; grid-template-columns:1fr 1fr; gap:20px 40px; padding-top:34px; border-top:1px solid rgba(226,234,245,.14); }
-      .cc-g div { display:flex; align-items:center; gap:14px; font:500 29px/1.1 "Plex Sans"; color:#f6f8fc; white-space:nowrap; }
-      .cc-g .ck { width:36px; height:36px; border-radius:50%; flex:none; border:1px solid rgba(242,201,76,.45); background:rgba(242,201,76,.08); display:flex; align-items:center; justify-content:center; }
-      .cc-g .ck svg { width:18px; height:18px; }
-      #cierre-logo { position:absolute; left:0; right:0; top:0; height:1080px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:26px; }
-      #cierre-logo .wm { font:400 92px/1 "DM Serif"; color:#f6f8fc; letter-spacing:-.02em; }
+      .cc-p .cur { font:600 22px/1 "Plex Mono"; letter-spacing:.14em; color:#ead9a4; align-self:flex-start; margin-top:12px; }
+      .cc-p .amt { font:400 116px/1 "DM Serif"; color:#f7dc8a; }
+      .cc-p .per { font:italic 400 36px/1 "Newsreader"; color:#f3e3bd; }
+      .cc-g { margin-top:auto; display:grid; grid-template-columns:1fr 1fr; gap:24px 40px; padding-top:36px; border-top:1px solid rgba(226,234,245,.14); }
+      .cc-g div { display:flex; align-items:center; gap:16px; font:600 29px/1.1 "Instrument"; color:#f6f8fc; white-space:nowrap; }
+      .cc-g .tile { width:54px; height:54px; border-radius:16px; }
+      .cc-g .tile svg { width:26px; height:26px; }
+      #cierre-logo { position:absolute; left:0; right:0; top:0; height:1080px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:28px; }
+      #cierre-logo .wm { font:400 96px/1 "DM Serif"; color:#f6f8fc; letter-spacing:-.025em; }
       #cierre-logo .wm em { font-style:italic; color:#f7dc8a; }
-      #cierre-logo .url { font:600 26px/1 "Plex Mono"; letter-spacing:.12em; color:#ead9a4; }
-      .mp { display:inline-flex; align-items:center; gap:12px; height:56px; padding:0 22px 0 14px; border-radius:999px; background:#fff; font:700 24px/1 "Plex Sans"; color:#2d3277; }
-      .mp b { color:#00b1ea; } .mp svg { width:40px; height:40px; }
-      .mprow { display:flex; align-items:center; gap:18px; font:500 24px/1 "Plex Sans"; color:#f6f8fc; }
+      #cierre-logo .url { font:600 26px/1 "Plex Mono"; letter-spacing:.14em; color:#ead9a4; }
+      .mp { display:inline-flex; align-items:center; gap:12px; height:58px; padding:0 22px 0 14px; border-radius:999px; background:#fff; font:700 25px/1 "Plex Sans"; color:#2d3277; }
+      .mp b { color:#00b1ea; } .mp svg { width:42px; height:42px; }
+      .mprow { display:flex; align-items:center; gap:18px; font:500 26px/1 "Instrument"; color:#f6f8fc; }
 
     </style>
-    <div class="bg"></div><div class="grid"></div><div class="halo"></div>
+    <svg width="0" height="0" style="position:absolute"><defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbecc4"/><stop offset=".55" stop-color="#f2c94c"/><stop offset="1" stop-color="#c99a2e"/></linearGradient></defs></svg>
+    <div class="halo"></div>
 
+      <div class="cshadow" id="cierre-cs"></div>
       <div class="pw">
       <div class="phone" id="cierre-phone">
+        <i class="pbtn a"></i><i class="pbtn v1"></i><i class="pbtn v2"></i><i class="pbtn p"></i>
         <div class="bezel"></div>
         <div class="screen" id="cierre-screen">
           <div class="app"></div>
           <div class="ahead" id="cierre-head"><div class="brand"><img src="assets/img/emblem.svg" alt="">Manfredi <em>Investment</em></div><div class="av">IM</div></div>
           <div class="view" id="cierre-view"></div>
-          <div class="tabs" id="cierre-tabs"><div class="pill" id="cierre-pill" style="left:4.67px"></div><div class="tab" id="cierre-t0"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg>Informes</div><div class="tab" id="cierre-t1"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H10l-6 4z"/><path d="M9 10.5h6"/></svg>Warren IA</div><div class="tab on" id="cierre-t2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Pedidos</div></div>
-          <div class="sbar"><span>9:41</span><span class="ic"><b style="height:5px"></b><b style="height:8px"></b><b style="height:11px"></b><b style="height:14px"></b><span class="bat"></span></span></div>
+          <div class="tabs" id="cierre-tabs"><div class="pill" id="cierre-pill" style="left:4.33px"></div><div class="tab" id="cierre-t0" style="color:#ead9a4"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg>Informes</div><div class="tab" id="cierre-t1" style="color:#ead9a4"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H10l-6 4z"/><path d="M9 10.5h6"/></svg>Warren IA</div><div class="tab" id="cierre-t2" style="color:#f2c94c"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Pedidos</div></div>
+          <div class="sbar" id="cierre-sbar"><span>9:41</span><span class="ic"><b style="height:5px"></b><b style="height:8px"></b><b style="height:11px"></b><b style="height:14px"></b><span class="bat"></span></span></div>
           <div class="island"></div>
-          <div class="homeind"></div>
+          <div class="homeind" id="cierre-home"></div>
           <div class="touch" id="cierre-touch"></div>
         </div>
+        <div class="glare"><i id="cierre-glare"></i></div>
       </div>
       </div>
       <div id="cierre-card">
         <div class="cc-top"><div class="cc-n" id="cierre-n">Manfredi <em>Pro</em></div>
           <div class="cc-p" id="cierre-p"><span class="cur">USD</span><span class="amt">15</span><span class="per">por mes</span></div></div>
-        <div class="cc-g"><div id="cierre-f0"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Informes institucionales</div><div id="cierre-f1"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Warren IA: 100 consultas</div><div id="cierre-f2"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>1 informe a pedido por mes</div><div id="cierre-f3"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Chats Pro con Ignacio</div></div>
+        <div class="cc-g"><div id="cierre-f0"><span class="tile"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg></span>Informes institucionales</div><div id="cierre-f1"><span class="tile"><svg viewBox="0 0 24 24"><path d="M5 8h13l-3-3"/><path d="M19 16H6l3 3"/></svg></span>Warren IA: 100 consultas</div><div id="cierre-f2"><span class="tile"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></span>1 informe a pedido por mes</div><div id="cierre-f3"><span class="tile"><svg viewBox="0 0 24 24"><path d="M12 3v9h9"/><path d="M21 12a9 9 0 1 1-9-9"/></svg></span>Chats Pro con Ignacio</div></div>
       </div>
       <div id="cierre-logo">
-        <img id="cierre-em" src="assets/img/emblem.svg" style="width:150px;height:150px" alt="">
+        <img id="cierre-em" src="assets/img/emblem.svg" style="width:156px;height:156px" alt="">
         <div class="wm" id="cierre-wm">Manfredi <em>Investment</em></div>
         <div class="url" id="cierre-url">MANFREDINVESTMENT.COM</div>
         <div class="mprow" id="cierre-mp"><span class="mp"><svg viewBox="0 0 24 24"><path fill="#00b1ea" d="M11.115 16.479a.93.927 0 0 1-.939-.886c-.002-.042-.006-.155-.103-.155-.04 0-.074.023-.113.059-.112.103-.254.206-.46.206a.816.814 0 0 1-.305-.066c-.535-.214-.542-.578-.521-.725.006-.038.007-.08-.02-.11l-.032-.03h-.034c-.027 0-.055.012-.093.039a.788.786 0 0 1-.454.16.7.699 0 0 1-.253-.05c-.708-.27-.65-.928-.617-1.126.005-.041-.005-.072-.03-.092l-.05-.04-.047.043a.728.726 0 0 1-.505.203.73.728 0 0 1-.732-.725c0-.4.328-.722.732-.722.364 0 .675.27.721.63l.026.195.11-.165c.01-.018.307-.46.852-.46.102 0 .21.016.316.05.434.13.508.52.519.68.008.094.075.1.09.1.037 0 .064-.024.083-.045a.746.744 0 0 1 .54-.225c.128 0 .263.03.402.09.69.293.379 1.158.374 1.167-.058.144-.061.207-.005.244l.027.013h.02c.03 0 .07-.014.134-.035.093-.032.235-.08.367-.08a.944.942 0 0 1 .94.93.936.934 0 0 1-.94.928zm7.302-4.171c-1.138-.98-3.768-3.24-4.481-3.77-.406-.302-.685-.462-.928-.533a1.559 1.554 0 0 0-.456-.07c-.182 0-.376.032-.58.095-.46.145-.918.505-1.362.854l-.023.018c-.414.324-.84.66-1.164.73a1.986 1.98 0 0 1-.43.049c-.362 0-.687-.104-.81-.258-.02-.025-.007-.066.04-.125l.008-.008 1-1.067c.783-.774 1.525-1.506 3.23-1.545h.085c1.062 0 2.12.469 2.24.524a7.03 7.03 0 0 0 3.056.724c1.076 0 2.188-.263 3.354-.795a9.135 9.11 0 0 0-.405-.317c-1.025.44-2.003.66-2.946.66-.962 0-1.925-.229-2.858-.68-.05-.022-1.22-.567-2.44-.57-.032 0-.065 0-.096.002-1.434.033-2.24.536-2.782.976-.528.013-.982.138-1.388.25-.361.1-.673.186-.979.185-.125 0-.35-.01-.37-.012-.35-.01-2.115-.437-3.518-.962-.143.1-.28.203-.415.31 1.466.593 3.25 1.053 3.812 1.089.157.01.323.027.491.027.372 0 .744-.103 1.104-.203.213-.059.446-.123.692-.17l-.196.194-1.017 1.087c-.08.08-.254.294-.14.557a.705.703 0 0 0 .268.292c.243.162.677.27 1.08.271.152 0 .297-.015.43-.044.427-.095.874-.448 1.349-.82.377-.296.913-.672 1.323-.782a1.494 1.49 0 0 1 .37-.05.611.61 0 0 1 .095.005c.27.034.533.125 1.003.472.835.62 4.531 3.815 4.566 3.846.002.002.238.203.22.537-.007.186-.11.352-.294.466a.902.9 0 0 1-.484.15.804.802 0 0 1-.428-.124c-.014-.01-1.28-1.157-1.746-1.543-.074-.06-.146-.115-.22-.115a.122.122 0 0 0-.096.045c-.073.09.01.212.105.294l1.48 1.47c.002 0 .184.17.204.395.012.244-.106.447-.35.606a.957.955 0 0 1-.526.171.766.764 0 0 1-.42-.127l-.214-.206a21.035 20.978 0 0 0-1.08-1.009c-.072-.058-.148-.112-.221-.112a.127.127 0 0 0-.094.038c-.033.037-.056.103.028.212a.698.696 0 0 0 .075.083l1.078 1.198c.01.01.222.26.024.511l-.038.048a1.18 1.178 0 0 1-.1.096c-.184.15-.43.164-.527.164a.8.798 0 0 1-.147-.012c-.106-.018-.178-.048-.212-.089l-.013-.013c-.06-.06-.602-.609-1.054-.98-.059-.05-.133-.11-.21-.11a.128.128 0 0 0-.096.042c-.09.096.044.24.1.293l.92 1.003a.204.204 0 0 1-.033.062c-.033.044-.144.155-.479.196a.91.907 0 0 1-.122.007c-.345 0-.712-.164-.902-.264a1.343 1.34 0 0 0 .13-.576 1.368 1.365 0 0 0-1.42-1.357c.024-.342-.025-.99-.697-1.274a1.455 1.452 0 0 0-.575-.125c-.146 0-.287.025-.42.075a1.153 1.15 0 0 0-.671-.564 1.52 1.515 0 0 0-.494-.085c-.28 0-.537.08-.767.242a1.168 1.165 0 0 0-.903-.43 1.173 1.17 0 0 0-.82.335c-.287-.217-1.425-.93-4.467-1.613a17.39 17.344 0 0 1-.692-.189 4.822 4.82 0 0 0-.077.494l.67.157c3.108.682 4.136 1.391 4.309 1.525a1.145 1.142 0 0 0-.09.442 1.16 1.158 0 0 0 1.378 1.132c.096.467.406.821.879 1.003a1.165 1.162 0 0 0 .415.08c.09 0 .179-.012.266-.034.086.22.282.493.722.668a1.233 1.23 0 0 0 .457.094c.122 0 .241-.022.355-.063a1.373 1.37 0 0 0 1.269.841c.37.002.726-.147.985-.41.221.121.688.341 1.163.341.06 0 .118-.002.175-.01.47-.059.689-.24.789-.382a.571.57 0 0 0 .048-.078c.11.032.234.058.373.058.255 0 .501-.086.75-.265.244-.174.418-.424.444-.637v-.01c.083.017.167.026.251.026.265 0 .527-.082.773-.242.48-.31.562-.715.554-.98a1.28 1.279 0 0 0 .978-.194 1.04 1.04 0 0 0 .502-.808 1.088 1.085 0 0 0-.16-.653c.804-.342 2.636-1.003 4.795-1.483a4.734 4.721 0 0 0-.067-.492 27.742 27.667 0 0 0-5.049 1.62zm5.123-.763c0 4.027-5.166 7.293-11.537 7.293-6.372 0-11.538-3.266-11.538-7.293 0-4.028 5.165-7.293 11.539-7.293 6.371 0 11.537 3.265 11.537 7.293zm.46.004c0-4.272-5.374-7.755-12-7.755S.002 7.277.002 11.55L0 12.004c0 4.533 4.695 8.203 11.999 8.203 7.347 0 12-3.67 12-8.204z"/></svg>mercado <b>pago</b></span>Suscribite con Mercado Pago</div>
       </div>
-    <div class="grain"></div>
     <script>
       (function () {
       const R = document.querySelector('[data-composition-id="cierre"]');
       const tl = gsap.timeline({ paused: true });
       const TAB0 = 2;
       const DUR = 7.0;
-      const TABX = [4.67, 122.0, 239.33];
+      const TABX = [4.33, 121.0, 237.67];
 
-      const $ = (s) => R.querySelector(s);
       function sidesIn(t0) {
-        tl.fromTo(["#cierre-k", "#cierre-l1", "#cierre-l2", "#cierre-pr", "#cierre-nt"], { opacity: 0, y: 70, filter: "blur(14px)" },
-          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "expo.out", stagger: 0.07 }, t0);
-        tl.fromTo("#cierre-kr", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: "expo.out" }, t0 + 0.1);
+        tl.fromTo("#cierre-k", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, t0);
+        tl.fromTo(["#cierre-l1", "#cierre-l2"], { opacity: 0, yPercent: 60, filter: "blur(16px)" },
+          { opacity: 1, yPercent: 0, filter: "blur(0px)", duration: 0.75, ease: "expo.out", stagger: 0.09 }, t0 + 0.05);
+        tl.fromTo("#cierre-rl", { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "expo.inOut" }, t0 + 0.25);
+        tl.fromTo("#cierre-ds", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, t0 + 0.4);
+        tl.fromTo("#cierre-kr", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, t0 + 0.1);
       }
-      function featsIn(t0, step) {
-        R.querySelectorAll("#cierre-sr li").forEach((li, i) => {
-          tl.fromTo(li, { opacity: 0, x: 60, filter: "blur(10px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, t0 + i * step);
-          tl.fromTo(li.querySelector(".ck"), { scale: 0.3 }, { scale: 1, duration: 0.45, ease: "back.out(2.6)" }, t0 + i * step + 0.06);
+      function actsIn(t0, step) {
+        R.querySelectorAll("#cierre-sr .act").forEach((li, i) => {
+          const t = t0 + i * step;
+          tl.fromTo(li.querySelector(".tile"), { opacity: 0, scale: 0.4, rotation: -14 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.7, ease: "back.out(2.2)" }, t);
+          tl.fromTo(li.querySelector(".t"), { opacity: 0, x: 46, filter: "blur(8px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, t + 0.08);
+          tl.fromTo(li.querySelector(".s"), { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, t + 0.16);
         });
       }
       function sidesOut(t) {
-        tl.to(["#cierre-sl", "#cierre-sr"], { y: -160, opacity: 0, filter: "blur(18px)", duration: 0.3, ease: "power3.in" }, t);
+        tl.to(["#cierre-sl", "#cierre-sr"], { y: -170, opacity: 0, filter: "blur(18px)", duration: 0.32, ease: "power3.in" }, t);
       }
-      function pageIn(sel, t) { tl.fromTo(sel, { x: 376 }, { x: 0, duration: 0.6, ease: "expo.out" }, t); }
-      function pageOut(sel, t) { tl.to(sel, { x: -376, opacity: 0.2, duration: 0.3, ease: "power3.in" }, t); }
+      function pageIn(sel, t) { tl.fromTo(sel, { x: 374 }, { x: 0, duration: 0.65, ease: "expo.out" }, t); }
+      function pageOut(sel, t) { tl.to(sel, { x: -374, opacity: 0.2, duration: 0.3, ease: "power3.in" }, t); }
       function tap(x, y, t) {
         const el = "#cierre-touch";
         tl.set(el, { x: x, y: y }, t - 0.3);
         tl.fromTo(el, { opacity: 0, scale: 1.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power2.out", immediateRender: false }, t - 0.26);
         tl.to(el, { scale: 0.78, duration: 0.08, ease: "power2.in" }, t - 0.04);
-        tl.to(el, { scale: 1.35, opacity: 0, duration: 0.32, ease: "power2.out" }, t + 0.05);
+        tl.to(el, { scale: 1.4, opacity: 0, duration: 0.34, ease: "power2.out" }, t + 0.05);
       }
-      function at(sel) {  // centro de un elemento en coordenadas de la pantalla del celular (sin transforms)
+      function at(sel) {  // centro de un elemento en coordenadas de la pantalla (sin transforms)
         let el = R.querySelector(sel), x = el.offsetWidth / 2, y = el.offsetHeight / 2;
         const scr = R.querySelector("#cierre-screen");
         while (el && el !== scr) { x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
@@ -97,18 +103,20 @@
       const pillEl = R.querySelector("#cierre-pill");
       if (pillEl) tl.set(pillEl, { x: TABX[TAB0] - TABX[0] }, 0);
       function tabTo(i, t) {
-        tl.to("#cierre-pill", { x: TABX[i] - TABX[0], duration: 0.42, ease: "back.out(1.6)" }, t);
-        R.querySelectorAll("#cierre-tabs .tab").forEach((tb, k) => {
-          tl.to(tb, { color: k === i ? "#f2c94c" : "#ead9a4", duration: 0.2, ease: "none" }, t + 0.05);
-        });
+        tl.to("#cierre-pill", { x: TABX[i] - TABX[0], duration: 0.45, ease: "back.out(1.6)" }, t);
+        R.querySelectorAll("#cierre-tabs .tab").forEach((tb, k) => tl.to(tb, { color: k === i ? "#f2c94c" : "#ead9a4", duration: 0.2, ease: "none" }, t + 0.05));
       }
-      function drift(deg) {  // giro 3D suave que vuelve a 0 justo al final (el corte con la escena siguiente no se nota)
-        tl.fromTo("#cierre-phone", { rotationY: 0, y: 0 }, { rotationY: deg, y: -10, duration: DUR / 2, ease: "sine.inOut", transformPerspective: 2000 }, 0);
-        tl.to("#cierre-phone", { rotationY: 0, y: 0, duration: DUR / 2, ease: "sine.inOut" }, DUR / 2);
+      function drift(deg, from, to) {  // giro 3D suave que vuelve a 0 (el corte con la escena siguiente no se nota)
+        const a = from || 0, b = to || DUR, h = (b - a) / 2;
+        tl.fromTo("#cierre-phone", { rotationY: 0, y: 0 }, { rotationY: deg, y: -12, duration: h, ease: "sine.inOut", transformPerspective: 2200 }, a);
+        tl.to("#cierre-phone", { rotationY: 0, y: 0, duration: h, ease: "sine.inOut" }, a + h);
+        tl.fromTo("#cierre-glare", { x: 0 }, { x: deg > 0 ? 300 : 140, duration: h, ease: "sine.inOut" }, a);
+        tl.to("#cierre-glare", { x: 0, duration: h, ease: "sine.inOut" }, a + h);
       }
 
 
       tl.to("#cierre-phone", { scale: 0.7, opacity: 0, filter: "blur(12px)", duration: 0.6, ease: "power3.in" }, 0.05);
+      tl.to("#cierre-cs", { opacity: 0, duration: 0.4 }, 0.05);
       tl.fromTo("#cierre-card", { opacity: 0, y: 280, rotationX: -22, transformPerspective: 1600 }, { opacity: 1, y: 0, rotationX: 0, duration: 0.9, ease: "expo.out" }, 0.45);
       tl.fromTo(["#cierre-n", "#cierre-p"], { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out", stagger: 0.12 }, 0.75);
       for (let i = 0; i < 4; i++) tl.fromTo("#cierre-f" + i, { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.5, ease: "expo.out" }, 1.1 + i * 0.14);

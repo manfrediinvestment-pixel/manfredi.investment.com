@@ -3,30 +3,30 @@
     <style>
       #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
       
-      .srch { display:flex; align-items:center; gap:8px; height:42px; border-radius:12px; padding:0 12px; border:1px solid rgba(226,234,245,.16);
-        background:rgba(255,255,255,.04); font:500 14px/1 "Plex Sans"; color:#f6f8fc; }
-      .srch.on { border-color:rgba(242,201,76,.55); box-shadow:0 0 0 3px rgba(242,201,76,.10); }
+      .srch { display:flex; align-items:center; gap:8px; height:42px; border-radius:12px; padding:0 12px; box-shadow:inset 0 0 0 1px rgba(226,234,245,.16);
+        background:rgba(255,255,255,.04); font:500 14px/1 "Instrument"; color:#f6f8fc; }
+      .srch.on { box-shadow:inset 0 0 0 1px rgba(242,201,76,.6), 0 0 0 3px rgba(242,201,76,.10); }
       .srch svg { width:16px; height:16px; fill:none; stroke:#ead9a4; stroke-width:2; flex:none; }
       #pedido-ph { color:#ead9a4; } .caret { display:inline-block; width:1.5px; height:17px; background:#f2c94c; margin-left:-6px; }
-      .res { margin-top:8px; border-radius:14px; overflow:hidden; border:1px solid rgba(226,234,245,.14); background:#0e1d36; }
+      .res { margin-top:8px; border-radius:14px; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(226,234,245,.14); background:#0e1d36; }
       .ri { display:flex; align-items:center; gap:10px; padding:11px 12px; border-bottom:1px solid rgba(226,234,245,.08); }
-      .rt { font:700 13px/1 "Plex Mono"; color:#f7dc8a; } .rn { font:500 13px/1 "Plex Sans"; color:#f6f8fc; flex:1; }
+      .rt { font:700 13px/1 "Plex Mono"; color:#f7dc8a; } .rn { font:500 13px/1 "Instrument"; color:#f6f8fc; flex:1; }
       .lg3 { width:30px; height:30px; border-radius:8px; background:#1d4fa3; display:flex; align-items:center; justify-content:center; flex:none; }
       .lg3 img { width:20px; height:20px; } .lg3.big { width:48px; height:48px; border-radius:12px; } .lg3.big img { width:32px; height:32px; }
-      .rempty { padding:12px; font:500 12.5px/1.45 "Plex Sans"; color:#f6f8fc; display:flex; flex-direction:column; gap:10px; }
+      .rempty { padding:12px; font:500 12.5px/1.45 "Instrument"; color:#f6f8fc; display:flex; flex-direction:column; gap:10px; }
       .rempty b { font-family:"Plex Mono"; color:#f7dc8a; }
-      .cta { align-self:flex-start; padding:9px 14px; border-radius:999px; background:linear-gradient(180deg,#f7dc8a,#d8a93a); color:#0a1322; font:600 12.5px/1 "Plex Sans"; }
-      .frm { position:absolute; left:20px; right:20px; top:96px; border-radius:18px; padding:16px; border:1px solid rgba(242,201,76,.35);
+      .cta { align-self:flex-start; padding:9px 14px; border-radius:999px; background:linear-gradient(180deg,#f7dc8a,#d8a93a); color:#0a1322; font:600 12.5px/1 "Instrument"; }
+      .frm { position:absolute; left:20px; right:20px; top:96px; border-radius:18px; padding:16px; box-shadow:inset 0 0 0 1px rgba(242,201,76,.38);
         background:radial-gradient(100% 60% at 100% 0%, rgba(242,201,76,.12), transparent 60%), linear-gradient(170deg,#1a3360,#0a1530); }
-      .fl { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-top:1px solid rgba(226,234,245,.10); margin-top:12px; font:500 12.5px/1 "Plex Sans"; color:#ead9a4; }
-      .fl + .fl { margin-top:0; } .fl b { font:600 12.5px/1 "Plex Sans"; color:#f6f8fc; }
-      .pbtn { margin-top:12px; height:50px; border-radius:25px; background:linear-gradient(180deg,#f7dc8a,#d8a93a); display:flex; align-items:center; justify-content:center; font:600 15px/1 "Plex Sans"; color:#0a1322; }
-      .ok { position:absolute; left:20px; right:20px; top:96px; border-radius:18px; padding:22px 18px; text-align:center; border:1px solid rgba(16,185,129,.4);
+      .fl { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-top:1px solid rgba(226,234,245,.10); margin-top:12px; font:500 12.5px/1 "Instrument"; color:#ead9a4; }
+      .fl + .fl { margin-top:0; } .fl b { font:600 12.5px/1 "Instrument"; color:#f6f8fc; }
+      .pbtn2 { margin-top:12px; height:50px; border-radius:25px; background:linear-gradient(180deg,#f7dc8a,#d8a93a); display:flex; align-items:center; justify-content:center; font:600 15px/1 "Instrument"; color:#0a1322; }
+      .ok { position:absolute; left:20px; right:20px; top:96px; border-radius:18px; padding:22px 18px; text-align:center; box-shadow:inset 0 0 0 1px rgba(16,185,129,.42);
         background:radial-gradient(100% 70% at 50% 0%, rgba(16,185,129,.16), transparent 65%), linear-gradient(170deg,#12304a,#0a1530); }
       .okc { width:64px; height:64px; margin:0 auto 14px; border-radius:50%; background:#10B981; display:flex; align-items:center; justify-content:center; box-shadow:0 0 40px rgba(16,185,129,.55); }
       .okc svg { width:32px; height:32px; }
       .okt { font:400 22px/1.15 "DM Serif"; color:#f6f8fc; } .okt b { font-family:"Plex Mono"; font-weight:700; color:#f7dc8a; font-size:18px; }
-      .oks { margin-top:10px; font:500 13px/1.45 "Plex Sans"; color:#f6f8fc; } .oks b { color:#34d399; }
+      .oks { margin-top:10px; font:500 13px/1.45 "Instrument"; color:#f6f8fc; } .oks b { color:#34d399; }
       .okl { margin-top:18px; display:flex; justify-content:space-between; position:relative; }
       .okl::before { content:""; position:absolute; left:18px; right:18px; top:6px; height:2px; background:rgba(226,234,245,.14); }
       .okl span { position:relative; display:flex; flex-direction:column; align-items:center; gap:7px; font:600 10.5px/1 "Plex Mono"; letter-spacing:.04em; color:#ead9a4; width:33%; }
@@ -34,10 +34,13 @@
       .okl span.on { color:#34d399; } .okl span.on i { background:#10B981; border-color:#10B981; }
 
     </style>
-    <div class="bg"></div><div class="grid"></div><div class="halo"></div>
+    <svg width="0" height="0" style="position:absolute"><defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbecc4"/><stop offset=".55" stop-color="#f2c94c"/><stop offset="1" stop-color="#c99a2e"/></linearGradient></defs></svg>
+    <div class="halo"></div>
 
+      <div class="cshadow" id="pedido-cs"></div>
       <div class="pw">
       <div class="phone" id="pedido-phone">
+        <i class="pbtn a"></i><i class="pbtn v1"></i><i class="pbtn v2"></i><i class="pbtn p"></i>
         <div class="bezel"></div>
         <div class="screen" id="pedido-screen">
           <div class="app"></div>
@@ -48,7 +51,7 @@
               <div class="sub">1 por mes con tu membresía · te queda 1</div>
               <div class="srch on" id="pedido-srch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span id="pedido-typed"></span><span id="pedido-caret" class="caret"></span><span id="pedido-ph">Buscar empresa o ticker…</span></div>
               <div class="res" id="pedido-res">
-                <div class="ri" id="pedido-ri"><span class="lg3"><img src="assets/img/boeing.svg" alt=""></span><span class="rt">BA</span><span class="rn">The Boeing Company</span></div>
+                <div class="ri"><span class="lg3"><img src="assets/img/boeing.svg" alt=""></span><span class="rt">BA</span><span class="rn">The Boeing Company</span></div>
                 <div class="rempty">Todavía no tenemos informe de <b>BOEING</b>.<span class="cta" id="pedido-cta">Pedilo con tu membresía →</span></div>
               </div>
               <div class="frm" id="pedido-frm">
@@ -59,67 +62,80 @@
                 <div class="fl"><span>Informe completo</span><b>14 secciones + fair value</b></div>
                 <div class="fl"><span>Entrega</span><b>48 hs como máximo</b></div>
                 <div class="fl"><span>Pedidos este mes</span><b>1 de 1</b></div>
-                <div class="pbtn" id="pedido-btn"><span id="pedido-bt">Pedir informe</span></div>
+                <div class="pbtn2" id="pedido-btn"><span id="pedido-bt">Pedir informe</span></div>
               </div>
               <div class="ok" id="pedido-ok">
                 <div class="okc" id="pedido-okc"><svg viewBox="0 0 24 24" fill="none" stroke="#06261b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
                 <div class="okt">¡Listo! Recibimos tu pedido de <b>BA</b>.</div>
                 <div class="oks">Lo vas a tener en un <b>máximo de 48 hs</b> y te avisamos por mail.</div>
-                <div class="okl"><span class="on" id="pedido-p0"><i></i>Pedido</span><span id="pedido-p1"><i></i>En análisis</span><span id="pedido-p2"><i></i>Publicado</span></div>
+                <div class="okl"><span class="on"><i></i>Pedido</span><span id="pedido-p1"><i id="pedido-p1i"></i>En análisis</span><span><i></i>Publicado</span></div>
               </div>
             </div></div>
-          <div class="tabs" id="pedido-tabs"><div class="pill" id="pedido-pill" style="left:4.67px"></div><div class="tab" id="pedido-t0"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg>Informes</div><div class="tab" id="pedido-t1"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H10l-6 4z"/><path d="M9 10.5h6"/></svg>Warren IA</div><div class="tab on" id="pedido-t2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Pedidos</div></div>
-          <div class="sbar"><span>9:41</span><span class="ic"><b style="height:5px"></b><b style="height:8px"></b><b style="height:11px"></b><b style="height:14px"></b><span class="bat"></span></span></div>
+          <div class="tabs" id="pedido-tabs"><div class="pill" id="pedido-pill" style="left:4.33px"></div><div class="tab" id="pedido-t0" style="color:#ead9a4"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg>Informes</div><div class="tab" id="pedido-t1" style="color:#ead9a4"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H10l-6 4z"/><path d="M9 10.5h6"/></svg>Warren IA</div><div class="tab" id="pedido-t2" style="color:#f2c94c"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Pedidos</div></div>
+          <div class="sbar" id="pedido-sbar"><span>9:41</span><span class="ic"><b style="height:5px"></b><b style="height:8px"></b><b style="height:11px"></b><b style="height:14px"></b><span class="bat"></span></span></div>
           <div class="island"></div>
-          <div class="homeind"></div>
+          <div class="homeind" id="pedido-home"></div>
           <div class="touch" id="pedido-touch"></div>
         </div>
+        <div class="glare"><i id="pedido-glare"></i></div>
       </div>
       </div>
       <div class="side side-l" id="pedido-sl">
-        <div class="kick" id="pedido-k">Manfredi Pro · Pedidos<i></i></div>
+        <div class="kick" id="pedido-k"><b>03</b> · Pedidos<i></i></div>
         <div class="ttl"><span class="ln" id="pedido-l1">Pedí tu</span><span class="ln" id="pedido-l2"><em>informe.</em></span></div>
-        <div class="price" id="pedido-pr"><span class="amt ">1</span><span class="per">por mes, incluido</span></div>
-        <div class="note" id="pedido-nt">De la empresa que quieras.</div>
+        <div class="rule" id="pedido-rl"></div>
+        <div class="desc" id="pedido-ds">1 por mes, de la empresa que quieras.</div>
       </div>
       <div class="side side-r" id="pedido-sr">
-        <div class="kick" id="pedido-kr"><i></i>Cómo funciona</div>
-        <ul class="feats"><li class="" id="pedido-f0"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Buscás la empresa</li><li class="" id="pedido-f1"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Tocás «Pedir informe»</li><li class="" id="pedido-f2"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Lo tenés en 48 hs como máximo</li><li class="" id="pedido-f3"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Te avisamos por mail</li></ul>
+        <div class="kick" id="pedido-kr"><i></i>Lo que podés hacer</div>
+        <ul class="acts">
+          <li class="act" id="pedido-a0"><span class="tile" id="pedido-ti0"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></span>
+            <div><div class="t" id="pedido-at0">Buscar cualquier empresa</div><div class="s" id="pedido-as0">Las que cotizan en bolsa</div></div></li>
+          <li class="act" id="pedido-a1"><span class="tile" id="pedido-ti1"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></span>
+            <div><div class="t" id="pedido-at1">Pedir el informe</div><div class="s" id="pedido-as1">Con un toque, incluido en Pro</div></div></li>
+          <li class="act" id="pedido-a2"><span class="tile" id="pedido-ti2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <div><div class="t" id="pedido-at2">Tenerlo en 48 hs</div><div class="s" id="pedido-as2">Como máximo</div></div></li>
+          <li class="act" id="pedido-a3"><span class="tile" id="pedido-ti3"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg></span>
+            <div><div class="t" id="pedido-at3">Recibir el aviso</div><div class="s" id="pedido-as3">Te llega por mail</div></div></li>
+        </ul>
       </div>
-    <div class="grain"></div>
     <script>
       (function () {
       const R = document.querySelector('[data-composition-id="pedido"]');
       const tl = gsap.timeline({ paused: true });
       const TAB0 = 2;
       const DUR = 10.6;
-      const TABX = [4.67, 122.0, 239.33];
+      const TABX = [4.33, 121.0, 237.67];
 
-      const $ = (s) => R.querySelector(s);
       function sidesIn(t0) {
-        tl.fromTo(["#pedido-k", "#pedido-l1", "#pedido-l2", "#pedido-pr", "#pedido-nt"], { opacity: 0, y: 70, filter: "blur(14px)" },
-          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "expo.out", stagger: 0.07 }, t0);
-        tl.fromTo("#pedido-kr", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: "expo.out" }, t0 + 0.1);
+        tl.fromTo("#pedido-k", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, t0);
+        tl.fromTo(["#pedido-l1", "#pedido-l2"], { opacity: 0, yPercent: 60, filter: "blur(16px)" },
+          { opacity: 1, yPercent: 0, filter: "blur(0px)", duration: 0.75, ease: "expo.out", stagger: 0.09 }, t0 + 0.05);
+        tl.fromTo("#pedido-rl", { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "expo.inOut" }, t0 + 0.25);
+        tl.fromTo("#pedido-ds", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, t0 + 0.4);
+        tl.fromTo("#pedido-kr", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, t0 + 0.1);
       }
-      function featsIn(t0, step) {
-        R.querySelectorAll("#pedido-sr li").forEach((li, i) => {
-          tl.fromTo(li, { opacity: 0, x: 60, filter: "blur(10px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, t0 + i * step);
-          tl.fromTo(li.querySelector(".ck"), { scale: 0.3 }, { scale: 1, duration: 0.45, ease: "back.out(2.6)" }, t0 + i * step + 0.06);
+      function actsIn(t0, step) {
+        R.querySelectorAll("#pedido-sr .act").forEach((li, i) => {
+          const t = t0 + i * step;
+          tl.fromTo(li.querySelector(".tile"), { opacity: 0, scale: 0.4, rotation: -14 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.7, ease: "back.out(2.2)" }, t);
+          tl.fromTo(li.querySelector(".t"), { opacity: 0, x: 46, filter: "blur(8px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, t + 0.08);
+          tl.fromTo(li.querySelector(".s"), { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, t + 0.16);
         });
       }
       function sidesOut(t) {
-        tl.to(["#pedido-sl", "#pedido-sr"], { y: -160, opacity: 0, filter: "blur(18px)", duration: 0.3, ease: "power3.in" }, t);
+        tl.to(["#pedido-sl", "#pedido-sr"], { y: -170, opacity: 0, filter: "blur(18px)", duration: 0.32, ease: "power3.in" }, t);
       }
-      function pageIn(sel, t) { tl.fromTo(sel, { x: 376 }, { x: 0, duration: 0.6, ease: "expo.out" }, t); }
-      function pageOut(sel, t) { tl.to(sel, { x: -376, opacity: 0.2, duration: 0.3, ease: "power3.in" }, t); }
+      function pageIn(sel, t) { tl.fromTo(sel, { x: 374 }, { x: 0, duration: 0.65, ease: "expo.out" }, t); }
+      function pageOut(sel, t) { tl.to(sel, { x: -374, opacity: 0.2, duration: 0.3, ease: "power3.in" }, t); }
       function tap(x, y, t) {
         const el = "#pedido-touch";
         tl.set(el, { x: x, y: y }, t - 0.3);
         tl.fromTo(el, { opacity: 0, scale: 1.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power2.out", immediateRender: false }, t - 0.26);
         tl.to(el, { scale: 0.78, duration: 0.08, ease: "power2.in" }, t - 0.04);
-        tl.to(el, { scale: 1.35, opacity: 0, duration: 0.32, ease: "power2.out" }, t + 0.05);
+        tl.to(el, { scale: 1.4, opacity: 0, duration: 0.34, ease: "power2.out" }, t + 0.05);
       }
-      function at(sel) {  // centro de un elemento en coordenadas de la pantalla del celular (sin transforms)
+      function at(sel) {  // centro de un elemento en coordenadas de la pantalla (sin transforms)
         let el = R.querySelector(sel), x = el.offsetWidth / 2, y = el.offsetHeight / 2;
         const scr = R.querySelector("#pedido-screen");
         while (el && el !== scr) { x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
@@ -128,21 +144,22 @@
       const pillEl = R.querySelector("#pedido-pill");
       if (pillEl) tl.set(pillEl, { x: TABX[TAB0] - TABX[0] }, 0);
       function tabTo(i, t) {
-        tl.to("#pedido-pill", { x: TABX[i] - TABX[0], duration: 0.42, ease: "back.out(1.6)" }, t);
-        R.querySelectorAll("#pedido-tabs .tab").forEach((tb, k) => {
-          tl.to(tb, { color: k === i ? "#f2c94c" : "#ead9a4", duration: 0.2, ease: "none" }, t + 0.05);
-        });
+        tl.to("#pedido-pill", { x: TABX[i] - TABX[0], duration: 0.45, ease: "back.out(1.6)" }, t);
+        R.querySelectorAll("#pedido-tabs .tab").forEach((tb, k) => tl.to(tb, { color: k === i ? "#f2c94c" : "#ead9a4", duration: 0.2, ease: "none" }, t + 0.05));
       }
-      function drift(deg) {  // giro 3D suave que vuelve a 0 justo al final (el corte con la escena siguiente no se nota)
-        tl.fromTo("#pedido-phone", { rotationY: 0, y: 0 }, { rotationY: deg, y: -10, duration: DUR / 2, ease: "sine.inOut", transformPerspective: 2000 }, 0);
-        tl.to("#pedido-phone", { rotationY: 0, y: 0, duration: DUR / 2, ease: "sine.inOut" }, DUR / 2);
+      function drift(deg, from, to) {  // giro 3D suave que vuelve a 0 (el corte con la escena siguiente no se nota)
+        const a = from || 0, b = to || DUR, h = (b - a) / 2;
+        tl.fromTo("#pedido-phone", { rotationY: 0, y: 0 }, { rotationY: deg, y: -12, duration: h, ease: "sine.inOut", transformPerspective: 2200 }, a);
+        tl.to("#pedido-phone", { rotationY: 0, y: 0, duration: h, ease: "sine.inOut" }, a + h);
+        tl.fromTo("#pedido-glare", { x: 0 }, { x: deg > 0 ? 300 : 140, duration: h, ease: "sine.inOut" }, a);
+        tl.to("#pedido-glare", { x: 0, duration: h, ease: "sine.inOut" }, a + h);
       }
 
 
       drift(-6);
       pageIn("#pedido-pg", 0.02);
-      sidesIn(0.12);
-      featsIn(0.6, 0.5);
+      sidesIn(0.1);
+      actsIn(0.55, 0.36);
       tl.fromTo("#pedido-frm", { opacity: 0, y: 500 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out", immediateRender: true }, 3.15);
       tl.fromTo("#pedido-ok", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.8)", immediateRender: true }, 6.2);
       const W = "Boeing";
@@ -166,7 +183,7 @@
       tl.to("#pedido-frm", { opacity: 0, scale: 0.92, duration: 0.3, ease: "power2.in" }, 6.0);
       tl.fromTo("#pedido-okc", { scale: 0, rotation: -60 }, { scale: 1, rotation: 0, duration: 0.6, ease: "back.out(2.6)" }, 6.35);
       tl.to("#pedido-p1", { color: "#34d399", duration: 0.3 }, 7.6);
-      tl.to("#pedido-p1 i", { backgroundColor: "#0a1530", borderColor: "#10B981", duration: 0.3 }, 7.6);
+      tl.to("#pedido-p1i", { backgroundColor: "#0a1530", borderColor: "#10B981", duration: 0.3 }, 7.6);
       pageOut("#pedido-pg", 9.95);
       sidesOut(9.95);
 
