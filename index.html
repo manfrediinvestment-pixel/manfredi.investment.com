@@ -39,7 +39,7 @@
 <link rel="stylesheet" href="assets/comunidad/chat.css?v=20261028m" />
 <link rel="stylesheet" href="assets/asesoria/asesoria.css?v=20261020o" />
 <link rel="stylesheet" href="assets/calendario/calendario.css?v=20261102b" />
-<link rel="stylesheet" href="assets/informes/estanteria.css?v=20261102n" />
+<link rel="stylesheet" href="assets/informes/estanteria.css?v=20261103b" />
 <link rel="stylesheet" href="assets/portfolio/portfolio.css?v=20261010z" />
 <link rel="stylesheet" href="assets/lector/lector.css?v=20261010z" />
 <link rel="stylesheet" href="assets/warren/warren.css?v=20261010z" />
@@ -4377,7 +4377,7 @@
   <!-- cartel con los pasos para postularse como analista -->
   <script src="assets/analistas/postular.js?v=20261010a" defer></script>
   <script src="assets/calendario/calendario.js?v=20261102b" defer></script>
-  <script src="assets/informes/estanteria.js?v=20261102n" defer></script>
+  <script src="assets/informes/estanteria.js?v=20261103b" defer></script>
   <!-- Lector de informes en PDF (window.openPdf) -->
   <script src="assets/lector/lector.js?v=20261010z" defer></script>
   <script src="assets/warren/warren.js?v=20261010z" defer></script>
@@ -4769,12 +4769,6 @@
       <div class="pro-mesa" id="proMesa"></div>
       <div class="pro-warren" id="proWarren"></div>
 
-      <div class="section-header inv-header est-head">
-        <button type="button" class="est-pedir" id="piOpenBtn" onclick="miOpenPedirInforme()">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z"/></svg>
-          Pedí tu propio informe<em>1 por mes</em>
-        </button>
-      </div>
 
 
       <!-- Panel de creador: solo lo ve una cuenta en MI_CREADORES (el worker lo vuelve a validar con el token) -->
@@ -4798,20 +4792,24 @@
       <!-- Estantería: la arma assets/informes/estanteria.js leyendo las pick-card de abajo (la fuente de verdad,
            la que actualizan las skills de informes) + informes/catalogo.json (scripts/catalogo-informes.mjs) -->
       <div class="est" id="est">
-        <section class="est-fx" id="estFicha" hidden></section>
-        <div class="est-secs" id="estSecs" role="group" aria-label="Elegir sector"></div>
-        <div class="est-tools">
-          <span class="est-cnt" id="estCnt"></span>
-          <!-- Buscador: indexa las pick-card de abajo (ticker + nombre) y dice si la accion ya tiene informe -->
-          <div class="inv-search" id="invSearch">
-            <div class="inv-search-box">
-              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-              <input type="search" id="invSearchInput" placeholder="Buscá una acción: ticker o empresa (ej. NVDA, Galicia)" autocomplete="off" spellcheck="false" aria-label="Buscar acción" aria-controls="invSearchResults" />
-            </div>
-            <div class="inv-search-results" id="invSearchResults" role="listbox" hidden></div>
+        <header class="lib-head">
+          <div class="lib-head__t">
+            <h2 class="lib-title">Informes</h2>
+            <p class="lib-sub" id="estCnt">Equity research de empresas, con valuación propia.</p>
           </div>
-        </div>
-        <div id="estShelves"></div>
+          <div class="lib-acts">
+            <!-- Buscador: indexa las pick-card de abajo (ticker + nombre) y dice si la accion ya tiene informe -->
+            <div class="inv-search lib-search" id="invSearch">
+              <div class="inv-search-box">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="search" id="invSearchInput" placeholder="Buscar empresa o ticker" autocomplete="off" spellcheck="false" aria-label="Buscar acción" aria-controls="invSearchResults" />
+              </div>
+              <div class="inv-search-results" id="invSearchResults" role="listbox" hidden></div>
+            </div>
+            <button type="button" class="lib-pedir" id="piOpenBtn" onclick="miOpenPedirInforme()">Pedí tu informe <span>1 por mes</span></button>
+          </div>
+        </header>
+        <div class="lib-rows" id="estShelves"></div>
       </div>
 
       <div class="inv-tabs-row est-oculto" aria-hidden="true">
