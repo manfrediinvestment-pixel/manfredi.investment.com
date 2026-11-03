@@ -1,24 +1,39 @@
-/* Pestaña Informes: arma la estantería a partir de las pick-card ocultas de
-   #inversiones (la lista que actualizan las skills de informes: un informe nuevo
-   aparece solo, en su sector) y de informes/catalogo.json (trimestre, secciones,
-   gráficos, cifras de la tapa y fecha; lo regenera scripts/catalogo-informes.mjs
-   todos los días). La ficha de arriba trae el precio del último año del worker
-   manfredi-mercados (/serie), que se actualiza solo. */
+/* Pestaña Informes: "el atril y la colección".
+   Arriba, el atril: un libro en 3D (tapa Monocromo, lomo del color de su serie, canto de
+   páginas) con el nombre, la tesis y tres cifras del informe. Abajo, la colección: todos
+   los informes como lomos en un estante, agrupados por sector, cada sector con su color
+   de serie. El grosor de cada lomo es el largo real del informe (palabras del catálogo) y
+   la altura, la cantidad de gráficos. Tocar un lomo lo lleva al atril.
+   Lee las pick-card ocultas de #inversiones (la lista que actualizan las skills de
+   informes: un informe nuevo aparece solo, en su sector) e informes/catalogo.json
+   (trimestre, secciones, gráficos, palabras, cifras, tesis y fecha; lo regenera
+   scripts/catalogo-informes.mjs). */
 (function () {
   var root = document.getElementById('est');
   if (!root) return;
-  var MERCADOS = 'https://manfredi-mercados.nachito2502.workers.dev/serie?category=usa_stocks&tf=1A&symbol=';
   var MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
   var ORDEN = ['semis', 'software', 'bigtech', 'bancos', 'defensivos', 'argentina'];
   var NOMBRES = { semis: 'Semiconductores', software: 'Software', bigtech: 'Big Tech', bancos: 'Bancos y pagos', defensivos: 'Defensivos', argentina: 'Argentina' };
-  var ACENTO = { semis: '#3fc1c9', software: '#8b7cf6', bigtech: '#5b8def', bancos: '#4fb37f', defensivos: '#e0a24a', argentina: '#74b9e8' };
-  var DESTACADOS = [{ t: 'AAPL', b: '#c3cad6' }, { t: 'MSFT', b: '#3b8cf0' }, { t: 'TSLA', b: '#e3343f' }];
+  // cada sector es una serie de la colección, siempre con colores de la página (escalera de
+  // navys, dorado #F2C94C, oro viejo, champagne y el verde #10B981): semis = azul acero;
+  // software = azul real; big tech = medianoche; bancos y pagos = verde; defensivos = oro
+  // viejo; Argentina = champagne claro (la única serie clara, con letra marino: CLARO).
+  // TINTA = el color vivo (puntos, etiquetas); FONDO = el tono del lomo y de la tapa.
+  var TINTA = { semis: '#a9c3e6', software: '#7fa6e8', bigtech: '#e6cf96', bancos: '#34d399', defensivos: '#f2c94c', argentina: '#f7dc6f' };
+  var FONDO = { semis: '#1a2f4a', software: '#14295e', bigtech: '#0a1222', bancos: '#0c3a2b', defensivos: '#4a3810', argentina: '#d8c493' };
+  var CLARO = { argentina: true };
+  // informes abiertos a todos (sin _preview-gate.js): llevan el sello verde "Gratis".
+  // El primero es el que recibe a la gente en el atril.
+  var GRATIS = ['MSFT'];
+  var PALABRAS_POR_PAGINA = 450;
+  var CORTO_SEC = { semis: 'Semis', software: 'Software', bigtech: 'Big Tech', bancos: 'Bancos', defensivos: 'Defensivos', argentina: 'Argentina' };
   var ETQ = { 'Ingresos TTM': 'Ingresos 12 meses', 'Ingresos FY2026 (TTM)': 'Ingresos 12 meses', 'Var. ingresos (últ. trim.)': 'Crecimiento trim.', 'Margen bruto TTM': 'Margen bruto', 'Margen operativo TTM': 'Margen operativo' };
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function corto(n) { return String(n || '').replace(/,? Inc\.?$|,? Inc\.,? | Corporation$| Incorporated$| plc$| N\.V\.$| S\.A\.$| SE$|,? Co\.$| Company$| Holdings?$/g, '').replace(/^The /, '').trim(); }
+  function corto(n) { return String(n || '').replace(/,? Inc\.?$|,? Inc\.,? | Corporation$| Incorporated$| plc$| N\.V\.$| S\.A\.$| SE$|,? &? ?Co\.?$| Company$| Holdings?$/g, '').replace(/\s*&\s*$/, '').replace(/^The /, '').trim(); }
   // los informes escriben el trimestre de mil formas ("Q3 FY2026", "3Q/FY2026", "2T2026",
-  // "3T fiscal 2026", "Q2 y H1 2026"): en la estantería siempre "3T 2026" (o "Año 2026")
+  // "3T fiscal 2026", "Q2 y H1 2026"): acá siempre "3T 2026" (o "Año 2026")
   function trimestre(q) {
     q = String(q || '');
     var a = q.match(/20\d\d/), n = q.match(/\b[QT]\s*([1-4])\b|\b([1-4])\s*[QT]/i);
@@ -48,153 +63,125 @@
     if (sec.libros.length) sectores.push(sec);
   });
   sectores.sort(function (a, b) { var ia = ORDEN.indexOf(a.key), ib = ORDEN.indexOf(b.key); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
-  var CAT = {}, NUM = {};
-  var filtro = 'todos';
-  // color de la palabra del sector en la tapa, según cómo lo "ve" el mercado:
-  // semis = cian eléctrico (silicio, hardware); software = violeta (nube, SaaS);
-  // big tech = azul (blue chips, la "tech" por excelencia); bancos y pagos = verde dólar;
-  // defensivos = ámbar/oro (refugio, dividendos); Argentina = celeste de la bandera.
-  var SECTOR_TINTA = { semis: '#6fd6df', software: '#ad9ff7', bigtech: '#86aef7', bancos: '#78cf9e', defensivos: '#e9b56c', argentina: '#9fd0f2' };
-  var CORTO_SEC = { semis: 'Semis', software: 'Software', bigtech: 'Big Tech', bancos: 'Bancos', defensivos: 'Defensivos', argentina: 'Argentina' };
+  var CAT = {}, NUM = {}, sel = null, W = [2000, 14000];
 
-  // N° de la colección: orden en que se publicó cada informe (fecha del catálogo)
   function numerar() {
     NUM = {};
-    todos.filter(function (d) { return !d.soon && CAT[d.t] && CAT[d.t].f; })
-      .sort(function (a, b) { return String(CAT[a.t].f).localeCompare(String(CAT[b.t].f)) || a.t.localeCompare(b.t); })
+    var pub = todos.filter(function (d) { return !d.soon && CAT[d.t] && CAT[d.t].f; });
+    pub.sort(function (a, b) { return String(CAT[a.t].f).localeCompare(String(CAT[b.t].f)) || a.t.localeCompare(b.t); })
       .forEach(function (d, i) { NUM[d.t] = String(i + 1).padStart(2, '0'); });
+    var ws = pub.map(function (d) { return +CAT[d.t].w || 0; }).filter(Boolean);
+    if (ws.length) W = [Math.min.apply(0, ws), Math.max.apply(0, ws)];
   }
+  function mono(d) { return d.logo ? d.logo.replace(/assets\/logos\/([^\/]+)$/, 'assets/logos/mono/$1') : ''; }
+  function vars(d) { return '--acc:' + (TINTA[d.sec] || '#e6cf96') + ';--deep:' + (FONDO[d.sec] || '#0d1a35'); }
+  function claro(d) { return CLARO[d.sec] ? ' claro' : ''; }
+  function gratis(d) { return GRATIS.indexOf(d.t) >= 0; }
+  // largo en páginas, redondeado para abajo de a 5 ("+20 páginas")
+  function paginas(w) { var p = Math.round((+w || 0) / PALABRAS_POR_PAGINA); if (!p) return ''; return (p >= 10 ? '+' + Math.floor(p / 5) * 5 : p) + ' páginas'; }
+  // medidas del lomo: grosor = largo del informe; altura = cantidad de gráficos
+  function grosor(d) { var w = +(CAT[d.t] || {}).w; if (d.soon || !w) return 25; return Math.round(27 + (w - W[0]) / Math.max(1, W[1] - W[0]) * 16); }
+  function alto(d) { var ch = +(CAT[d.t] || {}).ch; return d.soon || !ch ? 228 : 236 + Math.min(16, ch) * 3; }
+
   // tapa "Monocromo": logo en blanco (assets/logos/mono, lo genera scripts/logos-mono.py)
   function cover(d) {
     var c = CAT[d.t] || {};
     var q = d.soon ? 'Próximamente' : esc(trimestre(c.q));
     var der = !d.soon && nuevo(c.f) ? '<em class="est-cover__new">Nuevo</em>' : (NUM[d.t] ? '<span>N° ' + NUM[d.t] + '</span>' : '');
-    var mono = d.logo ? d.logo.replace(/assets\/logos\/([^\/]+)$/, 'assets/logos/mono/$1') : '';
-    return '<span class="est-cover" style="--acc:' + (SECTOR_TINTA[d.sec] || '#e6cf96') + '"><i class="est-cover__frame"></i><i class="est-cover__sheen"></i>' +
+    var m = mono(d);
+    return '<span class="est-cover' + claro(d) + '" style="' + vars(d) + '"><i class="est-cover__frame"></i><i class="est-cover__sheen"></i>' +
       '<span class="est-cover__in"><span class="est-cover__top"><span>Manfredi Research</span>' + der + '</span>' +
-      '<span class="est-cover__mark">' + (mono ? '<img class="est-cover__logo" src="' + esc(mono) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' : '') + '</span>' +
+      '<span class="est-cover__mark">' + (m ? '<img class="est-cover__logo" src="' + esc(m) + '" alt="" onerror="this.style.visibility=\'hidden\'">' : '') + '</span>' +
       '<i class="est-cover__rule"></i><span class="est-cover__tk' + (d.t.length > 4 ? ' largo' : '') + '">' + esc(d.t) + '</span><span class="est-cover__name">' + esc(corto(d.n)) + '</span>' +
       '<span class="est-cover__bot"><b>' + q + '</b><span class="est-cover__sec">' + esc(CORTO_SEC[d.sec] || '') + '</span></span></span></span>';
   }
-  function libro(d) {
-    var c = CAT[d.t] || {};
-    if (d.soon) {
-      return '<button type="button" class="est-book soon" data-pedir="' + esc(d.t) + '" style="border:0;background:none;padding:0;text-align:left;font:inherit">' + cover(d) +
-        '<span class="est-book__meta"><span>' + esc(corto(d.n)) + '</span><span class="est-pill">En preparación</span></span></button>';
-    }
-    return '<a class="est-book" href="' + esc(d.href) + '" target="_blank" rel="noopener">' + cover(d) +
-      '<span class="est-book__meta"><span>' + esc(corto(d.n)) + '</span><time>' + fmtF(c.f) + '</time></span>' +
-      (c.secs ? '<span class="est-book__depth">' + c.secs + ' secciones · ' + c.ch + ' gráficos</span>' : '') + '</a>';
+  // el lomo: mismo dibujo en el estante y en el libro del atril
+  function lomoIn(d) {
+    var m = mono(d);
+    return '<span class="spn__cap">' + (m ? '<img src="' + esc(m) + '" alt="" loading="lazy" onerror="this.remove()">' : '') + '</span>' +
+      '<i class="spn__gilt"></i><span class="spn__tk">' + esc(d.t) + '</span><i class="spn__gilt"></i>' +
+      '<span class="spn__no">' + (NUM[d.t] || '··') + '</span>';
+  }
+  function lomo(d, i) {
+    var est = 'style="' + vars(d) + ';--w:' + grosor(d) + 'px;--h:' + alto(d) + 'px;--i:' + i + '"';
+    var lbl = esc(corto(d.n)) + (d.soon ? ', en preparación: pedilo' : ', ' + esc(trimestre((CAT[d.t] || {}).q)));
+    return '<button type="button" class="spn' + claro(d) + (gratis(d) ? ' gratis' : '') + (d.soon ? ' soon' : '') + (sel && sel.t === d.t ? ' on' : '') + (!d.soon && nuevo((CAT[d.t] || {}).f) ? ' nuevo' : '') + '" ' + est + ' data-t="' + esc(d.t) + '"' + (d.soon ? ' data-pedir="' + esc(d.t) + '"' : '') + ' aria-label="' + lbl + '" aria-pressed="' + !!(sel && sel.t === d.t) + '">' + lomoIn(d) + '</button>';
   }
   function ordenar(l) {
     return l.slice().sort(function (a, b) {
       if (a.soon !== b.soon) return a.soon ? 1 : -1;
-      return String((CAT[b.t] || {}).f || '').localeCompare(String((CAT[a.t] || {}).f || ''));
+      return String((CAT[a.t] || {}).f || '').localeCompare(String((CAT[b.t] || {}).f || ''));
     });
   }
-  var FLECHA = function (d) { return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="' + d + '"/></svg>'; };
-  function estante(sec, grilla) {
-    return '<section class="est-shelf"><div class="est-shelf__h"><h3>' + esc(sec.nombre) + '</h3>' +
-      (grilla ? '' : '<div class="est-arrows"><button type="button" data-dir="-1" aria-label="Anterior">' + FLECHA('m15 18-6-6 6-6') + '</button><button type="button" data-dir="1" aria-label="Siguiente">' + FLECHA('m9 18 6-6-6-6') + '</button></div>') +
-      '</div><div class="est-track' + (grilla ? ' g' : '') + '"><div class="est-row' + (grilla ? ' grid' : '') + '">' + ordenar(sec.libros).map(libro).join('') + '</div></div></section>';
-  }
-  function pintar() {
-    var conInforme = todos.filter(function (d) { return !d.soon; }).length;
-    document.getElementById('estSecs').innerHTML = [{ key: 'todos', nombre: 'Todos', libros: todos }].concat(sectores).map(function (s) {
-      var n = s.libros.filter(function (d) { return !d.soon; }).length;
-      var av = s.key === 'todos' ? '<svg class="est-sec__av" aria-hidden="true"><use href="#miMark"/></svg>' : (s.libros[0] && s.libros[0].logo ? '<img class="est-sec__av" src="' + esc(s.libros[0].logo) + '" alt="">' : '');
-      return '<button type="button" class="est-sec' + (s.key === filtro ? ' on' : '') + '" data-s="' + s.key + '" aria-pressed="' + (s.key === filtro) + '">' + av + '<span class="est-sec__t">' + esc(s.nombre) + '</span><span class="est-sec__n">' + n + '</span></button>';
+  function pintarColeccion() {
+    var pub = todos.filter(function (d) { return !d.soon; }).length, i = 0;
+    document.getElementById('estCnt').innerHTML = '<b>' + pub + '</b> informes. Cada lomo es uno; el grosor es su largo real.';
+    shelves.innerHTML = sectores.map(function (s) {
+      var l = ordenar(s.libros), n = l.filter(function (d) { return !d.soon; }).length;
+      return '<div class="col-grp" style="--acc:' + (TINTA[s.key] || '#e6cf96') + '"><div class="col-books">' + l.map(function (d) { return lomo(d, i++); }).join('') + '</div>' +
+        '<div class="col-lbl"><i></i>' + esc(s.nombre) + '<b>' + n + '</b></div></div>';
     }).join('');
-    var lista = filtro === 'todos' ? sectores : sectores.filter(function (s) { return s.key === filtro; });
-    var n = filtro === 'todos' ? conInforme : lista[0].libros.filter(function (d) { return !d.soon; }).length;
-    document.getElementById('estCnt').innerHTML = '<b>' + n + '</b> ' + (n === 1 ? 'informe' : 'informes');
-    document.getElementById('estShelves').innerHTML = lista.map(function (s) { return estante(s, filtro !== 'todos'); }).join('');
-    document.querySelectorAll('#estShelves .est-row:not(.grid)').forEach(flechas);
-  }
-  function flechas(row) {
-    var a = row.closest('.est-shelf').querySelectorAll('.est-arrows button');
-    if (!a.length) return;
-    a[0].disabled = row.scrollLeft < 8;
-    a[1].disabled = row.scrollLeft + row.clientWidth >= row.scrollWidth - 8;
   }
 
-  document.getElementById('estSecs').addEventListener('click', function (e) {
-    var b = e.target.closest('.est-sec'); if (!b) return;
-    filtro = b.getAttribute('data-s'); pintar();
-  });
+  // 2) el atril
+  var lec = document.getElementById('estLec');
+  function libro3d(d) {
+    return '<div class="bk3" style="' + vars(d) + ';--d:' + Math.round(grosor(d) * 2.3) + 'px">' +
+      '<div class="bk3__f">' + cover(d) + '</div>' +
+      '<div class="bk3__s spn' + claro(d) + '" style="' + vars(d) + '">' + lomoIn(d) + '</div>' +
+      '<div class="bk3__p"></div><div class="bk3__t"></div></div>';
+  }
+  function pintarAtril(d) {
+    var c = CAT[d.t] || {};
+    var stats = (c.stats || []).slice(0, 3);
+    var meta = [esc(d.t), esc(trimestre(c.q)), NUM[d.t] ? 'N° ' + NUM[d.t] : ''].filter(Boolean).join('<i>·</i>');
+    lec.style.cssText = vars(d);
+    lec.innerHTML =
+      '<div class="lec__stage"><div class="lec__light"></div>' + libro3d(d) + '<div class="lec__floor"></div></div>' +
+      '<div class="lec__txt">' +
+        '<h2 class="lec__name">' + esc(corto(d.n)) + '</h2>' +
+        (gratis(d) ? '<a class="lec__gratis" href="' + esc(d.href) + '" target="_blank" rel="noopener"><i></i>Gratis<span>Leelo completo, sin ser socio</span></a>' : '') +
+        '<p class="lec__meta"><span class="lec__sec"><i></i>' + esc(NOMBRES[d.sec] || '') + '</span>' + meta + '</p>' +
+        (c.tesis ? '<p class="lec__tesis">' + esc(c.tesis) + '</p>' : '') +
+        (stats.length ? '<dl class="lec__stats">' + stats.map(function (st) {
+          return '<div><dt>' + esc(ETQ[st[0]] || st[0].replace(/\s*TTM$/, '')) + '</dt><dd class="' + (/^\+/.test(st[1]) ? 'up' : '') + '">' + esc(st[1]) + '</dd></div>';
+        }).join('') + '</dl>' : '') +
+        '<div class="lec__cta"><a class="lec__btn" href="' + esc(d.href) + '" target="_blank" rel="noopener">' + (gratis(d) ? 'Leer gratis' : 'Leer el informe') + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>' +
+        '<span>' + [c.secs ? c.secs + ' secciones' : '', c.ch ? c.ch + ' gráficos' : '', paginas(c.w), fmtF(c.f)].filter(Boolean).join(' · ') + '</span></div>' +
+      '</div>';
+  }
+  var cambiando = null;
+  function elegir(t, scroll) {
+    var d = todos.filter(function (x) { return x.t === t && !x.soon; })[0];
+    if (!d || (sel && sel.t === t)) return;
+    sel = d;
+    shelves.querySelectorAll('.spn').forEach(function (b) { var on = b.getAttribute('data-t') === t; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+    if (scroll && lec.getBoundingClientRect().top < -80) lec.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    if (reduce || !lec.firstChild) { pintarAtril(d); return; }
+    clearTimeout(cambiando);
+    lec.classList.add('sale');
+    cambiando = setTimeout(function () {
+      pintarAtril(d); lec.classList.remove('sale'); lec.classList.add('entra');
+      requestAnimationFrame(function () { requestAnimationFrame(function () { lec.classList.remove('entra'); }); });
+    }, 380);
+  }
+
   var shelves = document.getElementById('estShelves');
   shelves.addEventListener('click', function (e) {
-    var b = e.target.closest('.est-arrows button');
-    if (b) { var row = b.closest('.est-shelf').querySelector('.est-row'); row.scrollBy({ left: +b.getAttribute('data-dir') * row.clientWidth * .8 }); return; }
-    var p = e.target.closest('[data-pedir]');
-    if (p && typeof miOpenPedirInforme === 'function') miOpenPedirInforme(p.getAttribute('data-pedir'));
+    var b = e.target.closest('.spn'); if (!b) return;
+    if (b.hasAttribute('data-pedir')) { if (typeof miOpenPedirInforme === 'function') miOpenPedirInforme(b.getAttribute('data-pedir')); return; }
+    elegir(b.getAttribute('data-t'), true);
   });
-  shelves.addEventListener('scroll', function (e) { if (e.target.classList && e.target.classList.contains('est-row')) flechas(e.target); }, true);
 
-  // 2) ficha destacada: Apple, Microsoft y Tesla con el precio del último año
-  var fx = document.getElementById('estFicha'), series = {}, cur = 0, W = 700, H = 260;
-  function pr(v) { return '$' + v.toFixed(2); }
-  function pct(c) { return (c >= 0 ? '+' : '') + c.toFixed(1).replace('.', ',') + '%'; }
-  function cambio(s) { return s && s.length > 1 ? (s[s.length - 1][1] / s[0][1] - 1) * 100 : null; }
-  function grafico(s, color) {
-    var n = s.length, vs = s.map(function (p) { return p[1]; });
-    var mn = Math.min.apply(0, vs), mx = Math.max.apply(0, vs), pad = (mx - mn) * .12 || 1;
-    mn -= pad; mx += pad;
-    var X = function (i) { return i / (n - 1) * W; }, Y = function (v) { return H - (v - mn) / (mx - mn) * H; };
-    var d = s.map(function (p, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(p[1]).toFixed(1); }).join('');
-    return '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="estFg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + color + '" stop-opacity=".26"/><stop offset="1" stop-color="' + color + '" stop-opacity="0"/></linearGradient></defs>' +
-      '<line x1="0" x2="' + W + '" y1="' + Y(vs[0]).toFixed(1) + '" y2="' + Y(vs[0]).toFixed(1) + '" stroke="rgba(214,226,244,.28)" stroke-dasharray="3 5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="' + d + 'L' + W + ' ' + H + 'L0 ' + H + 'Z" fill="url(#estFg)"/>' +
-      '<path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>' +
-      '<line class="est-fx__v" x1="0" x2="0" y1="0" y2="' + H + '" stroke="rgba(243,246,251,.4)" vector-effect="non-scaling-stroke" opacity="0"/></svg><span class="est-fx__tip"></span>';
+  function arrancar() {
+    numerar(); var prev = sel; sel = null; pintarColeccion();
+    var pub = todos.filter(function (d) { return !d.soon; });
+    var ultimo = prev || pub.filter(gratis)[0] || pub.slice().sort(function (a, b) { return String((CAT[b.t] || {}).f || '').localeCompare(String((CAT[a.t] || {}).f || '')); })[0];
+    if (ultimo) { sel = ultimo; pintarAtril(ultimo); shelves.querySelectorAll('.spn').forEach(function (b) { var on = b.getAttribute('data-t') === ultimo.t; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }); }
   }
-  function eje(s) {
-    var out = [];
-    for (var k = 0; k < 5; k++) { var p = s[Math.round(k / 4 * (s.length - 1))], d = new Date(p[0] * 1000); out.push('<span>' + MES[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2) + '</span>'); }
-    return out.join('');
-  }
-  function pintarFicha() {
-    var lista = DESTACADOS.filter(function (f) { return CAT[f.t] && todos.some(function (d) { return d.t === f.t && !d.soon; }); });
-    if (!lista.length) { fx.hidden = true; return; }
-    if (cur >= lista.length) cur = 0;
-    var f = lista[cur], c = CAT[f.t], d = todos.filter(function (x) { return x.t === f.t; })[0], s = series[f.t];
-    var ch = cambio(s), col = ch == null || ch >= 0 ? '#56c793' : '#f07b70';
-    fx.hidden = false;
-    fx.style.setProperty('--b', f.b);
-    var stats = (c.stats || []).slice(0, 3);
-    fx.innerHTML = '<div class="est-fx__tabs" role="tablist">' + lista.map(function (g, i) {
-      var gd = todos.filter(function (x) { return x.t === g.t; })[0], gs = series[g.t], gc = cambio(gs);
-      return '<button type="button" role="tab" aria-selected="' + (i === cur) + '" class="est-fx__tab' + (i === cur ? ' on' : '') + '" data-i="' + i + '"><img src="' + esc(gd.logo) + '" alt=""><span><b>' + esc(corto(gd.n)) + '</b><small>' + g.t + '</small></span>' +
-        (gs ? '<span class="px">' + pr(gs[gs.length - 1][1]) + '<span style="color:' + (gc >= 0 ? 'var(--es-up)' : 'var(--es-dn)') + '">' + pct(gc) + '</span></span>' : '') + '</button>';
-    }).join('') + '</div>' +
-      '<div class="est-fx__body est-fx__sw"><div><div class="est-fx__k">Equity Research · ' + esc(c.q) + '</div><p class="est-fx__tk">' + f.t + '</p><div class="est-fx__name">' + esc(corto(d.n)) + '</div>' +
-      (c.tesis ? '<p class="est-fx__h">' + esc(c.tesis) + '</p>' : '') +
-      '<div class="est-fx__stats">' + stats.map(function (st) { return '<div><span>' + esc(ETQ[st[0]] || st[0].replace(/\s*TTM$/, '')) + '</span><b class="' + (/^\+/.test(st[1]) ? 'up' : '') + '">' + esc(st[1]) + '</b></div>'; }).join('') + '</div>' +
-      '<div class="est-fx__cta"><a class="est-btn" href="' + esc(d.href) + '" target="_blank" rel="noopener">Leer el informe</a><span>' + c.secs + ' secciones · ' + c.ch + ' gráficos</span></div></div>' +
-      '<div class="est-fx__chart"><small>Precio · último año</small>' +
-      (s ? '<div><span class="est-fx__price">' + pr(s[s.length - 1][1]) + '</span><span class="est-fx__chg ' + (ch >= 0 ? 'up' : 'dn') + '">' + pct(ch) + '</span></div><div class="est-fx__plot">' + grafico(s, col) + '</div><div class="est-fx__x">' + eje(s) + '</div>'
-         : '<div class="est-fx__plot"><span class="est-fx__sk">Cargando el precio…</span></div>') + '</div></div>';
-    var pl = fx.querySelector('.est-fx__plot');
-    if (s && pl) pl.onmousemove = function (e) {
-      var r = pl.getBoundingClientRect(), x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), p = s[Math.round(x * (s.length - 1))], dt = new Date(p[0] * 1000);
-      var tip = pl.querySelector('.est-fx__tip'); tip.textContent = pr(p[1]) + ' · ' + dt.getDate() + ' ' + MES[dt.getMonth()]; tip.style.left = (x * 100) + '%';
-      var v = pl.querySelector('.est-fx__v'); v.setAttribute('x1', x * W); v.setAttribute('x2', x * W); v.setAttribute('opacity', 1);
-    };
-  }
-  fx.addEventListener('click', function (e) { var b = e.target.closest('.est-fx__tab'); if (b) { cur = +b.getAttribute('data-i'); pintarFicha(); } });
-
-  pintar();
+  arrancar();
   fetch('informes/catalogo.json?d=' + hoyISO(), { signal: AbortSignal.timeout(8000) })
     .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
-    .then(function (cat) {
-      CAT = cat || {};
-      numerar(); pintar(); pintarFicha();
-      DESTACADOS.forEach(function (f) {
-        fetch(MERCADOS + f.t, { signal: AbortSignal.timeout(8000) })
-          .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
-          .then(function (j) { series[f.t] = (j.points || []).filter(function (p) { return p.c != null; }).map(function (p) { return [p.t, p.c]; }); if (series[f.t].length < 2) delete series[f.t]; pintarFicha(); })
-          .catch(function (e) { console.warn('[MI] Informes precio ' + f.t + ':', e.message); });
-      });
-    })
+    .then(function (cat) { CAT = cat || {}; sel = null; arrancar(); })
     .catch(function (e) { console.warn('[MI] Informes catálogo:', e.message); });
 })();
