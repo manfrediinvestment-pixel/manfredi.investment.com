@@ -30,7 +30,7 @@
 | 11 | 46,4 | "En nuestro informe, el método de flujos de caja dice que vale doscientos cinco dólares. Hoy cotiza a doscientos seis." | Orgullo tranquilo. Pausa antes de "Hoy". |
 | 12 | 54,6 | "Nvidia no tiene un problema de ventas. Tiene una pregunta: cuánto más le pueden comprar." | La frase para recordar. Lenta y clara. |
 | 13 | 59,6 | "Guardalo y mandáselo a quien compró en agosto." | Con sonrisa. |
-| 14 | 63,6 | "Y si querés el informe completo, comentá NVIDIA y te mando la guía." | Invitación directa. "NVIDIA" bien claro. |
+| 14 | 63,6 | "Y si querés el informe completo, comentá NVIDIA y te mando la guía para conseguirlo." | Invitación directa. "NVIDIA" bien claro. |
 | — | 69,2 | (silencio: logo de Manfredi) | |
 
 ## Texto corrido
@@ -44,7 +44,7 @@ Hoy el mercado no duda de Nvidia: duda de sus clientes, que ya gastan en IA casi
 En nuestro informe, el método de flujos de caja dice que vale doscientos cinco dólares. Hoy cotiza a doscientos seis.
 Nvidia no tiene un problema de ventas. Tiene una pregunta: cuánto más le pueden comprar.
 Guardalo y mandáselo a quien compró en agosto.
-Y si querés el informe completo, comentá NVIDIA y te mando la guía.
+Y si querés el informe completo, comentá NVIDIA y te mando la guía para conseguirlo.
 
 ## Texto para la publicación de Instagram
 
