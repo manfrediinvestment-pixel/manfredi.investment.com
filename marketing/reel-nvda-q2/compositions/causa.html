@@ -1,0 +1,126 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #s-shake { position: absolute; inset: 0; }
+    /* A: ventas */
+    #s-a { position: absolute; inset: 0; }
+    #s-ak { top: 420px; }
+    #s-sales { position: absolute; top: 470px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 128px; letter-spacing: -0.04em; color: #10B981; height: 140px;
+      filter: drop-shadow(0 0 30px rgba(16,185,129,.3)); }
+    #s-plus { position: absolute; top: 650px; left: 0; right: 0; text-align: center; }
+    #s-plus .badge { font-size: 54px; }
+    #s-dc { position: absolute; top: 780px; left: 0; right: 0; margin: 0 auto; width: fit-content; }
+    #s-dc b { color: #10B981; }
+    /* B: flujo de caja operativo */
+    #s-b { position: absolute; inset: 0; }
+    #s-bk { top: 420px; }
+    .ccol { position: absolute; top: 500px; width: 240px; height: 560px; }
+    .ccol .vbar { top: auto; }
+    .ccol .val { position: absolute; left: -90px; right: -90px; font-family: "Plex Mono"; font-weight: 700; font-size: 44px; letter-spacing: -0.03em; }
+    .ccol .lab { position: absolute; bottom: -58px; left: 0; right: 0; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 28px; color: #ead9a4; }
+    #s-c1 { left: 220px; } #s-c1 .vbar { height: 480px; } #s-c1 .val { bottom: 494px; color: #f6f8fc; }
+    #s-c2 { left: 620px; } #s-c2 .vbar { height: 230px; } #s-c2 .val { bottom: 244px; color: #EF4444; }
+    #s-cbase { position: absolute; left: 160px; right: 160px; top: 1060px; height: 3px; background: rgba(234,217,164,.6); transform-origin: center; }
+    #s-half { position: absolute; left: 640px; top: 640px; font-size: 48px; }
+    /* C: lo que quedó sin cobrar */
+    #s-c { position: absolute; inset: 0; }
+    #s-box { position: absolute; left: 190px; right: 190px; top: 420px; height: 330px; border-radius: 26px; border: 3px dashed rgba(239,68,68,.75);
+      background: linear-gradient(180deg, rgba(239,68,68,.10), rgba(239,68,68,.02)); }
+    #s-box .t { position: absolute; top: 24px; left: 0; right: 0; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 26px; letter-spacing: .16em; color: #EF4444; }
+    #s-due { position: absolute; top: 76px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 92px; letter-spacing: -0.04em; color: #EF4444; height: 100px; }
+    #s-chipwrap { position: absolute; left: 50%; top: 860px; width: 360px; height: 360px; margin-left: -180px; }
+    .bill { position: absolute; left: 465px; top: 990px; width: 150px; height: 74px; border-radius: 10px; opacity: 0;
+      background: linear-gradient(135deg, #34D399, #0E8F65); border: 2px solid rgba(255,255,255,.35); box-shadow: 0 16px 30px -12px rgba(0,0,0,.6);
+      display: flex; align-items: center; justify-content: center; font-family: "Plex Mono"; font-weight: 700; font-size: 30px; color: #063b2a; }
+    .bill::before { content: ""; position: absolute; inset: 7px; border-radius: 6px; border: 1.5px solid rgba(6,59,42,.35); }
+  </style>
+  <div id="root" data-composition-id="causa" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-panel"></div><div class="grid"></div>
+    <div id="s-shake">
+      <div class="hdr" id="s-h1"><span class="w">Vendió</span><span class="w em" data-acc="green">106%</span><span class="w em" data-acc="green">más.</span></div>
+      <div class="hdr" id="s-h2"><span class="w">Pero</span><span class="w">el</span><span class="w">efectivo</span><span class="w">que</span><span class="w">generó</span></div>
+      <div class="hdr" id="s-h3"><span class="w">se</span><span class="w">cayó</span><span class="w">a</span><span class="w">la</span><span class="w em" data-acc="red">mitad,</span></div>
+      <div class="hdr" id="s-h4"><span class="w">porque</span><span class="w em" data-acc="red">22</span><span class="w em" data-acc="red">mil</span><span class="w em" data-acc="red">millones</span></div>
+      <div class="hdr" id="s-h5"><span class="w">quedaron</span><span class="w em" data-acc="red">sin</span><span class="w em" data-acc="red">cobrar.</span></div>
+
+      <div id="s-a">
+        <div id="s-ak" class="kicker">VENTAS DEL TRIMESTRE · Q2 FY2027</div>
+        <div id="s-sales" class="odo" data-layout-ignore></div>
+        <div id="s-plus"><span class="badge green">+106% vs. hace un año</span></div>
+        <div id="s-dc" class="pill">DATA CENTER · US$ 89.000 M <b>+117%</b></div>
+      </div>
+
+      <div id="s-b">
+        <div id="s-bk" class="kicker">FLUJO DE CAJA OPERATIVO · POR TRIMESTRE</div>
+        <div class="ccol" id="s-c1"><div class="vbar navy"></div><div class="val odo" id="s-v1" data-layout-ignore></div><div class="lab">Q1 FY27</div></div>
+        <div class="ccol" id="s-c2"><div class="vbar red"></div><div class="val odo" id="s-v2" data-layout-ignore></div><div class="lab">Q2 FY27</div></div>
+        <div id="s-cbase"></div>
+        <div id="s-half" class="badge red">−52%</div>
+      </div>
+
+      <div id="s-c">
+        <div id="s-box"><div class="t">VENDIDO, SIN COBRAR</div><div id="s-due" class="odo" data-layout-ignore></div></div>
+        <div id="s-chipwrap" data-layout-allow-overflow><div class="chip"><div class="pins"></div><div class="body"></div><div class="plate nv" data-n></div></div></div>
+        <div class="bill" id="s-b1">$</div><div class="bill" id="s-b2">$</div><div class="bill" id="s-b3">$</div><div class="bill" id="s-b4">$</div><div class="bill" id="s-b5">$</div><div class="bill" id="s-b6">$</div>
+      </div>
+      <div class="src" id="s-src">NVIDIA 8-K y 10-Q Q2 FY2027 (26-jul-2026): ventas, flujo operativo y suba de cuentas por cobrar en el trimestre</div>
+    </div>
+    <div class="flash" id="s-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4, eInOut3 } = MF;
+      const R = document.querySelector('[data-composition-id="causa"]');
+      const $ = (s) => R.querySelector(s);
+      R.querySelectorAll("[data-n]").forEach((p) => (p.innerHTML = MF.N_SVG));
+      const money = ["US$ ", 10000, 1000, ".", 100, 10, 1, "~M"];
+      const sS = MF.odo($("#s-sales"), money), s1 = MF.odo($("#s-v1"), money), s2 = MF.odo($("#s-v2"), money);
+      const sD = MF.odo($("#s-due"), ["+US$ ", 10000, 1000, ".", 100, 10, 1, "~M"]);
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 9.0, (t) => {
+        sS(40000 + 56220 * eOut4(clamp((t - 0.1) / 1.2, 0, 1)));
+        s1(30000 + 20300 * eOut4(clamp((t - 3.1) / 0.7, 0, 1)));
+        s2(50300 - 26200 * eInOut3(clamp((t - 3.6) / 1.1, 0, 1)));
+        sD(22300 * eOut4(clamp((t - 6.3) / 1.6, 0, 1)));
+      });
+      MF.captions(tl, R, [["#s-h1", 0.04, 1.6], ["#s-h2", 1.6, 3.2], ["#s-h3", 3.2, 4.6], ["#s-h4", 4.6, 6.4], ["#s-h5", 6.4, 8.2]]);
+
+      // A — ventas
+      tl.fromTo("#s-ak", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, 0.05);
+      tl.fromTo("#s-sales", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, 0.05);
+      tl.fromTo("#s-plus", { opacity: 0, scale: 0.4, rotation: -10 }, { opacity: 1, scale: 1, rotation: -3, duration: 0.45, ease: "back.out(2.4)" }, 0.75);
+      tl.fromTo("#s-dc", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(2)" }, 1.15);
+      tl.to("#s-a", { y: -1100, filter: "blur(10px)", duration: 0.35, ease: "power3.in" }, 2.75);
+
+      // B — el flujo operativo se parte a la mitad
+      tl.fromTo("#s-bk", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 3.0);
+      tl.fromTo("#s-cbase", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 3.0);
+      tl.fromTo("#s-c1 .vbar", { scaleY: 0 }, { scaleY: 1, duration: 0.6, ease: "expo.out" }, 3.1);
+      tl.fromTo("#s-c2 .vbar", { scaleY: 0 }, { scaleY: 2.09, duration: 0.45, ease: "expo.out" }, 3.25);
+      tl.to("#s-c2 .vbar", { scaleY: 1, duration: 1.1, ease: "power3.inOut" }, 3.6);
+      tl.fromTo("#s-b .val, #s-b .lab", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 3.1);
+      tl.fromTo("#s-half", { opacity: 0, scale: 0.3, rotation: 14 }, { opacity: 1, scale: 1, rotation: 4, duration: 0.45, ease: "back.out(2.6)" }, 4.7);
+      MF.flash(tl, "#s-flash", 4.7);
+      MF.shake(tl, "#s-shake", 4.7, 9);
+      tl.to("#s-b", { y: -1300, filter: "blur(12px)", duration: 0.4, ease: "power3.in" }, 5.75);
+
+      // C — los billetes salen del chip y quedan en la caja de "sin cobrar"
+      tl.fromTo("#s-box", { y: -900, filter: "blur(12px)" }, { y: 0, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 6.05);
+      tl.fromTo("#s-chipwrap", { y: 1400, filter: "blur(12px)" }, { y: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 6.1);
+      const dest = [[-200, -330, -8], [0, -350, 6], [200, -330, 10], [-110, -275, -4], [110, -280, 5], [0, -300, -6]];
+      dest.forEach(([dx, dy, rot], i) => {
+        const at = 6.5 + i * 0.16;
+        tl.fromTo("#s-b" + (i + 1), { opacity: 1, x: 0, y: 0, rotation: 0, scale: 0.4 }, { x: dx, y: dy, rotation: rot, scale: 0.9, duration: 0.45, ease: "power3.out", immediateRender: false }, at);
+        tl.to("#s-b" + (i + 1), { opacity: 0.55, duration: 0.2 }, at + 0.45);
+      });
+      tl.set(R.querySelectorAll(".bill"), { opacity: 0 }, 0);
+      tl.fromTo("#s-chipwrap", { scale: 1 }, { scale: 0.92, duration: 0.07, ease: "power2.out", immediateRender: false }, 6.5);
+      tl.to("#s-chipwrap", { scale: 1, duration: 0.45, ease: "elastic.out(1, 0.45)" }, 6.57);
+      tl.to("#s-due", { scale: 1.07, duration: 0.07, ease: "power2.out" }, 7.9);
+      tl.to("#s-due", { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 7.97);
+      tl.fromTo("#s-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 0.5);
+      window.__timelines["causa"] = tl;
+    })();
+  </script>
+</template>

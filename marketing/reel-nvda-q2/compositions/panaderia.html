@@ -1,0 +1,96 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #p-shake { position: absolute; inset: 0; }
+    #p-sign { position: absolute; left: 50%; top: 380px; width: 520px; height: 150px; margin-left: -260px; transform-origin: 50% -40px; }
+    #p-sign .chain { position: absolute; top: -50px; width: 3px; height: 54px; background: linear-gradient(#ead9a4, #B8943F); }
+    #p-sign .board { position: absolute; inset: 0; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, #1c3354, #0b1830); border: 2px solid #B8943F; box-shadow: 0 30px 50px -20px rgba(0,0,0,.7), inset 0 0 0 6px rgba(242,201,76,.08); }
+    #p-sign .t { font-family: "DM Serif"; font-size: 76px; line-height: 1; color: #f2c94c; letter-spacing: .04em; }
+    #p-sign .s { font-family: "Plex Mono"; font-weight: 600; font-size: 18px; letter-spacing: .3em; color: #ead9a4; margin-top: 8px; }
+    #p-shop { position: absolute; left: 0; right: 0; top: 0; height: 900px; }
+    #p-counter { position: absolute; left: 190px; right: 190px; top: 790px; height: 16px; border-radius: 8px; background: linear-gradient(180deg, #2C4A70, #12233b); border: 1px solid rgba(226,234,245,.2); }
+    .loaf { position: absolute; width: 150px; height: 84px; border-radius: 50% 50% 42% 42% / 64% 64% 36% 36%;
+      background: radial-gradient(70% 60% at 45% 30%, #f3c27a, #d48b3f 60%, #9a5a22); box-shadow: 0 14px 20px -10px rgba(0,0,0,.6); }
+    .loaf::before, .loaf::after { content: ""; position: absolute; top: 24px; width: 30px; height: 6px; border-radius: 4px; background: rgba(120,64,20,.6); transform: rotate(-28deg); }
+    .loaf::before { left: 40px; } .loaf::after { left: 82px; }
+    .plus { position: absolute; font-family: "Plex Mono"; font-weight: 700; font-size: 40px; color: #10B981; opacity: 0; }
+    #p-book { position: absolute; left: 110px; right: 110px; top: 860px; height: 400px; padding: 26px 34px 26px 70px; border-radius: 18px;
+      background: linear-gradient(180deg, #f6efd9, #e8dcb8); color: #1a2638; box-shadow: 0 40px 70px -24px rgba(0,0,0,.7);
+      background-image: repeating-linear-gradient(180deg, transparent 0 63px, rgba(26,38,56,.13) 63px 65px), linear-gradient(180deg, #f6efd9, #e8dcb8); }
+    #p-book::before { content: ""; position: absolute; left: 44px; top: 0; bottom: 0; width: 3px; background: rgba(239,68,68,.55); }
+    #p-book .hd { font-family: "Plex Mono"; font-weight: 700; font-size: 22px; letter-spacing: .14em; color: #8a5a10; display: flex; justify-content: space-between; }
+    #p-book .row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 28px; }
+    #p-book .k { font-family: "DM Serif"; font-style: italic; font-size: 44px; color: #1a2638; }
+    #p-book .v { font-family: "Plex Mono"; font-weight: 700; font-size: 52px; letter-spacing: -0.03em; color: #1a2638; }
+    #p-r2 .v { color: #C81E1E; }
+    #p-res { position: absolute; left: 0; right: 0; top: 1150px; text-align: center; }
+    #p-res .badge { font-size: 52px; padding: 10px 30px; }
+  </style>
+  <div id="root" data-composition-id="panaderia" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div id="p-shake">
+      <div class="hdr" id="p-h1"><span class="w">Es</span><span class="w">como</span><span class="w">una</span><span class="w em" data-acc="gold">panadería</span></div>
+      <div class="hdr" id="p-h2"><span class="w">que</span><span class="w">vende</span><span class="w">el</span><span class="w em" data-acc="green">doble,</span></div>
+      <div class="hdr" id="p-h3"><span class="w">pero</span><span class="w">cada</span><span class="w">vez</span><span class="w">más</span><span class="w">clientes</span><span class="w">le</span><span class="w">dicen:</span></div>
+      <div class="hdr" id="p-h4"><span class="w em" data-acc="red">«anotalo</span><span class="w em" data-acc="red">en</span><span class="w em" data-acc="red">la</span><span class="w em" data-acc="red">libreta».</span></div>
+
+      <div id="p-shop">
+        <div id="p-sign"><div class="chain" style="left: 80px"></div><div class="chain" style="right: 80px"></div>
+          <div class="board"><div class="t">Panadería</div><div class="s">NVIDIA · DESDE 1993</div></div></div>
+        <div id="p-counter"></div>
+        <div class="loaf" id="p-l1" style="left: 230px; top: 710px"></div>
+        <div class="loaf" id="p-l2" style="left: 465px; top: 710px"></div>
+        <div class="loaf" id="p-l3" style="left: 700px; top: 710px"></div>
+        <div class="loaf" id="p-l4" style="left: 348px; top: 636px"></div>
+        <div class="loaf" id="p-l5" style="left: 582px; top: 636px"></div>
+        <div class="loaf" id="p-l6" style="left: 465px; top: 562px"></div>
+        <div class="plus" id="p-p1" style="left: 240px; top: 600px">+</div>
+        <div class="plus" id="p-p2" style="left: 800px; top: 590px">+</div>
+        <div class="plus" id="p-p3" style="left: 520px; top: 520px">+</div>
+      </div>
+
+      <div id="p-book">
+        <div class="hd"><span>LIBRETA · CUENTAS POR COBRAR</span><span>EN MILLONES</span></div>
+        <div class="row" id="p-r1"><div class="k">enero 2026</div><div class="v">US$ 38.500</div></div>
+        <div class="row" id="p-r2"><div class="k">julio 2026</div><div class="v odo" id="p-v2" data-layout-ignore></div></div>
+      </div>
+      <div id="p-res"><span class="badge red" id="p-resb">+64% en seis meses</span></div>
+      <div class="src" id="p-src">NVIDIA 10-Q Q2 FY2027: cuentas por cobrar US$ 38.500 M (25-ene-2026) → US$ 63.100 M (26-jul-2026)</div>
+    </div>
+    <div class="flash" id="p-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
+      const R = document.querySelector('[data-composition-id="panaderia"]');
+      const $ = (s) => R.querySelector(s);
+      const s2 = MF.odo($("#p-v2"), ["US$ ", 10000, 1000, ".", 100, 10, 1]);
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 7.8, (t) => s2(38500 + 24600 * eOut4(clamp((t - 4.75) / 1.1, 0, 1))));
+      MF.captions(tl, R, [["#p-h1", 0.04, 1.3], ["#p-h2", 1.3, 2.6], ["#p-h3", 2.6, 4.6], ["#p-h4", 4.6, 7.0]]);
+      // cartel que baja y se balancea
+      tl.fromTo("#p-sign", { y: -700 }, { y: 0, duration: 0.45, ease: "power3.in" }, 0.08);
+      tl.fromTo("#p-sign", { rotation: 0 }, { rotation: 6, duration: 0.18, ease: "power2.out", immediateRender: false }, 0.53);
+      tl.to("#p-sign", { rotation: 0, duration: 1.1, ease: "elastic.out(1, 0.3)" }, 0.71);
+      // panes: el doble
+      tl.fromTo("#p-counter", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out", transformOrigin: "center" }, 0.9);
+      ["#p-l1", "#p-l2", "#p-l3", "#p-l4", "#p-l5", "#p-l6"].forEach((s, i) => tl.fromTo(s, { scale: 0, y: -60 }, { scale: 1, y: 0, duration: 0.42, ease: "back.out(2.4)" }, 1.25 + i * 0.16));
+      ["#p-p1", "#p-p2", "#p-p3"].forEach((s, i) => {
+        tl.fromTo(s, { opacity: 0, y: 0 }, { opacity: 1, y: -40, duration: 0.3, ease: "power2.out" }, 1.5 + i * 0.28);
+        tl.to(s, { opacity: 0, y: -80, duration: 0.3, ease: "power2.in" }, 1.85 + i * 0.28);
+      });
+      // la tienda se achica y entra la libreta
+      tl.to("#p-shop", { y: -60, scale: 0.86, duration: 0.5, ease: "power3.inOut", transformOrigin: "50% 40%" }, 2.7);
+      tl.fromTo("#p-book", { y: 1100, rotation: 4, filter: "blur(12px)" }, { y: 0, rotation: -1.5, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, 2.8);
+      tl.fromTo("#p-r1", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 3.4);
+      tl.fromTo("#p-r2", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 4.7);
+      tl.fromTo("#p-res", { opacity: 0, scale: 1.8, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.32, ease: "power4.in" }, 5.65);
+      MF.flash(tl, "#p-flash", 5.97);
+      MF.shake(tl, "#p-shake", 5.97, 12);
+      tl.fromTo("#p-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 3.4);
+      window.__timelines["panaderia"] = tl;
+    })();
+  </script>
+</template>

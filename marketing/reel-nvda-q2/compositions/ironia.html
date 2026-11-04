@@ -1,0 +1,105 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #i-shake { position: absolute; inset: 0; }
+    .colhd { position: absolute; top: 380px; width: 440px; text-align: center; }
+    #i-ql { left: 70px; } #i-qr { left: 570px; }
+    #i-mid { position: absolute; left: 539px; top: 440px; width: 2px; height: 560px; background: linear-gradient(rgba(234,217,164,.4), transparent); transform-origin: top; }
+    .val { position: absolute; top: 470px; width: 520px; font-family: "Plex Mono"; font-weight: 700; font-size: 68px; letter-spacing: -0.04em; }
+    #i-vl { left: 20px; color: #10B981; filter: drop-shadow(0 0 24px rgba(16,185,129,.35)); }
+    #i-vr { left: 540px; color: #EF4444; filter: drop-shadow(0 0 24px rgba(239,68,68,.35)); }
+    .vlab { position: absolute; top: 560px; width: 440px; text-align: center; font-family: "Plex Mono"; font-weight: 600; font-size: 20px; letter-spacing: .12em; color: #ead9a4; }
+    #i-ll { left: 70px; } #i-lr { left: 570px; }
+    /* bóveda */
+    #i-vault { position: absolute; left: 160px; top: 650px; width: 260px; height: 260px; border-radius: 28px; background: linear-gradient(160deg, #34465f, #1a2638);
+      border: 3px solid rgba(16,185,129,.6); box-shadow: 0 30px 60px -20px rgba(0,0,0,.8), 0 0 50px -10px rgba(16,185,129,.4); }
+    #i-dial { position: absolute; left: 70px; top: 70px; width: 120px; height: 120px; border-radius: 50%; border: 8px solid #10B981; background: #0b1830; }
+    #i-dial::before { content: ""; position: absolute; left: 50%; top: 6px; width: 8px; height: 46px; margin-left: -4px; border-radius: 4px; background: #10B981; }
+    /* pagaré */
+    #i-iou { position: absolute; left: 640px; top: 660px; width: 300px; height: 210px; border-radius: 14px; background: linear-gradient(180deg, #f6efd9, #e8dcb8);
+      box-shadow: 0 30px 50px -20px rgba(0,0,0,.8); color: #1a2638; padding: 20px 24px; transform-origin: 50% 0%; }
+    #i-iou .t { font-family: "DM Serif"; font-style: italic; font-size: 52px; line-height: 1; color: #C81E1E; }
+    #i-iou .d { font-family: "Plex Mono"; font-weight: 700; font-size: 20px; letter-spacing: .08em; margin-top: 14px; }
+    #i-iou .s { position: absolute; right: 22px; bottom: 18px; font-family: "DM Serif"; font-style: italic; font-size: 30px; color: #8a5a10; }
+    #i-first { position: absolute; left: 640px; top: 900px; font-size: 24px; }
+    /* devolvió */
+    #i-back { position: absolute; left: 0; right: 0; top: 1040px; display: flex; justify-content: center; align-items: center; gap: 22px; }
+    #i-back .lab { font-family: "Plex Mono"; font-weight: 600; font-size: 22px; letter-spacing: .12em; color: #ead9a4; }
+    #i-bv { font-family: "Plex Mono"; font-weight: 700; font-size: 74px; letter-spacing: -0.04em; color: #f2c94c; filter: drop-shadow(0 0 24px rgba(242,201,76,.35)); }
+    .coin { position: absolute; left: 520px; top: 1180px; width: 56px; height: 56px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f7dc8a, #f2c94c 55%, #B8943F);
+      border: 3px solid #8a6a20; opacity: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 26px; color: #6a4a10; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <div id="root" data-composition-id="ironia" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-panel"></div><div class="grid"></div>
+    <div id="i-shake">
+      <div class="hdr" id="i-h1"><span class="w">Y</span><span class="w">lo</span><span class="w em" data-acc="gold">irónico:</span></div>
+      <div class="hdr" id="i-h2"><span class="w">con</span><span class="w em" data-acc="green">66</span><span class="w em" data-acc="green">mil</span><span class="w em" data-acc="green">millones</span><span class="w">de</span><span class="w">caja,</span></div>
+      <div class="hdr" id="i-h3"><span class="w">salió</span><span class="w">a</span><span class="w">pedir</span><span class="w em" data-acc="red">prestados</span><span class="w em" data-acc="red">25</span><span class="w em" data-acc="red">mil,</span></div>
+      <div class="hdr" id="i-h4"><span class="w">por</span><span class="w">primera</span><span class="w">vez</span><span class="w">en</span><span class="w em" data-acc="gold">cinco</span><span class="w em" data-acc="gold">años.</span></div>
+      <div class="hdr" id="i-h5"><span class="w">Y</span><span class="w">devolvió</span><span class="w em" data-acc="gold">26</span><span class="w em" data-acc="gold">mil</span><span class="w">a</span><span class="w">sus</span><span class="w">accionistas.</span></div>
+
+      <div class="colhd" id="i-ql"><span class="pill">TENÍA EN CAJA</span></div>
+      <div class="colhd" id="i-qr"><span class="pill">PIDIÓ PRESTADO</span></div>
+      <div id="i-mid"></div>
+      <div class="val odo" id="i-vl" data-layout-ignore></div>
+      <div class="val odo" id="i-vr" data-layout-ignore></div>
+      <div class="vlab" id="i-ll">CAJA NETA · JUL 2026</div>
+      <div class="vlab" id="i-lr">BONOS · JUN 2026</div>
+      <div id="i-vault"><div id="i-dial"></div></div>
+      <div id="i-iou"><div class="t">Debo</div><div class="d">US$ 25.000.000.000</div><div class="s">NVIDIA</div></div>
+      <div id="i-first" class="badge gold">1.ª vez desde 2021</div>
+      <div id="i-back"><span class="lab">DEVOLVIÓ EN 3 MESES</span><span id="i-bv" class="odo" data-layout-ignore></span></div>
+      <div class="coin" id="i-c1">$</div><div class="coin" id="i-c2">$</div><div class="coin" id="i-c3">$</div><div class="coin" id="i-c4">$</div><div class="coin" id="i-c5">$</div><div class="coin" id="i-c6">$</div>
+      <div class="src" id="i-src">NVIDIA 10-Q Q2 FY2027: caja neta +US$ 66.000 M; bonos US$ 25.000 M (jun-2026); recompras + dividendos ~US$ 26.000 M en el trimestre</div>
+    </div>
+    <div class="flash" id="i-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
+      const R = document.querySelector('[data-composition-id="ironia"]');
+      const $ = (s) => R.querySelector(s);
+      const sL = MF.odo($("#i-vl"), ["+US$ ", 10000, 1000, ".", 100, 10, 1, "~M"]);
+      const sR = MF.odo($("#i-vr"), ["US$ ", 10000, 1000, ".", 100, 10, 1, "~M"]);
+      const sB = MF.odo($("#i-bv"), ["US$ ", 10000, 1000, ".", 100, 10, 1, "~M"]);
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 9.8, (t) => {
+        sL(66000 * eOut4(clamp((t - 1.1) / 1.4, 0, 1)));
+        sR(25000 * eOut4(clamp((t - 3.1) / 1.2, 0, 1)));
+        sB(26000 * eOut4(clamp((t - 6.9) / 1.4, 0, 1)));
+        $("#i-dial").style.transform = `rotate(${-200 * eOut4(clamp((t - 1.1) / 1.4, 0, 1))}deg)`;
+      });
+      MF.captions(tl, R, [["#i-h1", 0.04, 1.0], ["#i-h2", 1.0, 3.0], ["#i-h3", 3.0, 5.0], ["#i-h4", 5.0, 6.6], ["#i-h5", 6.6, 9.0]]);
+
+      tl.fromTo("#i-ql", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, 0.9);
+      tl.fromTo("#i-qr", { opacity: 0, y: -20 }, { opacity: 0.45, y: 0, duration: 0.35, ease: "expo.out" }, 1.0);
+      tl.fromTo("#i-mid", { scaleY: 0 }, { scaleY: 1, duration: 0.6, ease: "expo.out" }, 1.0);
+      // la bóveda llena
+      tl.fromTo("#i-vault", { y: 1200, filter: "blur(10px)" }, { y: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 1.05);
+      tl.fromTo("#i-vl", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, 1.1);
+      tl.fromTo("#i-ll", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 1.3);
+      // el pagaré cae y se balancea
+      tl.to("#i-qr", { opacity: 1, duration: 0.3 }, 3.0);
+      tl.fromTo("#i-iou", { y: -1300, rotation: -14, filter: "blur(14px)" }, { y: 0, rotation: 0, filter: "blur(0px)", duration: 0.4, ease: "power3.in" }, 3.0);
+      tl.fromTo("#i-iou", { rotation: 0 }, { rotation: 7, duration: 0.14, ease: "power2.out", immediateRender: false }, 3.4);
+      tl.to("#i-iou", { rotation: 0, duration: 1.1, ease: "elastic.out(1, 0.3)" }, 3.54);
+      MF.flash(tl, "#i-flash", 3.4);
+      MF.shake(tl, "#i-shake", 3.4, 10);
+      tl.fromTo("#i-vr", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, 3.1);
+      tl.fromTo("#i-lr", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 3.3);
+      tl.fromTo("#i-first", { opacity: 0, scale: 0.3, rotation: -14 }, { opacity: 1, scale: 1, rotation: -4, duration: 0.45, ease: "back.out(2.6)" }, 5.6);
+      // devolvió: monedas que salen
+      tl.fromTo("#i-back", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 6.8);
+      [[-380, -40], [-230, 60], [-90, 10], [90, 40], [230, -30], [380, 50]].forEach(([dx, dy], i) => {
+        const at = 7.1 + i * 0.1;
+        tl.fromTo("#i-c" + (i + 1), { opacity: 1, x: 0, y: 0, scale: 0.3, rotation: 0 }, { x: dx, y: dy, scale: 1, rotation: 360, duration: 0.55, ease: "back.out(1.6)", immediateRender: false }, at);
+      });
+      tl.set(R.querySelectorAll(".coin"), { opacity: 0 }, 0);
+      tl.to("#i-bv", { scale: 1.07, duration: 0.07, ease: "power2.out" }, 8.3);
+      tl.to("#i-bv", { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 8.37);
+      tl.fromTo("#i-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 1.5);
+      window.__timelines["ironia"] = tl;
+    })();
+  </script>
+</template>

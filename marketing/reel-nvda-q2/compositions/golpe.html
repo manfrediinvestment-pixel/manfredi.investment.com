@@ -1,0 +1,112 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #g-shake { position: absolute; inset: 0; }
+    #g-pill { position: absolute; top: 352px; left: 0; right: 0; margin: 0 auto; width: fit-content; }
+    #g-pill i { background: #10B981; }
+    #g-pill-sub { top: 416px; }
+    #g-num { position: absolute; top: 452px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 196px; color: #10B981; letter-spacing: -0.04em; height: 200px;
+      filter: drop-shadow(0 0 30px rgba(16,185,129,.35)); }
+    #g-under { position: absolute; top: 668px; left: 170px; width: 740px; height: 6px; border-radius: 6px; transform-origin: left center;
+      background: linear-gradient(90deg, rgba(16,185,129,.95), rgba(16,185,129,.15)); }
+    #g-chart { position: absolute; top: 708px; left: 70px; width: 940px; height: 320px; }
+    #g-chart svg { overflow: visible; }
+    #g-tag { position: absolute; top: 0; left: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 26px; padding: 8px 14px; border-radius: 10px;
+      white-space: nowrap; color: #f6f8fc; border: 1px solid rgba(226,234,245,.2); will-change: transform; }
+    #g-axis { position: absolute; top: 1040px; left: 70px; right: 70px; display: flex; justify-content: space-between; font-family: "Plex Mono"; font-weight: 600;
+      font-size: 20px; letter-spacing: .1em; color: #ead9a4; }
+    #g-stamp { position: absolute; top: 1092px; width: 100%; text-align: center; font-weight: 700; font-size: 66px; letter-spacing: -0.02em; }
+    #g-stamp em { font-family: "DM Serif"; font-style: italic; font-weight: 400; font-size: 1.12em; color: #10B981; }
+    #g-chipwrap { position: absolute; left: 50%; top: 1390px; width: 360px; height: 360px; margin-left: -180px; }
+    #g-glow { position: absolute; left: 50%; top: 1330px; width: 620px; height: 480px; margin-left: -310px; border-radius: 50%;
+      background: radial-gradient(closest-side, rgba(242,201,76,.32), rgba(242,201,76,0)); opacity: 0; }
+    .spk { position: absolute; left: 172px; top: 170px; width: 16px; height: 16px; border-radius: 50%; background: #f2c94c; box-shadow: 0 0 14px #f2c94c; opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="golpe" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div id="g-shake">
+      <div class="hdr" id="g-h1"><span class="w">Nvidia</span><span class="w">sumó</span><span class="w">casi</span></div>
+      <div class="hdr" id="g-h2"><span class="w em" data-acc="green">medio</span><span class="w em" data-acc="green">billón</span><span class="w">en</span><span class="w">un</span><span class="w">día.</span></div>
+      <div id="g-pill" class="pill"><i></i>JUE · 27 AGO 2026</div>
+      <div id="g-pill-sub" class="kicker">NVDA · CIERRE · NASDAQ</div>
+      <div id="g-num" class="odo" data-layout-ignore></div>
+      <div id="g-under"></div>
+      <div id="g-chart">
+        <svg width="940" height="320" viewBox="0 0 940 320">
+          <defs><linearGradient id="g-area-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#10B981" stop-opacity=".30" /><stop offset="1" stop-color="#10B981" stop-opacity="0" /></linearGradient></defs>
+          <path id="g-area" d="" fill="url(#g-area-grad)" />
+          <path id="g-line" d="" fill="none" stroke="#f6f8fc" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
+          <circle id="g-dot" r="11" fill="#10B981" stroke="#070f1f" stroke-width="5" />
+        </svg>
+        <div id="g-tag">US$ 206,84</div>
+      </div>
+      <div id="g-axis"><span>24 JUL</span><span>27 AGO</span></div>
+      <div id="g-stamp">su <em>mejor día</em> de 2026</div>
+      <div class="src" id="g-src">NVDA, cierres diarios 2026 (Nasdaq vía Yahoo Finance): 209,66 → 227,98</div>
+      <div id="g-glow"></div>
+      <div id="g-chipwrap" data-layout-allow-overflow>
+        <div class="chip" id="g-chip"><div class="pins"></div><div class="body"></div><div class="plate nv" data-n></div></div>
+        <div class="spk" id="g-k1"></div><div class="spk" id="g-k2"></div><div class="spk" id="g-k3"></div><div class="spk" id="g-k4"></div><div class="spk" id="g-k5"></div>
+      </div>
+    </div>
+    <div class="flash green" id="g-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4, eInOut3 } = MF;
+      const R = document.querySelector('[data-composition-id="golpe"]');
+      const $ = (s) => R.querySelector(s);
+      R.querySelectorAll("[data-n]").forEach((p) => (p.innerHTML = MF.N_SVG));
+      // cierres reales NVDA 24-jul → 27-ago-2026
+      const P = [206.84,196.51,197.01,190.01,195.04,200.75,206.64,211.94,219.22,218.99,223.96,217.55,217.5,224.09,225.3,225.16,225.01,219.74,217.56,216.85,214.72,208.48,213.05,209.66,227.98];
+      const W = 940, H = 320, lo = 185, hi = 232;
+      const X = (i) => (i / (P.length - 1)) * (W - 250);
+      const Y = (p) => H - ((p - lo) / (hi - lo)) * H;
+      const fmt = (v) => v.toFixed(2).replace(".", ",");
+      const setNum = MF.odo($("#g-num"), ["+", 1, ",", 0.1, 0.01, "%"]);
+      const line = $("#g-line"), area = $("#g-area"), dot = $("#g-dot"), tag = $("#g-tag");
+      function drawChart(prog) {
+        const n = Math.floor(prog), f = prog - n;
+        let d = "", px = 0, py = 0;
+        for (let i = 0; i <= n && i < P.length; i++) { px = X(i); py = Y(P[i]); d += (i ? "L" : "M") + px.toFixed(1) + " " + py.toFixed(1); }
+        let price = P[Math.min(n, P.length - 1)];
+        if (n < P.length - 1 && f > 0) { price = P[n] + (P[n + 1] - P[n]) * f; px = X(n + f); py = Y(price); d += "L" + px.toFixed(1) + " " + py.toFixed(1); }
+        line.setAttribute("d", d);
+        area.setAttribute("d", d + `L${px.toFixed(1)} ${H} L0 ${H} Z`);
+        dot.setAttribute("cx", px); dot.setAttribute("cy", py);
+        tag.style.transform = `translate(${px + 22}px, ${py - 26}px)`;
+        tag.textContent = "US$ " + fmt(price);
+        tag.style.background = prog > P.length - 1.6 ? "#10B981" : "#12233b";
+        area.style.opacity = clamp((prog - (P.length - 2)) / 0.8, 0, 1);
+      }
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 3.8, (t) => {
+        setNum(1.2 + (8.74 - 1.2) * eInOut3(clamp(t / 1.95, 0, 1)));
+        const prog = t < 1.45 ? 6 + (P.length - 2 - 6) * eInOut3(clamp(t / 1.45, 0, 1)) : (P.length - 2) + eOut4(clamp((t - 1.45) / 0.45, 0, 1));
+        drawChart(Math.min(prog, P.length - 1));
+      });
+      MF.karaoke(tl, R, "#g-h1", -0.04, 1.18, 0.26, true);
+      MF.karaoke(tl, R, "#g-h2", 1.22, null, 0.32);
+      tl.fromTo("#g-under", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 1.92);
+      tl.fromTo("#g-num", { scale: 1 }, { scale: 1.08, duration: 0.08, ease: "power2.out" }, 1.9);
+      tl.to("#g-num", { scale: 1, duration: 0.45, ease: "back.out(2.2)" }, 1.98);
+      // el chip sube desde abajo y "despega": resplandor dorado + chispas
+      tl.fromTo("#g-chipwrap", { y: 1000, rotation: 8, filter: "blur(14px)" }, { y: 0, rotation: 0, filter: "blur(0px)", duration: 0.42, ease: "power3.out" }, 1.5);
+      tl.fromTo("#g-chipwrap", { scaleY: 1, scaleX: 1 }, { scaleY: 1.1, scaleX: 0.94, duration: 0.07, ease: "power2.out", immediateRender: false }, 1.92);
+      tl.to("#g-chipwrap", { scaleY: 1, scaleX: 1, duration: 0.5, ease: "elastic.out(1, 0.45)" }, 1.99);
+      tl.fromTo("#g-glow", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.4, ease: "expo.out" }, 1.92);
+      tl.to("#g-glow", { opacity: 0.45, duration: 1.0 }, 2.4);
+      [["#g-k1", -190, -230], ["#g-k2", 170, -260], ["#g-k3", -260, -60], ["#g-k4", 250, -90], ["#g-k5", 10, -320]].forEach(([s, dx, dy], i) => {
+        tl.fromTo(s, { opacity: 1, x: 0, y: 0, scale: 0.6 }, { x: dx, y: dy, scale: 1.1, duration: 0.45, ease: "power2.out", immediateRender: false }, 1.95 + i * 0.02);
+        tl.to(s, { opacity: 0, duration: 0.3 }, 2.3 + i * 0.02);
+      });
+      tl.set(R.querySelectorAll(".spk"), { opacity: 0 }, 0);
+      MF.flash(tl, "#g-flash", 1.92);
+      MF.shake(tl, "#g-shake", 1.92, 10);
+      tl.fromTo("#g-stamp", { opacity: 0, scale: 1.35, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.32, ease: "expo.out" }, 2.1);
+      tl.fromTo("#g-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 2.4);
+      window.__timelines["golpe"] = tl;
+    })();
+  </script>
+</template>

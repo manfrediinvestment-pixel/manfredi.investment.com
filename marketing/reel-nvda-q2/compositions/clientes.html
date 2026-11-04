@@ -1,0 +1,76 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #n-top { position: absolute; left: 0; right: 0; top: 0; height: 760px; transform-origin: 50% 400px; }
+    #n-chipwrap { position: absolute; left: 50%; top: 380px; width: 216px; height: 216px; margin-left: -108px; }
+    #n-chipscale { position: absolute; left: 0; top: 0; width: 360px; height: 360px; transform: scale(.6); transform-origin: 0 0; }
+    .cli { position: absolute; font-size: 28px; font-weight: 700; }
+    #n-k1 { left: 90px; top: 410px; } #n-k2 { left: 760px; top: 400px; } #n-k3 { left: 110px; top: 560px; } #n-k4 { left: 780px; top: 560px; }
+    .wire { position: absolute; height: 3px; background: linear-gradient(90deg, rgba(242,201,76,0), rgba(242,201,76,.7)); transform-origin: left center; }
+    #n-kick { top: 640px; }
+    .col { position: absolute; top: 700px; width: 240px; height: 460px; }
+    .col .vbar { top: auto; }
+    .col .val { position: absolute; left: -90px; right: -90px; font-family: "Plex Mono"; font-weight: 700; font-size: 56px; letter-spacing: -0.03em; }
+    .col .lab { position: absolute; bottom: -62px; left: -60px; right: -60px; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 24px; color: #ead9a4; }
+    #n-c1 { left: 220px; } #n-c1 .vbar { height: 168px; } #n-c1 .val { bottom: 182px; color: #f6f8fc; }
+    #n-c2 { left: 620px; } #n-c2 .vbar { height: 420px; } #n-c2 .val { bottom: 434px; color: #EF4444; }
+    #n-base { position: absolute; left: 160px; right: 160px; top: 1160px; height: 3px; background: rgba(234,217,164,.6); transform-origin: center; }
+    #n-x { position: absolute; left: 400px; top: 860px; font-size: 46px; }
+  </style>
+  <div id="root" data-composition-id="clientes" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div class="hdr" id="n-h1"><span class="w">Hoy</span><span class="w">el</span><span class="w">mercado</span><span class="w">no</span><span class="w">duda</span><span class="w">de</span><span class="w">Nvidia:</span></div>
+    <div class="hdr" id="n-h2"><span class="w">duda</span><span class="w">de</span><span class="w">sus</span><span class="w em" data-acc="gold">clientes,</span></div>
+    <div class="hdr" id="n-h3"><span class="w">que</span><span class="w">ya</span><span class="w">gastan</span><span class="w">en</span><span class="w em" data-acc="gold">IA</span></div>
+    <div class="hdr" id="n-h4"><span class="w em" data-acc="red">casi</span><span class="w em" data-acc="red">todo</span><span class="w">el</span><span class="w">efectivo</span><span class="w">que</span><span class="w">generan.</span></div>
+
+    <div id="n-top">
+      <div class="wire" id="n-w1" style="left: 300px; top: 440px; width: 170px; transform: rotate(8deg)"></div>
+      <div class="wire" id="n-w2" style="left: 610px; top: 440px; width: 150px; transform: rotate(172deg)"></div>
+      <div class="wire" id="n-w3" style="left: 330px; top: 580px; width: 150px; transform: rotate(-14deg)"></div>
+      <div class="wire" id="n-w4" style="left: 600px; top: 520px; width: 180px; transform: rotate(196deg)"></div>
+      <div id="n-chipwrap" data-layout-allow-overflow><div id="n-chipscale"><div class="chip"><div class="pins"></div><div class="body"></div><div class="plate nv" data-n></div></div></div></div>
+      <span class="pill cli" id="n-k1">Microsoft</span><span class="pill cli" id="n-k2">Alphabet</span>
+      <span class="pill cli" id="n-k3">Amazon</span><span class="pill cli" id="n-k4">Meta</span>
+    </div>
+    <div id="n-kick" class="kicker">GRANDES TECNOLÓGICAS · CAPEX / FLUJO OPERATIVO</div>
+    <div class="col" id="n-c1"><div class="vbar navy"></div><div class="val odo" id="n-v1" data-layout-ignore></div><div class="lab">PROMEDIO 10 AÑOS</div></div>
+    <div class="col" id="n-c2"><div class="vbar red"></div><div class="val odo" id="n-v2" data-layout-ignore></div><div class="lab">PLAN 2026</div></div>
+    <div id="n-base"></div>
+    <div id="n-x" class="badge red">×2,5</div>
+    <div class="src" id="n-src">Investing.com, 2-nov-2026: capex 2026 de los hyperscalers ≈ 100% de su flujo operativo vs. ~40% promedio de 10 años</div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
+      const R = document.querySelector('[data-composition-id="clientes"]');
+      const $ = (s) => R.querySelector(s);
+      R.querySelectorAll("[data-n]").forEach((p) => (p.innerHTML = MF.N_SVG));
+      const pct = ["≈", 100, 10, 1, "%"];
+      const s1 = MF.odo($("#n-v1"), pct), s2 = MF.odo($("#n-v2"), pct);
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 8.8, (t) => {
+        s1(40 * eOut4(clamp((t - 3.4) / 0.7, 0, 1)));
+        s2(100 * eOut4(clamp((t - 4.6) / 1.6, 0, 1)));
+      });
+      MF.captions(tl, R, [["#n-h1", 0.04, 1.8], ["#n-h2", 1.8, 3.2], ["#n-h3", 3.2, 4.6], ["#n-h4", 4.6, 8.0]]);
+      tl.fromTo("#n-chipwrap", { y: -900, filter: "blur(12px)" }, { y: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 0.3);
+      ["#n-k1", "#n-k2", "#n-k3", "#n-k4"].forEach((s, i) => {
+        tl.fromTo(s, { y: -1200, rotation: i % 2 ? 8 : -8, filter: "blur(12px)" }, { y: 0, rotation: i % 2 ? 3 : -3, filter: "blur(0px)", duration: 0.34, ease: "power3.in" }, 1.85 + i * 0.16);
+        tl.to(s, { rotation: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" }, 2.19 + i * 0.16);
+      });
+      ["#n-w1", "#n-w2", "#n-w3", "#n-w4"].forEach((s, i) => tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: 0.3 }, 2.3 + i * 0.08));
+      tl.to("#n-top", { scale: 0.78, y: -10, duration: 0.5, ease: "power3.inOut" }, 3.1);
+      tl.fromTo("#n-kick", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, 3.3);
+      tl.fromTo("#n-base", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 3.3);
+      tl.fromTo("#n-c1 .vbar", { scaleY: 0 }, { scaleY: 1, duration: 0.6, ease: "expo.out" }, 3.4);
+      tl.fromTo("#n-c2 .vbar", { scaleY: 0 }, { scaleY: 1, duration: 1.6, ease: "expo.out" }, 4.6);
+      tl.fromTo("#n-c1 .val, #n-c1 .lab", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 3.4);
+      tl.fromTo("#n-c2 .val, #n-c2 .lab", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 4.6);
+      tl.fromTo("#n-x", { opacity: 0, scale: 0.3, rotation: 14 }, { opacity: 1, scale: 1, rotation: -4, duration: 0.45, ease: "back.out(2.6)" }, 6.3);
+      tl.fromTo("#n-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 3.5);
+      window.__timelines["clientes"] = tl;
+    })();
+  </script>
+</template>
