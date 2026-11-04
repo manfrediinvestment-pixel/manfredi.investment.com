@@ -1,0 +1,103 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #v-bars { position: absolute; left: 0; right: 0; top: 0; height: 1100px; transform-origin: 50% 400px; }
+    #v-kicker { top: 352px; }
+    .col { position: absolute; bottom: 160px; width: 260px; height: 600px; }
+    .col .val { position: absolute; left: -80px; right: -80px; font-family: "Plex Mono"; font-weight: 700; font-size: 44px; letter-spacing: -0.03em; }
+    .col .lab { position: absolute; bottom: -62px; left: -40px; right: -40px; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 28px; color: #ead9a4; }
+    #v-c25 { left: 190px; } #v-c25 .vbar { height: 404px; top: auto; }
+    #v-c25 .val { bottom: 419px; color: #f6f8fc; }
+    #v-c26 { left: 630px; } #v-c26 .vbar { height: 480px; top: auto; }
+    #v-c26 .val { bottom: 495px; color: #10B981; }
+    #v-base { position: absolute; left: 130px; right: 130px; bottom: 158px; height: 3px; border-radius: 3px; background: rgba(234,217,164,.6); transform-origin: center; }
+    #v-plus { position: absolute; left: 447px; top: 480px; width: 180px; text-align: center; }
+    #v-plus .badge { font-size: 44px; }
+    #v-plus svg { display: block; margin: 10px auto 0; }
+    #v-az { position: absolute; left: 130px; right: 130px; top: 1010px; height: 150px; display: flex; align-items: center; gap: 26px; padding: 0 30px; }
+    #v-az .ico { width: 92px; height: 92px; border-radius: 18px; background: #fff; display: flex; align-items: center; justify-content: center; flex: none; }
+    #v-az .ico svg { width: 60px; height: 60px; }
+    #v-az .k { font-family: "Plex Mono"; font-weight: 600; font-size: 21px; letter-spacing: .14em; color: #ead9a4; }
+    #v-az .n { font-family: "Plex Mono"; font-weight: 700; font-size: 46px; letter-spacing: -0.03em; }
+    #v-az .badge { margin-left: auto; font-size: 46px; }
+    #v-chipwrap { position: absolute; left: 50%; top: 900px; width: 360px; height: 360px; margin-left: -180px; }
+    #v-lens { position: absolute; left: 0; top: 0; width: 250px; height: 250px; }
+    #v-q { position: absolute; left: 720px; top: 860px; font-family: "DM Serif"; font-style: italic; font-size: 260px; line-height: 1; color: #EF4444; filter: drop-shadow(0 18px 40px rgba(239,68,68,.35)); }
+  </style>
+  <div id="root" data-composition-id="ventas" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-panel"></div><div class="grid"></div>
+    <div class="hdr" id="v-h1"><span class="w">Vendió</span><span class="w em" data-acc="green">92</span><span class="w em" data-acc="green">mil</span><span class="w em" data-acc="green">millones</span></div>
+    <div class="hdr" id="v-h2"><span class="w">en</span><span class="w">tres</span><span class="w">meses:</span><span class="w em" data-acc="green">19%</span><span class="w em" data-acc="green">más.</span></div>
+    <div class="hdr" id="v-h3"><span class="w em" data-acc="gold">Azure,</span><span class="w">su</span><span class="w">nube,</span><span class="w">creció</span><span class="w em" data-acc="green">48%.</span></div>
+    <div class="hdr" id="v-h4"><span class="w">¿Entonces</span><span class="w">por</span><span class="w">qué</span><span class="w em" data-acc="red">cayó?</span></div>
+    <div id="v-bars">
+      <div id="v-kicker" class="kicker">VENTAS DE MICROSOFT · TRIMESTRE JUL–SEP</div>
+      <div class="col" id="v-c25"><div class="vbar navy"></div><div class="val odo" id="v-val25" data-layout-ignore></div><div class="lab">1T FY26</div></div>
+      <div class="col" id="v-c26"><div class="vbar green"></div><div class="val odo" id="v-val26" data-layout-ignore></div><div class="lab">1T FY27</div></div>
+      <div id="v-base"></div>
+      <div id="v-plus"><div class="badge green">+18,8%</div>
+        <svg width="120" height="60" viewBox="0 0 120 60"><path id="v-arrow" d="M8 50 C 40 50, 70 40, 104 12" fill="none" stroke="#10B981" stroke-width="6" stroke-linecap="round" /><path d="M86 10 L106 10 L102 30" fill="none" stroke="#10B981" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </div>
+    </div>
+    <div id="v-az" class="glass">
+      <div class="ico"><svg viewBox="0 0 48 48"><path d="M19 6h11L18 42H6z" fill="#0078D4"/><path d="M31 14l11 28H20l9-6h-4z" fill="#50A0E8"/></svg></div>
+      <div><div class="k">AZURE · LA NUBE</div><div class="n odo" id="v-azn" data-layout-ignore></div></div>
+      <div class="badge green">+48%</div>
+    </div>
+    <div class="src" id="v-src">Microsoft 8-K, 1T del año fiscal 2027 (jul–sep 2026), publicado el 28-oct-2026</div>
+    <div id="v-chipwrap" data-layout-allow-overflow>
+      <div class="chip half-l" id="v-halfL"><div class="pins"></div><div class="body"></div><div class="plate" data-ms></div></div>
+      <div class="chip half-r" id="v-halfR"><div class="pins"></div><div class="body"></div><div class="plate" data-ms></div></div>
+      <svg id="v-lens" viewBox="0 0 250 250">
+        <defs><radialGradient id="v-glass" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".4"/><stop offset="1" stop-color="#f2c94c" stop-opacity=".14"/></radialGradient></defs>
+        <line x1="150" y1="150" x2="232" y2="232" stroke="#ead9a4" stroke-width="22" stroke-linecap="round" />
+        <circle cx="96" cy="96" r="78" fill="url(#v-glass)" stroke="#f2c94c" stroke-width="16" />
+        <path d="M54 70 A 50 50 0 0 1 90 40" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".8" />
+      </svg>
+    </div>
+    <div id="v-q">?</div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
+      const R = document.querySelector('[data-composition-id="ventas"]');
+      const $ = (s) => R.querySelector(s);
+      R.querySelectorAll("[data-ms]").forEach((p) => (p.innerHTML = MF.MS_SVG));
+      const money = ["US$ ", 10000, 1000, ".", 100, 10, 1, "~M"];
+      const s25 = MF.odo($("#v-val25"), money), s26 = MF.odo($("#v-val26"), money), sAz = MF.odo($("#v-azn"), money);
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 9.3, (t) => {
+        s25(40000 + 37672 * eOut4(clamp((t - 0.2) / 0.8, 0, 1)));
+        s26(45000 + 47282 * eOut4(clamp((t - 0.45) / 1.0, 0, 1)));
+        sAz(15000 + 18170 * eOut4(clamp((t - 3.7) / 1.2, 0, 1)));
+      });
+      MF.captions(tl, R, [["#v-h1", 0.04, 1.6], ["#v-h2", 1.6, 3.4], ["#v-h3", 3.4, 5.9], ["#v-h4", 5.9, 8.6]]);
+      tl.fromTo("#v-kicker", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 0.1);
+      tl.fromTo("#v-base", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 0.12);
+      tl.fromTo("#v-c25 .vbar", { scaleY: 0 }, { scaleY: 1, duration: 0.8, ease: "expo.out" }, 0.2);
+      tl.fromTo("#v-c26 .vbar", { scaleY: 0 }, { scaleY: 1, duration: 1.0, ease: "expo.out" }, 0.45);
+      tl.fromTo(".lab", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.2);
+      tl.fromTo("#v-plus", { opacity: 0, scale: 0.4, rotation: -12 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.45, ease: "back.out(2.4)" }, 2.35);
+      tl.fromTo("#v-arrow", { strokeDasharray: 140, strokeDashoffset: 140 }, { strokeDashoffset: 0, duration: 0.4, ease: "power2.out" }, 2.45);
+      tl.fromTo("#v-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 0.5);
+      // Azure entra desde la derecha y su badge pega
+      tl.fromTo("#v-az", { x: 1100, rotation: 3, filter: "blur(12px)" }, { x: 0, rotation: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 3.45);
+      tl.fromTo("#v-az .badge", { scale: 1 }, { scale: 1.18, duration: 0.08, ease: "power2.out", immediateRender: false }, 4.9);
+      tl.to("#v-az .badge", { scale: 1, duration: 0.4, ease: "back.out(3)" }, 4.98);
+      // ¿entonces por qué cayó?
+      tl.to("#v-az", { y: -900, filter: "blur(10px)", opacity: 0, duration: 0.35, ease: "power3.in" }, 5.75);
+      tl.to("#v-bars", { scale: 0.62, y: -70, duration: 0.5, ease: "power3.inOut" }, 5.85);
+      tl.to("#v-src", { opacity: 0, duration: 0.15 }, 5.85);
+      tl.fromTo("#v-chipwrap", { y: 1300, rotation: 10, filter: "blur(14px)" }, { y: 0, rotation: 0, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, 5.95);
+      tl.set("#v-halfL", { x: -26, y: 8, rotation: -7 }, 0);
+      tl.set("#v-halfR", { x: 26, y: 12, rotation: 8 }, 0);
+      tl.fromTo("#v-lens", { x: -420, y: 120, rotation: -20, opacity: 0 }, { x: 70, y: 40, rotation: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 6.2);
+      tl.to("#v-lens", { x: 20, y: 30, duration: 0.6, ease: "power2.inOut" }, 6.9);
+      tl.to("#v-lens", { x: 90, y: 60, duration: 0.8, ease: "power2.inOut" }, 7.5);
+      tl.fromTo("#v-q", { opacity: 0, scale: 0.2, rotation: 25 }, { opacity: 1, scale: 1, rotation: 8, duration: 0.5, ease: "back.out(2.8)" }, 6.85);
+      tl.to("#v-q", { rotation: -4, duration: 1.2, ease: "elastic.out(1, 0.3)" }, 7.35);
+      window.__timelines["ventas"] = tl;
+    })();
+  </script>
+</template>

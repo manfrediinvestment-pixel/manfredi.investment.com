@@ -1,0 +1,75 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #n-kick { top: 400px; }
+    #n-num { position: absolute; top: 444px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 128px; letter-spacing: -0.04em; color: #10B981; height: 140px;
+      filter: drop-shadow(0 0 30px rgba(16,185,129,.35)); }
+    #n-bld { position: absolute; left: 340px; top: 640px; width: 400px; height: 470px; }
+    .nf { position: absolute; left: 0; width: 400px; height: 70px; border-radius: 6px; background: linear-gradient(180deg, #2C4A70, #142a4a); border: 2px solid rgba(226,234,245,.28);
+      display: flex; align-items: center; justify-content: space-evenly; padding: 0 10px; }
+    .nf i { width: 42px; height: 38px; border-radius: 4px; background: linear-gradient(180deg, #f7dc8a, #e0a93a); box-shadow: 0 0 14px rgba(242,201,76,.5); }
+    #n-gr { position: absolute; left: 140px; right: 140px; top: 1106px; height: 8px; border-radius: 4px; background: #B8943F; }
+    .coin { position: absolute; left: 520px; top: 760px; width: 54px; height: 54px; border-radius: 50%; opacity: 0;
+      background: radial-gradient(circle at 38% 32%, #6ee7b7, #10B981 60%, #0e8f65); border: 3px solid #d1fae5; display: flex; align-items: center; justify-content: center;
+      font-family: "Plex Mono"; font-weight: 700; font-size: 28px; color: #063b2a; }
+    #n-p1 { position: absolute; top: 1150px; left: 0; right: 0; margin: 0 auto; width: fit-content; font-size: 22px; }
+    #n-p1 b, #n-p2 b { color: #10B981; }
+    #n-p2 { position: absolute; top: 1218px; left: 0; right: 0; margin: 0 auto; width: fit-content; font-size: 22px; }
+  </style>
+  <div id="root" data-composition-id="caja" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-panel"></div><div class="grid"></div>
+    <div class="hdr" id="n-h1"><span class="w">Igual,</span><span class="w">la</span><span class="w em" data-acc="gold">caja</span></div>
+    <div class="hdr" id="n-h2"><span class="w">sigue</span><span class="w">en</span><span class="w em" data-acc="green">verde:</span></div>
+    <div class="hdr" id="n-h3"><span class="w em" data-acc="green">18.600</span><span class="w em" data-acc="green">millones</span><span class="w">libres.</span></div>
+    <div id="n-kick" class="kicker">FLUJO DE CAJA LIBRE · 1T FY27</div>
+    <div id="n-num" class="odo" data-layout-ignore></div>
+    <div id="n-bld">
+      <div class="nf" style="top: 400px"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="nf" style="top: 324px"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="nf" style="top: 248px"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="nf" style="top: 172px"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="nf" style="top: 96px"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="nf" style="top: 20px"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div id="n-gr"></div>
+    <div class="coin" id="n-c1">$</div><div class="coin" id="n-c2">$</div><div class="coin" id="n-c3">$</div><div class="coin" id="n-c4">$</div>
+    <div class="coin" id="n-c5">$</div><div class="coin" id="n-c6">$</div><div class="coin" id="n-c7">$</div><div class="coin" id="n-c8">$</div>
+    <div id="n-p1" class="pill">MARGEN OPERATIVO <b>49,8%</b> · EL MÁS ALTO EN 8 TRIMESTRES</div>
+    <div id="n-p2" class="pill">FLUJO OPERATIVO US$ 58.000 M · <b>+29%</b></div>
+    <div class="src" id="n-src">8-K 1T FY27: flujo operativo US$ 58.000 M − capex en efectivo US$ 39.370 M = flujo libre US$ 18.630 M</div>
+    <div class="flash gold" id="n-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4, eInOut3 } = MF;
+      const R = document.querySelector('[data-composition-id="caja"]');
+      const $ = (s) => R.querySelector(s);
+      const sN = MF.odo($("#n-num"), ["US$ ", 10000, 1000, ".", 100, 10, 1, "~M"]);
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 6.0, (t) => sN(18630 * eInOut3(clamp((t - 1.0) / 2.2, 0, 1))));
+      MF.captions(tl, R, [["#n-h1", 0.04, 1.2], ["#n-h2", 1.2, 2.3], ["#n-h3", 2.3, 5.3]]);
+      tl.fromTo("#n-kick", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 0.1);
+      tl.fromTo("#n-num", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, 0.2);
+      tl.fromTo("#n-gr", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 0.15);
+      // el edificio (ya terminado y vendido) entra desde abajo, piso por piso
+      R.querySelectorAll(".nf").forEach((f, i) =>
+        tl.fromTo(f, { y: 1200, filter: "blur(10px)" }, { y: 0, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 0.2 + i * 0.07));
+      // de las ventanas salen monedas verdes que suben al contador
+      const dirs = [[-260, -330], [200, -360], [-120, -300], [300, -320], [-330, -280], [80, -340], [-30, -360], [240, -300]];
+      dirs.forEach(([dx, dy], i) => {
+        const at = 1.1 + i * 0.22;
+        tl.fromTo("#n-c" + (i + 1), { opacity: 1, x: (i % 3 - 1) * 110, y: 40 + (i % 4) * 70, scale: 0.3 },
+          { x: dx * 0.6, y: dy, scale: 1, duration: 0.6, ease: "power3.out", immediateRender: false }, at);
+        tl.to("#n-c" + (i + 1), { opacity: 0, scale: 0.6, duration: 0.18 }, at + 0.5);
+      });
+      tl.to("#n-num", { scale: 1.07, duration: 0.07, ease: "power2.out" }, 3.2);
+      tl.to("#n-num", { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 3.27);
+      MF.flash(tl, "#n-flash", 3.2);
+      tl.fromTo("#n-p1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(2)" }, 3.5);
+      tl.fromTo("#n-p2", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(2)" }, 3.8);
+      tl.fromTo("#n-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 1.0);
+      window.__timelines["caja"] = tl;
+    })();
+  </script>
+</template>

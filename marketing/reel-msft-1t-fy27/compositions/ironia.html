@@ -1,0 +1,121 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #i-shake { position: absolute; inset: 0; }
+    #i-a { position: absolute; left: 0; right: 0; top: 0; height: 1300px; }
+    #i-kick { top: 352px; }
+    .col { position: absolute; top: 420px; width: 250px; height: 520px; }
+    .col .bar { position: absolute; bottom: 0; left: 0; right: 0; border-radius: 16px 16px 6px 6px; transform-origin: 50% 100%; }
+    .col .val { position: absolute; left: -90px; right: -90px; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 42px; letter-spacing: -0.03em; }
+    .col .lab { position: absolute; bottom: -54px; left: -60px; right: -60px; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 24px; color: #ead9a4; }
+    #i-cE { left: 200px; } #i-cE .bar { height: 470px; border: 4px dashed rgba(234,217,164,.7); background: rgba(234,217,164,.06); } #i-cE .val { bottom: 484px; color: #ead9a4; }
+    #i-cR { left: 630px; } #i-cR .bar { height: 425px; background: linear-gradient(180deg, #3A5B8C, #1A2F4A); border: 1px solid rgba(226,234,245,.2); } #i-cR .val { bottom: 439px; color: #f6f8fc; }
+    #i-base { position: absolute; left: 140px; right: 140px; top: 940px; height: 3px; background: rgba(234,217,164,.6); transform-origin: center; }
+    #i-less { position: absolute; left: 0; right: 0; top: 650px; margin: 0 auto; width: fit-content; font-size: 32px; }
+    /* camión con ladrillos */
+    #i-road { position: absolute; left: 0; right: 0; top: 1196px; height: 6px; background: repeating-linear-gradient(90deg, #B8943F 0 50px, transparent 50px 80px); opacity: .7; }
+    #i-tmove { position: absolute; left: 0; top: 1010px; width: 460px; height: 190px; }
+    #i-truck { position: absolute; left: 0; top: 0; width: 460px; height: 190px; }
+    #i-truck .bed { position: absolute; left: 0; top: 70px; width: 300px; height: 80px; border-radius: 8px; background: linear-gradient(180deg, #34465f, #1a2638); border: 2px solid rgba(226,234,245,.25); }
+    #i-truck .bricks { position: absolute; left: 14px; top: 10px; width: 270px; height: 66px;
+      background: repeating-linear-gradient(0deg, transparent 0 20px, #5a2a14 20px 22px), repeating-linear-gradient(90deg, #c4572e 0 42px, #5a2a14 42px 45px); border-radius: 4px; }
+    #i-truck .cab { position: absolute; left: 306px; top: 40px; width: 140px; height: 110px; border-radius: 10px 34px 8px 8px; background: linear-gradient(180deg, #f2c94c, #c99a2e); }
+    #i-truck .cab i { position: absolute; left: 60px; top: 14px; width: 64px; height: 42px; border-radius: 6px 22px 4px 4px; background: #7fb4ff; opacity: .8; }
+    .wh { position: absolute; top: 132px; width: 58px; height: 58px; border-radius: 50%; background: #0b1830; border: 8px solid #2C4A70; }
+    .wh::after { content: ""; position: absolute; left: 50%; top: 2px; width: 4px; height: 38px; margin-left: -2px; background: #ead9a4; }
+    #i-stamp { position: absolute; left: 470px; top: 1000px; padding: 8px 22px; border: 7px solid #EF4444; border-radius: 14px; color: #EF4444; font-family: "Plex Mono";
+      font-weight: 700; font-size: 54px; letter-spacing: .08em; background: rgba(6,13,26,.5); }
+    /* C: la guía */
+    #i-c { position: absolute; inset: 0; }
+    #i-ck { top: 470px; }
+    #i-arrow { position: absolute; left: 50%; top: 520px; width: 200px; height: 220px; margin-left: -100px; }
+    #i-big { position: absolute; top: 760px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 120px; letter-spacing: -0.04em; color: #EF4444; height: 130px;
+      filter: drop-shadow(0 0 30px rgba(239,68,68,.3)); }
+    #i-next { position: absolute; top: 930px; left: 0; right: 0; margin: 0 auto; width: fit-content; font-size: 24px; }
+  </style>
+  <div id="root" data-composition-id="ironia" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div id="i-shake">
+      <div class="hdr" id="i-h1"><span class="w">Lo</span><span class="w em" data-acc="gold">irónico:</span></div>
+      <div class="hdr" id="i-h2"><span class="w">gastó</span><span class="w em" data-acc="green">menos</span><span class="w">de</span><span class="w">lo</span><span class="w">esperado</span></div>
+      <div class="hdr" id="i-h3"><span class="w">porque</span><span class="w">se</span><span class="w">le</span><span class="w em" data-acc="red">demoraron</span></div>
+      <div class="hdr" id="i-h4"><span class="w">los</span><span class="w em" data-acc="gold">materiales.</span></div>
+      <div class="hdr" id="i-h5"><span class="w">Y</span><span class="w">ya</span><span class="w">avisó:</span><span class="w">este</span><span class="w">trimestre,</span></div>
+      <div class="hdr" id="i-h6"><span class="w em" data-acc="red">más</span><span class="w">de</span><span class="w em" data-acc="red">50</span><span class="w em" data-acc="red">mil</span><span class="w em" data-acc="red">millones.</span></div>
+
+      <div id="i-a">
+        <div id="i-kick" class="kicker">CAPEX DEL TRIMESTRE · JUL–SEP 2026</div>
+        <div class="col" id="i-cE"><div class="bar"></div><div class="val">&gt;50.000</div><div class="lab">ESPERADO</div></div>
+        <div class="col" id="i-cR"><div class="bar"></div><div class="val odo" id="i-vR" data-layout-ignore></div><div class="lab">REAL</div></div>
+        <div id="i-base"></div>
+        <div id="i-less" class="badge green">GASTÓ MENOS</div>
+        <div id="i-road"></div>
+        <div id="i-tmove"><div id="i-truck">
+          <div class="bed"><div class="bricks"></div></div>
+          <div class="cab"><i></i></div>
+          <div class="wh" id="i-w1" style="left: 30px"></div><div class="wh" id="i-w2" style="left: 200px"></div><div class="wh" id="i-w3" style="left: 350px"></div>
+        </div></div>
+        <div id="i-stamp">DEMORADO</div>
+      </div>
+
+      <div id="i-c">
+        <div id="i-ck" class="kicker">GUÍA DE CAPEX · OCT–DIC 2026</div>
+        <svg id="i-arrow" viewBox="0 0 200 220"><path id="i-ap" d="M100 210 V30 M40 90 L100 26 L160 90" fill="none" stroke="#EF4444" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <div id="i-big" class="odo" data-layout-ignore></div>
+        <div id="i-next" class="pill"><i></i>Y SE ACELERA EN LA 2ª MITAD DEL AÑO FISCAL</div>
+      </div>
+      <div class="src" id="i-src">Esperado: StreetAccount (&gt;US$ 50.000 M). Real: US$ 45.200 M. Amy Hood (CFO): demoras de proveedores; guía 2T FY27 &gt;US$ 50.000 M.</div>
+    </div>
+    <div class="flash" id="i-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4, eInOut3 } = MF;
+      const R = document.querySelector('[data-composition-id="ironia"]');
+      const $ = (s) => R.querySelector(s);
+      const sR = MF.odo($("#i-vR"), [10000, 1000, ".", 100, 10, 1]);
+      const sB = MF.odo($("#i-big"), [">US$ ", 10000, 1000, ".", 100, 10, 1, "~M"]);
+      const tl = gsap.timeline({ paused: true });
+      let truckX = -600;
+      const wheels = [$("#i-w1"), $("#i-w2"), $("#i-w3")];
+      MF.clock(tl, 8.9, (t) => {
+        sR(20000 + 25200 * eOut4(clamp((t - 1.1) / 0.9, 0, 1)));
+        sB(50000 * eInOut3(clamp((t - 6.6) / 1.1, 0, 1)));
+        // el camión entra frenando (posición determinista) y las ruedas giran con la distancia
+        const u = clamp((t - 2.6) / 1.25, 0, 1);
+        truckX = -600 + 680 * (1 - Math.pow(1 - u, 3));
+        $("#i-tmove").style.transform = `translateX(${truckX}px)`;
+        wheels.forEach((w) => (w.style.transform = `rotate(${(truckX + 600) * 2}deg)`));
+      });
+      MF.captions(tl, R, [["#i-h1", 0.04, 0.9], ["#i-h2", 0.9, 2.6], ["#i-h3", 2.6, 3.8], ["#i-h4", 3.8, 4.8], ["#i-h5", 4.8, 6.6], ["#i-h6", 6.6, 8.5]]);
+      // A — esperado vs real
+      tl.fromTo("#i-kick", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 0.1);
+      tl.fromTo("#i-base", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 0.2);
+      tl.fromTo("#i-cE .bar", { scaleY: 0 }, { scaleY: 1, duration: 0.6, ease: "expo.out" }, 0.4);
+      tl.fromTo("#i-cE .val, #i-cE .lab, #i-cR .lab", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.5);
+      tl.fromTo("#i-cR .bar", { scaleY: 0 }, { scaleY: 1, duration: 0.9, ease: "expo.out" }, 1.1);
+      tl.fromTo("#i-cR .val", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 1.1);
+      tl.fromTo("#i-less", { opacity: 0, scale: 0.3, rotation: -14 }, { opacity: 1, scale: 1, rotation: -4, duration: 0.45, ease: "back.out(2.6)" }, 2.0);
+      tl.fromTo("#i-road", { opacity: 0 }, { opacity: 0.7, duration: 0.3 }, 2.5);
+      // el camión de ladrillos se frena: la cabina cabecea y cae el sello DEMORADO
+      tl.fromTo("#i-truck", { rotation: 0 }, { rotation: 2.5, duration: 0.15, ease: "power2.out", transformOrigin: "100% 100%", immediateRender: false }, 3.85);
+      tl.to("#i-truck", { rotation: 0, duration: 0.8, ease: "elastic.out(1, 0.3)" }, 4.0);
+      tl.fromTo("#i-stamp", { opacity: 0, scale: 2.4, rotation: 0 }, { opacity: 1, scale: 1, rotation: -10, duration: 0.2, ease: "power4.in" }, 3.95);
+      MF.shake(tl, "#i-shake", 4.15, 11);
+      // C — el aviso: este trimestre más de 50 mil millones
+      tl.to("#i-a", { y: -1400, filter: "blur(12px)", duration: 0.4, ease: "power3.in" }, 4.75);
+      tl.fromTo("#i-ck", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, 5.15);
+      tl.fromTo("#i-arrow", { y: 900, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "expo.out" }, 5.2);
+      tl.to("#i-arrow", { y: -24, duration: 0.5, ease: "power2.inOut", yoyo: true, repeat: 3 }, 5.75);
+      tl.fromTo("#i-big", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, 6.5);
+      tl.to("#i-big", { scale: 1.08, duration: 0.07, ease: "power2.out" }, 7.7);
+      tl.to("#i-big", { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 7.77);
+      MF.flash(tl, "#i-flash", 7.7);
+      MF.shake(tl, "#i-shake", 7.7, 12);
+      tl.fromTo("#i-next", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(2)" }, 7.95);
+      tl.fromTo("#i-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 1.0);
+      window.__timelines["ironia"] = tl;
+    })();
+  </script>
+</template>

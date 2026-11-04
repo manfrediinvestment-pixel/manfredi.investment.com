@@ -1,0 +1,108 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #k-card { position: absolute; left: 110px; right: 110px; top: 350px; padding: 24px 30px; }
+    #k-card .top { display: flex; align-items: center; gap: 14px; }
+    #k-card .top img { width: 48px; height: 48px; }
+    #k-card .t1 { font-family: "Plex Mono"; font-weight: 600; font-size: 19px; letter-spacing: .14em; color: #ead9a4; }
+    #k-card .t2 { font-family: "DM Serif"; font-size: 34px; line-height: 1.05; }
+    #k-card .t2 em { font-style: italic; color: #f2c94c; }
+    #k-card ul { list-style: none; margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 18px; }
+    #k-card li { font-family: "Plex Mono"; font-weight: 600; font-size: 19px; color: #f3f6fb; padding-left: 22px; position: relative; }
+    #k-card li::before { content: ""; position: absolute; left: 0; top: 7px; width: 10px; height: 10px; border-radius: 3px; background: #f2c94c; }
+    #k-n { position: absolute; right: 26px; top: 26px; font-size: 19px; }
+    #k-box { position: absolute; left: 70px; right: 70px; top: 700px; height: 150px; border-radius: 26px; display: flex; align-items: center; gap: 22px; padding: 0 26px; }
+    #k-av { width: 84px; height: 84px; border-radius: 50%; flex: none; background: linear-gradient(135deg, #3A5B8C, #1A2F4A); border: 2px solid rgba(226,234,245,.3); }
+    #k-field { flex: 1; height: 96px; border-radius: 48px; background: rgba(6,13,26,.6); border: 1px solid rgba(226,234,245,.18); display: flex; align-items: center; padding: 0 28px; }
+    #k-word { display: flex; font-family: "Plex Mono"; font-weight: 700; font-size: 52px; letter-spacing: .02em; color: #f2c94c; }
+    #k-word span { display: inline-block; }
+    #k-caret { width: 4px; height: 58px; background: #f6f8fc; margin-left: 6px; }
+    #k-ph { position: absolute; font-family: "Plex Sans"; font-size: 30px; color: #ead9a4; opacity: .7; }
+    #k-send { width: 84px; height: 84px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; background: #f2c94c; }
+    #k-send svg { width: 40px; height: 40px; }
+    #k-posted { position: absolute; left: 70px; right: 70px; top: 700px; height: 120px; display: flex; align-items: center; gap: 20px; padding: 0 26px; }
+    #k-posted .av { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #3A5B8C, #1A2F4A); border: 2px solid rgba(226,234,245,.3); flex: none; }
+    #k-posted .u { font-family: "Plex Mono"; font-weight: 600; font-size: 22px; color: #ead9a4; }
+    #k-posted .c { font-family: "Plex Mono"; font-weight: 700; font-size: 44px; color: #f6f8fc; }
+    #k-heart { margin-left: auto; width: 46px; height: 46px; }
+    #k-dm { position: absolute; left: 90px; right: 90px; top: 890px; padding: 24px 28px; border-radius: 28px 28px 28px 8px; }
+    #k-dm .from { display: flex; align-items: center; gap: 14px; }
+    #k-dm .from img { width: 52px; height: 52px; }
+    #k-dm .from b { font-family: "DM Serif"; font-weight: 400; font-size: 32px; }
+    #k-dm .from b em { color: #f2c94c; }
+    #k-dm .from span { font-family: "Plex Mono"; font-weight: 600; font-size: 18px; color: #ead9a4; margin-left: auto; }
+    #k-dm p { margin-top: 14px; font-size: 32px; font-weight: 600; line-height: 1.25; }
+    #k-btn { margin-top: 18px; display: inline-flex; align-items: center; gap: 12px; background: #f2c94c; color: #0a1322; font-weight: 700; font-size: 30px; padding: 14px 30px; border-radius: 99px; }
+    #k-ping { position: absolute; right: 70px; top: 870px; width: 44px; height: 44px; border-radius: 50%; background: #EF4444; color: #fff; font-family: "Plex Mono"; font-weight: 700; font-size: 24px;
+      display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 6px rgba(239,68,68,.25); }
+    #k-url { position: absolute; top: 1222px; left: 0; right: 0; margin: 0 auto; width: fit-content; font-size: 24px; color: #f2c94c; border-color: rgba(242,201,76,.5); }
+    #k-cursor { position: absolute; left: 0; top: 0; width: 54px; height: 54px; }
+  </style>
+  <div id="root" data-composition-id="comenta" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div class="hdr" id="k-h1"><span class="w">Y</span><span class="w">si</span><span class="w">querés</span><span class="w">el</span><span class="w em" data-acc="gold">informe</span><span class="w em" data-acc="gold">completo,</span></div>
+    <div class="hdr" id="k-h2"><span class="w">comentá</span><span class="w em" data-acc="gold">MICROSOFT</span></div>
+    <div class="hdr" id="k-h3"><span class="w">y</span><span class="w">te</span><span class="w">mando</span><span class="w">la</span><span class="w em" data-acc="gold">guía</span></div>
+    <div class="hdr" id="k-h4"><span class="w">para</span><span class="w">conseguirlo.</span></div>
+
+    <div id="k-card" class="glass">
+      <div class="top"><img src="assets/logo-manfredi.svg" alt="" /><div><div class="t1">INFORME COMPLETO</div><div class="t2">Microsoft <em>(MSFT)</em></div></div></div>
+      <div id="k-n" class="pill">ACTUALIZADO 1T FY27</div>
+      <ul><li>Tesis de inversión</li><li>Resultados 1T FY27</li><li>Valuación 4 métodos</li><li>Comparables</li><li>Azure y OpenAI</li><li>Riesgos</li></ul>
+    </div>
+
+    <div id="k-box" class="glass">
+      <div id="k-av"></div>
+      <div id="k-field"><div id="k-ph">Agregá un comentario…</div><div id="k-word"><span>M</span><span>I</span><span>C</span><span>R</span><span>O</span><span>S</span><span>O</span><span>F</span><span>T</span></div><div id="k-caret"></div></div>
+      <div id="k-send"><svg viewBox="0 0 24 24" fill="none" stroke="#0a1322" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z" /></svg></div>
+    </div>
+    <div id="k-posted" class="glass">
+      <div class="av"></div><div><div class="u">vos · ahora</div><div class="c">MICROSOFT</div></div>
+      <svg id="k-heart" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3.3 5 6.8 5c2 0 3.4 1.1 4.2 2.3h2C13.8 6.1 15.2 5 17.2 5c3.5 0 5.6 3.6 4.3 6.8C19.5 16.4 12 21 12 21z" fill="#EF4444" /></svg>
+    </div>
+    <div id="k-dm" class="glass">
+      <div class="from"><img src="assets/logo-manfredi.svg" alt="" /><b>Manfredi <em>Investment</em></b><span>MENSAJE</span></div>
+      <p>¡Acá tenés la guía para leer el informe completo de Microsoft!</p>
+      <div id="k-btn">Ver la guía →</div>
+    </div>
+    <div id="k-ping">1</div>
+    <div id="k-url" class="pill">manfredinvestment.com/guia-msft</div>
+    <svg id="k-cursor" viewBox="0 0 24 24"><path d="M4 2l16 10-7 1.5L10 21z" fill="#f6f8fc" stroke="#0a1322" stroke-width="1.5" stroke-linejoin="round" /></svg>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF;
+      const R = document.querySelector('[data-composition-id="comenta"]');
+      const tl = gsap.timeline({ paused: true });
+      MF.captions(tl, R, [["#k-h1", 0.04, 1.7], ["#k-h2", 1.7, 2.9], ["#k-h3", 2.9, 4.0], ["#k-h4", 4.0, 5.6]]);
+      // el informe completo entra desde arriba
+      tl.fromTo("#k-card", { y: -700, rotation: -3, filter: "blur(12px)" }, { y: 0, rotation: 0, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, 0.1);
+      tl.fromTo("#k-card li", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out", stagger: 0.07 }, 0.45);
+      tl.fromTo("#k-n", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(2)" }, 0.9);
+      // caja de comentario: se escribe GOOGLE letra por letra
+      tl.fromTo("#k-box", { y: 1300, filter: "blur(10px)" }, { y: 0, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 1.25);
+      tl.fromTo("#k-word span", { opacity: 0, y: 20, scale: 1.3 }, { opacity: 1, y: 0, scale: 1, duration: 0.12, ease: "back.out(3)", stagger: 0.065 }, 1.8);
+      tl.to("#k-ph", { opacity: 0, duration: 0.05 }, 1.8);
+      [0, 1, 2, 3, 4, 5, 6, 7].forEach((i) => tl.to("#k-caret", { opacity: i % 2 ? 1 : 0, duration: 0.01 }, 1.4 + i * 0.18));
+      // cursor toca enviar
+      tl.fromTo("#k-cursor", { x: 1100, y: 1100, opacity: 0 }, { x: 905, y: 775, opacity: 1, duration: 0.4, ease: "power3.out" }, 2.3);
+      tl.to("#k-cursor", { scale: 0.82, duration: 0.07, ease: "power2.out", transformOrigin: "0 0" }, 2.72);
+      tl.to("#k-cursor", { scale: 1, duration: 0.18, ease: "back.out(3)" }, 2.79);
+      tl.to("#k-send", { scale: 0.85, duration: 0.07 }, 2.72);
+      tl.to("#k-send", { scale: 1, duration: 0.3, ease: "back.out(3)" }, 2.79);
+      // el comentario queda publicado
+      tl.to("#k-box", { opacity: 0, scale: 0.96, duration: 0.15 }, 2.85);
+      tl.fromTo("#k-posted", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 2.88);
+      tl.fromTo("#k-heart", { scale: 0 }, { scale: 1, duration: 0.35, ease: "back.out(3.5)" }, 3.1);
+      tl.to("#k-cursor", { x: 1200, y: 1300, opacity: 0, duration: 0.35, ease: "power3.in" }, 3.0);
+      // llega el mensaje con la guía
+      tl.fromTo("#k-dm", { x: 1200, filter: "blur(12px)" }, { x: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 3.2);
+      tl.fromTo("#k-ping", { scale: 0 }, { scale: 1, duration: 0.35, ease: "back.out(3)" }, 3.5);
+      tl.fromTo("#k-btn", { scale: 1 }, { scale: 1.08, duration: 0.12, ease: "power2.out", immediateRender: false }, 4.2);
+      tl.to("#k-btn", { scale: 1, duration: 0.35, ease: "back.out(3)" }, 4.32);
+      tl.fromTo("#k-url", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, 4.1);
+      window.__timelines["comenta"] = tl;
+    })();
+  </script>
+</template>

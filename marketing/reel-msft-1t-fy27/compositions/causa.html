@@ -1,0 +1,132 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #s-shake { position: absolute; inset: 0; }
+    #s-a { position: absolute; left: 0; right: 0; top: 0; height: 1300px; }
+    .rack { position: absolute; width: 200px; height: 270px; border-radius: 14px; background: linear-gradient(180deg, #1c3354, #0b1830);
+      border: 1px solid rgba(226,234,245,.2); box-shadow: 0 30px 50px -20px rgba(0,0,0,.7); padding: 16px 14px; display: flex; flex-direction: column; gap: 9px; }
+    .rack .u { height: 24px; border-radius: 5px; background: rgba(6,13,26,.7); border: 1px solid rgba(226,234,245,.08); position: relative; }
+    .rack .u::before { content: ""; position: absolute; left: 10px; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: #f2c94c; box-shadow: 0 0 8px #f2c94c; }
+    .rack .u::after { content: ""; position: absolute; left: 24px; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 8px #10B981; }
+    .rack .u i { position: absolute; right: 10px; top: 10px; width: 70px; height: 3px; background: rgba(234,217,164,.35); border-radius: 2px; }
+    #s-bk { top: 372px; }
+    #s-kick { top: 1010px; }
+    #s-num { position: absolute; top: 1050px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 128px; letter-spacing: -0.04em; color: #EF4444; height: 140px;
+      filter: drop-shadow(0 0 30px rgba(239,68,68,.3)); }
+    #s-cash { position: absolute; top: 1210px; left: 0; right: 0; margin: 0 auto; width: fit-content; font-size: 22px; }
+    #s-cash b { color: #EF4444; }
+    /* B: el bono */
+    #s-bond { position: absolute; left: 110px; right: 110px; top: 400px; height: 520px; border-radius: 22px; padding: 30px 40px;
+      background: linear-gradient(160deg, #f8f1dc, #e9dcb4); color: #0a1322; box-shadow: 0 40px 80px -24px rgba(0,0,0,.8); }
+    #s-bond::before { content: ""; position: absolute; inset: 14px; border-radius: 14px; border: 3px double #B8943F; }
+    #s-bond .h { display: flex; align-items: center; gap: 16px; position: relative; }
+    #s-bond .h .lg { width: 58px; height: 58px; }
+    #s-bond .h .t { font-family: "DM Serif"; font-size: 46px; line-height: 1; }
+    #s-bond .h .t small { display: block; font-family: "Plex Mono"; font-weight: 600; font-size: 18px; letter-spacing: .18em; color: #7a5c17; margin-top: 6px; }
+    #s-bond .lab { position: relative; margin-top: 40px; font-family: "Plex Mono"; font-weight: 600; font-size: 22px; letter-spacing: .16em; color: #7a5c17; text-align: center; }
+    #s-amt { position: relative; margin-top: 10px; font-family: "Plex Mono"; font-weight: 700; font-size: 104px; letter-spacing: -0.04em; color: #0a1322; height: 110px; }
+    #s-bond .ft { position: relative; margin-top: 40px; display: flex; justify-content: space-between; font-family: "Plex Mono"; font-weight: 700; font-size: 22px; color: #3b2c0b; }
+    #s-seal { position: absolute; right: 40px; bottom: 26px; width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #f7dc8a, #c99a2e 70%);
+      box-shadow: 0 8px 18px -6px rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center; font-family: "DM Serif"; font-style: italic; font-size: 30px; color: #5a3f08; }
+    #s-stamp { position: absolute; left: 330px; top: 640px; padding: 10px 26px; border: 7px solid #EF4444; border-radius: 14px; color: #EF4444; font-family: "Plex Mono";
+      font-weight: 700; font-size: 58px; letter-spacing: .08em; background: rgba(239,68,68,.06); }
+    #s-years { position: absolute; left: 0; right: 0; top: 990px; display: flex; justify-content: center; align-items: center; gap: 26px; }
+    #s-years .k { font-family: "Plex Mono"; font-weight: 600; font-size: 22px; letter-spacing: .14em; color: #ead9a4; text-align: right; line-height: 1.3; }
+    #s-yr { font-family: "Plex Mono"; font-weight: 700; font-size: 92px; letter-spacing: -0.03em; color: #f2c94c; height: 96px; }
+    #s-gap { font-size: 32px; }
+  </style>
+  <div id="root" data-composition-id="causa" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div id="s-shake">
+      <div class="hdr" id="s-h1"><span class="w">Por</span><span class="w">lo</span><span class="w">que</span><span class="w em" data-acc="red">gasta.</span></div>
+      <div class="hdr" id="s-h2"><span class="w">En</span><span class="w">tres</span><span class="w">meses</span><span class="w">metió</span></div>
+      <div class="hdr" id="s-h3"><span class="w em" data-acc="red">45</span><span class="w em" data-acc="red">mil</span><span class="w em" data-acc="red">millones</span></div>
+      <div class="hdr" id="s-h4"><span class="w">en</span><span class="w">centros</span><span class="w">de</span><span class="w em" data-acc="gold">datos.</span></div>
+      <div class="hdr" id="s-h5"><span class="w">Y</span><span class="w">para</span><span class="w">seguir,</span><span class="w">salió</span></div>
+      <div class="hdr" id="s-h6"><span class="w">a</span><span class="w em" data-acc="red">pedir</span><span class="w em" data-acc="red">prestado:</span></div>
+      <div class="hdr" id="s-h7"><span class="w">su</span><span class="w">primer</span><span class="w em" data-acc="gold">bono</span><span class="w">desde</span><span class="w em" data-acc="gold">2017.</span></div>
+      <div class="hdr" id="s-h8"><span class="w em" data-acc="red">25</span><span class="w em" data-acc="red">mil</span><span class="w em" data-acc="red">millones.</span></div>
+
+      <div id="s-a">
+        <div class="kicker" id="s-bk">CENTROS DE DATOS PARA IA</div>
+        <div class="rack" id="s-r1" style="left: 110px; top: 440px"><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div></div>
+        <div class="rack" id="s-r2" style="left: 440px; top: 440px"><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div></div>
+        <div class="rack" id="s-r3" style="left: 770px; top: 440px"><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div></div>
+        <div class="rack" id="s-r4" style="left: 275px; top: 720px"><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div></div>
+        <div class="rack" id="s-r5" style="left: 605px; top: 720px"><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div><div class="u"><i></i></div></div>
+        <div id="s-kick" class="kicker">INVERSIÓN EN 3 MESES · 1T FY27</div>
+        <div id="s-num" class="odo" data-layout-ignore></div>
+        <div id="s-cash" class="pill">EN EFECTIVO US$ 39.370 M · <b>×2,0</b> VS. HACE UN AÑO</div>
+      </div>
+
+      <div id="s-bond">
+        <div class="h"><div class="lg" data-ms></div><div class="t">Microsoft Corp.<small>BONO EN DÓLARES · OCT 2026</small></div></div>
+        <div class="lab">MONTO EMITIDO</div>
+        <div id="s-amt" class="odo" data-layout-ignore></div>
+        <div class="ft"><span>10 TRAMOS</span><span>2 A 40 AÑOS</span></div>
+        <div id="s-seal">MS</div>
+      </div>
+      <div id="s-stamp">PRESTADO</div>
+      <div id="s-years">
+        <div class="k">ÚLTIMO BONO<br />ANTERIOR</div>
+        <div id="s-yr" class="odo" data-layout-ignore></div>
+        <div id="s-gap" class="badge gold">9 años</div>
+      </div>
+      <div class="src" id="s-src">8-K 1T FY27: capex US$ 45.200 M con arrendamientos financieros (US$ 39.370 M en efectivo vs 19.390 M). Bono: Bloomberg/Reuters y 424B2 ante la SEC.</div>
+    </div>
+    <div class="flash" id="s-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4, eInOut3 } = MF;
+      const R = document.querySelector('[data-composition-id="causa"]');
+      const $ = (s) => R.querySelector(s);
+      R.querySelectorAll("[data-ms]").forEach((p) => (p.innerHTML = MF.MS_SVG));
+      const sN = MF.odo($("#s-num"), ["US$ ", 10000, 1000, ".", 100, 10, 1, "~M"]);
+      const sA = MF.odo($("#s-amt"), ["US$ ", 10000, 1000, ".", 100, 10, 1, "~M"]);
+      const sY = MF.odo($("#s-yr"), [1000, 100, 10, 1]);
+      const leds = R.querySelectorAll(".rack .u");
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 11.9, (t) => {
+        sN(45200 * eInOut3(clamp((t - 2.4) / 1.6, 0, 1)));
+        sY(2026 - 9 * eInOut3(clamp((t - 8.3) / 1.1, 0, 1)));
+        sA(25000 * eInOut3(clamp((t - 9.6) / 1.0, 0, 1)));
+        leds.forEach((u, i) => { u.style.opacity = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(t * 9 + i * 1.7)); });
+      });
+      MF.captions(tl, R, [["#s-h1", 0.04, 1.2], ["#s-h2", 1.2, 2.5], ["#s-h3", 2.5, 4.0], ["#s-h4", 4.0, 5.4], ["#s-h5", 5.4, 6.6], ["#s-h6", 6.6, 7.7], ["#s-h7", 7.7, 9.6], ["#s-h8", 9.6, 11.4]]);
+
+      // A — los racks caen uno por uno y el contador sube a 45.200
+      tl.fromTo("#s-bk", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.2);
+      ["#s-r1", "#s-r2", "#s-r3", "#s-r4", "#s-r5"].forEach((s, i) => {
+        tl.fromTo(s, { y: -1400, rotation: i % 2 ? 6 : -6, filter: "blur(14px)" }, { y: 0, rotation: 0, filter: "blur(0px)", duration: 0.34, ease: "power3.in" }, 1.1 + i * 0.22);
+        tl.to(s, { scaleY: 0.92, duration: 0.05, ease: "power2.out", transformOrigin: "50% 100%" }, 1.44 + i * 0.22);
+        tl.to(s, { scaleY: 1, duration: 0.35, ease: "elastic.out(1, 0.45)" }, 1.49 + i * 0.22);
+      });
+      tl.fromTo("#s-kick", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, 2.3);
+      tl.fromTo("#s-num", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, 2.3);
+      tl.to("#s-num", { scale: 1.07, duration: 0.07, ease: "power2.out" }, 4.0);
+      tl.to("#s-num", { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 4.07);
+      MF.flash(tl, "#s-flash", 4.0);
+      MF.shake(tl, "#s-shake", 4.0, 9);
+      tl.fromTo("#s-cash", { opacity: 0, y: 30, scale: 0.85 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(2)" }, 4.4);
+
+      // B — sale a pedir prestado: cae el bono, el año gira 2017 → 2026, el monto y el sello
+      tl.to("#s-a", { y: -1400, filter: "blur(12px)", duration: 0.4, ease: "power3.in" }, 5.45);
+      tl.fromTo("#s-bond", { y: -1500, rotation: -6, filter: "blur(14px)" }, { y: 0, rotation: -1.5, filter: "blur(0px)", duration: 0.45, ease: "power3.in" }, 6.55);
+      tl.to("#s-bond", { scaleY: 0.94, scaleX: 1.03, duration: 0.06, ease: "power2.out", transformOrigin: "50% 100%" }, 7.0);
+      tl.to("#s-bond", { scaleY: 1, scaleX: 1, rotation: 0, duration: 0.6, ease: "elastic.out(1, 0.4)" }, 7.06);
+      MF.shake(tl, "#s-shake", 7.0, 10);
+      tl.fromTo("#s-seal", { scale: 0, rotation: -90 }, { scale: 1, rotation: 0, duration: 0.5, ease: "back.out(2.6)" }, 7.3);
+      tl.fromTo("#s-years", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 7.8);
+      tl.fromTo("#s-gap", { opacity: 0, scale: 0.3, rotation: -14 }, { opacity: 1, scale: 1, rotation: -4, duration: 0.45, ease: "back.out(2.6)" }, 9.4);
+      tl.to("#s-amt", { scale: 1.07, duration: 0.07, ease: "power2.out" }, 10.6);
+      tl.to("#s-amt", { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 10.67);
+      tl.fromTo("#s-stamp", { opacity: 0, scale: 2.4, rotation: -2 }, { opacity: 1, scale: 1, rotation: -12, duration: 0.22, ease: "power4.in" }, 10.62);
+      MF.flash(tl, "#s-flash", 10.84);
+      MF.shake(tl, "#s-shake", 10.84, 12);
+      tl.fromTo("#s-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 2.4);
+      window.__timelines["causa"] = tl;
+    })();
+  </script>
+</template>
