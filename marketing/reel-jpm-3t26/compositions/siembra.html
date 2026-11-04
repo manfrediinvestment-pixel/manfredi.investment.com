@@ -1,0 +1,88 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #s-shake { position: absolute; inset: 0; }
+    #s-top { position: absolute; left: 0; right: 0; top: 0; height: 800px; transform-origin: 50% 360px; }
+    #s-kicker { top: 362px; }
+    .prow { position: absolute; left: 80px; right: 80px; height: 120px; }
+    .prow .k { font-family: "Plex Mono"; font-weight: 600; font-size: 22px; letter-spacing: .1em; color: #ead9a4; }
+    .prow .bar { position: absolute; left: 0; top: 44px; height: 54px; border-radius: 8px; transform-origin: left center; }
+    .prow .v { position: absolute; top: 48px; font-family: "Plex Mono"; font-weight: 700; font-size: 40px; color: #f6f8fc; white-space: nowrap; }
+    #s-r1 .bar { background: linear-gradient(90deg, #2C4A70, #5C7FAE); }
+    #s-r2 .bar { background: linear-gradient(90deg, #B8943F, #f2c94c); box-shadow: 0 0 40px rgba(242,201,76,.3); }
+    #s-x3 { position: absolute; top: 650px; left: 0; right: 0; margin: 0 auto; width: fit-content; font-size: 64px; padding: 6px 30px; }
+    #s-buy { position: absolute; left: 70px; width: 440px; top: 820px; height: 250px; padding: 24px 26px; }
+    #s-sow { position: absolute; right: 70px; width: 440px; top: 820px; height: 250px; padding: 24px 26px; border-color: rgba(16,185,129,.55); }
+    .opt .k { font-family: "Plex Mono"; font-weight: 600; font-size: 19px; letter-spacing: .14em; color: #ead9a4; }
+    .opt .t { font-family: "DM Serif"; font-style: italic; font-size: 46px; line-height: 1.05; margin-top: 8px; }
+    .opt .d { font-family: "Plex Mono"; font-weight: 700; font-size: 26px; margin-top: 14px; }
+    #s-buy .d { color: #EF4444; } #s-sow .d { color: #10B981; }
+    #s-no { position: absolute; left: 50%; top: 50%; width: 260px; margin: -60px 0 0 -130px; text-align: center; font-size: 70px; padding: 4px 0; border: 6px solid #EF4444; color: #EF4444;
+      background: rgba(10,19,34,.85); border-radius: 16px; font-family: "Plex Mono"; font-weight: 700; letter-spacing: .1em; }
+    .seed { position: absolute; width: 14px; height: 18px; border-radius: 50%; background: #f2c94c; opacity: 0; }
+    #s-quote { position: absolute; left: 90px; right: 90px; top: 1110px; padding: 22px 30px; }
+    #s-quote .q { font-family: "DM Serif"; font-style: italic; font-size: 44px; line-height: 1.1; }
+    #s-quote .q em { color: #f2c94c; }
+    #s-quote .a { font-family: "Plex Mono"; font-weight: 600; font-size: 20px; letter-spacing: .12em; color: #ead9a4; margin-top: 10px; }
+    #s-src { top: 1300px; }
+  </style>
+  <div id="root" data-composition-id="siembra" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-panel"></div><div class="grid"></div>
+    <div id="s-shake">
+      <div class="hdr" id="s-h1"><span class="w">Con</span><span class="w">esa</span><span class="w">cosecha</span><span class="w">podría</span><span class="w em" data-acc="gold">comprarle</span></div>
+      <div class="hdr" id="s-h2"><span class="w">su</span><span class="w">parte</span><span class="w">a</span><span class="w">los</span><span class="w em" data-acc="gold">socios.</span></div>
+      <div class="hdr" id="s-h3"><span class="w">Pero</span><span class="w">hoy</span><span class="w">el</span><span class="w">campo</span><span class="w">cotiza</span></div>
+      <div class="hdr" id="s-h4"><span class="w em" data-acc="red">tres</span><span class="w em" data-acc="red">veces</span><span class="w">lo</span><span class="w">que</span><span class="w">dicen</span><span class="w">los</span><span class="w">papeles.</span></div>
+      <div class="hdr" id="s-h5"><span class="w">Y</span><span class="w">Dimon</span><span class="w">prefirió</span><span class="w em" data-acc="green">sembrar</span><span class="w em" data-acc="green">más.</span></div>
+      <div id="s-top">
+        <div id="s-kicker" class="kicker">POR ACCIÓN · 30-SEP-2026 Y 2-NOV-2026</div>
+        <div class="prow" id="s-r1" style="top: 420px"><div class="k">LO QUE DICEN LOS PAPELES · VALOR LIBRO TANGIBLE</div><div class="bar" style="width: 300px"></div><div class="v" id="s-v1" style="left: 320px">US$ 112,64</div></div>
+        <div class="prow" id="s-r2" style="top: 540px"><div class="k">LO QUE CUESTA EN BOLSA</div><div class="bar" style="width: 906px"></div><div class="v" id="s-v2" style="left: 560px; color: #0a1322">US$ 340,58</div></div>
+        <div id="s-x3" class="badge red">3,02 veces</div>
+      </div>
+      <div id="s-buy" class="glass opt"><div class="k">OPCIÓN 1 · RECOMPRAR</div><div class="t">Comprarle a los socios</div><div class="d">−84% en el trimestre</div><div id="s-no">CARO</div></div>
+      <div id="s-sow" class="glass opt"><div class="k">OPCIÓN 2 · PRESTAR</div><div class="t">Sembrar más</div><div class="d">préstamos +10%</div>
+        <div class="seed" id="s-sd1" style="left: 300px; top: 40px"></div><div class="seed" id="s-sd2" style="left: 340px; top: 60px"></div><div class="seed" id="s-sd3" style="left: 380px; top: 30px"></div></div>
+      <div id="s-quote" class="glass"><div class="q">“Redesplegar ese capital es <em>mucho mejor que comprar acciones</em>.”</div><div class="a">JAMIE DIMON · LLAMADA DE RESULTADOS 3T26 (TRADUCCIÓN)</div></div>
+      <div class="src" id="s-src">JPM 8-K 3T26: valor libro tangible US$ 112,64 por acción; precio US$ 340,58 (cierre 2-nov, Yahoo). Préstamos US$ 1,58 billones, +10% interanual.</div>
+    </div>
+    <div class="flash" id="s-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF;
+      const R = document.querySelector('[data-composition-id="siembra"]');
+      const tl = gsap.timeline({ paused: true });
+      MF.captions(tl, R, [["#s-h1", 0.04, 1.6], ["#s-h2", 1.6, 2.9], ["#s-h3", 2.9, 4.0], ["#s-h4", 4.0, 6.4], ["#s-h5", 6.4, 9.4]]);
+      // opción 1 aparece primero (lo que podría hacer)
+      tl.fromTo("#s-buy", { x: -900, rotation: -4, filter: "blur(12px)" }, { x: 0, rotation: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 0.6);
+      // papeles vs bolsa
+      tl.fromTo("#s-kicker", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 2.9);
+      tl.fromTo("#s-r1", { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 3.0);
+      tl.fromTo("#s-r1 .bar", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 3.1);
+      tl.fromTo("#s-r2", { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 4.0);
+      tl.fromTo("#s-r2 .bar", { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power3.inOut" }, 4.1);
+      // el x3 cae con golpe
+      tl.fromTo("#s-x3", { opacity: 0, scale: 2.2, filter: "blur(12px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.3, ease: "power4.in" }, 4.8);
+      tl.to("#s-x3", { rotation: -4, duration: 0.5, ease: "back.out(3)" }, 5.1);
+      MF.shake(tl, "#s-shake", 5.1, 10);
+      // CARO: sello sobre la opción 1
+      tl.fromTo("#s-no", { opacity: 0, scale: 2.4, rotation: -30 }, { opacity: 1, scale: 1, rotation: -12, duration: 0.28, ease: "power4.in" }, 5.6);
+      tl.to("#s-buy", { opacity: 0.55, duration: 0.3 }, 5.95);
+      MF.flash(tl, "#s-flash", 5.88);
+      // opción 2: sembrar más, con semillas que caen
+      tl.fromTo("#s-sow", { x: 900, rotation: 4, filter: "blur(12px)" }, { x: 0, rotation: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 6.4);
+      ["#s-sd1", "#s-sd2", "#s-sd3"].forEach((s, i) => {
+        tl.fromTo(s, { opacity: 1, y: -300, x: 0 }, { y: 150, x: -60 - i * 30, duration: 0.5, ease: "power2.in", immediateRender: false }, 7.0 + i * 0.15);
+        tl.to(s, { opacity: 0, scale: 0.4, duration: 0.15 }, 7.5 + i * 0.15);
+      });
+      tl.to("#s-sow .d", { scale: 1.15, duration: 0.1, transformOrigin: "left center" }, 7.6);
+      tl.to("#s-sow .d", { scale: 1, duration: 0.4, ease: "back.out(3)" }, 7.7);
+      tl.to("#s-top", { scale: 0.92, y: -10, duration: 0.5, ease: "power3.inOut" }, 6.3);
+      tl.fromTo("#s-quote", { y: 1000, filter: "blur(12px)" }, { y: 0, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, 7.2);
+      tl.fromTo("#s-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 3.2);
+      window.__timelines["siembra"] = tl;
+    })();
+  </script>
+</template>

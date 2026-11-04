@@ -1,0 +1,62 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #q-sheet { position: absolute; left: 110px; right: 110px; top: 420px; padding: 30px 38px; }
+    #q-sheet .hd { font-family: "Plex Mono"; font-weight: 600; font-size: 22px; letter-spacing: .16em; color: #ead9a4; display: flex; justify-content: space-between; }
+    .ln { display: flex; justify-content: space-between; align-items: baseline; margin-top: 26px; padding-bottom: 18px; border-bottom: 1px solid rgba(226,234,245,.12); }
+    .ln .k { font-size: 32px; font-weight: 600; }
+    .ln .v { font-family: "Plex Mono"; font-weight: 700; font-size: 42px; letter-spacing: -0.02em; }
+    .ln .ok { color: #10B981; }
+    #q-l4 .v { color: #f2c94c; }
+    #q-l4 { position: relative; }
+    #q-hl { position: absolute; left: -18px; right: -18px; top: -14px; bottom: 2px; border-radius: 14px; border: 3px solid #f2c94c; background: rgba(242,201,76,.08); }
+    #q-lens { position: absolute; left: 0; top: 0; width: 230px; height: 230px; }
+    #q-lens .ring { position: absolute; inset: 0; border-radius: 50%; border: 14px solid #ead9a4; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.18), rgba(255,255,255,.03) 60%);
+      box-shadow: 0 30px 50px -18px rgba(0,0,0,.7); }
+    #q-lens .handle { position: absolute; width: 34px; height: 150px; left: 186px; top: 178px; border-radius: 16px; background: linear-gradient(90deg, #B8943F, #7a5f22); transform: rotate(-45deg); transform-origin: 50% 0; }
+    #q-mark { position: absolute; left: 50%; top: 1060px; width: 220px; margin-left: -110px; text-align: center; font-family: "DM Serif"; font-style: italic; font-size: 260px; line-height: 1; color: #EF4444;
+      filter: drop-shadow(0 0 40px rgba(239,68,68,.45)); }
+  </style>
+  <div id="root" data-composition-id="pregunta" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div class="hdr" id="q-h1"><span class="w">Pero</span><span class="w">el</span><span class="w">dato</span><span class="w">que</span><span class="w">más</span><span class="w">dice</span></div>
+    <div class="hdr" id="q-h2"><span class="w">no</span><span class="w">está</span><span class="w">en</span><span class="w">la</span><span class="w em" data-acc="green">ganancia.</span></div>
+    <div class="hdr" id="q-h3"><span class="w">Está</span><span class="w">en</span><span class="w">lo</span><span class="w">que</span><span class="w em" data-acc="gold">dejó</span><span class="w em" data-acc="gold">de</span><span class="w em" data-acc="gold">hacer.</span></div>
+    <div id="q-sheet" class="glass">
+      <div class="hd"><span>JPMORGAN · 3T 2026</span><span>US$ M</span></div>
+      <div class="ln" id="q-l1"><span class="k">Ingresos</span><span class="v ok">50.910 ▲8%</span></div>
+      <div class="ln" id="q-l2"><span class="k">Ganancia neta</span><span class="v ok">15.310 ▲6%</span></div>
+      <div class="ln" id="q-l3"><span class="k">Rentabilidad (ROTCE)</span><span class="v ok">20%</span></div>
+      <div class="ln" id="q-l4"><div id="q-hl"></div><span class="k">Recompra de acciones</span><span class="v">¿ ?</span></div>
+    </div>
+    <div id="q-lens" data-layout-allow-overflow><div class="handle"></div><div class="ring"></div></div>
+    <div id="q-mark">?</div>
+    <div class="src" id="q-src">JPM 8-K 13-oct-2026 (base managed): ingresos US$ 50.910 M, ganancia US$ 15.310 M, ROTCE 20%</div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF;
+      const R = document.querySelector('[data-composition-id="pregunta"]');
+      const tl = gsap.timeline({ paused: true });
+      MF.captions(tl, R, [["#q-h1", 0.04, 1.3], ["#q-h2", 1.3, 2.4], ["#q-h3", 2.4, 4.2]]);
+      tl.fromTo("#q-sheet", { y: 1300, rotation: 3, filter: "blur(12px)" }, { y: 0, rotation: 0, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, 0.08);
+      ["#q-l1", "#q-l2", "#q-l3", "#q-l4"].forEach((s, i) => tl.fromTo(s, { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, 0.4 + i * 0.16));
+      // los tres datos buenos pulsan y se apagan
+      tl.to(["#q-l1 .v", "#q-l2 .v", "#q-l3 .v"], { scale: 1.08, duration: 0.08, stagger: 0.12, transformOrigin: "right center" }, 1.3);
+      tl.to(["#q-l1 .v", "#q-l2 .v", "#q-l3 .v"], { scale: 1, duration: 0.3, ease: "back.out(2.4)", stagger: 0.12 }, 1.38);
+      tl.to(["#q-l1", "#q-l2", "#q-l3"], { opacity: 0.35, duration: 0.3 }, 2.3);
+      // la lupa entra y se apoya sobre la recompra
+      tl.fromTo("#q-lens", { x: 1200, y: 400, rotation: 30 }, { x: 640, y: 690, rotation: 0, duration: 0.55, ease: "power3.out" }, 1.55);
+      tl.to("#q-lens", { x: 560, y: 760, duration: 0.5, ease: "power3.inOut" }, 2.4);
+      tl.fromTo("#q-hl", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 2.6);
+      tl.to("#q-lens", { scale: 1.06, duration: 0.6, ease: "sine.inOut", yoyo: true, repeat: 2 }, 2.95);
+      tl.fromTo("#q-mark", { y: -1600, filter: "blur(14px)" }, { y: 0, filter: "blur(0px)", duration: 0.38, ease: "power3.in" }, 2.9);
+      tl.fromTo("#q-mark", { scaleY: 1 }, { scaleY: 0.82, duration: 0.06, immediateRender: false, transformOrigin: "50% 100%" }, 3.28);
+      tl.to("#q-mark", { scaleY: 1, duration: 0.5, ease: "elastic.out(1, 0.35)" }, 3.34);
+      tl.to("#q-mark", { rotation: 8, duration: 0.5, ease: "sine.inOut", yoyo: true, repeat: 1 }, 3.6);
+      tl.fromTo("#q-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 0.6);
+      window.__timelines["pregunta"] = tl;
+    })();
+  </script>
+</template>

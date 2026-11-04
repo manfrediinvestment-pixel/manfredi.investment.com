@@ -1,0 +1,83 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #b-shake { position: absolute; inset: 0; }
+    #b-kicker { top: 372px; }
+    #b-num { position: absolute; top: 420px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 140px; letter-spacing: -0.04em; color: #f6f8fc; height: 150px;
+      filter: drop-shadow(0 0 26px rgba(246,248,252,.18)); }
+    #b-chart { position: absolute; left: 110px; right: 110px; top: 640px; height: 470px; }
+    .col { position: absolute; bottom: 0; width: 170px; height: 100%; }
+    .col .vbar { left: 0; right: 0; }
+    .col .lab { position: absolute; bottom: -54px; left: 0; right: 0; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 26px; color: #ead9a4; }
+    .col .amt { position: absolute; left: 0; right: 0; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 34px; color: #f6f8fc; }
+    #b-floor { position: absolute; left: 90px; right: 90px; top: 1110px; height: 3px; background: rgba(234,217,164,.5); }
+    #b-badge { position: absolute; top: 1185px; left: 0; right: 0; margin: 0 auto; width: fit-content; font-size: 76px; padding: 8px 34px; }
+    #b-src { top: 1300px; }
+    .deb { position: absolute; width: 22px; height: 22px; border-radius: 4px; background: #EF4444; opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="recompras" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-panel"></div><div class="grid"></div>
+    <div id="b-shake">
+      <div class="hdr" id="b-h1"><span class="w">Recompró</span><span class="w">sus</span><span class="w">propias</span><span class="w">acciones</span></div>
+      <div class="hdr" id="b-h2"><span class="w">por</span><span class="w em" data-acc="red">1.060</span><span class="w em" data-acc="red">millones.</span></div>
+      <div class="hdr" id="b-h3"><span class="w">El</span><span class="w">trimestre</span><span class="w">anterior,</span><span class="w em" data-acc="gold">6.700.</span></div>
+      <div class="hdr" id="b-h4"><span class="w em" data-acc="red">84%</span><span class="w em" data-acc="red">menos.</span></div>
+      <div id="b-kicker" class="kicker">RECOMPRA DE ACCIONES · US$ M POR TRIMESTRE</div>
+      <div id="b-num" class="odo" data-layout-ignore></div>
+      <div id="b-chart" data-layout-allow-overflow>
+        <div class="col" id="b-c1" style="left: 0"><div class="vbar navy" id="b-v1" style="height: 438px"></div><div class="amt" style="bottom: 450px">8.300</div><div class="lab">4T25</div></div>
+        <div class="col" id="b-c2" style="left: 220px"><div class="vbar navy" id="b-v2" style="height: 438px"></div><div class="amt" style="bottom: 450px">8.300</div><div class="lab">1T26</div></div>
+        <div class="col" id="b-c3" style="left: 440px"><div class="vbar navy" id="b-v3" style="height: 354px"></div><div class="amt" style="bottom: 366px">6.700</div><div class="lab">2T26</div></div>
+        <div class="col" id="b-c4" style="left: 660px"><div class="vbar red" id="b-v4" style="height: 354px"></div><div class="amt" id="b-a4" style="bottom: 70px; color: #EF4444">1.060</div><div class="lab" style="color:#EF4444">3T26</div>
+          <div class="deb" id="b-d1" style="left: 30px; bottom: 300px"></div><div class="deb" id="b-d2" style="left: 110px; bottom: 320px"></div><div class="deb" id="b-d3" style="left: 70px; bottom: 260px"></div></div>
+      </div>
+      <div id="b-floor"></div>
+      <div id="b-badge" class="badge red">−84%</div>
+      <div class="src" id="b-src">JPM 8-K 3T26: recompra US$ 1.060 M (3,1 M de acciones a US$ 342,33 promedio) vs US$ 6.700 M en 2T26 y US$ 8.300 M en 4T25 y 1T26</div>
+    </div>
+    <div class="flash" id="b-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
+      const R = document.querySelector('[data-composition-id="recompras"]');
+      const $ = (s) => R.querySelector(s);
+      const sN = MF.odo($("#b-num"), ["US$ ", 1000, ".", 100, 10, 1, "~M"]);
+      const tl = gsap.timeline({ paused: true });
+      // el contador sube a 6.700 y cuando la barra se desploma cae a 1.060
+      MF.clock(tl, 7.6, (t) => {
+        const up = 6700 * eOut4(clamp((t - 0.6) / 1.4, 0, 1));
+        const dn = eOut4(clamp((t - 3.55) / 0.55, 0, 1));
+        sN(up - (6700 - 1060) * dn);
+      });
+      MF.captions(tl, R, [["#b-h1", 0.04, 1.3], ["#b-h2", 1.3, 2.7], ["#b-h3", 2.7, 4.7], ["#b-h4", 4.7, 7.0]]);
+      tl.fromTo("#b-kicker", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 0.1);
+      tl.fromTo("#b-num", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, 0.5);
+      // barras: crecen con rebote, una detrás de otra
+      ["#b-v1", "#b-v2", "#b-v3", "#b-v4"].forEach((s, i) => tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: 0.55, ease: "back.out(1.6)" }, 0.5 + i * 0.22));
+      ["#b-c1 .amt", "#b-c2 .amt", "#b-c3 .amt"].forEach((s, i) => tl.fromTo(s, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: "expo.out" }, 0.85 + i * 0.22));
+      tl.fromTo("#b-c4 .lab", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 1.2);
+      // 3T26: la barra se desploma
+      tl.to("#b-v4", { scaleY: 1.04, duration: 0.12, ease: "power2.out" }, 3.4);
+      tl.to("#b-v4", { scaleY: 0.158, duration: 0.3, ease: "power4.in" }, 3.52);
+      tl.to("#b-v4", { scaleY: 0.11, duration: 0.06, ease: "power2.out" }, 3.82);
+      tl.to("#b-v4", { scaleY: 0.158, duration: 0.45, ease: "elastic.out(1, 0.4)" }, 3.88);
+      [["#b-d1", -70, -120], ["#b-d2", 80, -160], ["#b-d3", 10, -200]].forEach(([s, dx, dy], i) => {
+        tl.fromTo(s, { opacity: 1, x: 0, y: 0, rotation: 0 }, { x: dx, y: dy, rotation: 200 + i * 60, duration: 0.3, ease: "power2.out", immediateRender: false }, 3.82);
+        tl.to(s, { y: 280, opacity: 0, duration: 0.5, ease: "power2.in" }, 4.12);
+      });
+      tl.fromTo("#b-a4", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2.4)" }, 3.9);
+      tl.to("#b-num", { color: "#EF4444", duration: 0.2 }, 3.7);
+      MF.flash(tl, "#b-flash", 3.82);
+      MF.shake(tl, "#b-shake", 3.82, 14);
+      // los trimestres anteriores se apagan y aterriza el -84%
+      tl.to(["#b-c1", "#b-c2"], { opacity: 0.45, duration: 0.3 }, 4.6);
+      tl.fromTo("#b-badge", { opacity: 0, scale: 2, filter: "blur(12px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.3, ease: "power4.in" }, 4.7);
+      tl.to("#b-badge", { scale: 1.06, duration: 0.06 }, 5.0);
+      tl.to("#b-badge", { scale: 1, rotation: -3, duration: 0.45, ease: "back.out(2.6)" }, 5.06);
+      tl.fromTo("#b-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 1.0);
+      window.__timelines["recompras"] = tl;
+    })();
+  </script>
+</template>

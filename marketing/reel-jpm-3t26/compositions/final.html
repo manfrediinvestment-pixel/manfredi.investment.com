@@ -1,0 +1,84 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #c-shake { position: absolute; inset: 0; }
+    #c-pill { position: absolute; top: 352px; left: 0; right: 0; margin: 0 auto; width: fit-content; }
+    #c-num { position: absolute; top: 410px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 150px; letter-spacing: -0.04em; color: #EF4444; height: 160px;
+      filter: drop-shadow(0 0 30px rgba(239,68,68,.3)); }
+    #c-sub { top: 580px; }
+    .card { position: absolute; left: 90px; right: 90px; padding: 20px 28px; border-radius: 20px; }
+    .card .k { font-family: "Plex Mono"; font-weight: 600; font-size: 20px; letter-spacing: .14em; }
+    .card .t { font-family: "DM Serif"; font-style: italic; font-size: 64px; line-height: 1.05; }
+    .card .d { font-family: "Plex Mono"; font-weight: 700; font-size: 24px; margin-top: 6px; }
+    #c-cardA { top: 640px; background: linear-gradient(180deg, rgba(20,38,66,.8), rgba(11,22,41,.9)); border: 1px solid rgba(226,234,245,.18); }
+    #c-cardA .k { color: #ead9a4; } #c-cardA .t { color: #f6f8fc; } #c-cardA .d { color: #10B981; }
+    #c-strike { position: absolute; left: 24px; top: 96px; height: 5px; width: 470px; background: #f2c94c; border-radius: 4px; transform-origin: left center; }
+    #c-cardB { top: 845px; background: linear-gradient(180deg, #DC2626, #991B1B); box-shadow: 0 30px 60px -20px rgba(239,68,68,.6); }
+    #c-cardB .k { color: #ffe1e1; } #c-cardB .t { color: #fff; } #c-cardB .d { color: #ffe1e1; }
+    #c-cta { position: absolute; top: 1090px; left: 0; right: 0; display: flex; justify-content: center; gap: 110px; }
+    .act { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .act .ic { width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(13,26,46,.85); border: 2px solid rgba(226,234,245,.2); }
+    .act .ic svg { width: 46px; height: 46px; }
+    .act span { font-family: "Plex Mono"; font-weight: 700; font-size: 22px; color: #ead9a4; }
+    #c-cursor { position: absolute; left: 0; top: 0; width: 54px; height: 54px; }
+  </style>
+  <div id="root" data-composition-id="final" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div id="c-shake">
+      <div class="hdr" id="c-h1"><span class="w">No</span><span class="w">es</span><span class="w">que</span><span class="w">JPMorgan</span><span class="w em" data-acc="gold">gane</span><span class="w em" data-acc="gold">poco.</span></div>
+      <div class="hdr" id="c-h2"><span class="w">Es</span><span class="w">que</span><span class="w em" data-acc="red">dejó</span><span class="w em" data-acc="red">de</span><span class="w em" data-acc="red">comprarse</span></div>
+      <div class="hdr" id="c-h3"><span class="w em" data-acc="red">a</span><span class="w em" data-acc="red">sí</span><span class="w em" data-acc="red">mismo.</span></div>
+      <div class="hdr" id="c-h4"><span class="w em" data-acc="gold">Guardalo</span><span class="w">y</span><span class="w em" data-acc="gold">mandáselo</span></div>
+      <div class="hdr" id="c-h5"><span class="w">a</span><span class="w">ese</span><span class="w">amigo</span><span class="w">que</span><span class="w">tiene</span><span class="w em" data-acc="gold">JPMorgan.</span></div>
+
+      <div id="c-pill" class="pill"><i></i>JPM · RECOMPRAS 3T26 VS 2T26</div>
+      <div id="c-num" class="odo" data-layout-ignore></div>
+      <div class="card" id="c-cardA"><div class="k">NO ES QUE</div><div class="t">gane poco</div><div class="d">ganancia US$ 15.310 M · ROTCE 20%</div><div id="c-strike"></div></div>
+      <div class="card" id="c-cardB"><div class="k">ES QUE</div><div class="t">dejó de comprarse</div><div class="d">recompra US$ 1.060 M · a 3,02 veces el libro</div></div>
+
+      <div id="c-cta">
+        <div class="act" id="c-a1"><div class="ic" id="c-i1"><svg viewBox="0 0 24 24" fill="none" stroke="#f6f8fc" stroke-width="2" stroke-linejoin="round"><path id="c-bm" d="M6 3h12v18l-6-4.5L6 21z" /></svg></div><span>Guardalo</span></div>
+        <div class="act" id="c-a2"><div class="ic" id="c-i2"><svg viewBox="0 0 24 24" fill="none" stroke="#f6f8fc" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z" /></svg></div><span>Mandáselo</span></div>
+        <div class="act" id="c-a3"><div class="ic" id="c-i3"><svg viewBox="0 0 24 24" fill="none" stroke="#f6f8fc" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" /></svg></div><span>Ese amigo</span></div>
+      </div>
+      <svg id="c-cursor" viewBox="0 0 24 24"><path d="M4 2l16 10-7 1.5L10 21z" fill="#f6f8fc" stroke="#0a1322" stroke-width="1.5" stroke-linejoin="round" /></svg>
+    </div>
+    <div class="flash" id="c-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
+      const R = document.querySelector('[data-composition-id="final"]');
+      const $ = (s) => R.querySelector(s);
+      const sN = MF.odo($("#c-num"), ["−", 10, 1, "%"]);
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 9.0, (t) => sN(60 + 24 * eOut4(clamp((t - 0.05) / 0.7, 0, 1))));
+      MF.captions(tl, R, [["#c-h1", 0.04, 1.6], ["#c-h2", 1.6, 2.9], ["#c-h3", 2.9, 3.9], ["#c-h4", 3.9, 5.2], ["#c-h5", 5.2, 8.4]]);
+      tl.fromTo("#c-num", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.3, ease: "expo.out" }, 0.05);
+      tl.fromTo("#c-cardA", { x: 900, filter: "blur(12px)" }, { x: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 0.4);
+      tl.fromTo("#c-strike", { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power3.out" }, 1.35);
+      tl.to("#c-cardA", { opacity: 0.6, duration: 0.3 }, 1.7);
+      tl.fromTo("#c-cardB", { x: 1000, rotation: 5, filter: "blur(14px)" }, { x: 0, rotation: 0, filter: "blur(0px)", duration: 0.32, ease: "power3.in" }, 1.75);
+      tl.to("#c-cardB", { scale: 1.05, duration: 0.06, ease: "power2.out" }, 2.07);
+      tl.to("#c-cardB", { scale: 1, duration: 0.45, ease: "elastic.out(1, 0.45)" }, 2.13);
+      MF.shake(tl, "#c-shake", 2.07, 10);
+      MF.flash(tl, "#c-flash", 2.07);
+      tl.fromTo(["#c-a1", "#c-a2", "#c-a3"], { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(2)", stagger: 0.08 }, 3.8);
+      tl.fromTo("#c-cursor", { x: 1100, y: 1450, opacity: 0 }, { x: 303, y: 1140, opacity: 1, duration: 0.45, ease: "power3.out" }, 3.9);
+      const tap = (ic, at) => {
+        tl.to("#c-cursor", { scale: 0.82, duration: 0.07, ease: "power2.out", transformOrigin: "0 0" }, at);
+        tl.to("#c-cursor", { scale: 1, duration: 0.18, ease: "back.out(3)" }, at + 0.07);
+        tl.to(ic, { scale: 0.88, duration: 0.07, ease: "power2.out" }, at);
+        tl.to(ic, { scale: 1, borderColor: "#f2c94c", backgroundColor: "rgba(242,201,76,.25)", duration: 0.3, ease: "back.out(3)" }, at + 0.07);
+      };
+      tap("#c-i1", 4.4);
+      tl.to("#c-bm", { attr: { fill: "#f2c94c" }, stroke: "#f2c94c", duration: 0.1 }, 4.47);
+      tl.to("#c-cursor", { x: 525, y: 1140, duration: 0.35, ease: "power3.inOut" }, 4.75);
+      tap("#c-i2", 5.15);
+      tl.to("#c-cursor", { x: 753, y: 1140, duration: 0.35, ease: "power3.inOut" }, 5.9);
+      tap("#c-i3", 6.3);
+      window.__timelines["final"] = tl;
+    })();
+  </script>
+</template>

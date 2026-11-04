@@ -1,0 +1,115 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #g-shake { position: absolute; inset: 0; }
+    #g-pill { position: absolute; top: 352px; left: 0; right: 0; margin: 0 auto; width: fit-content; }
+    #g-lab { top: 418px; }
+    #g-num { position: absolute; top: 456px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 150px; color: #10B981; letter-spacing: -0.04em; height: 160px;
+      filter: drop-shadow(0 0 30px rgba(16,185,129,.35)); }
+    #g-chart { position: absolute; top: 700px; left: 90px; width: 900px; height: 330px; }
+    #g-chart svg { overflow: visible; }
+    #g-tag { position: absolute; top: 0; left: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 30px; padding: 8px 16px; border-radius: 10px;
+      white-space: nowrap; color: #fff; will-change: transform; }
+    #g-axis span { position: absolute; top: 0; width: 160px; margin-left: -80px; text-align: center; }
+    #g-axis { position: absolute; top: 1046px; left: 90px; right: 90px; font-family: "Plex Mono"; font-weight: 600;
+      font-size: 20px; letter-spacing: .1em; color: #ead9a4; }
+    #g-stamp { position: absolute; top: 1100px; width: 100%; text-align: center; font-weight: 700; font-size: 70px; letter-spacing: -0.02em; }
+    #g-stamp em { font-family: "DM Serif"; font-style: italic; font-weight: 400; font-size: 1.12em; color: #EF4444; }
+    #g-platewrap { position: absolute; left: 50%; top: 1390px; width: 360px; height: 360px; margin-left: -180px; }
+    .bank { position: absolute; inset: 0; }
+    .bank .body { position: absolute; inset: 20px; border-radius: 40px; background: linear-gradient(150deg, #23396a, #0E1C3E 55%, #091026);
+      border: 2px solid rgba(226,234,245,.22); box-shadow: 0 40px 70px -20px rgba(0,0,0,.75), inset 0 2px 0 rgba(255,255,255,.12); }
+    .bank .plate { position: absolute; inset: 56px; border-radius: 24px; background: linear-gradient(160deg, #FFFFFF, #E9EDF4);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; color: #0a1730; }
+    .bank .plate b { font-family: "DM Serif"; font-weight: 400; font-size: 64px; line-height: 1; letter-spacing: -0.01em; }
+    .bank .plate span { font-family: "Plex Mono"; font-weight: 700; font-size: 22px; letter-spacing: .3em; margin-top: 10px; color: #1f3d68; }
+    .bank .cols { position: absolute; left: 56px; right: 56px; bottom: 30px; height: 14px; display: flex; justify-content: space-around; }
+    .bank .cols i { width: 22px; height: 14px; border-radius: 3px; background: #8FA3C4; }
+  </style>
+  <div id="root" data-composition-id="golpe" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div id="g-shake">
+      <div class="hdr" id="g-h1"><span class="w">JPMorgan</span><span class="w em" data-acc="green">ganó</span><span class="w em" data-acc="green">15.300</span><span class="w em" data-acc="green">millones</span></div>
+      <div class="hdr" id="g-h2"><span class="w">y</span><span class="w">la</span><span class="w">acción</span><span class="w">cerró</span><span class="w">en</span><span class="w em" data-acc="red">rojo.</span></div>
+      <div id="g-pill" class="pill"><i></i>MAR · 13 OCT 2026 · RESULTADOS 3T26</div>
+      <div id="g-lab" class="kicker">GANANCIA NETA DEL TRIMESTRE</div>
+      <div id="g-num" class="odo" data-layout-ignore></div>
+      <div id="g-chart">
+        <svg width="900" height="330" viewBox="0 0 900 330">
+          <defs><linearGradient id="g-area-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EF4444" stop-opacity=".30" /><stop offset="1" stop-color="#EF4444" stop-opacity="0" /></linearGradient></defs>
+          <line id="g-base" x1="0" x2="900" y1="0" y2="0" stroke="#ead9a4" stroke-width="2" stroke-dasharray="10 10" opacity=".55" />
+          <path id="g-area" d="" fill="url(#g-area-grad)" />
+          <path id="g-line" d="" fill="none" stroke="#f6f8fc" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
+          <circle id="g-dot" r="12" fill="#10B981" stroke="#070f1f" stroke-width="5" />
+        </svg>
+        <div id="g-tag">+0,00%</div>
+      </div>
+      <div id="g-axis"><span>PREVIO</span><span>APERTURA</span><span>MÁXIMO</span><span>CIERRE</span></div>
+      <div id="g-stamp">de <em>+3%</em> a <em>rojo</em></div>
+      <div class="src" id="g-src">JPM 13-oct-2026: previo US$ 334,30 · apertura 339,97 · máximo 344,36 · cierre 331,43 (Yahoo Finance)</div>
+      <div id="g-platewrap" data-layout-allow-overflow>
+        <div class="bank"><div class="body"></div><div class="plate"><b>JPM</b><span>NYSE</span></div><div class="cols"><i></i><i></i><i></i><i></i><i></i></div></div>
+      </div>
+    </div>
+    <div class="flash" id="g-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4, eInOut3 } = MF;
+      const R = document.querySelector('[data-composition-id="golpe"]');
+      const $ = (s) => R.querySelector(s);
+      // 13-oct-2026: cierre previo, apertura, máximo, cierre (Yahoo Finance). Recorrido entre puntos: ilustrativo.
+      const P = [334.30, 339.97, 344.36, 331.43];
+      const BASE = 334.30, W = 900, H = 330, lo = 328, hi = 347;
+      const X = (i) => 40 + (i / (P.length - 1)) * (W - 290);
+      const Y = (p) => H - ((p - lo) / (hi - lo)) * H;
+      const pct = (p) => { const v = (p / BASE - 1) * 100; return (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(2).replace(".", ",") + "%"; };
+      const setNum = MF.odo($("#g-num"), ["US$ ", 10000, 1000, ".", 100, 10, 1, "~M"]);
+      const line = $("#g-line"), area = $("#g-area"), dot = $("#g-dot"), tag = $("#g-tag");
+      R.querySelectorAll("#g-axis span").forEach((s, i) => (s.style.left = X(i) + "px"));
+      $("#g-base").setAttribute("y1", Y(BASE)); $("#g-base").setAttribute("y2", Y(BASE));
+      function drawChart(prog) {
+        const n = Math.floor(prog), f = prog - n;
+        let d = "", px = 0, py = 0;
+        for (let i = 0; i <= n && i < P.length; i++) { px = X(i); py = Y(P[i]); d += (i ? "L" : "M") + px.toFixed(1) + " " + py.toFixed(1); }
+        let price = P[Math.min(n, P.length - 1)];
+        if (n < P.length - 1 && f > 0) { price = P[n] + (P[n + 1] - P[n]) * f; px = X(n + f); py = Y(price); d += "L" + px.toFixed(1) + " " + py.toFixed(1); }
+        line.setAttribute("d", d);
+        area.setAttribute("d", d + `L${px.toFixed(1)} ${Y(BASE)} L${X(0)} ${Y(BASE)} Z`);
+        dot.setAttribute("cx", px); dot.setAttribute("cy", py);
+        tag.style.transform = `translate(${px + 24}px, ${py - 28}px)`;
+        tag.textContent = pct(price);
+        const red = price < BASE;
+        tag.style.background = red ? "#EF4444" : "#10B981";
+        dot.setAttribute("fill", red ? "#EF4444" : "#10B981");
+        area.style.opacity = clamp((prog - 2.6) / 0.4, 0, 1);
+      }
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 4.8, (t) => {
+        setNum(15000 + (15310 - 15000) * eOut4(clamp(t / 1.5, 0, 1)));
+        let prog;
+        if (t < 2.0) prog = 2 * eInOut3(clamp((t - 0.35) / 1.65, 0, 1));
+        else prog = 2 + eOut4(clamp((t - 2.15) / 0.75, 0, 1));
+        drawChart(Math.max(0.0001, prog));
+      });
+      MF.karaoke(tl, R, "#g-h1", -0.04, 1.9, 0.3, true);
+      MF.karaoke(tl, R, "#g-h2", 1.96, null, 0.26);
+      tl.fromTo("#g-num", { scale: 1 }, { scale: 1.07, duration: 0.08, ease: "power2.out" }, 1.45);
+      tl.to("#g-num", { scale: 1, duration: 0.45, ease: "back.out(2.2)" }, 1.53);
+      // el número verde se apaga cuando la acción se da vuelta
+      tl.to("#g-num", { color: "#f6f8fc", filter: "drop-shadow(0 0 0px rgba(0,0,0,0))", duration: 0.4 }, 2.6);
+      tl.fromTo("#g-axis span", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "expo.out", stagger: 0.25 }, 0.3);
+      // la placa del banco cae y pega; no se rompe, se hunde
+      tl.fromTo("#g-platewrap", { y: -1800, rotation: -6, filter: "blur(14px)" }, { y: 0, rotation: 0, filter: "blur(0px)", duration: 0.42, ease: "power3.in" }, 2.48);
+      tl.fromTo("#g-platewrap", { scaleY: 1, scaleX: 1 }, { scaleY: 0.88, scaleX: 1.07, duration: 0.06, ease: "power2.out", immediateRender: false }, 2.9);
+      tl.to("#g-platewrap", { scaleY: 1, scaleX: 1, duration: 0.45, ease: "elastic.out(1, 0.45)" }, 2.96);
+      tl.to("#g-platewrap", { rotation: 4, y: 26, duration: 0.5, ease: "power2.out" }, 3.0);
+      MF.flash(tl, "#g-flash", 2.9);
+      MF.shake(tl, "#g-shake", 2.9, 14);
+      tl.fromTo("#g-stamp", { opacity: 0, scale: 1.35, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.32, ease: "expo.out" }, 3.0);
+      tl.fromTo("#g-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 1.0);
+      window.__timelines["golpe"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,129 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #m-shake { position: absolute; inset: 0; }
+    #m-scene { position: absolute; left: 0; right: 0; top: 0; height: 1100px; transform-origin: 50% 0%; }
+    #m-post { position: absolute; left: 90px; top: 520px; width: 330px; height: 250px; transform-origin: 50% 100%; }
+    #m-post .leg { position: absolute; bottom: 0; width: 16px; height: 150px; background: linear-gradient(90deg, #7a5f22, #B8943F); border-radius: 4px; }
+    #m-post .board { position: absolute; left: 0; right: 0; top: 0; height: 120px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, #1c3354, #0b1830); border: 2px solid #B8943F; box-shadow: 0 24px 40px -18px rgba(0,0,0,.7); }
+    #m-post .t { font-family: "DM Serif"; font-size: 46px; line-height: 1; color: #f2c94c; }
+    #m-post .s { font-family: "Plex Mono"; font-weight: 600; font-size: 16px; letter-spacing: .26em; color: #ead9a4; margin-top: 8px; }
+    .cloud { position: absolute; width: 300px; height: 120px; }
+    .cloud .puff { position: absolute; border-radius: 50%; background: linear-gradient(180deg, #c9d6ea, #7f93b5); }
+    .cloud .lab { position: absolute; left: 0; right: 0; top: 46px; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 26px; color: #0a1730; letter-spacing: .06em; }
+    #m-field { position: absolute; left: 0; top: 700px; width: 1080px; height: 400px; }
+    .drop { position: absolute; left: 0; top: 0; width: 6px; height: 34px; border-radius: 3px; background: linear-gradient(180deg, rgba(147,197,253,0), #93C5FD); opacity: 0; }
+    .sprout { position: absolute; width: 60px; height: 80px; transform-origin: 50% 100%; }
+    #m-box { position: absolute; left: 110px; right: 110px; top: 1045px; padding: 22px 34px 26px; }
+    #m-box .hd { font-family: "Plex Mono"; font-weight: 600; font-size: 21px; letter-spacing: .14em; color: #ead9a4; display: flex; justify-content: space-between; }
+    #m-box .row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+    #m-nii { font-family: "Plex Mono"; font-weight: 700; font-size: 84px; letter-spacing: -0.04em; color: #10B981; justify-content: flex-start; filter: drop-shadow(0 0 22px rgba(16,185,129,.3)); }
+    #m-up { font-size: 52px; }
+    #m-src { top: 1300px; }
+  </style>
+  <div id="root" data-composition-id="campo" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div id="m-shake">
+      <div class="hdr" id="m-h1"><span class="w">Pensalo</span><span class="w">como</span><span class="w">un</span><span class="w em" data-acc="gold">campo.</span></div>
+      <div class="hdr" id="m-h2"><span class="w">Este</span><span class="w">año</span><span class="w">le</span><span class="w em" data-acc="green">llovió:</span></div>
+      <div class="hdr" id="m-h3"><span class="w">con</span><span class="w">la</span><span class="w">suba</span><span class="w">de</span><span class="w em" data-acc="gold">tasas,</span></div>
+      <div class="hdr" id="m-h4"><span class="w">lo</span><span class="w">que</span><span class="w">gana</span><span class="w">con</span><span class="w">los</span><span class="w">intereses</span></div>
+      <div class="hdr" id="m-h5"><span class="w">subió</span><span class="w em" data-acc="green">13%.</span></div>
+      <div id="m-scene" data-layout-allow-overflow>
+        <div class="cloud" id="m-cl1" style="left: 470px; top: 360px">
+          <div class="puff" style="left: 0; top: 40px; width: 140px; height: 80px"></div><div class="puff" style="left: 70px; top: 0; width: 150px; height: 120px"></div>
+          <div class="puff" style="left: 170px; top: 30px; width: 130px; height: 90px"></div><div class="lab">TASAS ▲</div></div>
+        <div class="cloud" id="m-cl2" style="left: 740px; top: 470px; transform: scale(.7)">
+          <div class="puff" style="left: 0; top: 40px; width: 140px; height: 80px"></div><div class="puff" style="left: 70px; top: 0; width: 150px; height: 120px"></div>
+          <div class="puff" style="left: 170px; top: 30px; width: 130px; height: 90px"></div></div>
+        <div id="m-rain"></div>
+        <svg id="m-field" viewBox="0 0 1080 400">
+          <defs><linearGradient id="m-soil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2a14" /><stop offset="1" stop-color="#1c140a" /></linearGradient>
+            <linearGradient id="m-green" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#10B981" stop-opacity=".0" /><stop offset="1" stop-color="#10B981" stop-opacity=".35" /></linearGradient></defs>
+          <polygon points="300,0 780,0 1080,330 0,330" fill="url(#m-soil)" />
+          <polygon id="m-greenwash" points="300,0 780,0 1080,330 0,330" fill="url(#m-green)" opacity="0" />
+          <g id="m-rows" stroke="#B8943F" stroke-opacity=".55" stroke-width="3"></g>
+        </svg>
+        <div id="m-sprouts"></div>
+        <div id="m-post"><div class="leg" style="left: 60px"></div><div class="leg" style="right: 60px"></div>
+          <div class="board"><div class="t">Campo JPM</div><div class="s">COSECHA 3T 2026</div></div></div>
+      </div>
+      <div id="m-box" class="glass">
+        <div class="hd"><span>LA COSECHA · INTERESES NETOS</span><span>3T26</span></div>
+        <div class="row"><div id="m-nii" class="odo" data-layout-ignore></div><span id="m-up" class="badge green">+13%</span></div>
+      </div>
+      <div class="src" id="m-src">JPM 8-K 3T26: ingreso neto por intereses US$ 27.036 M (+13% interanual). La Fed subió 0,25 pp el 16-sep-2026.</div>
+    </div>
+    <div class="flash gold" id="m-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
+      const R = document.querySelector('[data-composition-id="campo"]');
+      const $ = (s) => R.querySelector(s);
+      // surcos en perspectiva
+      const rows = $("#m-rows");
+      for (let i = 0; i <= 8; i++) {
+        const top = 300 + i * 60, bot = i * 135;
+        const l = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        l.setAttribute("x1", top); l.setAttribute("y1", 0); l.setAttribute("x2", bot); l.setAttribute("y2", 330);
+        rows.appendChild(l);
+      }
+      // brotes: posición fija sobre los surcos
+      const sp = $("#m-sprouts"), SPR = [];
+      const svgSprout = '<svg viewBox="0 0 60 80"><path d="M30 80 V34" stroke="#10B981" stroke-width="6" stroke-linecap="round"/><path d="M30 46 C10 44 4 28 6 18 C22 18 32 30 30 46Z" fill="#34D399"/><path d="M30 38 C48 36 56 20 54 10 C38 10 28 22 30 38Z" fill="#10B981"/></svg>';
+      [[0.25, 0.35], [0.5, 0.3], [0.75, 0.35], [0.18, 0.62], [0.42, 0.6], [0.62, 0.62], [0.84, 0.6], [0.3, 0.9], [0.55, 0.88], [0.78, 0.9]].forEach(([u, v], i) => {
+        const w = 480 + 600 * v, left = 540 - w / 2 + u * w;
+        const d = document.createElement("div"); d.className = "sprout"; d.innerHTML = svgSprout;
+        const sc = 0.6 + v * 0.8;
+        d.style.left = left - 30 + "px"; d.style.top = 700 + v * 330 - 80 + "px";
+        d.style.transform = `scale(0)`; d.dataset.sc = sc;
+        sp.appendChild(d); SPR.push(d);
+      });
+      // lluvia determinista
+      const rain = $("#m-rain"), DROPS = [];
+      for (let i = 0; i < 34; i++) {
+        const d = document.createElement("div"); d.className = "drop";
+        rain.appendChild(d); DROPS.push({ d, x: 420 + ((i * 137) % 560), off: (i * 0.173) % 1, sp: 1.6 + ((i * 7) % 5) * 0.12 });
+      }
+      const sN = MF.odo($("#m-nii"), ["US$ ", 10000, 1000, ".", 100, 10, 1, "~M"]);
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 9.4, (t) => {
+        const on = clamp((t - 1.5) / 0.3, 0, 1) * (1 - clamp((t - 7.4) / 0.5, 0, 1));
+        for (const { d, x, off, sp: s } of DROPS) {
+          const ph = (t * s + off) % 1;
+          d.style.transform = `translate(${x - ph * 40}px, ${470 + ph * 520}px) rotate(8deg)`;
+          d.style.opacity = on * (ph < 0.9 ? 1 : (1 - ph) * 10);
+        }
+        SPR.forEach((el, i) => {
+          const g = eOut4(clamp((t - 2.6 - i * 0.18) / 0.5, 0, 1));
+          const pop = g < 1 ? g * (1 + 0.25 * Math.sin(g * Math.PI)) : 1;
+          el.style.transform = `scale(${pop * el.dataset.sc})`;
+        });
+        sN(24000 + 3036 * eOut4(clamp((t - 6.0) / 1.1, 0, 1)));
+      });
+      MF.captions(tl, R, [["#m-h1", 0.04, 1.4], ["#m-h2", 1.4, 2.7], ["#m-h3", 2.7, 4.0], ["#m-h4", 4.0, 5.9], ["#m-h5", 5.9, 8.6]]);
+      // cartel clavado en la tierra
+      tl.fromTo("#m-post", { y: 700, rotation: -10 }, { y: 0, rotation: 0, duration: 0.45, ease: "back.out(1.8)" }, 0.12);
+      tl.fromTo("#m-post", { rotation: 0 }, { rotation: 5, duration: 0.15, ease: "power2.out", immediateRender: false }, 0.57);
+      tl.to("#m-post", { rotation: 0, duration: 1.0, ease: "elastic.out(1, 0.3)" }, 0.72);
+      tl.fromTo("#m-field", { y: 500, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "expo.out" }, 0.05);
+      // nubes que llegan
+      tl.fromTo("#m-cl1", { x: -1000 }, { x: 0, duration: 0.6, ease: "expo.out" }, 1.3);
+      tl.fromTo("#m-cl2", { x: 800 }, { x: 0, duration: 0.6, ease: "expo.out" }, 1.45);
+      tl.to("#m-cl1", { y: -8, duration: 0.9, ease: "sine.inOut", yoyo: true, repeat: 5 }, 1.9);
+      tl.fromTo("#m-cl1 .lab", { scale: 1 }, { scale: 1.15, duration: 0.1, immediateRender: false }, 3.0);
+      tl.to("#m-cl1 .lab", { scale: 1, duration: 0.35, ease: "back.out(3)" }, 3.1);
+      tl.fromTo("#m-greenwash", { opacity: 0 }, { opacity: 1, duration: 2.0, ease: "power1.inOut" }, 3.0);
+      // la cosecha: la escena se achica y sube la caja
+      tl.to("#m-scene", { scale: 0.9, y: -30, duration: 0.5, ease: "power3.inOut" }, 5.5);
+      tl.fromTo("#m-box", { y: 1100, filter: "blur(12px)" }, { y: 0, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, 5.55);
+      tl.fromTo("#m-up", { scale: 0, rotation: -20 }, { scale: 1, rotation: -4, duration: 0.45, ease: "back.out(2.6)" }, 7.1);
+      MF.flash(tl, "#m-flash", 7.1);
+      tl.fromTo("#m-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 5.8);
+      window.__timelines["campo"] = tl;
+    })();
+  </script>
+</template>

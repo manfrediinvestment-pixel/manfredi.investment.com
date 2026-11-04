@@ -1,0 +1,87 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #e-shake { position: absolute; inset: 0; }
+    #e-kicker { top: 372px; }
+    .row { position: absolute; left: 70px; right: 70px; height: 170px; }
+    .row .date { position: absolute; left: 0; top: 18px; font-family: "Plex Mono"; font-weight: 700; font-size: 34px; color: #f6f8fc; }
+    .row .ev { position: absolute; left: 0; top: 64px; font-family: "Plex Mono"; font-weight: 600; font-size: 21px; letter-spacing: .12em; color: #ead9a4; }
+    .row .track { position: absolute; left: 0; right: 0; top: 108px; height: 34px; border-radius: 6px; background: rgba(246,243,236,.06); border: 1px solid rgba(226,234,245,.08); }
+    .row .bar { position: absolute; left: 0; top: 108px; height: 34px; border-radius: 6px; background: linear-gradient(90deg, #2C4A70, #5C7FAE); transform-origin: left center; }
+    .row .val { position: absolute; right: 0; top: 6px; font-family: "Plex Mono"; font-weight: 700; font-size: 66px; letter-spacing: -0.03em; color: #f6f8fc; }
+    #e-rowE .bar { background: linear-gradient(90deg, #B8943F, #f2c94c); box-shadow: 0 0 40px rgba(242,201,76,.35); }
+    #e-rowE .val { color: #f2c94c; }
+    #e-rowA .bar { background: linear-gradient(90deg, #B91C1C, #EF4444); box-shadow: 0 0 40px rgba(239,68,68,.45); }
+    #e-rowA .val { color: #EF4444; }
+    #e-gap { position: absolute; top: 0; height: 34px; border: 3px dashed #EF4444; border-left: none; border-radius: 0 6px 6px 0; }
+    #e-miss { position: absolute; top: 960px; left: 0; right: 0; margin: 0 auto; width: fit-content; font-size: 46px; }
+    #e-tape-lab { top: 1300px; }
+    #e-tape { position: absolute; top: 1342px; left: 0; height: 64px; width: 100%; overflow: hidden; background: rgba(6,13,26,.5);
+      border-top: 1px solid rgba(226,234,245,.1); border-bottom: 1px solid rgba(226,234,245,.1); }
+    #e-tape-in { position: absolute; top: 14px; left: 0; white-space: nowrap; font-family: "Plex Mono"; font-weight: 700; font-size: 28px; color: #f6f8fc; }
+    #e-tape-in .dn { color: #EF4444; } #e-tape-in .tk { color: #f2c94c; margin-left: 34px; }
+    #e-src { top: 1180px; }
+  </style>
+  <div id="root" data-composition-id="esperado" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-panel"></div><div class="grid"></div>
+    <div id="e-shake">
+      <div class="hdr" id="e-h1"><span class="w">Llegó</span><span class="w">a</span><span class="w em" data-acc="green">subir</span><span class="w em" data-acc="green">3%.</span></div>
+      <div class="hdr" id="e-h2"><span class="w">Pero</span><span class="w">esperaban</span><span class="w em" data-acc="gold">5,92</span><span class="w">por</span><span class="w">acción</span></div>
+      <div class="hdr" id="e-h3"><span class="w">y</span><span class="w">dio</span><span class="w em" data-acc="red">5,75.</span></div>
+      <div id="e-kicker" class="kicker">GANANCIA POR ACCIÓN · 3T 2026</div>
+      <div class="row" id="e-rowE" style="top: 440px">
+        <div class="date">LO QUE ESPERABAN</div><div class="ev">CONSENSO BLOOMBERG</div>
+        <div class="track"></div><div class="bar" style="width: 940px"></div>
+        <div class="val odo" id="e-vE" data-layout-ignore></div>
+      </div>
+      <div class="row" id="e-rowA" style="top: 640px" data-layout-allow-overflow>
+        <div class="date">LO QUE DIO</div><div class="ev">SIN PÉRDIDA POR VENTA DE BONOS</div>
+        <div class="track"></div><div class="bar" style="width: 913px"></div>
+        <div style="position:absolute; left:913px; top:108px; width:27px"><div id="e-gap" style="left:0; width:27px"></div></div>
+        <div class="val odo" id="e-vA" data-layout-ignore></div>
+      </div>
+      <div id="e-miss" class="badge red">−US$ 0,17 por debajo</div>
+      <div class="src" id="e-src">JPM 8-K 13-oct-2026: EPS US$ 5,57 (5,75 sin US$ 658 M de pérdida por venta de títulos). Consenso: Bloomberg vía Yahoo Finance.</div>
+      <div id="e-tape-lab" class="kicker">LOS BANCOS ESE DÍA · 13 OCT</div>
+      <div id="e-tape" data-layout-allow-overflow><div id="e-tape-in">
+        <span class="tk">JPM</span> <span class="dn">▼ 0,86%</span><span class="tk">C</span> <span class="dn">▼ 5,60%</span><span class="tk">WFC</span> <span class="dn">▼ 3,10%</span><span class="tk">BAC</span> <span class="dn">▼ 1,14%</span><span class="tk">GS</span> <span class="dn">▼ 0,23%</span>
+        <span class="tk">JPM</span> <span class="dn">▼ 0,86%</span><span class="tk">C</span> <span class="dn">▼ 5,60%</span><span class="tk">WFC</span> <span class="dn">▼ 3,10%</span><span class="tk">BAC</span> <span class="dn">▼ 1,14%</span><span class="tk">GS</span> <span class="dn">▼ 0,23%</span>
+        <span class="tk">JPM</span> <span class="dn">▼ 0,86%</span><span class="tk">C</span> <span class="dn">▼ 5,60%</span><span class="tk">WFC</span> <span class="dn">▼ 3,10%</span>
+      </div></div>
+    </div>
+    <div class="flash" id="e-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
+      const R = document.querySelector('[data-composition-id="esperado"]');
+      const $ = (s) => R.querySelector(s);
+      const eps = ["US$ ", 1, ",", 0.1, 0.01];
+      const sE = MF.odo($("#e-vE"), eps), sA = MF.odo($("#e-vA"), eps);
+      const tape = $("#e-tape-in");
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 5.8, (t) => {
+        sE(5.92 * eOut4(clamp((t - 0.5) / 0.9, 0, 1)));
+        sA(5.75 * eOut4(clamp((t - 3.25) / 0.6, 0, 1)));
+        tape.style.transform = `translateX(${-130 * t}px)`;
+      });
+      MF.captions(tl, R, [["#e-h1", 0.04, 1.4], ["#e-h2", 1.4, 3.2], ["#e-h3", 3.2, 5.2]]);
+      tl.fromTo("#e-kicker", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 0.1);
+      tl.fromTo("#e-rowE", { x: -1200, filter: "blur(10px)" }, { x: 0, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 0.3);
+      tl.fromTo("#e-rowE .bar", { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "expo.out" }, 0.45);
+      // lo que dio cae desde arriba, golpea y se queda corto
+      tl.fromTo("#e-rowA", { y: -1200, filter: "blur(16px)" }, { y: 0, filter: "blur(0px)", duration: 0.3, ease: "power3.in" }, 3.0);
+      tl.fromTo("#e-rowA .bar", { scaleX: 0 }, { scaleX: 1, duration: 0.55, ease: "expo.out" }, 3.3);
+      tl.to("#e-rowE", { y: -12, duration: 0.06, ease: "power2.out" }, 3.3);
+      tl.to("#e-rowE", { y: 0, duration: 0.5, ease: "elastic.out(1, 0.4)" }, 3.36);
+      MF.shake(tl, "#e-shake", 3.3, 9);
+      tl.fromTo("#e-gap", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.3, ease: "expo.out", transformOrigin: "left center" }, 3.85);
+      tl.fromTo("#e-miss", { opacity: 0, scale: 1.8, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.3, ease: "power4.in" }, 3.9);
+      MF.flash(tl, "#e-flash", 4.2);
+      tl.fromTo("#e-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 3.6);
+      tl.fromTo(["#e-tape", "#e-tape-lab"], { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.1);
+      window.__timelines["esperado"] = tl;
+    })();
+  </script>
+</template>
