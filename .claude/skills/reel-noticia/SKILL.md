@@ -59,13 +59,24 @@ Estructura del piloto, en el orden en que funciona. Cada bloque es una escena; e
 | 2 | **Ranking** (3–7 s) | "Peor que en 2008. Peor que en el COVID." Barras de las peores caídas; la nueva **cae desde arriba** y empuja a las otras; contador "US$ 475.000 M" + "borrados" letra por letra; cinta de cotizaciones de pares. | panel |
 | 3 | **La pregunta** (7–10 s) | "Y eso que vendió 25% más. ¿Entonces por qué cayó?" Barras de ventas, lupa sobre el chip roto, "?" rojo. **Bucle abierto** que retiene. | aurora |
 | 4 | **La causa** (~10 s) | "Fue lo que gasta": billetes que salen disparados del chip, racks que caen, contador del gasto, comparación ×2,1. | panel |
-| 5 | **La metáfora** (~10 s) | Algo cotidiano (Portiv: panadería/harina). Piloto: panadería que compra hornos; la caja termina en **−9.065** con golpe. | aurora |
+| 5 | **La metáfora** (~10 s) | Algo cotidiano y NUEVO en cada video (ver regla de abajo). Piloto: panadería que compra hornos; la caja termina en **−9.065** con golpe. | aurora |
 | 6 | **Lo irónico** (~9 s) | Algo que se dio vuelta (SpaceX: +99.000 M un trimestre, −8.664 M el siguiente): cohete que sube y cohete que cae. | panel |
-| 7 | **El contrapeso** (~5 s) | Lo bueno que el mercado ignora (Cloud +103%) con callback a la metáfora ("los hornos ya venden"). | aurora |
+| 7 | **El contrapeso** (~5 s) | Lo bueno que el mercado ignora (Cloud +103%) con callback a la metáfora del video (en el piloto, "los hornos ya venden"). | aurora |
 | 8 | **Nuestro informe** (~8 s) | Tarjeta del informe con el valor justo + el precio cayendo hasta **tocar la línea dorada** ("a 1,1% de nuestro valor") + aviso de que no es recomendación. | panel |
 | 9 | **Frase espejo + compartir** (~9 s) | "No lo castigó por vender poco. Lo castigó por gastar mucho." Tarjeta tachada vs tarjeta roja; cursor que toca Guardalo / Mandáselo / Ese amigo. | aurora |
 | 10 | **Comentá PALABRA** (~5,6 s) | "Si querés el informe completo, comentá GOOGLE y te mando la guía." Tarjeta del informe, caja de comentario donde se tipea la palabra, se publica (corazón), llega el DM con "Ver la guía". | aurora |
 | 11 | **Logo** (3,5 s) | Emblema + "Manfredi *Investment*" + "Tu mundo financiero, *en un solo lugar.*" + URL + aviso. Sin voz. | panel |
+
+**Regla de la metáfora (pedido del user, 04-nov-2026: "que no hablemos de hornos, así no suena repetitivo"):** cada
+reel usa una metáfora cotidiana DISTINTA a todas las anteriores. Antes de escribir el guion, leer
+`marketing/METAFORAS.md` (registro de las ya usadas, con sus objetos en pantalla) y elegir una familia nueva; al
+terminar, agregar la propia al registro en el mismo commit. Prohibido repetir el escenario o los objetos de otra
+(panadería, hornos, harina, pan, libreta del fiado ya están usados). La escena de la metáfora del piloto
+(`panaderia.html`) NO se copia: se escribe una escena nueva con sus propios objetos animados (mismo nivel de detalle:
+algo que llega pesado, algo que se balancea, un contador que termina en el dato con golpe). La metáfora tiene que
+explicar el dato real del video, no decorarlo: si el número no se puede trasladar a la metáfora, buscar otra.
+Las sesiones en la nube se lanzan DE A UNA: cuatro en paralelo con el modelo grande agotaron el límite de 5 horas a
+los 8 minutos (03-nov-2026) y no subieron nada.
 
 Reglas del gancho: el **cuadro 0 es la portada** (título y número ya visibles, nunca negro); prometer en los primeros 10 s algo
 que se paga al final; una frase-espejo memorable para el cierre; siempre un dato propio (nuestro informe) que Portiv no tiene.
