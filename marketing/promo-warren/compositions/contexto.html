@@ -1,16 +1,13 @@
 <template>
   <style>
     #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
-    #c-chat { position: absolute; left: 50px; top: 420px; width: 980px; height: 620px; background: #ffffff; border-radius: 34px; overflow: hidden; color: #0b0f17;
-      box-shadow: 0 50px 100px -30px rgba(0,0,0,.75); transform-origin: 50% 0%; }
-    #c-chat .top { height: 92px; border-bottom: 2px solid #E6E9EF; display: flex; align-items: center; padding: 0 34px; }
-    #c-chat .top i { width: 44px; height: 44px; border-radius: 50%; border: 3px solid #0b0f17; display: block; }
-    #c-chat .q { position: absolute; right: 34px; top: 130px; background: #EEF1F5; border-radius: 30px 30px 8px 30px; padding: 22px 30px; font-size: 38px; font-weight: 600; white-space: nowrap; }
-    #c-chat .a { position: absolute; left: 34px; top: 300px; font-size: 34px; font-weight: 500; line-height: 1.55; }
-    #c-chat .a div { white-space: nowrap; }
-    #c-c0 { left: 70px; top: 760px; } #c-c1 { left: 680px; top: 760px; }
-    #c-c2 { left: 70px; top: 1020px; } #c-c3 { left: 680px; top: 1020px; }
-    #c-tag { position: absolute; left: 0; right: 0; top: 820px; text-align: center; font-family: "DM Serif"; font-style: italic; font-size: 64px; color: #f2c94c; }
+    #c-c0 { left: 50px; top: 420px; } #c-c1 { left: 560px; top: 420px; }
+    #c-c2 { left: 50px; top: 710px; } #c-c3 { left: 560px; top: 710px; }
+    .cw .crk path { stroke-dasharray: 700; stroke-dashoffset: 700; }
+    #c-cartel { position: absolute; left: 70px; right: 70px; top: 1040px; padding: 30px 36px 34px; border-radius: 30px; text-align: center; background: linear-gradient(170deg, #3a1520, #1a0b14);
+      border: 2px solid #EF4444; box-shadow: 0 0 70px -10px rgba(239,68,68,.45), 0 40px 80px -30px rgba(0,0,0,.9); }
+    #c-cartel div { font-weight: 700; font-size: 52px; letter-spacing: -0.02em; line-height: 1.08; }
+    #c-cartel em { font-family: "DM Serif"; font-weight: 400; font-size: 1.15em; color: #f2c94c; }
     /* botón flotante de Warren (index.html: .warren-fab) */
     #c-fab { position: absolute; left: 0; top: 0; width: 170px; height: 170px; margin: -85px 0 0 -85px; border-radius: 50%;
       background: linear-gradient(155deg, #f2c94c, #B8943F); box-shadow: 0 20px 60px -10px rgba(242,201,76,.75); display: flex; align-items: center; justify-content: center; }
@@ -24,9 +21,8 @@
   </style>
   <div id="root" data-composition-id="contexto" data-width="1080" data-height="1920" data-layout-allow-overlap>
     <div class="bg-panel"></div><div class="grid"></div>
-    <div id="c-chat"><div class="top"><i></i></div><div class="q">¿Google está barata después de caer 12%?</div>
-      <div class="a"><div>Depende de tu perfil de riesgo y tu horizonte.</div><div>Te recomiendo consultar con un asesor financiero.</div></div></div>
-    <div id="c-cards"></div>
+    <div id="c-shake"><div id="c-cards"></div>
+      <div id="c-cartel"><div>No los podés juntar</div><div>en <em>una sola IA.</em></div></div></div>
     <div id="c-flab">Preguntale a Warren</div>
     <div id="c-fab"><div id="c-ring"></div><svg viewBox="0 0 24 24" fill="#0A0F1E"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z" /></svg><div id="c-badge">W</div></div>
     <div id="c-fill"></div>
@@ -40,33 +36,43 @@
       const R = document.querySelector('[data-composition-id="contexto"]');
       R.querySelector("#c-cards").innerHTML = [0, 1, 2, 3].map((i) => window.CTX.card(i, "c-c" + i)).join("");
       const tl = gsap.timeline({ paused: true });
-      MF.say(tl, R, "c", [["El problema no es la *IA.*", 0.05, 1.35], ["Es que no sabe *nada* de vos.", 1.35, 2.8],
-        ["No conoce tu *cartera.*", 2.8, 3.9], ["Ni tu perfil de *riesgo.*", 3.9, 5.0], ["No leyó ningún *informe.*", 5.0, 6.1], ["Ni sabe el precio de *hoy.*", 6.1, 6.9]]);
-      // el chat genérico se encoge y sube
-      tl.fromTo("#c-chat", { scale: 1, y: 0 }, { scale: 0.5, y: -20, duration: 0.7, ease: "expo.inOut" }, 1.4);
-      tl.to("#c-chat", { rotation: -2, duration: 4, ease: "sine.inOut" }, 2.1);
-      // caen los cuatro casilleros, cada uno con su ✗
-      [2.85, 3.95, 5.05, 6.1].forEach((t, i) => {
+      MF.say(tl, R, "c", [["Le falta *contexto:* no sabe nada de vos.", 0.05, 2.3], ["No leyó ningún *informe.*", 2.3, 3.9], ["Tenés que saber escribirle el *prompt.*", 3.9, 5.7],
+        ["Y encima, veinte dólares por *mes.*", 5.7, 7.5], ["Esas cuatro cosas no las juntás en ninguna *IA.*", 7.5, 8.9]]);
+      tl.to(R.querySelector(".caps"), { opacity: 0, duration: 0.12 }, 8.9);
+      // cada casillero cae, golpea, se agrieta (con su ✗)
+      [0.45, 2.3, 3.95, 5.75].forEach((t, i) => {
         const c = "#c-c" + i;
         tl.fromTo(c, { y: -1700, filter: "blur(14px)", rotation: i % 2 ? 6 : -6 }, { y: 0, filter: "blur(0px)", rotation: 0, duration: 0.36, ease: "power3.in" }, t);
         tl.to(c, { scaleY: 0.9, duration: 0.06, ease: "power2.out", transformOrigin: "50% 100%" }, t + 0.36);
         tl.to(c, { scaleY: 1, duration: 0.5, ease: "elastic.out(1,.45)" }, t + 0.42);
-        tl.fromTo(c + " .mk.x", { scale: 0, rotation: -90 }, { scale: 1, rotation: 0, duration: 0.32, ease: "back.out(3)" }, t + 0.5);
-        tl.to(c, { borderColor: "rgba(239,68,68,.75)", duration: 0.1 }, t + 0.5);
-        tl.to(c, { rotation: i % 2 ? -1.5 : 1.5, duration: 0.6, ease: "sine.inOut" }, t + 0.9);
+        tl.to(c + " .crk path", { strokeDashoffset: 0, duration: 0.18, ease: "power2.out" }, t + 0.62);
+        MF.shake(tl, c, t + 0.62, 9);
+        tl.fromTo(c + " .mk.x", { scale: 0, rotation: -90 }, { scale: 1, rotation: 0, duration: 0.32, ease: "back.out(3)" }, t + 0.66);
+        tl.to(c + " .ctx", { borderColor: "rgba(239,68,68,.8)", duration: 0.1 }, t + 0.62);
+        tl.to(c + " .half-l", { x: -5, rotation: -1.2, duration: 0.2, ease: "power2.out" }, t + 0.66);
+        tl.to(c + " .half-r", { x: 5, rotation: 1.2, duration: 0.2, ease: "power2.out" }, t + 0.66);
       });
-      MF.flash(tl, "#c-flash", 6.62);
-      // entra el botón dorado de Warren desde la esquina, como en la web
+      // se rompen del todo
+      tl.to("#c-cards .half-l", { x: -46, y: 40, rotation: -9, duration: 0.4, ease: "power2.in", stagger: 0.05 }, 7.55);
+      tl.to("#c-cards .half-r", { x: 46, y: 64, rotation: 10, duration: 0.4, ease: "power2.in", stagger: 0.05 }, 7.55);
+      tl.to("#c-cards .crk", { opacity: 0, duration: 0.1 }, 7.6);
+      MF.flash(tl, "#c-flash", 7.95);
+      tl.fromTo("#c-cartel", { y: -1500, rotation: 6, filter: "blur(14px)" }, { y: 0, rotation: 1.5, filter: "blur(0px)", duration: 0.3, ease: "power3.in" }, 7.65);
+      tl.to("#c-cartel", { scaleY: 0.9, duration: 0.06, ease: "power2.out", transformOrigin: "50% 100%" }, 7.95);
+      tl.to("#c-cartel", { scaleY: 1, rotation: 0, duration: 0.5, ease: "elastic.out(1,.45)" }, 8.01);
+      MF.shake(tl, "#c-shake", 7.95, 18);
+      tl.to("#c-cards .half-l", { y: "+=20", rotation: "-=3", duration: 0.9, ease: "sine.inOut" }, 8.0);
+      tl.to("#c-cards .half-r", { y: "+=20", rotation: "+=3", duration: 0.9, ease: "sine.inOut" }, 8.0);
+      // entra el botón dorado de Warren desde la esquina y crece hasta llenar la pantalla
       const fab = R.querySelector("#c-fab");
-      tl.fromTo(fab, { x: 1250, y: 2050, scale: 0.6, rotation: 120 }, { x: 540, y: 860, scale: 1, rotation: 0, duration: 0.42, ease: "expo.out" }, 6.7);
-      tl.fromTo("#c-ring", { scale: 0.9, opacity: 0.8 }, { scale: 1.6, opacity: 0, duration: 0.5, ease: "power2.out" }, 6.95);
-      tl.fromTo("#c-flab", { x: 1250, y: 1030, opacity: 0 }, { x: 330, y: 970, opacity: 1, duration: 0.36, ease: "expo.out" }, 6.8);
-      tl.to("#c-flab", { opacity: 0, y: 1000, duration: 0.15, ease: "power2.in" }, 7.25);
-      tl.to(["#c-c0", "#c-c1", "#c-c2", "#c-c3", "#c-chat"], { scale: 0.9, filter: "blur(4px)", duration: 0.35, ease: "power2.in" }, 7.2);
-      // el botón crece hasta ser el mundo de la escena siguiente
-      tl.to("#c-badge", { opacity: 0, duration: 0.1 }, 7.25);
-      tl.set("#c-fill", { opacity: 1, scale: 0.85 }, 7.3);
-      tl.to("#c-fill", { scale: 26, duration: 0.48, ease: "expo.in" }, 7.32);
+      tl.fromTo(fab, { x: 1250, y: 2050, scale: 0.6, rotation: 120 }, { x: 540, y: 860, scale: 1, rotation: 0, duration: 0.42, ease: "expo.out" }, 8.9);
+      tl.fromTo("#c-ring", { scale: 0.9, opacity: 0.8 }, { scale: 1.6, opacity: 0, duration: 0.5, ease: "power2.out" }, 9.15);
+      tl.fromTo("#c-flab", { x: 1250, y: 1030, opacity: 0 }, { x: 330, y: 970, opacity: 1, duration: 0.36, ease: "expo.out" }, 8.95);
+      tl.to("#c-flab", { opacity: 0, y: 1000, duration: 0.15, ease: "power2.in" }, 9.4);
+      tl.to(["#c-cards", "#c-cartel"], { scale: 0.92, filter: "blur(4px)", duration: 0.35, ease: "power2.in" }, 9.35);
+      tl.to("#c-badge", { opacity: 0, duration: 0.1 }, 9.4);
+      tl.set("#c-fill", { opacity: 1, scale: 0.85 }, 9.48);
+      tl.to("#c-fill", { scale: 26, duration: 0.5, ease: "expo.in" }, 9.5);
       window.__timelines["contexto"] = tl;
     })();
   </script>

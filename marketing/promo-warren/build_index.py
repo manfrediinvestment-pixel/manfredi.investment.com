@@ -8,15 +8,15 @@ import pathlib
 
 SCENES = [
     ("gancho", 0),
-    ("contexto", 5.0),
-    ("revelacion", 12.8),   # entra sin latigazo: el botón de Warren crece y se vuelve el fondo
-    ("respuesta", 18.4),
-    ("contraste", 44.0),
-    ("informes", 50.0),
-    ("comenta", 57.8),
-    ("logo", 65.9),
+    ("pregunta", 6.0),
+    ("contexto", 12.0),
+    ("revelacion", 22.0),   # entra sin latigazo: el botón de Warren crece y se vuelve el fondo
+    ("respuesta", 27.0),
+    ("real", 42.0),
+    ("comenta", 54.0),
+    ("logo", 63.0),
 ]
-END = 69.4
+END = 66.0
 NOWHIP = {"revelacion"}  # escenas que no entran con latigazo
 WHIP = 0.3  # duración de la transición latigazo vertical
 
@@ -33,61 +33,63 @@ PEAK = {  # segundo del pico de cada archivo (npx hyperframes audio --only momen
     "ping": 0.324, "sparkle": 0.027, "notification": 0.229, "typing": 0.457, "whoosh-cinematic": 2.503,
 }
 SFX = [
-    # gancho: aparece la respuesta de dos líneas de golpe; "¿Eso es todo?" cae seco
-    ("click", "gancho", 1.95, 0.25, {}),
-    ("typing", "gancho", 2.75, 0.30, {"skip": 0.44, "dur": 0.6}),
-    ("pop", "gancho", 3.42, 0.30, {}),
-    ("impact-bass-1", "gancho", 3.94, 0.62, {"dur": 1.3}),
-    # contexto: el chat se encoge, caen los cuatro casilleros con su ✗, entra el botón dorado y crece
-    ("swoosh-b", "contexto", 1.55, 0.20, {}),
-] + [("impact-bass-1", "contexto", t + 0.36, 0.20, {"dur": 0.5}) for t in (2.85, 3.95, 5.05, 6.1)] + [
-    ("pop", "contexto", t + 0.55, 0.26, {}) for t in (2.85, 3.95, 5.05, 6.1)] + [
-    ("swoosh-a", "contexto", 6.85, 0.36, {}),
-    ("sparkle", "contexto", 7.0, 0.30, {}),
-    ("whoosh-cinematic", "contexto", 7.8, 0.40, {"dur": 3.0}),
-    # revelación: avatar, casilleros que llegan, cada cable que se enchufa (clic) y cada ✓ (tecla)
-    ("sparkle", "revelacion", 0.5, 0.30, {}),
-    ("swoosh-b", "revelacion", 1.15, 0.20, {}),
-] + [("click", "revelacion", t + 0.28, 0.42, {}) for t in (2.9, 3.3, 3.7, 4.1)] + [
-    ("key-press", "revelacion", t + 0.32, 0.48, {}) for t in (2.9, 3.3, 3.7, 4.1)] + [
-    ("impact-bass-2", "revelacion", 4.75, 0.36, {}),
-    ("sparkle", "revelacion", 4.77, 0.24, {}),
-    # respuesta: tecleo de la pregunta, enviar, cada ✓ de lo que leyó, golpes en el valor justo y el remate
-] + [("key-press", "respuesta", 0.45 + i * 0.045, 0.30 if i % 2 else 0.38, {}) for i in range(0, 40, 3)] + [
-    ("click", "respuesta", 2.32, 0.45, {}),
-    ("pop", "respuesta", 2.5, 0.24, {}),
-] + [("key-press", "respuesta", t + 0.22, 0.50, {}) for t in (2.9, 3.25, 3.6, 3.95)] + [
-    ("swoosh-b", "respuesta", 4.3, 0.20, {}),
-    ("impact-bass-1", "respuesta", 6.42, 0.52, {"dur": 1.2}),
-    ("pop", "respuesta", 7.2, 0.22, {}),
-    ("pop", "respuesta", 7.35, 0.30, {}),
-] + [("swoosh-b", "respuesta", t + 0.3, 0.13, {}) for t in (7.9, 11.0, 14.6, 17.8, 20.4)] + [
-    ("pop", "respuesta", 8.55, 0.20, {}),
-    ("pop", "respuesta", 8.9, 0.20, {}),
-    ("impact-bass-1", "respuesta", 9.45, 0.40, {"dur": 1.0}),
-    ("sparkle", "respuesta", 10.25, 0.24, {}),
-] + [("pop", "respuesta", 11.65 + i * 0.36, 0.16, {}) for i in range(6)] + [
-    ("impact-bass-1", "respuesta", 13.55, 0.28, {"dur": 0.8}),
-] + [("pop", "respuesta", 15.35 + i * 0.3, 0.14, {}) for i in range(5)] + [
-    ("click", "respuesta", 16.9, 0.30, {}),
-    ("ping", "respuesta", 17.2, 0.28, {}),
-] + [("pop", "respuesta", 18.45 + i * 0.4, 0.20, {}) for i in range(3)] + [
-    ("impact-bass-1", "respuesta", 19.75, 0.28, {"dur": 0.8}),
-] + [("click", "respuesta", 21.0 + i * 0.3, 0.24, {}) for i in range(4)] + [
-    ("impact-bass-2", "respuesta", 22.76, 0.48, {}),
-    ("impact-bass-1", "respuesta", 22.76, 0.30, {"dur": 1.2}),
-    # contraste: entran las dos ventanas, el "vs" y el contador de palabras
-    ("swoosh-b", "contraste", 0.3, 0.20, {}),
-    ("pop", "contraste", 0.85, 0.24, {}),
-    ("swoosh-b", "contraste", 1.65, 0.20, {}),
-    ("pop", "contraste", 1.95, 0.30, {}),
-    ("ping", "contraste", 3.3, 0.30, {}),
-    # informes: lluvia de lomos, "casi 50" con golpe, el de GOOGL pasa al atril
-] + [("impact-bass-1", "informes", 0.89 + i * 0.05, 0.13 + 0.04 * (i % 2), {"dur": 0.4}) for i in range(0, 49, 6)] + [
-    ("impact-bass-1", "informes", 3.4, 0.50, {"dur": 1.2}),
-    ("click", "informes", 4.35, 0.30, {}),
-    ("swoosh-c", "informes", 5.0, 0.28, {}),
-    ("sparkle", "informes", 5.1, 0.24, {}),
+    # gancho: golpe de entrada, logos que llegan, choque y cartel
+    ("impact-bass-1", "gancho", 0.02, 0.55, {"dur": 1.2}),
+    ("whoosh-cinematic", "gancho", 0.45, 0.30, {"dur": 1.2, "skip": 2.0}),
+] + [("pop", "gancho", 0.25 + i * 0.07, 0.16, {}) for i in range(6)] + [
+    ("swoosh-c", "gancho", 2.95, 0.36, {}),
+    ("impact-bass-2", "gancho", 3.04, 0.55, {}),
+    ("crack-a", "gancho", 3.05, 0.40, {}),
+    ("impact-bass-1", "gancho", 3.43, 0.55, {"dur": 1.3}),
+    ("sparkle", "gancho", 3.1, 0.28, {}),
+    # pregunta: tecleo, enviar, respuesta de golpe, cartel
+] + [("key-press", "pregunta", 0.35 + i * 0.038, 0.30 if i % 2 else 0.38, {}) for i in range(0, 40, 3)] + [
+    ("click", "pregunta", 1.94, 0.42, {}),
+    ("pop", "pregunta", 2.97, 0.32, {}),
+    ("impact-bass-1", "pregunta", 3.7, 0.58, {"dur": 1.3}),
+    ("pop", "pregunta", 4.65, 0.22, {}),
+    # contexto: cada casillero cae (golpe), se agrieta (vidrio) y se rompe al final
+] + [("impact-bass-1", "contexto", t + 0.36, 0.24, {"dur": 0.6}) for t in (0.45, 2.3, 3.95, 5.75)] + [
+    ("crack-a", "contexto", t + 0.62, 0.42, {}) for t in (0.45, 2.3, 3.95, 5.75)] + [
+    ("pop", "contexto", t + 0.7, 0.18, {}) for t in (0.45, 2.3, 3.95, 5.75)] + [
+    ("crack-b", "contexto", 7.6, 0.45, {"dur": 1.6}),
+    ("impact-bass-1", "contexto", 7.95, 0.55, {"dur": 1.2}),
+    ("swoosh-a", "contexto", 9.05, 0.36, {}),
+    ("sparkle", "contexto", 9.2, 0.28, {}),
+    ("whoosh-cinematic", "contexto", 10.0, 0.40, {"dur": 3.0}),
+    # revelación: las mitades vuelven, clic por cable, tecla por cada ✓
+    ("sparkle", "revelacion", 0.45, 0.30, {}),
+    ("swoosh-b", "revelacion", 0.75, 0.22, {}),
+] + [("click", "revelacion", t + 0.26, 0.42, {}) for t in (1.55, 1.95, 2.35, 2.75)] + [
+    ("key-press", "revelacion", t + 0.3, 0.48, {}) for t in (1.55, 1.95, 2.35, 2.75)] + [
+    ("impact-bass-2", "revelacion", 3.4, 0.36, {}),
+    ("sparkle", "revelacion", 3.42, 0.24, {}),
+    # respuesta: tecleo, enviar, ráfaga de ✓, golpes cortos en cada dato, remate
+] + [("key-press", "respuesta", 0.3 + i * 0.028, 0.28 if i % 2 else 0.36, {}) for i in range(0, 40, 4)] + [
+    ("click", "respuesta", 1.45, 0.42, {}),
+] + [("key-press", "respuesta", t + 0.18, 0.46, {}) for t in (1.68, 1.8, 1.92, 2.04)] + [
+    ("swoosh-b", "respuesta", 2.3, 0.20, {}),
+    ("impact-bass-1", "respuesta", 3.65, 0.48, {"dur": 1.0}),
+    ("pop", "respuesta", 3.8, 0.26, {}),
+    ("impact-bass-1", "respuesta", 4.35, 0.34, {"dur": 0.8}),
+    ("sparkle", "respuesta", 4.65, 0.22, {}),
+] + [("pop", "respuesta", 4.9 + i * 0.14, 0.14, {}) for i in range(6)] + [
+    ("impact-bass-1", "respuesta", 5.75, 0.28, {"dur": 0.7}),
+] + [("pop", "respuesta", 6.5 + i * 0.14, 0.13, {}) for i in range(5)] + [
+    ("click", "respuesta", 7.1, 0.28, {}),
+    ("ping", "respuesta", 7.32, 0.26, {}),
+] + [("pop", "respuesta", 8.0 + i * 0.16, 0.18, {}) for i in range(3)] + [
+    ("impact-bass-1", "respuesta", 8.65, 0.28, {"dur": 0.7}),
+] + [("click", "respuesta", 9.35 + i * 0.12, 0.22, {}) for i in range(4)] + [
+    ("impact-bass-2", "respuesta", 11.0, 0.48, {}),
+    ("impact-bass-1", "respuesta", 11.0, 0.30, {"dur": 1.2}),
+    # informe real: tapa, se abre la ventana, scroll, cartel
+    ("swoosh-b", "real", 0.25, 0.24, {}),
+    ("swoosh-c", "real", 1.6, 0.30, {}),
+    ("typing", "real", 2.3, 0.18, {"dur": 1.4}),
+    ("ping", "real", 8.6, 0.30, {}),
+    ("impact-bass-1", "real", 9.2, 0.55, {"dur": 1.2}),
+    ("pop", "real", 10.35, 0.32, {}),
     # comenta: F-I-N-A-N-Z-A-S, enviar, corazón, llega el mensaje, el código
 ] + [("key-press", "comenta", 1.31 + i * 0.09, 0.50 if i % 2 == 0 else 0.42, {}) for i in range(8)] + [
     ("click", "comenta", 2.57, 0.48, {}),
@@ -159,6 +161,7 @@ html = f"""<!doctype html>
     <link rel="stylesheet" href="assets/brand.css" />
     <script src="assets/brand.js"></script>
     <script src="assets/ctx.js"></script>
+    <script src="assets/ai-logos.js"></script>
     <script src="assets/warren-doc.js"></script>
     <style>
       * {{ margin: 0; padding: 0; box-sizing: border-box; }}

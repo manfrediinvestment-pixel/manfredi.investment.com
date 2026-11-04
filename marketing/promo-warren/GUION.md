@@ -1,39 +1,34 @@
-# Guion — Promo Warren (≈69 s)
+# Guion v2 — Promo Warren (66 s)
 
-Voz del user, voseo, de corrido. El subtítulo karaoke de arriba sigue este texto palabra por palabra.
+Voz del user, voseo, de corrido. El subtítulo karaoke sigue estas frases (en los carteles grandes el texto es el cartel).
 
-| # | Segundo | Texto exacto | Tono / qué se ve |
+| # | Segundo | Texto exacto | Qué se ve |
 |---|---|---|---|
-| 1 | 0,0 – 2,7 | Todos te dicen que uses IA para invertir. Le pregunté esto: | Natural, rápido. Chat blanco genérico con la pregunta ya escrita (cuadro 0). |
-| 2 | 2,7 – 3,8 | Mirá lo que me contestó: | Aparece de golpe la respuesta de 2 líneas. |
-| 3 | 3,9 – 5,0 | ¿Eso es todo? | Incrédulo. "¿Eso es todo?" cae en serif dorada, golpe seco. |
-| 4 | 5,0 – 7,8 | El problema no es la IA. Es que no sabe nada de vos. | El chat se encoge. |
-| 5 | 7,8 – 11,9 | No conoce tu cartera. Ni tu perfil de riesgo. No leyó ningún informe. Ni sabe el precio de hoy. | Una frase por casillero; cada uno cae con su ✗ roja. |
-| 6 | 12,9 – 14,3 | Ahí entra Warren. | El botón dorado entra desde la esquina y llena la pantalla. |
-| 7 | 14,3 – 18,3 | Es la IA de Manfredi, conectada con todo eso. | Los 4 casilleros se enchufan con líneas doradas. |
-| 8 | 18,4 – 20,7 | Le hice la misma pregunta. | Se tipea la pregunta. |
-| 9a | 20,7 – 22,8 | Antes de contestar, leyó todo esto. | ✓ informe, precio, perfil, cartera. |
-| 9b | 22,8 – 26,3 | Cuánto vale: trescientos treinta dólares, contra doscientos ochenta de precio. | Odómetro US$ 330,28 vs US$ 279,84. |
-| 9c | 26,3 – 29,4 | Lo que pesa: invirtió más de lo que generó. | Capex US$ 51,36 B > flujo operativo US$ 42,29 B → −US$ 9,07 B. |
-| 9d | 29,4 – 33,0 | Cinco métodos de valuación, cada uno con su peso. | Tabla fila por fila. |
-| 9e | 33,0 – 36,2 | Y los dibuja contra el precio de hoy. | Football field. |
-| 9f | 36,2 – 38,8 | Tres escenarios, con su probabilidad. | Bajista 25% · base 45% · alcista 30%. |
-| 9g | 38,8 – 40,9 | Y de dónde sale cada dato. | Bloque de fuentes. |
-| 10 | 40,9 – 44,0 | Y no me dijo qué comprar. Me mostró cuánto vale y por qué. | Cartel "No te digo qué comprar…" con golpe. |
-| 11 | 44,0 – 50,0 | Dos líneas… contra un informe completo. | 2 líneas · 16 palabras vs 148 palabras · 2 tablas · 2 gráficos. |
-| 12 | 50,0 – 57,8 | Y todo sale de casi cincuenta informes que hacemos a mano. Y Warren los lee por vos. | Lomos que caen, odómetro 49, "casi 50", tapa de GOOGL al atril. |
-| 13 | 57,8 – 65,9 | Comentá FINANZAS y te mando un código de descuento para usar Warren. | Se tipea FINANZAS, llega el mensaje con el código borroso. |
-| — | 65,9 – 69,4 | (sin voz) | Logo + "No es recomendación de inversión." |
+| 1 | 0,0 – 3,4 | Si no usás inteligencia artificial para invertir, estás perdido. | Logos de IA + gráficos que chocan; cartel "Si no usás IA para invertir, estás perdido." |
+| 2 | 6,0 – 9,3 | Pero mirá lo que pasa cuando le preguntás algo concreto. | Se tipea "¿Google está barata después de caer 12%?"; respuesta de 2 líneas. |
+| 3 | 9,4 – 12,0 | El problema no es la IA. Es todo lo que le decís. | Chat congelado + cartel. |
+| 4 | 12,0 – 19,5 | Le falta contexto: no sabe nada de vos. No leyó ningún informe. Tenés que saber escribirle el prompt. Y encima, veinte dólares por mes. | Caen CONTEXTO, FUENTES, PROMPT, PRECIO; cada uno se agrieta. |
+| 5 | 19,5 – 20,9 | Esas cuatro cosas no las juntás en ninguna IA. | Se rompen; cartel "No los podés juntar en una sola IA." |
+| 6 | 22,2 – 24,0 | Warren las junta todas. | El botón dorado llena la pantalla; los casilleros se rearman en ✓ verde. |
+| 7 | 27,0 – 28,7 | Le hice la misma pregunta. | Tecleo rápido en el chat de Warren. |
+| 8 | 28,7 – 37,7 | Cuánto vale contra el precio de hoy, cinco métodos de valuación, tres escenarios y de dónde sale cada dato. En segundos. | El informe baja de corrido: US$ 330,28 vs US$ 279,84, tabla, football field, escenarios, fuentes. |
+| 9 | 37,7 – 42,0 | Y no me dijo qué comprar. Me mostró cuánto vale y por qué. | Cartel "No te digo qué comprar. Te muestro cuánto vale y por qué." |
+| 10 | 42,0 – 54,0 | Y esto es lo que lee: el informe de Google, entero. Y esto es uno solo. Tenemos casi cincuenta. | Tapa → ventana con la página real que baja; 14 secciones · 18 tablas · 8 gráficos · 7.845 palabras; cartel "Esto es UN informe. Tenemos casi 50." |
+| 11 | 54,0 – 63,0 | Comentá FINANZAS y te mando un código de descuento para usar Warren. | Se tipea FINANZAS; llega el mensaje con el código borroso. |
+| — | 63,0 – 66,0 | (sin voz) | Logo + "Contenido informativo y educativo. No es recomendación de inversión." |
 
 ## Texto corrido (para leer al grabar)
 
-Todos te dicen que uses IA para invertir. Le pregunté esto: Mirá lo que me contestó: ¿Eso es todo?
-El problema no es la IA. Es que no sabe nada de vos. No conoce tu cartera. Ni tu perfil de riesgo. No leyó ningún informe. Ni sabe el precio de hoy.
-Ahí entra Warren. Es la IA de Manfredi, conectada con todo eso.
-Le hice la misma pregunta. Antes de contestar, leyó todo esto. Cuánto vale: trescientos treinta dólares, contra doscientos ochenta de precio. Lo que pesa: invirtió más de lo que generó. Cinco métodos de valuación, cada uno con su peso. Y los dibuja contra el precio de hoy. Tres escenarios, con su probabilidad. Y de dónde sale cada dato.
+Si no usás inteligencia artificial para invertir, estás perdido.
+Pero mirá lo que pasa cuando le preguntás algo concreto.
+El problema no es la IA. Es todo lo que le decís.
+Le falta contexto: no sabe nada de vos. No leyó ningún informe. Tenés que saber escribirle el prompt. Y encima, veinte dólares por mes.
+Esas cuatro cosas no las juntás en ninguna IA.
+Warren las junta todas.
+Le hice la misma pregunta.
+Cuánto vale contra el precio de hoy, cinco métodos de valuación, tres escenarios y de dónde sale cada dato. En segundos.
 Y no me dijo qué comprar. Me mostró cuánto vale y por qué.
-Dos líneas… contra un informe completo.
-Y todo sale de casi cincuenta informes que hacemos a mano. Y Warren los lee por vos.
+Y esto es lo que lee: el informe de Google, entero. Y esto es uno solo. Tenemos casi cincuenta.
 Comentá FINANZAS y te mando un código de descuento para usar Warren.
 
 ## Cómo grabar
@@ -42,5 +37,4 @@ Sin eco, celular a 15-20 cm, de corrido, medio segundo entre frases; si te equiv
 
 ## Pendiente fuera de la nube
 
-- Disparador de SendPulse: comentario que contiene **FINANZAS** → mensaje con el código de descuento real para Warren (no se puede crear desde la nube).
-- El código del video es de relleno y está borroso; no hay porcentaje en pantalla.
+- Disparador de SendPulse: comentario que contiene **FINANZAS** → mensaje con el código de descuento real (no se puede crear desde la nube).

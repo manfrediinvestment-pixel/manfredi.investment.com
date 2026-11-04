@@ -1,66 +1,111 @@
 <template>
   <style>
     #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
-    /* chat genérico: blanco, plano, sin marca. Nada de texto gris. */
-    #g-chat { position: absolute; left: 50px; right: 50px; top: 420px; height: 620px; background: #ffffff; border-radius: 34px; overflow: hidden; color: #0b0f17;
-      box-shadow: 0 50px 100px -30px rgba(0,0,0,.75); }
-    #g-top { height: 92px; border-bottom: 2px solid #E6E9EF; display: flex; align-items: center; padding: 0 34px; gap: 16px; }
-    #g-top .ic { width: 44px; height: 44px; border-radius: 50%; border: 3px solid #0b0f17; }
-    #g-top .bars { margin-left: auto; display: flex; flex-direction: column; gap: 7px; }
-    #g-top .bars i { width: 34px; height: 4px; background: #0b0f17; border-radius: 2px; display: block; }
-    #g-q { position: absolute; right: 34px; top: 130px; background: #EEF1F5; border-radius: 30px 30px 8px 30px; padding: 22px 30px; font-size: 38px; font-weight: 600; line-height: 1.25; white-space: nowrap; }
-    #g-a { position: absolute; left: 34px; right: 30px; top: 300px; font-size: 34px; font-weight: 500; line-height: 1.55; }
-    #g-a div { white-space: nowrap; }
-    #g-dots { position: absolute; left: 40px; top: 322px; display: flex; gap: 12px; }
-    #g-dots i { width: 16px; height: 16px; border-radius: 50%; background: #0b0f17; display: block; }
-    #g-in { position: absolute; left: 34px; right: 34px; bottom: 30px; height: 88px; border: 2px solid #0b0f17; border-radius: 44px; }
-    #g-in .s { position: absolute; right: 10px; top: 9px; width: 66px; height: 66px; border-radius: 50%; background: #0b0f17; }
-    #g-in .s svg { width: 66px; height: 66px; }
-    #g-esto { position: absolute; top: 1075px; left: 0; right: 0; text-align: center; font-family: "DM Serif"; font-style: italic; font-size: 150px; line-height: 1; color: #f2c94c;
-      filter: drop-shadow(0 18px 40px rgba(242,201,76,.35)); }
+    #gk-stage { position: absolute; inset: 0; transform-origin: 50% 47%; }
+    #gk-chart { position: absolute; left: 0; top: 560px; width: 1080px; height: 700px; overflow: visible; }
+    #gk-line { fill: none; stroke: #f2c94c; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 14px rgba(242,201,76,.7)); }
+    .gk-c rect { rx: 3; }
+    .gk-ai { position: absolute; left: 0; top: 0; width: 150px; height: 150px; margin: -75px 0 0 -75px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, rgba(20,38,66,.9), rgba(11,22,41,.95)); border: 2px solid rgba(242,201,76,.45); box-shadow: 0 24px 50px -16px rgba(0,0,0,.8), 0 0 40px -10px rgba(242,201,76,.35); }
+    .gk-ai svg { width: 74px; height: 74px; }
+    .gk-chip { position: absolute; padding: 14px 24px; border-radius: 18px; font-family: "Plex Mono"; font-weight: 700; font-size: 44px; display: flex; align-items: center; gap: 14px; }
+    .gk-chip b { font-family: "Plex Mono"; font-weight: 600; font-size: 24px; letter-spacing: .1em; color: #ead9a4; }
+    .gk-chip .odo { justify-content: flex-start; }
+    #gk-ch1 { left: 60px; top: 470px; color: #EF4444; } #gk-ch2 { right: 60px; top: 1170px; color: #10B981; }
+    #gk-tape { position: absolute; left: 0; top: 1400px; white-space: nowrap; font-family: "Plex Mono"; font-weight: 700; font-size: 34px; letter-spacing: .06em; color: #f6f8fc; }
+    #gk-tape span { margin: 0 26px; } #gk-tape i { font-style: normal; color: #f2c94c; margin-left: 10px; }
+    #gk-burst { position: absolute; left: 540px; top: 900px; width: 160px; height: 160px; margin: -80px 0 0 -80px; border-radius: 50%; background: radial-gradient(circle, #fff6d6, #f2c94c 40%, rgba(242,201,76,0) 70%); opacity: 0; }
+    .gk-ring { position: absolute; left: 540px; top: 900px; width: 240px; height: 240px; margin: -120px 0 0 -120px; border-radius: 50%; border: 5px solid #f2c94c; opacity: 0; }
+    .gk-p { position: absolute; left: 540px; top: 900px; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: #f7dc8a; box-shadow: 0 0 14px #f2c94c; opacity: 0; }
+    #gk-cartel { position: absolute; left: 40px; right: 40px; top: 690px; text-align: center; }
+    #gk-l1 { font-weight: 700; font-size: 66px; letter-spacing: -0.02em; line-height: 1.05; }
+    #gk-l2 { font-family: "DM Serif"; font-style: italic; font-size: 168px; line-height: 1; color: #f2c94c; margin-top: 10px; filter: drop-shadow(0 20px 50px rgba(242,201,76,.4)); }
   </style>
   <div id="root" data-composition-id="gancho" data-width="1080" data-height="1920" data-layout-allow-overlap>
     <div class="bg-aurora"></div><div class="grid"></div>
-    <div id="g-shake">
-      <div id="g-chat">
-        <div id="g-top"><div class="ic"></div><div class="bars"><i></i><i></i><i></i></div></div>
-        <div id="g-q">¿Google está barata después de caer 12%?</div>
-        <div id="g-dots"><i></i><i></i><i></i></div>
-        <div id="g-a"><div>Depende de tu perfil de riesgo y tu horizonte.</div><div>Te recomiendo consultar con un asesor financiero.</div></div>
-        <div id="g-in"><div class="s"><svg viewBox="0 0 66 66"><path d="M33 46V22M23 31l10-10 10 10" stroke="#ffffff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg></div></div>
-      </div>
-      <div id="g-esto">¿Eso es todo?</div>
+    <div id="gk-stage">
+      <svg id="gk-chart" viewBox="0 0 1080 700"><g id="gk-candles"></g><path id="gk-line" d="" /></svg>
+      <div id="gk-ch1" class="gk-chip glass"><b>GOOGL</b><span class="odo" id="gk-o1" data-layout-ignore></span></div>
+      <div id="gk-ch2" class="gk-chip glass"><b>CLOUD</b><span class="odo" id="gk-o2" data-layout-ignore></span></div>
+      <div id="gk-ais"></div>
+      <div id="gk-tape" data-layout-allow-overflow></div>
+      <div id="gk-burst"></div><div class="gk-ring" id="gk-r1"></div><div class="gk-ring" id="gk-r2"></div><div id="gk-ps"></div>
+      <div id="gk-cartel"><div id="gk-l1">Si no usás IA para invertir,</div><div id="gk-l2">estás perdido.</div></div>
     </div>
-    <div class="flash gold" id="g-flash"></div>
+    <div class="flash gold" id="gk-flash"></div>
     <div class="caps"></div>
     <div class="grain"></div>
   </div>
   <script>
     (function () {
-      const MF = window.MF;
+      const MF = window.MF, { clamp, eOut4 } = MF;
       const R = document.querySelector('[data-composition-id="gancho"]');
+      const $ = (s) => R.querySelector(s);
+      // velas (forma decorativa determinista, sin cifras) y línea que sube
+      const N = 22, cw = 1080 / N;
+      let px = 470, svgC = "", pts = [];
+      for (let i = 0; i < N; i++) {
+        const drift = -11 + 34 * Math.sin(i * 1.7) * Math.cos(i * 0.6);
+        const o = px, c = px - 14 + drift * 0.9 - 6, hi = Math.min(o, c) - 22 - 14 * Math.abs(Math.sin(i * 2.3)), lo = Math.max(o, c) + 20 + 12 * Math.abs(Math.cos(i * 1.1));
+        const up = c < o, col = up ? "#f2c94c" : "#EF4444", x = i * cw + cw / 2;
+        svgC += `<g class="gk-c" id="gk-c${i}"><line x1="${x}" x2="${x}" y1="${hi}" y2="${lo}" stroke="${col}" stroke-width="4"/><rect x="${x - cw * 0.3}" y="${Math.min(o, c)}" width="${cw * 0.6}" height="${Math.max(8, Math.abs(c - o))}" fill="${col}"/></g>`;
+        pts.push([x, c]); px = c;
+      }
+      $("#gk-candles").innerHTML = svgC;
+      const line = $("#gk-line");
+      line.setAttribute("d", "M" + pts.map((p) => p[0].toFixed(1) + " " + (p[1] - 60).toFixed(1)).join(" L"));
+      const L = line.getTotalLength(); line.style.strokeDasharray = L;
+      // logos de IA (simple-icons) en blanco y dorado
+      const A = window.AI_LOGOS, keys = Object.keys(A);
+      const POS = [[190, 330], [890, 330], [120, 1010], [960, 1010], [300, 1250], [780, 1250]];
+      $("#gk-ais").innerHTML = keys.map((k, i) => `<div class="gk-ai" id="gk-a${i}"><svg viewBox="0 0 24 24"><path fill="${i % 3 === 1 ? "#f2c94c" : "#f6f8fc"}" d="${A[k].path}"/></svg></div>`).join("");
+      // cinta de tickers (de informes/catalogo.json, sin cifras)
+      const T = "AAPL MSFT GOOGL NVDA AMZN META TSLA MELI JPM KO AVGO NFLX".split(" ");
+      $("#gk-tape").innerHTML = T.concat(T).map((t, i) => `<span>${t}<i>${i % 3 ? "▲" : "▼"}</i></span>`).join("");
+      $("#gk-ps").innerHTML = Array.from({ length: 14 }, (_, i) => `<div class="gk-p" id="gk-p${i}"></div>`).join("");
+      const o1 = MF.odo($("#gk-o1"), ["−", 10, 1, ",", 0.1, 0.01, "%"]), o2 = MF.odo($("#gk-o2"), ["+", 100, 10, 1, "%"]);
       const tl = gsap.timeline({ paused: true });
-      // cuadro 0 = portada: subtítulo y pregunta ya visibles
-      MF.say(tl, R, "g", [["Todos te dicen que uses *IA* para invertir.", 0, 1.9], ["Le pregunté esto:", 1.9, 2.7], ["Mirá lo que me contestó:", 2.7, 3.75]]);
-      tl.fromTo("#g-chat", { scale: 1 }, { scale: 1.035, duration: 3.4, ease: "none" }, 0);
-      tl.to("#g-q", { scale: 1.05, duration: 0.12, ease: "power2.out", transformOrigin: "100% 50%" }, 1.95);
-      tl.to("#g-q", { scale: 1, duration: 0.35, ease: "back.out(3)" }, 2.07);
-      // escribiendo…
-      tl.fromTo("#g-dots", { opacity: 0 }, { opacity: 1, duration: 0.1 }, 2.6);
-      tl.fromTo("#g-dots i", { y: 0 }, { y: -12, duration: 0.14, ease: "power2.out", stagger: { each: 0.08, repeat: 3, yoyo: true } }, 2.65);
-      tl.to("#g-dots", { opacity: 0, duration: 0.04 }, 3.4);
-      // la respuesta aparece de golpe, entera
-      tl.fromTo("#g-a", { opacity: 0 }, { opacity: 1, duration: 0.04, ease: "none" }, 3.42);
-      MF.shake(tl, "#g-chat", 3.42, 6);
-      // ¿Eso es todo?
-      tl.fromTo("#g-esto", { y: -900, scale: 1.5, filter: "blur(14px)", opacity: 0 }, { y: 0, scale: 1, filter: "blur(0px)", opacity: 1, duration: 0.32, ease: "power3.in" }, 3.62);
-      tl.to("#g-esto", { scaleY: 0.86, duration: 0.06, ease: "power2.out", transformOrigin: "50% 100%" }, 3.94);
-      tl.to("#g-esto", { scaleY: 1, duration: 0.5, ease: "elastic.out(1,.45)" }, 4.0);
-      MF.shake(tl, "#g-shake", 3.94, 18);
-      MF.flash(tl, "#g-flash", 3.94);
-      tl.to("#g-chat", { filter: "brightness(.55)", scale: 0.97, duration: 0.3, ease: "power2.out" }, 3.94);
-      tl.to("#g-esto", { rotation: -3, duration: 0.5, ease: "sine.inOut" }, 4.4);
-      tl.to("#g-esto", { rotation: 2, scale: 1.04, duration: 0.5, ease: "sine.inOut" }, 4.9);
+      MF.clock(tl, 6.4, (t) => { o1(12.64 * eOut4(clamp(t / 1.4, 0, 1))); o2(103 * eOut4(clamp((t - 0.3) / 1.4, 0, 1))); });
+      MF.say(tl, R, "gk", [["Si no usás *inteligencia* *artificial*", 0, 1.6], ["para *invertir,*", 1.6, 2.9]]);
+      tl.to(R.querySelector(".caps"), { opacity: 0, filter: "blur(8px)", duration: 0.12 }, 2.88);
+      // golpe de entrada: punch-in + flash desde el cuadro 0
+      tl.fromTo("#gk-stage", { scale: 1.22 }, { scale: 1, duration: 0.55, ease: "expo.out" }, 0);
+      MF.flash(tl, "#gk-flash", 0.02);
+      tl.fromTo("#gk-line", { strokeDashoffset: L * 0.75 }, { strokeDashoffset: 0, duration: 2.3, ease: "power2.out" }, 0);
+      tl.fromTo(".gk-c", { scaleY: 0.2, opacity: 0.4, transformOrigin: "50% 50%" }, { scaleY: 1, opacity: 1, duration: 0.4, ease: "back.out(2)", stagger: 0.06 }, 0);
+      tl.fromTo("#gk-tape", { x: 0 }, { x: -1500, duration: 6.4, ease: "none" }, 0);
+      tl.fromTo("#gk-ch1", { x: -500 }, { x: 0, duration: 0.45, ease: "expo.out" }, 0.05);
+      tl.fromTo("#gk-ch2", { x: 500 }, { x: 0, duration: 0.45, ease: "expo.out" }, 0.2);
+      // los logos entran desde afuera y orbitan
+      keys.forEach((k, i) => {
+        const [x, y] = POS[i], ox = x < 540 ? -260 : 1340, oy = y + (i % 2 ? -200 : 200);
+        tl.fromTo("#gk-a" + i, { x: ox, y: oy, rotation: x < 540 ? -90 : 90, scale: 0.8 }, { x, y, rotation: 0, scale: 1, duration: 0.5, ease: "expo.out" }, 0.02 + i * 0.07);
+        tl.to("#gk-a" + i, { y: y + (i % 2 ? 26 : -26), rotation: i % 2 ? 8 : -8, duration: 1.0, ease: "sine.inOut", yoyo: true, repeat: 1 }, 0.6);
+        // chocan en el centro
+        tl.to("#gk-a" + i, { x: 540, y: 900, scale: 0.35, rotation: x < 540 ? 200 : -200, filter: "blur(6px)", duration: 0.42, ease: "power3.in" }, 2.6 + (i % 3) * 0.03);
+        tl.to("#gk-a" + i, { opacity: 0, duration: 0.05 }, 3.05);
+      });
+      tl.to("#gk-chart", { scale: 0.2, y: 120, opacity: 0, filter: "blur(10px)", duration: 0.42, ease: "power3.in", transformOrigin: "50% 49%" }, 2.62);
+      tl.to(["#gk-ch1", "#gk-ch2"], { x: (i) => (i ? -380 : 380), y: (i) => (i ? -270 : 430), scale: 0.3, opacity: 0, duration: 0.42, ease: "power3.in" }, 2.62);
+      // impacto: se funden en un destello dorado y aparece el cartel
+      tl.set("#gk-burst", { opacity: 1, scale: 0.3 }, 3.04);
+      tl.to("#gk-burst", { scale: 9, opacity: 0, duration: 0.7, ease: "power2.out" }, 3.04);
+      [["#gk-r1", 3.04], ["#gk-r2", 3.16]].forEach(([s, t]) => { tl.set(s, { opacity: 1, scale: 0.3 }, t); tl.to(s, { scale: 5, opacity: 0, duration: 0.8, ease: "power2.out" }, t); });
+      for (let i = 0; i < 14; i++) {
+        const a = (i / 14) * Math.PI * 2, d = 380 + 120 * (i % 3);
+        tl.set("#gk-p" + i, { opacity: 1, x: 0, y: 0 }, 3.04);
+        tl.to("#gk-p" + i, { x: Math.cos(a) * d, y: Math.sin(a) * d + 160, opacity: 0, duration: 0.9, ease: "power2.out" }, 3.04);
+      }
+      MF.flash(tl, "#gk-flash", 3.04);
+      MF.shake(tl, "#gk-stage", 3.06, 22);
+      tl.fromTo("#gk-l1", { opacity: 0, y: -60, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.3, ease: "expo.out" }, 3.0);
+      tl.fromTo("#gk-l2", { y: -900, scale: 1.5, opacity: 0, filter: "blur(14px)" }, { y: 0, scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power3.in" }, 3.12);
+      tl.to("#gk-l2", { scaleY: 0.86, duration: 0.06, ease: "power2.out", transformOrigin: "50% 100%" }, 3.42);
+      tl.to("#gk-l2", { scaleY: 1, duration: 0.5, ease: "elastic.out(1,.45)" }, 3.48);
+      MF.shake(tl, "#gk-stage", 3.43, 16);
+      // nada quieto hasta el latigazo
+      tl.to("#gk-cartel", { scale: 1.06, duration: 2.5, ease: "sine.inOut" }, 3.6);
+      tl.to("#gk-l2", { rotation: -2.5, duration: 1.2, ease: "sine.inOut", yoyo: true, repeat: 1 }, 3.9);
       window.__timelines["gancho"] = tl;
     })();
   </script>

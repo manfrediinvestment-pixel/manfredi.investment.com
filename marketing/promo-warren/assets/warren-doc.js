@@ -20,12 +20,12 @@
   function html() {
     return `
 <div class="wd" style="height:${S.total}px">
-  <section class="wd-s" id="wd-head" style="top:${S.head}px;height:200px">
+  <section data-layout-allow-occlusion class="wd-s" id="wd-head" style="top:${S.head}px;height:200px">
     <div class="wd-k">INFORME · EMPRESA</div>
     <h1>Alphabet Inc. <em>(GOOGL)</em></h1>
     <div class="wd-pos"><i></i>POSTURA: NEUTRAL · SESGO CONSTRUCTIVO</div>
   </section>
-  <section class="wd-s" id="wd-fv" style="top:${S.fv}px;height:300px">
+  <section data-layout-allow-occlusion class="wd-s" id="wd-fv" style="top:${S.fv}px;height:300px">
     <div class="wd-fvrow">
       <div><div class="wd-k">VALOR JUSTO · BLEND</div><div class="wd-big odo" id="wd-fvn" data-layout-ignore></div></div>
       <div class="wd-vs">vs.</div>
@@ -33,22 +33,22 @@
     </div>
     <div class="wd-up" id="wd-up">+18,0% de diferencia</div>
   </section>
-  <section class="wd-s" id="wd-caja" style="top:${S.caja}px;height:420px">
-    <h2>La caja del 3T26</h2>
+  <section data-layout-allow-occlusion class="wd-s" id="wd-caja" style="top:${S.caja}px;height:420px">
+    <h2 data-layout-allow-occlusion>La caja del 3T26</h2>
     <div class="wd-bar"><span>Flujo operativo</span><div class="wd-tr"><i class="g" id="wd-b1"></i></div><b>US$ 42,29 B</b></div>
     <div class="wd-bar"><span>Capex</span><div class="wd-tr"><i class="r" id="wd-b2"></i></div><b>US$ 51,36 B</b></div>
     <div class="wd-fcf" id="wd-fcf">Flujo libre: <b>−US$ 9,07 B</b></div>
     <div class="wd-cloud" id="wd-cloud">Google Cloud <b>+103%</b> · US$ 30,71 B</div>
   </section>
-  <section class="wd-s" id="wd-met" style="top:${S.met}px;height:560px">
-    <h2>Valuación: cinco métodos</h2>
+  <section data-layout-allow-occlusion class="wd-s" id="wd-met" style="top:${S.met}px;height:560px">
+    <h2 data-layout-allow-occlusion>Valuación: cinco métodos</h2>
     <table class="wd-t"><thead><tr><th>Método</th><th>US$</th><th>Peso</th></tr></thead><tbody>
       ${met.map((r) => `<tr class="wd-mr"><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("")}
       <tr class="wd-mr wd-tot"><td>Blend ponderado</td><td>330,28</td><td>100%</td></tr>
     </tbody></table>
   </section>
-  <section class="wd-s" id="wd-ff" style="top:${S.ff}px;height:460px">
-    <h2>Football field de valuación</h2>
+  <section data-layout-allow-occlusion class="wd-s" id="wd-ff" style="top:${S.ff}px;height:460px">
+    <h2 data-layout-allow-occlusion>Football field de valuación</h2>
     <svg class="wd-ffsvg" width="940" height="360" viewBox="0 0 940 360">
       ${ff.map((r, i) => `<text x="0" y="${42 + i * 62}" class="wd-ffl">${r[0]}</text>
         <rect class="wd-ffb" data-x="${FFX(r[1]).toFixed(1)}" data-w="${(FFX(r[2]) - FFX(r[1])).toFixed(1)}" x="${FFX(r[1]).toFixed(1)}" y="${18 + i * 62}" width="0" height="32" rx="8"/>`).join("")}
@@ -58,13 +58,13 @@
       <text class="wd-ffvt" x="${FFX(330.28) + 8}" y="350">Blend 330</text>
     </svg>
   </section>
-  <section class="wd-s" id="wd-esc" style="top:${S.esc}px;height:400px">
-    <h2>Escenarios (DCF)</h2>
+  <section data-layout-allow-occlusion class="wd-s" id="wd-esc" style="top:${S.esc}px;height:400px">
+    <h2 data-layout-allow-occlusion>Escenarios (DCF)</h2>
     ${esc.map((r) => `<div class="wd-er"><span>${r[0]}</span><b>US$ ${r[1]}</b><div class="wd-tr"><i style="background:${r[3]}" data-p="${r[2]}"></i></div><em>${r[2]}%</em></div>`).join("")}
     <div class="wd-ev" id="wd-ev">Valor esperado ponderado: <b>US$ 257,15</b></div>
   </section>
-  <section class="wd-s" id="wd-src" style="top:${S.src}px;height:330px">
-    <h2>Fuentes</h2>
+  <section data-layout-allow-occlusion class="wd-s" id="wd-src" style="top:${S.src}px;height:330px">
+    <h2 data-layout-allow-occlusion>Fuentes</h2>
     <ul class="wd-ul">
       <li>Precio: cierre del 30-oct-2026, Nasdaq</li>
       <li>Resultados 3T26: 8-K en la SEC, 28-oct-2026</li>
@@ -72,7 +72,7 @@
       <li>Consenso: TipRanks, posterior al reporte</li>
     </ul>
   </section>
-  <section class="wd-s" id="wd-end" style="top:${S.end}px;height:110px">
+  <section data-layout-allow-occlusion class="wd-s" id="wd-end" style="top:${S.end}px;height:110px">
     <p class="wd-disc">Análisis educativo de Manfredi Investment. No constituye asesoramiento financiero regulado.</p>
   </section>
 </div>`;

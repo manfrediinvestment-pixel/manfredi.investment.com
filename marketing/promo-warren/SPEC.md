@@ -1,52 +1,62 @@
-# Promo Warren — "El problema no es la IA. Es el contexto."
+# Promo Warren v2 — "El problema no es la IA. Es todo lo que le decís."
 
-Video vertical 1080x1920, 30 fps, 69,4 s. Proyecto HyperFrames (`build_index.py` → `index.html`).
+Video vertical 1080x1920, 30 fps, 66,0 s. Proyecto HyperFrames (`build_index.py` → `index.html`).
 Rama `claude/promo-warren`. Sistema visual, movimiento y sonido: skill `reel-noticia` (secciones 4, 5, 6, 6b, 8b).
+
+## Escenas (segundo de entrada)
+
+| # | Escena | Entra | Qué pasa |
+|---|---|---|---|
+| 1 | `gancho` | 0,0 | Punch-in + flash en el cuadro 0; logos de IA (Claude, Anthropic, Google Gemini, Perplexity, Meta, Mistral AI) orbitando entre velas, línea que sube, cinta de tickers y dos odómetros; todo choca en el centro (destello, temblor, esquirlas) y cae el cartel "Si no usás IA para invertir, estás perdido." |
+| 2 | `pregunta` | 6,0 | Chat blanco genérico sin marca: se tipea la pregunta, la respuesta de 2 líneas aparece de golpe, queda congelado y cae el cartel "El problema no es la IA. Es todo lo que le decís." |
+| 3 | `contexto` | 12,0 | Caen CONTEXTO, FUENTES, PROMPT y PRECIO; cada uno se agrieta con su ✗ y al final se parten en dos; cartel "No los podés juntar en una sola IA."; entra el botón dorado de Warren y crece hasta llenar la pantalla. |
+| 4 | `revelacion` | 22,0 | Sin latigazo: el dorado se recoge en el avatar de Warren; las mitades vuelven y se rearman; un cable dorado por casillero, ✗ → ✓ verde y la frase nueva. |
+| 5 | `respuesta` | 27,0 | Misma pregunta a Warren: tecleo rápido, ráfaga de lo que leyó, y el informe (`assets/warren-doc.js`) baja de corrido con punch-ins de 0,5 s; cierra con "No te digo qué comprar. Te muestro cuánto vale y por qué." |
+| 6 | `real` | 42,0 | La tapa de GOOGL se abre en una ventana con la página REAL de `informes/googl.html`, que baja de punta a punta mientras corre el contador; cartel "Esto es UN informe. Tenemos casi 50." |
+| 7 | `comenta` | 54,0 | Comentá FINANZAS → mensaje con el código de descuento borroso, sin porcentaje. |
+| 8 | `logo` | 63,0 | Logo + "Contenido informativo y educativo. No es recomendación de inversión." Fin 66,0. |
+
+Se eliminaron las escenas `contraste` (pantalla partida) e `informes` (biblioteca).
 
 ## De dónde sale cada número
 
 | Dato en pantalla | Valor | Fuente |
 |---|---|---|
-| Pregunta "¿Google está barata después de caer 12%?" | −12,64% el 29-oct-2026 | `informes/googl.html` (resumen: "la acción cayó −12.64% el 29-oct-2026, de $324.89 a $283.82") |
-| Valor justo (blend ponderado) | US$ 330,28 | `informes/googl.html`, portada y tabla de síntesis de la sección 13 |
-| Precio de referencia | US$ 279,84, cierre del 30-oct-2026 | `informes/googl.html` ("Precio de referencia: cierre del 30-oct-2026 ($279.84, Yahoo Finance / Nasdaq)") |
-| Diferencia | +18,0% | `informes/googl.html` ("$330.28 vs. $279.84 mercado · +18.0%") |
-| Postura | Neutral con sesgo constructivo | `informes/googl.html`, portada (Warren nunca dice comprar/vender: `workers/warren/prompt.js`) |
-| Flujo operativo 3T26 / Capex 3T26 / Flujo libre | US$ 42,29 B / US$ 51,36 B / −US$ 9,07 B | `informes/googl.html`, tabla de flujo de caja (8-K, Exhibit 99.1) |
-| Google Cloud | +103%, US$ 30,71 B | `informes/googl.html`, resumen ejecutivo |
-| 5 métodos y pesos | DCF base 210,03 (7,5%) · Suma de partes 316,22 (7,5%) · Comparables 369,36 (25%) · Reversión histórica 280,43 (35%) · Consenso 401,29 (25%) | `informes/googl.html`, "Síntesis: los cinco métodos y el blend ponderado" |
-| Football field (rangos) | DCF 67,21–486,12 · Comparables 265,11–504,42 · Suma de partes 316,22–346,01 · Reversión 272,65–288,20 · Consenso 300–490; líneas en 279,84 y 330,28 | `informes/googl.html`, datos de `footballChart` |
-| Escenarios (DCF) | Bajista 67,21 (25%) · Base 210,03 (45%) · Alcista 486,12 (30%) · valor esperado ponderado 257,15 | `informes/googl.html`, sección 13 (DCF por escenarios) |
-| Fecha del informe | 2-nov-2026 | `informes/catalogo.json` (`GOOGL.f = 2026-11-02`) y `git log` del archivo (commit 441054c, 2026-11-02) |
-| Fuentes listadas | Nasdaq 30-oct · 8-K SEC 28-oct · informe Manfredi 2-nov · TipRanks post-reporte | las que cita el propio informe |
-| "casi 50 informes" / odómetro 49 | 49 | `informes/catalogo.json` tiene 49 entradas (48 empresas + FOMC) al 4-nov-2026 |
-| Lomos de la biblioteca | los 49 tickers del catálogo, en su orden | `informes/catalogo.json`; logos `assets/logos/mono/` |
-| Contraste: "2 líneas · 16 palabras · 0 datos" | 16 | respuesta genérica del guion, contada a mano |
-| Contraste: "148 palabras · 2 tablas · 2 gráficos" | 148 | texto de la respuesta de Warren (`assets/warren-doc.js`) contado con node (144 + los 2 valores del odómetro "US$ 330,28" y "US$ 279,84"). Tablas: métodos y escenarios. Gráficos: barras de caja y football field |
+| Pregunta "…después de caer 12%?" y odómetro GOOGL del gancho | −12,64% | `informes/googl.html` (caída del 29-oct-2026, de $324.89 a $283.82) |
+| Odómetro CLOUD del gancho | +103% | `informes/googl.html` (Google Cloud +103%, a $30.71 mil millones) |
+| Velas y línea del gancho | sin cifras | forma decorativa determinista: no representa ningún precio |
+| Cinta de tickers | sin cifras | tickers de `informes/catalogo.json`; las flechas son decorativas |
+| "USD 20 por mes" | 20 | guion del user (precio típico de una suscripción de IA; no sale del repo) |
+| "Incluido en la membresía" | sin número | por pedido del user no se muestra el precio de la membresía |
+| Valor justo / precio / diferencia | US$ 330,28 / US$ 279,84 (cierre 30-oct-2026) / +18,0% | `informes/googl.html`, portada y sección 13 |
+| Caja 3T26 | flujo operativo US$ 42,29 B · capex US$ 51,36 B · flujo libre −US$ 9,07 B | `informes/googl.html`, tabla de flujo de caja (8-K, Exhibit 99.1) |
+| 5 métodos y pesos | DCF base 210,03 (7,5%) · Suma de partes 316,22 (7,5%) · Comparables 369,36 (25%) · Reversión histórica 280,43 (35%) · Consenso 401,29 (25%) | `informes/googl.html`, síntesis de la sección 13 |
+| Football field | rangos de los datos de `footballChart`; líneas en 279,84 y 330,28 | `informes/googl.html` |
+| Escenarios | Bajista 67,21 (25%) · Base 210,03 (45%) · Alcista 486,12 (30%) · esperado 257,15 | `informes/googl.html`, DCF por escenarios |
+| Fecha del informe | 2-nov-2026 | `informes/catalogo.json` (`GOOGL.f`) |
+| Contador del informe real | 14 secciones · 18 tablas · 8 gráficos · 7.845 palabras | `informes/catalogo.json` (`GOOGL`: secs 14, tb 18, ch 8, w 7845). Verificado sobre el HTML renderizado: 14 `h2`, 18 `table`, 8 `canvas`/`.chartbox` (innerText: 7.832 palabras) |
+| "24.658 px de alto" | 24.658 | alto de la página completa capturada a 1080 px de ancho |
+| "casi 50" | 49 | `informes/catalogo.json` tiene 49 entradas (48 empresas + FOMC) |
+
+## Cómo se capturó el informe real
+
+1. `python3 -m http.server 8765` en la raíz del repo.
+2. `puppeteer-core` (npm, en el scratchpad) con `/usr/bin/google-chrome` headless, viewport 1080x1920, `fullPage: true` sobre `http://127.0.0.1:8765/informes/googl.html`.
+3. Durante la captura se bloqueó la carga de `informes/_preview-gate.js` (intercepción de requests) para que no difumine la página; el archivo NO se tocó. También se bloqueó cualquier request externo (fuentes de Google): la página usa las fuentes de respaldo.
+4. Resultado 1080x24.658 px, cortado en 13 tiras de 2.000 px (`assets/googl/t00.jpg`…`t12.jpg`, JPG calidad 72, 3,1 MB).
+
+## Logos de IA
+
+`npm i simple-icons` (CC0) en el scratchpad; los paths SVG se copiaron a `assets/ai-logos.js`. Pedidos: claude, anthropic, googlegemini, perplexity, meta, mistralai — están los seis. Monocromo blanco/dorado. Solo aparecen en el gancho; el chat que contesta poco sigue sin marca.
 
 ## Reglas aplicadas
 
-- Chat genérico sin marca (sin nombres ni logos), blanco y plano, texto casi negro `#0b0f17` (nada de gris). En el contraste se rotula "UNA IA CUALQUIERA".
-- La respuesta de Warren lleva el rótulo fijo "Recreación con datos del informe Manfredi de GOOGL (2-nov-2026)" en el encabezado del panel y termina con la línea de cierre real del prompt ("Análisis educativo de Manfredi Investment. No constituye asesoramiento financiero regulado.").
-- Remate: "No te digo qué comprar. Te muestro cuánto vale y por qué."
-- Descuento sin porcentaje; el código ("WARREN-K7Q2", de relleno) aparece siempre borroso.
-- Aviso final: "Contenido informativo y educativo. No es recomendación de inversión."
-- Todo local: GSAP en `assets/gsap.min.js`, fuentes en `assets/fonts/`, sonidos en `assets/sfx/` (los del piloto).
+- Cero texto gris (chat genérico con texto `#0b0f17`; rótulos chicos en champagne `#ead9a4`).
+- Warren nunca dice comprar ni vender; rótulo "Recreación con datos del informe Manfredi de GOOGL (2-nov-2026)".
+- Código de descuento de relleno, siempre borroso, sin porcentaje.
+- Todo local (GSAP, fuentes, sonidos, logos, captura).
 
-## Estilo tomado de la web
+## Pendiente
 
-- Botón dorado flotante (`.warren-fab`, `.warren-badge` con "W", etiqueta "Preguntale a Warren") → escena 2→3.
-- Panel de Warren (`.warren-header` #080c18, avatar `conic-gradient` de `.warren-avatar`, nombre en DM Serif dorado, punto verde, botón de enviar `linear-gradient(155deg,#F7CE4E,#F2784B)`).
-- Respuesta en estilo Lector (`assets/lector/lector.css`: fondo #0b1629, líneas rgba(214,226,244,.10/.18), serif + mono, dorado).
-- Biblioteca (`assets/informes/estanteria.css`): lomos `.spn` con filetes dorados, colores de serie `FONDO`, y la tapa `.est-cover` en el atril.
-
-## Escenas (segundo de entrada)
-
-gancho 0 · contexto 5,0 · revelacion 12,8 (sin latigazo: el botón crece y se vuelve el fondo) · respuesta 18,4 · contraste 44,0 · informes 50,0 · comenta 57,8 · logo 65,9 · fin 69,4.
-
-## Pendiente / notas
-
-- `marketing/reel-gota.html` no existe en el repo (ni en otra rama): la escena de comentario se armó desde `comenta.html` del piloto de Google.
-- No hay sonido de "disco que se frena" en la biblioteca local: el "¿Eso es todo?" usa el golpe seco (`impact-bass-1`).
-- Falta la voz del user; al grabarla, resincronizar con la sección 7 de la skill.
-- El disparador de SendPulse para FINANZAS y el código real de descuento hay que crearlos desde la PC.
+- Grabar la voz y resincronizar (skill, sección 7).
+- Disparador de SendPulse para FINANZAS y código real (no se puede desde la nube).

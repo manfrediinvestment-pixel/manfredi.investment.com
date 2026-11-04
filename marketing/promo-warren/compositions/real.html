@@ -1,0 +1,109 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    /* tapa en el atril (assets/informes/estanteria.css: .est-cover) */
+    #rl-cov { position: absolute; left: 360px; top: 650px; width: 360px; height: 504px; border-radius: 3px 9px 9px 3px; overflow: hidden; color: #f3f6fb;
+      background: radial-gradient(70% 45% at 50% 38%, rgba(230,207,150,.10), transparent 70%), linear-gradient(180deg, #16223a 0%, #0a1222 46%, #05080f 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 60px 90px -30px rgba(0,0,0,.95), 0 0 80px -10px rgba(242,201,76,.35); }
+    #rl-cov::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 12px; background: linear-gradient(90deg, rgba(0,0,0,.55), rgba(255,255,255,.08) 55%, rgba(0,0,0,.35)); }
+    #rl-cov .fr { position: absolute; inset: 22px 22px 22px 34px; border: 1px solid rgba(230,207,150,.22); }
+    #rl-cov .in { position: absolute; inset: 0; padding: 40px 40px 40px 52px; display: flex; flex-direction: column; }
+    #rl-cov .tp { display: flex; justify-content: space-between; font-family: "Plex Mono"; font-weight: 600; font-size: 18px; letter-spacing: .2em; color: #e6cf96; }
+    #rl-cov .mk { flex: 1; display: grid; place-items: center; }
+    #rl-cov .mk img { width: 130px; height: 130px; object-fit: contain; }
+    #rl-cov .rule { width: 34px; height: 1px; background: #e6cf96; margin-bottom: 16px; }
+    #rl-cov .t { font-family: "DM Serif"; font-size: 62px; line-height: .9; }
+    #rl-cov .n { font-family: "DM Serif"; font-style: italic; font-size: 28px; margin-top: 8px; color: #e6cf96; }
+    /* ventana con la página real */
+    #rl-win { position: absolute; left: 50px; top: 400px; width: 720px; height: 920px; border-radius: 20px; overflow: hidden; background: #ffffff;
+      border: 2px solid rgba(242,201,76,.6); box-shadow: 0 50px 100px -30px rgba(0,0,0,.85), 0 0 60px -14px rgba(242,201,76,.4); }
+    #rl-bar { position: absolute; left: 0; right: 0; top: 0; height: 56px; background: #080c18; display: flex; align-items: center; gap: 10px; padding: 0 18px; z-index: 2; }
+    #rl-bar i { width: 13px; height: 13px; border-radius: 50%; background: #f2c94c; display: block; }
+    #rl-bar span { margin-left: 12px; font-family: "Plex Mono"; font-weight: 600; font-size: 20px; color: #f6f8fc; white-space: nowrap; }
+    #rl-vp { position: absolute; left: 0; right: 0; top: 56px; bottom: 0; overflow: hidden; }
+    #rl-page { position: absolute; left: 0; top: 0; width: 720px; }
+    #rl-page img { display: block; width: 720px; height: auto; }
+    /* contador al costado */
+    #rl-side { position: absolute; left: 795px; top: 400px; width: 250px; }
+    .rl-st { margin-bottom: 30px; }
+    .rl-st b { display: block; font-family: "Plex Mono"; font-weight: 600; font-size: 22px; letter-spacing: .12em; color: #ead9a4; }
+    .rl-st .odo { justify-content: flex-start; font-family: "Plex Mono"; font-weight: 700; font-size: 64px; letter-spacing: -0.03em; color: #f6f8fc; margin-top: 4px; }
+    #rl-s3 .odo { color: #f2c94c; }
+    #rl-prog { position: absolute; left: 795px; top: 1010px; width: 8px; height: 300px; border-radius: 4px; background: rgba(226,234,245,.12); overflow: hidden; }
+    #rl-prog i { position: absolute; left: 0; right: 0; top: 0; height: 100%; background: linear-gradient(180deg, #f7dc8a, #f2c94c); transform-origin: 50% 0; border-radius: 4px; }
+    #rl-px { position: absolute; left: 825px; top: 1010px; width: 220px; font-family: "Plex Mono"; font-weight: 600; font-size: 22px; line-height: 1.3; color: #ead9a4; }
+    #rl-scrim { position: absolute; inset: 0; background: rgba(4,8,16,.72); opacity: 0; }
+    #rl-cartel { position: absolute; left: 80px; right: 80px; top: 640px; padding: 40px 40px 44px; border-radius: 30px; text-align: center; background: linear-gradient(170deg, #142a4a, #0b1629);
+      border: 2px solid #f2c94c; box-shadow: 0 0 80px -10px rgba(242,201,76,.45), 0 40px 80px -30px rgba(0,0,0,.9); }
+    #rl-k1 { font-family: "DM Serif"; font-size: 84px; line-height: 1.02; }
+    #rl-k1 em { color: #f2c94c; font-style: normal; font-family: "Plex Sans"; font-weight: 700; }
+    #rl-k2 { margin-top: 18px; font-weight: 700; font-size: 58px; letter-spacing: -0.02em; }
+    #rl-k2 em { font-family: "DM Serif"; font-weight: 400; color: #f2c94c; font-size: 1.15em; }
+  </style>
+  <div id="root" data-composition-id="real" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div id="rl-shake">
+      <div id="rl-win"><div id="rl-bar"><i></i><i></i><i></i><span>manfredinvestment.com/informes/googl</span></div>
+        <div id="rl-vp"><div id="rl-page" data-layout-ignore></div></div></div>
+      <div id="rl-side">
+        <div class="rl-st" id="rl-s0"><b>SECCIONES</b><div class="odo" id="rl-o0" data-layout-ignore></div></div>
+        <div class="rl-st" id="rl-s1"><b>TABLAS</b><div class="odo" id="rl-o1" data-layout-ignore></div></div>
+        <div class="rl-st" id="rl-s2"><b>GRÁFICOS</b><div class="odo" id="rl-o2" data-layout-ignore></div></div>
+        <div class="rl-st" id="rl-s3"><b>PALABRAS</b><div class="odo" id="rl-o3" data-layout-ignore></div></div>
+      </div>
+      <div id="rl-prog"><i></i></div>
+      <div id="rl-px">24.658 px de alto</div>
+      <div id="rl-cov"><div class="fr"></div><div class="in">
+        <div class="tp"><span>BIG TECH</span><span>3T26</span></div>
+        <div class="mk"><img src="assets/logos/googl.png" alt="" /></div>
+        <div class="rule"></div><div class="t">GOOGL</div><div class="n">Alphabet Inc.</div></div></div>
+      <div id="rl-scrim"></div>
+      <div id="rl-cartel"><div id="rl-k1">Esto es <em>UN</em> informe.</div><div id="rl-k2">Tenemos <em>casi 50.</em></div></div>
+    </div>
+    <div class="flash gold" id="rl-flash"></div>
+    <div class="caps"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
+      const R = document.querySelector('[data-composition-id="real"]');
+      const $ = (s) => R.querySelector(s);
+      // captura de página completa de informes/googl.html (1080 x 24.658 px) cortada en 13 tiras
+      $("#rl-page").innerHTML = Array.from({ length: 13 }, (_, i) => `<img src="assets/googl/t${String(i).padStart(2, "0")}.jpg" alt="" />`).join("");
+      const PAGE = 24658 * (720 / 1080), VP = 920 - 56;
+      // conteo real del HTML (= informes/catalogo.json: secs 14, tb 18, ch 8, w 7845)
+      const o = [MF.odo($("#rl-o0"), [10, 1]), MF.odo($("#rl-o1"), [10, 1]), MF.odo($("#rl-o2"), [1]), MF.odo($("#rl-o3"), [1000, ".", 100, 10, 1])];
+      const FIN = [14, 18, 8, 7845];
+      const S0 = 2.2, S1 = 8.6; // el scroll va de punta a punta en este tramo
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 12.4, (t) => {
+        const k = clamp((t - S0) / (S1 - S0), 0, 1);
+        FIN.forEach((v, i) => o[i](Math.round(v * k)));
+        $("#rl-prog i").style.transform = `scaleY(${k})`;
+      });
+      MF.say(tl, R, "rl", [["Y esto es lo que *lee:*", 0.05, 1.7], ["el informe de *Google,* entero.", 1.7, 8.9]]);
+      tl.to(R.querySelector(".caps"), { opacity: 0, duration: 0.12 }, 8.9);
+      // la tapa llega y se abre en una ventana que se expande
+      tl.fromTo("#rl-cov", { x: 900, rotationY: -70, transformPerspective: 1600, filter: "blur(10px)" }, { x: 0, rotationY: -14, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, 0.1);
+      tl.to("#rl-cov", { rotationY: 8, y: -10, duration: 0.8, ease: "sine.inOut" }, 0.65);
+      tl.to("#rl-cov", { rotationY: -100, x: -160, opacity: 0, duration: 0.4, ease: "power3.in", transformOrigin: "0% 50%" }, 1.45);
+      tl.fromTo("#rl-win", { x: 130, y: 42, scaleX: 0.5, scaleY: 0.55, opacity: 0 }, { x: 0, y: 0, scaleX: 1, scaleY: 1, opacity: 1, duration: 0.55, ease: "expo.out" }, 1.55);
+      tl.fromTo("#rl-side .rl-st", { opacity: 0, x: 120 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out", stagger: 0.08 }, 1.8);
+      tl.fromTo(["#rl-prog", "#rl-px"], { opacity: 0 }, { opacity: 1, duration: 0.3 }, 2.0);
+      // la página real baja de punta a punta
+      tl.fromTo("#rl-page", { y: 0 }, { y: -(PAGE - VP), duration: S1 - S0, ease: "power1.inOut" }, S0);
+      tl.to("#rl-win", { scale: 1.02, duration: 3.2, ease: "sine.inOut", yoyo: true, repeat: 1 }, S0);
+      // "Esto es UN informe. Tenemos casi 50."
+      tl.to("#rl-scrim", { opacity: 1, duration: 0.25 }, 8.85);
+      tl.fromTo("#rl-cartel", { y: -1500, rotation: -7, filter: "blur(14px)" }, { y: 0, rotation: -1.5, filter: "blur(0px)", duration: 0.3, ease: "power3.in" }, 8.9);
+      tl.to("#rl-cartel", { scaleY: 0.9, duration: 0.06, ease: "power2.out", transformOrigin: "50% 100%" }, 9.2);
+      tl.to("#rl-cartel", { scaleY: 1, rotation: 0, duration: 0.55, ease: "elastic.out(1,.45)" }, 9.26);
+      MF.shake(tl, "#rl-shake", 9.2, 18);
+      MF.flash(tl, "#rl-flash", 9.2);
+      tl.fromTo("#rl-k2", { opacity: 0, y: 40, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(2.4)" }, 10.3);
+      tl.to("#rl-cartel", { scale: 1.05, duration: 2.0, ease: "sine.inOut" }, 10.0);
+      window.__timelines["real"] = tl;
+    })();
+  </script>
+</template>
