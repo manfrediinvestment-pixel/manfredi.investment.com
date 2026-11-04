@@ -1,0 +1,73 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #c-chat { position: absolute; left: 50px; top: 420px; width: 980px; height: 620px; background: #ffffff; border-radius: 34px; overflow: hidden; color: #0b0f17;
+      box-shadow: 0 50px 100px -30px rgba(0,0,0,.75); transform-origin: 50% 0%; }
+    #c-chat .top { height: 92px; border-bottom: 2px solid #E6E9EF; display: flex; align-items: center; padding: 0 34px; }
+    #c-chat .top i { width: 44px; height: 44px; border-radius: 50%; border: 3px solid #0b0f17; display: block; }
+    #c-chat .q { position: absolute; right: 34px; top: 130px; background: #EEF1F5; border-radius: 30px 30px 8px 30px; padding: 22px 30px; font-size: 38px; font-weight: 600; white-space: nowrap; }
+    #c-chat .a { position: absolute; left: 34px; top: 300px; font-size: 34px; font-weight: 500; line-height: 1.55; }
+    #c-chat .a div { white-space: nowrap; }
+    #c-c0 { left: 70px; top: 760px; } #c-c1 { left: 680px; top: 760px; }
+    #c-c2 { left: 70px; top: 1020px; } #c-c3 { left: 680px; top: 1020px; }
+    #c-tag { position: absolute; left: 0; right: 0; top: 820px; text-align: center; font-family: "DM Serif"; font-style: italic; font-size: 64px; color: #f2c94c; }
+    /* botón flotante de Warren (index.html: .warren-fab) */
+    #c-fab { position: absolute; left: 0; top: 0; width: 170px; height: 170px; margin: -85px 0 0 -85px; border-radius: 50%;
+      background: linear-gradient(155deg, #f2c94c, #B8943F); box-shadow: 0 20px 60px -10px rgba(242,201,76,.75); display: flex; align-items: center; justify-content: center; }
+    #c-fab svg { width: 70px; height: 70px; }
+    #c-badge { position: absolute; top: -4px; right: -4px; width: 52px; height: 52px; border-radius: 50%; background: #080c18; border: 3px solid #f2c94c; color: #f2c94c;
+      font-family: "Plex Mono"; font-weight: 700; font-size: 28px; display: flex; align-items: center; justify-content: center; }
+    #c-ring { position: absolute; inset: -18px; border-radius: 50%; border: 4px solid rgba(242,201,76,.6); }
+    #c-flab { position: absolute; left: 0; top: 0; background: #080c18; border: 2px solid rgba(242,201,76,.55); color: #f2c94c; font-weight: 700; font-size: 34px;
+      padding: 16px 30px; border-radius: 40px; white-space: nowrap; }
+    #c-fill { position: absolute; left: 540px; top: 860px; width: 200px; height: 200px; margin: -100px 0 0 -100px; border-radius: 50%; background: radial-gradient(circle, #f7dc8a, #f2c94c 45%, #B8943F); opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="contexto" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-panel"></div><div class="grid"></div>
+    <div id="c-chat"><div class="top"><i></i></div><div class="q">¿Google está barata después de caer 12%?</div>
+      <div class="a"><div>Depende de tu perfil de riesgo y tu horizonte.</div><div>Te recomiendo consultar con un asesor financiero.</div></div></div>
+    <div id="c-cards"></div>
+    <div id="c-flab">Preguntale a Warren</div>
+    <div id="c-fab"><div id="c-ring"></div><svg viewBox="0 0 24 24" fill="#0A0F1E"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z" /></svg><div id="c-badge">W</div></div>
+    <div id="c-fill"></div>
+    <div class="flash" id="c-flash"></div>
+    <div class="caps"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF;
+      const R = document.querySelector('[data-composition-id="contexto"]');
+      R.querySelector("#c-cards").innerHTML = [0, 1, 2, 3].map((i) => window.CTX.card(i, "c-c" + i)).join("");
+      const tl = gsap.timeline({ paused: true });
+      MF.say(tl, R, "c", [["El problema no es la *IA.*", 0.05, 1.35], ["Es que no sabe *nada* de vos.", 1.35, 2.8],
+        ["No conoce tu *cartera.*", 2.8, 3.9], ["Ni tu perfil de *riesgo.*", 3.9, 5.0], ["No leyó ningún *informe.*", 5.0, 6.1], ["Ni sabe el precio de *hoy.*", 6.1, 6.9]]);
+      // el chat genérico se encoge y sube
+      tl.fromTo("#c-chat", { scale: 1, y: 0 }, { scale: 0.5, y: -20, duration: 0.7, ease: "expo.inOut" }, 1.4);
+      tl.to("#c-chat", { rotation: -2, duration: 4, ease: "sine.inOut" }, 2.1);
+      // caen los cuatro casilleros, cada uno con su ✗
+      [2.85, 3.95, 5.05, 6.1].forEach((t, i) => {
+        const c = "#c-c" + i;
+        tl.fromTo(c, { y: -1700, filter: "blur(14px)", rotation: i % 2 ? 6 : -6 }, { y: 0, filter: "blur(0px)", rotation: 0, duration: 0.36, ease: "power3.in" }, t);
+        tl.to(c, { scaleY: 0.9, duration: 0.06, ease: "power2.out", transformOrigin: "50% 100%" }, t + 0.36);
+        tl.to(c, { scaleY: 1, duration: 0.5, ease: "elastic.out(1,.45)" }, t + 0.42);
+        tl.fromTo(c + " .mk.x", { scale: 0, rotation: -90 }, { scale: 1, rotation: 0, duration: 0.32, ease: "back.out(3)" }, t + 0.5);
+        tl.to(c, { borderColor: "rgba(239,68,68,.75)", duration: 0.1 }, t + 0.5);
+        tl.to(c, { rotation: i % 2 ? -1.5 : 1.5, duration: 0.6, ease: "sine.inOut" }, t + 0.9);
+      });
+      MF.flash(tl, "#c-flash", 6.62);
+      // entra el botón dorado de Warren desde la esquina, como en la web
+      const fab = R.querySelector("#c-fab");
+      tl.fromTo(fab, { x: 1250, y: 2050, scale: 0.6, rotation: 120 }, { x: 540, y: 860, scale: 1, rotation: 0, duration: 0.42, ease: "expo.out" }, 6.7);
+      tl.fromTo("#c-ring", { scale: 0.9, opacity: 0.8 }, { scale: 1.6, opacity: 0, duration: 0.5, ease: "power2.out" }, 6.95);
+      tl.fromTo("#c-flab", { x: 1250, y: 1030, opacity: 0 }, { x: 330, y: 970, opacity: 1, duration: 0.36, ease: "expo.out" }, 6.8);
+      tl.to("#c-flab", { opacity: 0, y: 1000, duration: 0.15, ease: "power2.in" }, 7.25);
+      tl.to(["#c-c0", "#c-c1", "#c-c2", "#c-c3", "#c-chat"], { scale: 0.9, filter: "blur(4px)", duration: 0.35, ease: "power2.in" }, 7.2);
+      // el botón crece hasta ser el mundo de la escena siguiente
+      tl.to("#c-badge", { opacity: 0, duration: 0.1 }, 7.25);
+      tl.set("#c-fill", { opacity: 1, scale: 0.85 }, 7.3);
+      tl.to("#c-fill", { scale: 26, duration: 0.48, ease: "expo.in" }, 7.32);
+      window.__timelines["contexto"] = tl;
+    })();
+  </script>
+</template>

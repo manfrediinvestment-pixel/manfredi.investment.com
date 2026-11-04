@@ -1,0 +1,67 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    /* chat genérico: blanco, plano, sin marca. Nada de texto gris. */
+    #g-chat { position: absolute; left: 50px; right: 50px; top: 420px; height: 620px; background: #ffffff; border-radius: 34px; overflow: hidden; color: #0b0f17;
+      box-shadow: 0 50px 100px -30px rgba(0,0,0,.75); }
+    #g-top { height: 92px; border-bottom: 2px solid #E6E9EF; display: flex; align-items: center; padding: 0 34px; gap: 16px; }
+    #g-top .ic { width: 44px; height: 44px; border-radius: 50%; border: 3px solid #0b0f17; }
+    #g-top .bars { margin-left: auto; display: flex; flex-direction: column; gap: 7px; }
+    #g-top .bars i { width: 34px; height: 4px; background: #0b0f17; border-radius: 2px; display: block; }
+    #g-q { position: absolute; right: 34px; top: 130px; background: #EEF1F5; border-radius: 30px 30px 8px 30px; padding: 22px 30px; font-size: 38px; font-weight: 600; line-height: 1.25; white-space: nowrap; }
+    #g-a { position: absolute; left: 34px; right: 30px; top: 300px; font-size: 34px; font-weight: 500; line-height: 1.55; }
+    #g-a div { white-space: nowrap; }
+    #g-dots { position: absolute; left: 40px; top: 322px; display: flex; gap: 12px; }
+    #g-dots i { width: 16px; height: 16px; border-radius: 50%; background: #0b0f17; display: block; }
+    #g-in { position: absolute; left: 34px; right: 34px; bottom: 30px; height: 88px; border: 2px solid #0b0f17; border-radius: 44px; }
+    #g-in .s { position: absolute; right: 10px; top: 9px; width: 66px; height: 66px; border-radius: 50%; background: #0b0f17; }
+    #g-in .s svg { width: 66px; height: 66px; }
+    #g-esto { position: absolute; top: 1075px; left: 0; right: 0; text-align: center; font-family: "DM Serif"; font-style: italic; font-size: 150px; line-height: 1; color: #f2c94c;
+      filter: drop-shadow(0 18px 40px rgba(242,201,76,.35)); }
+  </style>
+  <div id="root" data-composition-id="gancho" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div id="g-shake">
+      <div id="g-chat">
+        <div id="g-top"><div class="ic"></div><div class="bars"><i></i><i></i><i></i></div></div>
+        <div id="g-q">¿Google está barata después de caer 12%?</div>
+        <div id="g-dots"><i></i><i></i><i></i></div>
+        <div id="g-a"><div>Depende de tu perfil de riesgo y tu horizonte.</div><div>Te recomiendo consultar con un asesor financiero.</div></div>
+        <div id="g-in"><div class="s"><svg viewBox="0 0 66 66"><path d="M33 46V22M23 31l10-10 10 10" stroke="#ffffff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg></div></div>
+      </div>
+      <div id="g-esto">¿Eso es todo?</div>
+    </div>
+    <div class="flash gold" id="g-flash"></div>
+    <div class="caps"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF;
+      const R = document.querySelector('[data-composition-id="gancho"]');
+      const tl = gsap.timeline({ paused: true });
+      // cuadro 0 = portada: subtítulo y pregunta ya visibles
+      MF.say(tl, R, "g", [["Todos te dicen que uses *IA* para invertir.", 0, 1.9], ["Le pregunté esto:", 1.9, 2.7], ["Mirá lo que me contestó:", 2.7, 3.75]]);
+      tl.fromTo("#g-chat", { scale: 1 }, { scale: 1.035, duration: 3.4, ease: "none" }, 0);
+      tl.to("#g-q", { scale: 1.05, duration: 0.12, ease: "power2.out", transformOrigin: "100% 50%" }, 1.95);
+      tl.to("#g-q", { scale: 1, duration: 0.35, ease: "back.out(3)" }, 2.07);
+      // escribiendo…
+      tl.fromTo("#g-dots", { opacity: 0 }, { opacity: 1, duration: 0.1 }, 2.6);
+      tl.fromTo("#g-dots i", { y: 0 }, { y: -12, duration: 0.14, ease: "power2.out", stagger: { each: 0.08, repeat: 3, yoyo: true } }, 2.65);
+      tl.to("#g-dots", { opacity: 0, duration: 0.04 }, 3.4);
+      // la respuesta aparece de golpe, entera
+      tl.fromTo("#g-a", { opacity: 0 }, { opacity: 1, duration: 0.04, ease: "none" }, 3.42);
+      MF.shake(tl, "#g-chat", 3.42, 6);
+      // ¿Eso es todo?
+      tl.fromTo("#g-esto", { y: -900, scale: 1.5, filter: "blur(14px)", opacity: 0 }, { y: 0, scale: 1, filter: "blur(0px)", opacity: 1, duration: 0.32, ease: "power3.in" }, 3.62);
+      tl.to("#g-esto", { scaleY: 0.86, duration: 0.06, ease: "power2.out", transformOrigin: "50% 100%" }, 3.94);
+      tl.to("#g-esto", { scaleY: 1, duration: 0.5, ease: "elastic.out(1,.45)" }, 4.0);
+      MF.shake(tl, "#g-shake", 3.94, 18);
+      MF.flash(tl, "#g-flash", 3.94);
+      tl.to("#g-chat", { filter: "brightness(.55)", scale: 0.97, duration: 0.3, ease: "power2.out" }, 3.94);
+      tl.to("#g-esto", { rotation: -3, duration: 0.5, ease: "sine.inOut" }, 4.4);
+      tl.to("#g-esto", { rotation: 2, scale: 1.04, duration: 0.5, ease: "sine.inOut" }, 4.9);
+      window.__timelines["gancho"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,84 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #r-bg { position: absolute; inset: 0; background: radial-gradient(55% 32% at 50% 42%, rgba(242,201,76,.30), transparent 72%), radial-gradient(90% 60% at 50% 45%, #14233f 0%, #080c18 70%); }
+    #r-av { position: absolute; left: 450px; top: 690px; width: 180px; height: 180px; font-size: 104px; box-shadow: 0 0 80px 10px rgba(242,201,76,.35); }
+    #r-avw { display: block; line-height: 1; margin-top: -6px; }
+    .r-ring { position: absolute; left: 450px; top: 690px; width: 180px; height: 180px; border-radius: 50%; border: 3px solid rgba(242,201,76,.55); opacity: 0; }
+    #r-gold { position: absolute; left: 540px; top: 780px; width: 200px; height: 200px; margin: -100px 0 0 -100px; border-radius: 50%; background: radial-gradient(circle, #f7dc8a, #f2c94c 45%, #B8943F); }
+    #r-name { position: absolute; top: 885px; left: 0; right: 0; text-align: center; font-family: "DM Serif"; font-size: 74px; color: #f2c94c; line-height: 1; }
+    #r-sub { position: absolute; top: 975px; left: 0; right: 0; text-align: center; font-family: "Plex Mono"; font-weight: 600; font-size: 24px; letter-spacing: .12em; color: #ead9a4; }
+    #r-sub i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #10B981; box-shadow: 0 0 10px #10B981; margin-right: 10px; vertical-align: 1px; }
+    #r-c0 { left: 40px; top: 440px; } #r-c1 { left: 710px; top: 440px; }
+    #r-c2 { left: 40px; top: 1100px; } #r-c3 { left: 710px; top: 1100px; }
+    .ctx .mk.ok { opacity: 0; }
+    #r-wires { position: absolute; inset: 0; overflow: visible; }
+    #r-wires path { fill: none; stroke: #f2c94c; stroke-width: 5; stroke-linecap: round; filter: drop-shadow(0 0 8px rgba(242,201,76,.7)); }
+    .r-pulse { position: absolute; left: 0; top: 0; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: #f7dc8a; box-shadow: 0 0 18px 6px rgba(242,201,76,.8); opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="revelacion" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div id="r-bg"></div><div class="grid"></div>
+    <svg id="r-wires" width="1080" height="1920" viewBox="0 0 1080 1920">
+      <path id="r-w0" d="M205 610 L205 735 Q205 760 230 760 L452 760" />
+      <path id="r-w1" d="M875 610 L875 735 Q875 760 850 760 L628 760" />
+      <path id="r-w2" d="M205 1100 L205 825 Q205 800 230 800 L452 800" />
+      <path id="r-w3" d="M875 1100 L875 825 Q875 800 850 800 L628 800" />
+    </svg>
+    <div class="r-ring" id="r-ring1"></div><div class="r-ring" id="r-ring2"></div>
+    <div id="r-av" class="wv-av"><span id="r-avw">W</span></div>
+    <div id="r-name">Warren</div>
+    <div id="r-sub"><i></i>LA IA DE MANFREDI INVESTMENT</div>
+    <div id="r-cards"></div>
+    <div class="r-pulse" id="r-p0"></div><div class="r-pulse" id="r-p1"></div><div class="r-pulse" id="r-p2"></div><div class="r-pulse" id="r-p3"></div>
+    <div id="r-gold"></div>
+    <div class="flash gold" id="r-flash"></div>
+    <div class="caps"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF;
+      const R = document.querySelector('[data-composition-id="revelacion"]');
+      R.querySelector("#r-cards").innerHTML = [0, 1, 2, 3].map((i) => window.CTX.card(i, "r-c" + i, true)).join("");
+      const tl = gsap.timeline({ paused: true });
+      MF.say(tl, R, "r", [["Ahí entra *Warren.*", 0.15, 1.5], ["Es la IA de *Manfredi,*", 1.5, 2.9], ["conectada con *todo* *eso.*", 2.9, 5.5]]);
+      // el dorado que llenaba la pantalla se recoge en el avatar de Warren
+      tl.fromTo("#r-gold", { scale: 26 }, { scale: 0.9, duration: 0.55, ease: "expo.out" }, 0);
+      tl.to("#r-gold", { opacity: 0, duration: 0.12 }, 0.5);
+      tl.fromTo("#r-av", { scale: 0.6 }, { scale: 1, duration: 0.5, ease: "back.out(2.4)" }, 0.45);
+      tl.fromTo("#r-avw", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3, ease: "expo.out" }, 0.5);
+      tl.fromTo("#r-name", { opacity: 0, y: 40, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 0.6);
+      tl.fromTo("#r-sub", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 0.78);
+      // los cuatro casilleros llegan desde las esquinas, todavía con su ✗
+      [[-700, -900], [700, -900], [-700, 1000], [700, 1000]].forEach(([x, y], i) =>
+        tl.fromTo("#r-c" + i, { x, y, rotation: x < 0 ? -20 : 20, filter: "blur(12px)" }, { x: 0, y: 0, rotation: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 0.95 + i * 0.1));
+      // se enchufan: la línea dorada se dibuja, clic, la ✗ pasa a ✓
+      const W = [0, 1, 2, 3].map((i) => R.querySelector("#r-w" + i));
+      W.forEach((p) => { const L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; });
+      [2.9, 3.3, 3.7, 4.1].forEach((t, i) => {
+        const L = W[i].getTotalLength();
+        tl.fromTo(W[i], { strokeDashoffset: L }, { strokeDashoffset: 0, duration: 0.28, ease: "power2.inOut" }, t);
+        tl.to("#r-c" + i + " .mk.x", { scale: 0, rotation: 90, duration: 0.14, ease: "power2.in" }, t + 0.2);
+        tl.fromTo("#r-c" + i + " .mk.ok", { opacity: 0, scale: 0, rotation: -90 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.32, ease: "back.out(3)" }, t + 0.3);
+        tl.to("#r-c" + i, { borderColor: "rgba(242,201,76,.8)", boxShadow: "0 0 40px -6px rgba(242,201,76,.55)", duration: 0.2 }, t + 0.3);
+        tl.to("#r-c" + i, { scale: 1.06, duration: 0.08, ease: "power2.out" }, t + 0.3);
+        tl.to("#r-c" + i, { scale: 1, duration: 0.4, ease: "back.out(3)" }, t + 0.38);
+        tl.to("#r-av", { scale: 1.08, duration: 0.07, ease: "power2.out" }, t + 0.28);
+        tl.to("#r-av", { scale: 1, duration: 0.35, ease: "back.out(3)" }, t + 0.35);
+        // pulso que viaja por el cable hacia Warren
+        const pu = R.querySelector("#r-p" + i);
+        const st = { k: 0 };
+        tl.fromTo(st, { k: 0 }, { k: 1, duration: 0.5, ease: "power1.in", onUpdate() { const pt = W[i].getPointAtLength(st.k * L); pu.style.transform = `translate(${pt.x}px, ${pt.y}px)`; } }, t + 0.35);
+        tl.fromTo(pu, { opacity: 0 }, { opacity: 1, duration: 0.05 }, t + 0.35);
+        tl.to(pu, { opacity: 0, duration: 0.08 }, t + 0.82);
+      });
+      MF.flash(tl, "#r-flash", 4.75);
+      [["#r-ring1", 4.75], ["#r-ring2", 5.0]].forEach(([s, t]) => { tl.set(s, { scale: 1, opacity: 0.9 }, t); tl.to(s, { scale: 2.6, opacity: 0, duration: 0.9, ease: "power2.out" }, t); });
+      tl.to("#r-av", { scale: 1.12, duration: 0.12, ease: "power2.out" }, 4.75);
+      tl.to("#r-av", { scale: 1, duration: 0.5, ease: "elastic.out(1,.4)" }, 4.87);
+      tl.to(["#r-c0", "#r-c1"], { y: -10, duration: 0.6, ease: "sine.inOut", yoyo: true, repeat: 1 }, 4.7);
+      tl.to(["#r-c2", "#r-c3"], { y: 10, duration: 0.6, ease: "sine.inOut", yoyo: true, repeat: 1 }, 4.7);
+      window.__timelines["revelacion"] = tl;
+    })();
+  </script>
+</template>

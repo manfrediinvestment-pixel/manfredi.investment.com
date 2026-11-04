@@ -1,0 +1,93 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #i-num { position: absolute; top: 390px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 180px; letter-spacing: -0.04em; color: #f2c94c;
+      filter: drop-shadow(0 0 30px rgba(242,201,76,.35)); }
+    #i-lab { position: absolute; top: 585px; left: 0; right: 0; text-align: center; font-family: "Plex Mono"; font-weight: 600; font-size: 26px; letter-spacing: .16em; color: #ead9a4; }
+    #i-casi { position: absolute; top: 420px; left: 700px; font-family: "DM Serif"; font-style: italic; font-size: 58px; color: #0a1322; background: #f2c94c; padding: 6px 26px 10px;
+      border-radius: 18px; box-shadow: 0 16px 36px -10px rgba(242,201,76,.7); white-space: nowrap; }
+    .i-board { position: absolute; left: 50px; right: 50px; height: 22px; border-radius: 4px; background: linear-gradient(180deg, #3a2a12, #1c140a); box-shadow: 0 18px 30px -10px rgba(0,0,0,.9); }
+    #i-b1 { top: 950px; } #i-b2 { top: 1262px; }
+    /* lomo (assets/informes/estanteria.css: .spn) */
+    .spn { position: absolute; width: 36px; height: 260px; display: flex; flex-direction: column; align-items: center; padding: 12px 0 10px; border-radius: 2px 2px 1px 1px;
+      background: linear-gradient(90deg, rgba(0,0,0,.5) 0, rgba(255,255,255,.13) 16%, rgba(255,255,255,.02) 38%, rgba(0,0,0,.12) 76%, rgba(0,0,0,.55) 100%), var(--deep);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 2px 0 4px -1px rgba(0,0,0,.6); transform-origin: 50% 100%; }
+    .spn img { width: 24px; height: 24px; object-fit: contain; flex: none; }
+    .spn .gilt { flex: none; width: 64%; height: 4px; margin: 9px 0; border-top: 1px solid rgba(230,207,150,.75); border-bottom: 1px solid rgba(230,207,150,.75); }
+    .spn .tk { flex: 1; writing-mode: vertical-rl; display: flex; align-items: center; justify-content: center; font-family: "DM Serif"; font-size: 21px; letter-spacing: .05em; color: #ffffff; white-space: nowrap; }
+    .spn .fx { font-family: "Plex Mono"; font-weight: 700; font-size: 11px; color: #e6cf96; height: 24px; display: flex; align-items: center; }
+    /* tapa en el atril (.est-cover) */
+    #i-cov { position: absolute; left: 360px; top: 650px; width: 360px; height: 504px; border-radius: 3px 9px 9px 3px; overflow: hidden; color: #f3f6fb;
+      background: radial-gradient(70% 45% at 50% 38%, rgba(230,207,150,.10), transparent 70%), linear-gradient(180deg, #16223a 0%, #0a1222 46%, #05080f 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 60px 90px -30px rgba(0,0,0,.95), 0 0 80px -10px rgba(242,201,76,.35); }
+    #i-cov::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 12px; background: linear-gradient(90deg, rgba(0,0,0,.55), rgba(255,255,255,.08) 55%, rgba(0,0,0,.35)); }
+    #i-cov .fr { position: absolute; inset: 22px 22px 22px 34px; border: 1px solid rgba(230,207,150,.22); }
+    #i-cov .in { position: absolute; inset: 0; padding: 40px 40px 40px 52px; display: flex; flex-direction: column; }
+    #i-cov .tp { display: flex; justify-content: space-between; font-family: "Plex Mono"; font-weight: 600; font-size: 16px; letter-spacing: .2em; color: #e6cf96; }
+    #i-cov .mk { flex: 1; display: grid; place-items: center; }
+    #i-cov .mk img { width: 130px; height: 130px; object-fit: contain; }
+    #i-cov .rule { width: 34px; height: 1px; background: #e6cf96; margin-bottom: 16px; }
+    #i-cov .t { font-family: "DM Serif"; font-size: 62px; line-height: .9; }
+    #i-cov .n { font-family: "DM Serif"; font-style: italic; font-size: 26px; margin-top: 8px; color: #e6cf96; }
+    #i-glow { position: absolute; left: 240px; top: 600px; width: 600px; height: 640px; background: radial-gradient(closest-side, rgba(242,201,76,.28), transparent); opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="informes" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div id="i-num" class="odo" data-layout-ignore></div>
+    <div id="i-lab">INFORMES PROPIOS · HECHOS A MANO</div>
+    <div id="i-casi">casi 50</div>
+    <div id="i-shelf"><div class="i-board" id="i-b1"></div><div class="i-board" id="i-b2"></div><div id="i-spines" data-layout-ignore></div></div>
+    <div id="i-glow"></div>
+    <div id="i-cov"><div class="fr"></div><div class="in">
+      <div class="tp"><span>BIG TECH</span><span>3T26</span></div>
+      <div class="mk"><img src="assets/logos/googl.png" alt="" /></div>
+      <div class="rule"></div><div class="t">GOOGL</div><div class="n">Alphabet Inc.</div></div></div>
+    <div class="flash gold" id="i-flash"></div>
+    <div class="caps"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
+      const R = document.querySelector('[data-composition-id="informes"]');
+      // informes/catalogo.json (49 informes al 4-nov-2026), en su orden
+      const T = ["AAPL","ADBE","AMD","AMZN","ARM","ASML","AVGO","AXP","BAC","BRK.B","C","CRM","CRWD","DIS","FOMC","GOOGL","GS","INTC","INTU","JNJ","JPM","KO","LLY","MA","MELI","META","MS","MSFT","MU","NFLX","NOW","NVDA","ORCL","PEP","PG","PLTR","QCOM","SAP","SHOP","SNOW","SPOT","TSLA","TSM","TXN","UBER","UNH","V","WFC","WMT"];
+      const SEC = { bigtech: "AAPL AMZN GOOGL META MSFT NFLX TSLA MELI", semis: "AMD ARM ASML AVGO INTC MU NVDA QCOM TSM TXN",
+        software: "ADBE CRM CRWD INTU NOW ORCL PLTR SAP SHOP SNOW SPOT UBER", bancos: "AXP BAC BRK.B C GS JPM MA MS V WFC", defensivos: "DIS JNJ KO LLY PEP PG UNH WMT FOMC" };
+      const FONDO = { semis: "#1a2f4a", software: "#14295e", bigtech: "#0a1222", bancos: "#0c3a2b", defensivos: "#4a3810" };
+      const sec = (t) => Object.keys(SEC).find((k) => SEC[k].split(" ").includes(t));
+      const box = R.querySelector("#i-spines");
+      box.innerHTML = T.map((t, i) => {
+        const row = i < 25 ? 0 : 1, col = row ? i - 25 : i, n = row ? 24 : 25;
+        const x = 540 - (n * 38) / 2 + col * 38, y = row ? 1002 : 690;
+        const cap = t === "FOMC" ? '<div class="fx">FED</div>' : `<img src="assets/logos/${t.toLowerCase().replace(".", "-")}.png" alt="" />`;
+        return `<div class="spn" id="i-s${i}" style="left:${x}px;top:${y}px;--deep:${FONDO[sec(t)]}">${cap}<div class="gilt"></div><div class="tk">${t}</div></div>`;
+      }).join("");
+      const sN = MF.odo(R.querySelector("#i-num"), [10, 1]);
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 8.2, (t) => sN(49 * clamp((t - 0.55) / 2.45, 0, 1)));
+      MF.say(tl, R, "i", [["Y todo sale de casi *50* informes", 0.05, 2.4], ["que hacemos a *mano.*", 2.4, 4.4], ["Y Warren los *lee* por vos.", 4.4, 7.8]]);
+      // lluvia de lomos: caen de a uno y rebotan al apoyar
+      T.forEach((t, i) => {
+        const at = 0.55 + i * 0.05;
+        tl.fromTo("#i-s" + i, { y: -1500, filter: "blur(10px)" }, { y: 0, filter: "blur(0px)", duration: 0.34, ease: "power3.in" }, at);
+        tl.to("#i-s" + i, { scaleY: 0.9, duration: 0.05, ease: "power2.out" }, at + 0.34);
+        tl.to("#i-s" + i, { scaleY: 1, duration: 0.4, ease: "elastic.out(1,.4)" }, at + 0.39);
+      });
+      tl.fromTo("#i-lab", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 0.6);
+      // "casi 50" cae con golpe junto al número
+      tl.fromTo("#i-casi", { y: -900, rotation: -20, opacity: 0 }, { y: 0, rotation: -7, opacity: 1, duration: 0.3, ease: "power3.in" }, 3.1);
+      tl.to("#i-casi", { rotation: 4, duration: 0.6, ease: "elastic.out(1,.3)" }, 3.4);
+      MF.flash(tl, "#i-flash", 3.4);
+      // el lomo de GOOGL sale del estante y pasa al atril como tapa
+      tl.to("#i-s15", { y: -60, filter: "brightness(1.4)", duration: 0.3, ease: "back.out(2)" }, 4.35);
+      tl.to("#i-shelf", { filter: "brightness(.45) blur(2px)", duration: 0.5 }, 4.7);
+      tl.to("#i-s15", { opacity: 0, duration: 0.1 }, 4.75);
+      tl.fromTo("#i-cov", { x: 113, y: -82, scale: 0.12, rotationY: 80, opacity: 0, transformPerspective: 1600 },
+        { x: 0, y: 0, scale: 1, rotationY: -14, opacity: 1, duration: 0.7, ease: "expo.out" }, 4.75);
+      tl.fromTo("#i-glow", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 4.9);
+      tl.to("#i-cov", { rotationY: 10, y: -14, duration: 2.2, ease: "sine.inOut" }, 5.5);
+      window.__timelines["informes"] = tl;
+    })();
+  </script>
+</template>
