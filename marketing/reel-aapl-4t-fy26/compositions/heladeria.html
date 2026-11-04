@@ -1,0 +1,189 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #h-shake { position: absolute; inset: 0; }
+    #h-shop { position: absolute; inset: 0; transform-origin: 50% 330px; }
+    /* toldo a rayas con borde festoneado */
+    #h-awn { position: absolute; left: 140px; top: 330px; width: 800px; height: 96px; transform-origin: 50% 0%; }
+    #h-awn .cloth { position: absolute; inset: 0 0 26px 0; border-radius: 10px 10px 0 0;
+      background: repeating-linear-gradient(90deg, #f2c94c 0 50px, #1f3d68 50px 100px); box-shadow: 0 20px 30px -16px rgba(0,0,0,.7); }
+    #h-awn .scal { position: absolute; left: 0; right: 0; bottom: 0; height: 26px;
+      background: radial-gradient(circle at 25px 0, #f2c94c 24px, transparent 25px) 0 0 / 100px 26px repeat-x,
+                  radial-gradient(circle at 25px 0, #1f3d68 24px, transparent 25px) 50px 0 / 100px 26px repeat-x; }
+    #h-awn .rod { position: absolute; left: -14px; right: -14px; top: -10px; height: 14px; border-radius: 7px; background: linear-gradient(#ead9a4, #B8943F); }
+    #h-sign { position: absolute; left: 50%; top: 466px; width: 470px; height: 112px; margin-left: -235px; transform-origin: 50% -40px; }
+    #h-sign .chain { position: absolute; top: -40px; width: 3px; height: 42px; background: linear-gradient(#ead9a4, #B8943F); }
+    #h-sign .board { position: absolute; inset: 0; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, #1c3354, #0b1830); border: 2px solid #B8943F; box-shadow: 0 30px 50px -20px rgba(0,0,0,.7), inset 0 0 0 6px rgba(242,201,76,.08); }
+    #h-sign .t { font-family: "DM Serif"; font-style: italic; font-size: 64px; line-height: 1; color: #f2c94c; }
+    #h-sign .s { font-family: "Plex Mono"; font-weight: 600; font-size: 17px; letter-spacing: .3em; color: #ead9a4; margin-top: 6px; }
+    /* freezer / vitrina */
+    #h-frz { position: absolute; left: 70px; top: 640px; width: 540px; height: 230px; }
+    #h-frz .box { position: absolute; inset: 0; border-radius: 18px; background: linear-gradient(180deg, #2a4a78, #12233b); border: 2px solid rgba(226,234,245,.28);
+      box-shadow: 0 34px 50px -20px rgba(0,0,0,.8); }
+    #h-frz .glass2 { position: absolute; left: 18px; right: 18px; top: 16px; height: 120px; border-radius: 12px; background: linear-gradient(180deg, rgba(190,225,255,.22), rgba(190,225,255,.06));
+      border: 1px solid rgba(226,234,245,.35); overflow: hidden; }
+    #h-frz .shine { position: absolute; top: -20px; left: -120px; width: 70px; height: 200px; background: rgba(255,255,255,.18); transform: rotate(20deg); }
+    #h-frz .lab { position: absolute; left: 0; right: 0; bottom: 22px; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 22px; letter-spacing: .2em; color: #ead9a4; }
+    .tub { position: absolute; bottom: 10px; width: 100px; height: 82px; }
+    .tub .sc { position: absolute; left: 6px; right: 6px; top: 0; height: 60px; border-radius: 50% 50% 14px 14px / 70% 70% 14px 14px; }
+    .tub .cup { position: absolute; left: 0; right: 0; bottom: 0; height: 34px; border-radius: 6px; background: linear-gradient(180deg, #e9edf4, #b9c3d3); }
+    /* cola de clientes */
+    .guy { position: absolute; top: 912px; width: 92px; height: 176px; }
+    .guy .hd { position: absolute; left: 18px; top: 0; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(160deg, #ead9a4, #c9a861); }
+    .guy .bd { position: absolute; left: 0; top: 62px; width: 92px; height: 114px; border-radius: 40px 40px 12px 12px; border: 2px solid rgba(242,201,76,.35); }
+    #h-qpill { position: absolute; top: 1112px; left: 0; right: 0; margin: 0 auto; width: fit-content; border-color: rgba(16,185,129,.5); }
+    #h-qpill b { color: #10B981; }
+    /* insumos con etiqueta de precio */
+    #h-cream { position: absolute; left: 670px; top: 700px; width: 150px; height: 160px; }
+    #h-cream .lid { position: absolute; left: -6px; right: -6px; top: 0; height: 24px; border-radius: 8px; background: linear-gradient(#f6f8fc, #cfd7e4); }
+    #h-cream .bdy { position: absolute; left: 0; right: 0; top: 20px; bottom: 0; border-radius: 0 0 18px 18px; background: linear-gradient(90deg, #dfe5ee, #f6f8fc 45%, #c3cddd);
+      display: flex; align-items: center; justify-content: center; font-family: "Plex Mono"; font-weight: 700; font-size: 24px; color: #0a1322; letter-spacing: .1em; }
+    #h-cones { position: absolute; left: 860px; top: 690px; width: 150px; height: 170px; }
+    .ptag { position: absolute; top: -66px; left: 50%; margin-left: -62px; width: 124px; padding: 6px 0; border-radius: 10px; text-align: center; transform-origin: 50% -24px;
+      background: #EF4444; color: #fff; font-family: "Plex Mono"; font-weight: 700; font-size: 24px; box-shadow: 0 12px 24px -10px rgba(239,68,68,.7); }
+    .ptag::before { content: ""; position: absolute; left: 50%; top: -24px; width: 2px; height: 24px; background: #ead9a4; }
+    .arrow-up { position: absolute; font-family: "Plex Mono"; font-weight: 700; font-size: 40px; color: #EF4444; opacity: 0; }
+    /* la caja */
+    #h-reg { position: absolute; left: 110px; right: 110px; top: 880px; height: 390px; padding: 24px 34px; }
+    #h-reg .hd { font-family: "Plex Mono"; font-weight: 600; font-size: 21px; letter-spacing: .14em; color: #ead9a4; display: flex; justify-content: space-between; }
+    #h-reg .row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 18px; }
+    #h-reg .row .k { font-size: 30px; font-weight: 600; color: #f6f8fc; }
+    #h-reg .row .k small { display: block; font-family: "Plex Mono"; font-size: 17px; font-weight: 600; letter-spacing: .08em; color: #ead9a4; }
+    #h-reg .row .v { font-family: "Plex Mono"; font-weight: 700; font-size: 58px; letter-spacing: -0.03em; }
+    #h-before .v { color: #10B981; } #h-after .v { color: #EF4444; }
+    #h-reg .div { height: 2px; background: rgba(234,217,164,.35); margin-top: 14px; transform-origin: left center; }
+    #h-res { position: absolute; left: 0; right: 0; top: 1176px; text-align: center; }
+    #h-res .badge { font-size: 50px; padding: 8px 28px; }
+  </style>
+  <div id="root" data-composition-id="heladeria" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div id="h-shake">
+      <div class="hdr" id="h-h1"><span class="w">Es</span><span class="w">como</span><span class="w">una</span><span class="w em" data-acc="gold">heladería</span></div>
+      <div class="hdr" id="h-h2"><span class="w">con</span><span class="w em" data-acc="green">cola</span><span class="w">a</span><span class="w">la</span><span class="w">vuelta</span><span class="w">de</span><span class="w">la</span><span class="w">manzana,</span></div>
+      <div class="hdr" id="h-h3"><span class="w">pero</span><span class="w">con</span><span class="w">la</span><span class="w em" data-acc="gold">crema</span><span class="w">y</span><span class="w">los</span><span class="w em" data-acc="gold">cucuruchos</span></div>
+      <div class="hdr" id="h-h4"><span class="w">cada</span><span class="w">vez</span><span class="w em" data-acc="red">más</span><span class="w em" data-acc="red">caros.</span></div>
+      <div class="hdr" id="h-h5"><span class="w">De</span><span class="w">cada</span><span class="w">100</span><span class="w">pesos,</span><span class="w">le</span><span class="w">quedaban</span><span class="w em" data-acc="green">49.</span></div>
+      <div class="hdr" id="h-h6"><span class="w">Ahora,</span><span class="w em" data-acc="red">45</span><span class="w em" data-acc="red">y</span><span class="w em" data-acc="red">medio.</span></div>
+
+      <div id="h-shop">
+        <div id="h-awn"><div class="rod"></div><div class="cloth"></div><div class="scal"></div></div>
+        <div id="h-sign"><div class="chain" style="left: 70px"></div><div class="chain" style="right: 70px"></div>
+          <div class="board"><div class="t">Heladería</div><div class="s">APPLE · DESDE 1976</div></div></div>
+
+        <div id="h-frz"><div class="box"></div>
+          <div class="glass2"><div class="shine" id="h-shine"></div>
+            <div class="tub" id="h-u1" style="left: 18px"><div class="sc" style="background: radial-gradient(70% 60% at 40% 30%, #ffd1dc, #f08aa6)"></div><div class="cup"></div></div>
+            <div class="tub" id="h-u2" style="left: 140px"><div class="sc" style="background: radial-gradient(70% 60% at 40% 30%, #b98563, #6e4126)"></div><div class="cup"></div></div>
+            <div class="tub" id="h-u3" style="left: 262px"><div class="sc" style="background: radial-gradient(70% 60% at 40% 30%, #d4f7e8, #6fd1ab)"></div><div class="cup"></div></div>
+            <div class="tub" id="h-u4" style="left: 384px"><div class="sc" style="background: radial-gradient(70% 60% at 40% 30%, #fff6d8, #f2d58a)"></div><div class="cup"></div></div>
+          </div>
+          <div class="lab">FREEZER · TEMPORADA ALTA</div>
+        </div>
+
+        <div id="h-cream"><div class="lid"></div><div class="bdy">CREMA</div><div class="ptag" id="h-t1">▲ $$</div></div>
+        <svg id="h-cones" viewBox="0 0 150 170">
+          <g fill="#d9a35b" stroke="#9a6a2c" stroke-width="3" stroke-linejoin="round">
+            <path d="M20 40 L75 160 L130 40 Z" /><path d="M20 28 L75 148 L130 28 Z" /><path d="M20 16 L75 136 L130 16 Z" />
+          </g>
+          <path d="M40 26 L110 26 M48 50 L102 50 M57 74 L93 74" stroke="#9a6a2c" stroke-width="3" />
+        </svg>
+        <div class="ptag" id="h-t2" style="left: 935px; top: 624px; margin-left: -62px;">▲ $$</div>
+        <div class="arrow-up" id="h-a1" style="left: 690px; top: 640px">▲</div>
+        <div class="arrow-up" id="h-a2" style="left: 1000px; top: 640px">▲</div>
+
+        <div class="guy" id="h-g1" style="left: 80px"><div class="hd"></div><div class="bd" style="background: linear-gradient(180deg, #3A5B8C, #1A2F4A)"></div></div>
+        <div class="guy" id="h-g2" style="left: 210px"><div class="hd"></div><div class="bd" style="background: linear-gradient(180deg, #2C4A70, #12233b)"></div></div>
+        <div class="guy" id="h-g3" style="left: 340px"><div class="hd"></div><div class="bd" style="background: linear-gradient(180deg, #4a6fa5, #1f3d68)"></div></div>
+        <div class="guy" id="h-g4" style="left: 470px"><div class="hd"></div><div class="bd" style="background: linear-gradient(180deg, #3A5B8C, #1A2F4A)"></div></div>
+        <div class="guy" id="h-g5" style="left: 600px"><div class="hd"></div><div class="bd" style="background: linear-gradient(180deg, #2C4A70, #12233b)"></div></div>
+        <div class="guy" id="h-g6" style="left: 730px"><div class="hd"></div><div class="bd" style="background: linear-gradient(180deg, #4a6fa5, #1f3d68)"></div></div>
+        <div class="guy" id="h-g7" style="left: 860px"><div class="hd"></div><div class="bd" style="background: linear-gradient(180deg, #3A5B8C, #1A2F4A)"></div></div>
+        <div class="guy" id="h-g8" style="left: 990px"><div class="hd"></div><div class="bd" style="background: linear-gradient(180deg, #2C4A70, #12233b)"></div></div>
+        <div id="h-qpill" class="pill">LA COLA: <b>VENTAS RÉCORD</b> PARA DICIEMBRE (+7% A +10%)</div>
+      </div>
+
+      <div id="h-reg" class="glass">
+        <div class="hd"><span>DE CADA $100 QUE COBRA</span><span>LE QUEDA</span></div>
+        <div class="row" id="h-before"><div class="k">Antes<small>AÑO FISCAL 2026 · MARGEN 48,8%</small></div><div class="v odo" id="h-vb" data-layout-ignore></div></div>
+        <div class="row" id="h-after"><div class="k">Ahora<small>GUÍA OCT–DIC · 45%–46%</small></div><div class="v odo" id="h-va" data-layout-ignore></div></div>
+        <div class="div" id="h-div"></div>
+      </div>
+      <div id="h-res"><span class="badge red" id="h-resb">−$3,30 por cada $100</span></div>
+      <div class="src" id="h-src">Apple 8-K 2-nov-2026: margen bruto FY26 48,8%; guía oct–dic 45%–46% (punto medio 45,5%) por el costo de la memoria</div>
+    </div>
+    <div class="flash" id="h-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
+      const R = document.querySelector('[data-composition-id="heladeria"]');
+      const $ = (s) => R.querySelector(s);
+      const peso = ["$", 10, 1, ",", 0.1, 0.01];
+      const sB = MF.odo($("#h-vb"), peso), sA = MF.odo($("#h-va"), peso);
+      const guys = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => $("#h-g" + i));
+      const ARR = guys.map((_, i) => 1.45 + i * 0.16);   // segundo en que cada cliente llega a su lugar
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 12.2, (t) => {
+        sB(40 + 8.8 * eOut4(clamp((t - 7.3) / 1.0, 0, 1)));
+        sA(48.8 - 3.3 * eOut4(clamp((t - 9.15) / 1.0, 0, 1)));
+        // la cola: caminan desde la derecha, con el vaivén del paso, y después esperan balanceándose
+        guys.forEach((g, i) => {
+          const u = clamp((t - (ARR[i] - 0.7)) / 0.7, 0, 1);
+          const x = (1 - eOut4(u)) * 1150;
+          const walking = u > 0 && u < 1;
+          const bob = walking ? -Math.abs(Math.sin(t * 16 + i)) * 16 : Math.sin(t * 2.4 + i * 1.3) * 3;
+          const lean = walking ? -4 : Math.sin(t * 1.8 + i) * 1.5;
+          g.style.transform = `translate(${x}px, ${bob}px) rotate(${lean}deg)`;
+        });
+        $("#h-shine").style.transform = `translateX(${((t * 260) % 900)}px) rotate(20deg)`;
+      });
+      MF.captions(tl, R, [["#h-h1", 0.04, 1.4], ["#h-h2", 1.4, 3.4], ["#h-h3", 3.4, 5.2], ["#h-h4", 5.2, 6.6], ["#h-h5", 6.6, 9.0], ["#h-h6", 9.0, 11.6]]);
+
+      // el toldo cae, rebota, y el cartel queda colgando y se balancea
+      tl.fromTo("#h-awn", { y: -700, filter: "blur(10px)" }, { y: 0, filter: "blur(0px)", duration: 0.42, ease: "power3.in" }, 0.06);
+      tl.to("#h-awn", { scaleY: 0.82, duration: 0.06, ease: "power2.out" }, 0.48);
+      tl.to("#h-awn", { scaleY: 1, duration: 0.6, ease: "elastic.out(1, 0.35)" }, 0.54);
+      tl.fromTo("#h-sign", { y: -900, rotation: 0 }, { y: 0, duration: 0.5, ease: "power3.in" }, 0.22);
+      tl.fromTo("#h-sign", { rotation: 0 }, { rotation: -7, duration: 0.18, ease: "power2.out", immediateRender: false }, 0.72);
+      tl.to("#h-sign", { rotation: 0, duration: 1.3, ease: "elastic.out(1, 0.28)" }, 0.9);
+      // el freezer entra pesado desde la izquierda y aparecen los gustos
+      tl.fromTo("#h-frz", { x: -900, rotation: -5, filter: "blur(12px)" }, { x: 0, rotation: 0, filter: "blur(0px)", duration: 0.42, ease: "power3.in" }, 0.75);
+      tl.to("#h-frz", { scaleY: 0.92, scaleX: 1.03, duration: 0.06, ease: "power2.out", transformOrigin: "50% 100%" }, 1.17);
+      tl.to("#h-frz", { scaleY: 1, scaleX: 1, duration: 0.45, ease: "elastic.out(1, 0.4)" }, 1.23);
+      MF.shake(tl, "#h-shake", 1.17, 6);
+      ["#h-u1", "#h-u2", "#h-u3", "#h-u4"].forEach((s, i) => tl.fromTo(s, { scale: 0, y: 40 }, { scale: 1, y: 0, duration: 0.4, ease: "back.out(2.6)" }, 1.3 + i * 0.12));
+      tl.fromTo("#h-qpill", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(2)" }, 2.75);
+      // los insumos: crema y cucuruchos, con etiqueta roja que se balancea
+      tl.fromTo("#h-cream", { y: -1200, rotation: 8, filter: "blur(12px)" }, { y: 0, rotation: 0, filter: "blur(0px)", duration: 0.38, ease: "power3.in" }, 3.45);
+      tl.to("#h-cream", { scaleY: 0.88, duration: 0.05, ease: "power2.out", transformOrigin: "50% 100%" }, 3.83);
+      tl.to("#h-cream", { scaleY: 1, duration: 0.4, ease: "elastic.out(1, 0.4)" }, 3.88);
+      tl.fromTo("#h-t1", { rotation: 0 }, { rotation: -24, duration: 0.15, ease: "power2.out", immediateRender: false }, 3.83);
+      tl.to("#h-t1", { rotation: 0, duration: 1.3, ease: "elastic.out(1, 0.25)" }, 3.98);
+      tl.fromTo(["#h-cones", "#h-t2"], { y: -1200, rotation: -8, filter: "blur(12px)" }, { y: 0, rotation: 0, filter: "blur(0px)", duration: 0.38, ease: "power3.in" }, 4.3);
+      tl.to("#h-cones", { scaleY: 0.86, duration: 0.05, ease: "power2.out", transformOrigin: "50% 100%" }, 4.68);
+      tl.to("#h-cones", { scaleY: 1, duration: 0.4, ease: "elastic.out(1, 0.4)" }, 4.73);
+      tl.fromTo("#h-t2", { rotation: 0 }, { rotation: 24, duration: 0.15, ease: "power2.out", immediateRender: false }, 4.68);
+      tl.to("#h-t2", { rotation: 0, duration: 1.3, ease: "elastic.out(1, 0.25)" }, 4.83);
+      // "cada vez más caros": las etiquetas se inflan y suben flechas
+      tl.to(["#h-t1", "#h-t2"], { scale: 1.3, duration: 0.2, ease: "back.out(3)", stagger: 0.12 }, 5.45);
+      [["#h-a1", 5.5], ["#h-a2", 5.65], ["#h-a1", 6.0], ["#h-a2", 6.15]].forEach(([s, at]) => {
+        tl.fromTo(s, { opacity: 0, y: 0 }, { opacity: 1, y: -50, duration: 0.25, ease: "power2.out", immediateRender: false }, at);
+        tl.to(s, { opacity: 0, y: -100, duration: 0.25, ease: "power2.in" }, at + 0.28);
+      });
+      // la caja: la heladería se achica y entra la cuenta
+      tl.to("#h-qpill", { opacity: 0, duration: 0.15 }, 6.45);
+      tl.to("#h-shop", { scale: 0.7, y: 12, duration: 0.5, ease: "power3.inOut" }, 6.5);
+      tl.fromTo("#h-reg", { y: 1100, filter: "blur(12px)" }, { y: 0, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, 6.6);
+      tl.fromTo("#h-before", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 7.25);
+      tl.fromTo("#h-after", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 9.05);
+      tl.fromTo("#h-div", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "expo.out" }, 9.9);
+      tl.fromTo("#h-res", { opacity: 0, scale: 1.8, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.32, ease: "power4.in" }, 10.05);
+      MF.flash(tl, "#h-flash", 10.37);
+      MF.shake(tl, "#h-shake", 10.37, 14);
+      tl.fromTo("#h-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 7.3);
+      window.__timelines["heladeria"] = tl;
+    })();
+  </script>
+</template>

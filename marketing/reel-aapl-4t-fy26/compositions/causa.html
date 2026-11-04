@@ -1,0 +1,137 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #s-shake { position: absolute; inset: 0; }
+    /* A: el margen */
+    #s-a { position: absolute; inset: 0; }
+    #s-kick { top: 352px; }
+    #s-num { position: absolute; top: 400px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 150px; letter-spacing: -0.04em; color: #f6f8fc; height: 160px; }
+    #s-guide { position: absolute; top: 576px; left: 0; right: 0; margin: 0 auto; width: fit-content; border-color: rgba(239,68,68,.6); }
+    #s-guide b { color: #EF4444; }
+    .mcol { position: absolute; bottom: 770px; width: 210px; height: 500px; }
+    .mcol .vbar { top: auto; }
+    .mcol .val { position: absolute; left: -60px; right: -60px; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 42px; letter-spacing: -0.03em; }
+    .mcol .lab { position: absolute; bottom: -56px; left: -30px; right: -30px; text-align: center; font-family: "Plex Mono"; font-weight: 700; font-size: 24px; color: #ead9a4; }
+    #s-m1 { left: 140px; } #s-m1 .vbar { height: 400px; } #s-m1 .val { bottom: 414px; }
+    #s-m2 { left: 435px; } #s-m2 .vbar { height: 356px; } #s-m2 .val { bottom: 370px; }
+    #s-m3 { left: 730px; } #s-m3 .vbar { height: 246px; } #s-m3 .val { bottom: 284px; color: #EF4444; }
+    #s-range { position: absolute; left: -10px; right: -10px; bottom: 224px; height: 44px; border: 3px dashed rgba(239,68,68,.9); border-radius: 8px; }
+    #s-mbase { position: absolute; left: 100px; right: 100px; top: 1150px; height: 3px; background: rgba(234,217,164,.6); transform-origin: center; }
+    #s-drop { position: absolute; left: 660px; top: 700px; font-size: 34px; }
+    /* B: la memoria */
+    #s-b { position: absolute; inset: 0; }
+    #s-bk { top: 352px; }
+    .ram { position: absolute; width: 400px; height: 120px; border-radius: 10px; background: linear-gradient(180deg, #17694d, #0d4a36); border: 2px solid rgba(255,255,255,.18);
+      box-shadow: 0 26px 40px -18px rgba(0,0,0,.75); }
+    .ram .ics { position: absolute; left: 22px; right: 22px; top: 18px; height: 56px; display: flex; gap: 14px; }
+    .ram .ics i { flex: 1; border-radius: 5px; background: linear-gradient(180deg, #23272e, #0b0d10); border: 1px solid rgba(255,255,255,.12); }
+    .ram .pins { position: absolute; left: 14px; right: 14px; bottom: 6px; height: 22px;
+      background: repeating-linear-gradient(90deg, #f2c94c 0 9px, transparent 9px 14px); border-radius: 2px; }
+    .ram .notch { position: absolute; left: 170px; bottom: -2px; width: 16px; height: 18px; background: #12233b; border-radius: 4px 4px 0 0; }
+    .ram .tag { position: absolute; top: -58px; right: 40px; padding: 6px 14px; border-radius: 10px; background: #EF4444; color: #fff; font-family: "Plex Mono"; font-weight: 700;
+      font-size: 24px; transform-origin: 50% -22px; box-shadow: 0 12px 24px -10px rgba(239,68,68,.7); white-space: nowrap; }
+    .ram .tag::before { content: ""; position: absolute; left: 50%; top: -22px; width: 2px; height: 22px; background: #ead9a4; }
+    #s-ik { top: 1000px; }
+    #s-inv { position: absolute; top: 1044px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 112px; letter-spacing: -0.04em; color: #EF4444; height: 120px;
+      filter: drop-shadow(0 0 30px rgba(239,68,68,.3)); }
+    #s-x { position: absolute; top: 1186px; left: 0; right: 0; margin: 0 auto; width: fit-content; font-size: 36px; }
+  </style>
+  <div id="root" data-composition-id="causa" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-panel"></div><div class="grid"></div>
+    <div id="s-shake">
+      <div class="hdr" id="s-h1"><span class="w">No</span><span class="w">fue</span><span class="w">lo</span><span class="w">que</span><span class="w em" data-acc="green">vendió:</span></div>
+      <div class="hdr" id="s-h2"><span class="w">fue</span><span class="w">lo</span><span class="w">que</span><span class="w">le</span><span class="w em" data-acc="gold">queda.</span></div>
+      <div class="hdr" id="s-h3"><span class="w">Avisó</span><span class="w">que</span><span class="w">su</span><span class="w">margen</span><span class="w em" data-acc="red">baja</span></div>
+      <div class="hdr" id="s-h4"><span class="w">a</span><span class="w em" data-acc="red">45-46%,</span><span class="w">desde</span><span class="w">casi</span><span class="w em" data-acc="gold">49.</span></div>
+      <div class="hdr" id="s-h5"><span class="w">¿El</span><span class="w em" data-acc="red">culpable?</span></div>
+      <div class="hdr" id="s-h6"><span class="w">La</span><span class="w em" data-acc="gold">memoria,</span><span class="w">cada</span><span class="w">vez</span><span class="w em" data-acc="red">más</span><span class="w em" data-acc="red">cara.</span></div>
+
+      <div id="s-a">
+        <div id="s-kick" class="kicker">MARGEN BRUTO · LO QUE LE QUEDA DE CADA US$ 100</div>
+        <div id="s-num" class="odo" data-layout-ignore></div>
+        <div id="s-guide" class="pill">GUÍA PARA DICIEMBRE: <b>45% – 46%</b></div>
+        <div class="mcol" id="s-m1"><div class="vbar navy"></div><div class="val odo" id="s-v1" data-layout-ignore></div><div class="lab">AÑO FY26</div></div>
+        <div class="mcol" id="s-m2"><div class="vbar navy"></div><div class="val odo" id="s-v2" data-layout-ignore></div><div class="lab">JUL–SEP</div></div>
+        <div class="mcol" id="s-m3"><div class="vbar red"></div><div id="s-range"></div><div class="val" id="s-v3">45–46%</div><div class="lab">GUÍA OCT–DIC</div></div>
+        <div id="s-mbase"></div>
+        <div id="s-drop" class="badge red">▼ 2,8 a 3,8 pts</div>
+      </div>
+
+      <div id="s-b">
+        <div id="s-bk" class="kicker">CHIPS DE MEMORIA · ESCASEZ EN TODA LA INDUSTRIA</div>
+        <div class="ram" id="s-r1" style="left: 110px; top: 470px"><div class="ics"><i></i><i></i><i></i><i></i><i></i></div><div class="pins"></div><div class="notch"></div><div class="tag" id="s-t1">▲ US$</div></div>
+        <div class="ram" id="s-r2" style="left: 570px; top: 470px"><div class="ics"><i></i><i></i><i></i><i></i><i></i></div><div class="pins"></div><div class="notch"></div><div class="tag" id="s-t2">▲ US$</div></div>
+        <div class="ram" id="s-r3" style="left: 110px; top: 700px"><div class="ics"><i></i><i></i><i></i><i></i><i></i></div><div class="pins"></div><div class="notch"></div><div class="tag" id="s-t3">▲ US$</div></div>
+        <div class="ram" id="s-r4" style="left: 570px; top: 700px"><div class="ics"><i></i><i></i><i></i><i></i><i></i></div><div class="pins"></div><div class="notch"></div><div class="tag" id="s-t4">▲ US$</div></div>
+        <div id="s-ik" class="kicker">INVENTARIO DE APPLE · COMPRA ANTES DE QUE SUBA MÁS</div>
+        <div id="s-inv" class="odo" data-layout-ignore></div>
+        <div id="s-x" class="badge red">×2,5 en un año</div>
+      </div>
+      <div class="src" id="s-src">Apple 8-K y 10-K FY2026: margen bruto 48,8% (año) y 47,9% (4T); guía 1T FY27 45%–46%; inventario US$ 5.720 M → 14.540 M</div>
+    </div>
+    <div class="flash" id="s-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4, eInOut3 } = MF;
+      const R = document.querySelector('[data-composition-id="causa"]');
+      const $ = (s) => R.querySelector(s);
+      const pct = [10, 1, ",", 0.1, "%"];
+      const sN = MF.odo($("#s-num"), pct), s1 = MF.odo($("#s-v1"), pct), s2 = MF.odo($("#s-v2"), pct);
+      const sInv = MF.odo($("#s-inv"), ["US$ ", 10000, 1000, ".", 100, 10, 1, "~M"]);
+      const num = $("#s-num");
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 10.9, (t) => {
+        const up = 40 + 8.8 * eOut4(clamp((t - 0.2) / 0.9, 0, 1));
+        const dn = eInOut3(clamp((t - 4.3) / 0.9, 0, 1));
+        sN(up - 3.3 * dn);
+        num.style.color = dn > 0.5 ? "#EF4444" : "#f6f8fc";
+        s1(40 + 8.8 * eOut4(clamp((t - 2.9) / 0.6, 0, 1)));
+        s2(40 + 7.9 * eOut4(clamp((t - 3.15) / 0.6, 0, 1)));
+        sInv(5720 + 8820 * eInOut3(clamp((t - 8.4) / 1.3, 0, 1)));
+      });
+      MF.captions(tl, R, [["#s-h1", 0.04, 1.4], ["#s-h2", 1.4, 2.6], ["#s-h3", 2.6, 4.2], ["#s-h4", 4.2, 6.4], ["#s-h5", 6.4, 7.4], ["#s-h6", 7.4, 10.3]]);
+
+      // A — el margen: 48,8% que rueda hacia abajo
+      tl.fromTo("#s-kick", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 0.08);
+      tl.fromTo("#s-num", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, 0.12);
+      tl.fromTo("#s-mbase", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 2.75);
+      tl.fromTo("#s-m1 .vbar", { scaleY: 0 }, { scaleY: 1, duration: 0.6, ease: "expo.out" }, 2.85);
+      tl.fromTo("#s-m2 .vbar", { scaleY: 0 }, { scaleY: 1, duration: 0.6, ease: "expo.out" }, 3.1);
+      tl.fromTo(".mcol .lab, #s-m1 .val, #s-m2 .val", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 2.85);
+      // la guía cae desde arriba y golpea
+      tl.fromTo("#s-m3", { y: -1300, filter: "blur(14px)" }, { y: 0, filter: "blur(0px)", duration: 0.36, ease: "power3.in" }, 4.55);
+      tl.to("#s-m3", { scaleY: 0.9, duration: 0.06, ease: "power2.out", transformOrigin: "50% 100%" }, 4.91);
+      tl.to("#s-m3", { scaleY: 1, duration: 0.45, ease: "elastic.out(1, 0.4)" }, 4.97);
+      tl.fromTo("#s-guide", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 4.95);
+      tl.fromTo("#s-drop", { opacity: 0, scale: 0.3, rotation: -14 }, { opacity: 1, scale: 1, rotation: -4, duration: 0.45, ease: "back.out(2.6)" }, 5.15);
+      tl.to(["#s-num"], { scale: 1.07, duration: 0.07, ease: "power2.out" }, 4.91);
+      tl.to(["#s-num"], { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 4.98);
+      MF.flash(tl, "#s-flash", 4.91);
+      MF.shake(tl, "#s-shake", 4.91, 11);
+      tl.to("#s-a", { y: -1300, filter: "blur(12px)", duration: 0.4, ease: "power3.in" }, 6.35);
+
+      // B — la memoria: módulos que caen uno por uno, con su etiqueta de precio en rojo
+      tl.fromTo("#s-bk", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 6.6);
+      ["#s-r1", "#s-r2", "#s-r3", "#s-r4"].forEach((s, i) => {
+        const at = 6.7 + i * 0.22;
+        tl.fromTo(s, { y: -1400, rotation: i % 2 ? 7 : -7, filter: "blur(14px)" }, { y: 0, rotation: 0, filter: "blur(0px)", duration: 0.34, ease: "power3.in" }, at);
+        tl.to(s, { scaleY: 0.88, duration: 0.05, ease: "power2.out", transformOrigin: "50% 100%" }, at + 0.34);
+        tl.to(s, { scaleY: 1, duration: 0.35, ease: "elastic.out(1, 0.45)" }, at + 0.39);
+        tl.fromTo("#s-t" + (i + 1), { rotation: 0 }, { rotation: i % 2 ? 24 : -24, duration: 0.15, ease: "power2.out", immediateRender: false }, at + 0.34);
+        tl.to("#s-t" + (i + 1), { rotation: 0, duration: 1.3, ease: "elastic.out(1, 0.25)" }, at + 0.49);
+      });
+      // los precios suben: las etiquetas crecen
+      tl.to(["#s-t1", "#s-t2", "#s-t3", "#s-t4"], { scale: 1.25, duration: 0.25, ease: "back.out(3)", stagger: 0.08 }, 7.9);
+      tl.fromTo("#s-ik", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, 8.3);
+      tl.fromTo("#s-inv", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, 8.3);
+      tl.to("#s-inv", { scale: 1.07, duration: 0.07, ease: "power2.out" }, 9.7);
+      tl.to("#s-inv", { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 9.77);
+      tl.fromTo("#s-x", { opacity: 0, scale: 0.3, rotation: 14 }, { opacity: 1, scale: 1, rotation: 3, duration: 0.45, ease: "back.out(2.6)" }, 9.75);
+      MF.shake(tl, "#s-shake", 9.7, 8);
+      tl.fromTo("#s-src", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 3.0);
+      window.__timelines["causa"] = tl;
+    })();
+  </script>
+</template>

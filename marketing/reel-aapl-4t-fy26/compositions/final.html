@@ -1,0 +1,96 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Plex Sans", sans-serif; color: #f6f8fc; }
+    #c-shake { position: absolute; inset: 0; }
+    #c-pill { position: absolute; top: 352px; left: 0; right: 0; margin: 0 auto; width: fit-content; }
+    #c-num { position: absolute; top: 410px; left: 0; right: 0; font-family: "Plex Mono"; font-weight: 700; font-size: 150px; letter-spacing: -0.04em; color: #EF4444; height: 160px;
+      filter: drop-shadow(0 0 30px rgba(239,68,68,.3)); }
+    #c-chipwrap { position: absolute; left: 20px; top: 610px; width: 224px; height: 224px; }
+    #c-chipscale { position: absolute; left: 0; top: 0; width: 360px; height: 360px; transform: scale(.62); transform-origin: 0 0; }
+    .card { position: absolute; left: 300px; right: 60px; padding: 20px 28px; border-radius: 20px; }
+    .card .k { font-family: "Plex Mono"; font-weight: 600; font-size: 20px; letter-spacing: .14em; }
+    .card .t { font-family: "DM Serif"; font-style: italic; font-size: 60px; line-height: 1.05; }
+    .card .d { font-family: "Plex Mono"; font-weight: 700; font-size: 22px; margin-top: 6px; }
+    #c-cardA { top: 600px; background: linear-gradient(180deg, rgba(20,38,66,.8), rgba(11,22,41,.9)); border: 1px solid rgba(226,234,245,.18); }
+    #c-cardA .k { color: #ead9a4; } #c-cardA .t { color: #f6f8fc; } #c-cardA .d { color: #10B981; }
+    #c-strike { position: absolute; left: 24px; top: 92px; height: 5px; width: 330px; background: #f2c94c; border-radius: 4px; transform-origin: left center; }
+    #c-cardB { top: 800px; background: linear-gradient(180deg, #DC2626, #991B1B); box-shadow: 0 30px 60px -20px rgba(239,68,68,.6); }
+    #c-cardB .k { color: #ffe1e1; } #c-cardB .t { color: #fff; } #c-cardB .d { color: #ffe1e1; }
+    #c-cta { position: absolute; top: 1050px; left: 0; right: 0; display: flex; justify-content: center; gap: 110px; }
+    .act { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .act .ic { width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(13,26,46,.85); border: 2px solid rgba(226,234,245,.2); }
+    .act .ic svg { width: 46px; height: 46px; }
+    .act span { font-family: "Plex Mono"; font-weight: 700; font-size: 22px; color: #ead9a4; }
+    #c-cursor { position: absolute; left: 0; top: 0; width: 54px; height: 54px; }
+  </style>
+  <div id="root" data-composition-id="final" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div class="bg-aurora"></div><div class="grid"></div>
+    <div id="c-shake">
+      <div class="hdr" id="c-h1"><span class="w">No</span><span class="w">la</span><span class="w em" data-acc="red">castigaron</span></div>
+      <div class="hdr" id="c-h2"><span class="w">por</span><span class="w em" data-acc="gold">vender</span><span class="w em" data-acc="gold">poco.</span></div>
+      <div class="hdr" id="c-h3"><span class="w">La</span><span class="w em" data-acc="red">castigaron</span><span class="w">porque</span></div>
+      <div class="hdr" id="c-h4"><span class="w">cada</span><span class="w">venta</span><span class="w">le</span><span class="w">deja</span><span class="w em" data-acc="red">menos.</span></div>
+      <div class="hdr" id="c-h5"><span class="w em" data-acc="gold">Mandáselo</span><span class="w">a</span><span class="w">ese</span><span class="w">amigo</span></div>
+      <div class="hdr" id="c-h6"><span class="w">que</span><span class="w">tiene</span><span class="w">un</span><span class="w em" data-acc="gold">iPhone.</span></div>
+
+      <div id="c-pill" class="pill"><i></i>AAPL · MAR 3 NOV</div>
+      <div id="c-num" class="odo" data-layout-ignore></div>
+      <div id="c-chipwrap" data-layout-allow-overflow><div id="c-chipscale">
+        <div class="chip half-l" id="c-halfL"><div class="pins"></div><div class="body"></div><div class="plate" data-a></div></div>
+        <div class="chip half-r" id="c-halfR"><div class="pins"></div><div class="body"></div><div class="plate" data-a></div></div>
+      </div></div>
+      <div class="card" id="c-cardA"><div class="k">NO FUE POR</div><div class="t">vender poco</div><div class="d">ventas +11,7% · año récord</div><div id="c-strike"></div></div>
+      <div class="card" id="c-cardB"><div class="k">FUE POR</div><div class="t">ganar menos</div><div class="d">margen 48,8% → guía 45%–46%</div></div>
+
+      <div id="c-cta">
+        <div class="act" id="c-a1"><div class="ic" id="c-i1"><svg viewBox="0 0 24 24" fill="none" stroke="#f6f8fc" stroke-width="2" stroke-linejoin="round"><path id="c-bm" d="M6 3h12v18l-6-4.5L6 21z" /></svg></div><span>Guardalo</span></div>
+        <div class="act" id="c-a2"><div class="ic" id="c-i2"><svg viewBox="0 0 24 24" fill="none" stroke="#f6f8fc" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z" /></svg></div><span>Mandáselo</span></div>
+        <div class="act" id="c-a3"><div class="ic" id="c-i3"><svg viewBox="0 0 24 24" fill="none" stroke="#f6f8fc" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" /></svg></div><span>Ese amigo</span></div>
+      </div>
+      <svg id="c-cursor" viewBox="0 0 24 24"><path d="M4 2l16 10-7 1.5L10 21z" fill="#f6f8fc" stroke="#0a1322" stroke-width="1.5" stroke-linejoin="round" /></svg>
+    </div>
+    <div class="flash" id="c-flash"></div>
+    <div class="grain"></div>
+  </div>
+  <script>
+    (function () {
+      const MF = window.MF, { clamp, eOut4 } = MF;
+      const R = document.querySelector('[data-composition-id="final"]');
+      const $ = (s) => R.querySelector(s);
+      R.querySelectorAll("[data-a]").forEach((p) => (p.innerHTML = MF.A_SVG));
+      const sN = MF.odo($("#c-num"), ["−", 1, ",", 0.1, 0.01, "%"]);
+      const tl = gsap.timeline({ paused: true });
+      MF.clock(tl, 9.4, (t) => sN(1 + 0.9 * eOut4(clamp((t - 0.05) / 0.7, 0, 1))));
+      MF.captions(tl, R, [["#c-h1", 0.04, 1.0], ["#c-h2", 1.0, 2.2], ["#c-h3", 2.2, 3.3], ["#c-h4", 3.3, 5.0], ["#c-h5", 5.0, 6.3], ["#c-h6", 6.3, 8.0]]);
+      tl.set("#c-halfL", { x: -26, y: 8, rotation: -7 }, 0);
+      tl.set("#c-halfR", { x: 26, y: 12, rotation: 8 }, 0);
+      tl.fromTo("#c-num", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.3, ease: "expo.out" }, 0.05);
+      tl.fromTo("#c-chipwrap", { x: -500, filter: "blur(12px)" }, { x: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 0.2);
+      // "no fue por vender poco": entra la tarjeta y se tacha
+      tl.fromTo("#c-cardA", { x: 800, filter: "blur(12px)" }, { x: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 1.5);
+      tl.fromTo("#c-strike", { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power3.out" }, 2.25);
+      // "por gastar mucho": la roja entra con golpe
+      tl.fromTo("#c-cardB", { x: 900, rotation: 5, filter: "blur(14px)" }, { x: 0, rotation: 0, filter: "blur(0px)", duration: 0.32, ease: "power3.in" }, 3.3);
+      tl.to("#c-cardB", { scale: 1.05, duration: 0.06, ease: "power2.out" }, 3.62);
+      tl.to("#c-cardB", { scale: 1, duration: 0.45, ease: "elastic.out(1, 0.45)" }, 3.68);
+      MF.shake(tl, "#c-shake", 3.62, 10);
+      // botones + cursor que toca
+      tl.fromTo(["#c-a1", "#c-a2", "#c-a3"], { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(2)", stagger: 0.08 }, 5.0);
+      tl.fromTo("#c-cursor", { x: 1100, y: 1400, opacity: 0 }, { x: 303, y: 1100, opacity: 1, duration: 0.45, ease: "power3.out" }, 5.1);
+      const tap = (ic, at, fill) => {
+        tl.to("#c-cursor", { scale: 0.82, duration: 0.07, ease: "power2.out", transformOrigin: "0 0" }, at);
+        tl.to("#c-cursor", { scale: 1, duration: 0.18, ease: "back.out(3)" }, at + 0.07);
+        tl.to(ic, { scale: 0.88, duration: 0.07, ease: "power2.out" }, at);
+        tl.to(ic, { scale: 1, borderColor: "#f2c94c", backgroundColor: fill, duration: 0.3, ease: "back.out(3)" }, at + 0.07);
+      };
+      tap("#c-i1", 5.6, "rgba(242,201,76,.25)");
+      tl.to("#c-bm", { attr: { fill: "#f2c94c" }, stroke: "#f2c94c", duration: 0.1 }, 5.67);
+      tl.to("#c-cursor", { x: 525, y: 1100, duration: 0.35, ease: "power3.inOut" }, 5.95);
+      tap("#c-i2", 6.35, "rgba(242,201,76,.25)");
+      tl.to("#c-cursor", { x: 753, y: 1100, duration: 0.35, ease: "power3.inOut" }, 6.8);
+      tap("#c-i3", 7.2, "rgba(242,201,76,.25)");
+      MF.flash(tl, "#c-flash", 7.6);
+      window.__timelines["final"] = tl;
+    })();
+  </script>
+</template>
