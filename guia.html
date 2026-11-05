@@ -330,7 +330,9 @@ table.q td:first-child small{font-size:11.5px;color:var(--champ)}
 .off .ctas{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:32px}
 .off .btn{font-size:15.5px;padding:15px 26px}
 .off__fine{margin-top:18px;font-size:13px;color:var(--champ)}
-.off--ended .badge,.off--ended .cd,.off--ended .price s,.off--ended .promo-only{display:none}
+.code{display:inline-flex;flex-direction:column;align-items:center;gap:4px;margin:18px auto 4px;padding:12px 26px;border:1px dashed var(--line3);border-radius:12px;background:rgba(233,211,160,.05)}
+.code small{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--champ2)}
+.code b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:clamp(22px,4vw,30px);letter-spacing:.08em;color:#fff}
 
 /* ---------- pie ---------- */
 .foot{border-top:1px solid var(--line);padding:36px 0 calc(40px + env(safe-area-inset-bottom))}
@@ -392,7 +394,7 @@ table.q td:first-child small{font-size:11.5px;color:var(--champ)}
         <div class="ctas">
           <a class="btn" href="/?registro=1">Crear mi cuenta gratis
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          <a class="lnk" href="#descuento">Ver el 33% OFF de Pro</a>
+          <a class="lnk" href="#descuento">Ver tu código de descuento</a>
         </div>
         <div class="facts">
           <span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Lo principal es gratis</span>
@@ -700,7 +702,7 @@ table.q td:first-child small{font-size:11.5px;color:var(--champ)}
               <li><span><b>Pedí tu propio informe</b>: uno por mes, de la empresa que vos elijas.</span></li>
             </ol>
           </div>
-          <div class="step__go"><a class="lnk" href="#descuento">Ver el precio con 33% OFF</a></div>
+          <div class="step__go"><a class="lnk" href="#descuento">Ver el precio con tu código</a></div>
         </div>
         <div class="pro rv">
           <div class="phone"><img src="/assets/promo/warren-chat.webp" alt="Chat de Warren IA: le piden analizar NVDA y responde con el informe" width="582" height="710" loading="lazy"></div>
@@ -759,26 +761,21 @@ table.q td:first-child small{font-size:11.5px;color:var(--champ)}
   <section class="off" id="descuento">
     <div class="wrap">
       <div class="off__card rv" id="offCard">
-        <span class="badge"><b>33%</b> OFF por ser de la comunidad</span>
-        <h2 class="h2"><span class="promo-only">Manfredi Pro, un tercio más barato.</span><span class="promo-end" hidden>Manfredi Pro, todo incluido.</span></h2>
-        <div class="price"><s>USD 15</s><b id="pUsd">USD 10</b><span>por mes</span></div>
-        <div class="cd" id="cd" aria-label="Tiempo que queda de la promo">
-          <div><b id="cdD">--</b><small>días</small></div>
-          <div><b id="cdH">--</b><small>horas</small></div>
-          <div><b id="cdM">--</b><small>min</small></div>
-          <div><b id="cdS">--</b><small>seg</small></div>
-        </div>
+        <span class="badge"><b>30%</b> OFF por ser de la comunidad</span>
+        <h2 class="h2">Manfredi Pro, con tu código.</h2>
+        <div class="price"><s>USD 15</s><b id="pUsd">USD 10,50</b><span>por mes</span></div>
+        <div class="code" aria-label="Tu código de descuento"><small>Tu código</small><b>MANFREDI30</b></div>
         <div class="off__inc">
           <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>48 informes</span>
           <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Warren IA</span>
           <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Tu informe a pedido</span>
         </div>
         <div class="ctas">
-          <a class="btn" href="/?membresia=1"><span class="promo-only">Quiero el 33% OFF</span><span class="promo-end" hidden>Hacerme Pro</span>
+          <a class="btn" href="/?membresia=1&amp;codigo=MANFREDI30">Usar mi código
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
           <a class="lnk" href="/?registro=1">Prefiero empezar gratis</a>
         </div>
-        <p class="off__fine"><span class="promo-only">El precio de USD 10 vale hasta el 31 de octubre. Se paga con Mercado Pago y cancelás cuando quieras.</span><span class="promo-end" hidden>Se paga con Mercado Pago y cancelás cuando quieras.</span></p>
+        <p class="off__fine">El botón abre el pago con el código ya cargado: tocá «¿Tenés un código de descuento?» si no lo ves. Vale para 1, 3, 6 o 12 meses, se paga una sola vez con Mercado Pago y no se renueva solo.</p>
       </div>
     </div>
   </section>
@@ -792,7 +789,7 @@ table.q td:first-child small{font-size:11.5px;color:var(--champ)}
 </footer>
 
 <div class="dock" id="dock">
-  <div><b class="promo-only">Pro a USD 10/mes</b><b class="promo-end" hidden>Manfredi Pro</b><small>Crear la cuenta es gratis</small></div>
+  <div><b>Código MANFREDI30</b><small>30% OFF en Manfredi Pro</small></div>
   <a class="btn" href="/?registro=1">Crear cuenta</a>
 </div>
 
@@ -802,28 +799,6 @@ table.q td:first-child small{font-size:11.5px;color:var(--champ)}
   if (reduce) document.documentElement.classList.remove('js');
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
-
-  /* ---- promo: misma fecha que window.MI_PROMO del sitio ---- */
-  var FIN = Date.parse('2026-11-01T03:00:00Z');
-  var card = $('#offCard');
-  function finPromo() {
-    $('.off').classList.add('off--ended');
-    $$('.promo-only').forEach(function (e) { e.hidden = true; });
-    $$('.promo-end').forEach(function (e) { e.hidden = false; });
-    $('#pUsd').textContent = 'USD 15';
-  }
-  function pad(n) { return (n < 10 ? '0' : '') + n; }
-  function tick() {
-    var ms = FIN - Date.now();
-    if (ms <= 0) { finPromo(); return false; }
-    var s = Math.floor(ms / 1000);
-    $('#cdD').textContent = Math.floor(s / 86400);
-    $('#cdH').textContent = pad(Math.floor(s % 86400 / 3600));
-    $('#cdM').textContent = pad(Math.floor(s % 3600 / 60));
-    $('#cdS').textContent = pad(s % 60);
-    return true;
-  }
-  if (tick()) { var cdT = setInterval(function () { if (!tick()) clearInterval(cdT); }, 1000); }
 
   /* ---- entradas ---- */
   var rvIO = 'IntersectionObserver' in window ? new IntersectionObserver(function (es) {
