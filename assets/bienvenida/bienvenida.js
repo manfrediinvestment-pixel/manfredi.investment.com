@@ -4,6 +4,8 @@
       la bienvenida marca mi_bienvenida_vista y "Explorar la página" vuelve acá.
    2) Los botones de la bienvenida vuelven con ?registro=1, ?ingresar=1,
       ?membresia=1 o ?warren=1: acá se abre el login o el pago y se limpia la URL.
+   ?membresia=1&codigo=MANFREDI30 abre el pago con el código ya cargado
+   (link del mensaje de FINANZAS en Instagram).
    Test: ?bienvenida=1 fuerza la redirección aunque ya la hayas visto. */
 (function () {
   var KEY = 'mi_bienvenida_vista';
@@ -18,12 +20,24 @@
   /* ---- 2) acciones que vienen de la bienvenida ---- */
   var accion = q.has('registro') || q.has('ingresar') ? 'login' : q.has('membresia') ? 'pago' : q.has('warren') ? 'warren' : null;
   if (accion) {
+    var codigo = (q.get('codigo') || '').replace(/[^A-Za-z0-9]/g, '').slice(0, 30).toUpperCase();
     ls(KEY, 'vista');
-    q.delete('registro'); q.delete('ingresar'); q.delete('membresia'); q.delete('warren');
+    q.delete('registro'); q.delete('ingresar'); q.delete('membresia'); q.delete('warren'); q.delete('codigo');
     var limpia = location.pathname + (q.toString() ? '?' + q.toString() : '') + location.hash;
     try { history.replaceState(null, '', limpia); } catch (e) {}
     if (accion === 'login') cuando('showLoginOverlay', function (f) { setTimeout(function () { if (!window._currentUser) f(); }, 600); });
-    if (accion === 'pago') cuando('openPaymentModal', function (f) { f(); });
+    if (accion === 'pago') cuando('openPaymentModal', function (f) {
+      f();
+      if (!codigo) return;
+      cuando('toggleDiscountPanel', function (abrir) {
+        var panel = document.getElementById('payDiscountPanel');
+        var campo = document.getElementById('payDiscountCode');
+        if (!panel || !campo) return;
+        if (panel.classList.contains('hidden')) abrir();
+        campo.value = codigo;
+        if (window.updateDiscountPriceDisplay) window.updateDiscountPriceDisplay();
+      });
+    });
     if (accion === 'warren') cuando('toggleWarren', function (f) { setTimeout(f, 600); });
     return;
   }
