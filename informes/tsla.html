@@ -289,8 +289,8 @@
     nuevas de Norteamérica salieron con FSD. Optimus empezó a producirse en líneas de alto volumen en Fremont. Ninguna de
     las tres publica ingresos propios, y la compañía no dio guía formal para 2027. En gobierno corporativo, el directorio
     formó un comité especial para explorar "profundizar la relación" con SpaceX, incluida una posible combinación de
-    negocios, y Tesla tiene acciones de SpaceX por $2.87 mil millones (la inversión de $2.0 mil millones que hizo en xAI
-    antes de que SpaceX la absorbiera).
+    negocios, y Tesla tiene acciones de SpaceX por $2.87 mil millones (la inversión de $2.0 mil millones acordada con xAI en
+    enero, que se completó en acciones de SpaceX después de la fusión entre ambas).
   </p>
   <p>
     La valuación cambia de forma, no de fondo. El informe anterior (datos al 30-jun-2026, precio de $311.21) mostraba en
@@ -338,7 +338,7 @@
 
   <!-- 03 -->
   <p class="secnum" id="s03">03 — Modelo de Negocio y Segmentos</p>
-  <h2>Tres segmentos que facturan, y tres apuestas (Robotaxi, FSD sin supervisión y Optimus) que todavía no tienen línea propia</h2>
+  <h2>Tres líneas que facturan, y tres apuestas (Robotaxi, FSD sin supervisión y Optimus) que todavía no tienen línea propia</h2>
   <p>
     Tesla reporta dos segmentos contables —Automotive &amp; Services and Other, y Energy Generation &amp; Storage— y tres
     líneas de ingresos: <strong>Automotive</strong> (venta y leasing de vehículos, créditos regulatorios y software FSD,
@@ -446,7 +446,7 @@
   <div class="table-scroll"><table>
     <tr><th>Tema</th><th>Verificable (documento de Tesla o registro público)</th><th>Anunciado o reportado por terceros (sin verificar)</th></tr>
     <tr><td class="label">Ciudades</td><td class="label">Cybercab da viajes en Austin desde el 3-sep-2026; Austin opera de 6 a 24 h (carta del 3T26). En la llamada, Tesla dijo operar en "6 ciudades" y que el Cybercab solo está en Austin.</td><td class="label">Trackers de prensa listan Austin, Dallas, Houston, Miami, Orlando y Tampa sin supervisor y la Bahía de San Francisco con supervisión; Tesla anunció Las Vegas, Phoenix, San Antonio y Jacksonville sin fecha; Dallas con Cybercab "el mes próximo" (noviembre).</td></tr>
-    <tr><td class="label">Viajes sin supervisor</td><td class="label">Cerca de 2 millones de millas acumuladas sin supervisión al 30-sep-2026, ocho veces más que al 30-jun (carta). Unas 3.1 millones al 18-oct según el reporte de seguridad citado en prensa.</td><td class="label">Tesla no publica viajes pagos, ingresos ni tarifa promedio por milla.</td></tr>
+    <tr><td class="label">Viajes sin supervisor</td><td class="label">Cerca de 2 millones de millas acumuladas sin supervisión al 30-sep-2026, ocho veces más que al 30-jun (carta).</td><td class="label">Unas 3.1 millones al 18-oct según el reporte de seguridad citado en prensa. Tesla no publica viajes pagos, ingresos ni tarifa promedio por milla.</td></tr>
     <tr><td class="label">Flota</td><td class="label">Capacidad instalada de Cybercab de más de 125,000 unidades por año en Texas, en estado "producción" (carta); en la llamada, la compañía dijo fabricar al ritmo que necesita su propia flota.</td><td class="label">Más de 300 Cybercab en servicio en Austin (prensa); registros del DMV de Texas con 449 Cybercab y 362 Model Y autorizados para operar sin conductor al 21-oct (prensa). Tesla no publica el tamaño de la flota.</td></tr>
     <tr><td class="label">Permisos</td><td class="label">El 10-Q menciona pedidos de información de la NHTSA, la NTSB, la SEC y el DOJ que incluyen Robotaxi, y una demanda colectiva (agosto de 2025) por declaraciones sobre FSD y Robotaxi.</td><td class="label">No encontramos en fuentes oficiales un permiso de despliegue sin conductor en California; en la Bahía el servicio sigue con supervisión.</td></tr>
     <tr><td class="label">FSD (Supervised)</td><td class="label">1.74 millones de suscripciones activas (1.04 millones un año antes); más del 75% de las entregas nuevas de Norteamérica con FSD; aprobado en nueve países de la UE, con más de 100,000 usuarios (carta).</td><td class="label">FSD sin supervisión en autos de clientes desde el 2T27 (vicepresidente de IA, en la llamada); aprobación en toda la UE "a más tardar en el 1T27" (Musk); ingresos anualizados de FSD "cerca de $1 mil millones" (estimación de un analista que Tesla confirmó en la llamada, según prensa).</td></tr>
@@ -573,8 +573,12 @@
   </table></div>
   <p class="footnote">Fuente: conciliación TTM del Q3 2026 Update. *Sobre el consenso de ingresos 2026 de $107.86 mil millones (stockanalysis.com, 9-nov-2026).</p>
   <div class="chartbox">
-    <canvas id="fcfChart" height="260"></canvas>
-    <div class="chartcap">Capex y flujo de caja libre trimestral, 3T25–3T26 (miles de millones USD). Fuente: Q3 2026 Update.</div>
+    <canvas id="capexQChart" height="240"></canvas>
+    <div class="chartcap">Capex trimestral, 3T25–3T26 (miles de millones USD). Fuente: Q3 2026 Update.</div>
+  </div>
+  <div class="chartbox">
+    <canvas id="fcfChart" height="240"></canvas>
+    <div class="chartcap">Flujo de caja libre trimestral, 3T25–3T26 (miles de millones USD). Fuente: Q3 2026 Update.</div>
   </div>
 
   <!-- 08 -->
@@ -1305,11 +1309,15 @@
 
     drawLines(document.getElementById('fcfChart'), {
       labels:['3T25','4T25','1T26','2T26','3T26'],
-      series:[
-        {name:'Capex', color:PALETTE.navy, values:[2.25,2.39,2.49,5.79,4.73]},
-        {name:'Flujo de caja libre', color:PALETTE.red, values:[3.99,1.42,1.44,-1.09,1.53]}
-      ],
+      series:[{name:'Flujo de caja libre', color:PALETTE.red, values:[3.99,1.42,1.44,-1.09,1.53]}],
       pointLabels:true, pointFmt:function(v){ return (v<0?'-$':'$')+Math.abs(v).toFixed(2); }
+    });
+
+    drawVBars(document.getElementById('capexQChart'), {
+      labels:['3T25','4T25','1T26','2T26','3T26'],
+      values:[2.25,2.39,2.49,5.79,4.73],
+      colors:[PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.navy,PALETTE.navy2],
+      valueFmt:function(v){ return '$'+v.toFixed(2)+'B'; }
     });
 
     drawHBars(document.getElementById('compsChart'), {
