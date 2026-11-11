@@ -70,13 +70,14 @@ window.MI_WA_COMUNIDAD = '';
     card.innerHTML =
       '<div class="wa-hd">' +
         '<img class="wa-av" src="assets/img/logo-mark-512.png" alt="" width="40" height="40">' +
-        '<div class="wa-hd-t"><b>Comunidad Manfredi</b><span>' + IC_WA + 'Grupo de WhatsApp · Gratis</span></div>' +
+        '<div class="wa-hd-t"><b>Comunidad Manfredi</b><span>' + IC_WA + 'Canal de WhatsApp · Gratis</span></div>' +
       '</div>' +
+      '<p class="wa-lead">Todos los días hábiles, un <b>resumen antes de la apertura</b> y otro <b>al cierre del mercado</b>, en tu celular.</p>' +
       '<div class="wa-feed">' + feed(lista) + '<div class="wa-solo">Solo los administradores pueden enviar mensajes</div></div>' +
-      '<div class="wa-hs"><span><i>Apertura</i><time>' + hs[0] + '</time></span><span><i>Cierre</i><time>' + hs[1] + '</time></span><span><i>Días hábiles</i><time>Lun a Vie</time></span></div>' +
+      '<div class="wa-hs"><span><i>Apertura</i><time>' + hs[0] + '</time></span><span><i>Cierre</i><time>' + hs[1] + '</time></span><span><i>Días</i><time>Lun a Vie</time></span></div>' +
       (link
-        ? '<a class="wa-btn" href="' + esc(link) + '" target="_blank" rel="noopener">' + IC_WA + '<span>Unirme al grupo</span></a>'
-        : '<span class="wa-btn wa-btn--pronto" aria-disabled="true">' + IC_WA + '<span>Unirme al grupo</span><em>Muy pronto</em></span>');
+        ? '<a class="wa-btn" href="' + esc(link) + '" target="_blank" rel="noopener">' + IC_WA + '<span>Seguir el canal</span></a>'
+        : '<span class="wa-btn wa-btn--pronto" aria-disabled="true">' + IC_WA + '<span>Seguir el canal</span><em>Muy pronto</em></span>');
   }
 
   function iniciar() {
