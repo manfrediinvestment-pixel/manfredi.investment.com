@@ -3,7 +3,7 @@
  *   Es el único lugar donde se carga: lo usan este cuadro y el chat (assets/comunidad/chat.js).
  * - Cuadro de la home (#waCard, en el lugar del Pulso del día): el grupo con el último resumen
  *   real como vista previa (worker manfredi-comunidad, sala "gratis") y el botón para unirse. */
-window.MI_WA_COMUNIDAD = '';
+window.MI_WA_COMUNIDAD = 'https://whatsapp.com/channel/0029Vb8rDVHB4hdUO5L2Lx17';
 
 (function () {
   'use strict';

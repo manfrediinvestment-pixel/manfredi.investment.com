@@ -193,8 +193,8 @@
           '<div class="ch-next" aria-live="off"></div>' +
           '<div class="ch-wa">' +
             '<span class="ch-wa-ic">' + IC.share + '</span>' +
-            '<div><b>También en WhatsApp</b><span>Los resúmenes del día, en tu celular.</span></div>' +
-            (WA_COMUNIDAD ? '<a class="ch-wa-btn" href="' + esc(WA_COMUNIDAD) + '" target="_blank" rel="noopener">Unirme</a>' : '<em class="ch-chip">Muy pronto</em>') +
+            '<div><b>Canal de WhatsApp</b><span>Los resúmenes del día, en tu celular.</span></div>' +
+            (WA_COMUNIDAD ? '<a class="ch-wa-btn" href="' + esc(WA_COMUNIDAD) + '" target="_blank" rel="noopener">Seguir</a>' : '<em class="ch-chip">Muy pronto</em>') +
           '</div>' +
         '</aside>' +
         '<section class="ch-main" aria-label="Conversación"></section>' +
