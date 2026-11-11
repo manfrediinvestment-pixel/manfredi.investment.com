@@ -18,6 +18,15 @@
   background:linear-gradient(90deg, transparent, rgba(233,211,160,.55), transparent); }
 
 .wa-hd { display:flex; align-items:center; gap:12px; }
+.wa-hd-t { flex:1; }
+/* sello "Gratis": champagne metálico apagado, borde fino y un brillo lento que apenas pasa */
+.wa-free { position:relative; overflow:hidden; align-self:flex-start; display:inline-flex; align-items:center; gap:6px; padding:6px 11px 6px 9px; border-radius:999px;
+  border:1px solid rgba(233,211,160,.45); background:linear-gradient(180deg, rgba(233,211,160,.10), rgba(233,211,160,.03));
+  font:600 10.5px/1 var(--wa-mono); letter-spacing:.16em; text-transform:uppercase; color:var(--wa-ch2); }
+.wa-free svg { color:#e6cb8a; }
+.wa-free::after { content:''; position:absolute; top:0; bottom:0; left:-60%; width:50%;
+  background:linear-gradient(100deg, transparent, rgba(243,227,189,.28), transparent); animation:wa-brillo 5.5s ease-in-out infinite; }
+@keyframes wa-brillo { 0%, 62% { left:-60%; } 100% { left:130%; } }
 .wa-av { width:40px; height:40px; border-radius:50%; object-fit:cover; box-shadow:0 0 0 1px rgba(233,211,160,.35); }
 .wa-hd-t { display:grid; gap:4px; min-width:0; }
 .wa-hd-t b { font:400 18px/1.1 var(--wa-serif); letter-spacing:.005em; }
@@ -61,6 +70,10 @@
 .wa-hs i { font:500 10px/1 var(--wa-mono); font-style:normal; letter-spacing:.1em; text-transform:uppercase; color:var(--wa-ch); }
 .wa-hs time { font:500 15px/1 var(--wa-sans); font-variant-numeric:tabular-nums; color:var(--wa-ink); }
 
+/* dos botones lado a lado: el canal y el chat de la web */
+.wa-btns { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.wa-btns .wa-btn { padding:0 10px; }
+.wa-btn--web svg { color:var(--wa-ch); }
 /* botón: borde fino, sin relleno; sube 1px y se tiñe apenas al pasar */
 .wa-btn { display:flex; align-items:center; justify-content:center; gap:9px; height:42px; border-radius:9px;
   border:1px solid rgba(233,211,160,.5); color:var(--wa-ink); font:500 13.5px/1 var(--wa-sans); letter-spacing:.01em; text-decoration:none;
@@ -78,4 +91,5 @@ a.wa-btn:focus-visible { outline:2px solid var(--wa-ch); outline-offset:3px; }
   .wa { padding:16px; gap:14px; }
   .wa-hs span { padding-left:10px; }
 }
-@media (prefers-reduced-motion:reduce) { .wa-msg { animation:none; } .wa-btn { transition:none; } }
+@media (max-width:380px) { .wa-btns { grid-template-columns:1fr; } }
+@media (prefers-reduced-motion:reduce) { .wa-msg, .wa-free::after { animation:none; } .wa-btn { transition:none; } }
