@@ -15,8 +15,10 @@
   if (window.ProChat) return;
   var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   var API = LOCAL ? 'http://localhost:8790' : 'https://manfredi-comunidad.nachito2502.workers.dev';
-  // Link de invitación de la Comunidad de WhatsApp (vacío = "Muy pronto").
-  var WA_COMUNIDAD = '';
+  // Link de invitación de la Comunidad de WhatsApp: vive en assets/comunidad/wa.js (vacío = "Muy pronto").
+  var WA_COMUNIDAD = window.MI_WA_COMUNIDAD || '';
+  // Los chats de Manfredi Pro todavía no abren: se ven con el cartel "Próximamente".
+  var PRO_PRONTO = true;
   var EMOJIS = ['👍', '🔥', '📈', '📉', '🤔'];
   var COLORES = ['#e9d3a0', '#8ec5ff', '#9be3c4', '#f0a8b8', '#c9b6ff', '#ffc58f'];
   var SALAS = {
@@ -136,7 +138,8 @@
       try { var q = new URLSearchParams(location.search); q.delete('r'); history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash); } catch (e) {}
     });
     PRO.forEach(function (k) {
-      if (usuario()) cargar(k);
+      if (PRO_PRONTO) S.salas[k].estado = 'pronto';
+      else if (usuario()) cargar(k);
       else { S.salas[k].estado = 'bloqueada'; S.salas[k].motivo = 'sin_sesion'; }
     });
     pintarLista();
@@ -190,8 +193,8 @@
           '<div class="ch-next" aria-live="off"></div>' +
           '<div class="ch-wa">' +
             '<span class="ch-wa-ic">' + IC.share + '</span>' +
-            '<div><b>También en WhatsApp</b><span>Los resúmenes del día, en tu celular.</span></div>' +
-            (WA_COMUNIDAD ? '<a class="ch-wa-btn" href="' + esc(WA_COMUNIDAD) + '" target="_blank" rel="noopener">Unirme</a>' : '<em class="ch-chip">Muy pronto</em>') +
+            '<div><b>Canal de WhatsApp</b><span>Los resúmenes del día, en tu celular.</span></div>' +
+            (WA_COMUNIDAD ? '<a class="ch-wa-btn" href="' + esc(WA_COMUNIDAD) + '" target="_blank" rel="noopener">Seguir</a>' : '<em class="ch-chip">Muy pronto</em>') +
           '</div>' +
         '</aside>' +
         '<section class="ch-main" aria-label="Conversación"></section>' +
@@ -206,7 +209,8 @@
     var z = S.salas[k], info = SALAS[k], ult = null;
     for (var i = z.orden.length - 1; i >= 0; i--) { var m = z.msgs[z.orden[i]]; if (m && !m.borrado) { ult = m; break; } }
     var noLeidos = z.estado === 'ok' && k !== S.sala ? z.orden.filter(function (id) { return id < 1e14 && id > (z.vistos[k] || 0) && z.msgs[id].h !== (S.yo && S.yo.h); }).length : 0;
-    var prev = z.estado === 'bloqueada' ? '<span class="ch-lock">' + IC.lock + ' Solo socios</span>'
+    var prev = z.estado === 'pronto' ? '<em class="ch-chip">Próximamente</em>'
+      : z.estado === 'bloqueada' ? '<span class="ch-lock">' + IC.lock + ' Solo socios</span>'
       : ult ? esc((ult.rol === 'oficial' ? '' : ult.nombre.split(' ')[0] + ': ') + (ult.tipo === 'resumen' ? (ult.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : ult.texto.replace(/[*_]/g, '')))
       : z.estado === 'cargando' ? 'Cargando…' : '';
     return '<li><button type="button" class="ch-item' + (info.pro ? ' ch-item--sub' : '') + '" data-ir="' + k + '"' + (k === S.sala ? ' aria-current="true"' : '') + '>' +
@@ -230,6 +234,7 @@
       avatarSala(k) +
       '<div class="ch-head-t"><b>' + (info.pro ? '<small>Manfredi Pro</small>' : '') + esc(info.nombre) + '</b><span>' + esc(info.sub) + '</span></div>' +
     '</header>';
+    if (z.estado === 'pronto') { main.innerHTML = cab + pronto(); return; }
     if (z.estado === 'bloqueada') { main.innerHTML = cab + bloqueo(); return; }
     main.innerHTML = cab +
       '<button type="button" class="ch-pin" data-a="pin" aria-expanded="false">' + IC.pin + '<span>' + esc(info.fijado) + '</span></button>' +
@@ -289,6 +294,21 @@
         '<textarea class="ch-ta" rows="1" maxlength="800" placeholder="Escribí un mensaje" aria-label="Mensaje">' + esc(S.borrador[S.sala] || '') + '</textarea>' +
         '<button type="submit" class="ch-send" aria-label="Enviar">' + IC.send + '</button>' +
       '</form><div class="ch-toast" role="status"></div>';
+  }
+
+  function pronto() {
+    var fantasmas = [62, 38, 74, 46, 58, 30, 66].map(function (w, i) {
+      return '<div class="ch-fake' + (i % 3 === 1 ? ' mio' : '') + '"><i style="width:' + w + '%"></i><i style="width:' + (w * 0.6) + '%"></i></div>';
+    }).join('');
+    return '<div class="ch-locked"><div class="ch-locked-bg" aria-hidden="true">' + fantasmas + '</div>' +
+      '<div class="ch-locked-card">' +
+        '<span class="ch-kick">Manfredi Pro · Próximamente</span>' +
+        '<h3>Los chats de los socios</h3>' +
+        '<ul><li><b>Ideas de Ignacio</b>Cada análisis, sus seguimientos y sus cierres.</li>' +
+        '<li><b>Charla de socios</b>Un espacio para hablar de mercados entre socios.</li>' +
+        '<li><b>Preguntas a Ignacio</b>Consultás y te responde Ignacio, no un bot.</li></ul>' +
+        '<button type="button" class="ch-btn ch-btn--gold" data-ir="gratis">Ir al chat de Mercados</button>' +
+      '</div></div>';
   }
 
   function bloqueo() {
@@ -437,7 +457,7 @@
     S.sala = k; S.responde = null;
     S.root.querySelector('.ch-app').dataset.vista = 'chat';
     pintarLista(); pintarSala(true);
-    if (S.salas[k].estado !== 'ok') cargar(k);
+    if (S.salas[k].estado !== 'ok' && S.salas[k].estado !== 'pronto') cargar(k);
   }
   function repintarCompositor() {
     var main = S.root.querySelector('.ch-main');

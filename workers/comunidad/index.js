@@ -156,28 +156,110 @@ async function getJSON(url) {
   } catch (e) { return null; }
 }
 
+// ─── Bolsa argentina: días hábiles, último cierre del dólar y Merval ─────────
+
+const AR_DATOS = 'https://api.argentinadatos.com/v1';
+const BYMA_FREE = 'https://open.bymadata.com.ar/vanoms-be-core/rest/api/bymadata/free';
+const CASAS_DOLAR = ['oficial', 'bolsa', 'contadoconliqui', 'blue'];
+
+// Feriados nacionales (ArgentinaDatos), por año; null si no se pudieron leer.
+async function feriadosAR(anios) {
+  const listas = await Promise.all(anios.map(a => getJSON(`${AR_DATOS}/feriados/${a}`)));
+  if (listas.some(l => !Array.isArray(l))) return null;
+  return new Map(listas.flat().map(f => [f.fecha, f.nombre]));
+}
+const diaSemana = iso => new Date(iso + 'T12:00:00Z').getUTCDay();
+const restarDia = iso => new Date(Date.parse(iso + 'T12:00:00Z') - 864e5).toISOString().slice(0, 10);
+const esHabil = (iso, feriados) => ![0, 6].includes(diaSemana(iso)) && !(feriados && feriados.has(iso));
+
+// El día con rueda anterior a `iso`: primero las velas reales del Merval (BYMA), que ya saben de
+// los días sin rueda que no son feriado nacional (10-nov-2026); si no hay, días hábiles por calendario.
+function ruedaAntes(iso, ruedas, feriados) {
+  const r = ruedas.filter(f => f < iso);
+  if (r.length && Date.parse(iso) - Date.parse(r[r.length - 1]) < 6 * 864e5) return r[r.length - 1];
+  let d = restarDia(iso);
+  while (!esHabil(d, feriados)) d = restarDia(d);
+  return d;
+}
+
+// ¿Hubo rueda hoy y cuál fue el último cierre? Lo dice BYMA: index-price trae el MSCI Merval
+// (mismo valor que el S&P Merval) con la fecha de su última rueda; las velas diarias, las anteriores.
+async function bolsaAR(hoyIso, feriados) {
+  const hasta = Math.floor(Date.now() / 1000), desde = hasta - 30 * 86400;
+  const [hist, vivo] = await Promise.all([
+    getJSON(`${BYMA_FREE}/chart/index-historical-series/history?symbol=M&resolution=D&from=${desde}&to=${hasta}`),
+    fetch(`${BYMA_FREE}/index-price`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', signal: AbortSignal.timeout(20000) })
+      .then(r => r.ok ? r.json() : null).catch(() => null),
+  ]);
+  const velas = hist && hist.s === 'ok' && Array.isArray(hist.t)
+    ? hist.t.map((t, i) => ({ f: new Date(t * 1000).toISOString().slice(0, 10), c: hist.c[i] })).filter(v => v.c > 0) : [];
+  const mm = vivo && Array.isArray(vivo.data) ? vivo.data.find(x => x.symbol === 'MMSCI') : null;
+  const ok = mm && /^\d{4}-\d{2}-\d{2}$/.test(mm.date || '') && mm.closingPrice > 0 && mm.previousClosingPrice > 0;
+  const ruedas = [...new Set([...velas.map(v => v.f), ...(ok && mm.date < hoyIso ? [mm.date] : [])])].sort();
+
+  // Hubo rueda hoy: BYMA ya muestra la fecha de hoy. Si no se pudo leer, se decide por calendario.
+  const ruedaHoy = ok ? mm.date === hoyIso : esHabil(hoyIso, feriados);
+  const ultimo = ruedaAntes(hoyIso, ruedas, feriados);
+  const anterior = ruedaAntes(ultimo, ruedas, feriados);
+
+  // Merval: el de hoy (cierre con rueda) o el del último cierre (apertura, o día sin rueda).
+  const delMM = () => ({ price: mm.closingPrice, change: (mm.closingPrice / mm.previousClosingPrice - 1) * 100 });
+  const vU = velas.find(v => v.f === ultimo), vA = velas.find(v => v.f === anterior);
+  const mervalHoy = ok && mm.date === hoyIso ? delMM() : null;
+  const mervalUltimo = vU && vA ? { price: vU.c, change: (vU.c / vA.c - 1) * 100 } : ok && mm.date === ultimo ? delMM() : null;
+  return { ruedaHoy, ultimo, anterior, mervalHoy, mervalUltimo };
+}
+
+// Antes de la apertura (y los feriados) la tabla dice "último cierre": el dólar del último día
+// hábil contra el del día hábil anterior. Antes salía 0,0% el día después de un fin de semana
+// o feriado, porque ArgentinaDatos repite el valor en los días sin rueda y /pulso comparaba con esa copia.
+async function dolaresUltimoCierre(argentina, ultimo, anterior) {
+  const dia = (casa, iso) => getJSON(`${AR_DATOS}/cotizaciones/dolares/${casa}/${iso.replace(/-/g, '/')}`);
+  await Promise.all(argentina.filter(f => CASAS_DOLAR.includes(f.id)).map(async f => {
+    const [a, b] = await Promise.all([dia(f.id, ultimo), dia(f.id, anterior)]);
+    if (a && a.venta != null) f.v = a.venta;
+    f.c = b && b.venta ? (f.v / b.venta - 1) * 100 : null;  // sin dato: la columna queda vacía, nunca un 0,0% falso
+  }));
+}
+
 async function juntarDatos(env, momento, hoy) {
-  const [pulso, mercados, cal, earn] = await Promise.all([
+  const anio = +hoy.iso.slice(0, 4);
+  const [pulso, mercados, cal, earn, feriados] = await Promise.all([
     getJSON(env.MERCADOS_URL + '/pulso'),
     getJSON(env.MERCADOS_URL + '/mercados'),
     getJSON(env.CALENDARIO_URL + '/calendario'),
     getJSON(env.CALENDARIO_URL + '/earnings'),
+    feriadosAR([anio - 1, anio]),
   ]);
   if (!pulso) throw new Error('No se pudieron leer las cotizaciones (worker mercados /pulso)');
+  const bolsa = await bolsaAR(hoy.iso, feriados);
+
+  // Día sin rueda en la Argentina con Wall Street abierto (feriado, o cierre como el 10-nov-2026):
+  // no se muestran panel, CEDEARs ni bonos (serían los del día con rueda anterior como si fueran de hoy).
+  const sinRuedaAR = momento === 'cierre' && !bolsa.ruedaHoy;
+  const feriadoAR = feriados ? feriados.get(hoy.iso) || null : null;
+  const ultimoCierre = momento === 'apertura' || sinRuedaAR;
+
+  // El Merval de /pulso viene de Yahoo y hace semanas que llega vacío: sale de BYMA.
+  const merval = ultimoCierre ? bolsa.mervalUltimo : bolsa.mervalHoy;
+  const cotAR = pulso.argentina.cotizaciones.map(c => c && c.id === 'merval'
+    ? (merval ? { ...c, price: merval.price, change: merval.change } : null) : c);
 
   const fila = c => c && c.price != null ? { id: c.id, n: c.name, v: c.price, u: c.unit || '', c: c.change ?? null, d: c.delta ?? null } : null;
-  const argentina = pulso.argentina.cotizaciones.map(fila).filter(Boolean);
+  const argentina = cotAR.map(fila).filter(Boolean);
+  if (ultimoCierre) await dolaresUltimoCierre(argentina, bolsa.ultimo, bolsa.anterior);
+  const ruedaAR = !sinRuedaAR;
   const mundo = pulso.mundo.cotizaciones.map(fila).filter(Boolean);
 
   const cat = k => (mercados && mercados.categorias && mercados.categorias[k] && mercados.categorias[k].items) || [];
   const porSimbolo = k => Object.fromEntries(cat(k).map(i => [i.symbol, i]));
   const bonosMap = porSimbolo('arg_bonds');
-  const bonos = BONOS.map(s => bonosMap[s]).filter(b => b && b.price != null && b.change != null)
+  const bonos = !ruedaAR ? [] : BONOS.map(s => bonosMap[s]).filter(b => b && b.price != null && b.change != null)
     .map(b => ({ n: b.symbol.replace(/D$/, ''), v: b.price, u: 'US$', c: b.change }));
 
   // Los que más se movieron solo tienen sentido al cierre (a la mañana son los de ayer).
   let panel = null, cedears = null;
-  if (momento === 'cierre') {
+  if (momento === 'cierre' && ruedaAR) {
     const acc = porSimbolo('arg_stocks');
     const lider = PANEL_LIDER.map(s => acc[s]).filter(a => a && a.change != null)
       .sort((a, b) => b.change - a.change).map(a => ({ n: a.symbol, c: a.change }));
@@ -219,7 +301,7 @@ async function juntarDatos(env, momento, hoy) {
     canje: mep && ccl ? (ccl / mep - 1) * 100 : null,
   };
 
-  return { argentina, derivados, bonos, mundo, panel, cedears, agenda, noticias, contexto };
+  return { argentina, derivados, bonos, mundo, panel, cedears, agenda, noticias, contexto, sinRuedaAR, feriadoAR };
 }
 
 // ─── Redacción con IA (Gemini, cupo gratis) ─────────────────────────────────
@@ -361,7 +443,8 @@ function textoWhatsApp(r, site) {
   out.push(r.intro, '');
 
   // Argentina (a la mañana es el último cierre)
-  out.push(`*🇦🇷 Argentina*${ape ? ' _· último cierre_' : ''}`);
+  out.push(`*🇦🇷 Argentina*${ape || d.sinRuedaAR ? ' _· último cierre_' : ''}`);
+  if (d.sinRuedaAR) out.push(`_Hoy no operó la bolsa argentina${d.feriadoAR ? ` (feriado: ${d.feriadoAR})` : ''}._`);
   const der = d.derivados || {}, extra = [];
   if (der.brecha != null) extra.push(filaTabla('Brecha MEP', '', pct(der.brecha, true, '-')));
   if (der.canje != null) extra.push(filaTabla('Canje CCL', '', pct(der.canje, true, '-')));
