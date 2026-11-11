@@ -448,7 +448,8 @@
     if (a === 'ir') { var o = S.root.querySelector('.ch-row[data-id="' + b.dataset.irId + '"]'); if (o) resaltar(o); return; }
     if (a === 'ver' && m) { var t = tarjeta(m); if (!t.url) return; var lb = S.root.querySelector('.ch-lb'); lb.querySelector('img').src = t.url; lb.hidden = false; return; }
     if (a === 'copiar-res' && m && esCreador()) {
-      var txt = window.MiTarjeta.epigrafe(m.datos, m.id);
+      // el mensaje entero, igual al de la web (tablas, bonos, agenda y titulares); si faltara, el epígrafe
+      var txt = m.datos.texto || window.MiTarjeta.epigrafe(m.datos, m.id);
       (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () {
         b.classList.add('ok'); setTimeout(function () { b.classList.remove('ok'); }, 1600);
         toast('Copiado. Pegalo en el canal de WhatsApp.');
