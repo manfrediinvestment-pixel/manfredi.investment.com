@@ -9,6 +9,8 @@ window.MI_WA_COMUNIDAD = 'https://whatsapp.com/channel/0029Vb8rDVHB4hdUO5L2Lx17'
   'use strict';
   var API = 'https://manfredi-comunidad.nachito2502.workers.dev';
   var IC_WA = '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2Zm0 18.15a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.23 8.23 0 1 1 6.98 3.86Zm4.52-6.16c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.16.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28Z"/></svg>';
+  var IC_STAR = '<svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="currentColor" d="M8 0c.5 4.1 2.6 6.9 8 8-5.4 1.1-7.5 3.9-8 8-.5-4.1-2.6-6.9-8-8 5.4-1.1 7.5-3.9 8-8Z"/></svg>';
+  var IC_WEB = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 9h18" stroke="currentColor" stroke-width="1.6"/><circle cx="6.2" cy="6.8" r=".9" fill="currentColor"/><circle cx="8.9" cy="6.8" r=".9" fill="currentColor"/></svg>';
   var IC_TICKS = '<svg viewBox="0 0 16 11" width="15" height="11" aria-hidden="true"><path d="M1 5.6 4 8.6 10.6 2M6 8.6 7.2 9.8 14.6 2.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -70,14 +72,19 @@ window.MI_WA_COMUNIDAD = 'https://whatsapp.com/channel/0029Vb8rDVHB4hdUO5L2Lx17'
     card.innerHTML =
       '<div class="wa-hd">' +
         '<img class="wa-av" src="assets/img/logo-mark-512.png" alt="" width="40" height="40">' +
-        '<div class="wa-hd-t"><b>Comunidad Manfredi</b><span>' + IC_WA + 'Canal de WhatsApp · Gratis</span></div>' +
+        '<div class="wa-hd-t"><b>Comunidad Manfredi</b><span>' + IC_WA + 'Canal de WhatsApp</span></div>' +
+        '<span class="wa-free" aria-label="Gratis">' + IC_STAR + '<span>Gratis</span></span>' +
       '</div>' +
       '<p class="wa-lead">Todos los días hábiles, un <b>resumen antes de la apertura</b> y otro <b>al cierre del mercado</b>, en tu celular.</p>' +
       '<div class="wa-feed">' + feed(lista) + '<div class="wa-solo">Solo los administradores pueden enviar mensajes</div></div>' +
       '<div class="wa-hs"><span><i>Apertura</i><time>' + hs[0] + '</time></span><span><i>Cierre</i><time>' + hs[1] + '</time></span><span><i>Días</i><time>Lun a Vie</time></span></div>' +
-      (link
-        ? '<a class="wa-btn" href="' + esc(link) + '" target="_blank" rel="noopener">' + IC_WA + '<span>Seguir el canal</span></a>'
-        : '<span class="wa-btn wa-btn--pronto" aria-disabled="true">' + IC_WA + '<span>Seguir el canal</span><em>Muy pronto</em></span>');
+      '<div class="wa-btns">' +
+        (link
+          ? '<a class="wa-btn wa-btn--wa" href="' + esc(link) + '" target="_blank" rel="noopener">' + IC_WA + '<span>Seguir el canal</span></a>'
+          : '<span class="wa-btn wa-btn--wa wa-btn--pronto" aria-disabled="true">' + IC_WA + '<span>Seguir el canal</span></span>') +
+        // el mismo chat en la web (pestaña Manfredi Pro → Chat de Mercados)
+        '<a class="wa-btn wa-btn--web" href="#pro" data-tab-target="inversiones">' + IC_WEB + '<span>Verlo en la web</span></a>' +
+      '</div>';
   }
 
   function iniciar() {
