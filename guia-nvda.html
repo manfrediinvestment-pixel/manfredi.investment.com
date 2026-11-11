@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Guía NVIDIA: el informe y sus competidores con 30% OFF</title>
-<meta name="description" content="El informe completo de NVIDIA y de sus competidores en chips (AMD, Broadcom, TSMC, Intel, Micron, Qualcomm, Arm, ASML y Texas Instruments), con el código MANFREDI30 para entrar con 30% de descuento.">
+<meta name="description" content="El informe completo de NVIDIA y de sus competidores en chips (AMD, Broadcom, TSMC, Intel, Micron, Qualcomm, Arm, ASML y Texas Instruments), más de 40 informes en total, con el código MANFREDI30 para entrar con 30% de descuento.">
 <meta property="og:title" content="Guía: NVIDIA y sus competidores, con 30% OFF">
-<meta property="og:description" content="El informe de NVIDIA y de 9 competidores, con el código MANFREDI30.">
+<meta property="og:description" content="El informe de NVIDIA, sus 9 competidores y 40+ informes más, con el código MANFREDI30.">
 <meta property="og:image" content="https://manfredinvestment.com/assets/img/og-image.png">
 <meta property="og:type" content="website">
 <meta name="robots" content="noindex">
@@ -14,132 +14,196 @@
 <meta name="theme-color" content="#060d19">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* Guía NVIDIA: llega desde el DM (comentan INFIDELIDAD). Informe de NVDA + 9 competidores + MANFREDI30 + paso a paso con capturas reales.
-   Mismo mundo que guia-informes.html: azul noche + champagne, letras chicas, ni una letra gris. */
+/* Guía NVIDIA: llega desde el DM (comentan INFIDELIDAD). Libros de NVDA + 9 competidores (mismo dibujo que la
+   colección de Informes, assets/informes/estanteria.css), MANFREDI30 y paso a paso con capturas reales.
+   Tipografía editorial: títulos en DM Serif Display, etiquetas en Plex Mono, texto en Plex Sans.
+   Paleta: azul noche + oro del sitio (#e6cf96). Ni una letra gris. */
 :root{
   --bg:#060d19;
-  --line:rgba(226,234,245,.09); --line2:rgba(226,234,245,.16); --line3:rgba(233,211,160,.3);
-  --ink:#f3f6fb; --champ:#e9d3a0; --champ2:#f3e3bd; --gold-a:#c9a24f; --gold-b:#e6cb8a;
-  --pos:#5fd39b; --neg:#f2857b;
+  --line:rgba(230,207,150,.10); --line2:rgba(230,207,150,.18); --line3:rgba(230,207,150,.34);
+  --ink:#f3f6fb; --gold:#e6cf96; --gold2:#f0dcaa; --gold-deep:#c9a24f;
+  --neg:#f2857b;
   --sans:'IBM Plex Sans',system-ui,sans-serif; --serif:'DM Serif Display',Georgia,serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
-  --ease:cubic-bezier(.16,1,.3,1); --gut:clamp(16px,4vw,40px);
+  --ease:cubic-bezier(.16,1,.3,1); --gut:clamp(18px,4vw,40px);
+  --es-serif:var(--serif); --es-mono:var(--mono); --es-out:var(--ease); --es-ease:cubic-bezier(.23,1,.32,1);
+  --es-grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;background:var(--bg)}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15.5px;line-height:1.65;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-:focus-visible{outline:1.5px solid var(--champ);outline-offset:3px;border-radius:6px}
-.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.dn{color:var(--neg)}
-.wrap{width:min(1000px,100% - var(--gut)*2);margin-inline:auto}
-em.s{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--champ)}
+::selection{background:rgba(230,207,150,.3);color:#fff}
+:focus-visible{outline:1.5px solid var(--gold);outline-offset:3px;border-radius:6px}
+.wrap{width:min(1040px,100% - var(--gut)*2);margin-inline:auto}
+.it{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--gold)}
 body::before{content:'';position:fixed;inset:-12%;z-index:-1;pointer-events:none;background:
-  radial-gradient(38% 34% at 16% 8%,rgba(233,211,160,.08),transparent 70%),
-  radial-gradient(36% 42% at 86% 16%,rgba(64,128,232,.14),transparent 70%),
-  radial-gradient(55% 40% at 48% 92%,rgba(24,64,128,.22),transparent 72%),
-  linear-gradient(180deg,#0a1730 0%,#070f1f 55%,#060d1a 100%)}
+  radial-gradient(40% 32% at 14% 6%,rgba(230,207,150,.07),transparent 70%),
+  radial-gradient(36% 40% at 88% 14%,rgba(64,118,210,.12),transparent 70%),
+  radial-gradient(60% 40% at 50% 96%,rgba(24,60,120,.2),transparent 72%),
+  linear-gradient(180deg,#0a1630 0%,#070f1f 55%,#060c19 100%)}
 
-.btn{display:inline-flex;align-items:center;gap:10px;font-weight:600;font-size:14.5px;color:#0a1120;background:linear-gradient(180deg,#ecd6a1,#d9b872);padding:12px 20px;border-radius:999px;box-shadow:0 8px 18px -10px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.5);transition:filter .2s,transform .2s var(--ease)}
-.btn:hover{filter:brightness(1.05)}.btn:active{transform:scale(.97)}
-.btn svg{transition:transform .35s var(--ease)}.btn:hover svg{transform:translateX(3px)}
-.ghost{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink);padding:11px 17px;border-radius:999px;border:1px solid var(--line2);transition:border-color .25s}
-.ghost:hover{border-color:var(--line3)}
+/* tipografía */
+.eyebrow{display:inline-flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.eyebrow::before{content:'';width:22px;height:1px;background:var(--gold);opacity:.7}
+.h1{margin-top:18px;font-family:var(--serif);font-weight:400;font-size:clamp(34px,5vw,54px);line-height:1.04;letter-spacing:-.018em;text-wrap:balance}
+.h2{margin-top:14px;font-family:var(--serif);font-weight:400;font-size:clamp(27px,3.4vw,38px);line-height:1.08;letter-spacing:-.015em;text-wrap:balance}
+.lead{margin-top:18px;font-size:16px;line-height:1.7;max-width:48ch}
 
-.top{position:sticky;top:0;z-index:40;background:rgba(6,13,25,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-.top__in{display:flex;align-items:center;justify-content:space-between;height:56px}
-.brand{display:flex;align-items:center;gap:10px}
+/* botones */
+.btn{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 22px 0 24px;border-radius:999px;font-weight:600;font-size:14.5px;letter-spacing:.005em;color:#0a1322;background:linear-gradient(180deg,#efdcae,#d9bd7f);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 10px 24px -14px rgba(230,207,150,.6);transition:filter .2s,transform .16s var(--ease),gap .3s var(--ease)}
+.btn:hover{filter:brightness(1.04);gap:14px}.btn:active{transform:scale(.97)}
+.ghost{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 20px;border-radius:999px;font-size:14px;font-weight:500;color:var(--ink);border:1px solid var(--line2);transition:border-color .25s,background .25s}
+.ghost:hover{border-color:var(--line3);background:rgba(230,207,150,.04)}
+.ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+
+/* barra */
+.top{position:sticky;top:0;z-index:40;background:rgba(6,13,25,.82);backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2);border-bottom:1px solid var(--line)}
+.top__in{display:flex;align-items:center;justify-content:space-between;height:58px}
+.brand{display:flex;align-items:center;gap:11px}
 .brand img{width:26px;height:26px}
-.brand b{font-family:var(--serif);font-weight:400;font-size:17.5px}
-.brand b i{color:var(--champ)}
-.brand small{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--champ);padding-left:12px;border-left:1px solid var(--line2)}
+.brand b{font-family:var(--serif);font-weight:400;font-size:18px;letter-spacing:-.005em}
+.brand b i{color:var(--gold)}
+.brand small{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);padding-left:12px;border-left:1px solid var(--line2)}
+.top .ghost{height:36px;padding:0 16px;font-size:13px}
 @media (max-width:520px){.brand small{display:none}}
 
-.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--champ)}
-.h1{margin-top:14px;font-size:clamp(28px,4.2vw,42px);font-weight:600;letter-spacing:-.03em;line-height:1.1;text-wrap:balance}
-.h2{font-size:clamp(22px,2.8vw,30px);font-weight:600;letter-spacing:-.025em;line-height:1.15;text-wrap:balance}
-.lead{margin-top:16px;font-size:16.5px;max-width:52ch}
-.ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
-.sec{padding:clamp(44px,6vw,72px) 0;border-top:1px solid var(--line)}
-.sec__head{display:flex;flex-direction:column;gap:8px}
+.sec{padding:clamp(56px,8vw,96px) 0;border-top:1px solid var(--line)}
 
 /* hero */
-.hero{padding:clamp(40px,7vw,80px) 0 clamp(40px,6vw,64px)}
-.hero__grid{display:grid;gap:clamp(28px,5vw,52px);align-items:center}
-@media (min-width:900px){.hero__grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)}}
-.tape{border:1px solid var(--line2);border-radius:16px;overflow:hidden;background:linear-gradient(180deg,rgba(20,38,66,.7),rgba(11,22,41,.9))}
-.tape__top{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}
-.tape__top img{width:36px;height:36px;border-radius:9px;background:#fff;padding:4px}
-.tape__top b{display:block;font-family:var(--serif);font-weight:400;font-size:22px;line-height:1.1}
-.tape__top small{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--champ)}
-.tape__top .q{margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:5px 10px;border-radius:999px;border:1px solid var(--line2)}
-.rows div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:13px 18px;border-bottom:1px solid var(--line);font-size:14.5px}
+.hero{padding:clamp(48px,8vw,96px) 0 clamp(52px,7vw,84px)}
+.hero__grid{display:grid;gap:clamp(36px,5vw,64px);align-items:center}
+@media (min-width:900px){.hero__grid{grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr)}}
+.tape{border:1px solid var(--line2);border-radius:18px;overflow:hidden;background:linear-gradient(180deg,rgba(18,34,60,.75),rgba(9,18,34,.92));box-shadow:0 40px 80px -44px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.04)}
+.tape__top{display:flex;align-items:center;gap:13px;padding:18px 20px;border-bottom:1px solid var(--line)}
+.tape__top img{width:38px;height:38px;border-radius:10px;background:#fff;padding:5px}
+.tape__top b{display:block;font-family:var(--serif);font-weight:400;font-size:23px;line-height:1.05}
+.tape__top small{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--gold)}
+.tape__top .q{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--gold);padding:6px 11px;border-radius:999px;border:1px solid var(--line2)}
+.rows div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:14px 20px;border-bottom:1px solid var(--line);font-size:14.5px}
 .rows div:last-child{border-bottom:0}
-.rows b{font-family:var(--mono);font-weight:600;font-size:15.5px;white-space:nowrap}
-.rows .lock{display:inline-flex;align-items:center;gap:7px}
-.rows .blur{filter:blur(6px);user-select:none}
-.tape__src{padding:11px 18px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--champ)}
+.rows b{font-family:var(--mono);font-weight:500;font-size:15.5px;letter-spacing:-.01em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rows .dn{color:var(--neg)}
+.rows .lock{display:inline-flex;align-items:center;gap:8px;color:var(--gold)}
+.rows .blur{filter:blur(6px);user-select:none;color:var(--ink)}
+.tape__src{padding:12px 20px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10.5px;line-height:1.6;letter-spacing:.02em;color:var(--gold)}
 
-/* informes */
-.feat{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;margin-top:24px;padding:18px;border:1px solid var(--line3);border-radius:16px;background:rgba(233,211,160,.05);transition:transform .25s var(--ease)}
-.feat:hover{transform:translateY(-1px)}
-.feat img{width:46px;height:46px;border-radius:11px;background:#fff;padding:5px}
-.feat b{display:block;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.15}
-.feat p{margin-top:4px;font-size:14px}
-.feat .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--champ);padding:4px 9px;border:1px solid var(--line3);border-radius:999px;white-space:nowrap}
-@media (max-width:520px){.feat{grid-template-columns:auto 1fr}.feat .tag{display:none}}
-.comp{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:10px}
-@media (max-width:420px){.comp{grid-template-columns:1fr 1fr}}
-.comp a{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line2);border-radius:12px;background:rgba(11,23,41,.6);transition:border-color .25s,transform .25s var(--ease)}
-.comp a:hover{border-color:var(--line3);transform:translateY(-1px)}
-.comp img{width:28px;height:28px;border-radius:7px;background:#fff;padding:3px;flex:none;object-fit:contain}
-.comp b{display:block;font-family:var(--mono);font-size:13px;font-weight:600}
-.comp small{display:block;font-size:12.5px;color:var(--champ2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.more{display:inline-flex;align-items:center;gap:8px;margin-top:16px;font-size:14px;color:var(--champ);border-bottom:1px solid var(--line3);padding-bottom:2px}
+/* biblioteca: libros 3D (mismo dibujo que la colección del sitio) */
+.lib__head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px 40px}
+.count{display:flex;align-items:baseline;gap:12px}
+.count b{font-family:var(--serif);font-weight:400;font-size:clamp(56px,8vw,84px);line-height:.9;letter-spacing:-.02em;background:linear-gradient(180deg,#f6e6bf,#c9a24f);-webkit-background-clip:text;background-clip:text;color:transparent}
+.count span{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);line-height:1.5}
+.shelf{position:relative;margin-top:clamp(28px,4vw,44px)}
+.shelf__row{display:flex;gap:clamp(18px,2.6vw,30px);overflow-x:auto;scroll-snap-type:x mandatory;padding:26px 6px 8px;margin:0 -6px;scrollbar-width:none;-webkit-mask:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 56px),transparent);mask:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 56px),transparent)}
+.shelf__row::-webkit-scrollbar{display:none}
+.shelf__rule{height:1px;margin-top:2px;background:linear-gradient(90deg,transparent,var(--line3) 15%,var(--line3) 85%,transparent)}
+.shelf__hint{display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.shelf__hint a{display:inline-flex;align-items:center;gap:8px;letter-spacing:.12em;border-bottom:1px solid var(--line3);padding-bottom:3px;transition:border-color .25s}
+.shelf__hint a:hover{border-color:var(--gold)}
+
+.bk{flex:none;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:18px;width:150px}
+.bk__st{display:grid;place-items:center;width:150px;height:226px;perspective:1100px;position:relative}
+.bk__st::after{content:'';position:absolute;left:50%;bottom:-8px;width:128px;height:18px;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(0,0,0,.8),transparent);filter:blur(5px);z-index:-1}
+.bk3{--bw:132px;--d:30px;position:relative;display:block;width:var(--bw);height:calc(var(--bw) * 1.4);transform-style:preserve-3d;transform:rotateX(-6deg) rotateY(30deg);transition:transform .9s var(--ease)}
+.bk:hover .bk3,.bk:focus-visible .bk3{transform:rotateX(-4deg) rotateY(12deg) translateY(-6px)}
+.bk3 > span{position:absolute;backface-visibility:hidden}
+.bk3__f{inset:0;transform:translateZ(calc(var(--d) / 2))}
+.bk3__f .est-cover{width:100%;height:100%;aspect-ratio:auto;border-radius:2px 5px 5px 2px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07),inset 0 1px 0 rgba(255,255,255,.12),0 34px 50px -24px rgba(0,0,0,.95)}
+.bk3__s{top:0;left:calc(50% - var(--d) / 2);width:var(--d) !important;height:100% !important;transform:rotateY(-90deg) translateZ(calc(var(--bw) / 2));border-radius:2px 0 0 2px !important}
+.bk3__s.spn{padding:10px 0 8px;filter:brightness(.88)}
+.bk3__s .spn__tk{font-size:14px}
+.bk3__s .spn__cap{height:18px}
+.bk3__s .spn__cap img{max-height:14px}
+.bk3__s .spn__gilt{margin:6px 0}
+.bk3__p{top:0;left:calc(50% - var(--d) / 2);width:var(--d);height:100%;transform:rotateY(90deg) translateZ(calc(var(--bw) / 2 - 2px));background:repeating-linear-gradient(90deg,#d8dce4 0 1px,#f1f3f6 1px 3px)}
+.bk3__t{left:2px;width:calc(100% - 6px);top:calc(50% - var(--d) / 2);height:var(--d);transform:rotateX(90deg) translateZ(calc(var(--bw) * .7 - 2px));background:repeating-linear-gradient(180deg,#cfd4dc 0 1px,#eef0f4 1px 3px);filter:brightness(.72)}
+.bk__lbl{text-align:center;line-height:1.3}
+.bk__lbl b{display:block;font-family:var(--serif);font-weight:400;font-size:17px;letter-spacing:-.005em;white-space:nowrap}
+.bk__lbl small{display:block;margin-top:5px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--gold)}
+
+.spn{--deep:#1a2f4a;position:relative;display:flex;flex-direction:column;align-items:center;color:#fff;overflow:hidden;
+  background:linear-gradient(90deg,rgba(0,0,0,.5) 0,rgba(255,255,255,.13) 16%,rgba(255,255,255,.02) 38%,rgba(0,0,0,.12) 76%,rgba(0,0,0,.55) 100%),
+    linear-gradient(180deg,color-mix(in srgb,var(--deep) 80%,#9fb4d8 9%) 0%,var(--deep) 26%,color-mix(in srgb,var(--deep) 62%,#03060d) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14)}
+.spn::after{content:'';position:absolute;inset:0;pointer-events:none;background-image:var(--es-grain);background-size:160px;opacity:.35;mix-blend-mode:overlay}
+.spn__cap{display:grid;place-items:center;flex:none}
+.spn__cap img{width:66%;object-fit:contain;opacity:.95}
+.spn__gilt{flex:none;width:64%;height:4px;border-top:1px solid rgba(230,207,150,.75);border-bottom:1px solid rgba(230,207,150,.75)}
+.spn__tk{flex:1;min-height:0;writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;font-family:var(--serif);letter-spacing:.05em;color:#fff;white-space:nowrap}
+.spn__no{flex:none;font:500 8px/1 var(--mono);color:var(--gold)}
+
+.est-cover{--acc:#a9c3e6;--deep:#1a2f4a;position:relative;display:block;overflow:hidden;isolation:isolate;container-type:inline-size;color:#f3f6fb;
+  background:radial-gradient(70% 45% at 50% 38%,rgba(230,207,150,.07),transparent 70%),
+    linear-gradient(180deg,color-mix(in srgb,var(--deep) 88%,#9fb4d8 7%) 0%,var(--deep) 46%,color-mix(in srgb,var(--deep) 55%,#03060d) 100%)}
+.est-cover::before{content:'';position:absolute;z-index:6;left:0;top:0;bottom:0;width:3.2%;background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(255,255,255,.08) 55%,rgba(0,0,0,.35))}
+.est-cover::after{content:'';position:absolute;inset:0;z-index:5;pointer-events:none;mix-blend-mode:overlay;opacity:.55;background:linear-gradient(115deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,0) 28%),var(--es-grain);background-size:auto,160px}
+.est-cover__frame{position:absolute;z-index:1;inset:6cqw 6cqw 6cqw 9.5cqw;border:1px solid rgba(230,207,150,.13)}
+.est-cover__in{position:absolute;z-index:2;inset:0;padding:11cqw 11cqw 11cqw 14.5cqw;display:flex;flex-direction:column}
+.est-cover__top{display:flex;justify-content:space-between;align-items:center;gap:3cqw;font:500 4.1cqw/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:#e6cf96;white-space:nowrap}
+.est-cover__top > span:last-child{letter-spacing:.08em}
+.est-cover__mark{flex:1;min-height:0;display:grid;place-items:center;padding:4cqw 0 2cqw}
+.est-cover__logo{max-width:46cqw;max-height:26cqw;width:auto;height:auto;object-fit:contain;opacity:.93;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
+.est-cover__rule{display:block;width:9cqw;height:1px;background:#e6cf96;opacity:.7;margin-bottom:5cqw}
+.est-cover__tk{font:400 15cqw/.9 var(--serif);letter-spacing:-.015em}
+.est-cover__tk.largo{font-size:12.5cqw}
+.est-cover__name{font:400 6.2cqw/1.2 var(--serif);font-style:italic;margin-top:2.6cqw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.est-cover__bot{display:flex;justify-content:space-between;align-items:center;gap:3cqw;margin-top:7cqw;padding-top:4.2cqw;border-top:1px solid rgba(230,207,150,.18);font:500 4.3cqw/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.est-cover__bot b{font-weight:500;color:#f3f6fb}
+.est-cover__sec{display:inline-flex;align-items:center;gap:2cqw;color:var(--acc)}
+.est-cover__sec::before{content:'';width:2.4cqw;height:2.4cqw;border-radius:50%;background:var(--acc);box-shadow:0 0 3cqw color-mix(in srgb,var(--acc) 55%,transparent)}
 
 /* código */
-.code{position:relative;margin-top:24px;border-radius:18px;border:1px solid var(--line3);background:radial-gradient(80% 120% at 50% 0%,rgba(233,211,160,.09),transparent 60%),linear-gradient(180deg,rgba(16,32,58,.9),rgba(9,19,36,.95));padding:clamp(28px,5vw,48px) clamp(18px,4vw,40px);text-align:center;overflow:hidden}
-.code::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(120deg,transparent 30%,rgba(230,203,138,.7) 50%,transparent 70%) 0 0/250% 100%;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:edge 7s ease-in-out infinite;pointer-events:none}
+.code{position:relative;border-radius:22px;border:1px solid var(--line2);background:radial-gradient(70% 90% at 50% 0%,rgba(230,207,150,.08),transparent 65%),linear-gradient(180deg,rgba(15,30,54,.92),rgba(8,17,33,.96));padding:clamp(40px,6vw,64px) clamp(20px,4vw,48px);text-align:center;overflow:hidden;box-shadow:0 50px 100px -56px rgba(0,0,0,.95)}
+.code::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(120deg,transparent 30%,rgba(230,207,150,.75) 50%,transparent 70%) 0 0/250% 100%;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:edge 7s ease-in-out infinite;pointer-events:none}
 @keyframes edge{0%{background-position:120% 0}60%,100%{background-position:-120% 0}}
-.code__lbl{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--champ)}
-.code__val{display:inline-flex;align-items:center;gap:14px;margin-top:16px;padding:14px clamp(18px,4vw,30px);border:1px dashed var(--line3);border-radius:14px;background:rgba(233,211,160,.05);transition:border-color .25s,background .25s}
-.code__val:hover{border-color:var(--champ);background:rgba(233,211,160,.08)}
-.code__val b{font-family:var(--mono);font-weight:600;font-size:clamp(30px,7vw,52px);letter-spacing:.08em;line-height:1;color:#fff}
-.code__val svg{flex:none;color:var(--champ)}
-.code__ok{display:block;height:20px;margin-top:8px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--champ);opacity:0;transition:opacity .25s}
+.code .eyebrow::after{content:'';width:22px;height:1px;background:var(--gold);opacity:.7}
+.code__val{display:inline-flex;align-items:center;gap:18px;margin-top:22px;padding:18px clamp(20px,4vw,34px);border:1px dashed var(--line3);border-radius:16px;background:rgba(230,207,150,.04);transition:border-color .25s,background .25s,transform .16s var(--ease)}
+.code__val:hover{border-color:var(--gold);background:rgba(230,207,150,.07)}
+.code__val:active{transform:scale(.98)}
+.code__val b{font-family:var(--mono);font-weight:500;font-size:clamp(32px,7.4vw,60px);letter-spacing:.1em;line-height:1;background:linear-gradient(180deg,#fbf3df 10%,#e6cf96 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.code__val svg{flex:none;color:var(--gold)}
+.code__ok{display:block;height:18px;margin-top:10px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);opacity:0;transition:opacity .25s}
 .code__ok.on{opacity:1}
-.price{display:flex;align-items:baseline;justify-content:center;gap:12px;margin-top:6px}
-.price s{font-family:var(--mono);font-size:16px;color:var(--champ);text-decoration-thickness:1.5px}
-.price b{font-family:var(--serif);font-weight:400;font-size:clamp(34px,5vw,44px);line-height:1}
-.price span{font-size:14px}
-.inc{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;margin-top:18px;font-size:13.5px}
-.inc span{display:inline-flex;align-items:center;gap:6px}
-.inc svg{color:var(--champ)}
-.code .ctas{justify-content:center}
+.price{display:flex;align-items:baseline;justify-content:center;gap:14px;margin-top:10px}
+.price s{font-family:var(--mono);font-size:15px;color:var(--gold);text-decoration-thickness:1px}
+.price b{font-family:var(--serif);font-weight:400;font-size:clamp(38px,5vw,50px);line-height:1;letter-spacing:-.01em}
+.price span{font-family:var(--serif);font-style:italic;font-size:17px;color:var(--gold)}
+.inc{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 22px;margin-top:22px;font-size:13.5px}
+.inc span{display:inline-flex;align-items:center;gap:7px}
+.inc svg{color:var(--gold)}
+.code .ctas{justify-content:center;margin-top:30px}
 
 /* paso a paso */
-.steps{display:grid;gap:14px;margin-top:26px}
-.st{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:clamp(16px,4vw,40px);align-items:center;padding:clamp(14px,3vw,24px);border:1px solid var(--line2);border-radius:18px;background:rgba(11,23,41,.55)}
+.steps{display:grid;gap:16px;margin-top:clamp(28px,4vw,44px)}
+.st{display:grid;grid-template-columns:minmax(0,44%) minmax(0,1fr);gap:clamp(16px,4vw,48px);align-items:center;padding:clamp(14px,2.6vw,26px);border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,rgba(14,28,50,.55),rgba(9,18,34,.6))}
 @media (min-width:760px){.st{grid-template-columns:300px 1fr}}
-.shot{border-radius:16px;overflow:hidden;border:1px solid var(--line2);background:#070e1b;box-shadow:0 30px 60px -30px rgba(0,0,0,.9)}
+.shot{border-radius:14px;overflow:hidden;border:1px solid var(--line2);background:#070e1b;box-shadow:0 30px 60px -32px rgba(0,0,0,.95)}
 .shot img{display:block;width:100%;height:auto}
-.st__n{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--champ)}
-.st h3{margin-top:8px;font-size:clamp(17px,2vw,20px);font-weight:600;letter-spacing:-.015em;line-height:1.25}
-.st p{margin-top:8px;font-size:clamp(14px,1.6vw,15.5px)}
-.st p b{color:var(--champ2);font-weight:600}
-.st .go{margin-top:14px}
-@media (max-width:520px){.st .go{display:none}}
+.url{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#0d1626;border-bottom:1px solid var(--line)}
+.url span{flex:1;display:flex;align-items:center;gap:7px;min-width:0;padding:7px 11px;border-radius:999px;background:#060c17;border:1px solid var(--line3);font-family:var(--mono);font-size:clamp(10px,2.6vw,12.5px);color:var(--ink);white-space:nowrap;overflow:hidden}
+.url span svg{flex:none;color:var(--gold)}
+.st__n{display:flex;align-items:baseline;gap:12px}
+.st__n b{font-family:var(--serif);font-weight:400;font-size:clamp(30px,4vw,40px);line-height:1;background:linear-gradient(180deg,#f6e6bf,#c9a24f);-webkit-background-clip:text;background-clip:text;color:transparent}
+.st__n span{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.st h3{margin-top:12px;font-family:var(--serif);font-weight:400;font-size:clamp(20px,2.4vw,26px);line-height:1.15;letter-spacing:-.01em}
+.st p{margin-top:10px;font-size:clamp(14px,1.6vw,15.5px);line-height:1.65}
+.st p b{color:var(--gold2);font-weight:500}
+.st .addr{display:inline-block;margin-top:14px;font-family:var(--mono);font-size:clamp(13px,1.8vw,15px);letter-spacing:.02em;color:var(--ink);padding:9px 14px;border-radius:10px;border:1px solid var(--line3);background:rgba(230,207,150,.05)}
+.st .go{margin-top:18px}
+.st .go .btn,.st .go .ghost{height:42px;font-size:13.5px}
+@media (max-width:520px){.st .go{display:none}.st .addr{font-size:12px;padding:7px 10px}.url{padding:7px 6px}.url span{padding:5px 7px;gap:4px;font-size:8.6px;letter-spacing:-.02em}.url span svg{width:9px;height:9px}}
 
 .end{text-align:center}
+.end .h2{margin-inline:auto;max-width:24ch}
 .end .ctas{justify-content:center}
-.foot{padding:28px 0 44px;border-top:1px solid var(--line);font-size:12.5px;color:var(--champ)}
-.foot p{max-width:82ch}
+.foot{padding:30px 0 46px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.6;color:var(--gold)}
+.foot p{max-width:84ch}
 
-.rv{opacity:0;transform:translateY(12px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv{opacity:0;transform:translateY(14px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
 .rv.in{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.code::before{animation:none}}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.code::before{animation:none}.bk3{transition:none}}
 </style>
 </head>
 <body>
@@ -159,8 +223,8 @@ body::before{content:'';position:fixed;inset:-12%;z-index:-1;pointer-events:none
   <section class="hero">
     <div class="wrap hero__grid">
       <div class="rv">
-        <span class="eyebrow">NVIDIA + 9 competidores</span>
-        <h1 class="h1">Lo que viste en el video, <em class="s">con todos los números.</em></h1>
+        <span class="eyebrow">NVIDIA y su competencia</span>
+        <h1 class="h1">Lo que viste en el video, <span class="it">con todos los números.</span></h1>
         <p class="lead">El informe completo de NVIDIA y el de cada empresa que compite con ella en chips: negocio, balance, flujo de caja, riesgos y cuánto creemos que vale cada acción.</p>
         <div class="ctas">
           <a class="btn" href="/?membresia=1&amp;codigo=MANFREDI30">Usar mi código
@@ -171,7 +235,7 @@ body::before{content:'';position:fixed;inset:-12%;z-index:-1;pointer-events:none
 
       <div class="tape rv" aria-label="NVIDIA esta semana">
         <div class="tape__top">
-          <img src="/assets/logos/nvda.png" alt="" width="36" height="36">
+          <img src="/assets/logos/nvda.png" alt="" width="38" height="38">
           <div><b>NVIDIA</b><small>NASDAQ · NVDA</small></div>
           <span class="q">ESTA SEMANA</span>
         </div>
@@ -189,45 +253,156 @@ body::before{content:'';position:fixed;inset:-12%;z-index:-1;pointer-events:none
 
   <section class="sec">
     <div class="wrap">
-      <div class="sec__head rv">
-        <span class="eyebrow">Los informes</span>
-        <h2 class="h2">NVIDIA y <em class="s">toda su competencia</em></h2>
+      <div class="lib__head rv">
+        <div>
+          <span class="eyebrow">La biblioteca</span>
+          <h2 class="h2">NVIDIA y <span class="it">toda su competencia</span></h2>
+        </div>
+        <div class="count"><b>40+</b><span>informes<br>completos</span></div>
       </div>
-
-      <a class="feat rv" href="/informes/nvda">
-        <img src="/assets/logos/nvda.png" alt="" width="46" height="46">
-        <span><b>NVIDIA</b><p>El proveedor, no el comprador: por qué el gasto en IA de todos los demás es el ingreso de NVIDIA.</p></span>
-        <span class="tag">Informe N° 01</span>
-      </a>
-
-      <div class="comp rv">
-        <a href="/informes/amd"><img src="/assets/logos/amd.png" alt="" width="28" height="28" loading="lazy"><span><b>AMD</b><small>AMD</small></span></a>
-        <a href="/informes/avgo"><img src="/assets/logos/avgo.png" alt="" width="28" height="28" loading="lazy"><span><b>AVGO</b><small>Broadcom</small></span></a>
-        <a href="/informes/tsm"><img src="/assets/logos/tsm.png" alt="" width="28" height="28" loading="lazy"><span><b>TSM</b><small>TSMC</small></span></a>
-        <a href="/informes/intc"><img src="/assets/logos/intc.png" alt="" width="28" height="28" loading="lazy"><span><b>INTC</b><small>Intel</small></span></a>
-        <a href="/informes/mu"><img src="/assets/logos/mu.png" alt="" width="28" height="28" loading="lazy"><span><b>MU</b><small>Micron</small></span></a>
-        <a href="/informes/qcom"><img src="/assets/logos/qcom.png" alt="" width="28" height="28" loading="lazy"><span><b>QCOM</b><small>Qualcomm</small></span></a>
-        <a href="/informes/arm"><img src="/assets/logos/arm.png" alt="" width="28" height="28" loading="lazy"><span><b>ARM</b><small>Arm</small></span></a>
-        <a href="/informes/asml"><img src="/assets/logos/asml.png" alt="" width="28" height="28" loading="lazy"><span><b>ASML</b><small>ASML</small></span></a>
-        <a href="/informes/txn"><img src="/assets/logos/txn.png" alt="" width="28" height="28" loading="lazy"><span><b>TXN</b><small>Texas Instruments</small></span></a>
+      <div class="shelf rv">
+        <div class="shelf__row">
+<a class="bk" href="/informes/nvda" aria-label="Informe de NVIDIA, 2T 2027">
+  <span class="bk__st"><span class="bk3" style="--d:36px">
+    <span class="bk3__f"><span class="est-cover"><i class="est-cover__frame"></i>
+      <span class="est-cover__in"><span class="est-cover__top"><span>Manfredi Research</span><span>N° 01</span></span>
+      <span class="est-cover__mark"><img class="est-cover__logo" src="/assets/logos/mono/nvda.png" alt="" loading="lazy"></span>
+      <i class="est-cover__rule"></i><span class="est-cover__tk">NVDA</span><span class="est-cover__name">NVIDIA</span>
+      <span class="est-cover__bot"><b>2T 2027</b><span class="est-cover__sec">Semis</span></span></span></span></span>
+    <span class="bk3__s spn"><span class="spn__cap"><img src="/assets/logos/mono/nvda.png" alt="" loading="lazy"></span><i class="spn__gilt"></i><span class="spn__tk">NVDA</span><i class="spn__gilt"></i><span class="spn__no">01</span></span>
+    <span class="bk3__p"></span><span class="bk3__t"></span>
+  </span></span>
+  <span class="bk__lbl"><b>NVIDIA</b><small>NVDA · 2T 2027</small></span>
+</a>
+<a class="bk" href="/informes/amd" aria-label="Informe de AMD, 2T 2026">
+  <span class="bk__st"><span class="bk3" style="--d:37px">
+    <span class="bk3__f"><span class="est-cover"><i class="est-cover__frame"></i>
+      <span class="est-cover__in"><span class="est-cover__top"><span>Manfredi Research</span><span>N° 05</span></span>
+      <span class="est-cover__mark"><img class="est-cover__logo" src="/assets/logos/mono/amd.png" alt="" loading="lazy"></span>
+      <i class="est-cover__rule"></i><span class="est-cover__tk">AMD</span><span class="est-cover__name">AMD</span>
+      <span class="est-cover__bot"><b>2T 2026</b><span class="est-cover__sec">Semis</span></span></span></span></span>
+    <span class="bk3__s spn"><span class="spn__cap"><img src="/assets/logos/mono/amd.png" alt="" loading="lazy"></span><i class="spn__gilt"></i><span class="spn__tk">AMD</span><i class="spn__gilt"></i><span class="spn__no">05</span></span>
+    <span class="bk3__p"></span><span class="bk3__t"></span>
+  </span></span>
+  <span class="bk__lbl"><b>AMD</b><small>AMD · 2T 2026</small></span>
+</a>
+<a class="bk" href="/informes/avgo" aria-label="Informe de Broadcom, 3T 2026">
+  <span class="bk__st"><span class="bk3" style="--d:42px">
+    <span class="bk3__f"><span class="est-cover"><i class="est-cover__frame"></i>
+      <span class="est-cover__in"><span class="est-cover__top"><span>Manfredi Research</span><span>N° 10</span></span>
+      <span class="est-cover__mark"><img class="est-cover__logo" src="/assets/logos/mono/avgo.png" alt="" loading="lazy"></span>
+      <i class="est-cover__rule"></i><span class="est-cover__tk">AVGO</span><span class="est-cover__name">Broadcom</span>
+      <span class="est-cover__bot"><b>3T 2026</b><span class="est-cover__sec">Semis</span></span></span></span></span>
+    <span class="bk3__s spn"><span class="spn__cap"><img src="/assets/logos/mono/avgo.png" alt="" loading="lazy"></span><i class="spn__gilt"></i><span class="spn__tk">AVGO</span><i class="spn__gilt"></i><span class="spn__no">10</span></span>
+    <span class="bk3__p"></span><span class="bk3__t"></span>
+  </span></span>
+  <span class="bk__lbl"><b>Broadcom</b><small>AVGO · 3T 2026</small></span>
+</a>
+<a class="bk" href="/informes/tsm" aria-label="Informe de TSMC, 2T 2026">
+  <span class="bk__st"><span class="bk3" style="--d:40px">
+    <span class="bk3__f"><span class="est-cover"><i class="est-cover__frame"></i>
+      <span class="est-cover__in"><span class="est-cover__top"><span>Manfredi Research</span><span>N° 15</span></span>
+      <span class="est-cover__mark"><img class="est-cover__logo" src="/assets/logos/mono/tsm.png" alt="" loading="lazy"></span>
+      <i class="est-cover__rule"></i><span class="est-cover__tk">TSM</span><span class="est-cover__name">TSMC</span>
+      <span class="est-cover__bot"><b>2T 2026</b><span class="est-cover__sec">Semis</span></span></span></span></span>
+    <span class="bk3__s spn"><span class="spn__cap"><img src="/assets/logos/mono/tsm.png" alt="" loading="lazy"></span><i class="spn__gilt"></i><span class="spn__tk">TSM</span><i class="spn__gilt"></i><span class="spn__no">15</span></span>
+    <span class="bk3__p"></span><span class="bk3__t"></span>
+  </span></span>
+  <span class="bk__lbl"><b>TSMC</b><small>TSM · 2T 2026</small></span>
+</a>
+<a class="bk" href="/informes/intc" aria-label="Informe de Intel, 2T 2026">
+  <span class="bk__st"><span class="bk3" style="--d:35px">
+    <span class="bk3__f"><span class="est-cover"><i class="est-cover__frame"></i>
+      <span class="est-cover__in"><span class="est-cover__top"><span>Manfredi Research</span><span>N° 03</span></span>
+      <span class="est-cover__mark"><img class="est-cover__logo" src="/assets/logos/mono/intc.png" alt="" loading="lazy"></span>
+      <i class="est-cover__rule"></i><span class="est-cover__tk">INTC</span><span class="est-cover__name">Intel</span>
+      <span class="est-cover__bot"><b>2T 2026</b><span class="est-cover__sec">Semis</span></span></span></span></span>
+    <span class="bk3__s spn"><span class="spn__cap"><img src="/assets/logos/mono/intc.png" alt="" loading="lazy"></span><i class="spn__gilt"></i><span class="spn__tk">INTC</span><i class="spn__gilt"></i><span class="spn__no">03</span></span>
+    <span class="bk3__p"></span><span class="bk3__t"></span>
+  </span></span>
+  <span class="bk__lbl"><b>Intel</b><small>INTC · 2T 2026</small></span>
+</a>
+<a class="bk" href="/informes/mu" aria-label="Informe de Micron, 4T 2026">
+  <span class="bk__st"><span class="bk3" style="--d:39px">
+    <span class="bk3__f"><span class="est-cover"><i class="est-cover__frame"></i>
+      <span class="est-cover__in"><span class="est-cover__top"><span>Manfredi Research</span><span>N° 33</span></span>
+      <span class="est-cover__mark"><img class="est-cover__logo" src="/assets/logos/mono/mu.png" alt="" loading="lazy"></span>
+      <i class="est-cover__rule"></i><span class="est-cover__tk">MU</span><span class="est-cover__name">Micron</span>
+      <span class="est-cover__bot"><b>4T 2026</b><span class="est-cover__sec">Semis</span></span></span></span></span>
+    <span class="bk3__s spn"><span class="spn__cap"><img src="/assets/logos/mono/mu.png" alt="" loading="lazy"></span><i class="spn__gilt"></i><span class="spn__tk">MU</span><i class="spn__gilt"></i><span class="spn__no">33</span></span>
+    <span class="bk3__p"></span><span class="bk3__t"></span>
+  </span></span>
+  <span class="bk__lbl"><b>Micron</b><small>MU · 4T 2026</small></span>
+</a>
+<a class="bk" href="/informes/qcom" aria-label="Informe de Qualcomm, 3T 2026">
+  <span class="bk__st"><span class="bk3" style="--d:41px">
+    <span class="bk3__f"><span class="est-cover"><i class="est-cover__frame"></i>
+      <span class="est-cover__in"><span class="est-cover__top"><span>Manfredi Research</span><span>N° 14</span></span>
+      <span class="est-cover__mark"><img class="est-cover__logo" src="/assets/logos/mono/qcom.png" alt="" loading="lazy"></span>
+      <i class="est-cover__rule"></i><span class="est-cover__tk">QCOM</span><span class="est-cover__name">Qualcomm</span>
+      <span class="est-cover__bot"><b>3T 2026</b><span class="est-cover__sec">Semis</span></span></span></span></span>
+    <span class="bk3__s spn"><span class="spn__cap"><img src="/assets/logos/mono/qcom.png" alt="" loading="lazy"></span><i class="spn__gilt"></i><span class="spn__tk">QCOM</span><i class="spn__gilt"></i><span class="spn__no">14</span></span>
+    <span class="bk3__p"></span><span class="bk3__t"></span>
+  </span></span>
+  <span class="bk__lbl"><b>Qualcomm</b><small>QCOM · 3T 2026</small></span>
+</a>
+<a class="bk" href="/informes/arm" aria-label="Informe de Arm, 1T 2027">
+  <span class="bk__st"><span class="bk3" style="--d:43px">
+    <span class="bk3__f"><span class="est-cover"><i class="est-cover__frame"></i>
+      <span class="est-cover__in"><span class="est-cover__top"><span>Manfredi Research</span><span>N° 13</span></span>
+      <span class="est-cover__mark"><img class="est-cover__logo" src="/assets/logos/mono/arm.png" alt="" loading="lazy"></span>
+      <i class="est-cover__rule"></i><span class="est-cover__tk">ARM</span><span class="est-cover__name">Arm</span>
+      <span class="est-cover__bot"><b>1T 2027</b><span class="est-cover__sec">Semis</span></span></span></span></span>
+    <span class="bk3__s spn"><span class="spn__cap"><img src="/assets/logos/mono/arm.png" alt="" loading="lazy"></span><i class="spn__gilt"></i><span class="spn__tk">ARM</span><i class="spn__gilt"></i><span class="spn__no">13</span></span>
+    <span class="bk3__p"></span><span class="bk3__t"></span>
+  </span></span>
+  <span class="bk__lbl"><b>Arm</b><small>ARM · 1T 2027</small></span>
+</a>
+<a class="bk" href="/informes/asml" aria-label="Informe de ASML, 2T 2026">
+  <span class="bk__st"><span class="bk3" style="--d:41px">
+    <span class="bk3__f"><span class="est-cover"><i class="est-cover__frame"></i>
+      <span class="est-cover__in"><span class="est-cover__top"><span>Manfredi Research</span><span>N° 16</span></span>
+      <span class="est-cover__mark"><img class="est-cover__logo" src="/assets/logos/mono/asml.png" alt="" loading="lazy"></span>
+      <i class="est-cover__rule"></i><span class="est-cover__tk">ASML</span><span class="est-cover__name">ASML</span>
+      <span class="est-cover__bot"><b>2T 2026</b><span class="est-cover__sec">Semis</span></span></span></span></span>
+    <span class="bk3__s spn"><span class="spn__cap"><img src="/assets/logos/mono/asml.png" alt="" loading="lazy"></span><i class="spn__gilt"></i><span class="spn__tk">ASML</span><i class="spn__gilt"></i><span class="spn__no">16</span></span>
+    <span class="bk3__p"></span><span class="bk3__t"></span>
+  </span></span>
+  <span class="bk__lbl"><b>ASML</b><small>ASML · 2T 2026</small></span>
+</a>
+<a class="bk" href="/informes/txn" aria-label="Informe de Texas Instruments, 2T 2026">
+  <span class="bk__st"><span class="bk3" style="--d:39px">
+    <span class="bk3__f"><span class="est-cover"><i class="est-cover__frame"></i>
+      <span class="est-cover__in"><span class="est-cover__top"><span>Manfredi Research</span><span>N° 18</span></span>
+      <span class="est-cover__mark"><img class="est-cover__logo" src="/assets/logos/mono/txn.png" alt="" loading="lazy"></span>
+      <i class="est-cover__rule"></i><span class="est-cover__tk">TXN</span><span class="est-cover__name">Texas Instruments</span>
+      <span class="est-cover__bot"><b>2T 2026</b><span class="est-cover__sec">Semis</span></span></span></span></span>
+    <span class="bk3__s spn"><span class="spn__cap"><img src="/assets/logos/mono/txn.png" alt="" loading="lazy"></span><i class="spn__gilt"></i><span class="spn__tk">TXN</span><i class="spn__gilt"></i><span class="spn__no">18</span></span>
+    <span class="bk3__p"></span><span class="bk3__t"></span>
+  </span></span>
+  <span class="bk__lbl"><b>Texas Instruments</b><small>TXN · 2T 2026</small></span>
+</a>
+        </div>
+        <div class="shelf__rule"></div>
+        <div class="shelf__hint"><span>Deslizá para ver los 10</span>
+          <a href="/guia-informes">Ver los 40+ informes
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
       </div>
-      <a class="more rv" href="/guia-informes">Y 38 empresas más en la biblioteca
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
   </section>
 
   <section class="sec" id="codigo">
     <div class="wrap">
       <div class="code rv">
-        <span class="code__lbl">Código de descuento · 30% OFF</span><br>
+        <span class="eyebrow">Código de descuento · 30% OFF</span><br>
         <button type="button" class="code__val" id="copiar" aria-label="Copiar el código MANFREDI30">
           <b>MANFREDI30</b>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
         </button>
         <span class="code__ok" id="copiado" aria-live="polite"></span>
         <div class="price"><s>USD 15</s><b>USD 10,50</b><span>por mes</span></div>
         <div class="inc">
-          <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Los 48 informes con valor justo</span>
+          <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>40+ informes con valor justo</span>
           <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Warren IA</span>
           <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Pago único, sin renovación</span>
         </div>
@@ -241,36 +416,47 @@ body::before{content:'';position:fixed;inset:-12%;z-index:-1;pointer-events:none
 
   <section class="sec" id="pasos">
     <div class="wrap">
-      <div class="sec__head rv">
+      <div class="rv">
         <span class="eyebrow">Paso a paso</span>
-        <h2 class="h2">Cómo usar el código, <em class="s">en cuatro pasos</em></h2>
+        <h2 class="h2">Cómo usar el código, <span class="it">en cinco pasos</span></h2>
       </div>
       <div class="steps">
         <div class="st rv">
+          <div class="shot">
+            <div class="url"><span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>manfredinvestment.com</span></div>
+            <img src="/assets/guia-nvda/paso-0.webp" alt="La página de inicio de Manfredi Investment" width="780" height="814" loading="lazy">
+          </div>
+          <div><div class="st__n"><b>01</b><span>Paso</span></div>
+            <h3>Entrá a la web</h3>
+            <p>Abrí el navegador y escribí <b>manfredinvestment.com</b>, todo junto, en minúscula y sin espacios. Es <b>manfredi</b> + <b>investment</b> con una sola “i” en el medio: manfred<b>i</b>nvestment.</p>
+            <span class="addr">manfredinvestment.com</span>
+            <div class="go"><a class="ghost" href="/">Ir a la web</a></div></div>
+        </div>
+        <div class="st rv">
           <div class="shot"><img src="/assets/guia-nvda/paso-1.webp" alt="Cartel para ingresar a Manfredi con Google o con email" width="780" height="1120" loading="lazy"></div>
-          <div><span class="st__n">Paso 01</span>
+          <div><div class="st__n"><b>02</b><span>Paso</span></div>
             <h3>Creá tu cuenta gratis</h3>
-            <p>Entrá a <b>manfredinvestment.com</b> y tocá <b>Continuar con Google</b>, o registrate con tu mail. Es gratis y no pide tarjeta.</p>
+            <p>Tocá <b>Ingresar</b> y después <b>Continuar con Google</b>, o registrate con tu mail. Es gratis y no pide tarjeta.</p>
             <div class="go"><a class="ghost" href="/?registro=1">Crear mi cuenta</a></div></div>
         </div>
         <div class="st rv">
           <div class="shot"><img src="/assets/guia-nvda/paso-2.webp" alt="Abajo del cartel de membresía, el enlace ¿Tenés un código de descuento?" width="780" height="388" loading="lazy"></div>
-          <div><span class="st__n">Paso 02</span>
+          <div><div class="st__n"><b>03</b><span>Paso</span></div>
             <h3>Abrí la membresía</h3>
             <p>Tocá <b>Membresía</b>, bajá hasta el final del cartel y tocá <b>¿Tenés un código de descuento?</b></p></div>
         </div>
         <div class="st rv">
           <div class="shot"><img src="/assets/guia-nvda/paso-3.webp" alt="Panel con meses a elegir, el código MANFREDI30 escrito y el precio de USD 10,50" width="780" height="610" loading="lazy"></div>
-          <div><span class="st__n">Paso 03</span>
+          <div><div class="st__n"><b>04</b><span>Paso</span></div>
             <h3>Escribí MANFREDI30</h3>
             <p>Elegí cuántos meses pagar (1, 3, 6 o 12) y escribí <b>MANFREDI30</b>. El precio baja solo a <b>USD 10,50 por mes</b>. Tocá <b>Pagar con código</b> y pagás con Mercado Pago.</p>
             <div class="go"><a class="btn" href="/?membresia=1&amp;codigo=MANFREDI30">Abrir con el código cargado</a></div></div>
         </div>
         <div class="st rv">
           <div class="shot"><img src="/assets/guia-nvda/paso-4.webp" alt="La biblioteca de informes con el de NVIDIA abierto" width="780" height="1140" loading="lazy"></div>
-          <div><span class="st__n">Paso 04</span>
+          <div><div class="st__n"><b>05</b><span>Paso</span></div>
             <h3>Abrí el informe de NVIDIA</h3>
-            <p>En <b>Informes</b> elegí NVIDIA, o cualquiera de sus competidores. Con la membresía activa vas a ver todo el informe, incluido el valor justo.</p>
+            <p>En <b>Informes</b> elegí NVIDIA, o cualquiera de sus competidores. Con la membresía activa ves el informe entero, valor justo incluido.</p>
             <div class="go"><a class="ghost" href="/informes/nvda">Ir al informe</a></div></div>
         </div>
       </div>
@@ -279,7 +465,8 @@ body::before{content:'';position:fixed;inset:-12%;z-index:-1;pointer-events:none
 
   <section class="sec end">
     <div class="wrap rv">
-      <h2 class="h2">¿Oportunidad o trampa? <em class="s">Decidilo con los números.</em></h2>
+      <span class="eyebrow">Antes del balance del 17 de noviembre</span>
+      <h2 class="h2">¿Oportunidad o trampa? <span class="it">Decidilo con los números.</span></h2>
       <div class="ctas">
         <a class="btn" href="/?membresia=1&amp;codigo=MANFREDI30">Usar MANFREDI30
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
