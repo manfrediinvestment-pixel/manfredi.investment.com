@@ -42,6 +42,7 @@
     trash: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     share: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M3.5 20.5l1.3-4.2A8.5 8.5 0 1 1 8 19.4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8.6c0 3.3 2.9 6.4 6.4 6.4l1.1-1.6-2-1-1 1c-1.2-.5-2.2-1.5-2.7-2.7l1-1-1-2z" fill="currentColor"/></svg>',
     check: '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 2l2.4 2.2 3.2-.4.9 3.1 2.9 1.5-1 3.1 1 3.1-2.9 1.5-.9 3.1-3.2-.4L12 22l-2.4-2.2-3.2.4-.9-3.1-2.9-1.5 1-3.1-1-3.1 2.9-1.5.9-3.1 3.2.4z" fill="currentColor"/><path d="M8.5 12.2l2.3 2.3 4.7-4.8" fill="none" stroke="#0b1629" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    copy: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
     lock: '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
     down: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     x: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
@@ -377,6 +378,9 @@
     return h + '</div></div>';
   }
 
+  // Compartir y copiar los resúmenes para el Canal de WhatsApp: solo el creador.
+  function esCreador() { return !!(S.yo && S.yo.rol === 'creador'); }
+
   function resumen(m) {
     var d = m.datos, t = tarjeta(m);
     // el texto completo es el mismo de WhatsApp: arriba la introducción, el resto se despliega
@@ -388,7 +392,10 @@
       (d.clave ? '<p class="ch-res-clave">' + esc(d.clave) + '</p>' : '') +
       '<div class="ch-txt">' + formato(d.intro, true) + '</div>' +
       '<details class="ch-det"><summary><span>Ver el resumen completo</span>' + IC.down + '</summary><div class="ch-txt">' + formato(cuerpo, true) + '</div></details>' +
-      '<div class="ch-res-pie"><button type="button" class="ch-share" data-a="compartir">' + IC.share + 'Compartir</button><span class="ch-time">' + hora(m.creado) + '</span></div>';
+      '<div class="ch-res-pie">' + (esCreador()
+        ? '<span class="ch-res-acc"><button type="button" class="ch-share" data-a="copiar-res">' + IC.copy + 'Copiar para el canal</button>' +
+          '<button type="button" class="ch-share" data-a="compartir">' + IC.share + 'Compartir</button></span>'
+        : '<span></span>') + '<span class="ch-time">' + hora(m.creado) + '</span></div>';
   }
 
   function herramientas(m, mio) {
@@ -440,7 +447,15 @@
     }
     if (a === 'ir') { var o = S.root.querySelector('.ch-row[data-id="' + b.dataset.irId + '"]'); if (o) resaltar(o); return; }
     if (a === 'ver' && m) { var t = tarjeta(m); if (!t.url) return; var lb = S.root.querySelector('.ch-lb'); lb.querySelector('img').src = t.url; lb.hidden = false; return; }
-    if (a === 'compartir' && m) {
+    if (a === 'copiar-res' && m && esCreador()) {
+      var txt = window.MiTarjeta.epigrafe(m.datos, m.id);
+      (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () {
+        b.classList.add('ok'); setTimeout(function () { b.classList.remove('ok'); }, 1600);
+        toast('Copiado. Pegalo en el canal de WhatsApp.');
+      }, function () { toast('No se pudo copiar. Probá con Compartir.'); });
+      return;
+    }
+    if (a === 'compartir' && m && esCreador()) {
       var tj = tarjeta(m);
       var epi = window.MiTarjeta.epigrafe(m.datos, m.id);
       window.MiTarjeta.compartirImagen(tj.blob, m.datos, epi).then(function (r) {
