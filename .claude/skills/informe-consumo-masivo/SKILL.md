@@ -337,7 +337,17 @@ Modelo de referencia: `modelos/pep/` (DCF por negocio, suma de partes, comparaci
   del precio (P/E, rendimientos, EV, relativo, gap del blend), con el cierre de la fuente a la misma fecha de corte; los
   fair values publicados no se tocan y se dice contra qué precio se publicaron.
 - Tabla de definiciones idénticas con una columna "Lectura", y una nota explícita para lo que difiere aunque se llame
-  igual (PEP excluye hiperinflación del orgánico desde 2025; KO la incluía y la cuantificó en 2024).
+  igual o parecido (las dos incluyen en el orgánico el precio de sus subsidiarias hiperinflacionarias: KO lo cuantificó en
+  2024 y PEP no lo cuantifica).
+- **"Moneda constante" para hiperinflación no limpia el orgánico, lo contamina** (corregido en PEP 3T 2026): medir una
+  subsidiaria hiperinflacionaria a tipo de cambio del año anterior deja dentro del orgánico la suba de precios en moneda
+  local. Una compañía solo "excluye" hiperinflación si lo dice (tope de precio, "ex-Argentina", puntos cuantificados);
+  si la definición dice "aplicamos moneda constante a esas subsidiarias", el precio está adentro. Buscá en el 10-Q la
+  frase de cada segmento ("part of which is from subsidiaries operating in highly inflationary economies").
+- **Reintegros o cargos puntuales dentro del EPS core del trimestre** (PEP 3T 2026: reintegros de aranceles IEEPA, 4
+  puntos del resultado core): estimá el efecto con el dato de la compañía (puntos × base del año anterior, a la tasa
+  core del trimestre) y mostrá el crecimiento sin él junto al reportado; no se saca del EPS del modelo si la compañía
+  no lo excluye (el consenso tampoco lo hace).
 - Gráficos lado a lado con `.chartpair` (dos columnas en escritorio, una en celular) y la **misma escala** (opción
   `minV`/`maxV` de `drawGroupedBars`, parche en `modelos/pep/build.py`). Métricas en `drawHBars` con pares "· PEP / · KO"
   y colores fijos por compañía.

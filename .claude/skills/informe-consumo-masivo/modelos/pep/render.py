@@ -25,6 +25,8 @@ def fmt(v, f):
     if f in ('sg', 'sg1'):  # puntos con signo: hasta 1 decimal, sin ".0" (PepsiCo reporta medios puntos)
         r = round(v + 0.0, 1); s = (f'{abs(r):.1f}').rstrip('0').rstrip('.')
         return (MINUS+s) if r < 0 else ('+'+s if r > 0 else '0')
+    if f == 'susd2':  # dólares con signo (puente)
+        s = f'{abs(v):,.2f}'; return (MINUS+'$'+s) if v < 0 and s != '0.00' else ('+$'+s if s != '0.00' else '$0.00')
     if f == 'a1': return f'{abs(v):.1f}'
     if f == 'a0': return f'{abs(v):,.0f}'
     if f == 'js2': return f'{v:.2f}'

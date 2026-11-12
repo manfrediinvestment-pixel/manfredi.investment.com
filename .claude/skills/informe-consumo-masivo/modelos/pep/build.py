@@ -6,6 +6,9 @@ pg = open(f'{ROOT}/informes/pg.html', encoding='utf-8').read()
 css = pg[pg.index('<style>'): pg.index('</style>')+len('</style>')]
 css = css.replace('content:"PG";', 'content:"PEP";')
 assert 'content:"PEP"' in css
+# CERO texto gris: la nota de la portada heredaba #5d646f de pg.html; pasa al azul oscuro del sitio (--muted), como en KO
+assert css.count('.verdict-note{color:#5d646f !important;}') == 1
+css = css.replace('.verdict-note{color:#5d646f !important;}', '.verdict-note{color:var(--muted) !important;}')
 s0 = pg.index('<script>', pg.index('</style>'))
 s1 = pg.index('  function renderAll(){', s0)
 eng = pg[s0:s1]
