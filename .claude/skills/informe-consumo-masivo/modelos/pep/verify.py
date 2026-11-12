@@ -55,20 +55,19 @@ if abs(M['nonop'] - M['celh_val'] - M['eqm']) > 1e-12: diffs.append('activos no 
 if M['reg_ok']: diffs.append('una regresión sostiene ajuste: revisar el Método 3')
 if abs(M['comp_pe'] - M['peer_pe_med']*M['eps_ntm']) > 1e-9: diffs.append('comparables P/E no es mediana x EPS')
 if 'PEP' in M['peers']: diffs.append('PepsiCo está dentro de su propio grupo de pares')
-# Prueba: se corre el modelo con otro precio de PEP (los asserts de redacción se neutralizan) y los tres métodos
-# independientes del precio tienen que dar exactamente lo mismo.
-src_m = open('model.py', encoding='utf-8').read()
-src_m = src_m.replace("PRICE = put('price', yh_close('PEP'))", "PRICE = put('price', 99.0)")
-src_m = src_m.replace("json.dump(M, open('model.json', 'w'), indent=1, default=float)", "TEST_OUT = {k: M[k] for k in ('comp', 'sotp', 'dcf_base')}")
-src_m = re.sub(r'(?m)^(\s*)assert .*$', r'\1pass', src_m)
-ns_t = {'__name__': 'anticirc', '__file__': 'model.py'}
+# Prueba: se corre el modelo con otro precio de PEP (variable PEP_PRICE: los chequeos de redacción no corren) y los
+# métodos que no usan el precio de PEP tienen que dar exactamente lo mismo. El DCF solo puede moverse por el WACC.
+import subprocess, os
 try:
-    exec(compile(src_m, 'model_test', 'exec'), ns_t)
-    for k in ('comp', 'sotp'):   # el DCF usa pesos de mercado en el WACC (declarado en la Sección 15)
-        if abs(ns_t['TEST_OUT'][k] - M[k]) > 1e-9: diffs.append(f"{k} cambia con el precio de PEP: {ns_t['TEST_OUT'][k]} vs {M[k]}")
-    print('anti-circularidad: comparables y suma de partes no cambian con el precio de PEP')
+    env = dict(os.environ, PEP_PRICE='99.0', PEP_OUT='model_vtest.json')
+    subprocess.run([sys.executable, 'model.py'], env=env, check=True, capture_output=True)
+    T = json.load(open('model_vtest.json')); os.remove('model_vtest.json')
+    for k in ('comp', 'comp_pe', 'comp_ev', 'sotp', 'rev', 'cons'):
+        if abs(T[k] - M[k]) > 1e-9: diffs.append(f"{k} cambia con el precio de PEP: {T[k]} vs {M[k]}")
+    print('anti-circularidad: comparables, suma de partes, reversión y consenso no cambian con el precio de PEP')
 except Exception as e:
     diffs.append(f'no corrió la prueba de anti-circularidad: {e!r}')
+if M.get('fails'): diffs += [f'frase del texto: {f}' for f in M['fails']]
 # 7) reglas de texto
 vis = re.sub(r'(?is)<(script|style).*?</\1>', '', out)
 for w in re.findall(r'\b(hoy|ayer|mañana)\b|hace \d+ hora', vis, re.I): diffs.append(f'lenguaje relativo: {w}')
