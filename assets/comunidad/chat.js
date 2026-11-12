@@ -388,6 +388,12 @@
         '<img alt="" ' + (m.datos.url ? 'src="' + m.datos.url + '"' : 'data-img="' + esc(m.datos.img) + '"') + '>' +
         (m.texto ? '' : '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span>') + '</button>';
       if (m.texto) h += '<div class="ch-txt">' + formato(m.texto, false) + '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span></div>';
+      // Pasarla a WhatsApp: en el celular, Compartir (imagen + texto); en la compu, copiar y pegar.
+      if (esCreador() && !m.pendiente) h += '<div class="ch-res-pie"><span class="ch-res-acc">' + (window.MiTarjeta.movil
+        ? '<button type="button" class="ch-share" data-a="compartir-img">' + IC.share + 'Compartir</button>'
+        : '<button type="button" class="ch-share" data-a="copiar-img">' + IC.copy + 'Copiar imagen</button>' +
+          (m.texto ? '<button type="button" class="ch-share" data-a="copiar-txt">' + IC.copy + 'Copiar texto</button>' : '')) +
+        '</span><span></span></div>';
     }
     else h += '<div class="ch-txt">' + formato(m.texto, m.rol === 'oficial') + '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span></div>';
     var re = Object.keys(m.reacciones || {});
@@ -452,6 +458,7 @@
     if (a === 'sin-reply') { S.responde = null; repintarCompositor(); return; }
     if (a === 'sin-adj') { quitarAdjunto(); repintarCompositor(); return; }
     if (a === 'ver-img') { var im = b.querySelector('img'); if (!im || !im.src) return; var lb2 = S.root.querySelector('.ch-lb'); lb2.querySelector('img').src = im.src; lb2.hidden = false; return; }
+    if ((a === 'copiar-img' || a === 'compartir-img' || a === 'copiar-txt') && m && esCreador()) { pasarAWhatsApp(a, m, b); return; }
     if (a === 'responder' && m) {
       S.responde = { id: m.id, nombre: m.nombre, texto: m.tipo === 'resumen' ? (m.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : m.tipo === 'imagen' && !m.texto ? 'Imagen' : m.texto.replace(/[*_]/g, '').slice(0, 140) };
       repintarCompositor(); var ta = S.root.querySelector('.ch-ta'); if (ta) ta.focus();
@@ -522,6 +529,39 @@
       IMGS[k].then(function (u) { if (u && el.isConnected) { el.src = u; el.removeAttribute('data-img'); } });
     });
   }
+  // La imagen del mensaje en PNG (el portapapeles del navegador solo acepta PNG).
+  function imagenPng(el) {
+    return new Promise(function (ok, mal) {
+      if (!el || !el.src) return mal(new Error('La imagen todavía se está cargando.'));
+      var cv = document.createElement('canvas'); cv.width = el.naturalWidth; cv.height = el.naturalHeight;
+      cv.getContext('2d').drawImage(el, 0, 0);
+      cv.toBlob(function (b) { b ? ok(b) : mal(new Error('No se pudo preparar la imagen.')); }, 'image/png');
+    });
+  }
+  function hecho(b, t) { b.classList.add('ok'); setTimeout(function () { b.classList.remove('ok'); }, 1600); toast(t); }
+  function pasarAWhatsApp(a, m, b) {
+    var texto = m.texto || '';
+    if (a === 'copiar-txt') {
+      (navigator.clipboard ? navigator.clipboard.writeText(texto) : Promise.reject()).then(function () { hecho(b, 'Texto copiado. Pegalo como epígrafe en WhatsApp.'); }, function () { toast('No se pudo copiar el texto.'); });
+      return;
+    }
+    var el = b.closest('.ch-bub').querySelector('.ch-img img');
+    imagenPng(el).then(function (png) {
+      if (a === 'compartir-img') {
+        var file = new File([png], 'manfredi-' + m.id + '.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          // por si WhatsApp descarta el texto: también queda copiado para pegarlo
+          if (texto && navigator.clipboard) navigator.clipboard.writeText(texto).catch(function () {});
+          return navigator.share(texto ? { files: [file], text: texto } : { files: [file] }).catch(function () {});
+        }
+      }
+      if (!navigator.clipboard || !window.ClipboardItem) throw new Error('Este navegador no deja copiar imágenes.');
+      return navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]).then(function () {
+        hecho(b, 'Imagen copiada. En WhatsApp: Ctrl+V' + (texto ? ', y después Copiar texto para el epígrafe.' : '.'));
+      });
+    }).catch(function (err) { toast(err.message || 'No se pudo copiar la imagen.'); });
+  }
+
   function quitarAdjunto() { if (S.adjunto) URL.revokeObjectURL(S.adjunto.url); S.adjunto = null; }
   // Lado más largo hasta 1600 px, en JPEG; si pesa más de ~900 KB baja la calidad.
   function prepararImagen(file) {
