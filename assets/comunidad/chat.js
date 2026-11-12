@@ -68,7 +68,105 @@
   function guardar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   // El formato de WhatsApp (negrita, cursiva, citas, listas y tablas): el mismo del mensaje que va
   // a la Comunidad. Los links se pueden tocar solo en los mensajes oficiales (anti-estafa).
-  function formato(t, oficial) { return window.MiTarjeta.waHtml(t, oficial); }
+  function formato(t, oficial) { return tickers(window.MiTarjeta.waHtml(t, oficial)); }
+
+  // ---------- $TICKER en los mensajes: precio en vivo y gráfico (datos de Mercados) ----------
+  var MERC = 'https://manfredi-mercados.nachito2502.workers.dev';
+  // Si un símbolo está en varias categorías, gana la primera (NVDA = la acción en EE.UU., no el CEDEAR)
+  var ORDEN_CAT = ['arg_stocks', 'usa_stocks', 'usa_adrs', 'cripto', 'commodities', 'arg_cedears', 'arg_bonds', 'dolares'];
+  var PRECIOS = null, PRECIOS_TS = 0;
+  function tickers(html) {
+    // $NVDA, $ggal, $BRK.B (el punto final de una oración no es parte del ticker)
+    return html.replace(/(^|[\s>(¡¿"])\$([A-Za-z][A-Za-z0-9]{0,7}(?:\.[A-Za-z])?)(?=$|[\s<.,;:!?)"])/g, function (_, antes, s) {
+      s = s.toUpperCase();
+      return antes + '<button type="button" class="ch-tk" data-a="tk" data-s="' + s + '"><b>$' + s + '</b>' + chipPrecio(s) + '</button>';
+    });
+  }
+  function fmtNum(v) { var d = Math.abs(v) >= 1000 ? 0 : 2; return Number(v).toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function fmtPct(v) { if (v == null || isNaN(v)) return ''; return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%'; }
+  function chipPrecio(s) {
+    var p = PRECIOS && PRECIOS[s];
+    if (!p || p.price == null) return '<span class="ch-tk-p"></span>';
+    return '<span class="ch-tk-p">' + (p.cur === 'USD' ? 'US$ ' : '$ ') + fmtNum(p.price) + (p.change != null ? ' <i class="' + (p.change > 0 ? 'up' : p.change < 0 ? 'dn' : '') + '">' + fmtPct(p.change) + '</i>' : '') + '</span>';
+  }
+  function cargarPrecios() {
+    if (Date.now() - PRECIOS_TS < 110e3) return;
+    PRECIOS_TS = Date.now();
+    fetch(MERC + '/mercados').then(function (r) { return r.json(); }).then(function (d) {
+      var m = {};
+      ORDEN_CAT.slice().reverse().forEach(function (k) {
+        var c = d.categorias && d.categorias[k]; if (!c) return;
+        c.items.forEach(function (it) { m[it.symbol.toUpperCase()] = { cat: k, cur: c.currency, price: it.price, change: it.change, name: it.name, logo: it.logo }; });
+      });
+      PRECIOS = m;
+      S.root.querySelectorAll('.ch-tk').forEach(function (b) { b.querySelector('.ch-tk-p').outerHTML = chipPrecio(b.dataset.s); });
+      if (S.ficha) pintarFichaCab();
+    }).catch(function () { PRECIOS_TS = 0; });
+  }
+
+  // Ficha del activo: precio, gráfico en vivo (1 día se actualiza cada minuto) y "Ver en Mercados".
+  var TFS = [['1D', '1 día'], ['1M', '1 mes'], ['1A', '1 año'], ['5A', '5 años']];
+  function abrirFicha(s) {
+    var p = PRECIOS && PRECIOS[s];
+    cerrarFicha();
+    S.ficha = { s: s, cat: p ? p.cat : 'usa_stocks', tf: p && (p.cat === 'arg_bonds' || p.cat === 'dolares') ? '1M' : '1D' };
+    var el = S.root.querySelector('.ch-ficha');
+    el.innerHTML = '<div class="ch-ficha-card" role="dialog" aria-label="Gráfico de ' + esc(s) + '">' +
+      '<div class="ch-ficha-cab"></div>' +
+      '<div class="ch-ficha-tf" role="group" aria-label="Temporalidad">' + TFS.map(function (t) { return '<button type="button" data-a="tk-tf" data-tf="' + t[0] + '"' + (t[0] === S.ficha.tf ? ' aria-pressed="true"' : '') + '>' + t[1] + '</button>'; }).join('') + '</div>' +
+      '<div class="ch-ficha-gr"><div class="ch-ficha-msg">Cargando gráfico…</div></div>' +
+      '<div class="ch-ficha-pie"><span class="ch-ficha-vivo"><i></i>En vivo · datos de Mercados</span><button type="button" class="ch-btn ch-btn--gold" data-a="tk-mercados">Ver en Mercados</button></div>' +
+      '<button type="button" class="ch-ficha-x" data-a="tk-cerrar" aria-label="Cerrar">' + IC.x + '</button></div>';
+    el.hidden = false;
+    pintarFichaCab(); serieFicha();
+    S.ficha.timer = setInterval(function () { if (S.ficha && S.ficha.tf === '1D' && aLaVista()) { PRECIOS_TS = 0; cargarPrecios(); serieFicha(true); } }, 60e3);
+  }
+  function pintarFichaCab() {
+    var f = S.ficha, cab = f && S.root.querySelector('.ch-ficha-cab'); if (!cab) return;
+    var p = PRECIOS && PRECIOS[f.s];
+    cab.innerHTML = (p && p.logo ? '<img src="' + esc(p.logo) + '" alt="" class="ch-ficha-logo">' : '<span class="ch-ficha-logo ch-ficha-logo--txt">' + esc(f.s.slice(0, 2)) + '</span>') +
+      '<div class="ch-ficha-t"><b>' + esc(f.s) + '</b><span>' + esc(p && p.name && p.name !== f.s ? p.name : '') + '</span></div>' +
+      (p && p.price != null ? '<div class="ch-ficha-p"><b>' + (p.cur === 'USD' ? 'US$ ' : '$ ') + fmtNum(p.price) + '</b><i class="' + (p.change > 0 ? 'up' : p.change < 0 ? 'dn' : '') + '">' + fmtPct(p.change) + ' hoy</i></div>' : '');
+  }
+  function serieFicha(silencio) {
+    var f = S.ficha; if (!f) return;
+    var gr = S.root.querySelector('.ch-ficha-gr'), tf = f.tf, s = f.s;
+    fetch(MERC + '/serie?category=' + f.cat + '&symbol=' + encodeURIComponent(s) + '&tf=' + tf).then(function (r) { return r.json(); }).then(function (d) {
+      if (!S.ficha || S.ficha.s !== s || S.ficha.tf !== tf) return;
+      if (!d.points || d.points.length < 2) throw new Error(d.error || 'Sin datos');
+      conGraficos(function (LC) {
+        if (!S.ficha || !gr.isConnected) return;
+        if (!f.ch) {
+          gr.innerHTML = '';
+          f.ch = LC.createChart(gr, {
+            autoSize: true,
+            layout: { background: { type: 'solid', color: 'transparent' }, textColor: '#e9d3a0', fontFamily: "'IBM Plex Mono', ui-monospace, monospace", fontSize: 11, attributionLogo: false },
+            grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(233,211,160,.06)' } },
+            rightPriceScale: { borderVisible: false }, timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false },
+            handleScale: false, handleScroll: false,
+            localization: { locale: 'es-AR', timeFormatter: function (t) { return new Date(t * 1000).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); } }
+          });
+          f.serie = f.ch.addSeries(LC.AreaSeries, { lineWidth: 2, priceLineVisible: true });
+        }
+        // en 1 día el color sigue a la variación del día (contra el cierre anterior), igual que el número de arriba
+        var pd = PRECIOS && PRECIOS[s], pts = d.points;
+        var sube = tf === '1D' && pd && pd.change != null ? pd.change >= 0 : pts[pts.length - 1].c >= (pts[0].o || pts[0].c), hex = sube ? '#56c793' : '#ef7a6b', rgb = sube ? '86,199,147' : '239,122,107';
+        f.serie.applyOptions({ lineColor: hex, topColor: 'rgba(' + rgb + ',.22)', bottomColor: 'rgba(' + rgb + ',0)', priceLineColor: hex });
+        f.serie.setData(pts.map(function (p) { return { time: p.t, value: p.c }; }));
+        if (!silencio) f.ch.timeScale().fitContent();
+      });
+    }).catch(function () {
+      if (silencio || !S.ficha || S.ficha.s !== s) return;
+      if (f.ch) { f.ch.remove(); f.ch = null; }
+      gr.innerHTML = '<div class="ch-ficha-msg">No hay gráfico para esta temporalidad. Probá con otra o abrilo en Mercados.</div>';
+    });
+  }
+  function conGraficos(cb) { var t0 = Date.now(); (function w() { if (window.LightweightCharts) return cb(window.LightweightCharts); if (Date.now() - t0 < 10000) setTimeout(w, 100); })(); }
+  function cerrarFicha() {
+    var f = S.ficha; if (!f) return;
+    clearInterval(f.timer); if (f.ch) f.ch.remove(); S.ficha = null;
+    var el = S.root.querySelector('.ch-ficha'); if (el) { el.hidden = true; el.innerHTML = ''; }
+  }
   function hora(ms) { return new Date(ms).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }); }
   function diaClave(ms) { var d = new Date(ms); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); }
   function diaTexto(ms) {
@@ -202,7 +300,8 @@
         '</aside>' +
         '<section class="ch-main" aria-label="Conversación"></section>' +
       '</div>' +
-      '<div class="ch-lb" hidden><button type="button" class="ch-lb-x" aria-label="Cerrar">' + IC.x + '</button><img alt=""></div>';
+      '<div class="ch-lb" hidden><button type="button" class="ch-lb-x" aria-label="Cerrar">' + IC.x + '</button><img alt=""></div>' +
+      '<div class="ch-ficha" hidden></div>';
     S.root.addEventListener('click', clic);
     S.root.addEventListener('keydown', tecla);
     S.root.addEventListener('input', function (e) {
@@ -323,7 +422,7 @@
       (adj ? editorAdj() : '') +
       '<form class="ch-comp" data-a="enviar">' +
         (cr ? '<label class="ch-clip" title="Adjuntar imagen" aria-label="Adjuntar imagen">' + IC.foto + '<input type="file" accept="image/*" class="ch-file" hidden></label>' : '') +
-        '<textarea class="ch-ta" rows="1" maxlength="800" placeholder="' + (adj ? 'Agregá un texto (opcional)' : 'Escribí un mensaje') + '" aria-label="Mensaje">' + esc(S.borrador[S.sala] || '') + '</textarea>' +
+        '<textarea class="ch-ta" rows="1" maxlength="800" placeholder="' + (adj ? 'Agregá un texto (opcional)' : 'Escribí un mensaje · con $NVDA se ve el gráfico') + '" aria-label="Mensaje">' + esc(S.borrador[S.sala] || '') + '</textarea>' +
         '<button type="submit" class="ch-send" aria-label="Enviar">' + IC.send + '</button>' +
       '</form><div class="ch-toast" role="status"></div>';
   }
@@ -475,6 +574,18 @@
     if (a === 'pin') { var x = b.getAttribute('aria-expanded') === 'true'; b.setAttribute('aria-expanded', String(!x)); return; }
     if (a === 'bajar') { var f = S.root.querySelector('.ch-feed'); f.scrollTo({ top: f.scrollHeight, behavior: 'smooth' }); b.hidden = true; return; }
     if (a === 'sin-reply') { S.responde = null; repintarCompositor(); return; }
+    if (a === 'tk') { abrirFicha(b.dataset.s); return; }
+    if (a === 'tk-cerrar') { cerrarFicha(); return; }
+    if (a === 'tk-tf' && S.ficha) {
+      S.ficha.tf = b.dataset.tf;
+      b.parentNode.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      serieFicha(); return;
+    }
+    if (a === 'tk-mercados' && S.ficha) {
+      var fi = S.ficha; cerrarFicha();
+      if (window.mktAbrirActivo) window.mktAbrirActivo(fi.s, fi.cat); else location.hash = 'mercados';
+      return;
+    }
     if (a === 'sin-adj') { quitarAdjunto(); repintarCompositor(); return; }
     if (a === 'adj-fmt' && S.adjunto) {
       S.adjunto.fmt = b.dataset.f; S.adjunto.ox = S.adjunto.oy = 0.5;
@@ -520,7 +631,7 @@
   }
   function tecla(e) {
     if (e.target.matches('.ch-ta') && e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); enviar(); }
-    if (e.key === 'Escape') { var lb = S.root.querySelector('.ch-lb'); if (!lb.hidden) lb.hidden = true; }
+    if (e.key === 'Escape') { var lb = S.root.querySelector('.ch-lb'); if (!lb.hidden) lb.hidden = true; cerrarFicha(); }
   }
   function abrir(k) {
     S.borrador[S.sala] = (S.root.querySelector('.ch-ta') || {}).value || '';
@@ -778,6 +889,9 @@
       esqueleto(); pintarLista(); pintarSala(true); pintarProximo();
       cargarTodas();
       cargarGente();
+      cargarPrecios();
+      setInterval(function () { if (aLaVista()) cargarPrecios(); }, 30e3);
+      S.root.querySelector('.ch-ficha').addEventListener('click', function (e) { if (e.target === e.currentTarget) cerrarFicha(); });
       setInterval(tic, 5000);
       setInterval(pintarProximo, 30000);
       setInterval(function () { if (sesion() !== S.sesion) { S.sesion = sesion(); reiniciar(); } }, 1500);

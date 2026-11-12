@@ -375,3 +375,49 @@ button.ch-hoy-b:active { transform:scale(.97); }
   .ch-adj-marco { width:100%; height:220px; }
   .ch-adj-cv { max-width:100%; max-height:204px; }
 }
+
+/* ── $TICKER en los mensajes: etiqueta con precio en vivo y ficha con gráfico ── */
+.ch-tk { display:inline-flex; align-items:baseline; gap:6px; margin:0 1px; padding:1px 8px 2px; border:1px solid var(--ch-line2); border-radius:7px; background:rgba(233,211,160,.07); color:var(--ch-ink); font:inherit; line-height:1.45; vertical-align:baseline; cursor:pointer; transition:background .2s, border-color .2s; }
+.ch-tk:hover { background:rgba(233,211,160,.14); border-color:var(--ch-ch); }
+.ch-tk b { font:600 .92em var(--ch-mono); color:var(--ch-ch); }
+.ch-tk-p { font:500 .86em var(--ch-mono); color:var(--ch-ink); }
+.ch-tk-p:empty { display:none; }
+.ch-tk-p i, .ch-ficha-p i { font-style:normal; }
+.ch-tk .up, .ch-ficha .up { color:var(--ch-up); } .ch-tk .dn, .ch-ficha .dn { color:var(--ch-dn); }
+.ch-ficha { position:fixed; inset:0; z-index:10000; display:grid; place-items:center; padding:20px; background:rgba(5,10,20,.78); backdrop-filter:blur(6px); animation:chFade .2s; }
+.ch-ficha[hidden] { display:none; }
+.ch-ficha-card { position:relative; width:min(560px, 100%); padding:20px 20px 16px; border:1px solid var(--ch-line2); border-radius:16px; background:var(--ch-panel); box-shadow:0 30px 80px rgba(0,0,0,.55); color:var(--ch-ink); font-family:var(--ch-sans); }
+.ch-ficha-cab { display:flex; align-items:center; gap:12px; padding-right:40px; }
+.ch-ficha-logo { width:40px; height:40px; border-radius:10px; object-fit:contain; background:#fff; }
+.ch-ficha-logo--txt { display:grid; place-items:center; background:var(--ch-bub2); color:var(--ch-ch); font:600 13px var(--ch-mono); }
+.ch-ficha-t { display:grid; min-width:0; }
+.ch-ficha-t b { font:600 17px var(--ch-mono); color:var(--ch-ch); }
+.ch-ficha-t span { font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ch-ficha-p { margin-left:auto; display:grid; justify-items:end; }
+.ch-ficha-p b { font:600 18px var(--ch-mono); }
+.ch-ficha-p i { font:500 12.5px var(--ch-mono); }
+.ch-ficha-tf { display:flex; gap:6px; margin:16px 0 10px; }
+.ch-ficha-tf button { padding:5px 11px; border:1px solid var(--ch-line2); border-radius:999px; background:transparent; color:var(--ch-ink); font:500 12px var(--ch-sans); cursor:pointer; }
+.ch-ficha-tf button[aria-pressed="true"] { background:var(--ch-ch); border-color:var(--ch-ch); color:#0b1629; }
+.ch-ficha-gr { position:relative; height:260px; }
+.ch-ficha-msg { display:grid; place-items:center; height:100%; padding:0 24px; text-align:center; font-size:13px; color:var(--ch-ink); }
+.ch-ficha-pie { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; }
+.ch-ficha-vivo { display:inline-flex; align-items:center; gap:7px; font:500 11px var(--ch-mono); color:var(--ch-ch); }
+.ch-ficha-vivo i { width:7px; height:7px; border-radius:50%; background:var(--ch-up); animation:chVivo 1.8s ease-in-out infinite; }
+@keyframes chVivo { 50% { opacity:.35; } }
+.ch-ficha-x { position:absolute; top:16px; right:16px; display:grid; place-items:center; width:34px; height:34px; border:1px solid var(--ch-line2); border-radius:50%; background:transparent; color:var(--ch-ch); cursor:pointer; }
+@media (max-width: 720px) {
+  .ch-ficha { place-items:end stretch; padding:0; }
+  .ch-ficha-card { width:100%; border-radius:16px 16px 0 0; }
+  .ch-ficha-gr { height:220px; }
+}
+@media (prefers-reduced-motion: reduce) { .ch-ficha, .ch-ficha-vivo i { animation:none; } }
+
+/* la ficha vive fuera de .ch-app: mismas variables de color */
+.ch-ficha {
+  --ch-bg:#081223; --ch-side:#0a162b; --ch-feed:#0a1528; --ch-panel:#0d1a31; --ch-bub:#13223d; --ch-bub2:#172a4a;
+  --ch-ink:#f3f6fb; --ch-ch:#e9d3a0; --ch-ch2:#f3e3bd; --ch-line:rgba(233,211,160,.12); --ch-line2:rgba(233,211,160,.24);
+  --ch-up:#56c793; --ch-dn:#ef7a6b;
+  --ch-sans:'IBM Plex Sans',system-ui,sans-serif; --ch-mono:'IBM Plex Mono',ui-monospace,monospace; --ch-serif:'DM Serif Display',Georgia,serif;
+  --ch-ease:cubic-bezier(.23,1,.32,1);
+}

@@ -12503,6 +12503,20 @@
   // ─── Modal de detalle: click en cualquier activo (tabla o buscador) ───────
   const MKT_DETAIL_CACHE = {};
 
+  // Desde otras secciones (los $TICKER del chat): abre Mercados con el detalle de ese activo.
+  // Espera a que lleguen los datos de Mercados (hasta 15 s) si todavía no estaban.
+  window.mktAbrirActivo = function (symbol, category) {
+    if (location.hash !== '#mercados') location.hash = 'mercados';
+    const t0 = Date.now();
+    (function intentar() {
+      const cat = MERCADOS && MERCADOS.categorias[category];
+      const item = cat && cat.items.find(i => i.symbol === symbol);
+      if (item) { openAssetModal(item, category, cat.currency); return; }
+      if (cat || Date.now() - t0 > 15000) { const inp = document.getElementById('mktSearchInput'); if (inp) { inp.value = symbol; inp.dispatchEvent(new Event('input', { bubbles: true })); } return; }
+      setTimeout(intentar, 200);
+    })();
+  };
+
   function mktCategoryLabel(key) {
     const c = MKT_CATEGORIES.find(c => c.key === key);
     return c ? c.label : key;
