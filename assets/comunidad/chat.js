@@ -506,11 +506,12 @@
         '<img alt="" ' + (m.datos.url ? 'src="' + m.datos.url + '"' : 'data-img="' + esc(m.datos.img) + '"') + '>' +
         (m.texto ? '' : '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span>') + '</button>';
       if (m.texto) h += '<div class="ch-txt">' + formato(m.texto, false) + '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span></div>';
-      // Pasarla a WhatsApp: en el celular, Compartir (imagen + texto); en la compu, copiar y pegar.
-      if (esCreador() && !m.pendiente) h += '<div class="ch-res-pie"><span class="ch-res-acc">' + (window.MiTarjeta.movil
-        ? '<button type="button" class="ch-share" data-a="compartir-img">' + IC.share + 'Compartir</button>'
-        : '<button type="button" class="ch-share" data-a="copiar-img">' + IC.copy + 'Copiar imagen</button>' +
-          (m.texto ? '<button type="button" class="ch-share" data-a="copiar-txt">' + IC.copy + 'Copiar texto</button>' : '')) +
+      // Pasarla al Canal de WhatsApp: copia la imagen y abre el canal para pegarla; después, el texto.
+      // En el celular además está Compartir (imagen + texto juntos, para mandarla a un chat).
+      if (esCreador() && !m.pendiente) h += '<div class="ch-res-pie"><span class="ch-res-acc">' +
+        '<button type="button" class="ch-share" data-a="copiar-img">' + IC.share + (WA_COMUNIDAD ? 'Copiar y abrir el canal' : 'Copiar imagen') + '</button>' +
+        (m.texto ? '<button type="button" class="ch-share" data-a="copiar-txt">' + IC.copy + 'Copiar texto</button>' : '') +
+        (window.MiTarjeta.movil ? '<button type="button" class="ch-share" data-a="compartir-img">' + IC.share + 'Compartir</button>' : '') +
         '</span><span></span></div>';
     }
     else h += '<div class="ch-txt">' + formato(m.texto, m.rol === 'oficial') + '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span></div>';
@@ -538,7 +539,7 @@
       '<div class="ch-txt">' + formato(d.intro, true) + '</div>' +
       '<details class="ch-det"><summary><span>Ver el resumen completo</span>' + IC.down + '</summary><div class="ch-txt">' + formato(cuerpo, true) + '</div></details>' +
       '<div class="ch-res-pie">' + (esCreador()
-        ? '<span class="ch-res-acc"><button type="button" class="ch-share" data-a="copiar-res">' + IC.copy + 'Copiar para el canal</button>' +
+        ? '<span class="ch-res-acc"><button type="button" class="ch-share" data-a="copiar-res">' + IC.copy + (WA_COMUNIDAD ? 'Copiar y abrir el canal' : 'Copiar para el canal') + '</button>' +
           '<button type="button" class="ch-share" data-a="compartir">' + IC.share + 'Compartir</button></span>'
         : '<span></span>') + '<span class="ch-time">' + hora(m.creado) + '</span></div>';
   }
@@ -617,7 +618,7 @@
       var txt = m.datos.texto || window.MiTarjeta.epigrafe(m.datos, m.id);
       (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () {
         b.classList.add('ok'); setTimeout(function () { b.classList.remove('ok'); }, 1600);
-        toast('Copiado. Pegalo en el canal de WhatsApp.');
+        toast(abrirCanal() ? 'Copiado. Se abrió el canal: pegalo ahí.' : 'Copiado. Pegalo en el canal de WhatsApp.');
       }, function () { toast('No se pudo copiar. Probá con Compartir.'); });
       return;
     }
@@ -684,6 +685,15 @@
       cv.toBlob(function (b) { b ? ok(b) : mal(new Error('No se pudo preparar la imagen.')); }, 'image/png');
     });
   }
+  // Abre el Canal de WhatsApp (link de wa.js) en otra pestaña o en la app. Se llama DESPUÉS de copiar:
+  // si la página pierde el foco antes, el navegador no deja escribir en el portapapeles.
+  function abrirCanal() {
+    if (!WA_COMUNIDAD) return false;
+    var w = window.open(WA_COMUNIDAD, '_blank');
+    if (!w) return false; // el navegador bloqueó la ventana nueva
+    try { w.opener = null; } catch (e) {}
+    return true;
+  }
   function hecho(b, t) { b.classList.add('ok'); setTimeout(function () { b.classList.remove('ok'); }, 1600); toast(t); }
   function pasarAWhatsApp(a, m, b) {
     var texto = m.texto || '';
@@ -703,7 +713,8 @@
       }
       if (!navigator.clipboard || !window.ClipboardItem) throw new Error('Este navegador no deja copiar imágenes.');
       return navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]).then(function () {
-        hecho(b, 'Imagen copiada. En WhatsApp: Ctrl+V' + (texto ? ', y después Copiar texto para el epígrafe.' : '.'));
+        var abierto = a === 'copiar-img' && abrirCanal();
+        hecho(b, (abierto ? 'Imagen copiada y canal abierto: pegala ahí (Ctrl+V)' : 'Imagen copiada. En WhatsApp: Ctrl+V') + (texto ? '. Después tocá Copiar texto para el epígrafe.' : '.'));
       });
     }).catch(function (err) { toast(err.message || 'No se pudo copiar la imagen.'); });
   }
