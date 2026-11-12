@@ -45,6 +45,7 @@
     copy: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
     lock: '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
     down: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    foto: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="10" r="1.7" fill="currentColor"/><path d="M4.5 17.5l5-5 3.5 3.5 2.5-2.5 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
     x: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
     ideas: '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4 19l5-6 4 3 7-9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 7h5v5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     socios: '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h7A2.5 2.5 0 0 1 16 6.5v4A2.5 2.5 0 0 1 13.5 13H9l-3.5 3v-3H6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M19 9.5a2 2 0 0 1 1 1.7v3.6a2 2 0 0 1-2 2h-.5V19L15 16.8h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
@@ -212,7 +213,7 @@
     var noLeidos = z.estado === 'ok' && k !== S.sala ? z.orden.filter(function (id) { return id < 1e14 && id > (z.vistos[k] || 0) && z.msgs[id].h !== (S.yo && S.yo.h); }).length : 0;
     var prev = z.estado === 'pronto' ? '<em class="ch-chip">Próximamente</em>'
       : z.estado === 'bloqueada' ? '<span class="ch-lock">' + IC.lock + ' Solo socios</span>'
-      : ult ? esc((ult.rol === 'oficial' ? '' : ult.nombre.split(' ')[0] + ': ') + (ult.tipo === 'resumen' ? (ult.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : ult.texto.replace(/[*_]/g, '')))
+      : ult ? esc((ult.rol === 'oficial' ? '' : ult.nombre.split(' ')[0] + ': ') + (ult.tipo === 'resumen' ? (ult.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : ult.tipo === 'imagen' && !ult.texto ? 'Imagen' : ult.texto.replace(/[*_]/g, '')))
       : z.estado === 'cargando' ? 'Cargando…' : '';
     return '<li><button type="button" class="ch-item' + (info.pro ? ' ch-item--sub' : '') + '" data-ir="' + k + '"' + (k === S.sala ? ' aria-current="true"' : '') + '>' +
       avatarSala(k) +
@@ -300,10 +301,12 @@
     if (!usuario()) return '<div class="ch-login"><span>Iniciá sesión para escribir en el chat.</span><button type="button" class="ch-btn ch-btn--gold" data-a="login">Iniciar sesión</button></div>';
     if (SALAS[S.sala].soloCreador && !(S.yo && S.yo.rol === 'creador'))
       return '<div class="ch-login"><span>Acá publica solo Ignacio. Para comentar una idea:</span><button type="button" class="ch-btn" data-ir="socios">Ir a Charla de socios</button></div>';
-    var r = S.responde;
+    var r = S.responde, adj = S.adjunto, cr = esCreador();
     return (r ? '<div class="ch-reply"><div><b>' + esc(r.nombre) + '</b><span>' + esc(r.texto) + '</span></div><button type="button" data-a="sin-reply" aria-label="Cancelar respuesta">' + IC.x + '</button></div>' : '') +
+      (adj ? '<div class="ch-adj"><img src="' + adj.url + '" alt=""><span>Imagen lista · podés sumarle un texto</span><button type="button" data-a="sin-adj" aria-label="Quitar imagen">' + IC.x + '</button></div>' : '') +
       '<form class="ch-comp" data-a="enviar">' +
-        '<textarea class="ch-ta" rows="1" maxlength="800" placeholder="Escribí un mensaje" aria-label="Mensaje">' + esc(S.borrador[S.sala] || '') + '</textarea>' +
+        (cr ? '<label class="ch-clip" title="Adjuntar imagen" aria-label="Adjuntar imagen">' + IC.foto + '<input type="file" accept="image/*" class="ch-file" hidden></label>' : '') +
+        '<textarea class="ch-ta" rows="1" maxlength="800" placeholder="' + (adj ? 'Agregá un texto (opcional)' : 'Escribí un mensaje') + '" aria-label="Mensaje">' + esc(S.borrador[S.sala] || '') + '</textarea>' +
         '<button type="submit" class="ch-send" aria-label="Enviar">' + IC.send + '</button>' +
       '</form><div class="ch-toast" role="status"></div>';
   }
@@ -355,6 +358,7 @@
       antes = m;
     });
     feed.querySelector('.ch-feed-in').innerHTML = html;
+    cargarImagenes(feed);
     if (sinAnim) S.recien = {};
     if (alFondo || estaba) { feed.scrollTop = feed.scrollHeight; marcarVisto(); }
     else if (Object.keys(S.recien).length) {
@@ -368,7 +372,7 @@
 
   function fila(m, cont) {
     var mio = S.yo && m.h === S.yo.h && m.rol !== 'oficial';
-    var cls = 'ch-row' + (mio ? ' mio' : '') + (cont ? ' cont' : '') + (S.recien[m.id] ? ' entra' : '') + (m.tipo === 'resumen' ? ' res' : '');
+    var cls = 'ch-row' + (mio ? ' mio' : '') + (cont ? ' cont' : '') + (S.recien[m.id] ? ' entra' : '') + (m.tipo === 'resumen' ? ' res' : '') + (m.tipo === 'imagen' ? ' img' : '');
     var h = '<div class="' + cls + '" data-id="' + m.id + '">';
     if (!mio) h += cont ? '<span class="ch-av-sp"></span>' : avatar(m, 'sm');
     h += '<div class="ch-bub' + (m.rol === 'oficial' ? ' of' : '') + (m.borrado ? ' borrado' : '') + '">';
@@ -379,6 +383,18 @@
     }
     if (m.cita) h += '<div class="ch-quote" data-a="ir" data-ir-id="' + (m.responde || '') + '"><b>' + esc(m.cita.nombre) + '</b><span>' + esc(m.cita.texto.replace(/[*_]/g, '')) + '</span></div>';
     if (m.tipo === 'resumen' && m.datos) h += resumen(m);
+    else if (m.tipo === 'imagen' && m.datos) {
+      h += '<button type="button" class="ch-img" data-a="ver-img" aria-label="Ver imagen" style="aspect-ratio:' + (+m.datos.w || 4) + '/' + (+m.datos.h || 5) + '">' +
+        '<img alt="" ' + (m.datos.url ? 'src="' + m.datos.url + '"' : 'data-img="' + esc(m.datos.img) + '"') + '>' +
+        (m.texto ? '' : '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span>') + '</button>';
+      if (m.texto) h += '<div class="ch-txt">' + formato(m.texto, false) + '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span></div>';
+      // Pasarla a WhatsApp: en el celular, Compartir (imagen + texto); en la compu, copiar y pegar.
+      if (esCreador() && !m.pendiente) h += '<div class="ch-res-pie"><span class="ch-res-acc">' + (window.MiTarjeta.movil
+        ? '<button type="button" class="ch-share" data-a="compartir-img">' + IC.share + 'Compartir</button>'
+        : '<button type="button" class="ch-share" data-a="copiar-img">' + IC.copy + 'Copiar imagen</button>' +
+          (m.texto ? '<button type="button" class="ch-share" data-a="copiar-txt">' + IC.copy + 'Copiar texto</button>' : '')) +
+        '</span><span></span></div>';
+    }
     else h += '<div class="ch-txt">' + formato(m.texto, m.rol === 'oficial') + '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span></div>';
     var re = Object.keys(m.reacciones || {});
     if (re.length) h += '<div class="ch-reacts">' + re.map(function (e) {
@@ -440,8 +456,11 @@
     if (a === 'pin') { var x = b.getAttribute('aria-expanded') === 'true'; b.setAttribute('aria-expanded', String(!x)); return; }
     if (a === 'bajar') { var f = S.root.querySelector('.ch-feed'); f.scrollTo({ top: f.scrollHeight, behavior: 'smooth' }); b.hidden = true; return; }
     if (a === 'sin-reply') { S.responde = null; repintarCompositor(); return; }
+    if (a === 'sin-adj') { quitarAdjunto(); repintarCompositor(); return; }
+    if (a === 'ver-img') { var im = b.querySelector('img'); if (!im || !im.src) return; var lb2 = S.root.querySelector('.ch-lb'); lb2.querySelector('img').src = im.src; lb2.hidden = false; return; }
+    if ((a === 'copiar-img' || a === 'compartir-img' || a === 'copiar-txt') && m && esCreador()) { pasarAWhatsApp(a, m, b); return; }
     if (a === 'responder' && m) {
-      S.responde = { id: m.id, nombre: m.nombre, texto: m.tipo === 'resumen' ? (m.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : m.texto.replace(/[*_]/g, '').slice(0, 140) };
+      S.responde = { id: m.id, nombre: m.nombre, texto: m.tipo === 'resumen' ? (m.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : m.tipo === 'imagen' && !m.texto ? 'Imagen' : m.texto.replace(/[*_]/g, '').slice(0, 140) };
       repintarCompositor(); var ta = S.root.querySelector('.ch-ta'); if (ta) ta.focus();
       return;
     }
@@ -489,7 +508,7 @@
   function repintarCompositor() {
     var main = S.root.querySelector('.ch-main');
     S.borrador[S.sala] = (main.querySelector('.ch-ta') || {}).value || S.borrador[S.sala] || '';
-    main.querySelectorAll('.ch-reply,.ch-comp,.ch-login,.ch-toast').forEach(function (n) { n.remove(); });
+    main.querySelectorAll('.ch-reply,.ch-adj,.ch-comp,.ch-login,.ch-toast').forEach(function (n) { n.remove(); });
     main.insertAdjacentHTML('beforeend', compositor());
     var ta = main.querySelector('.ch-ta'); if (ta) ajustar(ta);
   }
@@ -500,21 +519,92 @@
     S.tt = setTimeout(function () { el.classList.remove('on'); }, 3200);
   }
 
+  // ---------- imágenes (solo el creador sube) ----------
+  // Se cargan aparte, una vez por sesión: el worker devuelve la data URL y el navegador la arma.
+  var IMGS = {};
+  function cargarImagenes(feed) {
+    feed.querySelectorAll('img[data-img]').forEach(function (el) {
+      var k = el.getAttribute('data-img');
+      if (!IMGS[k]) IMGS[k] = fetch(API + '/img/' + k).then(function (r) { if (!r.ok) throw new Error(); return r.text(); }).catch(function () { delete IMGS[k]; return ''; });
+      IMGS[k].then(function (u) { if (u && el.isConnected) { el.src = u; el.removeAttribute('data-img'); } });
+    });
+  }
+  // La imagen del mensaje en PNG (el portapapeles del navegador solo acepta PNG).
+  function imagenPng(el) {
+    return new Promise(function (ok, mal) {
+      if (!el || !el.src) return mal(new Error('La imagen todavía se está cargando.'));
+      var cv = document.createElement('canvas'); cv.width = el.naturalWidth; cv.height = el.naturalHeight;
+      cv.getContext('2d').drawImage(el, 0, 0);
+      cv.toBlob(function (b) { b ? ok(b) : mal(new Error('No se pudo preparar la imagen.')); }, 'image/png');
+    });
+  }
+  function hecho(b, t) { b.classList.add('ok'); setTimeout(function () { b.classList.remove('ok'); }, 1600); toast(t); }
+  function pasarAWhatsApp(a, m, b) {
+    var texto = m.texto || '';
+    if (a === 'copiar-txt') {
+      (navigator.clipboard ? navigator.clipboard.writeText(texto) : Promise.reject()).then(function () { hecho(b, 'Texto copiado. Pegalo como epígrafe en WhatsApp.'); }, function () { toast('No se pudo copiar el texto.'); });
+      return;
+    }
+    var el = b.closest('.ch-bub').querySelector('.ch-img img');
+    imagenPng(el).then(function (png) {
+      if (a === 'compartir-img') {
+        var file = new File([png], 'manfredi-' + m.id + '.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          // por si WhatsApp descarta el texto: también queda copiado para pegarlo
+          if (texto && navigator.clipboard) navigator.clipboard.writeText(texto).catch(function () {});
+          return navigator.share(texto ? { files: [file], text: texto } : { files: [file] }).catch(function () {});
+        }
+      }
+      if (!navigator.clipboard || !window.ClipboardItem) throw new Error('Este navegador no deja copiar imágenes.');
+      return navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]).then(function () {
+        hecho(b, 'Imagen copiada. En WhatsApp: Ctrl+V' + (texto ? ', y después Copiar texto para el epígrafe.' : '.'));
+      });
+    }).catch(function (err) { toast(err.message || 'No se pudo copiar la imagen.'); });
+  }
+
+  function quitarAdjunto() { if (S.adjunto) URL.revokeObjectURL(S.adjunto.url); S.adjunto = null; }
+  // Lado más largo hasta 1600 px, en JPEG; si pesa más de ~900 KB baja la calidad.
+  function prepararImagen(file) {
+    if (!file || !/^image\//.test(file.type)) return;
+    var url = URL.createObjectURL(file), img = new Image();
+    img.onload = function () {
+      var k = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+      var w = Math.round(img.naturalWidth * k), h = Math.round(img.naturalHeight * k);
+      var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      var cx = cv.getContext('2d'); cx.fillStyle = '#0b1629'; cx.fillRect(0, 0, w, h); cx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      var q = 0.88, du = cv.toDataURL('image/jpeg', q);
+      while (du.length > 1.2e6 && q > 0.45) { q -= 0.1; du = cv.toDataURL('image/jpeg', q); }
+      if (du.length > 1.8e6) { toast('La imagen es muy pesada.'); return; }
+      quitarAdjunto();
+      S.adjunto = { url: du, b64: du.split(',')[1], mime: 'image/jpeg', w: w, h: h };
+      repintarCompositor();
+      var ta = S.root.querySelector('.ch-ta'); if (ta) ta.focus();
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); toast('No se pudo leer la imagen.'); };
+    img.src = url;
+  }
+
   function enviar() {
     var ta = S.root.querySelector('.ch-ta'); if (!ta) return;
-    var texto = ta.value.trim(); if (!texto || S.enviando) return;
+    var texto = ta.value.trim(), adj = S.adjunto; if ((!texto && !adj) || S.enviando) return;
     var sala = S.sala, z = S.salas[sala], resp = S.responde;
-    var tmp = { id: 1e15 + Date.now(), h: S.yo ? S.yo.h : 'yo', nombre: S.yo ? S.yo.nombre : '', rol: S.yo ? S.yo.rol : 'usuario', tipo: 'texto', texto: texto,
+    var tmp = { id: 1e15 + Date.now(), h: S.yo ? S.yo.h : 'yo', nombre: S.yo ? S.yo.nombre : '', rol: S.yo ? S.yo.rol : 'usuario', tipo: adj ? 'imagen' : 'texto', texto: texto,
+      datos: adj ? { url: adj.url, w: adj.w, h: adj.h } : null,
       cita: resp ? { nombre: resp.nombre, texto: resp.texto } : null, reacciones: {}, creado: Date.now(), editado: 0, pendiente: true };
-    S.enviando = true; ta.value = ''; ajustar(ta); S.borrador[sala] = ''; S.responde = null;
-    if (resp) repintarCompositor();
+    S.enviando = true; ta.value = ''; ajustar(ta); S.borrador[sala] = ''; S.responde = null; S.adjunto = null;
+    if (resp || adj) repintarCompositor();
     aplicar(sala, [tmp], true); pintarFeed(true);
-    api('/chat/' + sala, { method: 'POST', body: { texto: texto, responde: resp ? resp.id : null } }).then(function (d) {
+    var body = { texto: texto, responde: resp ? resp.id : null };
+    if (adj) body.imagen = { mime: adj.mime, b64: adj.b64, w: adj.w, h: adj.h };
+    api('/chat/' + sala, { method: 'POST', body: body }).then(function (d) {
       delete z.msgs[tmp.id]; z.orden = z.orden.filter(function (x) { return x !== tmp.id; });
+      if (adj && d.mensaje.datos) IMGS[d.mensaje.datos.img] = Promise.resolve(adj.url); // ya la tenemos: no se baja de nuevo
       aplicar(sala, [d.mensaje]); pintarFeed(true); pintarLista();
     }).catch(function (err) {
       delete z.msgs[tmp.id]; z.orden = z.orden.filter(function (x) { return x !== tmp.id; });
       pintarFeed(false);
+      if (adj && !S.adjunto) { S.adjunto = adj; repintarCompositor(); }
       var t2 = S.root.querySelector('.ch-ta'); if (t2 && !t2.value) { t2.value = texto; ajustar(t2); }
       toast(err.status === 401 ? 'Tu sesión venció: volvé a iniciar sesión.' : err.message);
     }).then(function () { S.enviando = false; });
@@ -623,6 +713,13 @@
       window.addEventListener('load', function () { setTimeout(otraVez, 200); }, { once: true });
       S.root.querySelector('.ch-lb').addEventListener('click', function (e) { if (e.target === e.currentTarget || e.target.closest('.ch-lb-x')) e.currentTarget.hidden = true; });
       S.root.addEventListener('submit', function (e) { if (e.target.matches('.ch-comp')) { e.preventDefault(); enviar(); } });
+      // Imagen: con el botón o pegándola (Ctrl+V) en la caja de texto. Solo el creador.
+      S.root.addEventListener('change', function (e) { if (e.target.matches('.ch-file') && esCreador()) { prepararImagen(e.target.files[0]); e.target.value = ''; } });
+      S.root.addEventListener('paste', function (e) {
+        if (!e.target.matches('.ch-ta') || !esCreador() || !e.clipboardData) return;
+        var f = Array.prototype.filter.call(e.clipboardData.items || [], function (it) { return it.kind === 'file' && /^image\//.test(it.type); })[0];
+        if (f) { e.preventDefault(); prepararImagen(f.getAsFile()); }
+      });
     }
   };
 })();

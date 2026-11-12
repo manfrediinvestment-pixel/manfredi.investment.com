@@ -6,7 +6,8 @@
 //    - "ideas", "socios", "preguntas" (Manfredi Pro): solo socios (verificado contra
 //      workers/memberships) y creadores. En "ideas" publica solo el creador.
 //    GET  /chat/:sala?ts=&antes=   mensajes (los últimos, los cambiados desde ts o los anteriores)
-//    POST /chat/:sala              { texto, responde }           -> mensaje nuevo
+//    POST /chat/:sala              { texto, responde, imagen? }  -> mensaje nuevo (imagen: solo creadores)
+//    GET  /img/:clave                                             -> la imagen de un mensaje (pública, clave al azar)
 //    POST /chat/:sala/:id/reaccion { emoji }                      -> pone/saca la reacción
 //    POST /chat/:sala/:id/borrar                                  -> el autor o un creador
 //
@@ -38,6 +39,9 @@ const SALAS = {
 };
 const EMOJIS = ['👍', '🔥', '📈', '📉', '🤔'];
 const MAX_TEXTO = 800;
+// Imágenes del chat: el navegador las achica antes de subirlas; en D1 una fila no pasa de ~2 MB.
+const MAX_IMG = 1.4e6;
+const MIME_IMG = ['image/jpeg', 'image/webp', 'image/png'];
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
@@ -53,6 +57,9 @@ export default {
     try {
       const c = url.pathname.match(/^\/chat\/(gratis|ideas|socios|preguntas)(?:\/(\d+)\/(reaccion|borrar))?$/);
       if (c) return await chat(request, env, url, c[1], c[2] ? +c[2] : null, c[3] || null);
+
+      const im = url.pathname.match(/^\/img\/([0-9a-f]{32})$/);
+      if (im && request.method === 'GET') return await imagen(env, im[1]);
 
       const m = url.pathname.match(/^\/wa\/(apertura|cierre)$/);
       if (!m || request.method !== 'GET') return json({ error: 'Ruta no encontrada' }, 404);
@@ -489,6 +496,8 @@ async function esquema(env) {
       borrado INTEGER NOT NULL DEFAULT 0)`),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS ix_sala_editado ON mensajes (sala, editado)'),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS ix_sala_id ON mensajes (sala, id)'),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS imagenes (
+      clave TEXT PRIMARY KEY, mime TEXT NOT NULL, b64 TEXT NOT NULL, creado INTEGER NOT NULL)`),
   ]);
   // Primer mensaje de cada sala: la bienvenida oficial (una sola vez, por clave).
   const ahora = Date.now();
@@ -577,7 +586,17 @@ async function chat(request, env, url, sala, id, accion) {
   if (!id) {
     if (SALAS[sala].soloCreador && !creador) return json({ error: 'En este chat publica solo Ignacio' }, 403);
     const texto = String(body.texto || '').replace(/\r/g, '').replace(/\n{3,}/g, '\n\n').trim();
-    if (!texto) return json({ error: 'El mensaje está vacío' }, 400);
+    let img = null;
+    if (body.imagen) {
+      if (!creador) return json({ error: 'Solo Ignacio puede subir imágenes' }, 403);
+      const { mime, b64 } = body.imagen;
+      if (!MIME_IMG.includes(mime) || typeof b64 !== 'string' || !b64) return json({ error: 'Imagen no válida' }, 400);
+      if (b64.length * 3 / 4 > MAX_IMG) return json({ error: 'La imagen es muy pesada' }, 400);
+      const w = Math.min(4000, Math.max(1, Math.round(+body.imagen.w) || 1)), h = Math.min(4000, Math.max(1, Math.round(+body.imagen.h) || 1));
+      const clave = Array.from(crypto.getRandomValues(new Uint8Array(16)), x => x.toString(16).padStart(2, '0')).join('');
+      img = { clave, mime, b64, w, h };
+    }
+    if (!texto && !img) return json({ error: 'El mensaje está vacío' }, 400);
     if (texto.length > MAX_TEXTO) return json({ error: `Máximo ${MAX_TEXTO} caracteres` }, 400);
     // Un mensaje cada 3 segundos por persona.
     const ult = await env.DB.prepare('SELECT creado FROM mensajes WHERE sala = ? AND h = ? ORDER BY id DESC LIMIT 1').bind(sala, yo.h).first();
@@ -587,14 +606,16 @@ async function chat(request, env, url, sala, id, accion) {
       const o = await env.DB.prepare('SELECT id, nombre, texto, tipo, datos, borrado FROM mensajes WHERE id = ? AND sala = ?').bind(+body.responde, sala).first();
       if (o && !o.borrado) {
         responde = o.id;
-        const t = o.tipo === 'resumen' ? (JSON.parse(o.datos).momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : o.texto;
+        const t = o.tipo === 'resumen' ? (JSON.parse(o.datos).momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : o.texto || (o.tipo === 'imagen' ? 'Imagen' : '');
         cita = JSON.stringify({ nombre: o.nombre, texto: t.slice(0, 160) });
       }
     }
+    if (img) await env.DB.prepare('INSERT INTO imagenes (clave, mime, b64, creado) VALUES (?, ?, ?, ?)').bind(img.clave, img.mime, img.b64, ahora).run();
     const r = await env.DB.prepare(
-      `INSERT INTO mensajes (sala, uid, h, nombre, foto, rol, texto, cita, responde, creado, editado)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`
-    ).bind(sala, u.uid, yo.h, yo.nombre.slice(0, 60), u.foto, yo.rol, texto, cita, responde, ahora, ahora).first();
+      `INSERT INTO mensajes (sala, uid, h, nombre, foto, rol, tipo, texto, datos, cita, responde, creado, editado)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`
+    ).bind(sala, u.uid, yo.h, yo.nombre.slice(0, 60), u.foto, yo.rol, img ? 'imagen' : 'texto', texto,
+      img ? JSON.stringify({ img: img.clave, w: img.w, h: img.h }) : null, cita, responde, ahora, ahora).first();
     return json({ mensaje: publico(r), ahora });
   }
 
@@ -619,6 +640,15 @@ async function chat(request, env, url, sala, id, accion) {
     return json({ mensaje: publico({ ...f, borrado: 1, editado: ahora }), ahora });
   }
   return json({ error: 'Ruta no encontrada' }, 404);
+}
+
+// La imagen de un mensaje, como data URL en texto: decodificar el base64 acá gastaría los 10 ms
+// de CPU del plan gratis; el navegador la arma solo. No cambia nunca: se guarda un año.
+async function imagen(env, clave) {
+  await esquema(env);
+  const f = await env.DB.prepare('SELECT mime, b64 FROM imagenes WHERE clave = ?').bind(clave).first();
+  if (!f) return new Response('No existe', { status: 404, headers: { 'Access-Control-Allow-Origin': '*' } });
+  return new Response(`data:${f.mime};base64,${f.b64}`, { headers: { 'Content-Type': 'text/plain', 'Cache-Control': 'public, max-age=31536000, immutable', 'Access-Control-Allow-Origin': '*' } });
 }
 
 // ─── Aviso por mail (Resend) ────────────────────────────────────────────────
