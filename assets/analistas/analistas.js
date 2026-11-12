@@ -309,19 +309,62 @@
     var it = e.target.closest('[data-id]');
     if (it) {
       var p = st.pubs.filter(function (x) { return x.id === it.dataset.id; })[0];
-      if (!p) return;
-      if (esTexto(p)) { location.hash = 'nota-' + p.id; return; }
-      if (typeof window.openPdf === 'function') window.openPdf(p.pdf, p.titulo, { fecha: cuando(p, true), tapa: p.tapa, etiqueta: p.autor === 'manfredi' ? etiqueta(p) : st.autores[p.autor].nombre });
-      else window.open(p.pdf, '_blank', 'noopener');
+      if (p) abrir(p);
       return;
     }
     var c = e.target.closest('[data-cat]');
     if (c && c.dataset.cat !== st.cat) elegirCat(c.dataset.cat);
+  });
+  /* ------------- cartel "Análisis" en la columna de Noticias (debajo de Cotizaciones) ------------- */
+  // el último análisis de un invitado destacado (con la página 1 del PDF) y los tres siguientes
+  function abrir(p) {
+    if (esTexto(p)) { location.hash = 'nota-' + p.id; return; }
+    if (typeof window.openPdf === 'function') window.openPdf(p.pdf, p.titulo, { fecha: cuando(p, true), tapa: p.tapa, etiqueta: p.autor === 'manfredi' ? etiqueta(p) : st.autores[p.autor].nombre });
+    else window.open(p.pdf, '_blank', 'noopener');
+  }
+  function naAv(a, s) {
+    return '<span class="na-av" style="--c:' + esc(a.color) + (s ? ';--s:' + s + 'px' : '') + '">' +
+      (a.foto || a.logo ? '<img src="' + esc(a.foto || a.logo) + '" alt="" loading="lazy">' : esc(iniciales(a.nombre))) + '</span>';
+  }
+  function naCat(p) { var c = CAT[p.categoria]; return '<span class="na-cat" style="--cc:' + c.c + '">' + esc(p.etiqueta || c.n) + '</span>'; }
+  function pintarCartel() {
+    var box = $('ntAnalisis');
+    if (!box) return;
+    var pubs = st.pubs.filter(function (p) { return p.autor !== 'manfredi'; });
+    if (!pubs.length) { box.hidden = true; return; }
+    var f = pubs[0], a = st.autores[f.autor];
+    var hoja = !esTexto(f) && f.tapa ? '<span class="na-sheet"><img src="' + esc(f.tapa) + '" alt="" loading="lazy"></span>'
+      : '<span class="na-sheet na-sheet--txt"><img src="assets/img/logo-mark-512.png" alt=""><small>Análisis</small></span>';
+    var autores = st.orden.filter(function (s) { return s !== 'manfredi' && pubs.some(function (p) { return p.autor === s; }); });
+    var FL = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+    box.innerHTML = '<h3 class="nt-card__h">Análisis<span class="na__n">De nuestros analistas</span></h3>' +
+      '<span class="na__k">Firmados por estudiantes y profesionales invitados.</span>' +
+      '<a class="na-feat" href="#analisis" data-id="' + esc(f.id) + '">' + hoja +
+        '<span><span class="na-feat__top">' + naCat(f) + '<span class="na-when">' + cuando(f) + '</span></span>' +
+        '<span class="na-feat__t">' + esc(f.titulo) + '</span>' +
+        '<span class="na-by">' + naAv(a, 26) + '<span><b>' + esc(a.nombre) + '</b><small>' + esc(a.corto || a.rol || '') + '</small></span></span></span></a>' +
+      (pubs.length > 1 ? '<ul class="na-list">' + pubs.slice(1, 4).map(function (p) {
+        var x = st.autores[p.autor];
+        return '<li><a class="na-row" href="#analisis" data-id="' + esc(p.id) + '">' + naAv(x) +
+          '<span><span class="na-row__t">' + esc(p.titulo) + '</span><span class="na-row__m">' + esc(x.nombre) + '<i></i>' + naCat(p) + '<i></i>' + cuando(p) + '</span></span></a></li>';
+      }).join('') + '</ul>' : '') +
+      '<div class="na-foot"><span class="na-stack">' + autores.slice(0, 5).map(function (s) { return naAv(st.autores[s]); }).join('') +
+        '<span>' + autores.length + (autores.length === 1 ? ' analista' : ' analistas') + '</span></span>' +
+        '<a class="na-link" href="#analisis">Ver todos ' + FL + '</a></div>';
+    box.hidden = false;
+  }
+  if ($('ntAnalisis')) $('ntAnalisis').addEventListener('click', function (e) {
+    var it = e.target.closest('[data-id]');
+    if (!it) return;
+    var p = st.pubs.filter(function (x) { return x.id === it.dataset.id; })[0];
+    if (!p) return;
+    e.preventDefault();
+    abrir(p);
   });
   window.addEventListener('resize', function () { marcarSub(); marcarCat(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { marcarSub(); marcarCat(); });
   window.addEventListener('hashchange', mostrar);
 
   mostrar();
-  cargar().then(function () { marcarSub(); pintarBarra(); pintarGrilla(); pintarRail(); mostrar(); });
+  cargar().then(function () { marcarSub(); pintarBarra(); pintarGrilla(); pintarRail(); pintarCartel(); mostrar(); });
 })();

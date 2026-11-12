@@ -109,7 +109,17 @@
     var nav = document.querySelector('.navbar');
     var pos = nav ? getComputedStyle(nav).position : '';
     document.querySelector('.nt').style.setProperty('--nt-sticky', (pos === 'sticky' || pos === 'fixed') ? nav.offsetHeight + 'px' : '0px');
+    fijarRail();
   }
+  // la columna (Cotizaciones + Análisis) queda fija al bajar; si es más alta que la pantalla,
+  // se deja correr hasta que se ve su final y recién ahí se fija (si no, el pie no se vería nunca)
+  function fijarRail() {
+    var rail = document.querySelector('#ntPanel .nt-rail');
+    if (!rail) return;
+    var arriba = (parseInt(getComputedStyle(document.querySelector('.nt')).getPropertyValue('--nt-sticky'), 10) || 0) + 16;
+    rail.style.top = Math.min(arriba, window.innerHeight - rail.offsetHeight - 16) + 'px';
+  }
+  if (window.ResizeObserver && document.querySelector('#ntPanel .nt-rail')) new ResizeObserver(fijarRail).observe(document.querySelector('#ntPanel .nt-rail'));
   var iniciado = false;
   function iniciar() {
     if (iniciado || !visible()) return;
