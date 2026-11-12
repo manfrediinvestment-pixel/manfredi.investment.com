@@ -112,12 +112,12 @@
     fijarRail();
   }
   // la columna (Cotizaciones + Análisis) queda fija al bajar; si es más alta que la pantalla,
-  // se deja correr hasta que se ve su final y recién ahí se fija (si no, el pie no se vería nunca)
+  // se deja correr hasta que se ve su final (por encima del botón de Warren) y recién ahí se fija
   function fijarRail() {
     var rail = document.querySelector('#ntPanel .nt-rail');
     if (!rail) return;
     var arriba = (parseInt(getComputedStyle(document.querySelector('.nt')).getPropertyValue('--nt-sticky'), 10) || 0) + 16;
-    rail.style.top = Math.min(arriba, window.innerHeight - rail.offsetHeight - 16) + 'px';
+    rail.style.top = Math.min(arriba, window.innerHeight - rail.offsetHeight - 92) + 'px';
   }
   if (window.ResizeObserver && document.querySelector('#ntPanel .nt-rail')) new ResizeObserver(fijarRail).observe(document.querySelector('#ntPanel .nt-rail'));
   var iniciado = false;
