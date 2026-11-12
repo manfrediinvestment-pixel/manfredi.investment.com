@@ -22,6 +22,8 @@ def fmt(v, f):
         return (MINUS+s) if v < 0 and float(s[:-1])!=0 else ('+'+s if float(s[:-1])!=0 else s)
     if f in ('spp0',):  # puntos con signo, entero
         s=f'{abs(v):.0f}'; return (MINUS+s) if v<0 and s!='0' else ('+'+s if s!='0' else '0')
+    if f == 'susd2':  # dólares con signo (puente)
+        s = f'{abs(v):,.2f}'; return (MINUS+'$'+s) if v < 0 and s != '0.00' else ('+$'+s if s != '0.00' else '$0.00')
     if f == 'a1': return f'{abs(v):.1f}'
     if f == 'a0': return f'{abs(v):,.0f}'
     if f == 'js2': return f'{v:.2f}'
