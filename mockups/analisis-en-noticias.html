@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Análisis en Noticias</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/noticias/noticias.css">
+<style>
+  html, body { margin:0; background:#07101e; }
+  /* barra del mockup (no va al sitio) */
+  .mk { position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:center; gap:14px; padding:12px 16px; background:rgba(5,11,22,.92); backdrop-filter:blur(10px); border-bottom:1px solid rgba(214,226,244,.12); font:500 12.5px 'IBM Plex Sans',sans-serif; color:#f3f6fb; }
+  .mk b { font:500 11px 'IBM Plex Mono',monospace; letter-spacing:.16em; text-transform:uppercase; color:#e6cf96; }
+  .mk .nt-seg { margin:0; width:300px; }
+
+  /* ================= cartel "Análisis" de los analistas (debajo de Cotizaciones) ================= */
+  .na { --champ:#e6cf96; --mono:'IBM Plex Mono',ui-monospace,monospace; --serif:'DM Serif Display',Georgia,serif; position:relative; overflow:hidden; }
+  .na::before { content:''; position:absolute; left:20px; right:20px; top:0; height:1px; background:linear-gradient(90deg, transparent, rgba(230,207,150,.55), transparent); }
+  .na .nt-card__h { margin-bottom:5px; }
+  .na__n { font:500 10.5px/1 var(--mono); letter-spacing:.16em; text-transform:uppercase; color:var(--champ); }
+  .na__k { display:block; font:400 13px/1.45 var(--serif); font-style:italic; color:#f3f6fb; margin:0 0 16px; }
+
+  /* hoja: la página 1 del PDF, como papel apoyado */
+  .na-sheet { position:relative; display:block; aspect-ratio:1/1.414; border-radius:2px; overflow:hidden; background:#fff;
+    box-shadow:0 0 0 1px rgba(0,0,0,.25), 0 18px 26px -14px rgba(0,0,0,.95), 0 3px 8px -2px rgba(0,0,0,.55); transition:transform .5s var(--nt-ease); }
+  .na-sheet img { width:100%; height:100%; object-fit:cover; object-position:top; display:block; }
+  .na-sheet::after { content:''; position:absolute; inset:0; background:linear-gradient(160deg, rgba(255,255,255,0) 55%, rgba(7,16,30,.18)); }
+
+  .na-av { position:relative; flex:none; display:inline-grid; place-items:center; width:var(--s, 30px); height:var(--s, 30px); border-radius:50%; overflow:hidden; background:color-mix(in srgb, var(--c) 22%, #0b1629); box-shadow:0 0 0 1.5px #0d1a30, 0 0 0 2.5px color-mix(in srgb, var(--c) 70%, transparent);
+    font:600 calc(var(--s, 30px) * .38)/1 'IBM Plex Sans',sans-serif; color:#f3f6fb; }
+  .na-av img { width:100%; height:100%; object-fit:cover; }
+  .na-cat { display:inline-flex; align-items:center; gap:6px; font:500 10.5px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase; color:var(--cc); }
+  .na-cat::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--cc); box-shadow:0 0 8px color-mix(in srgb, var(--cc) 60%, transparent); }
+  .na-when { font:500 10.5px/1 var(--mono); letter-spacing:.08em; text-transform:uppercase; color:#f3f6fb; }
+
+  /* --- Opción A: Destacado + lista --- */
+  .na-feat { display:grid; grid-template-columns:88px minmax(0,1fr); gap:16px; align-items:start; padding:2px 0 18px; border-bottom:1px solid var(--nt-line); }
+  .na-feat .na-sheet { transform:rotate(-2.5deg); margin-top:4px; }
+  .na-feat__top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .na-feat__t { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; font:400 18px/1.18 var(--serif); margin:10px 0 12px; text-wrap:pretty; transition:color .15s ease; }
+  .na-by { display:flex; align-items:center; gap:9px; min-width:0; }
+  .na-by > span:last-child { min-width:0; }
+  .na-by b { display:block; font:600 12.5px/1.2 'IBM Plex Sans',sans-serif; color:#f3f6fb; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .na-by small { display:block; margin-top:2px; font:400 11.5px/1.2 'IBM Plex Sans',sans-serif; color:#f3f6fb; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .na-list { list-style:none; margin:0; padding:0; }
+  .na-row { display:grid; grid-template-columns:34px minmax(0,1fr); gap:13px; align-items:start; padding:14px 0; border-bottom:1px solid var(--nt-line); }
+  .na-list li:last-child .na-row { border-bottom:0; }
+  .na-row .na-av { --s:34px; margin-top:2px; }
+  .na-row__t { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font:400 15px/1.28 var(--serif); color:#f3f6fb; text-wrap:pretty; transition:color .15s ease; }
+  .na-row__m { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:7px; font:500 12px/1 'IBM Plex Sans',sans-serif; color:#f3f6fb; }
+  .na-row__m { flex-wrap:nowrap; white-space:nowrap; overflow:hidden; }
+  .na-row__m i { flex:none; width:3px; height:3px; border-radius:50%; background:rgba(230,207,150,.7); }
+  .na-row__m .na-cat { font-size:10px; letter-spacing:.1em; }
+  .na-row__m .na-cat::before { display:none; }
+
+  /* pie: los analistas + link */
+  .na-foot { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; padding-top:14px; border-top:1px solid var(--nt-line); }
+  .na-stack { display:flex; align-items:center; }
+  .na-stack .na-av { --s:24px; margin-left:-6px; }
+  .na-stack .na-av:first-child { margin-left:0; }
+  .na-stack span:last-child { margin-left:10px; font:500 11.5px/1.25 'IBM Plex Sans',sans-serif; color:#f3f6fb; }
+  .na-link { display:inline-flex; align-items:center; gap:6px; font:600 13px 'IBM Plex Sans',sans-serif; color:var(--nt-gold2); white-space:nowrap; }
+  .na-link svg { transition:transform .25s var(--nt-ease); }
+
+  /* --- Opción B: Atril (tres hojas en abanico + lista) --- */
+  .na-desk { position:relative; height:196px; margin:0 -4px 6px; }
+  .na-desk__p { position:absolute; top:6px; width:118px; transition:transform .5s var(--nt-ease); }
+  .na-desk__p:nth-child(1) { left:50%; z-index:3; transform:translateX(-50%); }
+  .na-desk__p:nth-child(2) { left:6px;  z-index:2; transform:rotate(-7deg) translateY(10px); }
+  .na-desk__p:nth-child(3) { right:6px; z-index:2; transform:rotate(7deg) translateY(10px); }
+  .na-desk__p .na-av { --s:30px; position:absolute; left:50%; bottom:-12px; margin-left:-15px; z-index:2; }
+  .na-desk__p:nth-child(1) .na-sheet { box-shadow:0 0 0 1px rgba(0,0,0,.25), 0 26px 34px -14px rgba(0,0,0,1), 0 4px 10px -2px rgba(0,0,0,.6); }
+  .na-desk__p:not(:nth-child(1)) .na-sheet { filter:brightness(.72); }
+  .na-pick { display:block; text-align:center; padding:12px 6px 4px; }
+  .na-pick .na-cat { justify-content:center; }
+  .na-pick__t { display:block; font:400 17px/1.2 var(--serif); margin:9px auto 7px; max-width:30ch; text-wrap:balance; transition:color .15s ease; }
+  .na-pick__by { font:500 12.5px/1 'IBM Plex Sans',sans-serif; color:#f3f6fb; }
+  .na-pick__by b { font-weight:600; }
+  .na-dots { display:flex; justify-content:center; gap:6px; margin:14px 0 4px; }
+  .na-dots button { width:6px; height:6px; padding:0; border:0; border-radius:99px; background:rgba(230,207,150,.28); cursor:pointer; transition:width .3s var(--nt-ease), background-color .2s ease; }
+  .na-dots button.on { width:18px; background:var(--champ); }
+  .na-dots + .na-list { margin-top:8px; border-top:1px solid var(--nt-line); }
+
+  @media (hover:hover) and (pointer:fine) {
+    .na-feat:hover .na-sheet { transform:rotate(0) translateY(-3px); }
+    .na-feat:hover .na-feat__t, .na-row:hover .na-row__t, .na-pick:hover .na-pick__t { color:var(--nt-gold2); }
+    .na-desk:hover .na-desk__p:nth-child(1) { transform:translateX(-50%) translateY(-6px); }
+    .na-link:hover svg { transform:translateX(3px); }
+  }
+  .na [data-in] { animation:na-in .7s var(--nt-ease) both; animation-delay:calc(var(--i, 0) * 60ms + 120ms); }
+  @keyframes na-in { from { opacity:0; transform:translateY(6px); } }
+  .na-swap { animation:na-in .45s var(--nt-ease) both; }
+  @media (prefers-reduced-motion: reduce) { .na [data-in], .na-swap { animation:none; } .na-sheet, .na-desk__p { transition:none; } }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+
+<div class="mk">
+  <b>Mockup</b>
+  <div class="nt-seg" role="group" aria-label="Opción">
+    <button type="button" data-op="a" class="on">A · Destacado</button>
+    <button type="button" data-op="b">B · Atril</button>
+  </div>
+</div>
+
+<!-- Réplica de la pestaña Noticias (mismo HTML y CSS que el sitio; feed y cotizaciones reales) -->
+<section class="nt" id="informes" data-tab="informes">
+  <div class="nt-wrap">
+    <header class="nt-head nt-head--top" id="reportes">
+      <span class="nt-date" id="ntDate"></span>
+    </header>
+  </div>
+  <div class="nt-wrap nt-grid" id="ntPanel">
+    <div class="nt-main">
+      <div class="nt-bar" id="ntBar"><div class="nt-chips" id="ntChips" role="group" aria-label="Filtrar noticias"></div></div>
+      <div id="ntFeed" aria-live="polite">
+        <div style="padding:26px 0;display:grid;gap:22px">
+          <span class="nt-skel" style="height:18px;width:70%"></span>
+          <span class="nt-skel" style="height:18px;width:85%"></span>
+          <span class="nt-skel" style="height:18px;width:60%"></span>
+        </div>
+      </div>
+      <button type="button" class="nt-more" id="ntMore" hidden>Ver más noticias</button>
+    </div>
+    <aside class="nt-rail" aria-label="Cotizaciones y análisis">
+      <div class="nt-card" id="ntQuotes"><h3 class="nt-card__h">Cotizaciones</h3><span class="nt-skel" style="height:160px"></span></div>
+
+      <!-- ===== NUEVO · Opción A: Destacado ===== -->
+      <section class="nt-card na" data-na="a" aria-label="Últimos análisis">
+        <h3 class="nt-card__h">Análisis<span class="na__n">De nuestros analistas</span></h3>
+        <span class="na__k">Firmados por estudiantes y profesionales invitados.</span>
+        <div id="naA"></div>
+      </section>
+
+      <!-- ===== NUEVO · Opción B: Atril ===== -->
+      <section class="nt-card na" data-na="b" aria-label="Últimos análisis" hidden>
+        <h3 class="nt-card__h">Análisis<span class="na__n">De nuestros analistas</span></h3>
+        <span class="na__k">Firmados por estudiantes y profesionales invitados.</span>
+        <div id="naB"></div>
+      </section>
+    </aside>
+  </div>
+</section>
+
+<script src="../assets/pulso/pulso.js"></script>
+<script src="../assets/noticias/noticias.js"></script>
+<script>
+(function () {
+  // Datos reales publicados (worker manfredi-analistas /publicados, 12-nov-2026).
+  // En el sitio salen de st.pubs de assets/analistas/analistas.js, ya ordenados por fecha.
+  var W = 'https://manfredi-analistas.nachito2502.workers.dev';
+  var CAT = { acciones: ['Acciones', '#8fb4ff'], commodities: ['Commodities', '#e9c46a'], macro: ['Macro', '#e9c46a'] };
+  var A = {
+    'franco-barbieri':       { n: 'Franco Barbieri', r: 'Estudiante Cs. Económicas (UNR)', c: '#e9c46a' },
+    'benjamin-burgos':       { n: 'Benjamin Burgos', r: 'Estudiante Lic. en Economía (UNR)', c: '#7fd1ae', f: '/foto/benjamin-burgos.jpg?v=1793398517015' },
+    'elias-ivan-alfonso':    { n: 'Ivan Alfonso', r: 'Analista de Equity Research', c: '#8fb4ff', f: '/foto/elias-ivan-alfonso.jpg?v=1793584277222' },
+    'juan-ignacio-gonzalez': { n: 'Juan Ignacio Gonzalez', r: 'Lic. en Economía (UBA)', c: '#c3a6f2', f: '/foto/juan-ignacio-gonzalez.jpg?v=1793413986018' },
+    'lucas-cordera':         { n: 'Luca Cordera', r: 'Estudiante Lic. en Economía (UNR)', c: '#f29e8e', f: '/foto/lucas-cordera.jpg?v=1793397935091' }
+  };
+  var P = [
+    { a: 'franco-barbieri', cat: 'acciones', d: '10 nov', t: 'MP Materials (MP): Análisis fundamental y valuación objetiva', tapa: '/pub/20261110-franco-barbieri-da9095.jpg' },
+    { a: 'benjamin-burgos', cat: 'commodities', d: '4 nov', t: 'El Nuevo Ciclo del Cobre', tapa: '/pub/20261104-benjamin-burgos-c01f20.jpg' },
+    { a: 'elias-ivan-alfonso', cat: 'acciones', d: '2 nov', t: 'Transener (TRAN): Valuación Fundamental, Cambio de Control y Riesgo Regulatorio', tapa: '/pub/20261101-elias-ivan-alfonso-e2f3b2.jpg' },
+    { a: 'juan-ignacio-gonzalez', cat: 'macro', d: '31 oct', t: '¿Tipo de cambio atrasado o cambio de matriz productiva?', tapa: '/pub/20261030-juan-ignacio-gonzalez-4093f3.jpg' },
+    { a: 'lucas-cordera', cat: 'macro', d: '30 oct', t: 'Informe Macroeconómico Mensual', tapa: '/pub/20261030-lucas-cordera-163a1b.jpg' }
+  ];
+  function ini(n) { return n.split(' ').map(function (p) { return p[0]; }).slice(0, 2).join(''); }
+  function av(slug, s) {
+    var x = A[slug];
+    return '<span class="na-av" style="--c:' + x.c + (s ? ';--s:' + s + 'px' : '') + '">' + (x.f ? '<img src="' + W + x.f + '" alt="" loading="lazy">' : ini(x.n)) + '</span>';
+  }
+  function cat(p) { var c = CAT[p.cat]; return '<span class="na-cat" style="--cc:' + c[1] + '">' + c[0] + '</span>'; }
+  function sheet(p) { return '<span class="na-sheet"><img src="' + W + p.tapa + '" alt="" loading="lazy"></span>'; }
+  function row(p, i) {
+    return '<li data-in style="--i:' + i + '"><a class="na-row" href="../index.html#analisis">' + av(p.a) +
+      '<span><span class="na-row__t">' + p.t + '</span><span class="na-row__m">' + A[p.a].n + '<i></i>' + cat(p) + '<i></i>' + p.d + '</span></span></a></li>';
+  }
+  var ARROW = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  function foot(i) {
+    return '<div class="na-foot" data-in style="--i:' + i + '"><span class="na-stack">' + Object.keys(A).map(function (k) { return av(k); }).join('') +
+      '<span>5 analistas</span></span><a class="na-link" href="../index.html#analisis">Ver todos ' + ARROW + '</a></div>';
+  }
+
+  // A · destacado + lista
+  var f = P[0];
+  document.getElementById('naA').innerHTML =
+    '<a class="na-feat" href="../index.html#analisis" data-in style="--i:0">' + sheet(f) +
+      '<span><span class="na-feat__top">' + cat(f) + '<span class="na-when">' + f.d + '</span></span>' +
+      '<span class="na-feat__t">' + f.t + '</span>' +
+      '<span class="na-by">' + av(f.a, 26) + '<span><b>' + A[f.a].n + '</b><small>' + A[f.a].r + '</small></span></span></span></a>' +
+    '<ul class="na-list">' + P.slice(1, 4).map(function (p, i) { return row(p, i + 1); }).join('') + '</ul>' + foot(5);
+
+  // B · atril: tres hojas en abanico; la del frente rota sola cada 6 s
+  var frente = 0, primera = true, timer;
+  function pintarB() {
+    var orden = [frente, (frente + 1) % 3, (frente + 2) % 3], p = P[frente];
+    document.getElementById('naB').innerHTML =
+      '<div class="na-desk"' + (primera ? ' data-in style="--i:0"' : '') + '>' + orden.map(function (k) {
+        return '<a class="na-desk__p" href="../index.html#analisis">' + sheet(P[k]) + av(P[k].a) + '</a>';
+      }).join('') + '</div>' +
+      '<a class="na-pick na-swap" href="../index.html#analisis">' + cat(p) + '<span class="na-pick__t">' + p.t + '</span><span class="na-pick__by"><b>' + A[p.a].n + '</b> · ' + p.d + '</span></a>' +
+      '<div class="na-dots">' + [0, 1, 2].map(function (i) { return '<button type="button" aria-label="Análisis ' + (i + 1) + '" data-k="' + i + '" class="' + (i === frente ? 'on' : '') + '"></button>'; }).join('') + '</div>' +
+      '<ul class="na-list">' + P.slice(3, 5).map(function (q, i) { return row(q, primera ? i + 1 : -99); }).join('') + '</ul>' + foot(primera ? 4 : -99);
+    primera = false;
+  }
+  function pasar(k) { frente = k; pintarB(); }
+  pintarB();
+  document.getElementById('naB').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-k]'); if (!b) return;
+    pasar(+b.dataset.k); clearInterval(timer); timer = setInterval(auto, 6000);
+  });
+  function auto() { if (!document.querySelector('[data-na="b"]').hidden && !matchMedia('(prefers-reduced-motion: reduce)').matches) pasar((frente + 1) % 3); }
+  timer = setInterval(auto, 6000);
+
+  document.querySelector('.mk').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-op]'); if (!b) return;
+    document.querySelectorAll('.mk [data-op]').forEach(function (x) { x.classList.toggle('on', x === b); });
+    document.querySelectorAll('[data-na]').forEach(function (s) { s.hidden = s.dataset.na !== b.dataset.op; });
+  });
+})();
+</script>
+</body>
+</html>
