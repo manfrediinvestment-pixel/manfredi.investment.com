@@ -45,6 +45,7 @@
     copy: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
     lock: '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
     down: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    gente: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M15.5 5.6a3 3 0 0 1 0 5.8M17.5 14.3c1.8.7 3 2.300 3.500 4.700" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
     foto: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="10" r="1.7" fill="currentColor"/><path d="M4.5 17.5l5-5 3.5 3.5 2.5-2.5 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
     x: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
     ideas: '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4 19l5-6 4 3 7-9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 7h5v5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -67,7 +68,105 @@
   function guardar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   // El formato de WhatsApp (negrita, cursiva, citas, listas y tablas): el mismo del mensaje que va
   // a la Comunidad. Los links se pueden tocar solo en los mensajes oficiales (anti-estafa).
-  function formato(t, oficial) { return window.MiTarjeta.waHtml(t, oficial); }
+  function formato(t, oficial) { return tickers(window.MiTarjeta.waHtml(t, oficial)); }
+
+  // ---------- $TICKER en los mensajes: precio en vivo y gráfico (datos de Mercados) ----------
+  var MERC = 'https://manfredi-mercados.nachito2502.workers.dev';
+  // Si un símbolo está en varias categorías, gana la primera (NVDA = la acción en EE.UU., no el CEDEAR)
+  var ORDEN_CAT = ['arg_stocks', 'usa_stocks', 'usa_adrs', 'cripto', 'commodities', 'arg_cedears', 'arg_bonds', 'dolares'];
+  var PRECIOS = null, PRECIOS_TS = 0;
+  function tickers(html) {
+    // $NVDA, $ggal, $BRK.B (el punto final de una oración no es parte del ticker)
+    return html.replace(/(^|[\s>(¡¿"])\$([A-Za-z][A-Za-z0-9]{0,7}(?:\.[A-Za-z])?)(?=$|[\s<.,;:!?)"])/g, function (_, antes, s) {
+      s = s.toUpperCase();
+      return antes + '<button type="button" class="ch-tk" data-a="tk" data-s="' + s + '"><b>$' + s + '</b>' + chipPrecio(s) + '</button>';
+    });
+  }
+  function fmtNum(v) { var d = Math.abs(v) >= 1000 ? 0 : 2; return Number(v).toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function fmtPct(v) { if (v == null || isNaN(v)) return ''; return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%'; }
+  function chipPrecio(s) {
+    var p = PRECIOS && PRECIOS[s];
+    if (!p || p.price == null) return '<span class="ch-tk-p"></span>';
+    return '<span class="ch-tk-p">' + (p.cur === 'USD' ? 'US$ ' : '$ ') + fmtNum(p.price) + (p.change != null ? ' <i class="' + (p.change > 0 ? 'up' : p.change < 0 ? 'dn' : '') + '">' + fmtPct(p.change) + '</i>' : '') + '</span>';
+  }
+  function cargarPrecios() {
+    if (Date.now() - PRECIOS_TS < 110e3) return;
+    PRECIOS_TS = Date.now();
+    fetch(MERC + '/mercados').then(function (r) { return r.json(); }).then(function (d) {
+      var m = {};
+      ORDEN_CAT.slice().reverse().forEach(function (k) {
+        var c = d.categorias && d.categorias[k]; if (!c) return;
+        c.items.forEach(function (it) { m[it.symbol.toUpperCase()] = { cat: k, cur: c.currency, price: it.price, change: it.change, name: it.name, logo: it.logo }; });
+      });
+      PRECIOS = m;
+      S.root.querySelectorAll('.ch-tk').forEach(function (b) { b.querySelector('.ch-tk-p').outerHTML = chipPrecio(b.dataset.s); });
+      if (S.ficha) pintarFichaCab();
+    }).catch(function () { PRECIOS_TS = 0; });
+  }
+
+  // Ficha del activo: precio, gráfico en vivo (1 día se actualiza cada minuto) y "Ver en Mercados".
+  var TFS = [['1D', '1 día'], ['1M', '1 mes'], ['1A', '1 año'], ['5A', '5 años']];
+  function abrirFicha(s) {
+    var p = PRECIOS && PRECIOS[s];
+    cerrarFicha();
+    S.ficha = { s: s, cat: p ? p.cat : 'usa_stocks', tf: p && (p.cat === 'arg_bonds' || p.cat === 'dolares') ? '1M' : '1D' };
+    var el = S.root.querySelector('.ch-ficha');
+    el.innerHTML = '<div class="ch-ficha-card" role="dialog" aria-label="Gráfico de ' + esc(s) + '">' +
+      '<div class="ch-ficha-cab"></div>' +
+      '<div class="ch-ficha-tf" role="group" aria-label="Temporalidad">' + TFS.map(function (t) { return '<button type="button" data-a="tk-tf" data-tf="' + t[0] + '"' + (t[0] === S.ficha.tf ? ' aria-pressed="true"' : '') + '>' + t[1] + '</button>'; }).join('') + '</div>' +
+      '<div class="ch-ficha-gr"><div class="ch-ficha-msg">Cargando gráfico…</div></div>' +
+      '<div class="ch-ficha-pie"><span class="ch-ficha-vivo"><i></i>En vivo · datos de Mercados</span><button type="button" class="ch-btn ch-btn--gold" data-a="tk-mercados">Ver en Mercados</button></div>' +
+      '<button type="button" class="ch-ficha-x" data-a="tk-cerrar" aria-label="Cerrar">' + IC.x + '</button></div>';
+    el.hidden = false;
+    pintarFichaCab(); serieFicha();
+    S.ficha.timer = setInterval(function () { if (S.ficha && S.ficha.tf === '1D' && aLaVista()) { PRECIOS_TS = 0; cargarPrecios(); serieFicha(true); } }, 60e3);
+  }
+  function pintarFichaCab() {
+    var f = S.ficha, cab = f && S.root.querySelector('.ch-ficha-cab'); if (!cab) return;
+    var p = PRECIOS && PRECIOS[f.s];
+    cab.innerHTML = (p && p.logo ? '<img src="' + esc(p.logo) + '" alt="" class="ch-ficha-logo">' : '<span class="ch-ficha-logo ch-ficha-logo--txt">' + esc(f.s.slice(0, 2)) + '</span>') +
+      '<div class="ch-ficha-t"><b>' + esc(f.s) + '</b><span>' + esc(p && p.name && p.name !== f.s ? p.name : '') + '</span></div>' +
+      (p && p.price != null ? '<div class="ch-ficha-p"><b>' + (p.cur === 'USD' ? 'US$ ' : '$ ') + fmtNum(p.price) + '</b><i class="' + (p.change > 0 ? 'up' : p.change < 0 ? 'dn' : '') + '">' + fmtPct(p.change) + ' hoy</i></div>' : '');
+  }
+  function serieFicha(silencio) {
+    var f = S.ficha; if (!f) return;
+    var gr = S.root.querySelector('.ch-ficha-gr'), tf = f.tf, s = f.s;
+    fetch(MERC + '/serie?category=' + f.cat + '&symbol=' + encodeURIComponent(s) + '&tf=' + tf).then(function (r) { return r.json(); }).then(function (d) {
+      if (!S.ficha || S.ficha.s !== s || S.ficha.tf !== tf) return;
+      if (!d.points || d.points.length < 2) throw new Error(d.error || 'Sin datos');
+      conGraficos(function (LC) {
+        if (!S.ficha || !gr.isConnected) return;
+        if (!f.ch) {
+          gr.innerHTML = '';
+          f.ch = LC.createChart(gr, {
+            autoSize: true,
+            layout: { background: { type: 'solid', color: 'transparent' }, textColor: '#e9d3a0', fontFamily: "'IBM Plex Mono', ui-monospace, monospace", fontSize: 11, attributionLogo: false },
+            grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(233,211,160,.06)' } },
+            rightPriceScale: { borderVisible: false }, timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false },
+            handleScale: false, handleScroll: false,
+            localization: { locale: 'es-AR', timeFormatter: function (t) { return new Date(t * 1000).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); } }
+          });
+          f.serie = f.ch.addSeries(LC.AreaSeries, { lineWidth: 2, priceLineVisible: true });
+        }
+        // en 1 día el color sigue a la variación del día (contra el cierre anterior), igual que el número de arriba
+        var pd = PRECIOS && PRECIOS[s], pts = d.points;
+        var sube = tf === '1D' && pd && pd.change != null ? pd.change >= 0 : pts[pts.length - 1].c >= (pts[0].o || pts[0].c), hex = sube ? '#56c793' : '#ef7a6b', rgb = sube ? '86,199,147' : '239,122,107';
+        f.serie.applyOptions({ lineColor: hex, topColor: 'rgba(' + rgb + ',.22)', bottomColor: 'rgba(' + rgb + ',0)', priceLineColor: hex });
+        f.serie.setData(pts.map(function (p) { return { time: p.t, value: p.c }; }));
+        if (!silencio) f.ch.timeScale().fitContent();
+      });
+    }).catch(function () {
+      if (silencio || !S.ficha || S.ficha.s !== s) return;
+      if (f.ch) { f.ch.remove(); f.ch = null; }
+      gr.innerHTML = '<div class="ch-ficha-msg">No hay gráfico para esta temporalidad. Probá con otra o abrilo en Mercados.</div>';
+    });
+  }
+  function conGraficos(cb) { var t0 = Date.now(); (function w() { if (window.LightweightCharts) return cb(window.LightweightCharts); if (Date.now() - t0 < 10000) setTimeout(w, 100); })(); }
+  function cerrarFicha() {
+    var f = S.ficha; if (!f) return;
+    clearInterval(f.timer); if (f.ch) f.ch.remove(); S.ficha = null;
+    var el = S.root.querySelector('.ch-ficha'); if (el) { el.hidden = true; el.innerHTML = ''; }
+  }
   function hora(ms) { return new Date(ms).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }); }
   function diaClave(ms) { var d = new Date(ms); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); }
   function diaTexto(ms) {
@@ -201,10 +300,25 @@
         '</aside>' +
         '<section class="ch-main" aria-label="Conversación"></section>' +
       '</div>' +
-      '<div class="ch-lb" hidden><button type="button" class="ch-lb-x" aria-label="Cerrar">' + IC.x + '</button><img alt=""></div>';
+      '<div class="ch-lb" hidden><button type="button" class="ch-lb-x" aria-label="Cerrar">' + IC.x + '</button><img alt=""></div>' +
+      '<div class="ch-ficha" hidden></div>';
     S.root.addEventListener('click', clic);
     S.root.addEventListener('keydown', tecla);
-    S.root.addEventListener('input', function (e) { if (e.target.matches('.ch-ta')) ajustar(e.target); });
+    S.root.addEventListener('input', function (e) {
+      if (e.target.matches('.ch-ta')) ajustar(e.target);
+      if (e.target.matches('.ch-adj-zoom') && S.adjunto) { S.adjunto.zoom = +e.target.value; dibujarAdj(); }
+    });
+    // Encuadre: arrastrar la imagen (mouse o dedo)
+    var arr = null;
+    S.root.addEventListener('pointerdown', function (e) {
+      if (!e.target.matches('.ch-adj-cv')) return;
+      arr = { x: e.clientX, y: e.clientY }; e.target.setPointerCapture(e.pointerId); e.preventDefault();
+    });
+    S.root.addEventListener('pointermove', function (e) {
+      if (!arr) return;
+      moverAdj(e.clientX - arr.x, e.clientY - arr.y); arr = { x: e.clientX, y: e.clientY };
+    });
+    ['pointerup', 'pointercancel'].forEach(function (t) { S.root.addEventListener(t, function () { arr = null; }); });
   }
 
   function itemSala(k) {
@@ -235,6 +349,7 @@
       '<button type="button" class="ch-back" data-a="lista" aria-label="Volver a los chats">' + IC.back + '</button>' +
       avatarSala(k) +
       '<div class="ch-head-t"><b>' + (info.pro ? '<small>Manfredi Pro</small>' : '') + esc(info.nombre) + '</b><span>' + esc(info.sub) + '</span></div>' +
+      (k === 'gratis' ? '<div class="ch-gente"' + (S.gente ? '' : ' hidden') + '>' + IC.gente + '<span><b>' + (S.gente || 0).toLocaleString('es-AR') + '</b> personas en la comunidad</span></div>' : '') +
     '</header>';
     if (z.estado === 'pronto') { main.innerHTML = cab + pronto(); return; }
     if (z.estado === 'bloqueada') { main.innerHTML = cab + bloqueo(); return; }
@@ -261,6 +376,7 @@
     }
     pintarFeed(alFondo !== false);
     pintarHoy();
+    dibujarAdj();
   }
 
   // Guía a los resúmenes de hoy: siempre a la vista, lleva al mensaje aunque haya quedado lejos.
@@ -303,10 +419,10 @@
       return '<div class="ch-login"><span>Acá publica solo Ignacio. Para comentar una idea:</span><button type="button" class="ch-btn" data-ir="socios">Ir a Charla de socios</button></div>';
     var r = S.responde, adj = S.adjunto, cr = esCreador();
     return (r ? '<div class="ch-reply"><div><b>' + esc(r.nombre) + '</b><span>' + esc(r.texto) + '</span></div><button type="button" data-a="sin-reply" aria-label="Cancelar respuesta">' + IC.x + '</button></div>' : '') +
-      (adj ? '<div class="ch-adj"><img src="' + adj.url + '" alt=""><span>Imagen lista · podés sumarle un texto</span><button type="button" data-a="sin-adj" aria-label="Quitar imagen">' + IC.x + '</button></div>' : '') +
+      (adj ? editorAdj() : '') +
       '<form class="ch-comp" data-a="enviar">' +
         (cr ? '<label class="ch-clip" title="Adjuntar imagen" aria-label="Adjuntar imagen">' + IC.foto + '<input type="file" accept="image/*" class="ch-file" hidden></label>' : '') +
-        '<textarea class="ch-ta" rows="1" maxlength="800" placeholder="' + (adj ? 'Agregá un texto (opcional)' : 'Escribí un mensaje') + '" aria-label="Mensaje">' + esc(S.borrador[S.sala] || '') + '</textarea>' +
+        '<textarea class="ch-ta" rows="1" maxlength="800" placeholder="' + (adj ? 'Agregá un texto (opcional)' : 'Escribí un mensaje · con $NVDA se ve el gráfico') + '" aria-label="Mensaje">' + esc(S.borrador[S.sala] || '') + '</textarea>' +
         '<button type="submit" class="ch-send" aria-label="Enviar">' + IC.send + '</button>' +
       '</form><div class="ch-toast" role="status"></div>';
   }
@@ -375,7 +491,9 @@
     var cls = 'ch-row' + (mio ? ' mio' : '') + (cont ? ' cont' : '') + (S.recien[m.id] ? ' entra' : '') + (m.tipo === 'resumen' ? ' res' : '') + (m.tipo === 'imagen' ? ' img' : '');
     var h = '<div class="' + cls + '" data-id="' + m.id + '">';
     if (!mio) h += cont ? '<span class="ch-av-sp"></span>' : avatar(m, 'sm');
-    h += '<div class="ch-bub' + (m.rol === 'oficial' ? ' of' : '') + (m.borrado ? ' borrado' : '') + '">';
+    // Imagen: nunca más alta que ~420 px (una vertical larga queda angosta, no gigante)
+    var anchoImg = m.tipo === 'imagen' && m.datos ? Math.round(Math.min(380, 420 * (+m.datos.w || 4) / (+m.datos.h || 5))) : 0;
+    h += '<div class="ch-bub' + (m.rol === 'oficial' ? ' of' : '') + (m.borrado ? ' borrado' : '') + '"' + (anchoImg && !m.borrado ? ' style="width:min(' + Math.max(anchoImg, 230) + 'px, 80%)"' : '') + '>';
     if (!mio && !cont) h += '<div class="ch-who"><b style="color:' + (m.rol === 'oficial' || m.rol === 'creador' ? '#e9d3a0' : color(m.h)) + '">' + esc(m.nombre) + '</b>' + chip(m) + '</div>';
     if (m.borrado) {
       h += '<div class="ch-txt"><i>Mensaje eliminado</i><span class="ch-time">' + hora(m.creado) + '</span></div></div></div>';
@@ -456,7 +574,24 @@
     if (a === 'pin') { var x = b.getAttribute('aria-expanded') === 'true'; b.setAttribute('aria-expanded', String(!x)); return; }
     if (a === 'bajar') { var f = S.root.querySelector('.ch-feed'); f.scrollTo({ top: f.scrollHeight, behavior: 'smooth' }); b.hidden = true; return; }
     if (a === 'sin-reply') { S.responde = null; repintarCompositor(); return; }
+    if (a === 'tk') { abrirFicha(b.dataset.s); return; }
+    if (a === 'tk-cerrar') { cerrarFicha(); return; }
+    if (a === 'tk-tf' && S.ficha) {
+      S.ficha.tf = b.dataset.tf;
+      b.parentNode.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      serieFicha(); return;
+    }
+    if (a === 'tk-mercados' && S.ficha) {
+      var fi = S.ficha; cerrarFicha();
+      if (window.mktAbrirActivo) window.mktAbrirActivo(fi.s, fi.cat); else location.hash = 'mercados';
+      return;
+    }
     if (a === 'sin-adj') { quitarAdjunto(); repintarCompositor(); return; }
+    if (a === 'adj-fmt' && S.adjunto) {
+      S.adjunto.fmt = b.dataset.f; S.adjunto.ox = S.adjunto.oy = 0.5;
+      b.parentNode.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      dibujarAdj(); return;
+    }
     if (a === 'ver-img') { var im = b.querySelector('img'); if (!im || !im.src) return; var lb2 = S.root.querySelector('.ch-lb'); lb2.querySelector('img').src = im.src; lb2.hidden = false; return; }
     if ((a === 'copiar-img' || a === 'compartir-img' || a === 'copiar-txt') && m && esCreador()) { pasarAWhatsApp(a, m, b); return; }
     if (a === 'responder' && m) {
@@ -496,7 +631,7 @@
   }
   function tecla(e) {
     if (e.target.matches('.ch-ta') && e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); enviar(); }
-    if (e.key === 'Escape') { var lb = S.root.querySelector('.ch-lb'); if (!lb.hidden) lb.hidden = true; }
+    if (e.key === 'Escape') { var lb = S.root.querySelector('.ch-lb'); if (!lb.hidden) lb.hidden = true; cerrarFicha(); }
   }
   function abrir(k) {
     S.borrador[S.sala] = (S.root.querySelector('.ch-ta') || {}).value || '';
@@ -511,12 +646,23 @@
     main.querySelectorAll('.ch-reply,.ch-adj,.ch-comp,.ch-login,.ch-toast').forEach(function (n) { n.remove(); });
     main.insertAdjacentHTML('beforeend', compositor());
     var ta = main.querySelector('.ch-ta'); if (ta) ajustar(ta);
+    dibujarAdj();
   }
   function ajustar(ta) { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 140) + 'px'; }
   function toast(t) {
     var el = S.root.querySelector('.ch-toast'); if (!el) return;
     el.textContent = t; el.classList.add('on'); clearTimeout(S.tt);
     S.tt = setTimeout(function () { el.classList.remove('on'); }, 3200);
+  }
+
+  // Cuánta gente hay en la comunidad (registrados en el sitio): arriba del chat de Mercados.
+  function cargarGente() {
+    fetch('https://log-user.nachito2502.workers.dev/comunidad/cantidad').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d || !(d.usuarios > 0)) return;
+      S.gente = d.usuarios;
+      var el = S.root.querySelector('.ch-gente'); if (!el) return;
+      el.querySelector('b').textContent = S.gente.toLocaleString('es-AR'); el.hidden = false;
+    }).catch(function () {});
   }
 
   // ---------- imágenes (solo el creador sube) ----------
@@ -562,32 +708,74 @@
     }).catch(function (err) { toast(err.message || 'No se pudo copiar la imagen.'); });
   }
 
-  function quitarAdjunto() { if (S.adjunto) URL.revokeObjectURL(S.adjunto.url); S.adjunto = null; }
-  // Lado más largo hasta 1600 px, en JPEG; si pesa más de ~900 KB baja la calidad.
+  // ---------- ajustar la imagen antes de mandarla: formato, zoom y encuadre ----------
+  var FORMATOS = [{ k: 'orig', t: 'Original' }, { k: '4:5', t: '4:5', r: 4 / 5 }, { k: '1:1', t: '1:1', r: 1 }, { k: '16:9', t: '16:9', r: 16 / 9 }];
+  function quitarAdjunto() { if (S.adjunto && S.adjunto.src) URL.revokeObjectURL(S.adjunto.src); S.adjunto = null; }
   function prepararImagen(file) {
     if (!file || !/^image\//.test(file.type)) return;
     var url = URL.createObjectURL(file), img = new Image();
     img.onload = function () {
-      var k = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
-      var w = Math.round(img.naturalWidth * k), h = Math.round(img.naturalHeight * k);
-      var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
-      var cx = cv.getContext('2d'); cx.fillStyle = '#0b1629'; cx.fillRect(0, 0, w, h); cx.drawImage(img, 0, 0, w, h);
-      URL.revokeObjectURL(url);
-      var q = 0.88, du = cv.toDataURL('image/jpeg', q);
-      while (du.length > 1.2e6 && q > 0.45) { q -= 0.1; du = cv.toDataURL('image/jpeg', q); }
-      if (du.length > 1.8e6) { toast('La imagen es muy pesada.'); return; }
       quitarAdjunto();
-      S.adjunto = { url: du, b64: du.split(',')[1], mime: 'image/jpeg', w: w, h: h };
+      S.adjunto = { img: img, src: url, nw: img.naturalWidth, nh: img.naturalHeight, fmt: 'orig', zoom: 1, ox: 0.5, oy: 0.5 };
       repintarCompositor();
       var ta = S.root.querySelector('.ch-ta'); if (ta) ta.focus();
     };
     img.onerror = function () { URL.revokeObjectURL(url); toast('No se pudo leer la imagen.'); };
     img.src = url;
   }
+  // Dibuja el recorte elegido con el lado más largo en `lado` px.
+  function recorte(A, lado) {
+    var f = FORMATOS.filter(function (x) { return x.k === A.fmt; })[0];
+    var r = f.r || A.nw / A.nh;
+    var W = r >= 1 ? lado : Math.round(lado * r), H = Math.round(W / r);
+    var s = Math.max(W / A.nw, H / A.nh) * A.zoom, sw = W / s, sh = H / s;
+    var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    var cx = cv.getContext('2d'); cx.fillStyle = '#0b1629'; cx.fillRect(0, 0, W, H);
+    cx.drawImage(A.img, (A.nw - sw) * A.ox, (A.nh - sh) * A.oy, sw, sh, 0, 0, W, H);
+    return { cv: cv, sw: sw, sh: sh };
+  }
+  function dibujarAdj() {
+    var A = S.adjunto, cv = S.root.querySelector('.ch-adj-cv'); if (!A || !cv) return;
+    var r = recorte(A, 520); A._vista = r;
+    cv.width = r.cv.width; cv.height = r.cv.height; cv.getContext('2d').drawImage(r.cv, 0, 0);
+  }
+  // Lo que se sube: lado más largo hasta 1600 px en JPEG; si pesa más de ~900 KB baja la calidad.
+  function exportarAdj(A) {
+    var cv = recorte(A, Math.min(1600, Math.max(A.nw, A.nh))).cv;
+    var q = 0.88, du = cv.toDataURL('image/jpeg', q);
+    while (du.length > 1.2e6 && q > 0.45) { q -= 0.1; du = cv.toDataURL('image/jpeg', q); }
+    if (du.length > 1.8e6) return null;
+    return { url: du, b64: du.split(',')[1], mime: 'image/jpeg', w: cv.width, h: cv.height };
+  }
+  function editorAdj() {
+    var A = S.adjunto;
+    return '<div class="ch-adj">' +
+      '<div class="ch-adj-marco"><canvas class="ch-adj-cv" title="Arrastrá para encuadrar"></canvas></div>' +
+      '<div class="ch-adj-ctl">' +
+        '<div class="ch-adj-h"><b>Ajustar imagen</b><button type="button" data-a="sin-adj" aria-label="Quitar imagen">' + IC.x + '</button></div>' +
+        '<div class="ch-adj-k">Formato</div>' +
+        '<div class="ch-adj-fmt" role="group" aria-label="Formato">' + FORMATOS.map(function (f) {
+          return '<button type="button" data-a="adj-fmt" data-f="' + f.k + '"' + (A.fmt === f.k ? ' aria-pressed="true"' : '') + '>' + f.t + '</button>';
+        }).join('') + '</div>' +
+        '<label class="ch-adj-k" for="ch-adj-zoom">Zoom</label>' +
+        '<input id="ch-adj-zoom" class="ch-adj-zoom" type="range" min="1" max="3" step="0.01" value="' + A.zoom + '">' +
+        '<p class="ch-adj-ayuda">Arrastrá la imagen para encuadrarla. Abajo podés sumarle un texto.</p>' +
+      '</div></div>';
+  }
+  function moverAdj(dx, dy) {
+    var A = S.adjunto, v = A && A._vista, cv = S.root.querySelector('.ch-adj-cv'); if (!v || !cv) return;
+    var k = cv.width / cv.getBoundingClientRect().width; // px de pantalla -> px del lienzo
+    var fx = A.nw - v.sw, fy = A.nh - v.sh, s = v.cv.width / v.sw;
+    if (fx > 0.5) A.ox = Math.min(1, Math.max(0, A.ox - dx * k / s / fx));
+    if (fy > 0.5) A.oy = Math.min(1, Math.max(0, A.oy - dy * k / s / fy));
+    dibujarAdj();
+  }
 
   function enviar() {
     var ta = S.root.querySelector('.ch-ta'); if (!ta) return;
-    var texto = ta.value.trim(), adj = S.adjunto; if ((!texto && !adj) || S.enviando) return;
+    var texto = ta.value.trim(); if ((!texto && !S.adjunto) || S.enviando) return;
+    var original = S.adjunto, adj = original ? exportarAdj(original) : null;
+    if (original && !adj) { toast('La imagen es muy pesada.'); return; }
     var sala = S.sala, z = S.salas[sala], resp = S.responde;
     var tmp = { id: 1e15 + Date.now(), h: S.yo ? S.yo.h : 'yo', nombre: S.yo ? S.yo.nombre : '', rol: S.yo ? S.yo.rol : 'usuario', tipo: adj ? 'imagen' : 'texto', texto: texto,
       datos: adj ? { url: adj.url, w: adj.w, h: adj.h } : null,
@@ -600,11 +788,12 @@
     api('/chat/' + sala, { method: 'POST', body: body }).then(function (d) {
       delete z.msgs[tmp.id]; z.orden = z.orden.filter(function (x) { return x !== tmp.id; });
       if (adj && d.mensaje.datos) IMGS[d.mensaje.datos.img] = Promise.resolve(adj.url); // ya la tenemos: no se baja de nuevo
+      if (original && S.adjunto !== original) URL.revokeObjectURL(original.src);
       aplicar(sala, [d.mensaje]); pintarFeed(true); pintarLista();
     }).catch(function (err) {
       delete z.msgs[tmp.id]; z.orden = z.orden.filter(function (x) { return x !== tmp.id; });
       pintarFeed(false);
-      if (adj && !S.adjunto) { S.adjunto = adj; repintarCompositor(); }
+      if (original && !S.adjunto) { S.adjunto = original; repintarCompositor(); }
       var t2 = S.root.querySelector('.ch-ta'); if (t2 && !t2.value) { t2.value = texto; ajustar(t2); }
       toast(err.status === 401 ? 'Tu sesión venció: volvé a iniciar sesión.' : err.message);
     }).then(function () { S.enviando = false; });
@@ -699,6 +888,10 @@
       S = { root: el, sala: 'gratis', salas: nuevasSalas(), yo: null, responde: null, borrador: {}, recien: {}, vuelta: 0, sesion: sesion() };
       esqueleto(); pintarLista(); pintarSala(true); pintarProximo();
       cargarTodas();
+      cargarGente();
+      cargarPrecios();
+      setInterval(function () { if (aLaVista()) cargarPrecios(); }, 30e3);
+      S.root.querySelector('.ch-ficha').addEventListener('click', function (e) { if (e.target === e.currentTarget) cerrarFicha(); });
       setInterval(tic, 5000);
       setInterval(pintarProximo, 30000);
       setInterval(function () { if (sesion() !== S.sesion) { S.sesion = sesion(); reiniciar(); } }, 1500);

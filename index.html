@@ -37,7 +37,7 @@
 <link rel="stylesheet" href="assets/analistas/analistas.css?v=20261030" />
 <link rel="stylesheet" href="assets/portfolio/ratios.css?v=20261012" />
 <link rel="stylesheet" href="assets/pro/pro.css?v=20261028l" />
-<link rel="stylesheet" href="assets/comunidad/chat.css?v=20261111c" />
+<link rel="stylesheet" href="assets/comunidad/chat.css?v=20261112c" />
 <link rel="stylesheet" href="assets/asesoria/asesoria.css?v=20261103b" />
 <link rel="stylesheet" href="assets/calendario/calendario.css?v=20261102b" />
 <link rel="stylesheet" href="assets/informes/estanteria.css?v=20261103d" />
@@ -4425,7 +4425,7 @@
   <script src="assets/analistas/autor.js?v=20261030" defer></script>
   <script src="assets/comunidad/tarjeta.js?v=20261028m" defer></script>
   <script src="assets/comunidad/wa.js?v=20261112a" defer></script>
-  <script src="assets/comunidad/chat.js?v=20261112b" defer></script>
+  <script src="assets/comunidad/chat.js?v=20261112c" defer></script>
   <script src="assets/pro/pro.js?v=20261028j" defer></script>
   <script src="assets/asesoria/asesoria.js?v=20261103a" defer></script>
   <!-- cartel con los pasos para postularse como analista -->
@@ -12502,6 +12502,20 @@
 
   // ─── Modal de detalle: click en cualquier activo (tabla o buscador) ───────
   const MKT_DETAIL_CACHE = {};
+
+  // Desde otras secciones (los $TICKER del chat): abre Mercados con el detalle de ese activo.
+  // Espera a que lleguen los datos de Mercados (hasta 15 s) si todavía no estaban.
+  window.mktAbrirActivo = function (symbol, category) {
+    if (location.hash !== '#mercados') location.hash = 'mercados';
+    const t0 = Date.now();
+    (function intentar() {
+      const cat = MERCADOS && MERCADOS.categorias[category];
+      const item = cat && cat.items.find(i => i.symbol === symbol);
+      if (item) { openAssetModal(item, category, cat.currency); return; }
+      if (cat || Date.now() - t0 > 15000) { const inp = document.getElementById('mktSearchInput'); if (inp) { inp.value = symbol; inp.dispatchEvent(new Event('input', { bubbles: true })); } return; }
+      setTimeout(intentar, 200);
+    })();
+  };
 
   function mktCategoryLabel(key) {
     const c = MKT_CATEGORIES.find(c => c.key === key);

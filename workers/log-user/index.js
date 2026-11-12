@@ -11,6 +11,11 @@ export default {
               return await creadorUsuarios(request, env);
           }
 
+          // Chat: cuánta gente hay en la comunidad (solo el número, público, guardado 1 hora)
+          if (new URL(request.url).pathname === '/comunidad/cantidad') {
+              return await cantidadComunidad(request, env);
+          }
+
           if (request.method === 'OPTIONS') return new Response('', { headers });
                   if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers });
                   const pathname = new URL(request.url).pathname;
@@ -776,6 +781,27 @@ async function googleAccessToken(env, scope) {
     if (!d.access_token) throw new Error('Google auth: ' + (d.error_description || d.error || r.status));
     return d.access_token;
 }
+// Cantidad de registrados (emails distintos de la hoja Usuarios). Nunca devuelve datos de nadie.
+// Se guarda 1 hora en memoria (en workers.dev no hay caché de Cloudflare) y otra hora en el navegador.
+let _cantidad = { body: null, exp: 0 };
+async function cantidadComunidad(request, env) {
+    const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600' };
+    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+    if (_cantidad.body && Date.now() < _cantidad.exp) return new Response(_cantidad.body, { headers: cors });
+    try {
+        const token = await googleAccessToken(env, 'https://www.googleapis.com/auth/spreadsheets.readonly');
+        const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${env.GOOGLE_SHEETS_ID}/values/Usuarios!B2:B`, { headers: { Authorization: 'Bearer ' + token } });
+        const d = await r.json();
+        if (!r.ok) throw new Error('Sheets ' + r.status);
+        const emails = new Set((d.values || []).map(f => String(f[0] || '').trim().toLowerCase()).filter(e => e.includes('@')));
+        const body = JSON.stringify({ usuarios: emails.size, ts: Date.now() });
+        _cantidad = { body, exp: Date.now() + 3600e3 };
+        return new Response(body, { headers: cors });
+    } catch (e) {
+        return new Response(JSON.stringify({ error: 'No disponible' }), { status: 503, headers: { ...cors, 'Cache-Control': 'no-store' } });
+    }
+}
+
 async function creadorUsuarios(request, env) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CREADOR_CORS });
     const out = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: CREADOR_CORS });
