@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Informes en Noticias</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/noticias/noticias.css">
+<style>
+  html, body { margin:0; background:#07101e; }
+  /* barra del mockup (no va al sitio) */
+  .mk { position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:center; gap:14px; padding:12px 16px; background:rgba(5,11,22,.92); backdrop-filter:blur(10px); border-bottom:1px solid rgba(214,226,244,.12); font:500 12.5px 'IBM Plex Sans',sans-serif; color:#f3f6fb; }
+  .mk b { font:500 11px 'IBM Plex Mono',monospace; letter-spacing:.16em; text-transform:uppercase; color:#e6cf96; }
+  .mk .nt-seg { margin:0; width:280px; }
+
+  /* ================= cartel "Informes" (va debajo de Cotizaciones) ================= */
+  .ni { --acc:#e6cf96; --champ:#e6cf96; --mono:'IBM Plex Mono',ui-monospace,monospace; position:relative; overflow:hidden; }
+  .ni::before { content:''; position:absolute; left:20px; right:20px; top:0; height:1px; background:linear-gradient(90deg, transparent, rgba(230,207,150,.55), transparent); }
+  .ni .nt-card__h { margin-bottom:4px; }
+  .ni__season { font:500 10.5px/1 var(--mono); letter-spacing:.18em; text-transform:uppercase; color:var(--champ); }
+  .ni__k { display:block; font:400 13px/1.45 'DM Serif Display',serif; font-style:italic; color:#f3f6fb; margin:0 0 16px; }
+
+  /* tapa Monocromo en miniatura (misma receta que la estantería) */
+  .ni-cover { position:relative; display:block; aspect-ratio:5/7; border-radius:2px 5px 5px 2px; overflow:hidden; container-type:inline-size; color:#f3f6fb;
+    background:radial-gradient(70% 45% at 50% 38%, rgba(230,207,150,.06), transparent 70%), linear-gradient(180deg, #0d1a35 0%, #0a1530 46%, #070e21 100%);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.07), inset 0 1px 0 rgba(255,255,255,.1), 0 18px 26px -14px rgba(0,0,0,.95), 0 3px 8px -2px rgba(0,0,0,.5);
+    transition:transform .5s var(--nt-ease), box-shadow .5s var(--nt-ease); transform-origin:left center; }
+  .ni-cover::before { content:''; position:absolute; z-index:3; left:0; top:0; bottom:0; width:4%; background:linear-gradient(90deg, rgba(0,0,0,.55), rgba(255,255,255,.08) 55%, rgba(0,0,0,.35)); }
+  .ni-cover::after { content:''; position:absolute; z-index:1; inset:6cqw 6cqw 6cqw 10cqw; border:1px solid rgba(230,207,150,.14); }
+  .ni-cover__in { position:absolute; z-index:2; inset:0; padding:12cqw 12cqw 11cqw 16cqw; display:flex; flex-direction:column; }
+  .ni-cover__top { display:flex; justify-content:space-between; font:500 7cqw/1 var(--mono); letter-spacing:.14em; color:var(--champ); }
+  .ni-cover__mark { flex:1; display:grid; place-items:center; min-height:0; }
+  .ni-cover__mark img { max-width:52cqw; max-height:30cqw; object-fit:contain; opacity:.95; filter:drop-shadow(0 4px 10px rgba(0,0,0,.5)); }
+  .ni-cover__tk { font:400 19cqw/.9 'DM Serif Display',serif; letter-spacing:-.01em; }
+  .ni-cover__sec { display:flex; align-items:center; gap:3cqw; margin-top:6cqw; padding-top:5cqw; border-top:1px solid rgba(230,207,150,.18); font:500 6.6cqw/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:var(--acc); white-space:nowrap; }
+  .ni-cover__sec::before { content:''; width:4cqw; height:4cqw; border-radius:50%; background:var(--acc); box-shadow:0 0 4cqw color-mix(in srgb, var(--acc) 60%, transparent); }
+
+  .ni-chip { display:inline-block; font:600 12px/1 'IBM Plex Sans',sans-serif; font-variant-numeric:tabular-nums; padding:6px 7px; border-radius:6px; min-width:56px; text-align:center; }
+  .ni-chip.up { color:var(--nt-up); background:rgba(86,199,147,.12); } .ni-chip.dn { color:var(--nt-dn); background:rgba(240,123,112,.12); }
+  .ni-new { font:600 9.5px/1 var(--mono); letter-spacing:.14em; color:#0a1322; background:var(--champ); border-radius:99px; padding:4px 7px; }
+
+  /* --- Opción A: Atril (destacado + lista) --- */
+  .ni-feat { display:grid; grid-template-columns:96px minmax(0,1fr); gap:16px; align-items:center; padding:2px 0 18px; border-bottom:1px solid var(--nt-line); }
+  .ni-feat .ni-cover { transform:rotate(-2deg); }
+  .ni-feat__top { display:flex; align-items:center; gap:8px; font:500 11px/1 var(--mono); letter-spacing:.08em; text-transform:uppercase; color:#f3f6fb; }
+  .ni-feat__name { display:block; font:400 20px/1.1 'DM Serif Display',serif; margin:9px 0 6px; transition:color .15s ease; }
+  .ni-feat__t { font:400 13px/1.45 'IBM Plex Sans',sans-serif; color:#f3f6fb; margin:0 0 10px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; text-wrap:pretty; }
+  .ni-fv { display:flex; align-items:center; gap:8px; font:500 12px/1 'IBM Plex Sans',sans-serif; font-variant-numeric:tabular-nums; }
+  .ni-fv span { color:#f3f6fb; } .ni-fv b { font-weight:600; color:var(--champ); }
+
+  .ni-list { list-style:none; margin:0; padding:0; }
+  .ni-row { display:grid; grid-template-columns:30px minmax(0,1fr) auto; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--nt-line); }
+  .ni-list li:last-child .ni-row { border-bottom:0; }
+  .ni-spine { position:relative; width:30px; height:38px; border-radius:1px 4px 4px 1px; display:grid; place-items:center; background:linear-gradient(180deg, #0d1a35, #070e21); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), 0 6px 10px -6px rgba(0,0,0,.9); overflow:hidden; }
+  .ni-spine::before { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--acc); opacity:.85; }
+  .ni-spine img { width:17px; height:17px; object-fit:contain; opacity:.92; }
+  .ni-row__a { display:flex; align-items:baseline; gap:8px; min-width:0; }
+  .ni-row__tk { font:600 13.5px/1.2 'IBM Plex Sans',sans-serif; color:#f3f6fb; transition:color .15s ease; }
+  .ni-row__n { font:400 13.5px/1.2 'DM Serif Display',serif; font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ni-row__m { display:block; margin-top:4px; font:500 10.5px/1 var(--mono); letter-spacing:.06em; text-transform:uppercase; color:#f3f6fb; }
+  .ni-row__m i { display:inline-block; width:3px; height:3px; border-radius:50%; background:var(--acc); vertical-align:middle; margin:0 6px 2px 0; }
+  .ni-row__r { text-align:right; }
+  .ni-row__r { display:flex; align-items:center; gap:9px; }
+  .ni-row .ni-chip { min-width:52px; padding:6px 5px; }
+  .ni-row__fv { font:500 12px/1 var(--mono); color:#f3f6fb; font-variant-numeric:tabular-nums; }
+
+  /* avance de temporada */
+  .ni-prog { margin-top:16px; padding-top:14px; border-top:1px solid var(--nt-line); }
+  .ni-prog__t { display:flex; justify-content:space-between; font:500 11.5px/1 'IBM Plex Sans',sans-serif; color:#f3f6fb; margin-bottom:9px; }
+  .ni-prog__t b { font:600 11.5px/1 var(--mono); color:var(--champ); }
+  .ni-bar { position:relative; height:2px; border-radius:2px; background:rgba(214,226,244,.1); overflow:hidden; }
+  .ni-bar i { position:absolute; inset:0 auto 0 0; width:var(--p); background:linear-gradient(90deg, rgba(230,207,150,.5), var(--champ)); box-shadow:0 0 10px rgba(230,207,150,.5); transform-origin:left; animation:ni-fill 1.2s var(--nt-ease) both .3s; }
+  @keyframes ni-fill { from { transform:scaleX(0); } }
+
+  /* --- Opción B: Estante (3 tapas + lista corta) --- */
+  .ni-shelf { position:relative; display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; padding:4px 2px 0; }
+  .ni-shelf::after { content:''; position:absolute; left:-6px; right:-6px; bottom:44px; height:7px; border-radius:2px; background:linear-gradient(180deg, rgba(230,207,150,.16), rgba(230,207,150,.02)); box-shadow:0 10px 18px -8px rgba(0,0,0,.9); pointer-events:none; }
+  .ni-book { position:relative; display:flex; flex-direction:column; align-items:center; gap:0; perspective:600px; }
+  .ni-book .ni-cover { width:100%; margin-bottom:12px; }
+  .ni-book .ni-new { position:absolute; z-index:4; top:-6px; right:-5px; }
+  .ni-book__f { display:flex; flex-direction:column; align-items:center; gap:5px; padding-top:6px; }
+  .ni-book__f small { font:500 10px/1 var(--mono); letter-spacing:.06em; text-transform:uppercase; color:#f3f6fb; }
+  .ni-shelf + .ni-leg { margin-top:16px; padding-top:14px; border-top:1px solid var(--nt-line); }
+  .ni-leg { display:flex; justify-content:space-between; padding:14px 0 2px; font:500 10px/1 var(--mono); letter-spacing:.14em; text-transform:uppercase; color:var(--champ); }
+
+  .ni-link { display:flex; justify-content:center; align-items:center; gap:6px; margin-top:14px; font:600 13px 'IBM Plex Sans',sans-serif; color:var(--nt-gold2); }
+  .ni-link svg { transition:transform .25s var(--nt-ease); }
+
+  @media (hover:hover) and (pointer:fine) {
+    .ni-feat:hover .ni-cover { transform:rotate(0) translateY(-3px); }
+    .ni-feat:hover .ni-feat__name, .ni-row:hover .ni-row__tk { color:var(--nt-gold2); }
+    .ni-book:hover .ni-cover { transform:translateY(-6px) rotateY(-10deg); box-shadow:inset 0 0 0 1px rgba(230,207,150,.25), 16px 26px 34px -18px rgba(0,0,0,.95); }
+    .ni-link:hover svg { transform:translateX(3px); }
+  }
+  /* entrada suave, una vez */
+  .ni [data-in] { animation:ni-in .7s var(--nt-ease) both; animation-delay:calc(var(--i, 0) * 60ms + 120ms); }
+  @keyframes ni-in { from { opacity:0; transform:translateY(6px); } }
+  @media (prefers-reduced-motion: reduce) { .ni [data-in], .ni-bar i { animation:none; } .ni-cover { transition:none; } }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+
+<div class="mk">
+  <b>Mockup</b>
+  <div class="nt-seg" role="group" aria-label="Opción">
+    <button type="button" data-op="a" class="on">A · Atril</button>
+    <button type="button" data-op="b">B · Estante</button>
+  </div>
+</div>
+
+<!-- Réplica de la pestaña Noticias (mismo HTML y CSS que el sitio; feed y cotizaciones reales) -->
+<section class="nt" id="informes" data-tab="informes">
+  <div class="nt-wrap">
+    <header class="nt-head nt-head--top" id="reportes">
+      <span class="nt-date" id="ntDate"></span>
+    </header>
+  </div>
+  <div class="nt-wrap nt-grid" id="ntPanel">
+    <div class="nt-main">
+      <div class="nt-bar" id="ntBar"><div class="nt-chips" id="ntChips" role="group" aria-label="Filtrar noticias"></div></div>
+      <div id="ntFeed" aria-live="polite">
+        <div style="padding:26px 0;display:grid;gap:22px">
+          <span class="nt-skel" style="height:18px;width:70%"></span>
+          <span class="nt-skel" style="height:18px;width:85%"></span>
+          <span class="nt-skel" style="height:18px;width:60%"></span>
+        </div>
+      </div>
+      <button type="button" class="nt-more" id="ntMore" hidden>Ver más noticias</button>
+    </div>
+    <aside class="nt-rail" aria-label="Cotizaciones e informes">
+      <div class="nt-card" id="ntQuotes"><h3 class="nt-card__h">Cotizaciones</h3><span class="nt-skel" style="height:160px"></span></div>
+
+      <!-- ===== NUEVO · Opción A: Atril ===== -->
+      <section class="nt-card ni" data-ni="a" aria-label="Últimos informes">
+        <h3 class="nt-card__h">Informes<span class="ni__season">Temporada 3T 2026</span></h3>
+        <span class="ni__k">Análisis propios, actualizados a cada balance.</span>
+
+        <a class="ni-feat" href="../informes/ko.html" target="_blank" rel="noopener" data-in style="--i:0">
+          <span class="ni-cover" style="--acc:#e0a24a">
+            <span class="ni-cover__in">
+              <span class="ni-cover__top"><span>3T 2026</span></span>
+              <span class="ni-cover__mark"><img src="../assets/logos/mono/ko.png" alt=""></span>
+              <span class="ni-cover__tk">KO</span>
+              <span class="ni-cover__sec">Defensivos</span>
+            </span>
+          </span>
+          <span>
+            <span class="ni-feat__top"><span class="ni-new">NUEVO</span>12 nov</span>
+            <span class="ni-feat__name">Coca-Cola</span>
+            <span class="ni-feat__t">Tercer trimestre con volumen y sin precio, guía en alza, y una acción que sube más rápido que el negocio.</span>
+            <span class="ni-fv"><span>Valor justo <b>$79.03</b></span><span class="ni-chip dn">−19.0%</span></span>
+          </span>
+        </a>
+
+        <div class="ni-leg"><span>Último informe</span><span>Valor justo · potencial</span></div>
+        <ul class="ni-list">
+          <li data-in style="--i:1"><a class="ni-row" href="../informes/pep.html" target="_blank" rel="noopener" style="--acc:#e0a24a">
+            <span class="ni-spine"><img src="../assets/logos/mono/pep.png" alt=""></span>
+            <span><span class="ni-row__a"><span class="ni-row__tk">PEP</span><span class="ni-row__n">PepsiCo</span></span><span class="ni-row__m"><i></i>12 nov · 3T 2026</span></span>
+            <span class="ni-row__r"><span class="ni-row__fv">$162.32</span><span class="ni-chip up">+12.8%</span></span>
+          </a></li>
+          <li data-in style="--i:2"><a class="ni-row" href="../informes/nflx.html" target="_blank" rel="noopener" style="--acc:#5b8def">
+            <span class="ni-spine"><img src="../assets/logos/mono/nflx.png" alt=""></span>
+            <span><span class="ni-row__a"><span class="ni-row__tk">NFLX</span><span class="ni-row__n">Netflix</span></span><span class="ni-row__m"><i></i>9 nov · 3T 2026</span></span>
+            <span class="ni-row__r"><span class="ni-row__fv">$86.92</span><span class="ni-chip up">+35.9%</span></span>
+          </a></li>
+          <li data-in style="--i:3"><a class="ni-row" href="../informes/tsla.html" target="_blank" rel="noopener" style="--acc:#5b8def">
+            <span class="ni-spine"><img src="../assets/logos/mono/tsla.png" alt=""></span>
+            <span><span class="ni-row__a"><span class="ni-row__tk">TSLA</span><span class="ni-row__n">Tesla</span></span><span class="ni-row__m"><i></i>9 nov · 3T 2026</span></span>
+            <span class="ni-row__r"><span class="ni-row__fv">$253.03</span><span class="ni-chip dn">−33.1%</span></span>
+          </a></li>
+          <li data-in style="--i:4"><a class="ni-row" href="../informes/amzn.html" target="_blank" rel="noopener" style="--acc:#5b8def">
+            <span class="ni-spine"><img src="../assets/logos/mono/amzn.png" alt=""></span>
+            <span><span class="ni-row__a"><span class="ni-row__tk">AMZN</span><span class="ni-row__n">Amazon</span></span><span class="ni-row__m"><i></i>8 nov · 3T 2026</span></span>
+            <span class="ni-row__r"><span class="ni-row__fv">$297.14</span><span class="ni-chip up">+14.6%</span></span>
+          </a></li>
+        </ul>
+
+        <div class="ni-prog" data-in style="--i:5">
+          <div class="ni-prog__t"><span>Actualizados al 3T 2026</span><b>19 / 49</b></div>
+          <div class="ni-bar" style="--p:38.8%"><i></i></div>
+        </div>
+        <a class="ni-link" href="../index.html#inversiones">Ver la biblioteca completa <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </section>
+
+      <!-- ===== NUEVO · Opción B: Estante ===== -->
+      <section class="nt-card ni" data-ni="b" aria-label="Últimos informes" hidden>
+        <h3 class="nt-card__h">Informes<span class="ni__season">Temporada 3T 2026</span></h3>
+        <span class="ni__k">Lo último de la colección.</span>
+
+        <div class="ni-shelf">
+          <a class="ni-book" href="../informes/ko.html" target="_blank" rel="noopener" data-in style="--i:0">
+            <span class="ni-new">NUEVO</span>
+            <span class="ni-cover" style="--acc:#e0a24a"><span class="ni-cover__in">
+              <span class="ni-cover__top"><span>3T 2026</span></span>
+              <span class="ni-cover__mark"><img src="../assets/logos/mono/ko.png" alt=""></span>
+              <span class="ni-cover__tk">KO</span><span class="ni-cover__sec">Defensivos</span>
+            </span></span>
+            <span class="ni-book__f"><span class="ni-chip dn">−19.0%</span><small>12 nov</small></span>
+          </a>
+          <a class="ni-book" href="../informes/pep.html" target="_blank" rel="noopener" data-in style="--i:1">
+            <span class="ni-new">NUEVO</span>
+            <span class="ni-cover" style="--acc:#e0a24a"><span class="ni-cover__in">
+              <span class="ni-cover__top"><span>3T 2026</span></span>
+              <span class="ni-cover__mark"><img src="../assets/logos/mono/pep.png" alt=""></span>
+              <span class="ni-cover__tk">PEP</span><span class="ni-cover__sec">Defensivos</span>
+            </span></span>
+            <span class="ni-book__f"><span class="ni-chip up">+12.8%</span><small>12 nov</small></span>
+          </a>
+          <a class="ni-book" href="../informes/nflx.html" target="_blank" rel="noopener" data-in style="--i:2">
+            <span class="ni-cover" style="--acc:#5b8def"><span class="ni-cover__in">
+              <span class="ni-cover__top"><span>3T 2026</span></span>
+              <span class="ni-cover__mark"><img src="../assets/logos/mono/nflx.png" alt=""></span>
+              <span class="ni-cover__tk">NFLX</span><span class="ni-cover__sec">Big Tech</span>
+            </span></span>
+            <span class="ni-book__f"><span class="ni-chip up">+35.9%</span><small>9 nov</small></span>
+          </a>
+        </div>
+
+        <div class="ni-leg"><span>Último informe</span><span>Valor justo · potencial</span></div>
+        <ul class="ni-list">
+          <li data-in style="--i:3"><a class="ni-row" href="../informes/tsla.html" target="_blank" rel="noopener" style="--acc:#5b8def">
+            <span class="ni-spine"><img src="../assets/logos/mono/tsla.png" alt=""></span>
+            <span><span class="ni-row__a"><span class="ni-row__tk">TSLA</span><span class="ni-row__n">Tesla</span></span><span class="ni-row__m"><i></i>9 nov · 3T 2026</span></span>
+            <span class="ni-row__r"><span class="ni-row__fv">$253.03</span><span class="ni-chip dn">−33.1%</span></span>
+          </a></li>
+          <li data-in style="--i:4"><a class="ni-row" href="../informes/meta.html" target="_blank" rel="noopener" style="--acc:#5b8def">
+            <span class="ni-spine"><img src="../assets/logos/mono/meta.png" alt=""></span>
+            <span><span class="ni-row__a"><span class="ni-row__tk">META</span><span class="ni-row__n">Meta</span></span><span class="ni-row__m"><i></i>8 nov · 3T 2026</span></span>
+            <span class="ni-row__r"><span class="ni-row__fv">$745.96</span><span class="ni-chip up">+22.3%</span></span>
+          </a></li>
+          <li data-in style="--i:5"><a class="ni-row" href="../informes/ms.html" target="_blank" rel="noopener" style="--acc:#4fb37f">
+            <span class="ni-spine"><img src="../assets/logos/mono/ms.png" alt=""></span>
+            <span><span class="ni-row__a"><span class="ni-row__tk">MS</span><span class="ni-row__n">Morgan Stanley</span></span><span class="ni-row__m"><i></i>8 nov · 3T 2026</span></span>
+            <span class="ni-row__r"><span class="ni-row__fv">$156.83</span><span class="ni-chip dn">−13.6%</span></span>
+          </a></li>
+        </ul>
+
+        <div class="ni-prog" data-in style="--i:6">
+          <div class="ni-prog__t"><span>Actualizados al 3T 2026</span><b>19 / 49</b></div>
+          <div class="ni-bar" style="--p:38.8%"><i></i></div>
+        </div>
+        <a class="ni-link" href="../index.html#inversiones">Ver la biblioteca completa <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </section>
+    </aside>
+  </div>
+</section>
+
+<script src="../assets/pulso/pulso.js"></script>
+<script src="../assets/noticias/noticias.js"></script>
+<script>
+  document.querySelector('.mk').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-op]'); if (!b) return;
+    document.querySelectorAll('.mk [data-op]').forEach(function (x) { x.classList.toggle('on', x === b); });
+    document.querySelectorAll('[data-ni]').forEach(function (s) {
+      var on = s.dataset.ni === b.dataset.op; s.hidden = !on;
+      if (on) s.querySelectorAll('[data-in], .ni-bar i').forEach(function (el) { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; });
+    });
+  });
+</script>
+</body>
+</html>
