@@ -245,9 +245,19 @@
       compositor();
     var feed = main.querySelector('.ch-feed');
     feed.addEventListener('scroll', function () {
+      S.pegado = alFondoDe(feed);
       if (feed.scrollTop < 120) anteriores();
       if (alFondoDe(feed)) { main.querySelector('.ch-nuevos').hidden = true; marcarVisto(); }
     }, { passive: true });
+    // Al entrar, el chat queda pegado abajo (en el último mensaje) aunque después cambie el alto:
+    // las tarjetas de los resúmenes se dibujan un instante más tarde y el chat puede cargarse
+    // cuando todavía no se ve (otra pestaña). Se suelta cuando la persona sube a leer.
+    S.pegado = alFondo !== false;
+    if (S.ro) S.ro.disconnect();
+    if (window.ResizeObserver) {
+      S.ro = new ResizeObserver(function () { if (S.pegado) feed.scrollTop = feed.scrollHeight; });
+      S.ro.observe(feed); S.ro.observe(feed.querySelector('.ch-feed-in'));
+    }
     pintarFeed(alFondo !== false);
     pintarHoy();
   }
@@ -270,6 +280,7 @@
   // Mueve solo el chat (no la página) hasta el mensaje y lo destaca un instante.
   function resaltar(o) {
     var feed = S.root.querySelector('.ch-feed');
+    S.pegado = false;
     feed.scrollTo({ top: Math.max(0, o.offsetTop - 14), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     o.classList.remove('flash'); void o.offsetWidth; o.classList.add('flash');
   }
