@@ -2,7 +2,7 @@
 import subprocess, sys, os
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[5].as_posix()   # raíz del repo
-pg = open(f'{ROOT}/informes/pg.html', encoding='utf-8').read()
+pg = open(f'{ROOT}/.claude/skills/informe-consumo-masivo/modelos/_motor/pg_motor_sep2026.html', encoding='utf-8').read()   # motor congelado: pg.html cambia en cada edición de PG
 css = pg[pg.index('<style>'): pg.index('</style>')+len('</style>')]
 css = css.replace('content:"PG";', 'content:"PEP";')
 assert 'content:"PEP"' in css

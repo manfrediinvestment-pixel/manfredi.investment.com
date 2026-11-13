@@ -265,7 +265,7 @@ Adicionales (se reportan, no entran al blend salvo que se indique):
 **Transparencia del blend (obligatoria, agregada 30-sep-2026 como en informe-salud):** en la síntesis
 etiquetá cada método como "independiente del precio" (DCF, comparables) o "anclado al mercado"
 (reversión, consenso: 60% del peso) y reportá el promedio ponderado de cada grupo por separado, en la
-tabla y en la verdict-bar. PG: independientes $118.30 / anclados $160.73. KO: $63.57 / $84.27 (en KO ni
+tabla y en la verdict-bar. PG: independientes $118.30 / anclados $160.73 (sep-2026); en el 1T FY2027, $127.33 / $162.31 con precio $168.03 (los dos grupos debajo del precio). KO: $63.57 / $84.27 (en KO ni
 siquiera los anclados llegaban al precio). PEP: $167.89 / $160.02, con el DCF solo en $129.60 (en el precio): cuando los
 independientes incluyen métodos de múltiplos de pares, separá el DCF en la verdict-bar.
 
