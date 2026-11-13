@@ -42,7 +42,10 @@ for key in ('Grilla WACC', 'Sensibilidad al MLR'):
 # 4) grupos independientes / anclados recalculados desde el HTML
 fv = {n: money(v) for n, v, w, a in rows}
 ind = (0.15*fv['1'] + 0.25*fv['2'])/0.40; anc = (0.35*fv['3'] + 0.25*fv['4'])/0.60
-if fmt(ind,'usd2') not in out or fmt(anc,'usd2') not in out: diffs.append('promedios de grupo')
+# el modelo los calcula con los valores sin redondear: se exige que el HTML muestre el del modelo y que el recálculo
+# desde las cifras redondeadas del HTML no se aparte más de un centavo
+if fmt(M['indep'],'usd2') not in out or fmt(M['anch'],'usd2') not in out: diffs.append('promedios de grupo (texto)')
+if abs(ind - M['indep']) > 0.011 or abs(anc - M['anch']) > 0.011: diffs.append(f'promedios de grupo: {ind:.4f} / {anc:.4f}')
 # 5) pesos por segmento suman 15% y los valores por segmento suman el EV
 if abs(sum(M[f'w_{k}'] for k in ('uhc','health','insight','rx')) - 15) > 1e-9: diffs.append('pesos SOTP')
 if abs(sum(M['sotp'][k]['ev'] for k in M['sotp']) - M['dcf_base_ev']) > 1e-6: diffs.append('suma de EV por segmento')
@@ -53,6 +56,11 @@ for w in re.findall(r'\b(hoy|ayer|mañana)\b', out, re.I): diffs.append(f'lengua
 if '_preview-gate.js' not in out: diffs.append('falta el gate')
 if 'src="../assets/logos/unh.png"' not in out: diffs.append('falta el logo')
 if '{{' in out or '@@' in out: diffs.append('tokens sin reemplazar')
+# 7) edición 3T26: cabecera, sin gris, y con y sin el comparable en el límite
+if 'Datos al 3T 2026 (cierre 30 sep 2026, publicado 13 oct 2026)' not in out: diffs.append('cabecera 3T26')
+if '#5d646f' in out: diffs.append('verdict-note gris')
+if abs(M['blend_comp_core'] - (M['blend'] - 0.25*M['comp'] + 0.25*M['comp_core'])) > 1e-9: diffs.append('blend sin el par en el límite')
+if abs(M['blend'] - M['blend_sep'] - sum(M[f'd_contrib_{k}'] for k in ('dcf','comp','rev','cons'))) > 1e-9: diffs.append('puente contra septiembre')
 print('diferencias:', len(diffs))
 for d in diffs: print(' -', d)
 sys.exit(1 if diffs else 0)
