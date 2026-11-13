@@ -3,7 +3,7 @@ import subprocess, sys
 from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[4].as_posix()   # raíz del repo (.claude/skills/informe-consumo-masivo/modelos/wmt)
-pg = open(f'{ROOT}/informes/pg.html', encoding='utf-8').read()
+pg = open(f'{ROOT}/.claude/skills/informe-consumo-masivo/modelos/_motor/pg_motor_sep2026.html', encoding='utf-8').read()   # motor congelado: pg.html cambia en cada edición de PG
 css = pg[pg.index('<style>'): pg.index('</style>')+len('</style>')]
 css = css.replace('content:"PG";', 'content:"WMT";')
 assert 'content:"WMT"' in css
