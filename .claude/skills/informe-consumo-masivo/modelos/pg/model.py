@@ -339,16 +339,20 @@ vp2 = [x for x in vp if x[0] != 5.5]; assert round(reg2(*zip(*vp2)), 2) == 0.63
 M = run(NOV)
 P = M['price']
 M['m_g27'] = NOV['m_g27']; M['ne_g27'] = NE_G; M['rev_g27'] = REV_G; M['ocf_g27'] = OCF_G; M['ebitda_ttm'] = NOV['ebitda']
-M['sep'] = {k: MS[k] for k in ('blend', 'dcf_base', 'comp', 'rev', 'cons', 'indep', 'anch', 'price', 'blend_gap', 'rev1', 'rev2',
-                               'wacc', 'eps_ntm', 'rev_pe_avg', 'dcf_bear', 'dcf_bull', 'pe_ntm_now')}
+M['sep'] = {k: MS[k] for k in ('indep', 'anch', 'price', 'rev1', 'rev2', 'wacc', 'eps_ntm', 'rev_pe_avg', 'dcf_bear', 'dcf_bull', 'pe_ntm_now')}
+# lo que se compara contra septiembre son las cifras PUBLICADAS (no las reconstruidas, que difieren en centavos)
+for k in ('blend', 'dcf_base', 'comp', 'rev', 'cons'): M['sep'][k] = PUB_SEP.get(k, MS[k])
+M['sep']['cons'] = 160.61; M['sep']['blend_gap'] = -1.7
 # Puente contra septiembre: el modelo nuevo con el precio de septiembre aísla cuánto se movió por datos/método y cuánto por
 # precio (el precio solo entra por los pesos de mercado del WACC; comparables, reversión y consenso no lo usan).
 NOV_SEP_PX = dict(NOV, price=SEP['price'], mcap=SEP['price']*NOV['sh_out']/1000)
 M_sp = run(NOV_SEP_PX)
-M['bridge_model'] = M_sp['blend'] - MS['blend']; M['bridge_price'] = M['blend'] - M_sp['blend']
+M['bridge_model'] = M_sp['blend'] - M['sep']['blend']; M['bridge_price'] = M['blend'] - M_sp['blend']
 M['blend_at_sep_price'] = M_sp['blend']
-for k in ('dcf_base', 'comp', 'rev', 'cons'): M[f'chg_{k}'] = M[k] - MS[k]
-M['chg_blend'] = M['blend'] - MS['blend']; M['chg_price'] = (P/SEP['price']-1)*100
+for k in ('dcf_base', 'comp', 'rev', 'cons'): M[f'chg_{k}'] = M[k] - M['sep'][k]
+M['chg_blend'] = M['blend'] - M['sep']['blend']
+M['chg_cons_pct'] = (M['cons']/M['sep']['cons']-1)*100
+M['dcf_sbc_abs'] = -M['dcf_sbc'] if 'dcf_sbc' in M else None; M['chg_price'] = (P/SEP['price']-1)*100
 # Anti-circularidad: con el precio +25%, comparables, reversión y consenso no se mueven
 M_hi = run(dict(NOV, price=P*1.25, mcap=P*1.25*NOV['sh_out']/1000))
 for k in ('comp', 'rev', 'cons'): assert abs(M_hi[k] - M[k]) < 1e-9, k
@@ -456,6 +460,8 @@ M['blend_q'] = (M['blend']/M['eps_ntm'])                              # P/E impl
 M['thorne_pct'] = 3.9/87.032*100
 M['q1_ret_guide_pct'] = M['q1_ret']/15*100
 M['vol_sep_bull'] = 1.5
+M['dcf_sbc_abs'] = -M['dcf_sbc']; M['dcf_sbc_pct_abs'] = -M['dcf_sbc_pct']
+chk(M['chg_cons_pct'] < M['chg_price'], 'el consenso subió menos que la acción')
 M['rel_prem'] = (M['rel_avg']-1)*100
 chk(M['peer_pe_min'] < M['pe_ntm_now'] and sorted(p['pe'] for p in M['peers'].values())[3] < M['pe_ntm_now'] < M['peers']['CL']['pe'], 'entre Clorox y Colgate: por encima de cuatro de siete')
 M['pandemic_effect'] = (M['rev_pe_nocovid'] - M['rev_pe_avg'])*M['eps_ntm']

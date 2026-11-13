@@ -30,7 +30,7 @@ Todo número derivado de `informes/pg.html` sale de `model.py`. El HTML se arma 
   Septiembre sumó bien, sin duplicar.
 
 ## Edición 1T FY2027 (13-nov-2026, precio al 12-nov)
-- Blend $148.32 vs. $168.03 (−11.7%); septiembre $143.76 (−1.7% vs. $146.23). Modelo +$4.71, precio −$0.16.
+- Blend $148.32 vs. $168.03 (−11.7%); septiembre $143.76 (−1.7% vs. $146.23). Modelo +$4.72, precio −$0.16 (contra las cifras publicadas de septiembre, no las reconstruidas).
 - Cambios de método (reglas de la skill posteriores a PG): comparables con mediana, P/E de 12 meses y EV/EBITDA de 12 meses
   (antes promedio y FY2028 descontado), grupo de 7 (KO, PEP, CL, KMB, CHD, CLX, UL; sale KVUE); margen del DCF = año real +
   guía del año en curso (antes dos años reales: −$2.63 en el DCF); se restan minoritarios; ventana de reversión móvil (40
