@@ -61,7 +61,7 @@ put('g3_im_x_ste', ((q3('TOTAL INNOVATIVE') - q3('STELARA')) / (q3ly('TOTAL INNO
 put('g9_im_x_ste', ((g(N9, 'TOTAL INNOVATIVE')[0] - g(N9, 'STELARA')[0]) / (g(N9, 'TOTAL INNOVATIVE')[1] - g(N9, 'STELARA')[1]) - 1) * 100)
 put('ste3_share_im', q3('STELARA') / q3('TOTAL INNOVATIVE') * 100)
 put('ste_2024', 10.361); put('ste_2025', 6.078); put('ste_n9_26', g(N9, 'STELARA')[0] / 1000); put('ste_e26', e26('STELARA') / 1000)
-put('ste_lvl26', M['ste_e26'] / M['ste_2024'] * 100)              # nivel 2026e sobre 2024 (año previo a biosimilares)
+put('ste_lvl26', M['ste_e26'] / M['ste_2024'] * 100); put('ste_2024_m', 10361); put('ste_2025_m', 6078); put('ste_e26_m', e26('STELARA'))              # nivel 2026e sobre 2024 (año previo a biosimilares)
 put('ste3_cons', 0.591)                                           # LSEG vía CNBC, 13-oct-2026
 # Motores de reemplazo (3T26): ventas, crecimiento, peso en IM
 for k in ('darzalex', 'tremfya', 'carvykti', 'rybrevant', 'spravato', 'caplyta'):
