@@ -20,6 +20,8 @@ def fmt(v, f):
     if f in ('spct0','spct1','spct2'):
         s = f'{abs(v):.{int(f[4])}f}%'
         return (MINUS+s) if v < 0 and float(s[:-1])!=0 else ('+'+s if float(s[:-1])!=0 else s)
+    if f == 'spp1':  # puntos con signo, un decimal, sin %
+        s=f'{abs(v):.1f}'; return (MINUS+s) if v<0 and float(s)!=0 else ('+'+s if float(s)!=0 else s)
     if f in ('spp0',):  # puntos con signo, entero
         s=f'{abs(v):.0f}'; return (MINUS+s) if v<0 and s!='0' else ('+'+s if s!='0' else '0')
     if f == 'a1': return f'{abs(v):.1f}'
