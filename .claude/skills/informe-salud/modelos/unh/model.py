@@ -106,7 +106,8 @@ OE9 = {'uhc':12326, 'health':3074, 'insight':3416, 'rx':4392}          # resulta
 OE3 = {'uhc':2690,  'health':588,  'insight':1269, 'rx':1718}          # resultado ajustado 3T26
 RV9 = {'uhc':258612,'health':70528,'insight':15910,'rx':113955}        # ingresos ajustados 9M26
 RV3 = {'uhc':86330, 'health':22945,'insight':5460, 'rx':39927}         # ingresos ajustados 3T26
-T3 = put('tax_adj_3t26', 1 - (4228+190)/(6265-963+373))               # tasa efectiva sobre la utilidad ajustada 3T26
+T3 = put('tax_adj_3t26', 1 - (4228+190)/(6265-963+373))               # tasa efectiva sobre la utilidad ajustada 3T26 (fracción)
+put('tax_adj_3t26_pct', T3*100)
 AMORT_4T = 1405 - 1053
 OE_4T = put('oe_4t26e', (ADJ_NI_FY-ADJ_NI_9M + 190)/(1-T3) - AMORT_4T + 963)
 put('oe_4t26_health', -OE3['health'])
