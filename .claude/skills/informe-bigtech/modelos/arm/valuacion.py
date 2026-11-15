@@ -144,7 +144,7 @@ R["blend_sin_consenso"] = round(sum(M[k] * W[k] for k in W if k != "Consenso") /
 R["cambio_vs_sep_regla"] = round((blend / R["sep_blend_regla_vigente"] - 1) * 100, 1)
 R["price"] = dict(now=PRICE, sep=PRICE_SEP, chg=round((PRICE / PRICE_SEP - 1) * 100, 1), off_hi=round((PRICE / HI52 - 1) * 100, 1),
                   mcap=round(PRICE * SH, 1), ev=round(PRICE * SH - TTM["cash"], 1))
-json.dump(R, open(os.path.join(HERE, "resultados.json"), "w"), indent=1, ensure_ascii=False)
+json.dump(R, open(os.path.join(HERE, "resultados.json"), "w", encoding="utf-8"), indent=1, ensure_ascii=False)
 if __name__ == "__main__":
     for k, v in R.items():
         print(k, "=>", v)
