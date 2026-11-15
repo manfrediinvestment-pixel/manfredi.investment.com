@@ -254,7 +254,7 @@ R["price"] = dict(now=PRICE, sep=PRICE_SEP, chg=round((PRICE / PRICE_SEP - 1) * 
                   pe_ttm=round(PRICE / TTM["eps"], 1), ps_ttm=round(PRICE * 1.661 / TTM["rev"], 1),
                   pfcf=round(PRICE * 1.661 / TTM["fcf"], 1))
 
-json.dump(R, open(os.path.join(HERE, "resultados.json"), "w"), indent=1, ensure_ascii=False)
+json.dump(R, open(os.path.join(HERE, "resultados.json"), "w", encoding="utf-8"), indent=1, ensure_ascii=False)
 if __name__ == "__main__":
     for k, v in R.items():
         print(k, "=>", v)
