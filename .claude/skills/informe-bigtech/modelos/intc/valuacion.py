@@ -197,7 +197,7 @@ R["price"] = dict(now=PRICE, aug=PRICE_AUG, chg=round((PRICE / PRICE_AUG - 1) * 
                   off_hi=round((PRICE / HI52 - 1) * 100, 1), mcap=round(PRICE * BAL["shares_out"], 1),
                   vs_offering=round((PRICE / 95 - 1) * 100, 1), pe26=round(PRICE / C["eps_this"], 1))
 
-json.dump(R, open(os.path.join(HERE, "resultados.json"), "w"), indent=1, ensure_ascii=False)
+json.dump(R, open(os.path.join(HERE, "resultados.json"), "w", encoding="utf-8"), indent=1, ensure_ascii=False)
 if __name__ == "__main__":
     for k, v in R.items():
         print(k, "=>", v)
