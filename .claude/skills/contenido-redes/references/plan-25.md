@@ -86,25 +86,43 @@ El user tilda "grabado" y "subido" desde el Cerebro: eso alimenta el contador
 de la semana. En el recap, `videos` = cantidad de slots con `subido:true` en
 los días de esa semana (y se contrasta con TikTok Studio).
 
-### `contenido_radar/<id>`
-Materia prima para ideas que junta Claude Code (y el botón del Cerebro usa).
+### `contenido_ideas/<id>` — banco de ideas
+Lo que el Cerebro muestra de a 5 ("Ver 5 más"). Tocar una idea la pone en el
+primer video de la pauta que no esté grabado; "↻ Cambiar" en un video la
+cambia por la próxima del banco (mismo tipo si hay). La idea que sale vuelve
+al banco. **Cada idea tiene que traer `fuente` con el link real** (el user saca
+de ahí el gráfico o la captura). Id: `AAAA-MM-DD-<slug>`.
 ```json
-{"fecha":"2026-11-16","tipo":"noticia|dato|evento|comentario|construccion|grafico",
- "titulo":"", "detalle":"1-2 líneas con el número clave", "fuente":"url",
- "red":"tiktok|ig|web|x", "usado":false}
+{"fecha":"2026-11-16","tipo":"noticia|dato|grafico|comentario|informe",
+ "titulo":"tema en 5 palabras","gancho":"pregunta para los 2 primeros segundos",
+ "puntos":["3 frases para decir"],"pantalla":"qué se ve de fondo","cta":"cierre",
+ "fuente":"https://…","usada":false}
 ```
+Las ideas que ya están en la pauta llevan `usada:true`. Las de más de 4 días
+sin usar se borran en el modo Hoy (dejar como máximo ~25 en el banco).
+
+### `contenido_diario/<AAAA-MM-DD>` — foto diaria para los gráficos
+Al tocar un KPI del Cerebro se abre un gráfico Diario / Semanal de esto.
+```json
+{"tiktokSeg":4379,"tiktokLikes":222400,"igSeg":null,"igMarcaSeg":140,
+ "visitas":null,"registros":null,"sociosNuevos":null,"fuente":"Chrome: perfiles públicos"}
+```
+Seguidores = foto del día (stock). Visitas, registros y socios = lo del día
+(flujo; el gráfico semanal los suma). Nunca inventar: lo que no se leyó, `null`
+o no se escribe.
 
 ## Modo HOY — "contenido hoy", "ideas de hoy", "qué grabo hoy"
 
 Objetivo: en < 5 minutos de lectura, el user tiene las 5 piezas del día listas para grabar.
 
-1. **Radar** (cargar todo en `contenido_radar`, borrar del radar lo de > 3 días que no se usó):
+0. **Foto diaria**: leer seguidores de TikTok (perfil público, screenshot + zoom), IG personal y @manfredinvestment (`get_page_text` del perfil) y escribir `contenido_diario/<hoy>`.
+1. **Banco** (cargar cada noticia/dato/comentario como idea completa en `contenido_ideas`, con link; borrar las de > 4 días sin usar):
    - Noticias y datos de HOY: WebSearch (mode standard) en paralelo: "mercados hoy argentina", "dólar hoy", "Wall Street hoy", "INDEC hoy" / "BCRA", y lo que diga el calendario de la semana (`marketing/calendario` o el KV `eventos_semana`, ver memoria de la semana). Solo fuentes con fecha de hoy o ayer.
    - Earnings de la semana de tickers con informe (sale del calendario).
    - Noticias: la fuente más rápida y fresca es el worker propio `curl -s https://manfredi-noticias.nachito2502.workers.dev/noticias` (claves `argentina` y `wallstreet`, con fecha y link). WebSearch casi no trae notas fechadas en 2026. El calendario de la semana está en `~/Documents/semana_<dd>_<dd>_{calendario,earnings}.json` (lo deja la skill calendario-semanal; ojo, a veces está en cp1252).
    - **Comentarios y DMs**: Chrome → TikTok Studio → Comentarios, y notificaciones de IG @ignaciomanfreedi. Elegir 3-5 comentarios con pregunta respondible (no insultos, no pedidos de "qué compro"). Solo lectura: nunca responder, likear ni mandar DMs desde Chrome.
    - **Lo que se construyó**: `git log origin/main --since="7 days ago" --merges --oneline` + array `S` del Cerebro → material para la historia cinematográfica de @manfredinvestment.
-2. **Pauta**: escribir `contenido_dias/<hoy>` con los 5 slots (1 informe, 1 dato, 3 libres). Cada slot: gancho como PREGUNTA (regla de `aprendizajes.md`), 3 puntos para decir, CTA, qué poner de fondo y la fuente. Los martes y viernes sumar 1 slot `marca-*` para @manfredinvestment.
+2. **Pauta**: escribir `contenido_dias/<hoy>` con los 5 slots elegidos del banco (cada slot con `ideaId` y la idea marcada `usada:true`) (1 informe, 1 dato, 3 libres). Cada slot: gancho como PREGUNTA (regla de `aprendizajes.md`), 3 puntos para decir, CTA, qué poner de fondo y la fuente. Los martes y viernes sumar 1 slot `marca-*` para @manfredinvestment.
 3. En el chat: solo la tabla de los 5 (tipo · gancho · fondo) y el link al Cerebro. Los detalles quedan en el Cerebro.
 
 Reglas: todo número con fuente y fecha; **nunca decir el fair value ni el precio objetivo en un video** (regla de marketing del user: el cierre manda a comentar INFORME); nunca "comprá X"; cierre "no es recomendación de inversión". Respetar [[feedback_no_mostrar_composicion_cartera]]: rendimientos de la cartera sí, pesos no.
