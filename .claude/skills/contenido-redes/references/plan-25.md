@@ -155,7 +155,7 @@ Tabla de las semanas cerradas + proyección lineal al 31-dic contra las metas de
 
 - TikTok perfil público: Chrome lo lee (screenshot + zoom). 16-nov: 4.379 seguidores, 222,4K likes.
 - TikTok Studio: FUNCIONA desde el 17-nov (el user dio el permiso desde el panel de la extensión). `get_page_text` en tiktok.com/tiktokstudio/comment trae todos los comentarios con el video al que responden; Home trae vistas, visitas al perfil, likes, comentarios y compartidos de 7 días.
-- Instagram: screenshots bloqueados por la extensión; `get_page_text` sí anda en perfiles públicos. @nacho.finanzas da "página no disponible" (¿cambió el @?). @manfredinvestment 16-nov: 140 seguidores, 17 posts.
+- Instagram: FUNCIONA desde el 17-nov. Perfiles con `get_page_text`; panel profesional `instagram.com/accounts/insights/?timeframe=7` solo con screenshot + zoom (vistas, % no seguidores, espectadores, top 5). IG personal = @nacho.finanzas. @manfredinvestment 16-nov: 140 seguidores, 17 posts.
 - Panel de creador: en Chrome está logueada otra cuenta, no la creadora → no se ve. Si sigue así, pedir captura del Panel o que inicie sesión con la cuenta creadora en ese Chrome.
 
 ## Metas al 31-dic-2026 (las puso el user el 17-nov)
