@@ -1079,9 +1079,10 @@
 
     var allVals = [];
     series.forEach(function(s){ allVals = allVals.concat(s.values); });
-    var maxV = Math.max.apply(null, allVals) * 1.08;
-    var minV = Math.min.apply(null, allVals) * 0.92;
-    if(minV > 0) minV = Math.min(minV, 0);
+    var maxV = Math.max.apply(null, allVals);
+    var minV = Math.min.apply(null, allVals);
+    var pad = (maxV - minV) * 0.15 || 1;
+    maxV += pad; minV -= pad;
 
     function scaleX(i){ return padL + (plotW/(labels.length-1)) * i; }
     function scaleY(v){ return padT + plotH - ((v - minV)/(maxV-minV)) * plotH; }
@@ -1109,7 +1110,8 @@
         if(opts.pointLabels){
           ctx.font = '10px "IBM Plex Mono", monospace';
           ctx.textAlign = i===0 ? 'left' : (i===s.values.length-1 ? 'right' : 'center');
-          ctx.fillText((opts.valueFmt ? opts.valueFmt(v) : v), x, y-8);
+          var pv=s.values[i-1], nv=s.values[i+1], below=(pv===undefined||pv>v)&&(nv===undefined||nv>v);
+          ctx.fillText((opts.valueFmt ? opts.valueFmt(v) : v), x, below ? y+15 : y-8);
         }
       });
     });
