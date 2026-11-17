@@ -3,7 +3,7 @@
 ## Cuentas
 | Red | Handle | Link |
 |-----|--------|------|
-| Instagram (principal) | @ignaciomanfreedi | https://instagram.com/ignaciomanfreedi/ — 2.838 seguidores, acá está el alcance |
+| Instagram (principal) | @nacho.finanzas | https://instagram.com/nacho.finanzas/ — 3.137 seguidores al 17-nov-2026 (antes @nacho.finanzas) |
 | Instagram (marca) | @manfredinvestment | https://instagram.com/manfredinvestment/ — 120 seguidores, collab |
 | TikTok (principal) | @ignacio.manfredi | https://tiktok.com/@ignacio.manfredi |
 | TikTok (marca) | @manfredi.investment | https://tiktok.com/@manfredi.investment — vacía |
@@ -22,7 +22,7 @@
 - Graba sus tomas de cámara aparte; motion graphics con HyperFrames; paleta tomada de la web.
 - **Objetivo (16-nov-2026): PLAN 25** — 25 videos/semana (5/día L-V) hasta el 31-dic. Ver `.claude/skills/contenido-redes/references/plan-25.md`.
 - Tiempo para grabar: los descansos de 30 min entre bloques de estudio de 1:30 (1-2 videos por descanso). Producción mínima, nada de edición pesada.
-- Redes: los 25 → TikTok @ignacio.manfredi + Reels de prueba de IG @ignaciomanfreedi; los 3 mejores de la semana → feed de @ignaciomanfreedi; 2/semana → @manfredinvestment (1 historia cinematográfica de lo que construye + 1 mostrando lo Pro: Warren IA / informes).
+- Redes: los 25 → TikTok @ignacio.manfredi + Reels de prueba de IG @nacho.finanzas; los 3 mejores de la semana → feed de @nacho.finanzas; 2/semana → @manfredinvestment (1 historia cinematográfica de lo que construye + 1 mostrando lo Pro: Warren IA / informes).
 - Qué mide: seguidores, visitas a la web, registros y primeros socios pagos (Panel de creador).
 - Métricas: por Chrome automático (TikTok Studio, IG Insights, Panel de creador).
 - Fuentes de ideas además de noticias: lo que construye en la web (merges + Cerebro) y sus comentarios/DMs.
