@@ -3,7 +3,7 @@
 # Uso: bash render.sh [clip...]   (sin args: todos). Salida: salida/<clip>.mp4
 set -e
 cd "$(dirname "$0")"
-CLIPS=${@:-"gancho seccion-1 seccion-2 seccion-3"}
+CLIPS=${@:-"gancho seccion-1 seccion-2 seccion-3 cierre"}
 mkdir -p salida
 for c in $CLIPS; do
   cp comun/base.css comun/charts.js "$c/"

@@ -9,7 +9,7 @@ Formato: vos a cámara (vertical 9:16), mirando a lente, sin IA. Arriba de tu ca
 | Sección 1 | `salida/seccion-1.mp4` | 10 s (cambia de gráfico en el seg. 4,9) |
 | Sección 2 | `salida/seccion-2.mp4` | 10 s (cambia en el seg. 4,9) |
 | Sección 3 | `salida/seccion-3.mp4` | 10 s (cambia en el seg. 4,9) |
-| Cierre | sin clip (solo vos) | — |
+| Cierre | `salida/cierre.mp4` (el mismo para TODOS los videos) | 7 s |
 
 Si hablás más lento que el clip, congelá el último cuadro en el editor: todos terminan con el gráfico completo y quieto.
 Cada sección tiene **dos gráficos**: el primero entra con la primera mitad del texto y el segundo con la frase marcada ▶.
@@ -18,16 +18,18 @@ Cada sección tiene **dos gráficos**: el primero entra con la primera mitad del
 
 ## GANCHO (0–5 s)
 
-> **"A Netflix le pagaron 2.800 millones de dólares… por perder."**
-> "Y el día que perdió, la acción subió casi 14%. Hoy vale la mitad que hace un año."
+> **"¿Pagás Netflix? Este año te subió el precio otra vez…"**
+> "…y aun así su acción vale la mitad que hace un año. ¿Cómo puede ser? Te lo explico en tres puntos."
 
-Gráfico: precio real de NFLX día por día del último año, el salto del 27-feb marcado y el −48% al final.
+Gráfico: a la izquierda "lo que pagás vos" (flecha para arriba, subió en 2026) y "lo que vale su acción" (−48%);
+a la derecha el precio real día por día del último año.
 
 ---
 
 ## 1 · LA PELEA POR WARNER
 
-> "En diciembre Netflix firmó la compra de Warner: HBO, HBO Max, los estudios de Harry Potter y de Batman.
+> "Primero: a Netflix le pagaron 2.800 millones de dólares… por perder. Ese día la acción subió casi 14%.
+> En diciembre Netflix firmó la compra de Warner: HBO, HBO Max, los estudios de Harry Potter y de Batman.
 > Paramount ofreció más plata, Netflix no subió la oferta y se bajó. Y por contrato, a Netflix le pagaron
 > 2.800 millones de dólares de comisión por romper el acuerdo.
 > ¿Por qué el mercado festejó? Porque si la compraba, la deuda de Netflix pasaba de 7.000 millones a casi 90.000 millones.
@@ -67,12 +69,13 @@ Gráficos: (A) P/E propio 35x → 21x · (B) P/E 2027 contra Roku, Spotify, Alph
 
 ---
 
-## CIERRE (sin clip)
+## CIERRE (clip `cierre.mp4`, sirve para todos los videos)
 
-> "Si querés leer el informe completo de Netflix, junto con más de 40 informes más y una IA que te los explica,
-> **comentá la palabra INFORME** y te mando por privado un código de descuento.
+> "Si comentás la palabra **INFORME**, te mando el informe completo de Netflix y de otras 40 acciones,
+> con una IA que te lo explica, y un código de descuento.
 > Esto no es recomendación de inversión: es análisis para que decidas vos."
 
+Clip: "Comentá INFORME", los logos de las 48 empresas con informe y un informe real pasando páginas con gráficos.
 - Instagram: el bot de SendPulse ya responde INFORME → /guia-informes con MANFREDI30.
 - TikTok (sin bot): decí "link en mi perfil" y dejá el comentario fijado con el código.
 
@@ -91,5 +94,7 @@ Gráficos: (A) P/E propio 35x → 21x · (B) P/E 2027 contra Roku, Spotify, Alph
 - P/E propio (EPS 12 m sin extraordinarios): 35,3 · 35,2 · 25,4 · 23,4 · 21,5x (9-nov). Sección 13.
 - P/E 2027e al 9-nov: ROKU 40,0 · SPOT 35,6 · GOOGL 19,0 · NFLX 17,0 · DIS 15,9x. Sección 08.
 - No se muestra ni se dice el fair value (regla de marketing de la casa).
+
+- Subida de precios 2026: la carta del 3T26 habla del aumento de precios de marzo y de la respuesta "consistente con ajustes anteriores". Sección 03.
 
 Re-render: `bash render.sh` (todos) o `bash render.sh gancho`. Cuadros de control: `bash snap.sh <clip> 3.8,9.5`.
