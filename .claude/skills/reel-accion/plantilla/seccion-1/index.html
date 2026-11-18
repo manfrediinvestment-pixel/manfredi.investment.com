@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="base.css" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<script src="charts.js"></script>
+</head>
+<body>
+<div id="root" data-composition-id="seccion-1" data-start="0" data-duration="10" data-width="1920" data-height="1080" data-fps="30">
+  <section class="clip" data-start="0" data-duration="10" data-track-index="1">
+    <div class="glow"></div>
+    <div class="frame"></div>
+    <svg class="n-logo" viewBox="0 0 100 160"><rect width="28" height="160" fill="#b1060f"/><rect x="72" width="28" height="160" fill="#b1060f"/><polygon points="0,0 28,0 100,160 72,160" fill="#e50914"/></svg>
+
+    <!-- Fase A: la deuda que se ahorró -->
+    <div class="phase" id="pA">
+      <div class="hdr">
+        <div class="kicker">01 · La pelea por Warner</div>
+        <div class="title">Se salvó de una deuda <em>12 veces</em> más grande</div>
+      </div>
+      <div class="chartbox" id="debt" style="left:96px; top:420px; display:flex; flex-direction:column; gap:70px;"></div>
+      <div class="src">Deuda neta al 30-sep-26 y contrafáctico con los términos de ene-26 · 8-K/10-Q Netflix · informe Manfredi</div>
+    </div>
+
+    <!-- Fase B: qué hizo con la plata -->
+    <div class="phase" id="pB">
+      <div class="hdr">
+        <div class="kicker">01 · La pelea por Warner</div>
+        <div class="title">Y con la plata: <b>recompras récord</b></div>
+      </div>
+      <div class="chartbox" id="bb" style="left:150px; top:330px;"></div>
+      <div class="src">Recompras de acciones por trimestre, US$ miles de millones · 10-Q / cartas a accionistas</div>
+    </div>
+
+    <div class="brand"><span class="m serif">M</span>Manfredi Investment</div>
+  </section>
+</div>
+
+<script>
+  var debt = MC.hbars(document.getElementById('debt'), {
+    labels: ['Hoy', 'Si compraba Warner'],
+    subs: ['0,45x EBITDA', '5,6x EBITDA'],
+    values: [7.1, 89.8], max: 89.8, w: 860, rowH: 120, labW: 500, barH: 86,
+    colors: ['linear-gradient(90deg,#c9a24f,#f0dcaa)', 'linear-gradient(90deg,#b1060f,#f2857b)'],
+    valColors: ['#f0dcaa', '#f2857b'],
+    fmt: function (v) { return 'US$ ' + v.toFixed(1).replace('.', ',') + ' B'; }
+  });
+
+  var bb = MC.vbars(document.getElementById('bb'), {
+    labels: ['4T24', '1T25', '2T25', '3T25', '4T25', '1T26', '2T26', '3T26'],
+    values: [1.70, 3.54, 1.65, 1.86, 2.08, 1.27, 4.71, 4.80], max: 4.80, w: 1620, h: 600, gap: 44,
+    colors: ['#3a4a6b', '#3a4a6b', '#3a4a6b', '#3a4a6b', '#3a4a6b', '#7a3340',
+             'linear-gradient(180deg,#f0dcaa,#c9a24f)', 'linear-gradient(180deg,#f0dcaa,#c9a24f)'],
+    notes: [null, null, null, null, null, 'pausa\npor Warner', 'récord', 'récord'],
+    fmt: function (v) { return v.toFixed(2).replace('.', ','); }
+  });
+
+  window.__timelines = window.__timelines || {};
+  var tl = gsap.timeline({ paused: true });
+  var SW = 4.9;   // cambio de fase
+
+  gsap.set('.n-logo', { opacity: 0 });
+  gsap.set('#pA .kicker, #pA .title, #pB .kicker, #pB .title', { opacity: 0, y: 24 });
+  gsap.set('#pB', { opacity: 0 });
+  gsap.set(debt.rows, { opacity: 0, x: -30 });
+  gsap.set(debt.bars, { scaleX: 0 });
+  gsap.set(debt.vals, { opacity: 0 });
+  gsap.set(bb.bars, { scaleY: 0 });
+  gsap.set(bb.vals.concat(bb.labs, bb.notes), { opacity: 0 });
+  gsap.set('.src, .brand', { opacity: 0 });
+
+  tl.to('.n-logo, .brand', { opacity: 1, duration: .4 }, 0)
+    .to('#pA .kicker', { opacity: 1, y: 0, duration: .35, ease: 'power3.out' }, .05)
+    .to('#pA .title', { opacity: 1, y: 0, duration: .5, ease: 'power3.out' }, .15)
+    .to('#pA .src', { opacity: 1, duration: .4 }, .5)
+    .to(debt.rows[0], { opacity: 1, x: 0, duration: .4, ease: 'power3.out' }, .55)
+    .to(debt.bars[0], { scaleX: 1, duration: .5, ease: 'power2.out' }, .75)
+    .to(debt.vals[0], { opacity: 1, duration: .3 }, 1.1)
+    .to(debt.rows[1], { opacity: 1, x: 0, duration: .4, ease: 'power3.out' }, 1.45)
+    .to(debt.bars[1], { scaleX: 1, duration: 1.6, ease: 'power2.inOut' }, 1.65)
+    .to(debt.vals[1], { opacity: 1, duration: .35 }, 3.1)
+
+    .to('#pA', { opacity: 0, duration: .35, ease: 'power1.in' }, SW)
+    .to('#pB', { opacity: 1, duration: .01 }, SW + .3)
+    .to('#pB .kicker', { opacity: 1, y: 0, duration: .35, ease: 'power3.out' }, SW + .3)
+    .to('#pB .title', { opacity: 1, y: 0, duration: .5, ease: 'power3.out' }, SW + .4)
+    .to('#pB .src', { opacity: 1, duration: .4 }, SW + .6)
+    .to(bb.labs, { opacity: 1, duration: .3, stagger: .05 }, SW + .6)
+    .to(bb.bars, { scaleY: 1, duration: .55, ease: 'power3.out', stagger: .12 }, SW + .7)
+    .to(bb.vals, { opacity: 1, duration: .3, stagger: .12 }, SW + 1.0)
+    .to(bb.notes, { opacity: 1, duration: .4, stagger: .15 }, SW + 1.9);
+
+  window.__timelines['seccion-1'] = tl;
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="base.css" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<script src="charts.js"></script>
+</head>
+<body>
+<div id="root" data-composition-id="seccion-3" data-start="0" data-duration="10" data-width="1920" data-height="1080" data-fps="30">
+  <section class="clip" data-start="0" data-duration="10" data-track-index="1">
+    <div class="glow"></div>
+    <div class="frame"></div>
+    <svg class="n-logo" viewBox="0 0 100 160"><rect width="28" height="160" fill="#b1060f"/><rect x="72" width="28" height="160" fill="#b1060f"/><polygon points="0,0 28,0 100,160 72,160" fill="#e50914"/></svg>
+
+    <!-- Fase A: el múltiplo propio se comprimió -->
+    <div class="phase" id="pA">
+      <div class="hdr">
+        <div class="kicker">03 · ¿Está barata?</div>
+        <div class="title">Se pagaba <b>35 veces</b> su ganancia. Hoy, <em>21</em></div>
+      </div>
+      <div class="chartbox" id="pe" style="left:150px; top:300px;"></div>
+      <div class="src">P/E sobre la ganancia de 12 meses sin extraordinarios · cierres de trimestre y 9-nov-26 · informe Manfredi</div>
+    </div>
+
+    <!-- Fase B: contra sus pares -->
+    <div class="phase" id="pB">
+      <div class="hdr">
+        <div class="kicker">03 · ¿Está barata?</div>
+        <div class="title">Hoy cotiza casi <em>como Disney</em></div>
+      </div>
+      <div class="chartbox" id="cp" style="left:96px; top:320px; display:flex; flex-direction:column; gap:22px;"></div>
+      <div class="src">P/E sobre la ganancia esperada 2027 (consenso) · precios al 9-nov-26 · stockanalysis.com</div>
+    </div>
+
+    <div class="brand"><span class="m serif">M</span>Manfredi Investment</div>
+  </section>
+</div>
+
+<script>
+  var pe = MC.line(document.getElementById('pe'), {
+    labels: ['dic-25', 'mar-26', 'jun-26', 'sep-26', '9-nov-26'],
+    values: [35.3, 35.2, 25.4, 23.4, 21.5], min: 16, max: 38, w: 1620, h: 640, padX: 90,
+    color: '#f2857b', r: [12, 12, 12, 12, 20],
+    dotColors: ['#e6cf96', '#e6cf96', '#f2a08f', '#f2857b', '#f2857b'],
+    valColors: ['#f0dcaa', '#f0dcaa', '#f2a08f', '#f2857b', '#f2857b'],
+    fmt: function (v) { return v.toFixed(1).replace('.', ',') + 'x'; }
+  });
+
+  var cp = MC.hbars(document.getElementById('cp'), {
+    labels: ['Roku', 'Spotify', 'Alphabet', 'Netflix', 'Disney'],
+    values: [39.98, 35.61, 18.97, 16.96, 15.88], max: 39.98, w: 1080, rowH: 96, labW: 330, barH: 58,
+    colors: ['#3a4a6b', '#3a4a6b', '#3a4a6b', 'linear-gradient(90deg,#b1060f,#e50914)', 'linear-gradient(90deg,#c9a24f,#f0dcaa)'],
+    valColors: ['#e6cf96', '#e6cf96', '#e6cf96', '#f2857b', '#f0dcaa'],
+    labColors: [null, null, null, '#f2857b', null],
+    fmt: function (v) { return v.toFixed(1).replace('.', ',') + 'x'; }
+  });
+
+  window.__timelines = window.__timelines || {};
+  var tl = gsap.timeline({ paused: true });
+  var SW = 4.9;
+
+  gsap.set('.n-logo, .brand, .src', { opacity: 0 });
+  gsap.set('#pA .kicker, #pA .title, #pB .kicker, #pB .title', { opacity: 0, y: 24 });
+  gsap.set('#pB', { opacity: 0 });
+  gsap.set(pe.dots, { opacity: 0, scale: 0, transformOrigin: 'center', transformBox: 'fill-box' });
+  gsap.set(pe.vals.concat(pe.labs), { opacity: 0 });
+  gsap.set(cp.rows, { opacity: 0, x: -30 });
+  gsap.set(cp.bars, { scaleX: 0 });
+  gsap.set(cp.vals, { opacity: 0 });
+
+  tl.to('.n-logo, .brand', { opacity: 1, duration: .4 }, 0)
+    .to('#pA .kicker', { opacity: 1, y: 0, duration: .35, ease: 'power3.out' }, .05)
+    .to('#pA .title', { opacity: 1, y: 0, duration: .5, ease: 'power3.out' }, .15)
+    .to('#pA .src', { opacity: 1, duration: .4 }, .5)
+    .to(pe.labs, { opacity: 1, duration: .3, stagger: .05 }, .5)
+    .to(pe.path, { strokeDashoffset: 0, duration: 2.2, ease: 'none' }, .65);
+  pe.dots.forEach(function (d, i) {
+    var t = .65 + 2.2 * i / (pe.dots.length - 1);
+    tl.to(d, { opacity: 1, scale: 1, duration: .25, ease: 'back.out(2.4)' }, t)
+      .to(pe.vals[i], { opacity: 1, duration: .25 }, t + .05);
+  });
+  tl.to('#pA', { opacity: 0, duration: .35, ease: 'power1.in' }, SW)
+    .to('#pB', { opacity: 1, duration: .01 }, SW + .3)
+    .to('#pB .kicker', { opacity: 1, y: 0, duration: .35, ease: 'power3.out' }, SW + .3)
+    .to('#pB .title', { opacity: 1, y: 0, duration: .5, ease: 'power3.out' }, SW + .4)
+    .to('#pB .src', { opacity: 1, duration: .4 }, SW + .6)
+    .to(cp.rows, { opacity: 1, x: 0, duration: .35, ease: 'power3.out', stagger: .14 }, SW + .6)
+    .to(cp.bars, { scaleX: 1, duration: .7, ease: 'power3.out', stagger: .14 }, SW + .75)
+    .to(cp.vals, { opacity: 1, duration: .3, stagger: .14 }, SW + 1.2);
+
+  window.__timelines['seccion-3'] = tl;
+</script>
+</body>
+</html>

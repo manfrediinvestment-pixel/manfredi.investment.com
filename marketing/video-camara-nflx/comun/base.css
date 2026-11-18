@@ -1,0 +1,69 @@
+/* Sistema visual de los videos "a cámara" — paleta del sitio (guia-nvda / aurora).
+   Regla de la casa: CERO texto gris, nada de grilla de fondo, texto en serif champagne/dorado. */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #060d19;
+  --bg2: #0b1730;
+  --gold: #e6cf96;
+  --gold2: #f0dcaa;
+  --gold-deep: #c9a24f;
+  --neg: #f2857b;
+  --nf: #e50914;
+}
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+#root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+
+/* fondo: dos resplandores suaves, sin líneas */
+.glow { position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(900px 560px at 82% 18%, rgba(229, 9, 20, .10), transparent 70%),
+    radial-gradient(1100px 700px at 12% 100%, rgba(201, 162, 79, .10), transparent 70%),
+    linear-gradient(180deg, var(--bg2) 0%, var(--bg) 70%);
+}
+.frame { position: absolute; inset: 34px; border: 1.5px solid rgba(230, 207, 150, .22); border-radius: 22px; pointer-events: none; }
+
+.serif { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; }
+.mono  { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-weight: 600; }
+
+.brand { position: absolute; right: 78px; bottom: 62px; display: flex; align-items: center; gap: 14px;
+  font-family: 'DM Serif Display', Georgia, serif; font-size: 30px; color: var(--gold); letter-spacing: .01em; }
+.brand .m { width: 40px; height: 40px; border-radius: 9px; display: grid; place-items: center;
+  background: linear-gradient(145deg, #f0dcaa, #c9a24f); color: #0b1730; font-size: 27px; }
+
+.kicker { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 26px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--gold-deep); }
+.title { font-family: 'DM Serif Display', Georgia, serif; font-size: 82px; line-height: 1.04; color: var(--gold2); }
+.title em { font-style: normal; color: var(--neg); }
+.title b { font-weight: 400; color: var(--gold-deep); }
+.src { position: absolute; left: 78px; bottom: 66px; font-family: 'IBM Plex Mono', monospace; font-weight: 500;
+  font-size: 20px; color: var(--gold-deep); letter-spacing: .04em; }
+
+/* ---------- secciones ---------- */
+.hdr { position: absolute; left: 96px; top: 84px; right: 96px; }
+.hdr .kicker { margin-bottom: 14px; }
+.phase { position: absolute; inset: 0; }
+.chartbox { position: absolute; }
+.n-logo { position: absolute; right: 96px; top: 92px; width: 54px; height: 86px; }
+
+.vb { position: relative; }
+.vb-col { position: absolute; bottom: 0; height: 100%; }
+.vb-bar { position: absolute; left: 0; right: 0; bottom: 70px; border-radius: 10px 10px 3px 3px; transform-origin: 50% 100%; }
+.vb-val { position: absolute; left: 0; right: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 40px; color: var(--gold2); }
+.vb-lab { position: absolute; left: -20px; right: -20px; bottom: 10px; text-align: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 28px; color: var(--gold); letter-spacing: .04em; }
+.vb-note { position: absolute; left: -24px; right: -24px; white-space: pre-line; line-height: 1.05; text-align: center; font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--gold-deep); }
+
+.hb-row { display: flex; align-items: center; }
+.hb-lab { font-family: 'DM Serif Display', serif; font-size: 50px; color: var(--gold2); line-height: 1.05; flex: none; }
+.hb-lab span { display: block; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 24px; color: var(--gold-deep); letter-spacing: .06em; margin-top: 6px; }
+.hb-track { display: flex; align-items: center; gap: 26px; }
+.hb-bar { border-radius: 4px 12px 12px 4px; transform-origin: 0 50%; }
+.hb-val { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 52px; color: var(--gold2); white-space: nowrap; }
+
+.ln { position: relative; }
+.ln-val { position: absolute; transform: translateX(-50%); background: rgba(6,13,25,.88); padding: 0 10px; border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 40px; color: var(--gold2); white-space: nowrap; }
+.ln-lab { position: absolute; transform: translateX(-50%); font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 28px; color: var(--gold); white-space: nowrap; letter-spacing: .04em; }
+
+.badge { position: absolute; padding: 20px 30px 22px; border-radius: 18px; background: rgba(11,23,48,.92);
+  border: 1.5px solid var(--gold-deep); box-shadow: 0 18px 50px rgba(0,0,0,.5); }
+.badge .d { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 22px; letter-spacing: .14em; color: var(--gold-deep); text-transform: uppercase; }
+.badge .t { font-family: 'DM Serif Display', serif; font-size: 46px; color: var(--gold2); line-height: 1.1; margin-top: 6px; }

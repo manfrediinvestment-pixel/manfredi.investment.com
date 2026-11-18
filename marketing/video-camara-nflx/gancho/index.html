@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="base.css" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+  /* Gancho v2: algo de todos los días (la suscripción que pagás) contra la acción. */
+  #head { position: absolute; left: 96px; top: 84px; display: flex; align-items: center; gap: 34px; }
+  #logo { width: 86px; height: 138px; filter: drop-shadow(0 10px 30px rgba(229,9,20,.35)); }
+  #head .kicker { margin-bottom: 10px; }
+  #head .title { font-size: 76px; }
+
+  .card { position: absolute; left: 96px; width: 640px; padding: 30px 36px 34px; border-radius: 22px;
+    background: rgba(11,23,48,.88); border: 1.5px solid rgba(230,207,150,.28); box-shadow: 0 22px 60px rgba(0,0,0,.5); }
+  .card .kicker { font-size: 22px; }
+  .card .row { display: flex; align-items: center; gap: 26px; margin-top: 14px; }
+  #cardA { top: 330px; }
+  #cardB { top: 660px; border-color: rgba(242,133,123,.45); }
+  #arrow { width: 96px; height: 120px; flex: none; }
+  #cardA .txt { font-family: 'DM Serif Display', serif; font-size: 44px; line-height: 1.08; color: var(--gold2); }
+  #cardB .big { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 108px; line-height: 1; color: var(--neg); white-space: nowrap;
+    text-shadow: 0 0 50px rgba(242,133,123,.35); }
+  #cardB .txt { white-space: nowrap; font-family: 'DM Serif Display', serif; font-size: 40px; line-height: 1.1; color: var(--gold2); }
+  #cardB .txt span { display: block; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 22px; color: var(--gold-deep); margin-top: 6px; }
+
+  #chart { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+  .lbl { position: absolute; font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--gold); white-space: nowrap; }
+  #lblStart { font-size: 30px; }
+  #lblStart span, #lblEnd span { display: block; font-size: 21px; color: var(--gold-deep); letter-spacing: .06em; margin-top: 2px; }
+  #lblEnd { font-size: 30px; color: var(--neg); text-align: right; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="gancho" data-start="0" data-duration="5" data-width="1920" data-height="1080" data-fps="30">
+  <section id="scene" class="clip" data-start="0" data-duration="5" data-track-index="1">
+    <div class="glow"></div>
+    <div class="frame"></div>
+
+    <svg id="chart" viewBox="0 0 1920 1080">
+      <defs>
+        <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#e50914" stop-opacity=".30" />
+          <stop offset="1" stop-color="#e50914" stop-opacity="0" />
+        </linearGradient>
+        <clipPath id="reveal"><rect id="revealRect" x="0" y="0" width="0" height="1080" /></clipPath>
+      </defs>
+      <g clip-path="url(#reveal)">
+        <path id="areaPath" fill="url(#area)" />
+        <path id="linePath" fill="none" stroke="#e50914" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
+      </g>
+      <circle id="dotStart" r="11" fill="#e6cf96" />
+      <circle id="dotEnd" r="14" fill="#f2857b" />
+      <circle id="pulse" r="16" fill="none" stroke="#f2857b" stroke-width="4" />
+    </svg>
+
+    <div id="head">
+      <svg id="logo" viewBox="0 0 100 160" aria-label="Netflix">
+        <rect x="0" y="0" width="28" height="160" fill="#b1060f" />
+        <rect x="72" y="0" width="28" height="160" fill="#b1060f" />
+        <polygon points="0,0 28,0 100,160 72,160" fill="#e50914" />
+      </svg>
+      <div>
+        <div class="kicker">Netflix · NFLX</div>
+        <div class="title">Vos pagás más. <em>La acción vale la mitad.</em></div>
+      </div>
+    </div>
+
+    <div class="card" id="cardA">
+      <div class="kicker">Lo que pagás vos</div>
+      <div class="row">
+        <svg id="arrow" viewBox="0 0 96 120">
+          <defs><linearGradient id="ga" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c9a24f"/><stop offset="1" stop-color="#f0dcaa"/></linearGradient></defs>
+          <polygon points="48,0 96,52 64,52 64,120 32,120 32,52 0,52" fill="url(#ga)" />
+        </svg>
+        <div class="txt">Netflix subió sus<br>precios en 2026</div>
+      </div>
+    </div>
+
+    <div class="card" id="cardB">
+      <div class="kicker">Lo que vale su acción</div>
+      <div class="row">
+        <div class="big"><span id="pct">−48</span>%</div>
+        <div class="txt">en un año<span>$115,75 → $60,66</span></div>
+      </div>
+    </div>
+
+    <div class="lbl" id="lblStart">$115,75<span>12-NOV-25</span></div>
+    <div class="lbl" id="lblEnd">$60,66<span>16-NOV-26</span></div>
+
+    <div class="brand"><span class="m serif">M</span>Manfredi Investment</div>
+  </section>
+</div>
+
+<script>
+  // Cierres diarios NFLX (Yahoo Finance, ajustados por split) 12-nov-2025 → 16-nov-2026
+  var PX = [115.75,115.42,111.22,110.29,114.09,110.0,105.67,104.31,106.97,104.4,106.14,107.58,109.13,109.35,103.96,103.22,100.24,96.79,96.71,92.71,94.09,95.19,93.77,94.57,94.79,94.0,94.39,93.23,93.5,93.64,94.47,94.15,93.78,93.76,90.99,91.46,90.65,90.73,90.53,89.46,89.41,90.32,88.55,88.05,88.0,87.26,85.36,83.54,86.12,85.7,85.58,84.64,83.16,83.49,82.76,79.94,80.16,80.87,82.2,81.47,82.21,79.62,75.86,76.87,77.0,77.99,77.0,78.67,76.02,78.04,82.7,84.59,96.24,97.09,97.7,98.66,99.17,99.02,98.32,96.94,94.89,94.31,95.31,95.2,94.36,94.7,91.74,91.82,93.38,90.92,92.28,93.32,93.43,92.97,96.15,95.55,98.66,98.93,98.82,99.39,102.05,103.01,103.16,106.28,107.71,107.79,97.31,94.83,92.58,93.24,92.82,92.44,91.37,92.27,92.12,93.61,92.06,91.02,87.89,88.27,88.25,87.49,85.45,87.66,87.56,86.94,87.02,89.65,89.33,88.09,89.3,88.6,87.68,87.35,86.36,86.02,85.85,83.33,81.52,81.56,82.18,82.64,81.41,82.0,81.27,80.34,81.67,78.72,76.96,77.38,72.88,72.82,71.84,70.9,73.81,73.78,71.4,74.19,77.65,76.02,76.18,75.59,75.47,73.37,73.83,73.53,73.68,74.35,68.95,67.6,68.67,68.53,68.89,70.09,70.4,72.39,73.63,73.17,71.71,73.33,73.57,74.2,73.69,74.14,76.29,74.79,74.21,78.24,78.16,76.02,77.77,80.22,80.14,79.59,80.01,82.23,81.46,79.84,81.72,81.05,80.81,82.73,82.67,78.25,76.77,76.03,76.01,77.4,80.32,77.9,76.41,75.31,71.79,73.36,72.16,71.36,71.72,71.15,69.23,70.3,69.58,67.85,67.06,67.5,68.69,69.7,71.57,70.3,70.61,70.46,70.57,72.61,70.53,69.85,68.69,65.04,67.05,65.85,63.9,62.52,61.99,62.05,62.08,62.34,63.42,66.39,65.56,63.41,63.95,63.26,64.54,62.69,62.15,60.66];
+  var X0 = 830, X1 = 1780, Y0 = 380, Y1 = 900, PMIN = 54, PMAX = 122;
+  function X(i) { return X0 + (X1 - X0) * i / (PX.length - 1); }
+  function Y(p) { return Y0 + (Y1 - Y0) * (PMAX - p) / (PMAX - PMIN); }
+
+  var d = '';
+  PX.forEach(function (p, i) { d += (i ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(p).toFixed(1); });
+  document.getElementById('linePath').setAttribute('d', d);
+  document.getElementById('areaPath').setAttribute('d', d + 'L' + X1 + ',' + Y1 + 'L' + X0 + ',' + Y1 + 'Z');
+
+  function place(id, x, y) { var c = document.getElementById(id); c.setAttribute('cx', x); c.setAttribute('cy', y); }
+  var N = PX.length - 1;
+  place('dotStart', X(0), Y(PX[0]));
+  place('dotEnd', X(N), Y(PX[N]));
+  place('pulse', X(N), Y(PX[N]));
+  var ls = document.getElementById('lblStart'); ls.style.left = (X(0) + 24) + 'px'; ls.style.top = (Y(PX[0]) - 64) + 'px';
+  var le = document.getElementById('lblEnd'); le.style.right = (1920 - X(N) + 4) + 'px'; le.style.top = (Y(PX[N]) + 22) + 'px';
+
+  window.__timelines = window.__timelines || {};
+  var tl = gsap.timeline({ paused: true });
+  var DRAW0 = 0.9, DRAW = 2.3, END = DRAW0 + DRAW;
+
+  gsap.set('#logo', { opacity: 0, scale: .6, transformOrigin: '50% 50%' });
+  gsap.set('#head .kicker, #head .title', { opacity: 0, y: 26 });
+  gsap.set('#cardA, #cardB', { opacity: 0, x: -40 });
+  gsap.set('#arrow', { y: 40, opacity: 0 });
+  gsap.set('#dotStart, #dotEnd', { opacity: 0, scale: 0, transformOrigin: 'center', transformBox: 'fill-box' });
+  gsap.set('#pulse', { opacity: 0, transformOrigin: 'center', transformBox: 'fill-box' });
+  gsap.set('#lblStart, #lblEnd', { opacity: 0 });
+  gsap.set('.brand', { opacity: 0 });
+
+  tl.to('#logo', { opacity: 1, scale: 1, duration: .45, ease: 'back.out(1.8)' }, 0)
+    .to('#head .kicker', { opacity: 1, y: 0, duration: .35, ease: 'power3.out' }, .1)
+    .to('#head .title', { opacity: 1, y: 0, duration: .45, ease: 'power3.out' }, .18)
+    .to('.brand', { opacity: 1, duration: .4 }, .3)
+    .to('#cardA', { opacity: 1, x: 0, duration: .45, ease: 'power3.out' }, .45)
+    .to('#arrow', { y: 0, opacity: 1, duration: .55, ease: 'back.out(2.2)' }, .7)
+    .to('#arrow', { y: -10, duration: .5, ease: 'sine.inOut', yoyo: true, repeat: 3 }, 1.25)
+    .to('#dotStart', { opacity: 1, scale: 1, duration: .25, ease: 'back.out(2)' }, DRAW0 - .1)
+    .to('#lblStart', { opacity: 1, duration: .3 }, DRAW0)
+    .to('#revealRect', { attr: { width: X1 + 20 }, duration: DRAW, ease: 'none' }, DRAW0)
+    .to('#dotEnd', { opacity: 1, scale: 1, duration: .3, ease: 'back.out(2.4)' }, END - .05)
+    .to('#pulse', { opacity: .9, duration: .01 }, END)
+    .to('#pulse', { scale: 3.2, opacity: 0, duration: .8, ease: 'power2.out' }, END + .02)
+    .to('#lblEnd', { opacity: 1, duration: .3 }, END)
+    .to('#cardB', { opacity: 1, x: 0, duration: .45, ease: 'power3.out' }, END - .15);
+
+  var cnt = { v: 0 };
+  tl.to(cnt, { v: 48, duration: .7, ease: 'power2.out',
+    onUpdate: function () { document.getElementById('pct').textContent = '−' + Math.round(cnt.v); } }, END - .1);
+
+  window.__timelines['gancho'] = tl;
+</script>
+</body>
+</html>
