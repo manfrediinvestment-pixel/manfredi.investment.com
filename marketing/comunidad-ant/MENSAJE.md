@@ -1,7 +1,7 @@
 # Anthropic (ANT) — mensaje para la comunidad y el canal de WhatsApp
 
 Orden sugerido para mandarlo:
-1. `tarjeta-ant.jpg` con el texto de abajo como pie de foto.
+1. `tarjeta2-ant.jpg` (versión nueva, más completa) con el texto de abajo como pie de foto.
 2. `sticker-ant.webp` como sticker, justo después (el sticker no lleva link: el link va en el texto).
 
 ---

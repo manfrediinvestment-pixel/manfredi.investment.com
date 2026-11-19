@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ANT · vista en WhatsApp y comunidad</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #060d19; color: #f0dcaa; font-family: 'Inter', sans-serif; padding: 40px 20px 80px; }
+  h1 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 34px; text-align: center; }
+  .sub { text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: .14em; color: #c9a24f; margin-top: 8px; text-transform: uppercase; }
+  .row { display: flex; gap: 48px; justify-content: center; flex-wrap: wrap; margin-top: 36px; }
+  .col h2 { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 13px; letter-spacing: .16em; color: #e6cf96; text-align: center; margin-bottom: 14px; text-transform: uppercase; }
+  .phone { width: 390px; height: 844px; border-radius: 46px; border: 10px solid #1b2333; overflow: hidden; position: relative; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+
+  /* ---------- WhatsApp (canal) ---------- */
+  .wa { background: #0b141a; height: 100%; display: flex; flex-direction: column; font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; }
+  .wa .bar { background: #1f2c34; padding: 40px 14px 12px; display: flex; align-items: center; gap: 12px; }
+  .wa .av { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(145deg,#f0dcaa,#c9a24f); display: grid; place-items: center; color: #0b1730; font-family: 'DM Serif Display', serif; font-size: 22px; flex: none; }
+  .wa .nm { color: #e9edef; font-size: 16px; font-weight: 600; } .wa .nm small { display: block; color: #8696a0; font-size: 12.5px; font-weight: 400; }
+  .wa .feed { flex: 1; overflow-y: auto; padding: 14px 12px 20px; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none; }
+  .wa .day { align-self: center; background: #182229; color: #8696a0; font-size: 12px; padding: 5px 12px; border-radius: 8px; }
+  .wa .msg { background: #1f2c34; border-radius: 10px; padding: 4px; max-width: 92%; align-self: flex-start; color: #e9edef; font-size: 14.2px; line-height: 1.38; position: relative; }
+  .wa .msg img.ph { display: block; width: 100%; border-radius: 7px; }
+  .wa .cap { padding: 7px 7px 4px; white-space: pre-wrap; word-wrap: break-word; }
+  .wa .cap b { font-weight: 600; } .wa .cap i { font-style: italic; color: #d1d7db; }
+  .wa .cap a { color: #53bdeb; text-decoration: none; }
+  .wa .meta { text-align: right; color: #8696a0; font-size: 11px; padding: 0 6px 3px; }
+  .wa .reac { position: absolute; left: 10px; bottom: -14px; background: #1f2c34; border: 2px solid #0b141a; border-radius: 12px; font-size: 12px; padding: 1px 7px; color: #e9edef; }
+  .wa .stk { align-self: flex-start; margin-top: 14px; width: 170px; }
+  .wa .stk img { width: 170px; height: 170px; display: block; }
+  .wa .stk .meta { text-align: left; padding-left: 4px; }
+
+  /* ---------- Comunidad (web) ---------- */
+  .cm { background: radial-gradient(500px 400px at 100% 0%, rgba(217,119,87,.10), transparent 70%), linear-gradient(180deg,#0b1730,#060d19); height: 100%; display: flex; flex-direction: column; }
+  .cm .bar { padding: 42px 18px 14px; border-bottom: 1px solid rgba(230,207,150,.16); display: flex; align-items: center; gap: 12px; }
+  .cm .av { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(145deg,#f0dcaa,#c9a24f); display: grid; place-items: center; color: #0b1730; font-family: 'DM Serif Display', serif; font-size: 22px; }
+  .cm .nm { font-family: 'DM Serif Display', serif; font-size: 19px; color: #f0dcaa; } .cm .nm small { display: block; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .12em; color: #c9a24f; }
+  .cm .feed { flex: 1; overflow-y: auto; padding: 16px 14px 24px; scrollbar-width: none; }
+  .cm .who { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #e6cf96; font-weight: 600; margin-bottom: 8px; }
+  .cm .who .badge { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; color: #0b1730; background: #e6cf96; border-radius: 6px; padding: 2px 6px; }
+  .cm .who .t { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #c9a24f; font-weight: 500; }
+  .cm .post { background: rgba(11,23,48,.75); border: 1px solid rgba(230,207,150,.18); border-radius: 16px; padding: 12px; }
+  .cm .post img.ph { width: 100%; border-radius: 10px; display: block; }
+  .cm .txt { font-size: 14px; line-height: 1.5; color: #f0dcaa; margin-top: 10px; }
+  .cm .txt b { color: #e9a189; font-weight: 600; }
+  .cm .card { margin-top: 12px; display: flex; gap: 12px; align-items: center; border: 1px solid rgba(217,119,87,.55); border-radius: 12px; padding: 10px; text-decoration: none; }
+  .cm .card .lg { width: 46px; height: 46px; border-radius: 11px; background: #fff; display: grid; place-items: center; flex: none; }
+  .cm .card .lg img { width: 40px; }
+  .cm .card .ti { font-family: 'DM Serif Display', serif; font-size: 16px; color: #f0dcaa; } .cm .card .ti small { display: block; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #e9a189; margin-top: 2px; }
+  .cm .card .go { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #0b1730; background: linear-gradient(145deg,#f0dcaa,#c9a24f); border-radius: 8px; padding: 7px 10px; white-space: nowrap; }
+  .cm .stk { width: 150px; margin-top: 12px; }
+
+  .files { max-width: 900px; margin: 46px auto 0; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #e6cf96; line-height: 1.9; text-align: center; }
+  .files a { color: #e9a189; }
+</style>
+</head>
+<body>
+  <h1>Anthropic salió a la bolsa · así se ve</h1>
+  <div class="sub">Canal de WhatsApp · grupo de la comunidad en la web</div>
+
+  <div class="row">
+    <div class="col">
+      <h2>Canal de WhatsApp</h2>
+      <div class="phone"><div class="wa">
+        <div class="bar"><div class="av">M</div><div class="nm">Manfredi Investment<small>Canal · seguidores</small></div></div>
+        <div class="feed">
+          <div class="day">HOY</div>
+          <div class="msg">
+            <img class="ph" src="tarjeta2-ant.jpg" alt="" />
+            <div class="cap">🚀 <b>Salió a la bolsa la empresa de Claude</b>
+
+Anthropic empezó a cotizar en el Nasdaq como <b>ANT</b>:
+
+• <b>+34%</b> en la apertura: de US$ 83 a US$ 111,50
+• <b>US$ 81.340 M</b> recaudados: la salida a bolsa más grande de la historia
+• Ventas del 3T26: <b>US$ 17.000 M</b> (+1.127% en un año)
+
+Dato que nadie te cuenta: perdió US$ 104.000 M… <b>en los papeles</b>. Su operación generó US$ 6.600 M de caja.
+
+¿Cuánto vale de verdad? Lo analizamos en el informe 👇
+<a href="https://manfredinvestment.com/informes/ant" target="_blank">https://manfredinvestment.com/informes/ant</a>
+
+<i>Análisis, no recomendación de inversión.</i></div>
+            <div class="meta">18:10</div>
+            <div class="reac">🔥🚀👏</div>
+          </div>
+          <div class="stk"><img src="sticker-ant.webp" alt="sticker" /><div class="meta">18:10</div></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="col">
+      <h2>Grupo de la comunidad (web)</h2>
+      <div class="phone"><div class="cm">
+        <div class="bar"><div class="av">M</div><div class="nm">Comunidad Manfredi<small>GRUPO · NOVEDADES</small></div></div>
+        <div class="feed">
+          <div class="who">Manfredi Investment <span class="badge">CREADOR</span><span class="t">18:10</span></div>
+          <div class="post">
+            <img class="ph" src="tarjeta2-ant.jpg" alt="" />
+            <div class="txt">🚀 <b>Anthropic (Claude) salió a la bolsa</b>: abrió +34% (US$ 83 → US$ 111,50) y recaudó US$ 81.340 M, récord histórico. Vende US$ 17.000 M por trimestre (+1.127%).</div>
+            <a class="card" href="https://manfredinvestment.com/informes/ant" target="_blank">
+              <div class="lg"><img src="ant.png" alt="" /></div>
+              <div class="ti">Informe ANT · Anthropic<small>Cobertura inicial · 14 secciones</small></div>
+              <div class="go">Ver informe →</div>
+            </a>
+          </div>
+          <img class="stk" src="sticker-ant.webp" alt="sticker" />
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="files">
+    Archivos: <a href="tarjeta2-ant.jpg" download>tarjeta2-ant.jpg</a> · <a href="sticker-ant.webp" download>sticker-ant.webp</a> · <a href="sticker-ant.png" download>sticker-ant.png</a> · <a href="MENSAJE.md">MENSAJE.md</a><br>
+    Reacciones y horario son ilustrativos (es una maqueta).
+  </div>
+</body>
+</html>
