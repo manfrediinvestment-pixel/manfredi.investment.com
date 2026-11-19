@@ -33,7 +33,21 @@
   };
   var PRO = ['ideas', 'socios', 'preguntas'];
   var TODAS = ['gratis'].concat(PRO);
+  // Stickers: catálogo propio (assets/comunidad/stickers/). Viajan como un mensaje de texto con la forma
+  // [sticker:<id>]; el chat los dibuja sin burbuja y, si tienen href, tocarlos abre el informe.
+  var STICKERS = [
+    { id: 'informe-ant', src: '/assets/comunidad/stickers/informe-ant.webp', alt: 'Informe de Anthropic', href: '/informes/ant' }
+  ];
+  function stickerDe(m) {
+    var k = m && m.tipo === 'texto' && /^\[sticker:([a-z0-9-]{1,40})\]$/.exec((m.texto || '').trim());
+    return k ? STICKERS.filter(function (x) { return x.id === k[1]; })[0] || null : null;
+  }
+  function informeDe(texto) {
+    var k = /manfredinvestment\.com\/informes\/([a-z0-9.-]+)/i.exec(texto || '');
+    return k ? STICKERS.filter(function (x) { return x.href === '/informes/' + k[1].toLowerCase().replace(/\.html$/, ''); })[0] || null : null;
+  }
   var IC = {
+    stk: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 12.5V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h5.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12.5 20v-4.5a3 3 0 0 1 3-3H20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="9" cy="10" r="1.1" fill="currentColor"/><circle cx="14" cy="10" r="1.1" fill="currentColor"/></svg>',
     send: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12l16-8-6 16-2.5-6.5z" fill="currentColor"/></svg>',
     back: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     pin: '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M9 3h6l-1 6 3 3H7l3-3zM12 12v9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -327,7 +341,7 @@
     var noLeidos = z.estado === 'ok' && k !== S.sala ? z.orden.filter(function (id) { return id < 1e14 && id > (z.vistos[k] || 0) && z.msgs[id].h !== (S.yo && S.yo.h); }).length : 0;
     var prev = z.estado === 'pronto' ? '<em class="ch-chip">Próximamente</em>'
       : z.estado === 'bloqueada' ? '<span class="ch-lock">' + IC.lock + ' Solo socios</span>'
-      : ult ? esc((ult.rol === 'oficial' ? '' : ult.nombre.split(' ')[0] + ': ') + (ult.tipo === 'resumen' ? (ult.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : ult.tipo === 'imagen' && !ult.texto ? 'Imagen' : ult.texto.replace(/[*_]/g, '')))
+      : ult ? esc((ult.rol === 'oficial' ? '' : ult.nombre.split(' ')[0] + ': ') + (ult.tipo === 'resumen' ? (ult.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : ult.tipo === 'imagen' && !ult.texto ? 'Imagen' : stickerDe(ult) ? 'Sticker' : ult.texto.replace(/[*_]/g, '')))
       : z.estado === 'cargando' ? 'Cargando…' : '';
     return '<li><button type="button" class="ch-item' + (info.pro ? ' ch-item--sub' : '') + '" data-ir="' + k + '"' + (k === S.sala ? ' aria-current="true"' : '') + '>' +
       avatarSala(k) +
@@ -420,7 +434,11 @@
     var r = S.responde, adj = S.adjunto, cr = esCreador();
     return (r ? '<div class="ch-reply"><div><b>' + esc(r.nombre) + '</b><span>' + esc(r.texto) + '</span></div><button type="button" data-a="sin-reply" aria-label="Cancelar respuesta">' + IC.x + '</button></div>' : '') +
       (adj ? editorAdj() : '') +
+      (S.stkAbierto ? '<div class="ch-stk-tray" role="listbox" aria-label="Stickers">' + STICKERS.map(function (x) {
+        return '<button type="button" class="ch-stk-opt" data-a="stk" data-stk="' + x.id + '" aria-label="Mandar sticker: ' + esc(x.alt) + '"><img src="' + x.src + '" alt=""></button>';
+      }).join('') + '</div>' : '') +
       '<form class="ch-comp" data-a="enviar">' +
+        '<button type="button" class="ch-clip ch-stk-btn' + (S.stkAbierto ? ' on' : '') + '" data-a="stk-abrir" title="Stickers" aria-label="Stickers" aria-expanded="' + !!S.stkAbierto + '">' + IC.stk + '</button>' +
         (cr ? '<label class="ch-clip" title="Adjuntar imagen" aria-label="Adjuntar imagen">' + IC.foto + '<input type="file" accept="image/*" class="ch-file" hidden></label>' : '') +
         '<textarea class="ch-ta" rows="1" maxlength="800" placeholder="' + (adj ? 'Agregá un texto (opcional)' : 'Escribí un mensaje · con $NVDA se ve el gráfico') + '" aria-label="Mensaje">' + esc(S.borrador[S.sala] || '') + '</textarea>' +
         '<button type="submit" class="ch-send" aria-label="Enviar">' + IC.send + '</button>' +
@@ -488,11 +506,21 @@
 
   function fila(m, cont) {
     var mio = S.yo && m.h === S.yo.h && m.rol !== 'oficial';
-    var cls = 'ch-row' + (mio ? ' mio' : '') + (cont ? ' cont' : '') + (S.recien[m.id] ? ' entra' : '') + (m.tipo === 'resumen' ? ' res' : '') + (m.tipo === 'imagen' ? ' img' : '');
+    var stk = !m.borrado && stickerDe(m);
+    var cls = 'ch-row' + (mio ? ' mio' : '') + (cont ? ' cont' : '') + (S.recien[m.id] ? ' entra' : '') + (m.tipo === 'resumen' ? ' res' : '') + (m.tipo === 'imagen' ? ' img' : '') + (stk ? ' stk' : '');
     var h = '<div class="' + cls + '" data-id="' + m.id + '">';
     if (!mio) h += cont ? '<span class="ch-av-sp"></span>' : avatar(m, 'sm');
     // Imagen: nunca más alta que ~420 px (una vertical larga queda angosta, no gigante)
     var anchoImg = m.tipo === 'imagen' && m.datos ? Math.round(Math.min(380, 420 * (+m.datos.w || 4) / (+m.datos.h || 5))) : 0;
+    if (stk) {
+      h += '<div class="ch-bub ch-stk">' + (!mio && !cont ? '<div class="ch-who"><b style="color:' + (m.rol === 'oficial' || m.rol === 'creador' ? '#e9d3a0' : color(m.h)) + '">' + esc(m.nombre) + '</b>' + chip(m) + '</div>' : '') +
+        (stk.href ? '<a class="ch-stk-img" href="' + stk.href + '" target="_blank" rel="noopener" aria-label="' + esc(stk.alt) + '">' : '<span class="ch-stk-img">') +
+        '<img src="' + stk.src + '" alt="' + esc(stk.alt) + '" width="160" height="160">' + (stk.href ? '</a>' : '</span>') +
+        '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span>' +
+        (esCreador() && !m.pendiente ? '<div class="ch-res-pie"><span class="ch-res-acc"><a class="ch-share" href="' + stk.src + '" download="sticker-' + stk.id + '.webp">' + IC.copy + 'Bajar para WhatsApp</a></span><span></span></div>' : '');
+      if (!m.pendiente) h += herramientas(m, mio);
+      return h + '</div></div>';
+    }
     h += '<div class="ch-bub' + (m.rol === 'oficial' ? ' of' : '') + (m.borrado ? ' borrado' : '') + '"' + (anchoImg && !m.borrado ? ' style="width:min(' + Math.max(anchoImg, 230) + 'px, 80%)"' : '') + '>';
     if (!mio && !cont) h += '<div class="ch-who"><b style="color:' + (m.rol === 'oficial' || m.rol === 'creador' ? '#e9d3a0' : color(m.h)) + '">' + esc(m.nombre) + '</b>' + chip(m) + '</div>';
     if (m.borrado) {
@@ -506,6 +534,11 @@
         '<img alt="" ' + (m.datos.url ? 'src="' + m.datos.url + '"' : 'data-img="' + esc(m.datos.img) + '"') + '>' +
         (m.texto ? '' : '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span>') + '</button>';
       if (m.texto) h += '<div class="ch-txt">' + formato(m.texto, false) + '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span></div>';
+      // Si el texto lleva el link de un informe que tiene sticker, el sticker va adentro del mismo mensaje y abre el informe
+      var inf = informeDe(m.texto);
+      if (inf) h += '<a class="ch-inf" href="' + inf.href + '" target="_blank" rel="noopener">' +
+        '<img src="' + inf.src + '" alt="" width="96" height="96">' +
+        '<span><b>' + esc(inf.alt) + '</b><em>Ver el informe completo →</em></span></a>';
       // Pasarla al Canal de WhatsApp: copia la imagen y abre el canal para pegarla; después, el texto.
       // En el celular además está Compartir (imagen + texto juntos, para mandarla a un chat).
       if (esCreador() && !m.pendiente) h += '<div class="ch-res-pie"><span class="ch-res-acc">' +
@@ -587,6 +620,8 @@
       if (window.mktAbrirActivo) window.mktAbrirActivo(fi.s, fi.cat); else location.hash = 'mercados';
       return;
     }
+    if (a === 'stk-abrir') { S.stkAbierto = !S.stkAbierto; repintarCompositor(); return; }
+    if (a === 'stk') { S.stkAbierto = false; repintarCompositor(); enviarSticker(b.dataset.stk); return; }
     if (a === 'sin-adj') { quitarAdjunto(); repintarCompositor(); return; }
     if (a === 'adj-fmt' && S.adjunto) {
       S.adjunto.fmt = b.dataset.f; S.adjunto.ox = S.adjunto.oy = 0.5;
@@ -596,7 +631,7 @@
     if (a === 'ver-img') { var im = b.querySelector('img'); if (!im || !im.src) return; var lb2 = S.root.querySelector('.ch-lb'); lb2.querySelector('img').src = im.src; lb2.hidden = false; return; }
     if ((a === 'copiar-img' || a === 'compartir-img' || a === 'copiar-txt') && m && esCreador()) { pasarAWhatsApp(a, m, b); return; }
     if (a === 'responder' && m) {
-      S.responde = { id: m.id, nombre: m.nombre, texto: m.tipo === 'resumen' ? (m.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : m.tipo === 'imagen' && !m.texto ? 'Imagen' : m.texto.replace(/[*_]/g, '').slice(0, 140) };
+      S.responde = { id: m.id, nombre: m.nombre, texto: m.tipo === 'resumen' ? (m.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : m.tipo === 'imagen' && !m.texto ? 'Imagen' : stickerDe(m) ? 'Sticker' : m.texto.replace(/[*_]/g, '').slice(0, 140) };
       repintarCompositor(); var ta = S.root.querySelector('.ch-ta'); if (ta) ta.focus();
       return;
     }
@@ -807,6 +842,22 @@
       if (original && !S.adjunto) { S.adjunto = original; repintarCompositor(); }
       var t2 = S.root.querySelector('.ch-ta'); if (t2 && !t2.value) { t2.value = texto; ajustar(t2); }
       toast(err.status === 401 ? 'Tu sesión venció: volvé a iniciar sesión.' : err.message);
+    }).then(function () { S.enviando = false; });
+  }
+
+  function enviarSticker(id) {
+    if (S.enviando || !STICKERS.some(function (x) { return x.id === id; })) return;
+    var sala = S.sala, z = S.salas[sala], texto = '[sticker:' + id + ']';
+    var tmp = { id: 1e15 + Date.now(), h: S.yo ? S.yo.h : 'yo', nombre: S.yo ? S.yo.nombre : '', rol: S.yo ? S.yo.rol : 'usuario', tipo: 'texto', texto: texto,
+      datos: null, cita: null, reacciones: {}, creado: Date.now(), editado: 0, pendiente: true };
+    S.enviando = true;
+    aplicar(sala, [tmp], true); pintarFeed(true);
+    api('/chat/' + sala, { method: 'POST', body: { texto: texto, responde: null } }).then(function (d) {
+      delete z.msgs[tmp.id]; z.orden = z.orden.filter(function (x) { return x !== tmp.id; });
+      aplicar(sala, [d.mensaje]); pintarFeed(true); pintarLista();
+    }).catch(function (err) {
+      delete z.msgs[tmp.id]; z.orden = z.orden.filter(function (x) { return x !== tmp.id; });
+      pintarFeed(false); toast(err.status === 401 ? 'Tu sesión venció: volvé a iniciar sesión.' : err.message);
     }).then(function () { S.enviando = false; });
   }
 
