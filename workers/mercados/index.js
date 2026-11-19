@@ -58,6 +58,7 @@ const NAME_MAP = {
   NFLX: 'Netflix', 'BRK.B': 'Berkshire Hathaway', V: 'Visa', MA: 'Mastercard', WMT: 'Walmart',
   PG: 'Procter & Gamble', XOM: 'ExxonMobil', BA: 'Boeing', INTC: 'Intel', AMD: 'AMD',
   AIG: 'American International Group',
+  ANT: 'Anthropic', SPCX: 'SpaceX', PLTR: 'Palantir',
   // Bonos AR (soberanos en dólares)
   AL30: 'Bonar 2030', GD30: 'Global 2030', AL35: 'Bonar 2035', GD35: 'Global 2035',
   AE38: 'Bonar 2038', GD38: 'Global 2038', AL41: 'Bonar 2041', GD41: 'Global 2041',
@@ -109,7 +110,7 @@ const USA_MEGA_CAP_PINS = [
   'SBUX','COST','TGT','LMT','RTX','BA','CAT','DE','HON','UPS','UNP','GE',
   'MMM','T','VZ','CMCSA','ABT','TMO','DHR','LLY','MRK','BMY','GILD','AMGN',
   'ISRG','NOW','INTU','PYPL','UBER','SHOP','PLTR','AVGO','LIN','ACN','PM',
-  'SPCX',
+  'SPCX','ANT',
 ];
 // Simbolos que representan la MISMA empresa que otro ya en la lista (otra
 // clase de acciones) -- se excluyen aunque el volumen local los meta solos
