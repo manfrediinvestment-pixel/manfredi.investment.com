@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="base.css" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+  /* Cierre genérico para TODOS los videos a cámara: logos de un lado, informe pasando páginas del otro. */
+  #head { position: absolute; left: 96px; top: 76px; right: 96px; }
+  #head .title { font-size: 86px; }
+  .pill { display: inline-block; padding: 0 26px 6px; margin-left: 8px; border-radius: 18px;
+    background: linear-gradient(145deg, #f0dcaa, #c9a24f); color: #0b1730; box-shadow: 0 10px 40px rgba(201,162,79,.35); }
+  #sub { font-family: 'DM Serif Display', serif; font-size: 40px; color: var(--gold); margin-top: 10px; }
+  #sub i { font-style: normal; color: var(--gold2); }
+
+  #grid { position: absolute; left: 96px; top: 340px; display: grid; grid-template-columns: repeat(7, 78px); gap: 14px; }
+  .tile { width: 78px; height: 78px; border-radius: 18px; background: #fff; display: grid; place-items: center;
+    box-shadow: 0 8px 22px rgba(0,0,0,.45); overflow: hidden; }
+  .tile img { width: 58px; height: 58px; object-fit: contain; }
+  .tile.more { background: linear-gradient(145deg, #f0dcaa, #c9a24f); font-family: 'IBM Plex Mono', monospace; font-weight: 600;
+    font-size: 17px; color: #0b1730; text-align: center; line-height: 1; }
+
+  /* el libro */
+  #stage { position: absolute; left: 880px; top: 372px; width: 980px; height: 680px; perspective: 2600px; }
+  #book { position: absolute; left: 50%; top: 20px; width: 0; height: 560px; transform-style: preserve-3d;
+    transform: rotateX(10deg) rotateZ(-2deg); }
+  .page, .leaf { position: absolute; top: 0; left: 0; width: 430px; height: 560px; }
+  .page { background: #fff; border-radius: 2px 8px 8px 2px; box-shadow: 0 30px 70px rgba(0,0,0,.6); overflow: hidden; }
+  .page img, .face img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+  .leaf { transform-origin: 0 50%; transform-style: preserve-3d; }
+  .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden;
+    background: #fff; border-radius: 2px 8px 8px 2px; }
+  .face.back { transform: rotateY(180deg); border-radius: 8px 2px 2px 8px; }
+  .face::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(90deg, rgba(0,0,0,.18), rgba(0,0,0,0) 12%); }
+  .face.back::after { background: linear-gradient(270deg, rgba(0,0,0,.18), rgba(0,0,0,0) 12%); }
+  #spine { position: absolute; left: -4px; top: 0; width: 8px; height: 560px; background: linear-gradient(90deg,#0b1730,#1a2f4a,#0b1730);
+    transform: translateZ(1px); border-radius: 3px; }
+
+  /* tapa */
+  .cover { width: 100%; height: 100%; background: linear-gradient(160deg, #13284d 0%, #0b1730 55%, #060d19 100%);
+    display: flex; flex-direction: column; justify-content: space-between; padding: 46px 42px; border-left: 6px solid #c9a24f; }
+  .cover .k { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 16px; letter-spacing: .22em; color: #c9a24f; }
+  .cover .t { font-family: 'DM Serif Display', serif; font-size: 58px; line-height: 1.02; color: #f0dcaa; }
+  .cover .r { width: 70px; height: 3px; background: #c9a24f; margin: 22px 0; }
+  .cover .s { font-family: 'DM Serif Display', serif; font-size: 26px; color: #e6cf96; }
+  .cover .m { display: flex; align-items: center; gap: 12px; font-family: 'DM Serif Display', serif; font-size: 24px; color: #e6cf96; }
+  .cover .m b { width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; font-weight: 400;
+    background: linear-gradient(145deg, #f0dcaa, #c9a24f); color: #0b1730; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="cierre" data-start="0" data-duration="7" data-width="1920" data-height="1080" data-fps="30">
+  <section class="clip" data-start="0" data-duration="7" data-track-index="1">
+    <div class="glow"></div>
+    <div class="frame"></div>
+
+    <div id="head">
+      <div class="title">Comentá <span class="pill">INFORME</span></div>
+      <div id="sub">El informe completo de esta acción <i>y de otras 40</i> · con una IA que te lo explica</div>
+    </div>
+
+    <div id="grid"></div>
+
+    <div id="stage">
+      <div id="book">
+        <div class="page" id="base"><img src="paginas/p8.png" alt="" /></div>
+        <div class="leaf" id="l3"><div class="face front"><img src="paginas/p6.png" alt="" /></div><div class="face back"><img src="paginas/p7.png" alt="" /></div></div>
+        <div class="leaf" id="l2"><div class="face front"><img src="paginas/p4.png" alt="" /></div><div class="face back"><img src="paginas/p5.png" alt="" /></div></div>
+        <div class="leaf" id="l1"><div class="face front"><img src="paginas/p2.png" alt="" /></div><div class="face back"><img src="paginas/p3.png" alt="" /></div></div>
+        <div class="leaf" id="l0">
+          <div class="face front"><div class="cover">
+            <div class="k">EQUITY RESEARCH · INFORME INSTITUCIONAL</div>
+            <div><div class="t">Informes<br>Manfredi</div><div class="r"></div><div class="s">Tesis, estados financieros,<br>comparables y valuación</div></div>
+            <div class="m"><b>M</b>Manfredi Investment</div>
+          </div></div>
+          <div class="face back"><img src="paginas/p1.png" alt="" /></div>
+        </div>
+        <div id="spine"></div>
+      </div>
+    </div>
+
+    <div class="brand"><span class="m serif">M</span>Manfredi Investment</div>
+  </section>
+</div>
+
+<script>
+  // 48 empresas con informe (orden: las más conocidas primero) + tile "y más"
+  var T = ['ant','nvda','msft','aapl','googl','amzn','meta','tsla','nflx','avgo','tsm','jpm','v','ma','ko','pep','wmt','brk-b','lly','unh','jnj','pg','dis','meli','spot','uber','pltr','orcl','crm','adbe','amd','intc','qcom','mu','asml','arm','txn','sap','shop','snow','crwd','now','intu','axp','bac','c','gs','ms'];
+  var grid = document.getElementById('grid');
+  T.forEach(function (t) {
+    var d = document.createElement('div'); d.className = 'tile';
+    var im = document.createElement('img'); im.src = 'logos/' + t + '.png'; im.alt = t;
+    d.appendChild(im); grid.appendChild(d);
+  });
+  var more = document.createElement('div'); more.className = 'tile more'; more.textContent = 'y más'; grid.appendChild(more);
+  var tiles = Array.prototype.slice.call(grid.children);
+
+  window.__timelines = window.__timelines || {};
+  var tl = gsap.timeline({ paused: true });
+
+  gsap.set('#head .title, #sub', { opacity: 0, y: 26 });
+  gsap.set('.pill', { scale: .7, transformOrigin: '50% 60%' });
+  gsap.set(tiles, { opacity: 0, scale: .4 });
+  gsap.set('#book', { opacity: 0, y: 60 });
+  gsap.set('.leaf', { rotationY: 0 });
+  gsap.set('.brand', { opacity: 0 });
+
+  tl.to('#head .title', { opacity: 1, y: 0, duration: .45, ease: 'power3.out' }, 0)
+    .to('.pill', { scale: 1, duration: .5, ease: 'back.out(2.2)' }, .15)
+    .to('#sub', { opacity: 1, y: 0, duration: .45, ease: 'power3.out' }, .35)
+    .to('.brand', { opacity: 1, duration: .4 }, .3)
+    .to(tiles, { opacity: 1, scale: 1, duration: .38, ease: 'back.out(2)',
+                 stagger: { each: .028, grid: [7, 7], from: 'start' } }, .45)
+    .to('#book', { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, .35)
+    // páginas que pasan (cada hoja gira sobre el lomo y queda a la izquierda)
+    .to('#l0', { rotationY: -178, duration: .9, ease: 'power2.inOut' }, 1.2)
+    .to('#l1', { rotationY: -176, duration: .8, ease: 'power2.inOut' }, 2.35)
+    .to('#l2', { rotationY: -174, duration: .8, ease: 'power2.inOut' }, 3.4)
+    .to('#l3', { rotationY: -172, duration: .8, ease: 'power2.inOut' }, 4.45)
+    // latido final del "+40" y de la palabra
+    .to(more, { scale: 1.15, duration: .25, ease: 'power2.out', yoyo: true, repeat: 1 }, 5.6)
+    .to('.pill', { scale: 1.06, duration: .25, ease: 'power2.out', yoyo: true, repeat: 1 }, 5.6);
+
+  window.__timelines['cierre'] = tl;
+</script>
+</body>
+</html>

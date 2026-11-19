@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --bg:#060d19; --bg2:#0b1730; --gold:#e6cf96; --gold2:#f0dcaa; --deep:#c9a24f; --clay:#d97757; --clay2:#e9a189; --neg:#f2857b; }
+  html, body { width: 1080px; height: 1350px; background: var(--bg); }
+  #c { position: relative; width: 1080px; height: 1350px; overflow: hidden;
+    background:
+      radial-gradient(700px 480px at 92% 4%, rgba(217,119,87,.17), transparent 70%),
+      radial-gradient(900px 600px at 0% 100%, rgba(201,162,79,.11), transparent 70%),
+      linear-gradient(180deg, var(--bg2) 0%, var(--bg) 70%); }
+  .frame { position: absolute; inset: 28px; border: 1.5px solid rgba(230,207,150,.22); border-radius: 26px; }
+  .in { position: absolute; left: 72px; right: 72px; top: 70px; }
+  .mono { font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+  .serif { font-family: 'DM Serif Display', serif; font-weight: 400; }
+  .lab { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 17px; letter-spacing: .2em; color: var(--deep); text-transform: uppercase; }
+
+  .head { display: flex; align-items: center; gap: 18px; }
+  .logo { width: 84px; height: 84px; border-radius: 20px; background: #fff; display: grid; place-items: center; flex: none;
+    box-shadow: 0 8px 28px rgba(217,119,87,.28), 0 0 0 1.5px rgba(230,207,150,.35); }
+  .logo img { width: 74px; height: 74px; }
+  .spark { width: 54px; height: 54px; flex: none; }
+  .head .k { font-size: 18px; line-height: 1.6; letter-spacing: .18em; }
+  .head .k b { color: var(--clay2); }
+  .pill { margin-left: auto; padding: 10px 18px; border-radius: 999px; border: 1.5px solid rgba(217,119,87,.7);
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 16px; letter-spacing: .14em; color: var(--clay2); white-space: nowrap; }
+
+  h1 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 54px; line-height: 1.04; color: var(--gold2); margin-top: 28px; white-space: nowrap; }
+  h1 em { font-style: normal; color: var(--clay2); }
+
+  .panel { border: 1.5px solid rgba(230,207,150,.20); border-radius: 20px; background: rgba(11,23,48,.55); }
+
+  /* primer día */
+  #day { margin-top: 26px; height: 300px; position: relative; padding: 22px 26px; }
+  #day .top { display: flex; justify-content: space-between; align-items: baseline; }
+  #day .big { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 64px; color: var(--gold2); line-height: 1; }
+  #day .big small { font-size: 22px; color: var(--deep); margin-left: 10px; letter-spacing: .05em; }
+  #day .hl { text-align: right; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 18px; color: var(--gold); line-height: 1.6; }
+  #day svg { position: absolute; left: 26px; top: 116px; }
+  .tag { position: absolute; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 20px; color: var(--gold2); white-space: nowrap; }
+  .tag span { display: block; font-size: 14px; letter-spacing: .14em; color: var(--deep); }
+
+  /* fila: ventas + números */
+  .row { display: grid; grid-template-columns: 1.05fr 1fr; gap: 22px; margin-top: 22px; }
+  #rev { padding: 22px 24px; height: 300px; position: relative; }
+  #rev .x { position: absolute; left: 24px; top: 52px; font-family: 'DM Serif Display', serif; font-size: 44px; color: var(--clay2); }
+  #bars { position: absolute; left: 24px; right: 24px; bottom: 18px; height: 200px; display: flex; align-items: flex-end; gap: 12px; }
+  #bars .b { flex: 1; position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; }
+  #bars .bar { width: 100%; border-radius: 7px 7px 2px 2px; background: #3a4a6b; }
+  #bars .v { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 17px; color: var(--gold2); margin-bottom: 6px; }
+  #bars .q { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 14px; color: var(--gold); margin-top: 8px; }
+
+  .nums { display: grid; grid-template-rows: repeat(3, 1fr); gap: 14px; height: 300px; }
+  .n { padding: 10px 22px; display: flex; flex-direction: column; justify-content: center; }
+  .n .v { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 31px; color: var(--gold2); white-space: nowrap; }
+  .n .d { font-family: 'DM Serif Display', serif; font-size: 20px; white-space: nowrap; color: var(--gold); margin-top: 4px; line-height: 1.2; }
+
+  /* letra chica */
+  .fine { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; margin-top: 22px; }
+  .f { padding: 18px 22px 20px; }
+  .f .v { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px; white-space: nowrap; margin-top: 8px; }
+  .f .d { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--gold); margin-top: 6px; line-height: 1.22; }
+
+  .own { margin-top: 22px; padding: 18px 24px; display: flex; align-items: center; gap: 26px; }
+  .own .o { display: flex; align-items: baseline; gap: 10px; white-space: nowrap; }
+  .own .o b { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 28px; color: var(--gold2); }
+  .own .o span { font-family: 'DM Serif Display', serif; font-size: 21px; color: var(--gold); }
+  .own .sep { width: 1.5px; height: 30px; background: rgba(230,207,150,.25); }
+  .foot { position: absolute; left: 72px; right: 72px; bottom: 64px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .cta .t { font-family: 'DM Serif Display', serif; font-size: 27px; color: var(--gold2); }
+  .cta .u { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 25px; color: var(--clay2); margin-top: 6px; white-space: nowrap; }
+  .brand { display: flex; align-items: center; gap: 12px; font-family: 'DM Serif Display', serif; font-size: 25px; color: var(--gold); white-space: nowrap; }
+  .brand .m { width: 42px; height: 42px; border-radius: 10px; display: grid; place-items: center;
+    background: linear-gradient(145deg, #f0dcaa, #c9a24f); color: #0b1730; font-size: 27px; }
+</style>
+</head>
+<body>
+<div id="c">
+  <div class="frame"></div>
+  <div class="in">
+    <div class="head">
+      <div class="logo"><img src="ant.png" alt="Anthropic" /></div>
+      <img class="spark" src="claude.svg" alt="Claude" />
+      <div class="lab k">Anthropic · <b>ANT</b> · Nasdaq<br>19 · nov · 2026</div>
+      <div class="pill">IPO RÉCORD</div>
+    </div>
+
+    <h1>La empresa de <em>Claude</em> salió a la bolsa</h1>
+
+    <div class="panel" id="day">
+      <div class="top">
+        <div><div class="lab">Su primer día</div><div class="big" style="margin-top:10px">+34%<small>AL ABRIR</small></div></div>
+        <div class="hl">MÁX US$ 114,99<br>MÍN US$ 92,72</div>
+      </div>
+      <svg id="ln" width="884" height="160" viewBox="0 0 884 160"></svg>
+    </div>
+
+    <div class="row">
+      <div class="panel" id="rev">
+        <div class="lab">Ventas por trimestre · US$ B</div>
+        <div class="x">×45</div>
+        <div id="bars"></div>
+      </div>
+      <div class="nums">
+        <div class="panel n"><div class="v">US$ 81.340 M</div><div class="d">Recaudó: récord (SpaceX: 75.000 M)</div></div>
+        <div class="panel n"><div class="v">US$ 81.000 M</div><div class="d">Ritmo anual de ventas a octubre</div></div>
+        <div class="panel n"><div class="v">11.900</div><div class="d">Clientes de más de US$ 100 mil al año</div></div>
+      </div>
+    </div>
+
+    <div class="fine">
+      <div class="panel f"><div class="lab">En los papeles</div><div class="v" style="color:var(--neg)">−US$ 104.000 M</div><div class="d">Pérdida 2026, casi toda contable</div></div>
+      <div class="panel f"><div class="lab">En la caja</div><div class="v" style="color:var(--gold2)">+US$ 6.600 M</div><div class="d">Lo que generó su operación</div></div>
+      <div class="panel f"><div class="lab">El riesgo</div><div class="v" style="color:var(--clay2)">US$ 900.000 M</div><div class="d">En chips firmados hasta 2045</div></div>
+    </div>
+    <div class="panel own">
+      <div class="lab">Dueños</div>
+      <div class="o"><b>14,6%</b><span>Amazon</span></div><div class="sep"></div>
+      <div class="o"><b>13,4%</b><span>Google</span></div><div class="sep"></div>
+      <div class="o"><b>50,1%</b><span>de los votos: fundadores</span></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="cta"><div class="t">¿Cuánto vale de verdad? 4 métodos y los riesgos</div><div class="u">manfredinvestment.com/informes/ant</div></div>
+    <div class="brand"><span class="m">M</span>Manfredi Investment</div>
+  </div>
+</div>
+<script>
+  // primera rueda: salida US$ 83, apertura y cotizaciones de 5 min (Yahoo Finance)
+  var PX = [83.0, 111.5, 111.51, 105.03, 101.22, 102.36, 99.39, 96.09, 100.92, 100.86, 101.48, 98.88, 97.38, 99.07, 98.78, 96.69, 95.85, 95.55, 94.04, 94.07, 95.18, 96.83, 97.54, 97.03, 96.6, 95.85, 95.36, 95.75, 94.5, 94.39, 95.07, 94.68, 96.35, 96.79, 96.88, 97.64, 98.64, 99.04, 98.15, 96.34, 95.75, 95.5, 95.72, 95.87];
+  var W = 884, H = 160, x0 = 300, x1 = 690, y0 = 8, y1 = 150, lo = 80, hi = 116;
+  var X = function (i) { return x0 + (x1 - x0) * i / (PX.length - 1); }, Y = function (p) { return y0 + (y1 - y0) * (hi - p) / (hi - lo); };
+  var d = PX.map(function (p, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(p).toFixed(1); }).join('');
+  var N = PX.length - 1, s = '';
+  s += '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d97757" stop-opacity=".35"/><stop offset="1" stop-color="#d97757" stop-opacity="0"/></linearGradient></defs>';
+  s += '<line x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(83) + '" y2="' + Y(83) + '" stroke="rgba(230,207,150,.5)" stroke-width="2" stroke-dasharray="7 7"/>';
+  s += '<path d="' + d + 'L' + x1 + ',' + y1 + 'L' + x0 + ',' + y1 + 'Z" fill="url(#g)"/>';
+  s += '<path d="' + d + '" fill="none" stroke="#d97757" stroke-width="4" stroke-linejoin="round"/>';
+  s += '<circle cx="' + X(0) + '" cy="' + Y(83) + '" r="7" fill="#e6cf96"/><circle cx="' + X(1) + '" cy="' + Y(111.5) + '" r="8" fill="#f0dcaa"/><circle cx="' + X(N) + '" cy="' + Y(PX[N]) + '" r="9" fill="#d97757"/>';
+  document.getElementById('ln').innerHTML = s;
+  var day = document.getElementById('day');
+  function tag(html, x, y) { var t = document.createElement('div'); t.className = 'tag'; t.innerHTML = html; t.style.left = (26 + x) + 'px'; t.style.top = (116 + y) + 'px'; day.appendChild(t); }
+  tag('US$ 83<span>SALIDA</span>', X(0) - 130, Y(83) - 22);
+  tag('US$ 111,50<span>APERTURA</span>', X(1) + 24, Y(111.5) - 14);
+  tag('US$ 95,87<span>+15,5% · 1.ª RUEDA</span>', X(N) + 18, Y(PX[N]) - 22);
+
+  var Q = [['1T25', .376], ['2T25', .787], ['3T25', 1.382], ['4T25', 2.04], ['1T26', 4.731], ['2T26', 11.555], ['3T26', 16.956]];
+  var bars = document.getElementById('bars');
+  Q.forEach(function (q, i) {
+    var b = document.createElement('div'); b.className = 'b';
+    var h = 140 * q[1] / 16.956;
+    var col = i === 6 ? 'linear-gradient(180deg,#f0dcaa,#c9a24f)' : i === 5 ? 'linear-gradient(180deg,#e9a189,#d97757)' : '#3a4a6b';
+    b.innerHTML = '<div class="v">' + q[1].toFixed(1).replace('.', ',') + '</div><div class="bar" style="height:' + Math.max(h, 4) + 'px;background:' + col + '"></div><div class="q">' + q[0] + '</div>';
+    bars.appendChild(b);
+  });
+</script>
+</body>
+</html>
