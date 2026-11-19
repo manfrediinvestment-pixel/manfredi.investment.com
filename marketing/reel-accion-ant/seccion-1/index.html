@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="base.css" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<script src="charts.js"></script>
+</head>
+<body>
+<div id="root" data-composition-id="seccion-1" data-start="0" data-duration="10" data-width="1920" data-height="1080" data-fps="30">
+  <section class="clip" data-start="0" data-duration="10" data-track-index="1">
+    <div class="glow"></div>
+    <div class="frame"></div>
+    <div class="t-logo"><img src="ant.png" alt="" /></div>
+
+    <!-- Fase A: la pérdida contable vs. la caja -->
+    <div class="phase" id="pA">
+      <div class="hdr">
+        <div class="kicker">01 · La pérdida que no es pérdida</div>
+        <div class="title">Perdió US$ 104.000 M… <em>en los papeles</em></div>
+      </div>
+      <div class="chartbox" id="loss" style="left:96px; top:430px; display:flex; flex-direction:column; gap:70px;"></div>
+      <div class="src">Nueve meses al 30-sep-26 · pérdida neta y flujo de caja operativo · prospecto (SEC) · informe Manfredi</div>
+    </div>
+
+    <!-- Fase B: de dónde sale la pérdida -->
+    <div class="phase" id="pB">
+      <div class="hdr">
+        <div class="kicker">01 · La pérdida que no es pérdida</div>
+        <div class="title">Del negocio, solo <b>US$ 1.300 M</b></div>
+      </div>
+      <div class="chartbox" id="parts" style="left:96px; top:360px; display:flex; flex-direction:column; gap:30px;"></div>
+      <div class="src">Composición de la pérdida, nueve meses al 30-sep-26, US$ miles de millones · prospecto (SEC)</div>
+    </div>
+
+    <div class="brand"><span class="m serif">M</span>Manfredi Investment</div>
+  </section>
+</div>
+
+<script>
+  var loss = MC.hbars(document.getElementById('loss'), {
+    labels: ['Pérdida contable', 'Caja que generó'],
+    subs: ['RESULTADO NETO', 'FLUJO DE CAJA OPERATIVO'],
+    values: [104.0, 6.6], max: 104.0, w: 780, rowH: 120, labW: 500, barH: 86,
+    colors: ['linear-gradient(90deg,#7a3340,#f2857b)', 'linear-gradient(90deg,#c9a24f,#f0dcaa)'],
+    valColors: ['#f2857b', '#f0dcaa'],
+    fmt: function (v, i) { return (v > 50 ? '−' : '+') + 'US$ ' + v.toFixed(1).replace('.', ',') + ' B'; }
+  });
+
+  var parts = MC.hbars(document.getElementById('parts'), {
+    labels: ['Revaluación de convertibles', 'Marcas con socios', 'El negocio'],
+    subs: ['NO SALE DE LA CAJA', 'NO SALE DE LA CAJA', 'RESULTADO OPERATIVO'],
+    values: [94.3, 10.4, 1.26], max: 94.3, w: 760, rowH: 130, labW: 640, barH: 70,
+    colors: ['#3a4a6b', '#3a4a6b', 'linear-gradient(90deg,#c9a24f,#f0dcaa)'],
+    valColors: ['#e6cf96', '#e6cf96', '#f0dcaa'],
+    labColors: [null, null, '#f0dcaa'],
+    fmt: function (v) { return 'US$ ' + v.toFixed(v < 2 ? 2 : 1).replace('.', ',') + ' B'; }
+  });
+
+  window.__timelines = window.__timelines || {};
+  var tl = gsap.timeline({ paused: true });
+  var SW = 4.9;
+
+  gsap.set('.t-logo', { opacity: 0 });
+  gsap.set('#pA .kicker, #pA .title, #pB .kicker, #pB .title', { opacity: 0, y: 24 });
+  gsap.set('#pB', { opacity: 0 });
+  gsap.set(loss.rows.concat(parts.rows), { opacity: 0, x: -30 });
+  gsap.set(loss.bars.concat(parts.bars), { scaleX: 0 });
+  gsap.set(loss.vals.concat(parts.vals), { opacity: 0 });
+  gsap.set('.src, .brand', { opacity: 0 });
+
+  tl.to('.t-logo, .brand', { opacity: 1, duration: .4 }, 0)
+    .to('#pA .kicker', { opacity: 1, y: 0, duration: .35, ease: 'power3.out' }, .05)
+    .to('#pA .title', { opacity: 1, y: 0, duration: .5, ease: 'power3.out' }, .15)
+    .to('#pA .src', { opacity: 1, duration: .4 }, .5)
+    .to(loss.rows[0], { opacity: 1, x: 0, duration: .4, ease: 'power3.out' }, .55)
+    .to(loss.bars[0], { scaleX: 1, duration: 1.4, ease: 'power2.inOut' }, .75)
+    .to(loss.vals[0], { opacity: 1, duration: .3 }, 2.0)
+    .to(loss.rows[1], { opacity: 1, x: 0, duration: .4, ease: 'power3.out' }, 2.4)
+    .to(loss.bars[1], { scaleX: 1, duration: .5, ease: 'power2.out' }, 2.6)
+    .to(loss.vals[1], { opacity: 1, duration: .35 }, 3.0)
+
+    .to('#pA', { opacity: 0, duration: .35, ease: 'power1.in' }, SW)
+    .to('#pB', { opacity: 1, duration: .01 }, SW + .3)
+    .to('#pB .kicker', { opacity: 1, y: 0, duration: .35, ease: 'power3.out' }, SW + .3)
+    .to('#pB .title', { opacity: 1, y: 0, duration: .5, ease: 'power3.out' }, SW + .4)
+    .to('#pB .src', { opacity: 1, duration: .4 }, SW + .6)
+    .to(parts.rows, { opacity: 1, x: 0, duration: .35, ease: 'power3.out', stagger: .3 }, SW + .6)
+    .to(parts.bars, { scaleX: 1, duration: .6, ease: 'power3.out', stagger: .3 }, SW + .75)
+    .to(parts.vals, { opacity: 1, duration: .3, stagger: .3 }, SW + 1.2);
+
+  window.__timelines['seccion-1'] = tl;
+</script>
+</body>
+</html>

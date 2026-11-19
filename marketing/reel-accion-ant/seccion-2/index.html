@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="base.css" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<script src="charts.js"></script>
+</head>
+<body>
+<div id="root" data-composition-id="seccion-2" data-start="0" data-duration="10" data-width="1920" data-height="1080" data-fps="30">
+  <section class="clip" data-start="0" data-duration="10" data-track-index="1">
+    <div class="glow"></div>
+    <div class="frame"></div>
+    <div class="t-logo"><img src="ant.png" alt="" /></div>
+
+    <!-- Fase A: ventas por trimestre -->
+    <div class="phase" id="pA">
+      <div class="hdr">
+        <div class="kicker">02 · El crecimiento más rápido</div>
+        <div class="title">Sus ventas: <em>×45</em> en un año y medio</div>
+      </div>
+      <div class="chartbox" id="rev" style="left:150px; top:330px;"></div>
+      <div class="src">Ingresos por trimestre, US$ miles de millones · 1T25 a 3T26 · prospecto (SEC)</div>
+    </div>
+
+    <!-- Fase B: costo de cómputo sobre ventas -->
+    <div class="phase" id="pB">
+      <div class="hdr">
+        <div class="kicker">02 · El crecimiento más rápido</div>
+        <div class="title">Y cada dólar le cuesta <b>cada vez menos</b></div>
+      </div>
+      <div class="chartbox" id="cost" style="left:150px; top:300px;"></div>
+      <div class="src">Costo de cómputo e infraestructura como % de las ventas, por trimestre · prospecto (SEC)</div>
+    </div>
+
+    <div class="brand"><span class="m serif">M</span>Manfredi Investment</div>
+  </section>
+</div>
+
+<script>
+  var rev = MC.vbars(document.getElementById('rev'), {
+    labels: ['1T25', '2T25', '3T25', '4T25', '1T26', '2T26', '3T26'],
+    values: [0.376, 0.787, 1.382, 2.040, 4.731, 11.555, 16.956], max: 16.956, w: 1620, h: 620, gap: 50,
+    colors: ['#3a4a6b', '#3a4a6b', '#3a4a6b', '#3a4a6b', '#7a5a4a', 'linear-gradient(180deg,#e9a189,#d97757)', 'linear-gradient(180deg,#f0dcaa,#c9a24f)'],
+    notes: [null, null, null, null, null, null, '×45'],
+    fmt: function (v) { return v.toFixed(1).replace('.', ','); }
+  });
+
+  var cost = MC.line(document.getElementById('cost'), {
+    labels: ['1T25', '2T25', '3T25', '4T25', '1T26', '2T26', '3T26'],
+    values: [251, 177, 148, 144, 72, 48, 58], min: 20, max: 270, w: 1620, h: 660, padX: 90,
+    color: '#d97757', r: [12, 12, 12, 12, 12, 16, 16],
+    dotColors: ['#f2857b', '#f2857b', '#e6cf96', '#e6cf96', '#e6cf96', '#f0dcaa', '#f0dcaa'],
+    valColors: ['#f2857b', '#f2857b', '#e6cf96', '#e6cf96', '#e6cf96', '#f0dcaa', '#f0dcaa'],
+    fmt: function (v) { return v + '%'; }
+  });
+
+  window.__timelines = window.__timelines || {};
+  var tl = gsap.timeline({ paused: true });
+  var SW = 4.9;
+
+  gsap.set('.t-logo, .brand, .src', { opacity: 0 });
+  gsap.set('#pA .kicker, #pA .title, #pB .kicker, #pB .title', { opacity: 0, y: 24 });
+  gsap.set('#pB', { opacity: 0 });
+  gsap.set(rev.bars, { scaleY: 0 });
+  gsap.set(rev.vals.concat(rev.labs, rev.notes), { opacity: 0 });
+  gsap.set(cost.dots, { opacity: 0, scale: 0, transformOrigin: 'center', transformBox: 'fill-box' });
+  gsap.set(cost.vals.concat(cost.labs), { opacity: 0 });
+
+  tl.to('.t-logo, .brand', { opacity: 1, duration: .4 }, 0)
+    .to('#pA .kicker', { opacity: 1, y: 0, duration: .35, ease: 'power3.out' }, .05)
+    .to('#pA .title', { opacity: 1, y: 0, duration: .5, ease: 'power3.out' }, .15)
+    .to('#pA .src', { opacity: 1, duration: .4 }, .5)
+    .to(rev.labs, { opacity: 1, duration: .3, stagger: .05 }, .5)
+    .to(rev.bars, { scaleY: 1, duration: .5, ease: 'power3.out', stagger: .3 }, .6)
+    .to(rev.vals, { opacity: 1, duration: .3, stagger: .3 }, .9)
+    .to(rev.notes, { opacity: 1, duration: .4 }, 3.2)
+
+    .to('#pA', { opacity: 0, duration: .35, ease: 'power1.in' }, SW)
+    .to('#pB', { opacity: 1, duration: .01 }, SW + .3)
+    .to('#pB .kicker', { opacity: 1, y: 0, duration: .35, ease: 'power3.out' }, SW + .3)
+    .to('#pB .title', { opacity: 1, y: 0, duration: .5, ease: 'power3.out' }, SW + .4)
+    .to('#pB .src', { opacity: 1, duration: .4 }, SW + .6)
+    .to(cost.labs, { opacity: 1, duration: .3, stagger: .05 }, SW + .6)
+    .to(cost.path, { strokeDashoffset: 0, duration: 2.4, ease: 'none' }, SW + .75);
+  cost.dots.forEach(function (d, i) {
+    var t = SW + .75 + 2.4 * i / (cost.dots.length - 1);
+    tl.to(d, { opacity: 1, scale: 1, duration: .25, ease: 'back.out(2.4)' }, t)
+      .to(cost.vals[i], { opacity: 1, duration: .25 }, t + .05);
+  });
+
+  window.__timelines['seccion-2'] = tl;
+</script>
+</body>
+</html>
