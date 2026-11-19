@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
 <title>ANT · vista en WhatsApp y comunidad</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
@@ -112,9 +113,64 @@ Dato que nadie te cuenta: perdió US$ 104.000 M… <b>en los papeles</b>. Su ope
     </div>
   </div>
 
-  <div class="files">
-    Archivos: <a href="tarjeta2-ant.jpg" download>tarjeta2-ant.jpg</a> · <a href="sticker-ant.webp" download>sticker-ant.webp</a> · <a href="sticker-ant.png" download>sticker-ant.png</a> · <a href="MENSAJE.md">MENSAJE.md</a><br>
-    Reacciones y horario son ilustrativos (es una maqueta).
-  </div>
+  <section class="kit">
+    <h2>Para publicar</h2>
+    <div class="dl">
+      <a class="btn" href="tarjeta2-ant.jpg" download>Bajar la tarjeta</a>
+      <a class="btn" href="sticker-ant.webp" download>Bajar el sticker (.webp)</a>
+      <a class="btn ghost" href="sticker-ant.png" download>Sticker en .png</a>
+    </div>
+    <div class="box">
+      <div class="bh"><span>Canal de WhatsApp · pie de foto de la tarjeta</span><button type="button" data-copy="t1">Copiar</button></div>
+      <pre id="t1">🚀 *Salió a la bolsa la empresa de Claude*
+
+Anthropic empezó a cotizar en el Nasdaq como *ANT* el 19 de noviembre:
+
+• *+34%* en la apertura: de US$ 83 a US$ 111,50
+• *US$ 81.340 M* recaudados: la salida a bolsa más grande de la historia
+• Ventas del 3T26: *US$ 17.000 M* (+1.127% en un año)
+• Ritmo anual de ventas: *US$ 81.000 M* a octubre
+
+Dato que nadie te cuenta: perdió US$ 104.000 M en 2026… *en los papeles*. Casi todo es contable; su operación generó US$ 6.600 M de caja.
+
+¿Cuánto vale de verdad y cuáles son los riesgos? Lo analizamos en el informe completo 👇
+https://manfredinvestment.com/informes/ant
+
+_Análisis, no recomendación de inversión._</pre>
+    </div>
+    <div class="box">
+      <div class="bh"><span>Grupo de la comunidad · versión corta</span><button type="button" data-copy="t2">Copiar</button></div>
+      <pre id="t2">🚀 *Anthropic (Claude) salió a la bolsa*: abrió *+34%* (US$ 83 → US$ 111,50) y recaudó *US$ 81.340 M*, récord histórico. Vende US$ 17.000 M por trimestre (+1.127%).
+Informe completo 👉 https://manfredinvestment.com/informes/ant</pre>
+    </div>
+    <p class="how">Sticker: en WhatsApp Web, ícono de stickers → <b>Crear</b> → subí el .webp. Mandalo justo después de la tarjeta (el sticker no lleva link; el link va en el texto).</p>
+    <p class="how">Reacciones y horario de las maquetas son ilustrativos.</p>
+  </section>
+  <style>
+    .kit { max-width: 820px; margin: 50px auto 0; }
+    .kit h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 28px; text-align: center; }
+    .dl { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 18px 0 22px; }
+    .btn { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 14px; color: #0b1730; text-decoration: none;
+      background: linear-gradient(145deg,#f0dcaa,#c9a24f); padding: 12px 18px; border-radius: 10px; }
+    .btn.ghost { background: transparent; color: #f0dcaa; border: 1.5px solid rgba(230,207,150,.4); }
+    .box { border: 1px solid rgba(230,207,150,.22); border-radius: 14px; background: rgba(11,23,48,.6); margin-top: 16px; overflow: hidden; }
+    .bh { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid rgba(230,207,150,.16);
+      font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .1em; color: #c9a24f; text-transform: uppercase; }
+    .bh button { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 13px; color: #0b1730; background: #e6cf96; border: 0; border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+    .kit pre { white-space: pre-wrap; word-wrap: break-word; font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.55; color: #f0dcaa; padding: 14px 16px; }
+    .how { text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #e6cf96; margin-top: 14px; line-height: 1.7; }
+    .how b { color: #e9a189; }
+  </style>
+  <script>
+    document.querySelectorAll('[data-copy]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var t = document.getElementById(b.getAttribute('data-copy')).innerText;
+        var done = function () { b.textContent = '¡Copiado!'; setTimeout(function () { b.textContent = 'Copiar'; }, 1600); };
+        if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, function () { fallback(t); done(); });
+        else { fallback(t); done(); }
+      });
+    });
+    function fallback(t) { var a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand('copy'); } catch (e) {} a.remove(); }
+  </script>
 </body>
 </html>
