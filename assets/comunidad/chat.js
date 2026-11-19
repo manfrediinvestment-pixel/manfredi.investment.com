@@ -42,6 +42,10 @@
     var k = m && m.tipo === 'texto' && /^\[sticker:([a-z0-9-]{1,40})\]$/.exec((m.texto || '').trim());
     return k ? STICKERS.filter(function (x) { return x.id === k[1]; })[0] || null : null;
   }
+  function informeDe(texto) {
+    var k = /manfredinvestment\.com\/informes\/([a-z0-9.-]+)/i.exec(texto || '');
+    return k ? STICKERS.filter(function (x) { return x.href === '/informes/' + k[1].toLowerCase().replace(/\.html$/, ''); })[0] || null : null;
+  }
   var IC = {
     stk: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 12.5V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h5.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12.5 20v-4.5a3 3 0 0 1 3-3H20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="9" cy="10" r="1.1" fill="currentColor"/><circle cx="14" cy="10" r="1.1" fill="currentColor"/></svg>',
     send: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12l16-8-6 16-2.5-6.5z" fill="currentColor"/></svg>',
@@ -530,6 +534,11 @@
         '<img alt="" ' + (m.datos.url ? 'src="' + m.datos.url + '"' : 'data-img="' + esc(m.datos.img) + '"') + '>' +
         (m.texto ? '' : '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span>') + '</button>';
       if (m.texto) h += '<div class="ch-txt">' + formato(m.texto, false) + '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span></div>';
+      // Si el texto lleva el link de un informe que tiene sticker, el sticker va adentro del mismo mensaje y abre el informe
+      var inf = informeDe(m.texto);
+      if (inf) h += '<a class="ch-inf" href="' + inf.href + '" target="_blank" rel="noopener">' +
+        '<img src="' + inf.src + '" alt="" width="96" height="96">' +
+        '<span><b>' + esc(inf.alt) + '</b><em>Ver el informe completo →</em></span></a>';
       // Pasarla al Canal de WhatsApp: copia la imagen y abre el canal para pegarla; después, el texto.
       // En el celular además está Compartir (imagen + texto juntos, para mandarla a un chat).
       if (esCreador() && !m.pendiente) h += '<div class="ch-res-pie"><span class="ch-res-acc">' +
