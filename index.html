@@ -33,7 +33,7 @@
   <link rel="stylesheet" href="assets/mercados/terminal.css?v=20261026a" />
 <link rel="stylesheet" href="assets/pulso/pulso.css?v=20261010z" />
 <link rel="stylesheet" href="assets/comunidad/wa.css?v=20261112a" />
-<link rel="stylesheet" href="assets/home/lo-ultimo.css?v=20261120c" />
+<link rel="stylesheet" href="assets/home/lo-ultimo.css?v=20261120e" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261112" />
 <link rel="stylesheet" href="assets/analistas/analistas.css?v=20261030" />
 <link rel="stylesheet" href="assets/portfolio/ratios.css?v=20261012" />
@@ -4162,10 +4162,6 @@
     <div class="htx-hero">
       <div class="htx-hero__lead">
         <h1 class="htx-h1">Tu mundo financiero, <em>en un solo lugar.</em></h1><script src="assets/aurora/aurora.js?v=20261010z"></script>
-        <div class="htx-cta">
-          <a class="htx-btn" href="#inversiones" data-tab-target="inversiones">Ver los informes</a>
-          <a class="htx-ghost" href="#portfolio" data-tab-target="portfolio">Probar el Portfolio</a>
-        </div>
         <!-- S&P 500 con 1D / 1M / 1A (assets/pulso/pulso.js) -->
         <div class="htx-spx" id="htxSpx"></div>
         <!-- extras del lado izquierdo según el estilo (assets/home/lo-ultimo.js) -->
@@ -4240,123 +4236,6 @@
       </section>
     </div>
 
-    <!-- mercados ahora -->
-    <div class="htx-markets">
-      <div class="htx-markets__head">
-        <span>Mercados <span class="htx-live">En vivo</span></span>
-        <a href="#mercados" data-tab-target="mercados">Ver todos los mercados</a>
-      </div>
-      <div class="htx-markets__grid">
-        <div class="htx-mk">
-          <div class="htx-mk__top"><span class="htx-mk__tk">MERV</span><span class="htx-mk__nm">Merval &middot; BYMA</span></div>
-          <div class="htx-mk__val htx-num" id="hspot-merv-price">&mdash;</div>
-          <div class="htx-mk__chg"><span id="hspot-merv-chg">&mdash;</span></div>
-          <svg class="htx-mk__spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,28 25,24 50,26 75,18 100,20 125,12 150,14 175,8 200,6" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-        </div>
-        <div class="htx-mk">
-          <div class="htx-mk__top"><span class="htx-mk__tk">NDX</span><span class="htx-mk__nm">Nasdaq &middot; cierre</span></div>
-          <div class="htx-mk__val htx-num" id="htx-ndx-price">&mdash;</div>
-          <div class="htx-mk__chg"><span id="htx-ndx-chg">&mdash;</span></div>
-          <svg class="htx-mk__spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,24 25,21 50,25 75,14 100,17 125,10 150,12 175,7 200,6" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-        </div>
-        <div class="htx-mk">
-          <div class="htx-mk__top"><span class="htx-mk__tk">BTC</span><span class="htx-mk__nm">Bitcoin</span></div>
-          <div class="htx-mk__val htx-num" id="hspot-btc-price">&mdash;</div>
-          <div class="htx-mk__chg"><span id="hspot-btc-chg">&mdash;</span></div>
-          <svg class="htx-mk__spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,30 25,24 50,27 75,19 100,15 125,17 150,10 175,12 200,5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-        </div>
-        <div class="htx-mk">
-          <div class="htx-mk__top"><span class="htx-mk__tk">UST 10Y</span><span class="htx-mk__nm">Treasury &middot; yield</span></div>
-          <div class="htx-mk__val htx-num" id="htx-ust10-price">&mdash;</div>
-          <div class="htx-mk__chg"><span id="htx-ust10-note">Rendimiento a 10 a&ntilde;os</span></div>
-          <svg class="htx-mk__spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,10 25,12 50,9 75,14 100,13 125,18 150,16 175,20 200,19" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-        </div>
-        <div class="htx-mk">
-          <div class="htx-mk__top"><span class="htx-mk__tk">ORO</span><span class="htx-mk__nm">XAU &middot; onza troy</span></div>
-          <div class="htx-mk__val htx-num" id="hspot-oro-price">&mdash;</div>
-          <div class="htx-mk__chg"><span id="hspot-oro-chg">&mdash;</span></div>
-          <svg class="htx-mk__spark" id="hspot-oro-spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,26 25,24 50,20 75,22 100,16 125,14 150,15 175,9 200,7" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- bento -->
-    <div class="htx-bento">
-      <div class="htx-tile htx-tile--informes">
-        <div class="htx-tile__head"><span class="htx-tile__title">Informes institucionales</span></div>
-        <!-- Lista fija: los 7 primeros informes. No sumar m&aacute;s (mantiene la home compacta). -->
-        <div class="htx-inf">
-          <a class="htx-inf__row" href="informes/msft.html" target="_blank" rel="noopener">
-            <img class="htx-inf__logo" src="assets/logos/msft.png" alt="" width="28" height="28">
-            <span class="htx-inf__tk">MSFT</span>
-            <span class="htx-inf__nm">Microsoft Corporation<span class="free">Gratis</span></span>
-            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/amd.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AMD')">
-            <img class="htx-inf__logo" src="assets/logos/amd.png" alt="" width="28" height="28">
-            <span class="htx-inf__tk">AMD</span>
-            <span class="htx-inf__nm">Advanced Micro Devices, Inc.</span>
-            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/pltr.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'PLTR')">
-            <img class="htx-inf__logo" src="assets/logos/pltr.png" alt="" width="28" height="28">
-            <span class="htx-inf__tk">PLTR</span>
-            <span class="htx-inf__nm">Palantir Technologies Inc.</span>
-            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/uber.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'UBER')">
-            <img class="htx-inf__logo" src="assets/logos/uber.png" alt="" width="28" height="28">
-            <span class="htx-inf__tk">UBER</span>
-            <span class="htx-inf__nm">Uber Technologies, Inc.</span>
-            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/intc.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'INTC')">
-            <img class="htx-inf__logo" src="assets/logos/intc.png" alt="" width="28" height="28">
-            <span class="htx-inf__tk">INTC</span>
-            <span class="htx-inf__nm">Intel Corporation</span>
-            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/mu.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MU')">
-            <img class="htx-inf__logo" src="assets/logos/mu.png" alt="" width="28" height="28">
-            <span class="htx-inf__tk">MU</span>
-            <span class="htx-inf__nm">Micron Technology, Inc.</span>
-            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/meli.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MELI')">
-            <img class="htx-inf__logo" src="assets/logos/meli.png" alt="" width="28" height="28">
-            <span class="htx-inf__tk">MELI</span>
-            <span class="htx-inf__nm">MercadoLibre, Inc.</span>
-            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
-          </a>
-          <!-- FIJO: 7 informes destacados en la home. NO agregar filas nuevas ac&aacute;.
-               Los informes nuevos van solo al picks-list de la secci&oacute;n #inversiones. -->
-        </div>
-        <a class="htx-tile__link" href="#inversiones" data-tab-target="inversiones">Ver todos los informes</a>
-      </div>
-
-      <div class="htx-tile htx-tile--pf">
-        <div class="htx-tile__head"><span class="htx-tile__title">Manfredi Portfolio</span></div>
-        <div class="htx-pf__tabs">
-          <button type="button">1S</button><button type="button" class="on">1M</button><button type="button">YTD</button><button type="button">1A</button>
-        </div>
-        <div class="htx-pf__stat">
-          <span class="htx-pf__big" id="htxPfBig">&hellip;</span>
-          <span class="htx-pf__bench" id="htxPfBench">Calculando con datos hist&oacute;ricos&hellip;</span>
-        </div>
-        <svg class="htx-pf__chart" id="htxPfChart" viewBox="0 0 460 132" preserveAspectRatio="none" aria-hidden="true">
-          <polyline points="0,66 115,64 230,62 345,60 460,58" fill="none" stroke="rgba(232,238,246,.18)" stroke-width="1.5" />
-        </svg>
-        <div class="htx-pf__legend">
-          <span><i style="background:#f2c94c;"></i>Manfredi</span>
-          <span><i style="background:rgba(232,238,246,.4);"></i>S&amp;P 500</span>
-        </div>
-        <div class="htx-pf__links">
-          <a class="htx-tile__link" href="#portfolio" data-tab-target="portfolio">Ver el Manfredi Portfolio</a>
-          <a class="htx-tile__link" href="#portfolio" data-tab-target="portfolio">Armar el m&iacute;o</a>
-        </div>
-      </div>
-    </div>
-
   </section>
   <script src="assets/membresia/membresia.js?v=20261103a" defer></script>
   <script src="assets/promo/wall.js?v=20261010z" defer></script>
@@ -4376,7 +4255,7 @@
   <script src="assets/analistas/autor.js?v=20261030" defer></script>
   <script src="assets/comunidad/tarjeta.js?v=20261028m" defer></script>
   <script src="assets/comunidad/wa.js?v=20261112a" defer></script>
-  <script src="assets/home/lo-ultimo.js?v=20261120c" defer></script>
+  <script src="assets/home/lo-ultimo.js?v=20261120d" defer></script>
   <script src="assets/comunidad/chat.js?v=20261119b" defer></script>
   <script src="assets/pro/pro.js?v=20261028j" defer></script>
   <script src="assets/asesoria/asesoria.js?v=20261103a" defer></script>

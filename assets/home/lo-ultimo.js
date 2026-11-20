@@ -1,14 +1,9 @@
 /* Primera vista de la home: "Lo último" (#luFront) + extras del lado izquierdo (#luLeft).
    Estilos en assets/home/lo-ultimo.css.
 
-   TRES ESTILOS EN PRUEBA (se elige uno y se borran los otros dos al mergear):
-     a · Portada   — tapa de diario (FT / Bloomberg): fecha y estado del mercado, franja "Mercado ahora",
-                     a la derecha tres secciones con nombre: Noticias, Informes, Análisis.
-     b · En vivo   — terminal (Koyfin / TradingView): pestañas Noticias · Informes · Análisis que pasan solas
-                     como historias, la palabra del título cambia con ellas, y una tarjeta "Tu portafolio".
-     c · Mosaico   — bento a todo el ancho (Robinhood / Apple Newsroom): tarjetas que entran escalonadas,
-                     foto con zoom lento, mercado, portafolio con aviso que aparece, WhatsApp escribiendo.
-   Cuál se ve: ?estilo=a|b|c, o el puerto local (8817 = a, 8818 = b, 8819 = c). Sin nada: a.
+   Estilo "Portada" (tapa de diario, como FT / Bloomberg): a la izquierda la fecha con el estado del mercado,
+   la frase, la franja "Mercado ahora" y el S&P 500; a la derecha tres secciones con nombre
+   (Noticias, Informes, Análisis) y el canal de WhatsApp en una línea.
 
    Datos (todos reales):
    - Noticias: worker manfredi-noticias (con foto).
@@ -31,12 +26,6 @@
   var MERCADOS = 'https://manfredi-mercados.nachito2502.workers.dev';
   var TZ = 'America/Argentina/Buenos_Aires';
   var REDUCIR = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  var V = (function () {
-    var q = (new URLSearchParams(location.search).get('estilo') || '').toLowerCase();
-    if (/^[abc]$/.test(q)) return q;
-    return { '8818': 'b', '8819': 'c' }[location.port] || 'a';
-  })();
 
   var IC_WA = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2Zm4.52 11.99c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.16.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28Z"/></svg>';
   var FLECHA = '<svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg>';
@@ -216,43 +205,12 @@
     }).join('') + '</div>';
   }
 
-  // Tarjeta "Tu portafolio" (ejemplo): 50% S&P 500, 30% Nasdaq 100, 20% Bitcoin con la variación real de hoy.
-  function portafolio(clase) {
-    var m = st.mkt || {};
-    var pos = [
-      { t: 'SPY', n: 'S&P 500', w: .5, c: (m.sp500 || {}).change },
-      { t: 'QQQ', n: 'Nasdaq 100', w: .3, c: (m.nasdaq || {}).change },
-      { t: 'BTC', n: 'Bitcoin', w: .2, c: (m.btc || {}).change }
-    ];
-    var base = 10000, hay = pos.every(function (p) { return p.c != null; });
-    var dia = hay ? pos.reduce(function (s, p) { return s + p.w * p.c; }, 0) : 0;
-    var total = base * (1 + dia / 100);
-    // curva del mes: camino fijo que termina en el valor de hoy
-    var pts = [0, .6, .2, 1.1, .9, 1.6, 1.2, 2.1, 1.8, 2.6, 2.2, 3.1, 2.7, 3.4, 3.0, 3.9, 3.5, 4.2, 3.8, 4.6];
-    pts[pts.length - 1] = pts[pts.length - 2] + dia;
-    var mn = Math.min.apply(null, pts), mx = Math.max.apply(null, pts), W = 300, H = 70;
-    var path = pts.map(function (v, i) { return (i ? 'L' : 'M') + (i * W / (pts.length - 1)).toFixed(1) + ',' + (H - 6 - (v - mn) / (mx - mn || 1) * (H - 12)).toFixed(1); }).join('');
-    return '<div class="lu-pf ' + (clase || '') + '">' +
-      '<div class="lu-pf__hd"><span class="lu-k"><b>Tu portafolio</b></span><span class="lu-pf__ej">Ejemplo</span></div>' +
-      '<div class="lu-pf__v"><b>' + (hay ? cifra(total, 2, 'US$ ', '') : 'US$ 10.000,00') + '</b>' +
-        (hay ? '<em class="' + cls(dia) + '">' + pct(dia) + ' hoy</em>' : '') + '</div>' +
-      '<svg class="lu-pf__sp" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="luPfG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#e9d3a0" stop-opacity=".28"/><stop offset="1" stop-color="#e9d3a0" stop-opacity="0"/></linearGradient></defs>' +
-        '<path class="lu-pf__a" d="' + path + 'L' + W + ',' + H + 'L0,' + H + 'Z" fill="url(#luPfG)"/><path class="lu-pf__l" d="' + path + '" pathLength="1"/></svg>' +
-      '<ul class="lu-pf__ps">' + pos.map(function (p, i) {
-        return '<li class="lu-rv" style="--d:' + (300 + i * 90) + 'ms"><b>' + p.t + '</b><span>' + p.n + '</span><i>' + Math.round(p.w * 100) + '%</i><em class="' + cls(p.c || 0) + '">' + (p.c != null ? pct(p.c) : '—') + '</em></li>';
-      }).join('') + '</ul>' +
-      '<a class="lu-pf__cta" href="#portfolio" data-tab-target="portfolio">Cargá tu cartera y seguila en vivo' + FLECHA + '</a>' +
-      (hay ? '<div class="lu-toast" role="status"><i class="' + cls(dia) + '"></i><span>Tu cartera ' + (dia >= 0 ? 'sube' : 'baja') + ' <b class="' + cls(dia) + '">' + pct(dia) + '</b> hoy</span></div>' : '') +
-    '</div>';
-  }
-
   /* ================================ ESTILO A ================================ */
   // Portada: tres secciones con nombre. Noticias (foto grande + 2) | Informes (2) y Análisis (2).
   function izqA(left) {
     var e = estadoMercado();
     left.innerHTML =
       '<p class="lu-date lu-rv"><span class="lu-dot' + (e.abierto ? ' on' : '') + '"></span>' + esc(fechaLarga()) + '<i>·</i>' + esc(e.txt) + '</p>' +
-      '<p class="lu-deck lu-rv" style="--d:120ms">Noticias, informes de empresas y análisis de inversores, actualizados todo el día.</p>' +
       mercado('lu-mkt');
   }
   function derA() {
@@ -274,116 +232,6 @@
       '</div>' + waLinea();
   }
 
-  /* ================================ ESTILO B ================================ */
-  // En vivo: pestañas que pasan solas (como historias) y la palabra del título cambia con ellas.
-  var TABS = [
-    { k: 'noticias', n: 'Noticias', w: 'las noticias del día.' },
-    { k: 'informes', n: 'Informes', w: 'informes de empresas.' },
-    { k: 'analisis', n: 'Análisis', w: 'análisis de inversores.' }
-  ];
-  var tabB = 0, timerB = null, pausaB = false, DUR_B = 8000;
-  function izqB(left) {
-    left.innerHTML =
-      '<p class="lu-rot lu-rv" aria-live="polite">Hoy en Manfredi: <span class="lu-rot__w"><b>' + TABS[0].w + '</b></span></p>' +
-      portafolio('lu-pf--b lu-rv');
-  }
-  function contenidoB(k) {
-    var o = noticiasOrden();
-    if (k === 'noticias') {
-      var p = o.principal;
-      if (!p) return '<div class="lu-b__lead">' + sk(260) + '</div>';
-      return '<a class="lu-b__lead" ' + linkNoticia(p) + '><div class="lu-ph lu-ph--rv lu-ph--kb">' + (p.imagen ? '<img src="' + esc(p.imagen) + '" alt="">' : '') + '</div>' +
-          '<div class="lu-b__txt">' + kNoticia(p) + '<h4 class="lu-lead__t">' + esc(p.titulo) + '</h4>' + (p.resumen ? '<p>' + esc(p.resumen) + '</p>' : '') + '</div></a>' +
-        '<div class="lu-b__list">' + o.resto.slice(0, 3).map(function (n, i) { return '<div class="lu-rv" style="--d:' + (160 + i * 80) + 'ms">' + itNoticia(n) + '</div>'; }).join('') + '</div>';
-    }
-    if (k === 'informes') {
-      var i0 = INFORMES_RECIENTES[0];
-      return '<a class="lu-b__lead lu-b__lead--inf" ' + linkInforme(i0) + '><div class="lu-b__tile">' + logo(i0, 'lu-b__logo') + '<span>' + esc(i0.t) + '</span></div>' +
-          '<div class="lu-b__txt"><span class="lu-k"><b>' + esc(i0.nombre) + '</b><i>' + esc(hace(i0.fecha)) + '</i></span><h4 class="lu-lead__t">' + esc(i0.titulo) + '</h4><span class="lu-sello">' + esc(i0.nota) + '</span></div></a>' +
-        '<div class="lu-b__list">' + INFORMES_RECIENTES.slice(1, 4).map(function (i, j) { return '<div class="lu-rv" style="--d:' + (160 + j * 80) + 'ms">' + itInforme(i) + '</div>'; }).join('') + '</div>';
-    }
-    var an = st.analisis || [];
-    if (!an.length) return '<div class="lu-b__lead">' + sk(260) + '</div>';
-    var a0 = an[0];
-    return '<a class="lu-b__lead lu-b__lead--an" href="#analista-' + esc(a0.autor) + '" data-lu-pdf="' + esc(a0.id) + '">' +
-        (a0.tapa ? '<div class="lu-b__tapa"><img src="' + esc(a0.tapa) + '" alt=""></div>' : '') +
-        '<div class="lu-b__txt"><span class="lu-k"><b>Análisis</b><i>' + esc(hace(a0.fecha)) + '</i></span><h4 class="lu-lead__t">' + esc(a0.titulo) + '</h4>' +
-        (a0.resumen ? '<p>' + esc(a0.resumen) + '</p>' : '') + autor(a0) + '</div></a>' +
-      '<div class="lu-b__list">' + an.slice(1, 4).map(function (p, i) { return '<div class="lu-rv" style="--d:' + (160 + i * 80) + 'ms">' + itAnalisis(p) + '</div>'; }).join('') + '</div>';
-  }
-  function derB() {
-    return '<div class="lu-b">' +
-      '<div class="lu-b__tabs" role="tablist">' + TABS.map(function (t, i) {
-        return '<button type="button" role="tab" data-lu-tab="' + i + '" aria-selected="' + (i === tabB) + '"><span>' + t.n + '</span><i class="lu-b__bar"><i></i></i></button>';
-      }).join('') + '<span class="lu-live">En vivo</span></div>' +
-      '<div class="lu-b__body" data-k="' + TABS[tabB].k + '">' + contenidoB(TABS[tabB].k) + '</div>' +
-    '</div>' + waLinea();
-  }
-  function irB(box, i, auto) {
-    tabB = (i + TABS.length) % TABS.length;
-    var body = box.querySelector('.lu-b__body');
-    box.querySelectorAll('[data-lu-tab]').forEach(function (b, j) {
-      b.setAttribute('aria-selected', j === tabB);
-      var bar = b.querySelector('.lu-b__bar i');
-      bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = '';
-    });
-    if (body) {
-      body.classList.remove('is-in');
-      body.dataset.k = TABS[tabB].k;
-      body.innerHTML = contenidoB(TABS[tabB].k);
-      requestAnimationFrame(function () { body.classList.add('is-in'); });
-      fotos(body);
-    }
-    var w = document.querySelector('.lu-rot__w');
-    if (w) {
-      var nueva = document.createElement('b'); nueva.textContent = TABS[tabB].w;
-      var vieja = w.querySelector('b'); if (vieja) vieja.classList.add('out');
-      w.appendChild(nueva);
-      setTimeout(function () { if (vieja) vieja.remove(); }, 450);
-    }
-    programarB(box);
-  }
-  function programarB(box) {
-    clearTimeout(timerB);
-    if (REDUCIR) return;
-    timerB = setTimeout(function () { if (!pausaB) irB(box, tabB + 1, true); else programarB(box); }, DUR_B);
-  }
-
-  /* ================================ ESTILO C ================================ */
-  // Mosaico a todo el ancho, debajo de la frase.
-  function izqC(left) {
-    var e = estadoMercado();
-    left.innerHTML = '<p class="lu-date lu-rv"><span class="lu-dot' + (e.abierto ? ' on' : '') + '"></span>' + esc(fechaLarga()) + '<i>·</i>' + esc(e.txt) + '</p>';
-  }
-  function derC() {
-    var o = noticiasOrden(), p = o.principal, i0 = INFORMES_RECIENTES[0], an = st.analisis || [], a0 = an[0];
-    var m = st.wa, r = (m && m.datos) || {};
-    var card = function (cl, d, html) { return '<div class="lu-c__card ' + cl + ' lu-rv" style="--d:' + d + 'ms">' + html + '</div>'; };
-    var lab = function (n, href) { return '<span class="lu-c__lab">' + n + '</span>' + (href ? '<a class="lu-c__go" href="' + href + '" aria-label="Ver ' + n + '">' + FLECHA + '</a>' : ''); };
-    return '<div class="lu-c">' +
-      card('lu-c--news', 0, p
-        ? '<a class="lu-c__fill" ' + linkNoticia(p) + '><div class="lu-c__img lu-ph--kb">' + (p.imagen ? '<img src="' + esc(p.imagen) + '" alt="">' : '') + '</div>' + lab('Noticias') +
-          '<div class="lu-c__ov">' + kNoticia(p) + '<h4 class="lu-lead__t">' + esc(p.titulo) + '</h4>' + (p.resumen ? '<p>' + esc(p.resumen) + '</p>' : '') + '</div></a>'
-        : sk(400)) +
-      card('lu-c--inf', 90, '<a class="lu-c__fill lu-c__pad" ' + linkInforme(i0) + '>' + lab('Informes') +
-          '<div class="lu-c__logo">' + logo(i0, 'lu-c__lg') + '<span><b>' + esc(i0.t) + '</b>' + esc(i0.nombre) + '</span></div>' +
-          '<h4>' + esc(i0.titulo) + '</h4><div class="lu-c__also">' + INFORMES_RECIENTES.slice(1, 4).map(function (i) { return logo(i, 'lu-c__mini'); }).join('') + '<span>y más actualizados esta semana</span></div></a>') +
-      card('lu-c--an', 160, a0
-        ? '<a class="lu-c__fill lu-c__pad" href="#analista-' + esc(a0.autor) + '" data-lu-pdf="' + esc(a0.id) + '">' + lab('Análisis') +
-          (a0.tapa ? '<div class="lu-c__tapa"><img src="' + esc(a0.tapa) + '" alt=""></div>' : '') + '<h4>' + esc(a0.titulo) + '</h4>' + autor(a0) + '</a>'
-        : '<div class="lu-c__pad">' + lab('Análisis') + sk(120) + '</div>') +
-      card('lu-c--mkt', 230, '<div class="lu-c__pad">' + lab('Mercado ahora', '#mercados') + mercado('lu-mkt lu-mkt--c') + '</div>') +
-      card('lu-c--pf', 300, portafolio('lu-pf--c')) +
-      card('lu-c--list', 370, '<div class="lu-c__pad">' + lab('Más noticias', '#reportes') + o.resto.slice(0, 3).map(itNoticia).join('') + '</div>') +
-      card('lu-c--wa', 440, '<div class="lu-c__pad">' + lab('Canal de WhatsApp') +
-        '<div class="lu-c__chat"><span class="lu-c__typing"><i></i><i></i><i></i></span>' +
-        '<div class="lu-c__bub"><b>' + (r.momento === 'apertura' ? 'Antes de la apertura' : 'Cierre del mercado') + '</b><p>' + esc(r.clave || String(r.intro || 'Un resumen antes de la apertura y otro al cierre, todos los días hábiles.').split('. ')[0]) + '</p>' +
-        (m ? '<time>' + new Date(m.creado).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: TZ }) + '</time>' : '') + '</div></div>' +
-        '<a class="lu-wa__btn" href="' + esc(window.MI_WA_COMUNIDAD || 'https://whatsapp.com/channel/0029Vb8rDVHB4hdUO5L2Lx17') + '" target="_blank" rel="noopener">' + IC_WA + 'Seguir el canal</a></div>') +
-      card('lu-c--spx', 510, '<div class="lu-c__pad lu-c__spxslot">' + lab('S&P 500') + '</div>') +
-    '</div>';
-  }
-
   /* ------------------------------- montaje ------------------------------- */
   function fotos(root) { root.querySelectorAll('img').forEach(function (img) { img.addEventListener('error', function () { img.remove(); }, { once: true }); }); }
   function entrar(root) {
@@ -394,26 +242,19 @@
   function pintar() {
     var box = document.getElementById('luFront'), left = document.getElementById('luLeft');
     if (!box) return;
-    var der = V === 'b' ? derB() : V === 'c' ? derC() : derA();
     var yaEntro = box.classList.contains('is-in');
-    // en C el gráfico del S&P pasa a su tarjeta: se saca antes de repintar y se vuelve a poner
-    var spx = document.getElementById('htxSpx');
-    if (V === 'c' && spx && box.contains(spx)) document.querySelector('.htx-hero__lead').appendChild(spx);
-    box.innerHTML = der;
-    if (V === 'c' && spx) { var slot = box.querySelector('.lu-c__spxslot'); if (slot) slot.appendChild(spx); }
-    if (V === 'b') { var body = box.querySelector('.lu-b__body'); if (body) body.classList.add('is-in'); }
+    box.innerHTML = derA();
     fotos(box);
-    if (left && !left.dataset.ok) { (V === 'b' ? izqB : V === 'c' ? izqC : izqA)(left); left.dataset.ok = '1'; entrar(left); }
-    else if (left && (V === 'a')) { var mk = left.querySelector('.lu-mkt'); if (mk && st.mkt && !mk.dataset.ok) { mk.outerHTML = mercado('lu-mkt'); left.querySelector('.lu-mkt').dataset.ok = '1'; contar(left); } }
-    else if (left && V === 'b' && st.mkt && !left.dataset.pf) { left.dataset.pf = '1'; var pf = left.querySelector('.lu-pf'); if (pf) { pf.outerHTML = portafolio('lu-pf--b lu-rv'); contar(left); } }
+    if (left && !left.dataset.ok) { izqA(left); left.dataset.ok = '1'; entrar(left); }
+    else if (left && st.mkt) { var mk = left.querySelector('.lu-mkt'); if (mk && !mk.dataset.ok) { mk.outerHTML = mercado('lu-mkt'); left.querySelector('.lu-mkt').dataset.ok = '1'; contar(left); } }
     if (yaEntro) { box.classList.add('is-in'); contar(box); }
     else if (st.noticias !== null || pintar.tarde) entrar(box); // entra cuando ya está la noticia principal
   }
 
-  // Lo de abajo de la home también entra al hacer scroll (membresía, mercados, informes).
+  // La membresía (lo de abajo de la home) también entra al hacer scroll.
   function revelarAbajo() {
     if (REDUCIR || !('IntersectionObserver' in window)) return;
-    var sel = '.htx-member .mbr__head, .htx-member .mbr__film, .htx-member .mbr__pay, .htx-markets__head, .htx-mk, .htx-tile, .htx-inf__row';
+    var sel = '.htx-member .mbr__head, .htx-member .mbr__film, .htx-member .mbr__pay';
     var els = Array.prototype.slice.call(document.querySelectorAll(sel));
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('lu-up--in'); io.unobserve(e.target); } });
@@ -430,11 +271,9 @@
     var box = document.getElementById('luFront');
     if (!box) return;
     var hero = document.querySelector('.htx-hero');
-    if (hero) hero.setAttribute('data-lu', V);
+    if (hero) hero.setAttribute('data-lu', 'a');
     pintar();
     box.addEventListener('click', function (e) {
-      var t = e.target.closest('[data-lu-tab]');
-      if (t) { irB(box, +t.dataset.luTab); return; }
       var a = e.target.closest('[data-lu-pdf]');
       if (!a || typeof window.openPdf !== 'function') return;
       var p = (st.analisis || []).filter(function (x) { return x.id === a.dataset.luPdf; })[0];
@@ -442,11 +281,6 @@
       e.preventDefault();
       window.openPdf(p.pdf, p.titulo, { tapa: p.tapa, etiqueta: (st.autores[p.autor] || {}).nombre || '' });
     });
-    if (V === 'b') {
-      box.addEventListener('mouseenter', function () { pausaB = true; box.classList.add('lu-pausa'); });
-      box.addEventListener('mouseleave', function () { pausaB = false; box.classList.remove('lu-pausa'); });
-      programarB(box);
-    }
     var listo = function (k) { return function (v) { st[k] = v; pintar(); }; };
     setTimeout(function () { pintar.tarde = true; if (!box.classList.contains('is-in')) entrar(box); }, 2500);
     cargarNoticias().then(listo('noticias')).catch(function () { st.noticias = []; pintar(); });
