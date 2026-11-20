@@ -211,15 +211,17 @@
     var box = $('htxSpx');
     if (!box) return;
     box.innerHTML =
-      '<div class="htx-spx__top"><div><div class="htx-spx__k">S&amp;P 500 <span class="pls-live" id="htxSpxLive"></span></div>' +
-      '<div class="htx-spx__px"><span class="htx-spx__v" id="htxSpxV">—</span><span class="htx-spx__c" id="htxSpxC"></span><span class="htx-spx__p" id="htxSpxP"></span></div></div>' +
-      '<div class="pls-seg" id="htxSpxTf" role="group" aria-label="Período">' + ['1D', '1M', '1A'].map(function (t) { return '<button type="button" data-tf="' + t + '" class="' + (t === spx.tf ? 'on' : '') + '">' + t + '</button>'; }).join('') + '</div></div>' +
-      '<div class="htx-spx__chart"><div id="htxSpxChart" style="position:absolute;inset:0"></div><div class="htx-spx__msg" id="htxSpxMsg" hidden></div></div>';
+      '<div class="htx-spx__bar"><div class="htx-spx__k">S&amp;P 500 <span class="pls-live" id="htxSpxLive"></span></div>' +
+      '<div class="htx-spx__tf" id="htxSpxTf" role="tablist" aria-label="Período">' + ['1D', '1M', '1A'].map(function (t) { return '<button type="button" role="tab" data-tf="' + t + '" aria-selected="' + (t === spx.tf) + '" class="' + (t === spx.tf ? 'on' : '') + '">' + t + '</button>'; }).join('') + '</div></div>' +
+      '<div class="htx-spx__px"><span class="htx-spx__v" id="htxSpxV">—</span><span class="htx-spx__c" id="htxSpxC"></span><span class="htx-spx__p" id="htxSpxP"></span></div>' +
+      '<div class="htx-spx__chart" id="htxSpxWrap"><div id="htxSpxChart" style="position:absolute;inset:0"></div><div class="htx-spx__msg" id="htxSpxMsg" hidden></div></div>' +
+      '<div class="htx-spx__ft" id="htxSpxFt"></div>';
     $('htxSpxTf').addEventListener('click', function (e) {
       var b = e.target.closest('[data-tf]');
       if (!b || b.dataset.tf === spx.tf) return;
       spx.tf = b.dataset.tf;
-      [].forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); });
+      [].forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); x.setAttribute('aria-selected', x === b); });
+      spx.anim = true;
       serieSpx();
     });
     (function esperar(t0) {
@@ -231,49 +233,76 @@
     var LC = window.LightweightCharts, el = $('htxSpxChart');
     spx.ch = LC.createChart(el, {
       autoSize: true,
-      layout: { background: { type: 'solid', color: 'transparent' }, textColor: 'rgba(238,242,248,.62)', fontFamily: "'IBM Plex Sans', system-ui, sans-serif", fontSize: 11.5, attributionLogo: false },
-      grid: { vertLines: { visible: false }, horzLines: { visible: false } },
-      rightPriceScale: { borderVisible: false, scaleMargins: { top: .12, bottom: .04 } },
-      timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false, fixLeftEdge: true, fixRightEdge: true },
-      crosshair: { mode: LC.CrosshairMode.Magnet, vertLine: { color: 'rgba(242,201,76,.45)', labelBackgroundColor: '#1d3357', style: 3 }, horzLine: { color: 'rgba(242,201,76,.3)', labelBackgroundColor: '#1d3357', style: 3 } },
+      layout: { background: { type: 'solid', color: 'transparent' }, textColor: 'rgba(238,242,248,.86)', fontFamily: "'IBM Plex Mono', ui-monospace, monospace", fontSize: 10.5, attributionLogo: false },
+      grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(214,226,244,.055)', style: 2 } },
+      rightPriceScale: { borderVisible: false, ticksVisible: false, scaleMargins: { top: .14, bottom: .14 } },
+      timeScale: { borderVisible: false, ticksVisible: false, timeVisible: true, secondsVisible: false, fixLeftEdge: true, fixRightEdge: true },
+      crosshair: { mode: LC.CrosshairMode.Magnet, vertLine: { color: 'rgba(233,211,160,.5)', width: 1, labelBackgroundColor: '#1a2c4b', style: 2 }, horzLine: { color: 'rgba(233,211,160,.32)', width: 1, labelBackgroundColor: '#1a2c4b', style: 2 } },
       localization: { locale: 'es-AR', priceFormatter: function (p) { return n(p, 0); },
         timeFormatter: function (t) { return new Date(t * 1000).toLocaleString('es-AR', spx.tf === '1D' ? { timeZone: TZ, hour: '2-digit', minute: '2-digit' } : { timeZone: TZ, day: '2-digit', month: 'short', year: '2-digit' }); } },
       handleScale: false, handleScroll: false
     });
     // el color lo define la variación del período (colorSpx): verde si sube, rojo si baja
-    spx.serie = spx.ch.addSeries(LC.AreaSeries, { lineWidth: 2.5, priceLineVisible: false, lastValueVisible: true, crosshairMarkerBorderColor: '#0b1528', crosshairMarkerRadius: 5,
+    spx.serie = spx.ch.addSeries(LC.AreaSeries, { lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerBorderColor: '#0b1528', crosshairMarkerBorderWidth: 2, crosshairMarkerRadius: 4.5,
       lastPriceAnimation: LC.LastPriceAnimationMode ? LC.LastPriceAnimationMode.Continuous : 0 });
     colorSpx(1);
     serieSpx();
   }
   function colorSpx(v) {
     var up = v >= 0, c = up ? '86,199,147' : '240,123,112', hex = up ? '#56c793' : '#f07b70';
-    spx.serie.applyOptions({ lineColor: hex, topColor: 'rgba(' + c + ',.26)', bottomColor: 'rgba(' + c + ',0)', crosshairMarkerBackgroundColor: hex });
+    spx.serie.applyOptions({ lineColor: hex, topColor: 'rgba(' + c + ',.18)', bottomColor: 'rgba(' + c + ',0)', crosshairMarkerBackgroundColor: hex });
+  }
+  // línea punteada de referencia: el cierre anterior (1D) o el primer valor del período (1M / 1A)
+  function baseSpx(precio) {
+    if (spx.base) { spx.serie.removePriceLine(spx.base); spx.base = null; }
+    if (precio == null || isNaN(precio)) return;
+    spx.base = spx.serie.createPriceLine({ price: precio, color: 'rgba(233,211,160,.42)', lineWidth: 1, lineStyle: 1, axisLabelVisible: false, title: '' });
+  }
+  function entrarSpx() {
+    var w = $('htxSpxWrap');
+    if (!w) return;
+    w.classList.remove('is-draw'); void w.offsetWidth; w.classList.add('is-draw');
   }
   function serieSpx() {
     if (!spx.serie) return;
     var tf = spx.tf, id = ++spx.req, msg = $('htxSpxMsg');
-    var poner = function (pts) {
+    var poner = function (orig) {
       if (id !== spx.req) return;
       msg.hidden = true;
-      spx.serie.setData(pts.map(function (p) { return { time: p.t, value: p.c }; }));
+      var hoy = DATA && DATA.mundo.cotizaciones.filter(function (x) { return x.id === 'sp500'; })[0];
+      var pts = orig.map(function (p) { return { time: p.t, value: p.c }; });
+      // el último punto del gráfico coincide con el precio en vivo del encabezado
+      if (hoy && hoy.price != null && Date.now() / 1000 - pts[pts.length - 1].time < 36 * 3600) pts[pts.length - 1].value = hoy.price;
+      spx.serie.setData(pts);
       spx.ch.timeScale().fitContent();
-      var a = pts[0].c, z = pts[pts.length - 1].c, v = (z - a) / a * 100;
+      var a = pts[0].value, z = pts[pts.length - 1].value, v = (z - a) / a * 100;
       // en 1D manda la variación del día contra el cierre de ayer (la del "hoy"),
       // no la del primer minuto de la rueda contra el último
-      var hoy = DATA && DATA.mundo.cotizaciones.filter(function (x) { return x.id === 'sp500'; })[0];
-      colorSpx(tf === '1D' && hoy && hoy.change != null ? hoy.change : v);
+      var en1D = tf === '1D' && hoy && hoy.change != null && hoy.price != null;
+      colorSpx(en1D ? hoy.change : v);
+      var ref = en1D ? hoy.price / (1 + hoy.change / 100) : a;
+      baseSpx(ref);
       // si /pulso todavía no llegó (o falló), el número sale del último punto del gráfico
       if (!DATA && $('htxSpxV').textContent === '—') $('htxSpxV').textContent = n(z, 2);
       var p = $('htxSpxP');
       p.innerHTML = tf === '1D' ? '' : '<b class="' + (v > 0 ? 'up' : v < 0 ? 'dn' : '') + '">' + (v > 0 ? '+' : v < 0 ? '−' : '') + n(Math.abs(v), 2) + '%</b> ' + TF_TXT[tf];
+      var vals = pts.map(function (q) { return q.value; });
+      $('htxSpxFt').innerHTML =
+        '<span><i>' + (en1D ? 'Cierre anterior' : 'Inicio') + '</i>' + n(ref, 0) + '</span>' +
+        '<span><i>Máximo</i>' + n(Math.max.apply(null, vals), 0) + '</span>' +
+        '<span><i>Mínimo</i>' + n(Math.min.apply(null, vals), 0) + '</span>';
+      if (!spx.dibujado) { spx.dibujado = true; entrarSpx(); }
     };
-    if (spx.cache[tf]) return poner(spx.cache[tf]);
+    // la animación de entrada solo al aparecer y al cambiar de período (no en el refresco de cada minuto)
+    var animar = spx.anim; spx.anim = false;
+    if (spx.cache[tf]) { if (animar) entrarSpx(); return poner(spx.cache[tf]); }
     fetch(API + '/serie?category=indices&symbol=SP500&tf=' + tf, { signal: AbortSignal.timeout(12000) })
       .then(function (r) { return r.json(); })
       .then(function (d) {
         if (!d.points || d.points.length < 2) throw new Error(d.error || 'sin datos');
-        spx.cache[tf] = d.points; poner(d.points);
+        spx.cache[tf] = d.points;
+        if (animar && id === spx.req) entrarSpx();
+        poner(d.points);
       })
       .catch(function () { if (id === spx.req) { msg.hidden = false; msg.textContent = 'No pudimos cargar el gráfico.'; } });
   }
@@ -289,7 +318,9 @@
     c.textContent = cambio(q) + ' hoy';
     c.className = 'htx-spx__c ' + cls(q);
     $('htxSpxLive').textContent = fechaLarga(DATA.updated).split(' · ')[1];
-    if (spx.tf === '1D') { delete spx.cache['1D']; serieSpx(); }
+    // repinta con el precio en vivo (1D además vuelve a pedir la rueda del día)
+    if (spx.tf === '1D') delete spx.cache['1D'];
+    serieSpx();
   }
 
   function iniciar() {

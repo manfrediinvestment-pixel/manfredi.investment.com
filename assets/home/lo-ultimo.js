@@ -217,7 +217,7 @@
     var o = noticiasOrden(), p = o.principal;
     var lead = p ? '<a class="lu-lead lu-rv" ' + linkNoticia(p) + '>' +
         '<div class="lu-ph lu-ph--rv">' + (p.imagen ? '<img src="' + esc(p.imagen) + '" alt="">' : '') + '</div>' +
-        kNoticia(p) + '<h4 class="lu-lead__t">' + esc(p.titulo) + '</h4>' + (p.resumen ? '<p>' + esc(p.resumen) + '</p>' : '') + '</a>'
+        kNoticia(p) + '<h4 class="lu-lead__t">' + esc(p.titulo) + '</h4></a>'
       : '<div class="lu-lead"><div class="lu-ph lu-sk"></div>' + sk(12, '40%') + sk(52) + '</div>';
     var an = st.analisis;
     return '<div class="lu-hd lu-rv"><h2>Lo último</h2><span class="lu-live">En vivo</span></div>' +
