@@ -30,3 +30,7 @@ P/E de FOXA "aproximado" → calculado.
 - Reversión: agregar el cierre del 1T FY27 y sacar el más viejo (4 cierres), EPS ajustado de 12 meses; el 4T FY27 compara
   contra la semana 53.
 - Consenso: stockanalysis.com (S&P Global), páginas `/forecast/` y `/statistics/` (JSON embebido). Nasdaq/Zacks bloquea.
+
+## Ajustes de revisión (21-nov-2026, a mano sobre el HTML, después de actualizar_html.py)
+Orden de la síntesis 1-2-3, "~" fuera de cifras exactas, sin dobles signos, 46% en el pie del gráfico de segmentos, matiz del 1T de Fox, drawLines con pointLabels (valores con halo blanco) en el gráfico de margen, football field angosto.
+
