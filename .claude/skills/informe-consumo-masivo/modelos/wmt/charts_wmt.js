@@ -62,8 +62,8 @@
     });
 
     drawHBars(document.getElementById('compsChart'), {
-      labels:['Costco','Walmart','Amazon (referencia)',"BJ's Wholesale",'Target','Dollar Tree','Dollar General','Kroger'],
-      values:[{{peers.COST.pe|js2}},{{pe_ntm_now|js2}},{{amzn.pe|js2}},{{peers.BJ.pe|js2}},{{peers.TGT.pe|js2}},{{peers.DLTR.pe|js2}},{{peers.DG.pe|js2}},{{peers.KR.pe|js2}}],
+      labels:['Costco','Walmart','Amazon (referencia)',"BJ's Wholesale",'Dollar Tree','Target','Dollar General','Kroger'],
+      values:[{{peers.COST.pe|js2}},{{pe_ntm_now|js2}},{{amzn.pe|js2}},{{peers.BJ.pe|js2}},{{peers.DLTR.pe|js2}},{{peers.TGT.pe|js2}},{{peers.DG.pe|js2}},{{peers.KR.pe|js2}}],
       colors:[PALETTE.blueLight,PALETTE.navy,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight],
       padL:170,
       valueFmt:function(v){ return v.toFixed(1)+'x'; }
