@@ -4,6 +4,10 @@ Todo número derivado de `informes/wmt.html` sale de `model.py`. El HTML se arma
 `{{clave|formato}}` (mismo sistema que PG y UNH); `verify.py` compara el HTML contra el modelo y tiene que dar
 **0 diferencias** antes de publicar.
 
+## Ediciones
+- 30-sep-2026: inicial (2T FY2027), blend $82.75 vs $106.80.
+- 21-nov-2026: 3T FY2027, blend $88.19 vs $127.95 (antes → ahora en la Sección 13 y en `sep` / `chg_*` del modelo). Sam's Club revisó tráfico/ticket 3T FY26-2T FY27.
+
 ## Archivos
 | Archivo | Qué hace |
 |---|---|
@@ -21,9 +25,14 @@ Todo número derivado de `informes/wmt.html` sale de `model.py`. El HTML se arma
 | `data/extract_kpis.py` | Imprime comparables, tráfico, ticket y aporte del e-commerce de cada comunicado |
 
 ## Actualizar el próximo trimestre
-1. `python fetch_data.py` → copiar a `model.py`: `PRICE`, `RF`, consenso (`C27/C28/C29`, `Q_CONS`: los cuatro trimestres
-   siguientes), pares en `PEERS` (precio, consenso trimestral, comparables del último trimestre, EV/EBITDA y beta de
-   stockanalysis), Walmex (`WALMEX_PX`, `MXN`), consenso de precio objetivo (`CONS`).
+1. `python fetch_data.py` (solo la parte de Yahoo: la API de Nasdaq/Zacks devuelve 403 a pedidos automáticos desde nov-2026)
+   → copiar a `model.py`: `PRICE`, `RF`, Walmex (`WALMEX_PX`, `MXN`). Consenso de EPS y de precio objetivo: stockanalysis.com
+   (S&P Global), páginas `/stocks/<t>/forecast/` y `/statistics/` (JSON embebido: `estimates`, `targets`/`numPriceTargets`).
+   Publica gratis dos trimestres y dos años fiscales: `Q_CONS` = los dos trimestres siguientes, `C27/C28` = años fiscales;
+   el NTM de WMT y de los pares = dos trimestres + la mitad del año fiscal siguiente (`ntm_rule`; COST con 4 trimestres por
+   reportar usa el año en curso). Revisar que el consenso anual esté actualizado tras el reporte (BJ en nov-2026 no lo estaba).
+   Pares en `PEERS` (precio, consenso, comparables del último trimestre, EV/EBITDA y beta de stockanalysis).
+   Datos compartidos con DIS (precios, Treasury, S&P, consenso de precio objetivo, consumidor): `data/comun_2026-11-20.json`.
 2. Del comunicado nuevo (`python data/fetch_sec.py` y `python data/extract_kpis.py`): agregar el trimestre a `QL`, `US`, `SAMS`,
    `ECOM_Q`; el EPS ajustado a `EPS_RAW`; `Q2` (o el trimestre que corresponda), balance (`DEBT_FIN`, `FIN_LEASE`, `OP_LEASE`,
    `CASH`), acciones (`SH_DIL`, `SH_OUT`), guía (`GUIDE_LO/HI`).

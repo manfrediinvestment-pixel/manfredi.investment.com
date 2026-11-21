@@ -1,68 +1,86 @@
 # Modelo de valuación WMT (Walmart Inc.) — todos los números derivados del informe salen de acá.
 # Marco: informe-consumo-masivo, bloque de RETAIL (ventas comparables tráfico vs. ticket, e-commerce, membresías,
 # publicidad, rotación de inventario, ROIC). Año fiscal cerrado el 31 de enero: FY2027 = feb-2026 a ene-2027.
-# Fuentes: 10-K FY2026 (31-ene-2026), 10-Q 1T/2T FY2027, comunicados 8-K ítem 2.02 (1T FY2017 a 2T FY2027),
-# proxy 2026, SEC XBRL companyfacts (data/annual.json), Yahoo Finance, Nasdaq/Zacks, stockanalysis (S&P Global),
-# FactSet Earnings Insight, Walmex (reportes 4T25 y 2T26). Precios: cierre del 29-sep-2026.
+# Fuentes: 10-K FY2026 (31-ene-2026), 10-Q 1T/2T FY2027, comunicado 8-K ítem 2.02 del 3T FY2027 (19-nov-2026; el 10-Q del
+# 3T todavía no está presentado), comunicados 8-K 2.02 desde el 1T FY2017, proxy 2026, SEC XBRL companyfacts
+# (data/annual.json), Yahoo Finance, stockanalysis (S&P Global), FactSet Earnings Insight, Walmex (reportes 4T25 y 2T26).
+# Precios: cierre del viernes 20-nov-2026 (data/comun_2026-11-20.json, bloque compartido con DIS).
+# Edición anterior: cierre del 29-sep-2026, datos al 2T FY2027 (blend $82.75).
 import json, datetime, statistics as st
 from pathlib import Path
 HERE = Path(__file__).resolve().parent
 M = {}
 def put(k, v): M[k] = v; return v
 
-# ---------------- Mercado (cierre 29-sep-2026) ----------------
-PRICE = put('price', 106.80)
-RF = put('rf', 5.26)                  # ^TNX cierre 29-sep-2026
-ERP = put('erp', 5.0)
-SH_DIL = put('sh_dil', 7978.0)        # diluidas promedio 2T FY27 (millones)
-SH_OUT = put('sh_out', 7933.746241)   # en circulación al 26-ago-2026 (portada del 10-Q)
+# ---------------- Mercado (cierre 20-nov-2026) ----------------
+PRICE = put('price', 127.95)
+RF = put('rf', 4.912)                 # ^TNX cierre 20-nov-2026
+ERP = put('erp', 5.0)                 # prima fija del marco (referencia: Damodaran implícita 1-nov-2026 4.41%)
+put('erp_dam', 4.41)
+SH_DIL = put('sh_dil', 7952.0)        # diluidas promedio 3T FY27 (millones, comunicado)
+SH_OUT = put('sh_out', 7931.0)        # básicas promedio 3T FY27 (el 10-Q con la cifra de portada todavía no está presentado)
 MKT_CAP = put('mkt_cap', PRICE*SH_OUT/1000)     # US$ miles de millones
-put('hi52', 135.16); put('lo52', 98.88)
+put('hi52', 135.16); put('lo52', 102.15)
 put('px_apr26', 131.93)               # cierre de abril de 2026 (máximo de cierre mensual)
+PRICE_SEP = put('price_sep', 106.80); BLEND_SEP = put('blend_sep', 82.75)   # edición anterior (cierre 29-sep-2026)
 
-# ---------------- Consenso de EPS (Nasdaq / Zacks, 30-sep-2026) ----------------
-C27, C28, C29 = put('c27', 2.87), put('c28', 3.22), put('c29', 3.53)
-put('c27_n', 16); put('c28_n', 16); put('c29_n', 4)
-Q_CONS = {'3T27': 0.63, '4T27': 0.78, '1T28': 0.73, '2T28': 0.84, '3T28': 0.78}
+# ---------------- Consenso de EPS (stockanalysis / S&P Global, 21-nov-2026) ----------------
+# Cambio de fuente: la API de Nasdaq/Zacks dejó de responder a pedidos automáticos; S&P Global para WMT y todos los pares.
+C27, C28 = put('c27', 2.88784), put('c28', 3.23346)
+put('c27_n', 36)
+Q_CONS = {'4T27': 0.77834, '1T28': 0.73473}            # los dos trimestres siguientes (consenso trimestral)
 M['q_cons'] = Q_CONS
-GUIDE_LO, GUIDE_HI = put('guide_lo', 2.80), put('guide_hi', 2.87)
+GUIDE_LO, GUIDE_HI = put('guide_lo', 2.84), put('guide_hi', 2.89)
 put('guide_mid', (GUIDE_LO+GUIDE_HI)/2)
 put('guide_orig_lo', 2.75); put('guide_orig_hi', 2.85)
-# EPS de los próximos cuatro trimestres a reportar (3T FY27 a 2T FY28 = ago-2026 a jul-2027), suma del consenso trimestral.
-# Se usa la misma definición para WMT y para los pares: no incluye el 2T 2026, el trimestre de las devoluciones de aranceles.
-NTM = put('eps_ntm', sum(Q_CONS[q] for q in ('3T27', '4T27', '1T28', '2T28')))
+put('guide_aug_lo', 2.80); put('guide_aug_hi', 2.87)
+# EPS de los próximos cuatro trimestres (4T FY27 a 3T FY28 = nov-2026 a oct-2027): consenso de los dos trimestres siguientes +
+# la mitad del consenso del año fiscal siguiente (2T y 3T FY28). Misma regla para WMT y para los pares (S&P Global publica
+# gratis solo dos trimestres). No incluye el 2T FY2027, el trimestre de las devoluciones de aranceles.
+NTM = put('eps_ntm', Q_CONS['4T27'] + Q_CONS['1T28'] + 0.5*C28)
 put('pe_ntm_now', PRICE/NTM)
 put('pe_c28', PRICE/C28); put('pe_c27', PRICE/C27)
-put('eps_g28', (C28/C27-1)*100); put('eps_g29', (C29/C28-1)*100)
+put('eps_g28', (C28/C27-1)*100)
 
 # ---------------- EPS ajustado trimestral (comunicados 8-K 2.02; antes del split 3x1 de feb-2024 se divide por 3) ----------------
 EPS_RAW = {2017: [0.98, 1.07, 0.98, 1.30], 2018: [1.00, 1.08, 1.00, 1.33], 2019: [1.14, 1.29, 1.08, 1.41],
            2020: [1.13, 1.27, 1.16, 1.38], 2021: [1.18, 1.56, 1.34, 1.39], 2022: [1.69, 1.78, 1.45, 1.53],
            2023: [1.30, 1.77, 1.50, 1.71], 2024: [1.47, 1.84, 1.53, 1.80], 2025: [0.60, 0.67, 0.58, 0.66],
-           2026: [0.61, 0.68, 0.62, 0.74], 2027: [0.66, 0.81]}
+           2026: [0.61, 0.68, 0.62, 0.74], 2027: [0.66, 0.81, 0.65]}
 FY_ADJ = {2017: 4.32, 2018: 4.42, 2019: 4.91, 2020: 4.93, 2021: 5.48, 2022: 6.46, 2023: 6.29, 2024: 6.65, 2025: 2.51, 2026: 2.64}
 for y, v in FY_ADJ.items():
     assert abs(sum(EPS_RAW[y]) - v) < 0.025, (y, sum(EPS_RAW[y]), v)
+assert abs(sum(EPS_RAW[2027]) - 2.12) < 0.005          # EPS ajustado de nueve meses del comunicado del 3T: $2.12
 EPS = {y: [x/3 if y <= 2024 else x for x in q] for y, q in EPS_RAW.items()}
-EPS[2027] = EPS[2027] + [Q_CONS['3T27'], Q_CONS['4T27']]
-EPS[2028] = [Q_CONS['1T28'], Q_CONS['2T28'], Q_CONS['3T28']]
+EPS[2027] = EPS[2027] + [Q_CONS['4T27']]
+EPS[2028] = [Q_CONS['1T28'], 0.25*C28, 0.25*C28]       # 2T y 3T FY28: mitad del consenso anual (misma regla que el NTM)
 M['eps_fy'] = {str(y): (FY_ADJ[y]/3 if y <= 2024 else FY_ADJ[y]) for y in FY_ADJ}
-M['eps_fy']['2027'] = C27; M['eps_fy']['2028'] = C28; M['eps_fy']['2029'] = C29
-put('eps_1h27', sum(EPS[2027][:2])); put('eps_1h26', sum(EPS[2026][:2]))
+M['eps_fy']['2027'] = C27; M['eps_fy']['2028'] = C28
+put('eps_9m27', sum(EPS[2027][:3])); put('eps_9m26', sum(EPS[2026][:3]))
+put('eps_9m_g', (M['eps_9m27']/M['eps_9m26']-1)*100)
+put('eps_3q27', 0.65); put('eps_3q26', 0.62); put('eps_3q_g', (0.65/0.62-1)*100)
 put('eps_2q27', 0.81); put('eps_2q27_guide_hi', 0.74)
 put('tariff_eps_q2', 0.81 - 0.74)                  # EPS del 2T por encima del techo de la guía (efecto neto máximo de las devoluciones)
 put('guide_raise_mid', (GUIDE_LO+GUIDE_HI)/2 - (2.75+2.85)/2)
+put('guide_raise_mid_aug', (GUIDE_LO+GUIDE_HI)/2 - (2.80+2.87)/2)
+put('q4_implied_lo', GUIDE_LO - 2.12); put('q4_implied_hi', GUIDE_HI - 2.12)   # 4T implícito en la guía
+put('c27_vs_guide', C27 - M['guide_mid'])
 
 # ---------------- Ventas comparables sin combustible (comunicados trimestrales) ----------------
-QL = ['1T24', '2T24', '3T24', '4T24', '1T25', '2T25', '3T25', '4T25', '1T26', '2T26', '3T26', '4T26', '1T27', '2T27']
-US = dict(comp=[7.4, 6.4, 4.9, 4.0, 3.8, 4.2, 5.3, 4.6, 4.5, 4.6, 4.5, 4.6, 4.1, 2.6],
-          trx=[2.9, 2.9, 3.4, 4.3, 3.8, 3.6, 3.1, 2.8, 1.6, 1.5, 1.8, 2.6, 3.0, 1.5],
-          tkt=[4.4, 3.4, 1.5, -0.3, 0.0, 0.6, 2.1, 1.8, 2.8, 3.1, 2.7, 2.0, 1.1, 1.1],
-          ecom=[270, 230, 300, 240, 280, 300, 290, 290, 350, 420, 440, 520, 530, 510])
-SAMS = dict(comp=[7.0, 5.5, 3.8, 3.1, 4.4, 5.2, 7.0, 6.8, 6.7, 5.9, 3.8, 4.0, 3.9, 4.4],
-            trx=[2.9, 2.9, 4.0, 3.6, 5.4, 6.1, 6.4, 5.4, 4.8, 3.9, 3.9, 5.3, 6.2, 7.0],
-            tkt=[4.0, 2.5, -0.2, -0.4, -1.0, -0.8, 0.5, 1.3, 1.7, 2.0, -0.1, -1.3, -2.2, -2.5],
-            ecom=[160, 150, 170, 190, 180, 230, 290, 280, 350, 350, 330, 380, 400, 450])
+# Serie de 14 trimestres: se agrega el 3T FY27 y sale el 1T FY24. Sam's Club revisó en el 3T FY27 ("immaterial correction",
+# sin cambio en la comparable) el tráfico y el ticket de 3T FY26 a 2T FY27: 3.4/0.4, 5.0/−1.0, 5.1/−1.2, 5.8/−1.4
+# (antes 3.9/−0.1, 5.3/−1.3, 6.2/−2.2, 7.0/−2.5). Fuente: presentación financiera del 3T FY27, "Supplemental information".
+QL = ['2T24', '3T24', '4T24', '1T25', '2T25', '3T25', '4T25', '1T26', '2T26', '3T26', '4T26', '1T27', '2T27', '3T27']
+US = dict(comp=[6.4, 4.9, 4.0, 3.8, 4.2, 5.3, 4.6, 4.5, 4.6, 4.5, 4.6, 4.1, 2.6, 2.9],
+          trx=[2.9, 3.4, 4.3, 3.8, 3.6, 3.1, 2.8, 1.6, 1.5, 1.8, 2.6, 3.0, 1.5, 1.5],
+          tkt=[3.4, 1.5, -0.3, 0.0, 0.6, 2.1, 1.8, 2.8, 3.1, 2.7, 2.0, 1.1, 1.1, 1.4],
+          ecom=[230, 300, 240, 280, 300, 290, 290, 350, 420, 440, 520, 530, 510, 530])
+SAMS = dict(comp=[5.5, 3.8, 3.1, 4.4, 5.2, 7.0, 6.8, 6.7, 5.9, 3.8, 4.0, 3.9, 4.4, 4.9],
+            trx=[2.9, 4.0, 3.6, 5.4, 6.1, 6.4, 5.4, 4.8, 3.9, 3.4, 5.0, 5.1, 5.8, 5.1],
+            tkt=[2.5, -0.2, -0.4, -1.0, -0.8, 0.5, 1.3, 1.7, 2.0, 0.4, -1.0, -1.2, -1.4, -0.3],
+            ecom=[150, 170, 190, 180, 230, 290, 280, 350, 350, 330, 380, 400, 450, 520])
+SAMS_OLD = {'3T26': (3.9, -0.1), '4T26': (5.3, -1.3), '1T27': (6.2, -2.2), '2T27': (7.0, -2.5)}
+M['sams_old'] = SAMS_OLD
 M['ql'] = QL; M['us'] = US; M['sams'] = SAMS
 def avg(xs): return sum(xs)/len(xs)
 for tag, D in (('us', US), ('sams', SAMS)):
@@ -71,6 +89,9 @@ for tag, D in (('us', US), ('sams', SAMS)):
     put(f'{tag}_trx_share_8q', M[f'{tag}_trx_8q']/M[f'{tag}_comp_8q']*100)
 put('us_comp_q2_exhw', 3.4); put('us_mfp_bps', 125); put('sams_mfp_bps', 40); put('glp1_fy27_bps', 50); put('glp1_fy26_bps', 100)
 put('us_lfl_infl_q2', 1.4)
+put('us_mfp_bps_q3', 70); put('sams_mfp_bps_q3', 35); put('us_lfl_infl_q3', 1.2); put('us_grocery_infl_q3', 1.4)
+put('us_comp_q3_exmfp', 2.9 + 0.70)                       # comparable de Walmart U.S. sumando de vuelta los ~70 pb de farmacia
+put('sams_rev_trx_q2_d', 7.0 - 5.8)                       # cuánto bajó el tráfico revisado del 2T de Sam's
 
 # ---------------- E-commerce, publicidad, membresías ----------------
 ECOM = {'us': (65.4, 79.3, 99.6), 'intl': (24.8, 29.5, 35.8), 'sams': (9.9, 12.1, 15.0)}   # FY24, FY25, FY26 (10-K, nota 11)
@@ -82,7 +103,7 @@ for i, y in enumerate(('24', '25', '26')):
     for k in ECOM: put(f'ecom_{k}_pct_{y}', ECOM[k][i]/NS[k][i]*100)
 put('ecom_g26', (M['ecom_tot_26']/M['ecom_tot_25']-1)*100); put('ecom_g25', (M['ecom_tot_25']/M['ecom_tot_24']-1)*100)
 put('ecom_us_g26', (ECOM['us'][2]/ECOM['us'][1]-1)*100)
-ECOM_Q = [21, 21, 27, 16, 22, 25, 27, 24, 26, 23]      # crecimiento global trimestral, 1T FY25 a 2T FY27
+ECOM_Q = [21, 21, 27, 16, 22, 25, 27, 24, 26, 23, 17]  # crecimiento global trimestral, 1T FY25 a 3T FY27 (3T: Flipkart corrió los Big Billion Days al 4T)
 M['ecom_q'] = ECOM_Q; put('ecom_q_avg', avg(ECOM_Q))
 ADS = {'FY23': 2.7, 'FY24': 3.4, 'FY25': 4.4, 'FY26': 6.4}   # negocio global de publicidad (comunicados del 4T); FY26 incluye VIZIO
 M['ads'] = ADS; put('ads_g26', (ADS['FY26']/ADS['FY25']-1)*100); put('ads_cagr', ((ADS['FY26']/ADS['FY23'])**(1/3)-1)*100)
@@ -90,6 +111,10 @@ MEMB = {'FY24': 3.1, 'FY25': 3.8, 'FY26': 4.4}               # ingresos por cuot
 M['memb'] = MEMB; put('memb_g26', (MEMB['FY26']/MEMB['FY25']-1)*100)
 put('memb_q4', 15.1); put('memb_q1', 17.4); put('memb_q2', 17.0); put('sams_memb_q2', 6.0); put('intl_memb_q2', 28.0)
 put('ads_q2', 38); put('connect_q2', 43); put('mkt_q2', 52); put('ads_intl_q2', 20)
+# 3T FY27 (comunicado y presentación del 19-nov-2026)
+put('ads_q3', 25); put('ads_us_q3', 37); put('connect_q3', 36); put('mkt_q3', 49); put('ads_intl_q3', -15)
+put('ecom_q3', 17); put('ecom_us_q3', 23); put('ecom_sams_q3', 30); put('ecom_intl_q3', -2); put('ecom_share_q3', 24)
+put('memb_q3', 17); put('sams_memb_q3', 2.2); put('us_memb_other_q3', 43.0); put('bbd_bps', 500); put('bundle_price', 120)
 put('hm_rev26', ADS['FY26'] + MEMB['FY26'])                   # ingresos de los negocios de alto margen
 # "Advertising income and membership fees represented nearly one third of our operating income this quarter" (CFO, 4T FY26)
 OI_Q4 = 8.708
@@ -125,7 +150,7 @@ put('rev_cagr_5', ((REVY[2026]/REVY[2021])**(1/5)-1)*100)
 put('dio26', 365/M['ann']['2026']['turns']); put('dio16', 365/M['ann']['2016']['turns'])
 ADJ_OI = {2024: 27.105, 2025: 29.504, 2026: 30.982}          # resultado operativo ajustado (comunicados del 4T)
 for y, v in ADJ_OI.items(): put(f'adj_om_{y}', v/REVY[y]*100)
-ROI = {'FY23': 12.7, 'FY24': 15.0, 'FY25': 15.5, 'FY26': 15.1, 'TTM 2T27': 15.4}   # ROI según Walmart (comunicados)
+ROI = {'FY23': 12.7, 'FY24': 15.0, 'FY25': 15.5, 'FY26': 15.1, 'TTM 3T27': 15.4}   # ROI según Walmart (comunicados)
 M['roi'] = ROI
 # ROIC propio: resultado operativo ajustado después de impuestos / capital invertido promedio (patrimonio total + deuda
 # financiera con arrendamientos financieros − caja). Balances de SEC XBRL y del comunicado del 2T FY27.
@@ -158,12 +183,39 @@ Q2_GUIDE_OI_HI = 10.0                                          # guía del 2T: r
 put('q2_oi_guide_top', Q2['adj_oi_py']*(1+Q2_GUIDE_OI_HI/100))
 put('tariff_net_q2', Q2['oi_cc'] - M['q2_oi_guide_top'])      # efecto neto máximo de las devoluciones en el 2T (US$ mil millones)
 put('tariff_reinvested_pct', (1 - M['tariff_net_q2']/2.9)*100)
-TTM_REV = put('ttm_rev', REVY[2026] - 343.011 + 365.688)
-TTM_OCF = put('ttm_ocf', OCF[2026] - 18.352 + 19.710)
-TTM_CAPEX = put('ttm_capex', CAPEX[2026] - 11.409 + 14.181)
+# 3T FY27 (comunicado del 19-nov-2026, trimestre al 31-oct-2026)
+Q3 = dict(rev=188.835, ns=186.757, gp=45.754, opex=40.062, oi=7.770, oi_py=6.696, adj_oi_py=7.263, oi_cc=7.663,
+          rev_py=179.496, ns_py=177.769, gp_py=43.063, opex_py=38.094, ni=4.945, ni_py=6.143, memb=2.078, memb_py=1.727,
+          us_oi=6.324, us_oi_py=5.803, us_ns=124.969, us_ns_py=120.678, intl_oi=1.628, intl_adj_oi_py=1.422, intl_oi_cc=1.521,
+          intl_ns=35.876, intl_ns_py=33.541, sams_oi=0.547, sams_oi_py=0.650, sams_ns=25.912, sams_ns_py=23.550, sams_ns_xf=22.3,
+          corp_oi=-0.729, corp_oi_py=-0.457, fx_rev=1.234)
+M['q3'] = Q3
+put('q3_gm', Q3['gp']/Q3['ns']*100); put('q3_gm_py', Q3['gp_py']/Q3['ns_py']*100)
+put('q3_opex', Q3['opex']/Q3['ns']*100); put('q3_opex_py', Q3['opex_py']/Q3['ns_py']*100)
+put('q3_om', Q3['oi']/Q3['rev']*100); put('q3_om_py', Q3['adj_oi_py']/Q3['rev_py']*100)
+put('q3_gm_bp', (M['q3_gm'] - M['q3_gm_py'])*100); put('q3_opex_bp', (M['q3_opex'] - M['q3_opex_py'])*100)
+put('q3_rev_g', (Q3['rev']/Q3['rev_py']-1)*100); put('q3_rev_g_cc', 4.5)
+put('q3_oi_g', (Q3['oi']/Q3['oi_py']-1)*100); put('q3_adj_oi_g', (Q3['oi']/Q3['adj_oi_py']-1)*100); put('q3_adj_oi_g_cc', 5.5)
+put('q3_memb_g', (Q3['memb']/Q3['memb_py']-1)*100)
+put('q3_us_oi_g', (Q3['us_oi']/Q3['us_oi_py']-1)*100); put('q3_us_ns_g', (Q3['us_ns']/Q3['us_ns_py']-1)*100)
+put('q3_us_om', Q3['us_oi']/(Q3['us_ns']+0.951)*100); put('q3_us_om_py', Q3['us_oi_py']/(Q3['us_ns_py']+0.665)*100)
+put('q3_intl_ns_g', (Q3['intl_ns']/Q3['intl_ns_py']-1)*100); put('q3_intl_ns_g_cc', 3.3)
+put('q3_sams_oi_g', (Q3['sams_oi']/Q3['sams_oi_py']-1)*100); put('q3_sams_ns_g', (Q3['sams_ns']/Q3['sams_ns_py']-1)*100)
+put('q3_corp_d', Q3['corp_oi'] - Q3['corp_oi_py'])
+put('q3_ni_g', (Q3['ni']/Q3['ni_py']-1)*100)
+put('q3_inv_loss_eps', 0.03); put('q3_tax_adj', 24.6)
+# Nueve meses FY27 vs FY26
+put('n9_rev', 554.523); put('n9_rev_py', 522.507); put('n9_rev_g', (554.523/522.507-1)*100)
+put('n9_adj_oi', 24.827); put('n9_adj_oi_py', 22.274); put('n9_adj_oi_g', (24.827/22.274-1)*100); put('n9_adj_oi_g_cc', 9.6)
+put('n9_ocf', 29.436); put('n9_ocf_py', 27.452); put('n9_capex', 22.621); put('n9_capex_py', 18.627)
+put('n9_fcf', 29.436-22.621); put('n9_fcf_py', 27.452-18.627); put('n9_capex_ns', 22.621/548.541*100)
+TTM_REV = put('ttm_rev', REVY[2026] - 522.507 + 554.523)
+TTM_OCF = put('ttm_ocf', OCF[2026] - 27.452 + 29.436)
+TTM_CAPEX = put('ttm_capex', CAPEX[2026] - 18.627 + 22.621)
 put('ttm_ocf_m', TTM_OCF/TTM_REV*100); put('ttm_fcf', TTM_OCF-TTM_CAPEX)
-put('ttm_adj_oi', 30.982 - 15.011 + 17.057)
-put('ttm_da', 15.094)
+put('ttm_adj_oi', 30.982 - 22.274 + 24.827)
+put('ttm_da', 14.203 - 10.462 + 11.763)              # = 15.504 de la tabla de ROI del comunicado
+assert abs(M['ttm_da'] - 15.504) < 1e-9
 
 # ---------------- Segmentos (10-K FY2026, nota 11; ajustados según comunicado del 4T FY26) ----------------
 SEG = {  # ingresos totales, resultado operativo ajustado, D&A y capex FY2026 (US$ miles de millones)
@@ -187,9 +239,10 @@ US_CAT = {'Almacén (grocery)': 285.482, 'Mercadería general': 115.060, 'Salud 
 M['us_cat'] = US_CAT; put('grocery_pct', 285.482/482.975*100); put('hw_g26', (69.547/62.092-1)*100)
 
 # ---------------- Internacional: participaciones con marca de mercado o de transacción ----------------
-WALMEX_PX = put('walmex_px', 46.71)       # MXN, cierre 29-sep-2026 (BMV)
+WALMEX_PX = put('walmex_px', 54.42)       # MXN, cierre 20-nov-2026 (BMV)
 WALMEX_SH = put('walmex_sh', 17.30)       # miles de millones de acciones (feb-2026)
-MXN = put('mxn', 18.0068)                 # MXN por US$ (Yahoo, a la fecha de corte)
+MXN = put('mxn', 19.0901)                 # MXN por US$ (Yahoo, a la fecha de corte)
+put('walmex_px_sep', 46.71); put('mxn_sep', 18.0068)
 WALMEX_STAKE = put('walmex_stake', 70.5)  # participación de Walmart (~70%-71% según las fuentes)
 put('walmex_mcap', WALMEX_PX*WALMEX_SH/MXN)
 put('walmex_val', M['walmex_mcap']*WALMEX_STAKE/100)
@@ -211,22 +264,24 @@ put('nci_book', 6.268 + 0.293)
 put('intl_marks', M['walmex_val'] + M['flip_mark'] + M['pp_mark'])
 put('intl_marks_ps', M['intl_marks']/SH_DIL*1000)
 
-# ---------------- Balance (comunicado 2T FY27, 31-jul-2026) ----------------
-DEBT_FIN = put('debt_fin', 10.479 + 3.470 + 36.462)
-FIN_LEASE = put('fin_lease', 0.880 + 5.952)
-OP_LEASE = put('op_lease', 1.714 + 14.798)
-CASH = put('cash', 11.529)
+# ---------------- Balance (comunicado 3T FY27, 31-oct-2026) ----------------
+DEBT_FIN = put('debt_fin', 12.277 + 3.221 + 41.962)
+FIN_LEASE = put('fin_lease', 0.893 + 5.939)
+OP_LEASE = put('op_lease', 1.734 + 15.126)
+CASH = put('cash', 13.432)
+assert abs(DEBT_FIN + FIN_LEASE - 64.292) < 0.01       # "Total debt of $64.3 billion" (comunicado)
+put('debt_issued_oct', 6.5)
 DEBT = put('debt', DEBT_FIN + FIN_LEASE)
 NETDEBT_DCF = put('net_debt_dcf', DEBT - CASH)               # sin arrendamientos operativos (sus pagos ya están en el OCF)
 NETDEBT_EV = put('net_debt_ev', DEBT + OP_LEASE - CASH)      # con arrendamientos operativos (EV/EBITDA)
 put('ebitda_ttm_adj', M['ttm_adj_oi'] + M['ttm_da'])
 put('nd_ebitda', NETDEBT_DCF/M['ebitda_ttm_adj'])
 put('nd_ebitda_leases', NETDEBT_EV/M['ebitda_ttm_adj'])
-put('inv_q2', 61.600); put('inv_g_q2', 6.7); put('ap_q2', 64.318)
-put('ap_inv_q2', 64.318/61.600*100)
+put('inv_q2', 70.630); put('inv_g_q2', (70.630/65.354-1)*100); put('ap_q2', 71.410)   # (claves heredadas: ahora 31-oct-2026)
+put('ap_inv_q2', 71.410/70.630*100)
 
 # ---------------- Costo de capital ----------------
-BETA_WMT = put('beta_wmt', 0.59)                              # stockanalysis, 5 años mensual
+BETA_WMT = put('beta_wmt', 0.53)                              # stockanalysis, 5 años mensual (21-nov-2026; sep: 0.59)
 BETA_ADJ = put('beta_adj', 0.67*BETA_WMT + 0.33)
 KE_FLOOR = put('ke_floor', RF + 2.5)
 KE = put('ke', max(RF + BETA_ADJ*ERP, KE_FLOOR))
@@ -251,7 +306,7 @@ put('sbc26', SBC[2026])
 
 # ---------------- DCF consolidado por segmento (Método 1a, 7.5%) ----------------
 YEARS = [2028, 2029, 2030, 2031, 2032]     # FY2028 (feb-2027 a ene-2028) a FY2032
-STUB = 1/3                                  # oct-2026 a ene-2027 (un tercio del FY2027)
+STUB = put('stub', 72/365)                  # 21-nov-2026 a 31-ene-2027 (resto del FY2027; sep: un tercio)
 CAPEX_PATH = {'bear': [4.00, 4.00, 4.00, 4.00, 4.00, 4.00], 'base': [3.95, 3.75, 3.60, 3.50, 3.50, 3.50], 'bull': [3.95, 3.60, 3.40, 3.25, 3.25, 3.25]}
 DA_PATH = [2.05, 2.10, 2.15, 2.20, 2.25, 2.30]                    # D&A / ingresos, FY27 a FY32 (sube con el capex)
 SC = {
@@ -260,8 +315,17 @@ SC = {
  'bull': dict(dw=-0.5, g=3.0, us_trx=2.75, us_tkt=2.5, us_dm=0.25, sams_g=[5.5, 5.5, 5.5, 5.5, 5.5], sams_dm=0.10, intl_g=[8, 8, 7.5, 7, 6.5], intl_dm=0.15),
 }
 US_OTHER = put('us_other_g', 0.3)          # crecimiento fuera de comparables (tiendas nuevas y otros ingresos), puntos por año
-FY27_G = {'us': 4.0, 'sams': 5.0, 'intl': 8.0}   # FY2027E: primer semestre real (+4.0% U.S., +7.5% Sam's con combustible, +9.0% Intl cc)
-FY27_DM = {'us': 0.17, 'sams': 0.05, 'intl': 0.10}
+# FY2027E: crecimiento real de los nueve meses de los ingresos totales de cada segmento (comunicado del 3T: U.S. +4.0%,
+# Sam's +8.3% con combustible, Internacional +12.4% en dólares con +7.0% a moneda constante). Sep: 4.0 / 5.0 / 8.0.
+# Margen: el de FY2026 + el cambio de los nueve meses en el margen ajustado del segmento, salvo U.S., que se deja en +0.17
+# (el +0.41 de nueve meses incluye las devoluciones de aranceles del 2T). Chequeo: base_oi27_g contra la guía (+8.0% a +8.6% cc).
+N9 = {'us': (367.327+2.627, 353.752+1.950, 20.467, 18.231), 'sams': (75.030+1.986, 69.252+1.889, 1.899, 1.866),
+      'intl': (106.184+1.306, 94.496+1.151, 4.669, 3.949)}
+FY27_G = {k: round((v[0]/v[1]-1)*100, 1) for k, v in N9.items()}
+M['fy27_g'] = FY27_G
+FY27_DM = {'us': 0.17, 'sams': round((N9['sams'][2]/N9['sams'][0] - N9['sams'][3]/N9['sams'][1])*100, 2),
+           'intl': round((N9['intl'][2]/N9['intl'][0] - N9['intl'][3]/N9['intl'][1])*100, 2)}
+M['fy27_dm'] = FY27_DM
 def paths(sc, sc_name, dcomp=0.0, dm_us=None):
     rows = {}
     capex = CAPEX_PATH[sc_name]
@@ -338,7 +402,9 @@ put('impl_dcomp', solve(lambda d: dcf('base', dcomp=d), 0.0, 40.0, PRICE, inc=Tr
 put('impl_us_g', M['base_us_g'] + M['impl_dcomp'])
 # Chequeos de sesgo (el DCF queda a más de 30%-40% del precio)
 Ks = K
-put('dcf_peerbeta', dcf('base', w=wacc(max(RF + (0.67*0.56+0.33)*ERP, KE_FLOOR))))
+PEER_BETA_MED = put('peer_beta_med', st.median([0.85, 0.93, 0.36, 0.14, 0.19, 0.69]))   # betas de PEERS (se verifica abajo)
+put('dcf_peerbeta', dcf('base', w=wacc(max(RF + (0.67*PEER_BETA_MED+0.33)*ERP, KE_FLOOR))))
+put('dcf_erp_dam', dcf('base', w=wacc(max(RF + BETA_ADJ*M['erp_dam'], KE_FLOOR))))
 put('dcf_kefloor', dcf('base', w=wacc(KE_FLOOR)))
 K = M['k_26']; put('dcf_k26', dcf('base')); K = Ks
 K = (num + SBC[2025] + SBC[2026])/den; put('dcf_k_sbc', dcf('base')); K = Ks
@@ -395,29 +461,45 @@ put('hm_oi_annual', M['hm_oi_q4']*4)                               # un tercio d
 put('hm_oi_share_fy', M['hm_oi_annual']/ADJ_OI[2026]*100)
 
 # ---------------- Comparables (Método 2, 25%) ----------------
-PEERS = {  # precio 29-sep-2026; consenso trimestral de los próximos 4 trimestres (Nasdaq/Zacks); comparables del último trimestre
- 'COST': dict(name='Costco', px=924.59, q=[4.89, 5.11, 5.45, 7.18], f1=22.86, f2=24.94, comp=6.7, beta=0.87, eve=27.66, cl='Club de precios'),
- 'TGT':  dict(name='Target', px=156.43, q=[2.05, 2.67, 1.88, 2.64], f1=9.40, f2=10.00, comp=3.8, beta=0.99, eve=9.87, cl='Tienda de descuento'),
- 'KR':   dict(name='Kroger', px=60.79, q=[1.16, 1.36, 1.73, 1.15], f1=5.56, f2=5.92, comp=0.2, beta=0.41, eve=7.26, cl='Supermercado'),
- 'BJ':   dict(name="BJ's Wholesale", px=95.49, q=[1.22, 1.02, 1.17, 1.37], f1=5.03, f2=5.36, comp=3.1, beta=0.18, eve=12.76, cl='Club de precios'),
- 'DG':   dict(name='Dollar General', px=122.64, q=[1.39, 2.03, 2.23, 2.37], f1=8.40, f2=9.46, comp=3.5, beta=0.24, eve=11.51, cl='Dólar'),
- 'DLTR': dict(name='Dollar Tree', px=113.30, q=[0.89, 2.63, 1.95, 1.41], f1=7.97, f2=8.98, comp=3.7, beta=0.71, eve=11.13, cl='Dólar'),
+PEERS = {  # precio: cierre 20-nov-2026 (Yahoo). Consenso S&P Global (stockanalysis, 21-nov-2026): q = los dos trimestres
+ # siguientes; f1 = año fiscal en curso, f2 = año fiscal siguiente. NTM = q1 + q2 + la parte de f1/f2 que completa los cuatro
+ # trimestres (ver ntm_rule). EV/EBITDA de los últimos 12 meses y beta de 5 años: stockanalysis. Comparables sin combustible
+ # del último trimestre reportado (TGT y BJ reportaron el 3T al 31-oct-2026 el 18 y 20-nov; COST, KR, DG y DLTR sin cambios).
+ 'COST': dict(name='Costco', px=1102.15, q=[4.90522, 5.1187], f1=22.80045, f2=25.0437, left=4, comp=6.7, beta=0.85, eve=33.65, cl='Club de precios'),
+ 'TGT':  dict(name='Target', px=165.83, q=[2.68043, 1.92192], f1=11.03749, f2=9.76771, left=1, comp=5.6, beta=0.93, eve=10.07, cl='Tienda de descuento'),
+ 'KR':   dict(name='Kroger', px=68.44, q=[1.16258, 1.35662], f1=5.18992, f2=5.48368, left=2, comp=0.2, beta=0.36, eve=7.82, cl='Supermercado'),
+ 'BJ':   dict(name="BJ's Wholesale", px=104.82, q=[1.03893, 1.21358], f1=4.20+1.03893, f2=5.07235*(4.20+1.03893)/4.73388, left=1, comp=4.1, beta=0.14, eve=15.45, cl='Club de precios'),
+ 'DG':   dict(name='Dollar General', px=130.53, q=[1.40884, 2.03114], f1=7.89694, f2=8.30077, left=2, comp=3.5, beta=0.19, eve=12.00, cl='Dólar'),
+ 'DLTR': dict(name='Dollar Tree', px=137.96, q=[0.92441, 2.62318], f1=7.92882, f2=7.8869, left=2, comp=3.7, beta=0.69, eve=12.98, cl='Dólar'),
 }
-AMZN = dict(name='Amazon', px=246.67, q=[2.01, 2.56, 2.34, 2.59], f1=10.52, f2=13.69, beta=1.44, eve=16.51)
+# BJ: el consenso anual de stockanalysis no estaba actualizado tras el 3T (4.73 contra 4.20 reales de nueve meses + 1.04 del 4T):
+# f1 = nueve meses reales + consenso del 4T, f2 = f1 × el crecimiento que tenía el consenso viejo (supuesto declarado).
+AMZN = dict(name='Amazon', px=246.82, q=[2.49111, 2.34857], f1=9.6025, f2=10.92608, left=1, beta=1.50, eve=15.56)
+def ntm_rule(p):
+    # left = trimestres del año fiscal en curso sin reportar. Con 1 o 2: los dos trimestres siguientes de consenso + la mitad
+    # del año fiscal siguiente (los dos trimestres que faltan para completar cuatro). Con 4 (COST): el año fiscal en curso.
+    if p['left'] == 4: return p['f1']
+    return p['q'][0] + p['q'][1] + 0.5*p['f2']
 for p in list(PEERS.values()) + [AMZN]:
-    p['ntm'] = sum(p['q']); p['pe'] = p['px']/p['ntm']; p['g'] = (p['f2']/p['f1']-1)*100
+    p['ntm'] = ntm_rule(p); p['pe'] = p['px']/p['ntm']; p['g'] = (p['f2']/p['f1']-1)*100
+# TGT: su año fiscal en curso incluye devoluciones de aranceles (2T y 3T), así que f2/f1 da crecimiento negativo: se excluye de
+# la regresión contra el crecimiento del EPS (no del P/E, que usa trimestres posteriores a las devoluciones).
 M['peers'] = PEERS; M['amzn'] = AMZN
-WMT_COMP = put('wmt_comp', (2.6*125.2 + 4.4*22.1)/(125.2 + 22.1))       # 2T FY27, U.S. + Sam's sin combustible, ponderado por ventas
-WMT_COMP4 = put('wmt_comp4', (M['us_comp_4q']*125.2 + M['sams_comp_4q']*22.1)/(125.2+22.1))
-WMT_G = put('wmt_g', (C29/C28-1)*100)
+assert abs(st.median(p['beta'] for p in PEERS.values()) - PEER_BETA_MED) < 1e-12
+put('ntm_wmt_check', ntm_rule(dict(left=1, q=[Q_CONS['4T27'], Q_CONS['1T28']], f1=C27, f2=C28)) - NTM)
+assert abs(M['ntm_wmt_check']) < 1e-12
+WMT_COMP = put('wmt_comp', (2.9*125.0 + 4.9*22.3)/(125.0 + 22.3))       # 3T FY27, U.S. + Sam's sin combustible, ponderado por ventas
+WMT_COMP4 = put('wmt_comp4', (M['us_comp_4q']*125.0 + M['sams_comp_4q']*22.3)/(125.0+22.3))
+WMT_G = put('wmt_g', (C28/C27-1)*100)
 def reg(xs, ys):
     mx, my = st.mean(xs), st.mean(ys)
     sxy = sum((x-mx)*(y-my) for x, y in zip(xs, ys)); sxx = sum((x-mx)**2 for x in xs); syy = sum((y-my)**2 for y in ys)
     b = sxy/sxx; return dict(slope=b, icpt=my-b*mx, r2=sxy**2/(sxx*syy), n=len(xs))
 pl = list(PEERS.items())
 for key, var in (('comp', 'comp'), ('g', 'g')):
-    R = reg([p[var] for _, p in pl], [p['pe'] for _, p in pl]); M[f'reg_{key}'] = R
-    ex = [kp for kp in pl if kp[0] != 'COST']
+    pk = pl if key == 'comp' else [kp for kp in pl if kp[0] != 'TGT']
+    R = reg([p[var] for _, p in pk], [p['pe'] for _, p in pk]); M[f'reg_{key}'] = R
+    ex = [kp for kp in pk if kp[0] != 'COST']
     Rx = reg([p[var] for _, p in ex], [p['pe'] for _, p in ex]); M[f'reg_{key}_xcost'] = Rx
     x_wmt = WMT_COMP if key == 'comp' else WMT_G
     put(f'reg_{key}_pe_wmt', R['icpt'] + R['slope']*x_wmt)
@@ -451,8 +533,8 @@ EVES = sorted(p['eve'] for p in PEERS.values())
 put('peer_eve_med', pctl(EVES, 0.5)); put('peer_eve_q3', pctl(EVES, 0.75)); put('peer_eve_max', EVES[-1])
 EVE_RULE = M['peer_eve_q3'] if M['wmt_comp_rank_above_med'] else M['peer_eve_med']
 EVE_SEL = put('eve_sel', M['reg_eve_wmt'] if M['reg_eve_ok'] else EVE_RULE)
-WMT_EBITDA = put('wmt_ebitda_sa', 44.07)                          # EBITDA de los últimos 12 meses (stockanalysis, misma fuente que los pares)
-WMT_EVE = put('wmt_eve', 20.67)
+WMT_EBITDA = put('wmt_ebitda_sa', 48.68)                          # EBITDA de los últimos 12 meses (stockanalysis, misma fuente que los pares)
+WMT_EVE = put('wmt_eve', 22.24)
 def eve_ps(mult): return (mult*WMT_EBITDA - NETDEBT_EV - MIN_MKT)/SH_DIL*1000
 COMP_EV = put('comp_ev', eve_ps(EVE_SEL))
 COMP = put('comp', (COMP_PE + COMP_EV)/2)
@@ -481,7 +563,7 @@ win = []
 for i, (fy, q) in enumerate(seq):
     cal_y = fy - 1 if q < 3 else fy
     ym = (cal_y, QEND[q])
-    if ym < (2016, 4) or ym > (2026, 7): continue
+    if ym < (2016, 4) or ym > (2026, 10): continue
     nx = seq[i+1:i+5]
     ntm = sum(EPS[a][b] for a, b in nx)
     win.append(dict(date=f'{ym[0]}-{ym[1]:02d}', fy=fy, price=closes[ym], ntm=ntm, pe=closes[ym]/ntm))
@@ -510,11 +592,17 @@ for w in win: fyavg.setdefault(w['fy'], []).append(w['pe'])
 M['pe_by_fy'] = {str(k): dict(avg=st.mean(v), mn=min(v), mx=max(v), n=len(v)) for k, v in fyavg.items()}
 REV1 = put('rev1', PE_RR*NTM)                                     # Lectura 1: P/E propio de la ventana post re-rating
 # Lectura 2: P/E relativo al S&P 500, promedio de diez años (cociente de promedios: FactSet no publica serie trimestral)
-SPX_PE, SPX_PE10 = put('spx_pe', 19.2), put('spx_pe10', 19.0)
+# S&P 500: cierre del 20-nov-2026 (6,910.39) sobre el EPS de 12 meses de FactSet del 5-nov ($415.82); FactSet publicó 18.3x
+# en su informe del 13-nov, antes de la caída de la semana del 17 al 20-nov. Promedio de diez años de FactSet: 19.1x.
+SPX_PX, SPX_EPS = put('spx_px', 6910.39), put('spx_eps', 415.82)
+SPX_PE, SPX_PE10 = put('spx_pe', SPX_PX/SPX_EPS), put('spx_pe10', 19.1)
+put('spx_pe_13nov', 18.3)
 REL10 = put('rel10', M['pe10_avg']/SPX_PE10)
 put('rel_now', M['pe_ntm_now']/SPX_PE)
 REV2 = put('rev2', REL10*SPX_PE*NTM)
 REV = put('rev', (REV1 + REV2)/2)
+put('rev2_13nov', REL10*M['spx_pe_13nov']*NTM); put('rev_13nov_d', (M['rev2_13nov']-REV2)/2)
+put('rel_at_spx10', M['pe_ntm_now']/SPX_PE10)
 put('rev_low', min(M['pe_rr_min']*NTM, REV2))
 put('rev_high', M['pe_rr_max']*NTM)
 put('rev1_min', M['pe_rr_min']*NTM)
@@ -525,8 +613,9 @@ put('pe_now_vs_rr', (M['pe_ntm_now']/PE_RR-1)*100)
 put('spx_vs_10', (SPX_PE/SPX_PE10-1)*100)
 
 # ---------------- Consenso (Método 4, 25%) ----------------
-CONS = put('cons', 127.43); put('cons_med', 130.0); put('cons_low', 81.0); put('cons_high', 155.0); put('cons_n', 43)
-put('cons_sb', 27); put('cons_b', 10); put('cons_h', 5); put('cons_s', 1); put('cons_ss', 0)
+# stockanalysis (S&P Global), 20-nov-2026 — misma fuente y mismo día que DIS (data/comun_2026-11-20.json)
+CONS = put('cons', 135.90); put('cons_med', 138.0); put('cons_low', 81.0); put('cons_high', 155.0); put('cons_n', 41)
+put('cons_sb', 28); put('cons_b', 10); put('cons_h', 5); put('cons_s', 0); put('cons_ss', 1); put('cons_sep', 127.43)
 put('cons_gap', (CONS/PRICE-1)*100)
 
 # ---------------- Blend ----------------
@@ -551,8 +640,12 @@ for k in ('dcf_bull', 'dcf_bear', 'sotp_bull', 'sotp_bear'): put(f'{k}_gap', (M[
 DIV = put('div_annual', 0.99); put('div_yield', DIV/PRICE*100); put('div_prev', 0.94); put('div_raise', (0.99/0.94-1)*100)
 put('div_streak', 53)                                             # años consecutivos de aumento del dividendo (desde 1974)
 put('payout_eps', DIV/M['guide_mid']*100)
-put('buyback_auth', 30.0); put('buyback_left', 25.1); put('buyback_1h', 5.104); put('buyback_sh_1h', 42.3); put('buyback_px_q2', 117.61)
-put('div_paid_1h', 3.945)
+# Nueve meses FY27 (comunicado del 3T): 67.0 millones de acciones por $7.830 mil millones; quedan $22.4 de la autorización de $30.
+# Claves heredadas *_1h = nueve meses; buyback_px_q2 = precio promedio pagado en el 3T.
+put('buyback_auth', 30.0); put('buyback_left', 22.4); put('buyback_1h', 7.830); put('buyback_sh_1h', 67.0)
+put('buyback_px_q2', (7.830-5.104)/(67.0-42.3)*1000)
+put('buyback_px_9m', 7.830/67.0*1000)
+put('div_paid_1h', 5.913)
 put('fcf_yield', M['fcf_2026']/MKT_CAP*100); put('fcf_yield_ttm', M['ttm_fcf']/MKT_CAP*100)
 put('walton_pct', 44.11)
 put('capex_guide', 4.0)
@@ -561,9 +654,10 @@ put('capex_guide', 4.0)
 M['js_ql'] = json.dumps([q[:2] + ' FY' + q[2:] for q in QL[2:]], ensure_ascii=False)
 M['js_us_trx'] = json.dumps(US['trx'][2:]); M['js_us_tkt'] = json.dumps(US['tkt'][2:]); M['js_us_comp'] = json.dumps(US['comp'][2:])
 M['js_sams_trx'] = json.dumps(SAMS['trx'][2:]); M['js_sams_tkt'] = json.dumps(SAMS['tkt'][2:]); M['js_sams_comp'] = json.dumps(SAMS['comp'][2:])
-M['js_ecom_ql'] = json.dumps([f'{q}T FY{y}' for y in (25, 26) for q in (1, 2, 3, 4)] + ['1T FY27', '2T FY27'])
+M['js_ecom_ql'] = json.dumps([f'{q}T FY{y}' for y in (25, 26) for q in (1, 2, 3, 4)] + ['1T FY27', '2T FY27', '3T FY27'])
 M['js_ecom_q'] = json.dumps(ECOM_Q)
-M['js_us_ecom'] = json.dumps(US['ecom'][4:])
+M['js_us_ecom'] = json.dumps(US['ecom'][3:])
+assert len(US['ecom'][3:]) == len(ECOM_Q)
 FYL = [str(y) for y in YRS]
 M['js_fy'] = json.dumps(['FY' + y[2:] for y in FYL])
 M['js_rev'] = json.dumps([round(REVY[y], 1) for y in YRS])
@@ -578,12 +672,12 @@ M['js_pe_labels'] = json.dumps([(w['date'][:4] if w['date'][5:] == '04' else '')
 M['js_pe_vals'] = json.dumps([round(w['pe'], 2) for w in win])
 M['js_pe_rr_full'] = json.dumps([round(PE_RR, 2)]*len(win))
 M['js_pe_10'] = json.dumps([round(M['pe10_avg'], 2)]*len(win))
-# sparkline: últimos 7 cierres mensuales (mar-2026 a ago-2026 + 29-sep-2026)
-SPARK = [closes[(2026, m)] for m in range(3, 9)] + [PRICE]
+# sparkline: últimos 7 cierres mensuales (may-2026 a oct-2026 + 20-nov-2026)
+SPARK = [closes[(2026, m)] for m in range(5, 11)] + [PRICE]
 M['spark'] = [round(x, 2) for x in SPARK]
 put('ret_ytd', (PRICE/closes[(2025, 12)]-1)*100); put('px_dec25', closes[(2025, 12)])
 put('ret_from_apr', (PRICE/closes[(2026, 4)]-1)*100)
-put('ret_1y', (PRICE/closes[(2025, 9)]-1)*100)
+put('ret_1y', (PRICE/closes[(2025, 10)]-1)*100)
 # derivados de texto
 put('pe_ntm_vs_10', (M['pe_ntm_now']/M['pe10_avg']-1)*100)
 put('dcf_base_vs_sotp', (M['sotp_base']/M['dcf_base']-1)*100)
@@ -609,6 +703,24 @@ put('capex_pct_min_1621', min(M['ann'][str(y)]['capex_pct'] for y in range(2016,
 put('capex_pct_max_1621', max(M['ann'][str(y)]['capex_pct'] for y in range(2016, 2022)))
 put('turns_min_year', min(YRS, key=lambda y: M['ann'][str(y)]['turns']))
 
+# ---------------- Antes → ahora (edición del 29-sep-2026, reproducida al centavo con el modelo de esa fecha) ----------------
+SEP = {'dcf': 40.3169, 'sotp': 45.0756, 'comp': 52.3098, 'rev': 89.7505, 'cons': 127.43}
+M['sep'] = SEP
+for k in SEP: put(f'chg_{k}', V[k] - SEP[k])
+put('blend_chg', BLEND - BLEND_SEP); put('blend_chg_pct', (BLEND/BLEND_SEP-1)*100)
+put('price_chg_pct', (PRICE/PRICE_SEP-1)*100); put('blend_sep_gap', (BLEND_SEP/PRICE_SEP-1)*100)
+for k in W: put(f'chg_contrib_{k}', W[k]*(V[k]-SEP[k]))
+assert abs(sum(M[f'chg_contrib_{k}'] for k in W) - M['blend_chg']) < 0.01
+# Asserts que atan las frases cualitativas de la plantilla a los números (si fallan, hay que reescribir el texto)
+assert M['indep'] < PRICE/2                                    # "vale menos de la mitad de su precio"
+assert M['anch'] < PRICE and CONS > PRICE and REV < PRICE       # "solo el consenso queda por encima"
+assert M['pe_ntm_now'] > 2*M['peer_pe_med']                     # "más del doble que la mediana"
+assert M['impl_wacc'] < RF                                      # "por debajo de la propia tasa libre de riesgo"
+assert M['buyback_px_q2'] < PRICE                               # "por debajo del precio de la fecha de corte"
+assert SPX_PE < SPX_PE10                                        # "el S&P cotiza por debajo de su promedio"
+assert M['reg_ok'] == 1 and M['reg_comp']['r2'] < 0.55          # "apenas por encima del umbral"
+assert WMT_COMP < M['peer_comp_med'] and WMT_COMP4 < M['peer_comp_med']   # "debajo de la mitad del grupo" / "apenas debajo"
+assert M['n9_adj_oi_g_cc'] > 8.6                                # "por encima de la guía anual"
 json.dump(M, open(HERE/'model.json', 'w'), indent=1, default=float)
 if __name__ == '__main__':
     skip = ('js_',)

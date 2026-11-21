@@ -34,7 +34,7 @@
     drawVBars(document.getElementById('ecomChart'), {
       labels:(NARROW() ? {{js_ecom_ql}}.map(function(l){ return l.indexOf('1T')===0 ? l.replace(' FY','') : l.slice(0,2); }) : {{js_ecom_ql}}),
       values:{{js_ecom_q}},
-      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.blue,PALETTE.blue,PALETTE.blue,PALETTE.navy,PALETTE.navy],
+      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.blue,PALETTE.blue,PALETTE.blue,PALETTE.navy,PALETTE.navy,PALETTE.navy],
       valueFmt:function(v){ return '+'+v.toFixed(0)+'%'; }
     });
 
@@ -70,9 +70,9 @@
     });
 
     drawVBars(document.getElementById('estChart'), {
-      labels:['FY2024 real','FY2025 real','FY2026 real','FY2027 consenso','FY2028 consenso','FY2029 consenso'],
-      values:[{{eps_fy.2024|js2}},{{eps_fy.2025|js2}},{{eps_fy.2026|js2}},{{c27|js2}},{{c28|js2}},{{c29|js2}}],
-      colors:[PALETTE.pale,PALETTE.blueLight,PALETTE.navy,PALETTE.blue,PALETTE.blueLight,PALETTE.pale],
+      labels:['FY2024 real','FY2025 real','FY2026 real','FY2027 consenso','FY2028 consenso'],
+      values:[{{eps_fy.2024|js2}},{{eps_fy.2025|js2}},{{eps_fy.2026|js2}},{{c27|js2}},{{c28|js2}}],
+      colors:[PALETTE.pale,PALETTE.blueLight,PALETTE.navy,PALETTE.blue,PALETTE.blueLight],
       valueFmt:function(v){ return '$'+v.toFixed(2); }
     });
 
