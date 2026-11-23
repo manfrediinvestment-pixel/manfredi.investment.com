@@ -13,6 +13,9 @@ css = css.replace('.verdict-note{color:#5d646f !important;}', '.verdict-note{col
 s0 = pg.index('<script>', pg.index('</style>'))
 s1 = pg.index('  function renderAll(){', s0)
 eng = pg[s0:s1]
+# Football field en celular: el rótulo del techo del consenso ($1,315) se cortaba con padR fijo de 40 -> padR por opción
+assert eng.count('var padL = opts.padL || 200, padR = 40,') == 1
+eng = eng.replace('var padL = opts.padL || 200, padR = 40,', 'var padL = opts.padL || 200, padR = opts.padR || 40,')
 for fn in ('function drawVBars','function drawHBars','function drawLines','function drawRangeBars','function drawGroupedBars','function drawLegend','function wrapLabel','var padL = Math.min(opts.padL || 128'):
     assert fn in eng, fn
 # drawLines: rango del eje Y opcional (opts.minV / opts.maxV) para escalas limpias

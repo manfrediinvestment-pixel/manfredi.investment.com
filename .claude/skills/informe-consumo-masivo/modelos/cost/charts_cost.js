@@ -16,7 +16,7 @@
       minV:0, maxV:7,
       yFmt:function(v){ return '$'+v.toFixed(1); },
       series:[{name:'Cuotas de membresía', color:PALETTE.navy, values:{{js_fees}}},
-              {name:'Resultado de la mercadería (resultado operativo − cuotas)', color:PALETTE.gold, values:{{js_merch_oi}}}]
+              {name:(NARROW() ? 'Resultado de la mercadería' : 'Resultado de la mercadería (resultado operativo − cuotas)'), color:PALETTE.gold, values:{{js_merch_oi}}}]
     });
 
     drawVBars(document.getElementById('shareChart'), {
@@ -149,6 +149,7 @@
     });
 
     drawRangeBars(document.getElementById('footballChart'), {
+      padR:(W520() ? 54 : 40),
       labels:(W520() ? ['M1a: DCF','M1b: Cuotas + mercadería','M2: Comparables','M3: Reversión','M4: Consenso'] : ['M1a: DCF consolidado (Bear a Bull)','M1b: DCF por negocio (Bear a Bull)','M2: Comparables minoristas','M3: Reversión (propio y relativo)','M4: Consenso Wall Street']),
       domMin:0,
       ranges:[[{{dcf_bear|js2}},{{dcf_bull|js2}}],[{{biz_bear|js2}},{{biz_bull|js2}}],[{{comp_low|js2}},{{comp_high|js2}}],[{{rev_low|js2}},{{rev_high|js2}}],[{{cons_low|js2}},{{cons_high|js2}}]],

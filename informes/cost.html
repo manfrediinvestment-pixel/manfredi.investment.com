@@ -409,6 +409,10 @@
     Canadá y 182 en otros mercados), con un capex de unos $7.5 mil millones (+17%). Al 10 de noviembre ya operaba 945
     depósitos. Costco no da guía de ventas ni de ganancias; el consenso de S&amp;P Global espera un EPS de $22.80 para el FY2027 y $25.04 para el FY2028.
   </p>
+  <div class="chartbox">
+    <canvas id="whChart" height="260"></canvas>
+    <p class="chartcap">Depósitos al cierre de cada año fiscal, FY2016-FY2026, y plan del FY2027 (en dorado). Fuente: 10-K de cada año y comunicado del 4T FY2026.</p>
+  </div>
   <p>
     <strong>El consumidor de EE.UU. al cierre de este informe.</strong> Las ventas minoristas de octubre subieron 0.2% contra septiembre y 6.8% contra octubre de
     2025 (Census, avance del 17 de noviembre), con las ventas "de control" en +0.6%. La confianza de la Universidad de Michigan subió a 51.0 en la lectura
@@ -1166,7 +1170,7 @@
     ctx.clearRect(0,0,W,H);
 
     var labels = opts.labels, ranges = opts.ranges, colors = opts.colors, refLines = opts.refLines || [];
-    var padL = opts.padL || 200, padR = 40, padT = 34, padB = 10;
+    var padL = opts.padL || 200, padR = opts.padR || 40, padT = 34, padB = 10;
     var plotW = W - padL - padR, plotH = H - padT - padB;
 
     var allVals = [];
@@ -1374,7 +1378,7 @@
       minV:0, maxV:7,
       yFmt:function(v){ return '$'+v.toFixed(1); },
       series:[{name:'Cuotas de membresía', color:PALETTE.navy, values:[2.65, 2.85, 3.14, 3.35, 3.54, 3.88, 4.22, 4.58, 4.83, 5.32, 5.91]},
-              {name:'Resultado de la mercadería (resultado operativo − cuotas)', color:PALETTE.gold, values:[1.03, 1.26, 1.34, 1.39, 1.89, 2.83, 3.57, 3.53, 4.46, 5.06, 5.78]}]
+              {name:(NARROW() ? 'Resultado de la mercadería' : 'Resultado de la mercadería (resultado operativo − cuotas)'), color:PALETTE.gold, values:[1.03, 1.26, 1.34, 1.39, 1.89, 2.83, 3.57, 3.53, 4.46, 5.06, 5.78]}]
     });
 
     drawVBars(document.getElementById('shareChart'), {
@@ -1507,6 +1511,7 @@
     });
 
     drawRangeBars(document.getElementById('footballChart'), {
+      padR:(W520() ? 54 : 40),
       labels:(W520() ? ['M1a: DCF','M1b: Cuotas + mercadería','M2: Comparables','M3: Reversión','M4: Consenso'] : ['M1a: DCF consolidado (Bear a Bull)','M1b: DCF por negocio (Bear a Bull)','M2: Comparables minoristas','M3: Reversión (propio y relativo)','M4: Consenso Wall Street']),
       domMin:0,
       ranges:[[212.54,527.48],[206.73,509.03],[423.47,848.22],[514.50,1270.86],[770.00,1315.00]],
