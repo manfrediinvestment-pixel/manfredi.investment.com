@@ -117,7 +117,7 @@ TTM['eps'] = round(TTM['eps'], 2); put('ttm', TTM)
 put('ttm_gm', (1 - TTM['cogs'] / TTM['rev']) * 100); put('ttm_rd_pct', TTM['rd'] / TTM['rev'] * 100)
 put('ttm_sia_pct', TTM['sia'] / TTM['rev'] * 100)
 FCF = put('ttm_fcf', TTM['ocf'] - TTM['capex']); put('ttm_ocfm', TTM['ocf'] / TTM['rev'] * 100); put('ttm_fcfm', FCF / TTM['rev'] * 100)
-put('ttm_capex_pct', TTM['capex'] / TTM['rev'] * 100)
+put('ttm_capex_pct', TTM['capex'] / TTM['rev'] * 100); put('ocf9m_pct', N26G['ocf'] / N26G['rev'] * 100)
 # Ajustado (non-GAAP) TTM
 FYA = dict(cogs=15141, sia=13642, rd=10212, iprd=1613, inc=18406); N25A = dict(cogs=10075, sia=9562, rd=7096, iprd=1401, inc=14620)
 N26A = dict(cogs=10905, sia=9481, rd=8107, iprd=822, inc=13715)
@@ -401,13 +401,18 @@ put('reg_pts', [[round(float(a), 2), round(float(b), 2)] for a, b in zip(xs, ys)
 REG_OK = R2B >= 0.30
 assert not REG_OK      # la regresión no se sostiene sin el extremo: se usa el criterio de la skill
 NTM = put('eps_ntm', (C26 - 2.39) + 0.75 * C27); put('q4_eps_impl', C26 - 2.39)
-M2 = put('m2', M['peer_q3'] * C27 / (1 + KE / 100))
-put('m2_lo', M['peer_med'] * NTM); put('m2_hi', M['peer_max'] * C27 / (1 + KE / 100))
+# Decisión del coordinador (22-nov-2026, igual en ABBV): la regresión no se sostiene -> regla de la casa desde KO: MEDIANA del
+# P/E forward de los 13 pares sobre el EPS 2027 de consenso, descontado un año al costo de equity común. El cuartil superior
+# mete un premio por calidad que la regresión no respalda: queda como referencia, fuera del blend.
+M2 = put('m2', M['peer_med'] * C27 / (1 + KE / 100))
+put('m2_q3', M['peer_q3'] * C27 / (1 + KE / 100)); put('m2_ntm', M['peer_med'] * NTM)
+put('m2_hi', M['peer_max'] * C27 / (1 + KE / 100))
 q3_name = min(PEERS, key=lambda k: abs(PEERS[k] - M['peer_q3'])); max_name = max(PEERS, key=PEERS.get); med_name = min(PEERS, key=lambda k: abs(PEERS[k] - M['peer_med']))
 put('q3_name', q3_name); put('max_name', max_name); put('med_name', med_name)
 # Referencia (no entra al método): pares con precipicio de patentes en curso o reciente (BMY, SNY, GSK, NVO)
 CLIFF = ['BMY', 'SNY', 'GSK', 'NVO']
 put('cliff_pe', st.mean(PEERS[k] for k in CLIFF)); put('cliff_fv', M['cliff_pe'] * C27 / (1 + KE / 100))
+put('m2_lo', M['cliff_fv'])   # piso del rango del football field: subgrupo de pares en precipicio
 put('pfe_pe_fwd', SH['pfe_precio']['multiplos']['pe_fwd']); put('abbv_pe_fwd', PH['comparables']['referencia_cruzada']['ABBV']['pe_fwd'])
 put('pfe_disc_med', (M['pfe_pe_fwd'] / M['peer_med'] - 1) * 100)
 put('hc_pe', SH['mercado']['sectores_pe_fwd']['health_care']['pe_ajustado_20nov']); put('sp_pe', SH['mercado']['sp500']['pe_fwd_ajustado_20nov'])
@@ -459,16 +464,20 @@ M4 = put('m4', CO['pt_prom']); put('m4_lo', CO['pt_min']); put('m4_hi', CO['pt_m
 # ======================= 9. Blend =======================
 W = {'m1': 0.15, 'm2': 0.25, 'm3': 0.35, 'm4': 0.25}
 for k, w in W.items(): put(k + '_ap', round(M[k], 2) * w)
-BL = put('blend', sum(round(M[k], 2) * w for k, w in W.items())); put('blend_gap', (BL / PRICE - 1) * 100)
+BL = put('blend', round(sum(round(M[k], 2) * w for k, w in W.items()), 2)); put('blend_gap', (BL / PRICE - 1) * 100)
 for k in W: put(k + '_gap', (M[k] / PRICE - 1) * 100)
 put('indep', (0.15 * M['m1'] + 0.25 * M['m2']) / 0.40); put('anch', (0.35 * M['m3'] + 0.25 * M['m4']) / 0.60)
 put('indep_gap', (M['indep'] / PRICE - 1) * 100); put('anch_gap', (M['anch'] / PRICE - 1) * 100)
-put('blend_med', BL + 0.25 * (M['m2_lo'] - M['m2'])); put('blend_med_gap', (M['blend_med'] / PRICE - 1) * 100)
+put('blend_q3', BL + 0.25 * (M['m2_q3'] - M['m2'])); put('blend_q3_gap', (M['blend_q3'] / PRICE - 1) * 100)
 put('blend_cliff', BL + 0.25 * (M['cliff_fv'] - M['m2'])); put('blend_cliff_gap', (M['blend_cliff'] / PRICE - 1) * 100)
 put('blend_xcons', (0.15 * M['m1'] + 0.25 * M['m2'] + 0.35 * M['m3']) / 0.75); put('blend_xcons_gap', (M['blend_xcons'] / PRICE - 1) * 100)
 put('blend_lip', BL + 0.35 * (M['m3_lip'] - M['m3'])); put('blend_all', BL + 0.35 * (M['m3_all'] - M['m3']))
 put('ranges', [[M['m1_bear'], M['m1_bull']], [M['m2_lo'], M['m2_hi']], [M['m3_lo'], M['m3_hi']], [M['m4_lo'], M['m4_hi']]])
-POST = put('postura', 'neutral, con sesgo constructivo')
+# Postura: sale del número (misma escala que las tarjetas: |brecha| < 5% neutral; 5-15% neutral con sesgo; > 15% fuera de neutral)
+g_ = M['blend_gap']
+POST = put('postura', 'neutral' if abs(g_) < 5 else ('neutral, con sesgo constructivo' if 0 < g_ <= 15 else
+            'neutral, con sesgo cauteloso' if -15 <= g_ < 0 else ('constructiva' if g_ > 0 else 'neutral, con sesgo bajista')))
+put('card_accent', 'neutral' if abs(g_) <= 15 else ('up' if g_ > 0 else 'down'))
 put('postura_up', POST.upper())
 
 # Anti-circularidad: el modelo corrido con otro precio de PFE da lo mismo en M1, M2, M3 y M4 (la tasa común no usa el precio de PFE)
@@ -549,11 +558,13 @@ put('seagen_30', B['R']['seagen'][2030]); put('launch_30', B['R']['launch'][2030
 # ======================= 12. Frases del texto atadas a números =======================
 if TXT:
     assert 30 < M['gap30_pct'] < 40 and M['gap31_pct'] > 40                       # "más de un tercio", "más de 40% con Vyndaqel EE.UU."
-    assert M['m1'] < PRICE and M['m3'] < PRICE < M['m4'] < M['m2']                  # orden de los métodos que cita la Sección 13
-    assert M['blend_gap'] > 5 and M['blend_med_gap'] > 0 and M['blend_cliff_gap'] < M['blend_gap']
+    assert M['m1'] < PRICE and M['m3'] < PRICE < M['m4'] < M['m2'] < M['m2_q3']     # orden de los métodos que cita la Sección 13
+    assert 0 < M['blend_gap'] < 5 and M['postura'] == 'neutral' and M['blend_cliff_gap'] < 0 < M['blend_q3_gap']
+    assert M['m1'] / PRICE < 0.40 and M['m2'] / PRICE > 1.5 and abs(M['m3_gap']) < 10 and 10 < M['indep_gap'] < 15 and M['anch_gap'] < 0
     assert M['div_cover_fcf'] > 1.0 and M['cf_hist']['2023']['cov'] < 1 and M['cf_hist']['2025']['cov'] < 1 and M['fcf30_b'] < M['div_ttm_b'] and M['payout_adj'] < 60 and M['div_yield'] > M['tsy']
     assert M['cov_drop_pct'] > 90 and M['eliq3_g'] > 20 and M['pax3_g'] < -60
     assert M['c27_g'] < 0 and M['pe_27'] < M['peer_min'] + 0.5
+    assert M['pe_27'] < 10 and M['pe_ttm_adj'] < 10 and M['nd_chg_9m'] < 0 and sorted(k for k in PEERS if PEERS[k] < M['pfe_pe_fwd']) == ['BMY', 'SNY']
     assert M['nd_lev'] < 2.5 and M['m1'] < M['m1_renewal'] < PRICE and M['m1'] / PRICE < 0.40
     assert M['rev_trough_year'] in (2028, 2029, 2030)
 out = 'model.json' if TXT else 'model_price.json'

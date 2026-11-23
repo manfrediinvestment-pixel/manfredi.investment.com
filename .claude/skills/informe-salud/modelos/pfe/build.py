@@ -67,6 +67,10 @@ patch("  function drawRangeBars(canvas, opts){", """  function drawDiverging(can
   function drawRangeBars(canvas, opts){""")
 body = open('pfe.body.tpl.html', encoding='utf-8').read()
 ch = open('charts_pfe.js', encoding='utf-8').read()
+tab, has_abbv = table_html(json.load(open('model.json', encoding='utf-8')))
+assert body.count('@@CMP_TABLE@@') == 1
+body = body.replace('@@CMP_TABLE@@', tab)
+print('columna ABBV:', 'sí' if has_abbv else 'no (falta su model.json)')
 full = head + body + '\n' + eng.rstrip() + '\n\n' + ch
 assert '@@' not in full
 open('pfe.full.tpl.html', 'w', encoding='utf-8', newline='\n').write(full)
