@@ -30,7 +30,8 @@
 
     drawLines(document.getElementById('cashChart'), {
       labels:{{cash_years|json}},
-      series:[{name:'Flujo operativo', color:PALETTE.navy, values:{{cash_ocf|json}}},{name:'Flujo de caja libre', color:PALETTE.blueLight, values:{{cash_fcf|json}}},{name:'Dividendos pagados', color:PALETTE.red, values:{{cash_div|json}}}]
+      series:[{name:'Flujo operativo', color:PALETTE.navy, values:{{cash_ocf|json}}, noLabels:true},{name:'Flujo de caja libre', color:PALETTE.blueLight, values:{{cash_fcf|json}}},{name:'Dividendos pagados', color:PALETTE.red, values:{{cash_div|json}}, labelBelow:true}],
+      valueFmt:function(v){ return '$'+v.toFixed(1); }
     });
 
     var cL = {{comps_labels|json}};
@@ -43,7 +44,7 @@
     });
 
     drawVBars(document.getElementById('estChart'), {
-      labels:['TTM (real)','2026E guía','2026E consenso','2027E consenso','2027E modelo'],
+      labels:['TTM (real)','Guía 2026','Cons. 2026','Cons. 2027','Modelo 2027'],
       values:{{est_values|json}},
       colors:[PALETTE.navy,PALETTE.blue,PALETTE.blueLight,PALETTE.pale,PALETTE.gold],
       valueFmt:function(v){ return '$'+v.toFixed(1)+'B'; }
@@ -65,7 +66,7 @@
     });
 
     drawVBars(document.getElementById('peChart'), {
-      labels:{{fy_pe_chart_years|json}},
+      labels:{{fy_pe_chart_years|json}}.map(function(y){ return (document.getElementById('peChart').parentElement.clientWidth || 999) < 560 ? "'" + String(y).slice(2) : y; }),
       values:{{fy_pe_chart|json}},
       colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.gold,PALETTE.gold,PALETTE.gold,PALETTE.navy,PALETTE.navy],
       valueFmt:function(v){ return v.toFixed(1)+'x'; }

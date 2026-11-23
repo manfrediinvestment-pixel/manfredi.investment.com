@@ -61,7 +61,7 @@
       ctx.textAlign = 'center';
       ctx.font = '600 11px "IBM Plex Mono", monospace';
       var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
-      ctx.fillText(vLabel, cx, y0 - 6);
+      var _dense = ctx.measureText(String(vLabel)).width + 4 > slot; if(!_dense || i % 2 === 0 || i === n - 1){ ctx.fillText(vLabel, cx, y0 - 6); }
 
       ctx.fillStyle = PALETTE.muted;
       ctx.font = '10px "Inter", sans-serif';
@@ -235,7 +235,7 @@
         if(opts.valueFmt){
           ctx.font = '600 10px "IBM Plex Mono", monospace';
           ctx.textAlign = 'center';
-          ctx.fillText(opts.valueFmt(v), x, y - 8);
+          var _t = opts.valueFmt(v, i, s.values.length); var _k = Math.max(1, Math.ceil(34 / (plotW / Math.max(1, labels.length - 1)))); if(_t && !s.noLabels && (_k === 1 || i % _k === 0 || i === s.values.length - 1)){ ctx.fillText(_t, x, s.labelBelow ? y + 14 : y - 8); }
         }
       });
     });
@@ -243,7 +243,7 @@
     ctx.fillStyle = PALETTE.muted;
     ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
-    labels.forEach(function(l,i){ ctx.fillText(l, scaleX(i), padT+plotH+16); });
+    var _lw = Math.max.apply(null, labels.map(function(l){ return ctx.measureText(String(l)).width; })); var _lk = Math.max(1, Math.ceil((_lw + 6) / (plotW / Math.max(1, labels.length - 1)))); labels.forEach(function(l,i){ if(i % _lk === 0 || (i === labels.length - 1 && i % _lk >= _lk / 2)){ ctx.fillText(l, scaleX(i), padT+plotH+16); } });
 
     var lx = padL, ly = H - 12;
     ctx.font = '11px "Inter", sans-serif';

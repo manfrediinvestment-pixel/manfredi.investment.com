@@ -1108,7 +1108,7 @@
       ctx.textAlign = 'center';
       ctx.font = '600 11px "IBM Plex Mono", monospace';
       var vLabel = opts.valueFmt ? opts.valueFmt(values[i]) : values[i];
-      ctx.fillText(vLabel, cx, y0 - 6);
+      var _dense = ctx.measureText(String(vLabel)).width + 4 > slot; if(!_dense || i % 2 === 0 || i === n - 1){ ctx.fillText(vLabel, cx, y0 - 6); }
 
       ctx.fillStyle = PALETTE.muted;
       ctx.font = '10px "Inter", sans-serif';
@@ -1313,7 +1313,7 @@
         if(opts.valueFmt){
           ctx.font = '600 10px "IBM Plex Mono", monospace';
           ctx.textAlign = 'center';
-          ctx.fillText(opts.valueFmt(v), x, y - 8);
+          var _t = opts.valueFmt(v, i, s.values.length); var _k = Math.max(1, Math.ceil(34 / (plotW / Math.max(1, labels.length - 1)))); if(_t && !s.noLabels && (_k === 1 || i % _k === 0 || i === s.values.length - 1)){ ctx.fillText(_t, x, s.labelBelow ? y + 14 : y - 8); }
         }
       });
     });
@@ -1321,7 +1321,7 @@
     ctx.fillStyle = PALETTE.muted;
     ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
-    labels.forEach(function(l,i){ ctx.fillText(l, scaleX(i), padT+plotH+16); });
+    var _lw = Math.max.apply(null, labels.map(function(l){ return ctx.measureText(String(l)).width; })); var _lk = Math.max(1, Math.ceil((_lw + 6) / (plotW / Math.max(1, labels.length - 1)))); labels.forEach(function(l,i){ if(i % _lk === 0 || (i === labels.length - 1 && i % _lk >= _lk / 2)){ ctx.fillText(l, scaleX(i), padT+plotH+16); } });
 
     var lx = padL, ly = H - 12 - (lrows - 1) * 15;
     ctx.font = '11px "Inter", sans-serif';
@@ -1368,7 +1368,8 @@
 
     drawLines(document.getElementById('cashChart'), {
       labels:["2021", "2022", "2023", "2024", "2025", "TTM"],
-      series:[{name:'Flujo operativo', color:PALETTE.navy, values:[32.58, 29.27, 8.7, 12.74, 11.7, 14.17]},{name:'Flujo de caja libre', color:PALETTE.blueLight, values:[29.87, 26.03, 4.79, 9.83, 9.07, 11.78]},{name:'Dividendos pagados', color:PALETTE.red, values:[8.73, 8.98, 9.25, 9.51, 9.77, 9.79]}]
+      series:[{name:'Flujo operativo', color:PALETTE.navy, values:[32.58, 29.27, 8.7, 12.74, 11.7, 14.17], noLabels:true},{name:'Flujo de caja libre', color:PALETTE.blueLight, values:[29.87, 26.03, 4.79, 9.83, 9.07, 11.78]},{name:'Dividendos pagados', color:PALETTE.red, values:[8.73, 8.98, 9.25, 9.51, 9.77, 9.79], labelBelow:true}],
+      valueFmt:function(v){ return '$'+v.toFixed(1); }
     });
 
     var cL = ["PFE", "LLY", "VRTX", "JNJ", "GILD", "AMGN", "MRK", "NVS", "AZN", "NVO", "REGN", "GSK", "SNY", "BMY"];
@@ -1381,7 +1382,7 @@
     });
 
     drawVBars(document.getElementById('estChart'), {
-      labels:['TTM (real)','2026E guía','2026E consenso','2027E consenso','2027E modelo'],
+      labels:['TTM (real)','Guía 2026','Cons. 2026','Cons. 2027','Modelo 2027'],
       values:[63.62, 63.0, 63.13, 60.82, 58.18],
       colors:[PALETTE.navy,PALETTE.blue,PALETTE.blueLight,PALETTE.pale,PALETTE.gold],
       valueFmt:function(v){ return '$'+v.toFixed(1)+'B'; }
@@ -1403,7 +1404,7 @@
     });
 
     drawVBars(document.getElementById('peChart'), {
-      labels:["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"],
+      labels:["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"].map(function(y){ return (document.getElementById('peChart').parentElement.clientWidth || 999) < 560 ? "'" + String(y).slice(2) : y; }),
       values:[14.67, 13.53, 13.67, 14.55, 13.28, 16.58, 13.36, 7.79, 15.65, 8.53, 7.73],
       colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.gold,PALETTE.gold,PALETTE.gold,PALETTE.navy,PALETTE.navy],
       valueFmt:function(v){ return v.toFixed(1)+'x'; }
