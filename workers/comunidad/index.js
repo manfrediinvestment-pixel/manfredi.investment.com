@@ -77,10 +77,12 @@ export default {
   // El cron corre cada 10/30 min en las horas posibles (UTC) y acá se decide con la hora de
   // Nueva York, que cambia de horario de verano en fechas distintas que la Argentina.
   async scheduled(event, env, ctx) {
-    const turno = turnoDeResumen(new Date(event.scheduledTime));
+    const cuando = new Date(event.scheduledTime);
+    // si un disparo se perdió (Cloudflare tarda en tomar un cron nuevo, o se cayó), el siguiente lo recupera
+    const turno = turnoDeResumen(cuando) || await turnoAtrasado(env, cuando);
     if (!turno) return;
     ctx.waitUntil((async () => {
-      let r = await resumen(env, turno.momento, !turno.reintento);
+      let r = await resumen(env, turno.momento, !turno.reintento || turno.forzar);
       if (turno.reintento && !r.ia) r = await resumen(env, turno.momento, true);
       if (turno.reintento) await avisarPorMail(env, r);
     })());
@@ -113,6 +115,25 @@ function turnoDeResumen(d) {
   if (ny.min === cierre) return { momento: 'cierre', reintento: false };
   if (ny.min === cierre + 10) return { momento: 'cierre', reintento: true };
   return null;
+}
+
+// Recupera un resumen que no salió: pasada su hora (apertura 9:31 NY, cierre 16:30/13:30) y antes
+// del siguiente, si el de hoy no existe o se armó antes de esa hora (ej. con datos de antes de abrir).
+async function turnoAtrasado(env, d) {
+  const ny = horaNY(d);
+  if (ny.finde || NYSE_FERIADOS.has(ny.iso)) return null;
+  const cierre = NYSE_MEDIO_DIA.has(ny.iso) ? 13 * 60 + 30 : 16 * 60 + 30;
+  const momento = ny.min >= 9 * 60 + 31 && ny.min < cierre ? 'apertura'
+    : ny.min >= cierre && ny.min < cierre + 120 ? 'cierre' : null;
+  if (!momento) return null;
+  const desde = momento === 'apertura' ? 9 * 60 + 31 : cierre;
+  await esquema(env);
+  const fila = await env.DB.prepare('SELECT datos FROM mensajes WHERE clave = ?').bind(`resumen:${hoyART().iso}:${momento}`).first();
+  if (fila) {
+    const g = horaNY(new Date(JSON.parse(fila.datos).generado));
+    if (g.iso === ny.iso && g.min >= desde) return null;   // ya salió a tiempo
+  }
+  return { momento, reintento: true, forzar: true };
 }
 
 // ─── Resumen del día ─────────────────────────────────────────────────────────
