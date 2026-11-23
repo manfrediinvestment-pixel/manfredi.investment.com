@@ -240,7 +240,7 @@ async function bolsaAR(hoyIso, feriados) {
   return { ruedaHoy, ultimo, anterior, mervalHoy, mervalUltimo };
 }
 
-// Antes de la apertura (y los feriados) la tabla dice "último cierre": el dólar del último día
+// Si BYMA todavía no abrió (y los feriados) la tabla dice "último cierre": el dólar del último día
 // hábil contra el del día hábil anterior. Antes salía 0,0% el día después de un fin de semana
 // o feriado, porque ArgentinaDatos repite el valor en los días sin rueda y /pulso comparaba con esa copia.
 async function dolaresUltimoCierre(argentina, ultimo, anterior) {
@@ -540,7 +540,7 @@ async function esquema(env) {
   // Primer mensaje de cada sala: la bienvenida oficial (una sola vez, por clave).
   const ahora = Date.now();
   const bienvenida = {
-    gratis: 'Bienvenidos a la Comunidad de *Manfredi Investment*. Acá se publica el resumen del mercado antes de la apertura y al cierre, todos los días hábiles, y se charla de mercados con respeto. Nadie del equipo te va a escribir por privado ni a pedirte dinero.',
+    gratis: 'Bienvenidos a la Comunidad de *Manfredi Investment*. Acá se publica el resumen del mercado en la apertura y al cierre, todos los días hábiles, y se charla de mercados con respeto. Nadie del equipo te va a escribir por privado ni a pedirte dinero.',
     ideas: 'Acá publica Ignacio sus *ideas*, los *seguimientos* y los *cierres*, con resultado. Para comentar, usá la Charla de socios; para consultar, Preguntas a Ignacio.',
     socios: 'La *charla de los socios* de Manfredi Pro. Lo que se comparte acá queda entre socios.',
     preguntas: 'Dejá tu pregunta para Ignacio: te responde citando tu mensaje. Una pregunta por mensaje ayuda a que nada quede sin respuesta.',
@@ -644,7 +644,7 @@ async function chat(request, env, url, sala, id, accion) {
       const o = await env.DB.prepare('SELECT id, nombre, texto, tipo, datos, borrado FROM mensajes WHERE id = ? AND sala = ?').bind(+body.responde, sala).first();
       if (o && !o.borrado) {
         responde = o.id;
-        const t = o.tipo === 'resumen' ? (JSON.parse(o.datos).momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : o.texto || (o.tipo === 'imagen' ? 'Imagen' : '');
+        const t = o.tipo === 'resumen' ? (JSON.parse(o.datos).momento === 'apertura' ? 'Resumen de la apertura' : 'Resumen del cierre') : o.texto || (o.tipo === 'imagen' ? 'Imagen' : '');
         cita = JSON.stringify({ nombre: o.nombre, texto: t.slice(0, 160) });
       }
     }
@@ -694,7 +694,7 @@ async function imagen(env, clave) {
 async function avisarPorMail(env, r) {
   if (!env.RESEND_API_KEY) return;
   const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
-  const asunto = r.momento === 'apertura' ? 'Listo para WhatsApp: resumen antes de la apertura' : 'Listo para WhatsApp: resumen del cierre';
+  const asunto = r.momento === 'apertura' ? 'Listo para WhatsApp: resumen de la apertura' : 'Listo para WhatsApp: resumen del cierre';
   const html = `<div style="background:#0b1629;padding:28px;font-family:Helvetica,Arial,sans-serif;color:#f3f6fb">
     <p style="margin:0 0 6px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#e9d3a0">Comunidad de WhatsApp</p>
     <p style="margin:0 0 18px;font-size:15px;color:#f3f6fb">El resumen está listo. Abrilo en el Panel y tocá <b>Compartir</b>:</p>

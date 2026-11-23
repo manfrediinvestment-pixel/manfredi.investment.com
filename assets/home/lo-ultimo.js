@@ -162,8 +162,8 @@
     var m = st.wa, txt;
     if (m) {
       var r = m.datos || {};
-      txt = '<b>' + (r.momento === 'apertura' ? 'Antes de la apertura' : 'Cierre del mercado') + ':</b> ' + esc(r.clave || String(r.intro || '').split('. ')[0]);
-    } else txt = 'Un <b>resumen antes de la apertura</b> y otro <b>al cierre</b>, todos los días hábiles.';
+      txt = '<b>' + (r.momento === 'apertura' ? 'Apertura del mercado' : 'Cierre del mercado') + ':</b> ' + esc(r.clave || String(r.intro || '').split('. ')[0]);
+    } else txt = 'Un <b>resumen en la apertura</b> y otro <b>al cierre</b>, todos los días hábiles.';
     return '<div class="lu-wa lu-rv">' +
       '<span class="lu-wa__ic">' + IC_WA + '</span>' +
       '<div class="lu-wa__t"><span class="lu-k"><b>Canal de WhatsApp</b><i>Gratis' + (m ? ' · ' + esc(hace(new Date(m.creado).toISOString())) : '') + '</i></span><p>' + txt + '</p></div>' +

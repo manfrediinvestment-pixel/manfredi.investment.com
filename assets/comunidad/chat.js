@@ -23,7 +23,7 @@
   var COLORES = ['#e9d3a0', '#8ec5ff', '#9be3c4', '#f0a8b8', '#c9b6ff', '#ffc58f'];
   var SALAS = {
     gratis: { nombre: 'Mercados', tag: 'Gratis', sub: 'Comunidad abierta · resúmenes antes y después de Wall Street',
-      fijado: 'Resúmenes del mercado media hora antes de que abra Wall Street y media hora después del cierre. Las opiniones de los miembros no son recomendaciones de inversión. Nadie del equipo te va a escribir por privado ni a pedirte dinero.' },
+      fijado: 'Resúmenes del mercado un minuto después de que abre Wall Street, con precios en vivo, y media hora después del cierre. Las opiniones de los miembros no son recomendaciones de inversión. Nadie del equipo te va a escribir por privado ni a pedirte dinero.' },
     ideas: { nombre: 'Ideas de Ignacio', pro: true, soloCreador: true, sub: 'Publica solo Ignacio · ideas, seguimientos y cierres',
       fijado: 'Las ideas son análisis generales: no consideran tu situación particular. Antes de operar, mirá si encajan con tu perfil.' },
     socios: { nombre: 'Charla de socios', pro: true, sub: 'Solo socios Pro',
