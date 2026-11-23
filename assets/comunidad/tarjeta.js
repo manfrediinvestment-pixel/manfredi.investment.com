@@ -58,7 +58,7 @@
   }
 
   // ---------- horario de los resúmenes (el de Wall Street, en hora argentina) ----------
-  // 30 min antes de la apertura (9:00 NY) y 30 min después del cierre (16:30 NY; 13:30 los días
+  // 1 min después de la apertura (9:31 NY) y 30 min después del cierre (16:30 NY; 13:30 los días
   // de cierre temprano). Mismas fechas que workers/comunidad (NYSE_FERIADOS / NYSE_MEDIO_DIA).
   var FERIADOS = ['2026-11-26', '2026-12-25', '2027-01-01', '2027-01-18', '2027-02-15', '2027-03-26', '2027-05-31', '2027-06-18', '2027-07-05', '2027-09-06', '2027-11-25', '2027-12-24'];
   var MEDIO_DIA = ['2026-11-27', '2026-12-24', '2027-11-26'];
@@ -69,7 +69,7 @@
     var dif = 12 - nyHora;                       // 15:00 UTC = 12:00 en Argentina: horas que va adelantada a NY (1 o 2)
     var wd = dia.getUTCDay(), cierreNY = MEDIO_DIA.indexOf(iso) > -1 ? 13 * 60 + 30 : 16 * 60 + 30;
     var hm = function (m) { return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
-    var ap = 9 * 60 + dif * 60, ci = cierreNY + dif * 60;
+    var ap = 9 * 60 + 31 + dif * 60, ci = cierreNY + dif * 60;
     return { iso: iso, hay: wd !== 0 && wd !== 6 && FERIADOS.indexOf(iso) < 0,
       apertura: { min: ap, hora: hm(ap) }, cierre: { min: ci, hora: hm(ci) } };
   }
@@ -80,7 +80,7 @@
   // agenda y titulares completos).
   function epigrafe(d, id) {
     var fecha = d.fechaLarga.charAt(0).toUpperCase() + d.fechaLarga.slice(1);
-    var out = ['*MANFREDI · ' + (d.momento === 'apertura' ? 'ANTES DE LA APERTURA' : 'CIERRE DEL MERCADO') + '*', '_' + fecha + '_', ''];
+    var out = ['*MANFREDI · ' + (d.momento === 'apertura' ? (d.datos.mundoVivo ? 'APERTURA DEL MERCADO' : 'ANTES DE LA APERTURA') : 'CIERRE DEL MERCADO') + '*', '_' + fecha + '_', ''];
     if (d.clave) out.push('> *' + d.clave + '*', '');
     out.push(d.intro, '', 'El resumen completo, con bonos, agenda y titulares:', 'manfredinvestment.com/' + (id ? '?r=' + id : '') + '#pro');
     return out.join('\n');
@@ -103,7 +103,7 @@
       x.fillText(d.fechaLarga.charAt(0).toUpperCase() + d.fechaLarga.slice(1), R, 105);
       x.textAlign = 'left';
       x.fillStyle = C.ink; x.font = '400 70px "DM Serif Display"';
-      x.fillText(d.momento === 'apertura' ? 'Antes de la apertura' : 'Cierre del mercado', L, 215);
+      x.fillText(d.momento === 'apertura' ? (d.datos.mundoVivo ? 'Apertura del mercado' : 'Antes de la apertura') : 'Cierre del mercado', L, 215);
       var y = 278;
       if (d.clave) {
         // la clave del día, en hasta 2 líneas
@@ -115,8 +115,10 @@
       linea(x, L, R, y);
 
       y += 52;
-      y = seccion(x, d.momento === 'apertura' ? 'ARGENTINA · ÚLTIMO CIERRE' : 'ARGENTINA', d.datos.argentina, L, R, y);
-      y = seccion(x, d.momento === 'apertura' ? 'MUNDO · ÚLTIMO CIERRE' : 'MUNDO', d.datos.mundo, L, R, y + 20);
+      // mensajes viejos (sin arUltimo/mundoVivo): la apertura era todo último cierre
+      var ape = d.momento === 'apertura', arUlt = d.datos.arUltimo != null ? d.datos.arUltimo : ape;
+      y = seccion(x, arUlt ? 'ARGENTINA · ÚLTIMO CIERRE' : ape ? 'ARGENTINA · EN VIVO' : 'ARGENTINA', d.datos.argentina, L, R, y);
+      y = seccion(x, ape ? (d.datos.mundoVivo ? 'MUNDO · EN VIVO' : 'MUNDO · ÚLTIMO CIERRE') : 'MUNDO', d.datos.mundo, L, R, y + 20);
 
       // cierre: panel líder · apertura: agenda de hoy
       var extra = [], p = d.datos.panel;

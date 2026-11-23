@@ -16,8 +16,10 @@
 //    - Texto: Gemini (cupo gratis, clave SIN facturación) redacta un párrafo corto SOLO con los
 //      números que se le pasan; si inventa un número, falla o no hay cupo, sale la plantilla.
 //    - Se publican como mensaje oficial del chat gratis (1 por día y momento: regenerar lo reemplaza).
-//    - Horario de Wall Street: 30 min antes de la apertura (9:00 NY) y 30 min después del cierre
-//      (16:30 NY; 13:30 los días que cierra temprano). Sin resumen los feriados de la NYSE.
+//    - Horario de Wall Street: 1 min después de la apertura (9:31 NY, con precios EN VIVO) y 30 min
+//      después del cierre (16:30 NY; 13:30 los días que cierra temprano). Sin resumen los feriados de la NYSE.
+//      La Argentina sale en vivo si BYMA ya abrió (11:00 ART); con el horario de verano de NY
+//      (9:31 NY = 10:31 ART) todavía no abrió y sale con el último cierre.
 //      10 min después se reintenta la IA si hizo falta y sale el mail (si hay RESEND_API_KEY).
 //    GET /wa/apertura · /wa/cierre  (?regenerar=1)  -> solo creadores (Panel de creador)
 
@@ -101,13 +103,13 @@ function horaNY(d) {
   }).formatToParts(d).map(x => [x.type, x.value]));
   return { iso: `${p.year}-${p.month}-${p.day}`, min: +p.hour * 60 + +p.minute, finde: p.weekday === 'Sat' || p.weekday === 'Sun' };
 }
-// apertura: 9:00 NY (30 min antes de las 9:30) · cierre: 30 min después de las 16:00 (o 13:00)
+// apertura: 9:31 NY (1 min después de que abre, precios en vivo) · cierre: 30 min después de las 16:00 (o 13:00)
 function turnoDeResumen(d) {
   const ny = horaNY(d);
   if (ny.finde || NYSE_FERIADOS.has(ny.iso)) return null;
   const cierre = NYSE_MEDIO_DIA.has(ny.iso) ? 13 * 60 + 30 : 16 * 60 + 30;
-  if (ny.min === 9 * 60) return { momento: 'apertura', reintento: false };
-  if (ny.min === 9 * 60 + 10) return { momento: 'apertura', reintento: true };
+  if (ny.min === 9 * 60 + 31) return { momento: 'apertura', reintento: false };
+  if (ny.min === 9 * 60 + 41) return { momento: 'apertura', reintento: true };
   if (ny.min === cierre) return { momento: 'cierre', reintento: false };
   if (ny.min === cierre + 10) return { momento: 'cierre', reintento: true };
   return null;
@@ -232,8 +234,9 @@ async function dolaresUltimoCierre(argentina, ultimo, anterior) {
 async function juntarDatos(env, momento, hoy) {
   const anio = +hoy.iso.slice(0, 4);
   const [pulso, mercados, cal, earn, feriados] = await Promise.all([
-    getJSON(env.MERCADOS_URL + '/pulso'),
-    getJSON(env.MERCADOS_URL + '/mercados'),
+    // refresh=1: sin la caché de 5 min del worker mercados (a las 9:31 serían precios de antes de abrir)
+    getJSON(env.MERCADOS_URL + '/pulso?refresh=1'),
+    getJSON(env.MERCADOS_URL + '/mercados?refresh=1'),
     getJSON(env.CALENDARIO_URL + '/calendario'),
     getJSON(env.CALENDARIO_URL + '/earnings'),
     feriadosAR([anio - 1, anio]),
@@ -243,9 +246,12 @@ async function juntarDatos(env, momento, hoy) {
 
   // Día sin rueda en la Argentina con Wall Street abierto (feriado, o cierre como el 10-nov-2026):
   // no se muestran panel, CEDEARs ni bonos (serían los del día con rueda anterior como si fueran de hoy).
-  const sinRuedaAR = momento === 'cierre' && !bolsa.ruedaHoy;
+  // A la apertura, BYMA puede no haber abierto todavía (horario de verano de NY): la Argentina va con
+  // el último cierre. Si ya abrió (BYMA muestra la fecha de hoy), todo en vivo.
+  const sinRuedaAR = !bolsa.ruedaHoy && (momento === 'cierre' || !esHabil(hoy.iso, feriados));
   const feriadoAR = feriados ? feriados.get(hoy.iso) || null : null;
-  const ultimoCierre = momento === 'apertura' || sinRuedaAR;
+  const ultimoCierre = !bolsa.ruedaHoy;
+  const arAunNoAbre = ultimoCierre && !sinRuedaAR;
 
   // El Merval de /pulso viene de Yahoo y hace semanas que llega vacío: sale de BYMA.
   const merval = ultimoCierre ? bolsa.mervalUltimo : bolsa.mervalHoy;
@@ -255,7 +261,7 @@ async function juntarDatos(env, momento, hoy) {
   const fila = c => c && c.price != null ? { id: c.id, n: c.name, v: c.price, u: c.unit || '', c: c.change ?? null, d: c.delta ?? null } : null;
   const argentina = cotAR.map(fila).filter(Boolean);
   if (ultimoCierre) await dolaresUltimoCierre(argentina, bolsa.ultimo, bolsa.anterior);
-  const ruedaAR = !sinRuedaAR;
+  const ruedaAR = !ultimoCierre;
   const mundo = pulso.mundo.cotizaciones.map(fila).filter(Boolean);
 
   const cat = k => (mercados && mercados.categorias && mercados.categorias[k] && mercados.categorias[k].items) || [];
@@ -264,9 +270,9 @@ async function juntarDatos(env, momento, hoy) {
   const bonos = !ruedaAR ? [] : BONOS.map(s => bonosMap[s]).filter(b => b && b.price != null && b.change != null)
     .map(b => ({ n: b.symbol.replace(/D$/, ''), v: b.price, u: 'US$', c: b.change }));
 
-  // Los que más se movieron solo tienen sentido al cierre (a la mañana son los de ayer).
+  // Los que más se movieron: solo con la rueda de hoy en curso o cerrada (si no, serían los de ayer).
   let panel = null, cedears = null;
-  if (momento === 'cierre' && ruedaAR) {
+  if (ruedaAR) {
     const acc = porSimbolo('arg_stocks');
     const lider = PANEL_LIDER.map(s => acc[s]).filter(a => a && a.change != null)
       .sort((a, b) => b.change - a.change).map(a => ({ n: a.symbol, c: a.change }));
@@ -308,7 +314,9 @@ async function juntarDatos(env, momento, hoy) {
     canje: mep && ccl ? (ccl / mep - 1) * 100 : null,
   };
 
-  return { argentina, derivados, bonos, mundo, panel, cedears, agenda, noticias, contexto, sinRuedaAR, feriadoAR };
+  // arUltimo: la tabla argentina es del último cierre · mundoVivo: Wall Street en vivo (apertura 9:31 NY)
+  return { argentina, derivados, bonos, mundo, panel, cedears, agenda, noticias, contexto, sinRuedaAR, feriadoAR,
+    arUltimo: ultimoCierre, arAunNoAbre, mundoVivo: momento === 'apertura' };
 }
 
 // ─── Redacción con IA (Gemini, cupo gratis) ─────────────────────────────────
@@ -316,9 +324,9 @@ async function juntarDatos(env, momento, hoy) {
 async function redactar(env, momento, datos) {
   if (!env.GEMINI_KEY) return null;
   const consigna = momento === 'apertura'
-    ? `Es el resumen de la MAÑANA, media hora antes de que abra Wall Street. Los precios son del último cierre.
-"clave": lo que define el día que empieza (un dato de la agenda, una noticia o el último movimiento importante).
-"parrafo": 1) en qué quedó el último cierre en la Argentina y por qué, 2) cómo viene el mundo, 3) qué hay que mirar hoy en la agenda.`
+    ? `Es el resumen de la APERTURA, un minuto después de que abrió Wall Street. Los precios de "mundo" son EN VIVO: "c" es cuánto va hoy contra el cierre anterior (incluye lo que se movió antes de abrir, en los futuros).${datos.arAunNoAbre ? ' La bolsa argentina todavía no abrió: los precios de "argentina" son del último cierre.' : datos.sinRuedaAR ? ' Hoy no opera la bolsa argentina: los precios de "argentina" son del último cierre.' : ' La bolsa argentina ya abrió: los precios de "argentina" también son EN VIVO.'}
+"clave": cómo arranca el día (lo que más se mueve en la apertura, o el dato o la noticia que lo explica).
+"parrafo": 1) cómo abrió Wall Street y el mundo y por qué, 2) cómo viene la Argentina${datos.arUltimo ? ' (último cierre)' : ' hoy'} y por qué, 3) qué hay que mirar hoy en la agenda.`
     : `Es el resumen del CIERRE, media hora después de que cerró Wall Street.
 "clave": lo que definió la rueda de hoy.
 "parrafo": 1) qué pasó en la Argentina y por qué, 2) qué pasó en Wall Street y el mundo y por qué, 3) qué hay en la agenda de mañana, si es relevante.`;
@@ -393,21 +401,28 @@ function numerosInvalidos(txt, datos) {
   };
   recorrer(datos);
   const hoy = hoyART();
-  [hoy.d.getUTCDate(), hoy.d.getUTCFullYear(), 11, 16, 17].forEach(agregar);
+  [hoy.d.getUTCDate(), hoy.d.getUTCFullYear(), 10, 11, 16, 17, 30, 31].forEach(agregar);
   return (txt.match(/\d+(?:[.,]\d+)*/g) || []).filter(n => +sinSep(n) >= 10 && !ok.has(sinSep(n)));
 }
 
 function introPlantilla(momento, datos) {
   const buscar = id => datos.argentina.find(f => f.id === id) || datos.mundo.find(f => f.id === id);
-  const partes = [];
+  const ape = momento === 'apertura', arVivo = ape && !datos.arUltimo;
+  // en vivo (apertura) "sube/baja"; cerrado "subió/bajó"
+  const v = (c, vivo) => vivo ? (r1(c) > 0 ? 'sube' : r1(c) < 0 ? 'baja' : 'está estable,') : verbo(c);
   const merval = buscar('merval'), riesgo = buscar('riesgo'), mep = buscar('bolsa'), sp = buscar('sp500');
-  if (merval && merval.c != null) partes.push(`el Merval ${verbo(merval.c)} ${pct(merval.c, false)}`);
-  if (riesgo) partes.push(`el riesgo país quedó en ${num(riesgo.v, 0)} puntos`);
-  if (mep && mep.c != null) partes.push(`el dólar MEP ${verbo(mep.c)} ${pct(mep.c, false)} a $${num(mep.v, 2)}`);
-  if (sp && sp.c != null) partes.push(`en Wall Street el S&P 500 ${verbo(sp.c)} ${pct(sp.c, false)}`);
-  if (!partes.length) return momento === 'apertura' ? 'Lo que hay que saber antes de la apertura.' : 'Así cerró el mercado hoy.';
-  const cuerpo = partes.length > 1 ? partes.slice(0, -1).join(', ') + ' y ' + partes[partes.length - 1] : partes[0];
-  return (momento === 'apertura' ? 'En el último cierre, ' : 'Hoy ') + cuerpo + '.';
+  const ar = [];
+  if (merval && merval.c != null) ar.push(`el Merval ${v(merval.c, arVivo)} ${pct(merval.c, false)}`);
+  if (riesgo) ar.push(`el riesgo país ${arVivo ? 'está' : 'quedó'} en ${num(riesgo.v, 0)} puntos`);
+  if (mep && mep.c != null) ar.push(`el dólar MEP ${v(mep.c, arVivo)} ${pct(mep.c, false)} a $${num(mep.v, 2)}`);
+  const ws = sp && sp.c != null ? `el S&P 500 ${v(sp.c, ape)} ${pct(sp.c, false)}` : null;
+  const unir = l => l.length > 1 ? l.slice(0, -1).join(', ') + ' y ' + l[l.length - 1] : l[0];
+  if (!ar.length && !ws) return ape ? 'Así arranca el mercado hoy.' : 'Así cerró el mercado hoy.';
+  if (!ape) return 'Hoy ' + unir([...ar, ...(ws ? ['en Wall Street ' + ws] : [])]) + '.';
+  const frases = [];
+  if (ws) frases.push(`En la apertura de Wall Street, ${ws}.`);
+  if (ar.length) frases.push(`${datos.arUltimo ? 'En el último cierre local' : 'En la Argentina'}, ${unir(ar)}.`);
+  return frases.join(' ');
 }
 
 // ─── Formato WhatsApp ────────────────────────────────────────────────────────
@@ -445,13 +460,15 @@ function tabla(filas, extra) {
 function textoWhatsApp(r, site) {
   const d = r.datos, ape = r.momento === 'apertura';
   const fecha = r.fechaLarga.charAt(0).toUpperCase() + r.fechaLarga.slice(1);
-  const out = [`*MANFREDI · ${ape ? 'ANTES DE LA APERTURA' : 'CIERRE DEL MERCADO'}*`, `_${fecha}_`, ''];
+  const out = [`*MANFREDI · ${ape ? (d.mundoVivo ? 'APERTURA DEL MERCADO' : 'ANTES DE LA APERTURA') : 'CIERRE DEL MERCADO'}*`, `_${fecha}_`, ''];
   if (r.clave) out.push(`> *${r.clave}*`, '');
   out.push(r.intro, '');
 
-  // Argentina (a la mañana es el último cierre)
-  out.push(`*🇦🇷 Argentina*${ape || d.sinRuedaAR ? ' _· último cierre_' : ''}`);
-  if (d.sinRuedaAR) out.push(`_Hoy no operó la bolsa argentina${d.feriadoAR ? ` (feriado: ${d.feriadoAR})` : ''}._`);
+  // Argentina: en vivo si BYMA ya abrió; si no, el último cierre (mensajes viejos: apertura = último cierre)
+  const arUltimo = d.arUltimo != null ? d.arUltimo : ape || d.sinRuedaAR;
+  out.push(`*🇦🇷 Argentina*${arUltimo ? ' _· último cierre_' : ape ? ' _· en vivo_' : ''}`);
+  if (d.sinRuedaAR) out.push(`_Hoy no ${ape ? 'opera' : 'operó'} la bolsa argentina${d.feriadoAR ? ` (feriado: ${d.feriadoAR})` : ''}._`);
+  else if (d.arAunNoAbre) out.push('_La bolsa argentina abre a las 11:00._');
   const der = d.derivados || {}, extra = [];
   if (der.brecha != null) extra.push(filaTabla('Brecha MEP', '', pct(der.brecha, true, '-')));
   if (der.canje != null) extra.push(filaTabla('Canje CCL', '', pct(der.canje, true, '-')));
@@ -471,7 +488,7 @@ function textoWhatsApp(r, site) {
   }
   if (d.cedears) out.push('', '*CEDEARs más operados*', d.cedears.map(c => `${c.n} ${pct(c.c)}`).join(' · '));
 
-  out.push('', `*🇺🇸 Wall Street y el mundo* _· ${ape ? 'último cierre, ' : ''}en US$_`, ...tabla(d.mundo));
+  out.push('', `*🇺🇸 Wall Street y el mundo* _· ${ape ? (d.mundoVivo ? 'en vivo, ' : 'último cierre, ') : ''}en US$_`, ...tabla(d.mundo));
   if (d.agenda.eventos.length) out.push('', `*📅 ${d.agenda.titulo}*`, ...d.agenda.eventos.map(e => `- ${e.t}`));
   if (d.noticias.length) out.push('', '*📰 Lo que se lee*', ...d.noticias.map(n => `- ${n.t} _(${n.f})_`));
   out.push('', `_Cotizaciones en vivo y la Comunidad: ${site.replace(/^https?:\/\//, '')}_`);

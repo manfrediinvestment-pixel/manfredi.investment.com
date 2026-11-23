@@ -1293,7 +1293,8 @@ export default {
     // GET /pulso -- cartel "Pulso del día" de la home (ver buildPulso)
     if (url.pathname === '/pulso') {
       const sh = { ...headers, 'Cache-Control': 'public, max-age=120' };
-      const mem = memGet('pulso');
+      // ?refresh=1: sin caché (el resumen de la apertura de workers/comunidad, 9:31 NY)
+      const mem = url.searchParams.get('refresh') === '1' ? null : memGet('pulso');
       if (mem) return new Response(mem, { headers: sh });
       try {
         const data = await buildPulso();

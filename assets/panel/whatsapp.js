@@ -141,14 +141,14 @@
 
   window.pnWhatsapp = function (el, get, base) {
     if (!window.MiTarjeta) {
-      var t = document.createElement('script'); t.src = 'assets/comunidad/tarjeta.js?v=20261028i';
+      var t = document.createElement('script'); t.src = 'assets/comunidad/tarjeta.js?v=20261123a';
       t.onload = function () { window.pnWhatsapp(el, get, base); }; document.body.appendChild(t); return;
     }
     st = { el: el, get: get, base: base, datos: {}, blobs: {}, cargando: {} };
     estilos(); esqueleto();
     var ahora = minutosART(), h = window.MiTarjeta.horarios(new Date());
     MOMENTOS.forEach(function (m) {
-      if (m.id === 'apertura' || ahora >= h[m.id].min) cargar(m.id, false);
+      if (ahora >= h[m.id].min) cargar(m.id, false);
       else pendiente(m.id);
     });
   };
