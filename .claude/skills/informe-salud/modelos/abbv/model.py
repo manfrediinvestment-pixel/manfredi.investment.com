@@ -492,6 +492,7 @@ for pth in (HERE.parent / 'pfe' / 'model.json', Path('C:/Users/Equipo/Documents/
 if PFEJ:
     assert list(PFEJ) == CMPK, 'claves del cmp de PFE'
     CMPS = [PFEJ] + CMPS
+CMPS = [dict(c, postura=c['postura'][:1].upper() + c['postura'][1:]) for c in CMPS]  # misma mayúscula en todas las columnas
 put('cmp_rows', CMPS); put('cmp_has_pfe', bool(PFEJ))
 put('rf_lly_jnj', 5.103)
 
