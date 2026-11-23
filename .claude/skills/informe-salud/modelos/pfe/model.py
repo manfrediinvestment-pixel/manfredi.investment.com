@@ -354,6 +354,9 @@ put('grid_min', min(min(r) for r in M['grid'])); put('grid_max', max(max(r) for 
 # Tabla del pipeline (para el informe)
 put('pipe_rows', [dict(name=a['name'], area=a['area'], phase=a['phase'], pos=a['pos'] * 100, peak=a['peak'], launch=a['launch'],
                        radj=a['peak'] * a['pos'], v=CMP[a['key']], src=a['src']) for a in PIPE0])
+AREA_ES = dict(metabolica='Metabólica', oncologia='Oncología', autoinmune='Autoinmune', infecciosas='Infecciosas (vacunas)', hematologia='Hematología', todas='Todas las áreas')
+PHASE_ES = {1: 'Fase 1', 2: 'Fase 2', 3: 'Fase 3', 'pres': 'Presentado'}
+for r, a in zip(M['pipe_rows'], PIPE0): r['area_es'] = AREA_ES[a['area']]; r['phase_es'] = PHASE_ES[a['phase']]
 put('pipe_radj_peak', sum(a['peak'] * a['pos'] for a in PIPE0))
 # Revenue gap: ventas TTM que pierden exclusividad en EE.UU. (o en todos sus mercados) hasta fin de 2030
 LOE_ROWS = [  # clave, producto, tipo, LOE EE.UU., LOE Europa, IRA, fracción en riesgo hasta 2030 (1 = todo el producto)
@@ -516,7 +519,13 @@ put('sotp_chart_labels', ['Eliquis', 'Vyndaqel', 'Prevnar', 'Seagen (Padcev, Tuk
                           'Licencia Innovent (a costo)', 'CVR Metsera', 'I+D corporativa', 'Deuda neta'])
 put('sotp_chart', [round(x, 1) for x in (CMP['eliq'], CMP['vyn'], CMP['prev'], CMP['seagen'], CMP['launch'], CMP['rest'], CMP['covid'],
                                          CMP['ibr'] + CMP['xtd'] + CMP['xelj'], CMP['loeg'], M['pipe_total'], CMP['platform'], CMP['acq'], CMP['cvr'], CMP['rd'], -ND)])
-put('sotp_short', CMP['ibr'] + CMP['xtd'] + CMP['xelj'])
+put('sotp_short', CMP['ibr'] + CMP['xtd'] + CMP['xelj']); put('sotp_short_ps', M['sotp_short'] / M['shares_dil'])
+CF = {'2023': dict(ocf=8700, capex=3907, div=9247), '2024': dict(ocf=12744, capex=2909, div=9512), '2025': dict(ocf=11704, capex=2629, div=9771)}   # 10-K 2025
+for c in CF.values(): c['fcf'] = c['ocf'] - c['capex']; c['cov'] = c['fcf'] / c['div']
+put('cf_hist', CF)
+put('fcf30', R['base']['fcf'][2030] + 0.0); put('fcf30_b', M['fcfm30_base'] / 100 * M['rev30_base'])
+put('pfe_eve', SH['pfe_precio']['multiplos']['ev_ebitda']); put('pfe_de_sa', SH['pfe_precio']['multiplos']['deuda_ebitda'])
+put('amort3_ly', 1223); put('epsa3_g', (M['epsa3'] / M['epsa3_ly'] - 1) * 100)
 put('margin_q_labels', ['1T25', '2T25', '3T25', '4T25', '1T26', '2T26', '3T26'])
 REVQ = [13715, 14653, 16654, 17557, 13576, 15908, 16583]; COGSQ = [3074, 3549, 4172, 5272, 3627, 4013, 4028]
 assert sum(REVQ[:3]) == 45022 and sum(REVQ[4:]) == 46067 and sum(COGSQ[:3]) == 10795 and sum(COGSQ[4:]) == 11668 and sum(REVQ[:4]) == 62579 and sum(COGSQ[:4]) == 16067
@@ -542,7 +551,7 @@ if TXT:
     assert 30 < M['gap30_pct'] < 40 and M['gap31_pct'] > 40                       # "más de un tercio", "más de 40% con Vyndaqel EE.UU."
     assert M['m1'] < PRICE and M['m3'] < PRICE < M['m4'] < M['m2']                  # orden de los métodos que cita la Sección 13
     assert M['blend_gap'] > 5 and M['blend_med_gap'] > 0 and M['blend_cliff_gap'] < M['blend_gap']
-    assert M['div_cover_fcf'] > 1.0 and M['payout_adj'] < 60 and M['div_yield'] > M['tsy']
+    assert M['div_cover_fcf'] > 1.0 and M['cf_hist']['2023']['cov'] < 1 and M['cf_hist']['2025']['cov'] < 1 and M['fcf30_b'] < M['div_ttm_b'] and M['payout_adj'] < 60 and M['div_yield'] > M['tsy']
     assert M['cov_drop_pct'] > 90 and M['eliq3_g'] > 20 and M['pax3_g'] < -60
     assert M['c27_g'] < 0 and M['pe_27'] < M['peer_min'] + 0.5
     assert M['nd_lev'] < 2.5 and M['m1'] < M['m1_renewal'] < PRICE and M['m1'] / PRICE < 0.40
