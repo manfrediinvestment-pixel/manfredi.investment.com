@@ -23,7 +23,7 @@
   var COLORES = ['#e9d3a0', '#8ec5ff', '#9be3c4', '#f0a8b8', '#c9b6ff', '#ffc58f'];
   var SALAS = {
     gratis: { nombre: 'Mercados', tag: 'Gratis', sub: 'Comunidad abierta · resúmenes antes y después de Wall Street',
-      fijado: 'Resúmenes del mercado media hora antes de que abra Wall Street y media hora después del cierre. Las opiniones de los miembros no son recomendaciones de inversión. Nadie del equipo te va a escribir por privado ni a pedirte dinero.' },
+      fijado: 'Resúmenes del mercado un minuto después de que abre Wall Street, con precios en vivo, y media hora después del cierre. Las opiniones de los miembros no son recomendaciones de inversión. Nadie del equipo te va a escribir por privado ni a pedirte dinero.' },
     ideas: { nombre: 'Ideas de Ignacio', pro: true, soloCreador: true, sub: 'Publica solo Ignacio · ideas, seguimientos y cierres',
       fijado: 'Las ideas son análisis generales: no consideran tu situación particular. Antes de operar, mirá si encajan con tu perfil.' },
     socios: { nombre: 'Charla de socios', pro: true, sub: 'Solo socios Pro',
@@ -341,7 +341,7 @@
     var noLeidos = z.estado === 'ok' && k !== S.sala ? z.orden.filter(function (id) { return id < 1e14 && id > (z.vistos[k] || 0) && z.msgs[id].h !== (S.yo && S.yo.h); }).length : 0;
     var prev = z.estado === 'pronto' ? '<em class="ch-chip">Próximamente</em>'
       : z.estado === 'bloqueada' ? '<span class="ch-lock">' + IC.lock + ' Solo socios</span>'
-      : ult ? esc((ult.rol === 'oficial' ? '' : ult.nombre.split(' ')[0] + ': ') + (ult.tipo === 'resumen' ? (ult.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : ult.tipo === 'imagen' && !ult.texto ? 'Imagen' : stickerDe(ult) ? 'Sticker' : ult.texto.replace(/[*_]/g, '')))
+      : ult ? esc((ult.rol === 'oficial' ? '' : ult.nombre.split(' ')[0] + ': ') + (ult.tipo === 'resumen' ? (ult.datos.momento === 'apertura' ? 'Resumen de la apertura' : 'Resumen del cierre') : ult.tipo === 'imagen' && !ult.texto ? 'Imagen' : stickerDe(ult) ? 'Sticker' : ult.texto.replace(/[*_]/g, '')))
       : z.estado === 'cargando' ? 'Cargando…' : '';
     return '<li><button type="button" class="ch-item' + (info.pro ? ' ch-item--sub' : '') + '" data-ir="' + k + '"' + (k === S.sala ? ' aria-current="true"' : '') + '>' +
       avatarSala(k) +
@@ -394,7 +394,7 @@
   }
 
   // Guía a los resúmenes de hoy: siempre a la vista, lleva al mensaje aunque haya quedado lejos.
-  var RES = [{ k: 'apertura', t: 'Antes de la apertura' }, { k: 'cierre', t: 'Cierre del mercado' }];
+  var RES = [{ k: 'apertura', t: 'Apertura del mercado' }, { k: 'cierre', t: 'Cierre del mercado' }];
   function pintarHoy() {
     var el = S.root.querySelector('.ch-hoy'); if (!el) return;
     var z = S.salas.gratis, hoy = window.MiTarjeta.horarios(new Date());
@@ -498,7 +498,7 @@
     else if (Object.keys(S.recien).length) {
       var res = Object.keys(S.recien).map(function (id) { return z.msgs[id]; }).filter(function (m) { return m && m.tipo === 'resumen'; })[0];
       var pill = S.root.querySelector('.ch-nuevos');
-      pill.querySelector('span').textContent = res ? 'Nuevo: ' + (res.datos.momento === 'apertura' ? 'resumen antes de la apertura' : 'resumen del cierre') : 'Mensajes nuevos';
+      pill.querySelector('span').textContent = res ? 'Nuevo: ' + (res.datos.momento === 'apertura' ? 'resumen de la apertura' : 'resumen del cierre') : 'Mensajes nuevos';
       pill.hidden = false;
     }
     S.recien = {};
@@ -566,8 +566,8 @@
     // el texto completo es el mismo de WhatsApp: arriba la clave y el párrafo, el resto se despliega
     var k = d.texto.indexOf(d.intro), cuerpo = (k > -1 ? d.texto.slice(k + d.intro.length) : d.texto).trim();
     return '<button type="button" class="ch-card' + (t.url ? ' on' : '') + '" data-a="ver" aria-label="Ver la tarjeta en grande">' +
-        '<img data-card="' + m.id + '" src="' + (t.url || '') + '" alt="Tarjeta: ' + (d.momento === 'apertura' ? 'antes de la apertura' : 'cierre del mercado') + '"></button>' +
-      '<div class="ch-res-k">' + (d.momento === 'apertura' ? 'Antes de la apertura' : 'Cierre del mercado') + '</div>' +
+        '<img data-card="' + m.id + '" src="' + (t.url || '') + '" alt="Tarjeta: ' + (d.momento === 'apertura' ? 'apertura del mercado' : 'cierre del mercado') + '"></button>' +
+      '<div class="ch-res-k">' + (d.momento === 'apertura' ? 'Apertura del mercado' : 'Cierre del mercado') + '</div>' +
       (d.clave ? '<p class="ch-res-clave">' + esc(d.clave) + '</p>' : '') +
       '<div class="ch-txt">' + formato(d.intro, true) + '</div>' +
       '<details class="ch-det"><summary><span>Ver el resumen completo</span>' + IC.down + '</summary><div class="ch-txt">' + formato(cuerpo, true) + '</div></details>' +
@@ -631,7 +631,7 @@
     if (a === 'ver-img') { var im = b.querySelector('img'); if (!im || !im.src) return; var lb2 = S.root.querySelector('.ch-lb'); lb2.querySelector('img').src = im.src; lb2.hidden = false; return; }
     if ((a === 'copiar-img' || a === 'compartir-img' || a === 'copiar-txt') && m && esCreador()) { pasarAWhatsApp(a, m, b); return; }
     if (a === 'responder' && m) {
-      S.responde = { id: m.id, nombre: m.nombre, texto: m.tipo === 'resumen' ? (m.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : m.tipo === 'imagen' && !m.texto ? 'Imagen' : stickerDe(m) ? 'Sticker' : m.texto.replace(/[*_]/g, '').slice(0, 140) };
+      S.responde = { id: m.id, nombre: m.nombre, texto: m.tipo === 'resumen' ? (m.datos.momento === 'apertura' ? 'Resumen de la apertura' : 'Resumen del cierre') : m.tipo === 'imagen' && !m.texto ? 'Imagen' : stickerDe(m) ? 'Sticker' : m.texto.replace(/[*_]/g, '').slice(0, 140) };
       repintarCompositor(); var ta = S.root.querySelector('.ch-ta'); if (ta) ta.focus();
       return;
     }
@@ -889,7 +889,7 @@
     for (var d = 0; d < 10 && !prox; d++) {
       var h = window.MiTarjeta.horarios(new Date(ahora + d * 864e5));
       if (!h.hay) continue;
-      [['apertura', 'Antes de la apertura'], ['cierre', 'Cierre del mercado']].some(function (x) {
+      [['apertura', 'Apertura del mercado'], ['cierre', 'Cierre del mercado']].some(function (x) {
         if (d === 0 && h[x[0]].min <= artMin) return false;
         prox = { d: d, t: x[1], hora: h[x[0]].hora, min: h[x[0]].min, iso: h.iso }; return true;
       });

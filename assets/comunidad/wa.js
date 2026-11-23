@@ -24,7 +24,7 @@ window.MI_WA_COMUNIDAD = 'https://whatsapp.com/channel/0029Vb8rDVHB4hdUO5L2Lx17'
   // Horarios de hoy (cambian con el horario de verano de Nueva York): los sabe tarjeta.js.
   function horarios() {
     try { var h = window.MiTarjeta && window.MiTarjeta.horarios(new Date()); if (h && h.apertura) return [h.apertura.hora, h.cierre.hora]; } catch (e) {}
-    return ['11:00', '18:30'];
+    return ['11:31', '18:30'];
   }
 
   function pct(c) {
@@ -46,7 +46,7 @@ window.MI_WA_COMUNIDAD = 'https://whatsapp.com/channel/0029Vb8rDVHB4hdUO5L2Lx17'
 
   function burbuja(m, conDatos) {
     var r = m.datos || {};
-    var titulo = r.momento === 'apertura' ? 'Antes de la apertura' : 'Cierre del mercado';
+    var titulo = r.momento === 'apertura' ? 'Apertura del mercado' : 'Cierre del mercado';
     var texto = r.clave || String(r.intro || '').split('. ')[0];
     return '<div class="wa-msg">' +
         '<b class="wa-msg-k">' + titulo + '</b>' +
@@ -75,7 +75,7 @@ window.MI_WA_COMUNIDAD = 'https://whatsapp.com/channel/0029Vb8rDVHB4hdUO5L2Lx17'
         '<div class="wa-hd-t"><b>Comunidad Manfredi</b><span>' + IC_WA + 'Canal de WhatsApp</span></div>' +
         '<span class="wa-free" aria-label="Gratis">' + IC_STAR + '<span>Gratis</span></span>' +
       '</div>' +
-      '<p class="wa-lead">Todos los días hábiles, un <b>resumen antes de la apertura</b> y otro <b>al cierre del mercado</b>, en tu celular.</p>' +
+      '<p class="wa-lead">Todos los días hábiles, un <b>resumen en la apertura</b> y otro <b>al cierre del mercado</b>, en tu celular.</p>' +
       '<div class="wa-feed">' + feed(lista) + '<div class="wa-solo">Solo los administradores pueden enviar mensajes</div></div>' +
       '<div class="wa-hs"><span><i>Apertura</i><time>' + hs[0] + '</time></span><span><i>Cierre</i><time>' + hs[1] + '</time></span><span><i>Días</i><time>Lun a Vie</time></span></div>' +
       '<div class="wa-btns">' +
