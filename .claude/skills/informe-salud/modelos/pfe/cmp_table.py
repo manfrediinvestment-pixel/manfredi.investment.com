@@ -29,7 +29,7 @@ ROWS = [('Precio (cierre 20-nov-2026)', 'precio', usd), ('Fair value (blend)', '
         ('P/E sobre EPS 2027E', 'pe_fy27', x), ('Rendimiento del dividendo', 'div_yield_pct', pct), ('Dividendos / FCF', 'payout_fcf_pct', pct),
         ('Deuda neta / EBITDA', 'nd_ebitda', x), ('I+D / ventas (TTM)', 'rd_ventas_pct', pct), ('Margen bruto (3T26)', 'margen_bruto_pct', pct),
         ('Ventas en riesgo de LOE', 'ventas_riesgo_loe_2030_pct', pct), ('Crecimiento EPS 2027E', 'crec_eps_fy27_pct', lambda v: pct(v, True)),
-        ('Tasa de descuento del M1', 'wacc_pct', pct), ('Postura', 'postura', lambda v: v)]
+        ('Tasa de descuento del M1', 'wacc_pct', pct), ('Postura', 'postura', lambda v: v[:1].upper() + v[1:])]
 def table_html(M):
     ab, src = abbv_cmp()
     cols = [M['cmp']] + ([ab] if ab else []) + [M['cmp_refs']['LLY'], M['cmp_refs']['JNJ']]

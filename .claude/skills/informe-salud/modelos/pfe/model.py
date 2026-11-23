@@ -504,7 +504,7 @@ def ref(t, d):
     m1, m2, m3, m4 = d['m1_sotp'], d['m2_comp'], d['m3_rev'], d['m4_cons']
     return dict(ticker=t, precio=d['cierre_20nov'], fair_value=d['fair_value_publicado'], gap_pct=d['gap_al_20nov_pct'], m1_sotp=m1, m2_comp=m2,
                 m3_rev=m3, m4_cons=m4, indep=(0.15 * m1 + 0.25 * m2) / 0.40, anclados=(0.35 * m3 + 0.25 * m4) / 0.60, pe_fy27=d['pe_fy27_20nov'],
-                div_yield_pct=d['div_yield_20nov_pct'], payout_fcf_pct=None, nd_ebitda=d['deuda_neta_ebitda'],
+                div_yield_pct=d['div_yield_20nov_pct'], payout_fcf_pct=(lambda mj: mj['ttm']['div'] / mj['ttm_fcf'] * 100)(json.load(open(HERE.parent / t.lower() / 'model.json', encoding='utf-8'))), nd_ebitda=d['deuda_neta_ebitda'],
                 rd_ventas_pct=d['rd_ventas_ttm_pct'], margen_bruto_pct=d['margen_bruto_3t_pct'],
                 ventas_riesgo_loe_2030_pct=d.get('ventas_en_riesgo_loe_ttm_pct', d.get('ventas_en_riesgo_loe_pct')),
                 crec_eps_fy27_pct=(PRS[t]['eps_fy27'] / PRS[t]['eps_fy26'] - 1) * 100,
