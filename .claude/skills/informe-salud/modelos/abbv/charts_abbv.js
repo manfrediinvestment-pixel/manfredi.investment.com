@@ -1,6 +1,6 @@
   function renderAll(){
     drawVBars(document.getElementById('historyChart'), {
-      labels:['FY2016','FY2017','FY2018','FY2019','FY2020','FY2021','FY2022','FY2023','FY2024','FY2025','TTM'],
+      labels:["'16","'17","'18","'19","'20","'21","'22","'23","'24","'25",'TTM'],
       values:{{hist|json}},
       colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.blue,PALETTE.navy2,PALETTE.navy],
       valueFmt:function(v){ return '$'+v.toFixed(1); }
@@ -65,7 +65,8 @@
 
     drawLines(document.getElementById('cashChart'), {
       labels:['2021','2022','2023','2024','2025','TTM'],
-      series:[{name:'Flujo operativo', color:PALETTE.navy, values:{{cash_ocf|json}}},{name:'Flujo de caja libre', color:PALETTE.blueLight, values:{{cash_fcf|json}}},{name:'Dividendos', color:PALETTE.gold, values:{{cash_div|json}}}]
+      series:[{name:'Flujo operativo', color:PALETTE.navy, values:{{cash_ocf|json}}, noLabels:true},{name:'Flujo de caja libre', color:PALETTE.blueLight, values:{{cash_fcf|json}}},{name:'Dividendos', color:PALETTE.gold, values:{{cash_div|json}}}],
+      valueFmt:function(v){ return '$'+v.toFixed(1); }
     });
 
     var cl = {{comps_labels|json}};
@@ -85,8 +86,9 @@
     });
 
     drawLines(document.getElementById('pathChart'), {
-      labels:{{m1_rev_years|json}},
-      series:[{name:'Ingresos totales (Base)', color:PALETTE.navy, values:{{m1_rev_path|json}}},{name:'Skyrizi + Rinvoq', color:PALETTE.gold, values:{{m1_sr_path|json}}}]
+      labels:{{m1_rev_years|json}}.map(function(y){ return "'" + y.slice(2); }),
+      series:[{name:'Ingresos totales (Base)', color:PALETTE.navy, values:{{m1_rev_path|json}}},{name:'Skyrizi + Rinvoq', color:PALETTE.gold, values:{{m1_sr_path|json}}}],
+      valueFmt:function(v, i, n){ return (i % 3 === 0 || i === n - 1) ? '$' + v.toFixed(0) : ''; }
     });
 
     drawHBars(document.getElementById('sotpChart'), {
