@@ -51,7 +51,7 @@ if fmt(ind, 'usd2') not in out or fmt(anc, 'usd2') not in out: diffs.append('pro
 # 5) anti-circularidad: ningún método depende del precio de ABBV (modelo corrido con el precio +25%)
 for k in ('anti_m1', 'anti_m2', 'anti_m3', 'anti_m4'):
     if M[k] != 0: diffs.append(k)
-if abs(M['m2'] - M['peer_q3'] * M['c27'] / (1 + M['ke'] / 100)) > 1e-9: diffs.append('Método 2 no es cuartil superior x EPS 2027')
+if abs(M['m2'] - M['peer_med'] * M['c27'] / (1 + M['ke'] / 100)) > 1e-9: diffs.append('Método 2 no es mediana x EPS 2027 descontado')
 if 'ABBV' in M['peers'] or 'PFE' in M['peers'] or len(M['peers']) != 13: diffs.append('set de pares')
 if abs(M['wacc'] - 7.114) > 1e-9: diffs.append('WACC común')
 # 6) deuda (10-Q): corto + porción corriente + no corriente − caja; puente GAAP → ajustado

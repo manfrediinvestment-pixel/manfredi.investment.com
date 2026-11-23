@@ -22,10 +22,10 @@ entry = {
     "abstract": (f"Informe inicial con datos al tercer trimestre (comunicado del 30-oct-2026 y 10-Q del 3-nov-2026): ingresos de ${M['rev3']:,.0f} millones ({pct(M['rev3_g'])}), "
                  f"con Skyrizi y Rinvoq en ${M['sky_rin3']:,.0f} millones ({pct(M['sky_rin3_g'])}), {M['sky_rin3_share']:.0f}% de las ventas. Humira, que facturó $21,237 millones en 2022, "
                  f"perdió {M['hum_us_y3']:.0f}% de sus ventas en EE.UU. en tres años de biosimilares: el informe usa esa curva real como análogo para Skyrizi (patente de 2033) "
-                 f"y Rinvoq (genéricos desde abril de 2037). La suma de partes producto por producto + pipeline ponderado da {usd(M['m1'])}; comparables contra 13 pharmas "
+                 f"y Rinvoq (genéricos desde abril de 2037). La suma de partes producto por producto + pipeline ponderado da {usd(M['m1'])}; comparables contra 13 pharmas (mediana) "
                  f"{usd(M['m2'])}; reversión al múltiplo posterior a Humira {usd(M['m3'])}; consenso {usd(M['m4'])}. Blend {usd(M['blend'])} vs. {usd(M['price'])} "
                  f"(cierre del 20-nov), {pct(M['blend_gap'])}. Puente GAAP → ajustado (amortización y regalías contingentes de Skyrizi), deuda de Apogee "
-                 f"({M['nd_ebitda']:.2f}x EBITDA) y dividendo con {M['payout_fcf']:.0f}% del FCF. Postura: neutral, con sesgo cauteloso."),
+                 f"({M['nd_ebitda']:.2f}x EBITDA) y dividendo con {M['payout_fcf']:.0f}% del FCF. Postura: {M['postura'].lower()}."),
     "date": "22 de noviembre de 2026",
     "href": "informes/abbv.html",
     "publishedAt": "2026-11-22",

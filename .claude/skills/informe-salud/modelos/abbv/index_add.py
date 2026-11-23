@@ -1,6 +1,6 @@
 # Conecta ABBV en index.html (panel Defensivos): reemplaza la tarjeta "Próximamente" por una tarjeta activa con
 # sparkline de 7 cierres mensuales (model.json["spark"]), logo y botón con miGateAnalysis, igual a las vecinas
-# (LLY, JNJ, PG, UNH, WMT, KO, PEP). Acento "neutral": postura neutral, con sesgo cauteloso (como BRK.B y SAP).
+# (LLY, JNJ, PG, UNH, WMT, KO, PEP). Acento "neutral": postura neutral, con sesgo bajista, igual que las tarjetas de LLY y JNJ.
 # NO toca el contador "N de 10 con informe completo" (lo maneja la integración de los tres informes).
 # NO se corre en la rama del informe: se corre en la integración (feat/defensivos-10-de-10).
 import json

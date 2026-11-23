@@ -24,7 +24,7 @@
       </div>
     </div>
     <div class="verdict-bar">
-      <div class="verdict-stance">POSTURA DEL ANÁLISIS: <strong>NEUTRAL, CON SESGO CAUTELOSO</strong> — el blend de cuatro métodos queda {{blend_gap|a1}}% por debajo del precio; los dos métodos que no usan el precio de AbbVie (suma de partes por producto y comparables contra el sector) promedian {{indep|usd2}} y los dos anclados al mercado (reversión y consenso), {{anch|usd2}} (ver Sección 13)</div>
+      <div class="verdict-stance">POSTURA DEL ANÁLISIS: <strong>{{postura_up}}</strong> — el blend de cuatro métodos queda {{blend_gap|a1}}% por debajo del precio y solo el consenso de analistas lo supera; los dos métodos que no usan el precio de AbbVie (suma de partes por producto y comparables contra el sector) promedian {{indep|usd2}} y los dos anclados al mercado (reversión y consenso), {{anch|usd2}} (ver Sección 13)</div>
       <div class="verdict-note">Este documento es análisis independiente con fines informativos y educativos. El autor no es un asesor financiero registrado (no CFA / no matriculado ante la CNV/SEC) y este contenido no constituye una recomendación de compra, venta o mantenimiento para ningún lector en particular. Ver disclosure completo al pie.</div>
     </div>
     <div class="frontbox-body">
@@ -97,11 +97,11 @@
     por la probabilidad de aprobación (rNPV), da <strong>{{m1|usd2}}</strong> por acción. Los comparables contra 13 farmacéuticas
     grandes dan <strong>{{m2|usd2}}</strong>, la reversión al propio múltiplo de AbbVie después de la LOE de Humira <strong>{{m3|usd2}}</strong>
     y el consenso de {{m4_n|f0}} analistas <strong>{{m4|usd2}}</strong>. El blend ponderado (15/25/35/25) es de <strong>{{blend|usd2}}</strong>,
-    {{blend_gap|a1}}% por debajo del precio. Dos métodos quedan por encima del mercado (comparables y consenso) y dos por debajo
-    (suma de partes y reversión).
+    {{blend_gap|a1}}% por debajo del precio. Solo el consenso queda por encima del mercado; suma de partes, comparables y
+    reversión quedan por debajo.
   </p>
   <p>
-    La postura es <strong>neutral, con sesgo cauteloso</strong>. El negocio está en su mejor momento operativo: crecimiento de
+    La postura es <strong>neutral, con sesgo bajista</strong>, la misma que, con la misma regla, tienen Lilly y J&amp;J. El negocio está en su mejor momento operativo: crecimiento de
     dos dígitos, guía de EPS subida en el reporte del 3T, margen operativo ajustado de {{om3_adj|f1}}% y una calificación crediticia que
     Moody's subió a {{rating_moodys}}. Pero a {{price|usd2}} la acción cotiza a {{pe_27|f1}}x el EPS de consenso de 2027 y a {{m3_pe_now|f1}}x el EPS ajustado de
     doce meses, por encima del promedio de su propia historia posterior a Humira ({{rev_pe|f1}}x). La suma de partes muestra que
@@ -420,8 +420,8 @@
     con dato), el R² es de {{reg.peg.r2|f2}}, y de {{reg.peg.r2x|f2}} sin el par extremo ({{reg.peg.ext}}). Con el crecimiento del EPS de consenso de 2027
     contra 2026 ({{reg.eps.n|f0}} pares, sin Merck ni Gilead, cuyo EPS 2026 está deprimido por IPR&amp;D), el R² es de {{reg.eps.r2|f2}}, y de {{reg.eps.r2x|f2}}
     sin {{reg.eps.ext}}. La relación depende casi entera de Lilly; sin ella, desaparece. Como en los informes de Lilly y J&amp;J, el
-    ajuste por crecimiento no se sostiene y la Sección 13 usa el criterio de la skill: el P/E del cuartil superior aplicado al
-    EPS de consenso del año siguiente.
+    ajuste por crecimiento no se sostiene y la Sección 13 aplica la regla de la casa para ese caso: la mediana del P/E del grupo
+    sobre el EPS de consenso del año siguiente.
   </p>
   <h3>Cuadro corto: PFE vs. ABBV vs. LLY vs. JNJ</h3>
   <p>
@@ -636,18 +636,22 @@
 
   <h3>Método 2 — Comparables contra el sector (independiente del precio de AbbVie)</h3>
   <p>
-    Como la regresión contra el crecimiento no se sostiene (Sección 08), se aplica el P/E forward del <strong>cuartil superior</strong>
-    de los 13 pares ({{peer_q3|f2}}x, {{peer_q3_name}}) al EPS de consenso de 2027 de AbbVie ({{c27|usd2}}), descontado un año al costo de equity
-    ({{ke|f3}}%). Resultado: <strong>{{m2|usd2}}</strong>. El cuartil superior se justifica porque AbbVie crece más que la mediana del grupo
-    (+{{c27_g|f0}}% de EPS esperado en 2027), aunque buena parte de ese salto es la no repetición de la IPR&amp;D de 2026.
+    La regresión del P/E contra el crecimiento no se sostiene (R² de {{reg.peg.r2|f2}} y {{reg.eps.r2|f2}} con todos los pares; {{reg.peg.r2x|f2}} y {{reg.eps.r2x|f2}} sin
+    {{reg.eps.ext}}; Sección 08). La regla de la casa desde Coca-Cola es que, en ese caso, va la <strong>mediana</strong> del grupo: el
+    cuartil superior metería un premio por calidad o crecimiento que la regresión no respalda. Se aplica entonces el P/E forward
+    mediano de los 13 pares ({{peer_med|f3}}x, {{peer_med_name}}) al EPS de consenso de 2027 de AbbVie ({{c27|usd2}}), descontado un año al costo de
+    equity común ({{ke|f3}}%). Resultado: <strong>{{m2|usd2}}</strong>. El informe de Pfizer usa el mismo criterio. El cuartil superior
+    ({{peer_q3|f2}}x, {{peer_q3_name}}) daría {{m2_q3|usd2}}: se muestra como referencia y no entra al blend (con él, el blend sería de {{blend_q3|usd2}},
+    {{blend_q3_gap|spct1}}). Buena parte del +{{c27_g|f0}}% de EPS que el consenso espera para 2027 es la no repetición de la IPR&amp;D de 2026.
   </p>
   <div class="table-scroll"><table>
     <tr><th>Enfoque</th><th class="right-al">Múltiplo</th><th class="right-al">EPS</th><th class="right-al">Precio implícito</th></tr>
-    <tr><td class="label">Mediana de 13 pares × EPS de los próximos 12 meses (piso del rango)</td><td class="right-al">{{peer_med|f2}}x</td><td class="right-al">{{eps_ntm|usd2}}</td><td class="right-al">{{m2_lo|usd2}}</td></tr>
-    <tr class="total"><td class="label">Cuartil superior × EPS 2027E, descontado 1 año (método elegido)</td><td class="right-al">{{peer_q3|f2}}x</td><td class="right-al">{{c27|usd2}}</td><td class="right-al">{{m2|usd2}}</td></tr>
-    <tr><td class="label">Cuartil superior sin Lilly (12 pares)</td><td class="right-al">{{peer_q3_xlly|f2}}x</td><td class="right-al">{{c27|usd2}}</td><td class="right-al">{{m2_xlly|usd2}}</td></tr>
+    <tr class="total"><td class="label">Mediana de 13 pares × EPS 2027E, descontado 1 año (método elegido; piso del rango)</td><td class="right-al">{{peer_med|f2}}x</td><td class="right-al">{{c27|usd2}}</td><td class="right-al">{{m2|usd2}}</td></tr>
+    <tr><td class="label">Mediana sin Lilly (12 pares)</td><td class="right-al">{{peer_med_xlly|f2}}x</td><td class="right-al">{{c27|usd2}}</td><td class="right-al">{{m2_xlly|usd2}}</td></tr>
+    <tr><td class="label">Mediana × EPS de los próximos 12 meses</td><td class="right-al">{{peer_med|f2}}x</td><td class="right-al">{{eps_ntm|usd2}}</td><td class="right-al">{{m2_ntm|usd2}}</td></tr>
     <tr><td class="label">Sector salud del S&amp;P 500 (FactSet) × EPS de los próximos 12 meses</td><td class="right-al">{{hc_pe|f2}}x</td><td class="right-al">{{eps_ntm|usd2}}</td><td class="right-al">{{m2_hc|usd2}}</td></tr>
-    <tr><td class="label">Par más caro ({{peer_max_name}}) × EPS 2027E, descontado 1 año (techo del rango)</td><td class="right-al">{{peer_max|f2}}x</td><td class="right-al">{{c27|usd2}}</td><td class="right-al">{{m2_hi|usd2}}</td></tr>
+    <tr><td class="label">Cuartil superior ({{peer_q3_name}}) × EPS 2027E, descontado 1 año (referencia fuera del blend; techo del rango)</td><td class="right-al">{{peer_q3|f2}}x</td><td class="right-al">{{c27|usd2}}</td><td class="right-al">{{m2_q3|usd2}}</td></tr>
+    <tr><td class="label">Par más caro ({{peer_max_name}}) × EPS 2027E, descontado 1 año</td><td class="right-al">{{peer_max|f2}}x</td><td class="right-al">{{c27|usd2}}</td><td class="right-al">{{m2_max|usd2}}</td></tr>
   </table></div>
   <p class="footnote">EPS de los próximos 12 meses = 4T2026 implícito en el consenso ({{q4_eps_impl|usd2}}) + tres cuartos del EPS 2027 de consenso. Cuartil y mediana: percentiles 75 y 50 con interpolación lineal, idénticos a los del research común. El método no usa el precio ni el múltiplo de AbbVie en ningún paso: con el precio 25% más alto, el resultado cambia en {{anti_m2|susd2}}.</p>
 
@@ -686,7 +690,7 @@
   <h3>Síntesis: el blend ponderado</h3>
   <div class="chartbox">
     <canvas id="footballChart" height="300"></canvas>
-    <p class="chartcap">"Football field" de valuación: rango bajo/alto de cada método. Línea roja: precio de mercado ({{price|usd0}}). Línea azul: blend propio ({{blend|usd0}}). Rangos: M1 = Bear a Bull; M2 = mediana de pares a par más caro; M3 = mínimo y máximo de los doce cierres; M4 = rango de precios objetivo.</p>
+    <p class="chartcap">"Football field" de valuación: rango bajo/alto de cada método. Línea roja: precio de mercado ({{price|usd0}}). Línea azul: blend propio ({{blend|usd0}}). Rangos: M1 = Bear a Bull; M2 = mediana de pares (método) a cuartil superior (referencia); M3 = mínimo y máximo de los doce cierres; M4 = rango de precios objetivo.</p>
   </div>
   <div class="table-scroll"><table>
     <tr><th>Método</th><th>Tipo</th><th class="right-al">Fair value</th><th class="right-al">Peso</th><th class="right-al">Aporte</th><th class="right-al">vs. precio</th></tr>
@@ -704,18 +708,19 @@
   <p>
     El blend de {{blend|usd2}} queda {{blend_gap|a1}}% por debajo del precio de {{price|usd2}}. Los dos grupos dicen cosas distintas, y conviene
     leerlos por separado. Los métodos independientes del precio promedian {{indep|usd2}} ({{indep_gap|spct1}}): la suma de partes dice que lo
-    que AbbVie ya vende, con su pipeline tardío, vale alrededor de un tercio del precio, y los comparables, que el mercado le
-    pagaría un múltiplo de cuartil superior y algo más que el precio por sus ganancias de 2027. Los anclados al mercado promedian
+    que AbbVie ya vende, con su pipeline tardío, vale alrededor de un tercio del precio, y los comparables, que con el múltiplo
+    mediano del sector sus ganancias de 2027 valen {{m2_gap|a1}}% menos que el precio. Los anclados al mercado promedian
     {{anch|usd2}} ({{anch_gap|spct1}}): la reversión queda debajo del precio y el consenso, por encima. Sin el consenso, el blend sería de
     {{blend_xcons|usd2}} ({{blend_xcons_gap|spct1}}); sin Lilly en los comparables, {{blend_xlly|usd2}} ({{blend_xlly_gap|spct1}}); con el escenario de renovación en lugar del Base
     del Método 1, {{blend_m1ren|usd2}} ({{blend_m1ren_gap|spct1}}). Anti-circularidad: con el precio de AbbVie 25% más alto, los cuatro métodos cambian
     en {{anti_m1|susd2}}, {{anti_m2|susd2}}, {{anti_m3|susd2}} y {{anti_m4|susd2}}: ninguno usa el precio de la acción.
   </p>
   <p>
-    <strong>Postura: neutral, con sesgo cauteloso.</strong> No es bajista porque el negocio no muestra deterioro: el relevo de
-    Humira ya ocurrió, la guía de EPS subió en el 3T, la deuda baja en relación con la generación de caja y el dividendo está cubierto. Tampoco es
-    constructiva, porque el precio ya incorpora un múltiplo por encima de su historia posterior a Humira y la suma de partes
-    muestra cuánto depende el valor de lo que todavía no existe. El riesgo que el lector compra a {{price|usd2}} no es Humira, que ya
+    <strong>Postura: neutral, con sesgo bajista.</strong> Sale del número con la misma regla que Lilly y J&amp;J: el blend queda
+    {{blend_gap|a1}}% abajo y solo uno de los cuatro métodos (el consenso) supera el precio. No es bajista a secas porque el negocio no
+    muestra deterioro: el relevo de Humira ya ocurrió, la guía de EPS subió en el 3T, la deuda baja en relación con la generación de
+    caja y el dividendo está cubierto. Pero el precio ya incorpora un múltiplo por encima de la mediana del sector y de su propia
+    historia posterior a Humira, y la suma de partes muestra cuánto depende el valor de lo que todavía no existe. El riesgo que el lector compra a {{price|usd2}} no es Humira, que ya
     pasó, sino 2033: si AbbVie llega a esa fecha con zumilokibart, lutikizumab, etentamig y lo que compre en el camino vendiendo
     lo suficiente para tapar a Skyrizi, el precio se justifica; si no, la curva de Humira muestra lo rápido que puede caer.
   </p>
@@ -742,7 +747,8 @@
       son de prensa y no se verificaron en EDGAR.
     </p>
     <p style="margin-bottom:0;">
-      El Método 2 usa un criterio propio (cuartil superior y EPS 2027) porque la regresión no se sostiene; el EPS de consenso de
+      El Método 2 usa la mediana del sector sobre el EPS 2027 porque la regresión no se sostiene (regla de la casa); si el mercado
+      le pagara a AbbVie un premio por calidad, la referencia es el cuartil superior ({{m2_q3|usd2}}); el EPS de consenso de
       2027 supone que no se repite la IPR&amp;D adquirida de 2026. El Método 3 usa una ventana elegida con criterio declarado y la
       alternativa se muestra. El 60% del blend corresponde a métodos anclados en cómo el mercado viene valuando a AbbVie, por regla
       fija de la casa; el lector que quiera una lectura independiente del precio debería mirar los Métodos 1 y 2 por separado

@@ -371,10 +371,15 @@ put('reg', REG); put('reg_g', {'peg': ga, 'eps': gb})
 REG_OK = max(REG['peg']['r2'], REG['eps']['r2'], REG['peg']['r2x'], REG['eps']['r2x']) >= 0.5
 put('reg_ok', REG_OK)
 assert not REG_OK                                         # el texto dice que la regresión no se sostiene
-M2 = put('m2', M['peer_q3'] * C27 / (1 + KE / 100))
-put('m2_lo', M['peer_med'] * NTM); put('m2_hi', M['peer_max'] * C27 / (1 + KE / 100))
-pv = sorted(x for k, x in PEERS.items() if k != 'LLY'); put('peer_q3_xlly', float(np.percentile(pv, 75)))
-put('m2_xlly', M['peer_q3_xlly'] * C27 / (1 + KE / 100))
+# Regla de la casa (desde KO; decisión del coordinador, igual en PFE): si la regresión no se sostiene, va la MEDIANA de los
+# pares sobre el EPS de consenso del año siguiente, descontado un año al costo de equity común. El cuartil superior
+# metería un premio por calidad que la regresión no respalda: se muestra como referencia, fuera del blend.
+M2 = put('m2', M['peer_med'] * C27 / (1 + KE / 100))
+put('m2_q3', M['peer_q3'] * C27 / (1 + KE / 100)); put('m2_ntm', M['peer_med'] * NTM)
+put('m2_lo', M2); put('m2_hi', M['m2_q3'])
+put('m2_max', M['peer_max'] * C27 / (1 + KE / 100))
+pv = sorted(x for k, x in PEERS.items() if k != 'LLY'); put('peer_med_xlly', float(np.percentile(pv, 50)))
+put('m2_xlly', M['peer_med_xlly'] * C27 / (1 + KE / 100))
 put('m2_hc', M['hc_pe'] * NTM)
 put('abbv_pe_fwd_sa', A['multiplos']['pe_fwd'])
 put('prem_med', (M['abbv_pe_fwd_sa'] / M['peer_med'] - 1) * 100); put('prem_q3', (M['abbv_pe_fwd_sa'] / M['peer_q3'] - 1) * 100)
@@ -424,10 +429,17 @@ put('indep', (0.15 * M['m1'] + 0.25 * M['m2']) / 0.40); put('anch', (0.35 * M['m
 put('indep_gap', (M['indep'] / PRICE - 1) * 100); put('anch_gap', (M['anch'] / PRICE - 1) * 100)
 put('blend_xcons', (0.15 * M['m1'] + 0.25 * M['m2'] + 0.35 * M['m3']) / 0.75); put('blend_xcons_gap', (M['blend_xcons'] / PRICE - 1) * 100)
 put('blend_pre', BL + 0.35 * (M['m3_pre'] - M3)); put('blend_pre_gap', (M['blend_pre'] / PRICE - 1) * 100)
+put('blend_q3', BL + 0.25 * (M['m2_q3'] - M2)); put('blend_q3_gap', (M['blend_q3'] / PRICE - 1) * 100)
 put('blend_xlly', BL + 0.25 * (M['m2_xlly'] - M2)); put('blend_xlly_gap', (M['blend_xlly'] / PRICE - 1) * 100)
 put('blend_m1ren', BL + 0.15 * (M['m1_renewal'] - M['m1'])); put('blend_m1ren_gap', (M['blend_m1ren'] / PRICE - 1) * 100)
 put('ranges', [[M['m1_bear'], M['m1_bull']], [M['m2_lo'], M['m2_hi']], [M['m3_lo'], M['m3_hi']], [M['m4_lo'], M['m4_hi']]])
-POST = put('postura', 'Neutral, con sesgo cauteloso')
+# Postura: sale del número con la misma regla que LLY y JNJ (salud): si a lo sumo un método supera el precio y el blend
+# queda más de 10% abajo → sesgo bajista; si el blend queda entre −5% y −20% con dos o más métodos arriba → cauteloso.
+put('n_above', sum(M[k] > PRICE for k in ('m1', 'm2', 'm3', 'm4')))
+if M['blend_gap'] < -10 and M['n_above'] <= 1: POST = 'Neutral, con sesgo bajista'
+elif M['blend_gap'] < -5: POST = 'Neutral, con sesgo cauteloso'
+else: POST = 'Neutral'
+put('postura', POST); put('postura_up', POST.upper())
 put('m1_frac', M['m1'] / PRICE * 100)
 SPK = sorted(MC)[-7:]; put('spark', [round(MC[k], 2) for k in SPK]); put('spark_months', [f'{k[0]}-{k[1]:02d}' for k in SPK])
 assert abs(M['spark'][-1] - PRICE) < 0.01 or not TXT
@@ -504,9 +516,9 @@ put('bs_s26_gwi', BS['s26']['gw'] + BS['s26']['intg']); put('bs_d25_gwi', BS['d2
 put('rin_ira_bear', 2 * M['rin_ira']); put('cm30_bear', CM0 - 2.0); put('cm30_bull', CM0 + 1.5)
 # ======================= 16. Frases del texto atadas a números =======================
 if TXT and not os.environ.get('NOASSERT'):
-    assert M['m1'] < M['m3'] < M['m2'] < M['m4'], 'orden de métodos'
-    assert M['m1'] < M['m3'] < PRICE < M['m2'] < M['m4']                 # "dos métodos por encima del precio (comparables y consenso), dos por debajo"
-    assert -20 < M['blend_gap'] < -5                                     # postura "neutral, con sesgo cauteloso"
+    assert M['m1'] < M['m2'] < M['m3'] < PRICE < M['m4'], 'orden de métodos'   # "solo el consenso supera el precio"
+    assert M['m2_q3'] > PRICE and M['m2_ntm'] < PRICE and M['n_above'] == 1
+    assert POST == 'Neutral, con sesgo bajista' and -20 < M['blend_gap'] < -10
     assert M['m1_renewal'] < PRICE and M['anch_gap'] < 0 and M['indep_gap'] < 0
     assert M['m3_pre'] < M['m3'] and M['pre_pe'] < 13                   # la ventana previa a la LOE valuaba ~11x
     assert M['sky_rin3_g'] > 20 and M['hum_us_y3'] > 80 and M['hum_us_y1'] < 40

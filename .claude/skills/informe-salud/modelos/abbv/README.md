@@ -22,10 +22,14 @@ Datos de mercado, consenso, pares, WACC común (7.114%), tasas BIO e IRA: `.clau
 | Método | Valor | Peso | vs. precio | Tipo |
 |---|---|---|---|---|
 | M1 suma de partes + rNPV | $106.53 | 15% | −62.8% | independiente |
-| M2 comparables (cuartil superior 19.95x GILD × EPS 2027 $16.22, descontado) | $301.05 | 25% | +5.2% | independiente |
+| M2 comparables (mediana 15.766x, NVS, × EPS 2027 $16.22, descontado al ke común) | $237.89 | 25% | −16.9% | independiente |
 | M3 reversión (12 cierres post-Humira, 19.39x × EPS ajustado TTM $12.83) | $248.78 | 35% | −13.1% | anclado |
 | M4 consenso (29 analistas) | $315.88 | 25% | +10.4% | anclado |
-| **Blend** | **$257.28** | | **−10.1%** | neutral, con sesgo cauteloso |
+| **Blend** | **$241.49** | | **−15.6%** | neutral, con sesgo bajista |
+
+M2: la regresión P/E vs. crecimiento no se sostiene (R² 0.27 / 0.41 con todos; 0.01 / 0.19 sin LLY) → regla de la casa
+(desde KO, decisión del coordinador, igual en PFE): mediana. El cuartil superior (19.95x, GILD → $301.05; blend $257.28) se
+muestra como referencia fuera del blend. Postura: regla de `model.py` (≤1 método arriba del precio y blend < −10% → sesgo bajista).
 
 ## Integración (rama feat/defensivos-10-de-10)
 Desde la raíz del repo, con `informes/abbv.html` y esta carpeta ya traídos de `feat/informe-abbv`, y la carpeta
