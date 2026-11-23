@@ -244,7 +244,7 @@ PIPE = {
 }
 for k, a in PIPE.items():
     a['pos'] = EC[a['area']][a['idx']] / 100; a['curve'] = BIO; a['tail'] = BIO_TAIL
-put('pipe', {k: {kk: vv for kk, vv in a.items() if kk not in ('curve',)} for k, a in PIPE.items()})
+put('pipe', {k: dict({kk: vv for kk, vv in a.items() if kk not in ('curve',)}, pos_pct=a['pos'] * 100) for k, a in PIPE.items()})
 put('pos_zumi', PIPE['zumi']['pos'] * 100)
 JUV_PEAK = put('juvmo_peak', 1.5)
 
@@ -499,6 +499,9 @@ put('fcf27_base', B['fcf'][2027]); put('fcf33_base', B['fcf'][2033]); put('fcf38
 put('tot_peak_year', max(YEARS, key=lambda y: B['tot'][y])); put('tot_peak', max(B['tot'].values()))
 put('tot_trough', min(B['tot'][y] for y in YEARS if y > M['tot_peak_year'])); put('rev38', B['tot'][2038])
 
+put('mig_ttm', PTTM['ubr'] + PTTM['qul']); put('aes_ttm', PTTM['btxc'] + PTTM['juv'] + PTTM['aoth'])
+put('bs_s26_gwi', BS['s26']['gw'] + BS['s26']['intg']); put('bs_d25_gwi', BS['d25']['gw'] + BS['d25']['intg'])
+put('rin_ira_bear', 2 * M['rin_ira']); put('cm30_bear', CM0 - 2.0); put('cm30_bull', CM0 + 1.5)
 # ======================= 16. Frases del texto atadas a números =======================
 if TXT and not os.environ.get('NOASSERT'):
     assert M['m1'] < M['m3'] < M['m2'] < M['m4'], 'orden de métodos'
