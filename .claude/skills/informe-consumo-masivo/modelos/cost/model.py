@@ -163,7 +163,7 @@ put('fees_g26_ex_hike', (FEES[2026]-FEES[2025])*0.70/FEES[2025]*100)
 put('fees_g25_ex_hike', (FEES[2025]-FEES[2024])*0.60/FEES[2024]*100)
 put('hike_runrate', 52.0*(0.5*5 + 0.5*10)/1000)          # cota: ~mitad Gold Star (+$5) y ~mitad Executive (+$10), US$ mil millones
 put('def_fees_26', 3.006); put('def_fees_25', 2.854); put('rewards_liab_26', 3.037)
-put('fee_hike_hist_years', 2024 - 2017)
+put('fee_hike_hist_years', 2024 - 2017); put('next_hike_est', 2024 + (2024 - 2017))
 
 # ---------------- Ventas comparables sin nafta ni tipo de cambio (comunicados 99.1 y presentaciones 99.2) ----------------
 # 3T FY24 a 4T FY26 (diez trimestres). Tráfico = frecuencia de compra (igual con y sin ajuste). Ticket ajustado publicado desde el
@@ -233,7 +233,7 @@ NETCASH_EV = put('net_cash_ev', CASH - DEBT - FIN_L - OP_L)     # con arrendamie
 put('card_recv', 2.842)
 EBITDA26 = put('ebitda26', OI[2026] + DA[2026])
 put('debt_ebitda', (DEBT + FIN_L)/EBITDA26)
-put('equity_26', 35.803); put('assets_26', 89.045)
+put('debt_cur', 2.248); put('equity_26', 35.803); put('assets_26', 89.045)
 SPECIAL = put('special', 30.0); put('special_total', 13.3); put('special_cash_pct', 13.3/CASH*100)
 put('special_yield', SPECIAL/PRICE*100); put('cash_after_special', CASH - 13.3)
 put('net_cash_after_special', NETCASH_DCF - 13.3)
@@ -480,6 +480,7 @@ for kk in ('TGT', 'KR', 'BJ', 'DG', 'DLTR'):
 PEERS['WMT'] = dict(name='Walmart', cl='Supercentro + club', px=WM['price'], ntm=WM['eps_ntm'], pe=WM['pe_ntm_now'], comp=WM['wmt_comp'],
                     g=WM['wmt_g'], eve=WM['wmt_eve'], beta=WM['beta_wmt'], roic=RT['WMT']['roic_pct'], dy=RT['WMT']['div_yield_pct'])
 M['peers'] = PEERS
+put('wmt_gm_26', WM['ann']['2026']['gm']); put('sams_comp_wmt', WM['sams']['comp'][-1])
 AMZN = dict(WM['amzn']); AMZN['roic'] = RT['AMZN']['roic_pct']; M['amzn'] = AMZN
 COST_COMP = put('cost_comp', COMP['tot'][-1])           # 4T FY2026, total compañía sin nafta ni FX (misma vara que los pares)
 COST_G = put('cost_g', (C28/C27-1)*100)
@@ -574,6 +575,8 @@ M['rev_window'] = win
 put('rev_n', len(win)); put('rev_n_cons', sum(1 for w in win if w['cons']))
 PE10 = put('pe10_avg', st.mean(w['pe'] for w in win))
 put('pe10_min', min(w['pe'] for w in win)); put('pe10_max', max(w['pe'] for w in win))
+MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+_wm = max(win, key=lambda w: w['pe']); put('pe10_max_date', MESES[int(_wm['date'][5:])-1] + '-' + _wm['date'][:4])
 put('pe5_avg', st.mean(w['pe'] for w in win if w['date'] >= '2021-11'))
 # Regla de cambio de escalón (simétrica): ventana nueva solo si todos los cierres desde un punto superan el máximo (o quedan debajo
 # del mínimo) de al menos 20 cierres previos (cinco años) durante al menos 8 trimestres. Incluye el último cierre trimestral (ago-2026).
@@ -678,6 +681,7 @@ M['js_wh'] = json.dumps([WH[y] for y in range(2016, 2027)] + [WH27E])
 M['js_pe_labels'] = json.dumps([(w['date'][:4] if w['date'][5:] == '08' else '') for w in win])
 M['js_pe_vals'] = json.dumps([round(w['pe'], 2) for w in win])
 M['js_pe_10'] = json.dumps([round(PE10, 2)]*len(win))
+M['js_pe_rr'] = json.dumps([None]*start + [round(PE_RR, 2)]*(len(win)-start))
 M['js_pe_rel'] = json.dumps([round(REL10*SPX_PE10, 2)]*len(win))
 SPARK = [closes[(2026, m)] for m in range(5, 11)] + [PRICE]
 M['spark'] = [round(x, 2) for x in SPARK]
@@ -707,6 +711,14 @@ if not ALT:
     assert M['rel_now'] > REL10                                 # el relativo está por encima del promedio
     assert M['blend_gap'] < -25 and M['stance_accent'] == 'down'
     assert M['buyback_px_26'] < PRICE
+    assert TKT['us'][6] > TRX['us'][6] and TKT['us'][5] < TRX['us'][5]   # "el ticket supera al tráfico en EE.UU. desde el 1T FY2026"
+    assert M['dcf_bull'] < PRICE/2 and M['indep'] < PRICE/2         # "ni el Bull llega a la mitad"; "menos de la mitad de su precio"
+    assert M['impl_wacc'] < RF                                      # "por debajo de la propia tasa libre de riesgo"
+    assert M['impl_m32'] > 3*M['om_26'] and M['impl_m32'] > M['gm_26']   # "más del triple ... por encima del margen bruto"
+    assert M['pe10_max_date'] == 'feb-2025' and M['rr_last_pe'] < M['pe10_max']
+    assert abs(M['wmt_gm_26'] - 2*M['gm_26']) < 4                   # "la mitad que Walmart"
+    assert M['cons'] < PRICE and M['cons_gap'] < 0
+    assert M['exec_share_26'] > 49.5 and M['memq']['ren_us'][-1] > 92   # "ya son la mitad"; "arriba de 92%"
     assert MEMQ['ren_ww'][-1] < MEMQ['ren_ww'][0]               # "la renovación mundial bajó desde 90.5%"
     assert M['paid_g26'] < M['paid_cagr_8']                     # el crecimiento de socios se desaceleró
     assert M['biz_base_merch_ps'] < M['biz_base_memb_ps']       # "las cuotas valen más que la mercadería"
