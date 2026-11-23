@@ -80,7 +80,7 @@ for y in YRS:
     M['ann'][str(y)] = dict(rev=REV[y], ns=NS[y], fees=FEES[y], oi=OI[y], gm=(NS[y]-COGS[y])/NS[y]*100, sga=SGA[y]/NS[y]*100,
                             om=OI[y]/REV[y]*100, fee_share=FEES[y]/OI[y]*100, merch_oi=OI[y]-FEES[y],
                             merch_m=(OI[y]-FEES[y])/NS[y]*100, turns=COGS[y]/((INV[y]+INV[y-1])/2), ap_inv=AP[y]/INV[y]*100,
-                            ocf=OCF[y], capex=CAPEX[y], fcf=OCF[y]-CAPEX[y], ni=NI[y], div=DIVP[y], buyback=BUYB[y])
+                            ocf=OCF[y], capex=CAPEX[y], da=DA[y], fcf=OCF[y]-CAPEX[y], ni=NI[y], div=DIVP[y], buyback=BUYB[y])
 ANN = M['ann']
 put('rev_cagr_10', ((REV[2026]/REV[2016])**(1/10)-1)*100); put('ns_cagr_10', ((NS[2026]/NS[2016])**(1/10)-1)*100)
 put('fees_cagr_10', ((FEES[2026]/FEES[2016])**(1/10)-1)*100); put('oi_cagr_10', ((OI[2026]/OI[2016])**(1/10)-1)*100)

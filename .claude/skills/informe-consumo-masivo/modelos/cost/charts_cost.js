@@ -23,7 +23,7 @@
       labels:fyl({{js_fy}}),
       values:{{js_fee_share}},
       colors:[PALETTE.navy,PALETTE.navy,PALETTE.navy2,PALETTE.navy2,PALETTE.blue,PALETTE.blue,PALETTE.blue,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight],
-      valueFmt:function(v){ return v.toFixed(0)+'%'; }
+      valueFmt:function(v){ return NARROW() ? v.toFixed(0) : v.toFixed(0)+'%'; }
     });
 
     drawHBars(document.getElementById('segChart'), {
@@ -58,10 +58,10 @@
     });
 
     drawVBars(document.getElementById('digChart'), {
-      labels:ql({{js_ql}}).map(function(l){ return NARROW() ? l.slice(0, 2) : l; }),
+      labels:ql({{js_ql}}),
       values:{{js_dig}},
       colors:[PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.blue,PALETTE.blue,PALETTE.navy],
-      valueFmt:function(v){ return '+'+v.toFixed(0)+'%'; }
+      valueFmt:function(v){ return NARROW() ? '+'+v.toFixed(0) : '+'+v.toFixed(0)+'%'; }
     });
 
     drawLines(document.getElementById('renewChart'), {
@@ -79,21 +79,21 @@
     });
 
     drawVBars(document.getElementById('feeqChart'), {
-      labels:ql({{js_mq}}).map(function(l){ return NARROW() ? l.slice(0, 2) : l; }),
+      labels:ql({{js_mq}}),
       values:{{js_fee_g}},
       colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blue,PALETTE.navy,PALETTE.navy,PALETTE.navy,PALETTE.blue,PALETTE.blueLight],
-      valueFmt:function(v){ return '+'+v.toFixed(1)+'%'; }
+      valueFmt:function(v){ return NARROW() ? '+'+v.toFixed(0) : '+'+v.toFixed(1)+'%'; }
     });
 
     drawVBars(document.getElementById('whChart'), {
-      labels:fyl({{js_wh_y}}),
+      labels:fyl({{js_wh_y}}).map(function(l){ return l.replace("'27E", '27E'); }),
       values:{{js_wh}},
       colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.navy2,PALETTE.navy,PALETTE.gold],
       valueFmt:function(v){ return v.toFixed(0); }
     });
 
     drawLines(document.getElementById('marginChart'), {
-      labels:{{js_fy}},
+      labels:fyl({{js_fy}}),
       minV:0, maxV:14,
       yFmt:function(v){ return v.toFixed(0)+'%'; },
       series:[{name:'Margen bruto', color:PALETTE.navy, values:{{js_gm}}},
@@ -106,11 +106,11 @@
       labels:fyl({{js_fy}}),
       values:{{js_turns}},
       colors:[PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.navy2,PALETTE.navy],
-      valueFmt:function(v){ return v.toFixed(1)+'x'; }
+      valueFmt:function(v){ return NARROW() ? v.toFixed(0) : v.toFixed(1)+'x'; }
     });
 
     drawLines(document.getElementById('cashChart'), {
-      labels:{{js_fy}},
+      labels:fyl({{js_fy}}),
       minV:0, maxV:18,
       yFmt:function(v){ return '$'+v.toFixed(0); },
       series:[{name:'Flujo operativo', color:PALETTE.navy, values:{{js_ocf}}},{name:'Capex', color:PALETTE.red, values:{{js_capex}}},{name:'Flujo de caja libre', color:PALETTE.blueLight, values:{{js_fcf}}}]
@@ -125,7 +125,7 @@
     });
 
     drawVBars(document.getElementById('estChart'), {
-      labels:['FY2024 real','FY2025 real','FY2026 real','FY2027 consenso','FY2028 consenso'],
+      labels:(NARROW() ? ['FY24','FY25','FY26','FY27e','FY28e'] : ['FY2024 real','FY2025 real','FY2026 real','FY2027 consenso','FY2028 consenso']),
       values:[{{eps_fy.2024|js2}},{{eps_fy.2025|js2}},{{eps_fy.2026|js2}},{{c27|js2}},{{c28|js2}}],
       colors:[PALETTE.pale,PALETTE.blueLight,PALETTE.navy,PALETTE.blue,PALETTE.blueLight],
       valueFmt:function(v){ return '$'+v.toFixed(2); }
