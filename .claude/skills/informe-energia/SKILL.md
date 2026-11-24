@@ -57,7 +57,9 @@ razón por la que la valuación no puede anclarse en el spot de un día.
 **Argentina (YPF, VIST, PAM, TGS):** mismo marco, más riesgo país explícito (sumá el spread de
 riesgo soberano al costo de equity, citando el valor vigente), régimen de precios local vs. paridad
 de exportación, RIGI y controles de cambio/exportación vigentes, e inventario de Vaca Muerta. YPF es
-integrada (usar SOTP), VIST es E&P pura (NAV).
+integrada (usar SOTP), VIST es E&P pura (NAV). **Para tickers argentinos el informe lo gobierna
+`informe-argentina`** (moneda, NIC 29, costo de capital con senda de riesgo país, blend); de acá se
+toma el NAV/SOTP como su método sectorial.
 
 ## Antes de empezar — datos reales
 

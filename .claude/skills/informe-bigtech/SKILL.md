@@ -429,6 +429,8 @@ tickers. Lo mismo para los sectores defensivos, cada uno con su skill:
   ISRG, TMO…) → `informe-salud`
 - **Energía** (integradas, E&P, midstream, refinación: XOM, CVX, COP, EPD, VIST, YPF…) → `informe-energia`
 - **Utilities** (reguladas e IPPs: NEE, DUK, SO, CEG, VST…) → `informe-utilities`
+- **Acciones argentinas** (GGAL, YPF, PAM, VIST, BMA, BBAR, TGS, CEPU, TEO, LOMA, TXAR, ALUA, IRS, CRESY…) →
+  `informe-argentina` (capa país: USD, riesgo país, NIC 29, CCL; toma prestado el método sectorial)
 
 ## Al terminar un ticker
 
