@@ -294,7 +294,7 @@
   </p>
   <div class="table-scroll"><table>
     <tr><th>Crisis</th><th>Qué le pasó a Galicia</th><th>Precio de la acción</th></tr>
-    <tr><td class="label">1993 (fin del efecto tequila previo)</td><td class="label">Pérdidas severas en medio de la crisis financiera local (Funding Universe)</td><td>s/d</td></tr>
+    <tr><td class="label">Principios de los 90 (1993)</td><td class="label">Pérdidas severas en medio de la crisis financiera local (Funding Universe)</td><td>s/d</td></tr>
     <tr><td class="label">2001-02: corralito, default y pesificación asimétrica</td><td class="label">Corrida de depósitos, asistencia del BCRA y reestructuración de su deuda externa; el programa de compensación con el BCRA siguió generando pérdidas hasta 2006 (Euromoney). Sin dividendos durante años</td><td>Local ARS 1.43 (5-abr-2001) → 0.46 (4-oct-2001): −68% en seis meses, con el peso todavía 1 a 1 (Rava)</td></tr>
     <tr><td class="label">2018: crisis cambiaria y acuerdo con el FMI</td><td class="label">Devaluación de más del 100%; sigue ganando dinero en pesos</td><td>ADR USD 65.85 (dic-17) → 25.43 (sep-18): −61%</td></tr>
     <tr><td class="label">2019: PASO, reperfilamiento y cepo</td><td class="label">Riesgo país de 835 a 2,143 pb en un trimestre; pérdidas por tenencia de títulos reperfilados</td><td>ADR USD 35.50 (jun-19) → 13.00 (sep-19): −63%</td></tr>
@@ -513,7 +513,7 @@
   <h2>Control familiar con voto múltiple, el FGS como segundo accionista y una holding que cotiza con descuento</h2>
   <div class="govrow">
     <div class="govcell"><div class="k">EBA Holding (Escasany, Ayerza, Braun)</div><div class="v">19.7% / 55.1%</div><div class="sub">capital / votos, por las acciones Clase A de voto múltiple</div></div>
-    <div class="govcell"><div class="k">FGS-ANSES</div><div class="v">~16.6%</div><div class="sub">desde la estatización de las AFJP (2008); con derecho a proponer directores</div></div>
+    <div class="govcell"><div class="k">FGS-ANSES</div><div class="v">~16.6%</div><div class="sub">accionista estatal desde la estatización de las AFJP (2008)</div></div>
     <div class="govcell"><div class="k">ADR</div><div class="v">1 ADR = 10 Clase B</div><div class="sub">Nasdaq desde 2000; 160.6 M de ADR equivalentes</div></div>
     <div class="govcell"><div class="k">HSBC</div><div class="v">~7% (vendiendo)</div><div class="sub">recibió acciones como pago de HSBC Argentina y se desprendió de un paquete</div></div>
     <div class="govcell"><div class="k">Acciones en circulación</div><div class="v">1,606.3 M</div><div class="sub">1,474.7 M hasta dic-2024; acciones nuevas por HSBC</div></div>
@@ -1012,7 +1012,8 @@
     var ctx = setup.ctx, W = setup.w, H = setup.h;
     ctx.clearRect(0,0,W,H);
     var labels = opts.labels, px = opts.price, rp = opts.rp, n = labels.length;
-    var padL = 44, padR = 52, padT = 34, padB = 46;
+    var narrow = W < 520;
+    var padL = narrow ? 34 : 44, padR = narrow ? 38 : 52, padT = 34, padB = narrow ? 58 : 46;
     var plotW = W - padL - padR, plotH = H - padT - padB;
     var pMax = opts.priceMax, rMax = opts.rpMax;
     function X(i){ return padL + plotW * i / (n - 1); }
@@ -1033,9 +1034,10 @@
       ctx.strokeStyle = PALETTE.gold; ctx.setLineDash([3,3]); ctx.lineWidth = 1.2;
       ctx.beginPath(); ctx.moveTo(x, padT - 2); ctx.lineTo(x, padT + plotH); ctx.stroke(); ctx.setLineDash([]);
       ctx.fillStyle = PALETTE.navy2; ctx.font = '600 9.5px "Inter", sans-serif';
-      var tw = ctx.measureText(e.t).width;
+      var et = (narrow && e.c) ? e.c : e.t;
+      var tw = ctx.measureText(et).width;
       var tx = Math.min(Math.max(x, padL + tw / 2), W - padR - tw / 2);
-      ctx.textAlign = 'center'; ctx.fillText(e.t, tx, (k % 2 === 0) ? padT - 20 : padT - 8);
+      ctx.textAlign = 'center'; ctx.fillText(et, tx, (k % 2 === 0) ? padT - 20 : padT - 8);
     });
     function line(vals, f, color, w){
       ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath();
@@ -1045,9 +1047,10 @@
     line(rp, Yr, PALETTE.red, 1.6);
     line(px, Yp, PALETTE.navy, 2.4);
     ctx.fillStyle = PALETTE.muted; ctx.font = '10px "IBM Plex Mono", monospace'; ctx.textAlign = 'center';
-    labels.forEach(function(l, i){ if(l.slice(3) === '12') ctx.fillText('20' + l.slice(0,2), X(i), padT + plotH + 15); });
-    var lx = padL, ly = H - 10; ctx.font = '11px "Inter", sans-serif';
-    [[opts.priceName, PALETTE.navy], ['Riesgo país EMBI, pb (eje der., invertido)', PALETTE.red]].forEach(function(s){
+    labels.forEach(function(l, i){ var y = +l.slice(0,2); if(l.slice(3) === '12' && (!narrow || y % 2 === 0)) ctx.fillText(narrow ? "'" + l.slice(0,2) : '20' + l.slice(0,2), X(i), padT + plotH + 15); });
+    var lx = padL, ly = narrow ? H - 26 : H - 10; ctx.font = '11px "Inter", sans-serif';
+    [[opts.priceName, PALETTE.navy], [narrow ? 'Riesgo país, pb (der., invertido)' : 'Riesgo país EMBI, pb (eje der., invertido)', PALETTE.red]].forEach(function(s, k){
+      if(narrow && k === 1){ lx = padL; ly += 16; }
       ctx.fillStyle = s[1]; ctx.fillRect(lx, ly - 8, 10, 10);
       ctx.fillStyle = PALETTE.ink; ctx.textAlign = 'left'; ctx.fillText(s[0], lx + 14, ly);
       lx += 14 + ctx.measureText(s[0]).width + 22;
@@ -1060,7 +1063,8 @@
     var setup = setupCanvas(canvas, cssH);
     var ctx = setup.ctx, W = setup.w, H = setup.h;
     ctx.clearRect(0,0,W,H);
-    var padL = 46, padR = 16, padT = 14, padB = 58;
+    var narrow = W < 520;
+    var padL = 46, padR = 16, padT = 14, padB = narrow ? 70 : 58;
     var plotW = W - padL - padR, plotH = H - padT - padB;
     var xMax = opts.xMax, yMax = opts.yMax;
     function X(v){ return padL + plotW * v / xMax; }
@@ -1072,7 +1076,7 @@
       ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, padT + plotH); ctx.stroke();
       ctx.fillStyle = PALETTE.muted; ctx.textAlign = 'right';
       ctx.fillText((yMax * (4 - g) / 4).toFixed(1) + 'x', padL - 6, yy + 3);
-      ctx.textAlign = g === 4 ? 'right' : (g === 0 ? 'left' : 'center'); ctx.fillText(Math.round(xMax * g / 4) + ' pb', xx, padT + plotH + 15);
+      ctx.textAlign = g === 4 ? 'right' : (g === 0 ? 'left' : 'center'); ctx.fillText(Math.round(xMax * g / 4) + (narrow ? '' : ' pb'), xx, padT + plotH + 15);
     }
     ctx.strokeStyle = PALETTE.blue; ctx.lineWidth = 1.6; ctx.setLineDash([5,4]);
     ctx.beginPath(); ctx.moveTo(X(0), Y(opts.a)); ctx.lineTo(X(xMax), Y(opts.a + opts.b * xMax)); ctx.stroke();
@@ -1087,8 +1091,9 @@
       if(tx + tw > W - padR) tx = X(m.x) - 9 - tw;
       ctx.textAlign = 'left'; ctx.fillText(m.t, tx, Y(m.y) + (m.dy || -8));
     });
-    var lx = padL, ly = H - 10; ctx.font = '11px "Inter", sans-serif';
-    [['Trimestres 1T20-3T26', 'rgba(21,51,92,.55)'], ['Regresión P/BV ~ riesgo país', PALETTE.blue]].forEach(function(s){
+    var lx = padL, ly = narrow ? H - 26 : H - 10; ctx.font = '11px "Inter", sans-serif';
+    [['Trimestres 1T20-3T26', 'rgba(21,51,92,.55)'], ['Regresión P/BV ~ riesgo país', PALETTE.blue]].forEach(function(s, k){
+      if(narrow && k === 1){ lx = padL; ly += 16; }
       ctx.fillStyle = s[1]; ctx.fillRect(lx, ly - 8, 10, 10);
       ctx.fillStyle = PALETTE.ink; ctx.textAlign = 'left'; ctx.fillText(s[0], lx + 14, ly);
       lx += 14 + ctx.measureText(s[0]).width + 22;
@@ -1097,11 +1102,13 @@
 
   var FECHAS = ["16-12","17-03","17-06","17-09","17-12","18-03","18-06","18-09","18-12","19-03","19-06","19-09","19-12","20-03","20-06","20-09","20-12","21-03","21-06","21-09","21-12","22-03","22-06","22-09","22-12","23-03","23-06","23-09","23-12","24-03","24-06","24-09","24-12","25-03","25-06","25-09","25-12","26-03","26-06","26-09"];
   var RP = [455,452,432,367,351,420,610,623,817,774,835,2143,1744,3803,2495,1300,1368,1589,1596,1607,1688,1718,2428,2754,2213,2276,2037,2543,1906,1439,1456,1290,635,816,701,1222,571,617,426,607];
-  var EVENTOS = [{i:6,t:'Crisis 2018'},{i:11,t:'PASO 2019'},{i:13,t:'Pandemia'},{i:28,t:'Devaluación dic-23'},{i:35,t:'Pre-legislativas 2025'}];
+  var EVENTOS = [{i:6,t:'Crisis 2018',c:'2018'},{i:11,t:'PASO 2019',c:'PASO'},{i:13,t:'Pandemia',c:'Covid'},{i:28,t:'Devaluación dic-23',c:'Dic-23'},{i:35,t:'Pre-legislativas 2025',c:'2025'}];
 
   function renderAll(){
+    var N = (document.getElementById('compsChart').parentElement.clientWidth - 44) < 520;
+    function L(full, corto){ return N ? corto : full; }
     drawDual(document.getElementById('historyChart'), {
-      labels:FECHAS, rp:RP, rpMax:4000, priceMax:80, events:EVENTOS, priceName:'ADR GGAL (USD, eje izq.)',
+      labels:FECHAS, rp:RP, rpMax:4000, priceMax:80, events:EVENTOS, priceName:L('ADR GGAL (USD, eje izq.)','ADR GGAL (USD)'),
       price:[26.92,37.86,42.64,51.54,65.85,65.76,32.98,25.43,27.57,25.52,35.5,13.0,16.23,7.05,9.7,7.24,8.74,7.61,8.62,10.07,9.49,10.8,6.91,7.46,9.73,10.98,17.2,13.05,17.27,25.42,30.56,42.09,62.32,54.47,50.39,27.56,53.94,46.71,50.03,37.24]
     });
 
@@ -1109,15 +1116,15 @@
       labels:['Banco Galicia','Fondos Fima','Naranja X','Galicia Seguros','Galicia Securities'],
       values:[158.2,38.2,35.6,22.6,7.7],
       colors:[PALETTE.navy,PALETTE.blue,PALETTE.red,PALETTE.blueLight,PALETTE.pale],
-      padL:150,
-      valueFmt:function(v){ return 'ARS '+v.toFixed(1)+' mil M'; }
+      padL:N ? 118 : 150,
+      valueFmt:function(v){ return N ? v.toFixed(0) : 'ARS '+v.toFixed(1)+' mil M'; }
     });
 
     drawHBars(document.getElementById('exposureChart'), {
-      labels:['Depósitos en USD','Préstamos en USD','Activos que rinden interés en USD','Exposición al sector público / activo','Posición neta en USD / patrimonio'],
+      labels:L(['Depósitos en USD','Préstamos en USD','Activos que rinden interés en USD','Exposición al sector público / activo','Posición neta en USD / patrimonio'],['Depósitos USD','Préstamos USD','Activos USD','Sector público','Posición USD/PN']),
       values:[39,35,28,18,0.3],
       colors:[PALETTE.navy,PALETTE.blue,PALETTE.blueLight,PALETTE.gold,PALETTE.pale],
-      padL:250,
+      padL:N ? 110 : 250,
       valueFmt:function(v){ return v+'%'; }
     });
 
@@ -1125,14 +1132,14 @@
       labels:['2T25','3T25','4T25','1T26','2T26'],
       values:[142.5,-56.7,-23.0,45.1,165.2],
       colors:[PALETTE.navy2,PALETTE.red,PALETTE.red,PALETTE.blueLight,PALETTE.navy],
-      valueFmt:function(v){ return 'USD '+v.toFixed(0)+' M'; }
+      valueFmt:function(v){ return (N ? '' : 'USD ')+v.toFixed(0)+(N ? '' : ' M'); }
     });
 
     drawHBars(document.getElementById('capitalChart'), {
-      labels:['Capital total Banco Galicia (2T26)','Nivel "cómodo" usado en el informe','Mínimo regulatorio'],
+      labels:L(['Capital total Banco Galicia (2T26)','Nivel "cómodo" usado en el informe','Mínimo regulatorio'],['Capital 2T26','Nivel cómodo','Mínimo BCRA']),
       values:[26.0,15.0,8.2],
       colors:[PALETTE.navy,PALETTE.blueLight,PALETTE.pale],
-      padL:240,
+      padL:N ? 100 : 240,
       valueFmt:function(v){ return v.toFixed(1)+'%'; }
     });
 
@@ -1140,22 +1147,22 @@
       labels:['Banco de Chile','Santander Chile','Credicorp','Banorte','Itaú Unibanco','Bancolombia','BMA (par directo)','Bradesco','GGAL','BBAR','SUPV'],
       values:[3.27,3.01,2.45,2.12,1.91,1.80,0.84,0.78,0.74,0.71,0.55],
       colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.gold,PALETTE.blueLight,PALETTE.navy,PALETTE.pale,PALETTE.pale],
-      padL:150,
+      padL:N ? 118 : 150,
       valueFmt:function(v){ return v.toFixed(2)+'x'; }
     });
 
     drawScatter(document.getElementById('scatterChart'), {
       xMax:4000, yMax:2.4, a:1.646, b:-0.000311,
       points:[[3803,0.646],[2495,1.023],[1300,0.964],[1368,1.017],[1589,0.794],[1596,0.919],[1607,1.068],[1688,0.946],[1718,0.84],[2428,0.605],[2754,0.675],[2213,0.804],[2276,0.798],[2037,1.185],[2543,1.058],[1906,1.226],[1439,1.573],[1456,1.749],[1290,1.677],[635,1.974],[816,1.775],[701,1.41],[1222,0.963],[571,1.698],[617,1.289],[426,1.36],[607,0.999]],
-      marks:[{x:1070,y:0.736,color:PALETTE.red,t:'20-nov-26: 0.74x con 1,070 pb',dy:16},{x:810,y:1.394,color:PALETTE.gold,t:'Base: 1.39x en 810 pb',dy:-10}]
+      marks:[{x:1070,y:0.736,color:PALETTE.red,t:L('20-nov-26: 0.74x con 1,070 pb','20-nov 0.74x'),dy:16},{x:810,y:1.394,color:PALETTE.gold,t:L('Base: 1.39x en 810 pb','Base 1.39x'),dy:-10}]
     });
 
     drawRangeBars(document.getElementById('footballChart'), {
-      labels:['DDM payout total (Bear → Bull)','P/BV justificado − holding (Bear → Bull)','Comparables Latam (P25 → P75)','Reversión por régimen de riesgo país','Consenso (mín. → máx., 90 días)'],
+      labels:L(['DDM payout total (Bear → Bull)','P/BV justificado − holding (Bear → Bull)','Comparables Latam (P25 → P75)','Reversión por régimen de riesgo país','Consenso (mín. → máx., 90 días)'],['DDM','P/BV justif.','Comparables','Reversión','Consenso']),
       ranges:[[14.43,58.20],[17.37,53.26],[28.38,40.31],[30.22,54.05],[45.00,103.00]],
       colors:[PALETTE.blue,PALETTE.navy2,PALETTE.gold,PALETTE.blueLight,PALETTE.navy],
-      padL:250,
-      refLines:[{value:25.29,color:PALETTE.red,label:'Mercado $25.3'},{value:46.85,color:PALETTE.navy,label:'Blend $46.9'}],
+      padL:N ? 110 : 250,
+      refLines:[{value:25.29,color:PALETTE.red,label:L('Mercado $25.3','$25')},{value:46.85,color:PALETTE.navy,label:L('Blend $46.9','$47')}],
       valueFmt:function(v){ return '$'+v.toFixed(0); }
     });
   }
