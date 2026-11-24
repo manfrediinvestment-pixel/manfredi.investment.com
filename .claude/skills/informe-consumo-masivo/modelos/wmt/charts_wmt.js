@@ -34,7 +34,7 @@
     drawVBars(document.getElementById('ecomChart'), {
       labels:(NARROW() ? {{js_ecom_ql}}.map(function(l){ return l.indexOf('1T')===0 ? l.replace(' FY','') : l.slice(0,2); }) : {{js_ecom_ql}}),
       values:{{js_ecom_q}},
-      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.blue,PALETTE.blue,PALETTE.blue,PALETTE.navy,PALETTE.navy],
+      colors:[PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blue,PALETTE.blue,PALETTE.blue,PALETTE.blue,PALETTE.navy,PALETTE.navy,PALETTE.navy],
       valueFmt:function(v){ return '+'+v.toFixed(0)+'%'; }
     });
 
@@ -62,17 +62,17 @@
     });
 
     drawHBars(document.getElementById('compsChart'), {
-      labels:['Costco','Walmart','Amazon (referencia)',"BJ's Wholesale",'Target','Dollar Tree','Dollar General','Kroger'],
-      values:[{{peers.COST.pe|js2}},{{pe_ntm_now|js2}},{{amzn.pe|js2}},{{peers.BJ.pe|js2}},{{peers.TGT.pe|js2}},{{peers.DLTR.pe|js2}},{{peers.DG.pe|js2}},{{peers.KR.pe|js2}}],
+      labels:['Costco','Walmart','Amazon (referencia)',"BJ's Wholesale",'Dollar Tree','Target','Dollar General','Kroger'],
+      values:[{{peers.COST.pe|js2}},{{pe_ntm_now|js2}},{{amzn.pe|js2}},{{peers.BJ.pe|js2}},{{peers.DLTR.pe|js2}},{{peers.TGT.pe|js2}},{{peers.DG.pe|js2}},{{peers.KR.pe|js2}}],
       colors:[PALETTE.blueLight,PALETTE.navy,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight],
       padL:170,
       valueFmt:function(v){ return v.toFixed(1)+'x'; }
     });
 
     drawVBars(document.getElementById('estChart'), {
-      labels:['FY2024 real','FY2025 real','FY2026 real','FY2027 consenso','FY2028 consenso','FY2029 consenso'],
-      values:[{{eps_fy.2024|js2}},{{eps_fy.2025|js2}},{{eps_fy.2026|js2}},{{c27|js2}},{{c28|js2}},{{c29|js2}}],
-      colors:[PALETTE.pale,PALETTE.blueLight,PALETTE.navy,PALETTE.blue,PALETTE.blueLight,PALETTE.pale],
+      labels:['FY2024 real','FY2025 real','FY2026 real','FY2027 consenso','FY2028 consenso'],
+      values:[{{eps_fy.2024|js2}},{{eps_fy.2025|js2}},{{eps_fy.2026|js2}},{{c27|js2}},{{c28|js2}}],
+      colors:[PALETTE.pale,PALETTE.blueLight,PALETTE.navy,PALETTE.blue,PALETTE.blueLight],
       valueFmt:function(v){ return '$'+v.toFixed(2); }
     });
 

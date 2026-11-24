@@ -32,4 +32,5 @@ for t in ['PEP', 'KO', 'KDP', 'MNST', 'MDLZ', 'PG', 'CL', 'PM', 'HSY', 'GIS']:
         print(t, [(r['fiscalEnd'], r['consensusEPSForecast'], r['noOfEstimates']) for r in j['yearlyForecast']['rows']])
     except Exception as e:
         print(t, 'nasdaq error', e, file=sys.stderr)
-json.dump(out, open('data/nasdaq_eps.json', 'w'), indent=1)
+if len(out) == 10: json.dump(out, open('data/nasdaq_eps.json', 'w'), indent=1)
+else: print('Nasdaq incompleto: data/nasdaq_eps.json no se toca (leer el consenso desde el navegador)', file=sys.stderr)

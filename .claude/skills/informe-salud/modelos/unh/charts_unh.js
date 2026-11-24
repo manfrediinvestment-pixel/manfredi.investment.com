@@ -29,7 +29,7 @@
     });
 
     drawLines(document.getElementById('segMarginChart'), {
-      labels:['2023','2024','2025','2026G'],
+      labels:['2023','2024','2025','2026E'],
       minV:0, maxV:8,
       yFmt:function(v){ return v.toFixed(1)+'%'; },
       series:[{name:'UnitedHealthcare', color:PALETTE.navy, values:[{{seg_hist.uhc.2023|js1}},{{seg_hist.uhc.2024|js1}},2.8,{{seg.uhc.m26|js1}}]},
@@ -46,15 +46,15 @@
     });
 
     drawHBars(document.getElementById('compsChart'), {
-      labels:['Humana (excluido)','Molina (excluido)','UnitedHealth','Elevance Health','Centene (excluido)','CVS Health','Cigna Group'],
+      labels:{{js_comps_labels}},
       values:[{{peers.HUM.pe|js2}},{{peers.MOH.pe|js2}},{{pe_ntm_now|js2}},{{peers.ELV.pe|js2}},{{peers.CNC.pe|js2}},{{peers.CVS.pe|js2}},{{peers.CI.pe|js2}}],
-      colors:[PALETTE.pale,PALETTE.pale,PALETTE.navy,PALETTE.blueLight,PALETTE.pale,PALETTE.blueLight,PALETTE.blueLight],
+      colors:{{js_comps_colors}},
       padL:170,
       valueFmt:function(v){ return v.toFixed(1)+'x'; }
     });
 
     drawVBars(document.getElementById('estChart'), {
-      labels:['2024 real','2025 real','2026 guía','2027 consenso','2028 consenso'],
+      labels:['2024 real','2025 real','2026 guía (piso)','2027 consenso','2028 consenso'],
       values:[27.66,16.35,{{guide_mid|js2}},{{c27|js2}},{{c28|js2}}],
       colors:[PALETTE.pale,PALETTE.red,PALETTE.navy,PALETTE.blue,PALETTE.blueLight],
       valueFmt:function(v){ return '$'+v.toFixed(2); }

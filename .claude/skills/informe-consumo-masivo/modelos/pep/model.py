@@ -1,16 +1,21 @@
 # Modelo de valuación PEP (PepsiCo) — todos los números derivados del informe salen de acá.
 # Marco: informe-consumo-masivo, sub-industria bebidas sin alcohol + alimentos/snacks (modelo integrado: fabrica,
 # embotella y distribuye directo a la tienda). Pipeline copiado de modelos/ko/ y adaptado.
-# Fuentes: 10-K 2025 (3-feb-2026) y 10-K 2016-2024, 10-Q 1T/2T 2026, comunicados 8-K ítem 2.02 (4T2015-2T2026), 8-K del
-# 8-dic-2025 (plan con Elliott), carta de Elliott (2-sep-2025), Yahoo, Nasdaq/Zacks, stockanalysis (S&P Global),
-# FactSet Earnings Insight, y modelos/ko/model.json para la comparación con Coca-Cola.
-# Fecha de corte de precios: cierre del 1-oct-2026 (PEP, KO, pares, ^TNX).
-import json, datetime, statistics as st, os
+# Fuentes: 10-K 2025 (3-feb-2026) y 10-K 2016-2024, 10-Q 1T/2T/3T 2026 (el del 3T presentado el 8-oct-2026), comunicados
+# 8-K ítem 2.02 (4T2015-3T2026), 8-K del 8-dic-2025 (plan con Elliott), carta de Elliott (2-sep-2025), Yahoo, Nasdaq/Zacks,
+# stockanalysis (S&P Global), FactSet Earnings Insight, y modelos/ko/model.json (edición 3T 2026) para la comparación con KO.
+# Fecha de corte de precios: cierre del 11-nov-2026 (PEP, KO, pares, ^TNX), la misma que la edición 3T 2026 de KO.
+# Edición anterior (2T 2026, precios al 1-oct-2026): model_2t26.json (copia del model.json publicado en octubre).
+import json, datetime, statistics as st, os, subprocess, sys
 HERE = os.path.dirname(os.path.abspath(__file__)); os.chdir(HERE)
+TXT = 'PEP_PRICE' not in os.environ   # los assert que atan el texto a los números solo corren con el precio de corte
 
 M = {}
 def put(k, v): M[k] = v; return v
-CUT = '2026-10-01'
+FAILS = []
+def chk(c, m):   # frases del texto atadas a los números (solo con el precio de corte)
+    if TXT and not c: FAILS.append(m)
+CUT = '2026-11-11'
 def yh_rows(t):
     d = json.load(open(f'yh/{t}.d.json'))['chart']['result'][0]
     return [(datetime.datetime.fromtimestamp(a, datetime.UTC).date().isoformat(), c)
@@ -19,33 +24,39 @@ def yh_close(t, day=CUT): return [r for r in yh_rows(t) if r[0] <= day][-1][1]
 def yh_last(t): return yh_rows(t)[-1][1]
 SA = json.load(open('data/sa_stats.json'))
 
-# ---------------- Mercado (cierre 1-oct-2026) ----------------
-PRICE = put('price', yh_close('PEP'))
+# ---------------- Mercado (cierre 11-nov-2026) ----------------
+# PEP_PRICE (variable de entorno) solo la usan el puente contra la edición anterior y el chequeo de anti-circularidad.
+PRICE = put('price', float(os.environ['PEP_PRICE']) if 'PEP_PRICE' in os.environ else yh_close('PEP'))
 RF = put('rf', yh_close('^TNX'))
 ERP = put('erp', 5.0)
-SH_DIL = put('sh_dil', 1369.0)       # diluidas promedio 2T26 (millones; comunicado del 2T26)
-SH_OUT = put('sh_out', 1366.0)       # en circulación al 13-jun-2026 (balance del 2T26)
+SH_DIL = put('sh_dil', 1367.0)       # diluidas promedio 3T26 (millones; comunicado del 3T26)
+SH_OUT = put('sh_out', 1364.0)       # en circulación al 5-sep-2026 (balance del 3T26)
 MKT_CAP = put('mkt_cap', PRICE*SH_OUT/1000)   # US$ miles de millones
-SPX_PE, SPX_PE10 = put('spx_pe', 19.2), put('spx_pe10', 19.0)   # FactSet, 25-sep-2026 (mismo dato que KO y PG)
+SPX_PE, SPX_PE10 = put('spx_pe', 17.7), put('spx_pe10', 19.1)   # FactSet Earnings Insight 6-nov-2026 (dato del 5-nov), igual que KO
+put('spx_pe_sep', 19.2); put('spx_pe10_sep', 19.0)                # dato usado en la edición anterior (25-sep-2026)
 put('px_feb_hi', 169.74)             # cierre mensual de feb-2026 (Yahoo), máximo del año
 
-# ---------------- Consenso de EPS core (Nasdaq / Zacks, 2-oct-2026) ----------------
+# ---------------- Consenso de EPS core (Nasdaq / Zacks, 12-nov-2026) ----------------
 NQ = json.load(open('data/nasdaq_eps.json'))
 def nq(t):
     rows = NQ[t]['yearlyForecast']['rows']
     return [float(r['consensusEPSForecast']) for r in rows], [int(r['noOfEstimates']) for r in rows]
 (C26, C27, C28, _), (n26, n27, n28, _) = nq('PEP')
 put('c26', C26); put('c27', C27); put('c28', C28); put('c26_n', n26); put('c27_n', n27); put('c28_n', n28)
-put('c26_sa', 8.55); put('c27_sa', 8.93)   # stockanalysis (S&P Global), 2-oct-2026, referencia
-REV_C26 = put('rev_c26', 98.90)            # consenso de ventas 2026 (S&P Global, 21 analistas), US$ miles de millones
-OI_C26 = put('oi_c26', 15.88)              # consenso de resultado operativo 2026 (S&P Global)
-FCF_C26 = put('fcf_c26', 10.52)            # consenso de flujo de caja libre 2026 (S&P Global)
-NI_C26_SA = put('ni_c26_sa', 11.32)        # consenso de utilidad neta 2026 (S&P Global)
+put('c26_sa', 8.42); put('c27_sa', 8.62)   # stockanalysis (S&P Global), 12-nov-2026, referencia
+put('c26_hi', 8.68); put('c26_lo', 8.35)    # rango del consenso 2026 (Nasdaq)
+REV_C26 = put('rev_c26', 99.23)            # consenso de ventas 2026 (S&P Global, 20 analistas), US$ miles de millones
+OI_C26 = put('oi_c26', 15.49)              # consenso de resultado operativo 2026 (S&P Global)
+FCF_C26 = put('fcf_c26', 10.49)            # consenso de flujo de caja libre 2026 (S&P Global)
+NI_C26_SA = put('ni_c26_sa', 11.18)        # consenso de utilidad neta 2026 (S&P Global)
 EPS25 = put('eps25', 8.14); EPS24 = put('eps24', 8.16)
-GUIDE_LO, GUIDE_HI = put('guide_lo', 5.0), put('guide_hi', 7.0)   # core EPS 2026, con monedas (guía del 9-jul-2026)
+GUIDE_LO, GUIDE_HI = put('guide_lo', 2.5), put('guide_hi', 3.5)   # core EPS 2026, con monedas (guía del 8-oct-2026)
+put('guide_prev_lo', 5.0); put('guide_prev_hi', 7.0)              # guía anterior: "el piso de +5% a +7%" (9-jul-2026)
+put('guide_cc_lo', 1.0); put('guide_cc_hi', 2.0)                  # core a moneda constante: +1% a +2% (antes el piso de +4% a +6%)
+put('guide_org', 3.0)                                             # orgánico 2026: "aproximadamente +3%" (antes +2% a +4%)
 put('guide_eps_lo', EPS25*(1+GUIDE_LO/100)); put('guide_eps_hi', EPS25*(1+GUIDE_HI/100))
 GUIDE_MID = put('guide_mid', (M['guide_eps_lo']+M['guide_eps_hi'])/2)
-NTM = put('eps_ntm', 0.25*C26 + 0.75*C27)        # oct-2026 a sep-2027 (misma convención que KO y los pares)
+NTM = put('eps_ntm', 0.25*C26 + 0.75*C27)        # 4T 2026 a 3T 2027 (los cuatro trimestres siguientes al último reportado; misma convención que KO)
 put('pe_ntm_now', PRICE/NTM)
 put('eps_g26', (C26/EPS25-1)*100); put('eps_g27', (C27/C26-1)*100); put('eps_g28', (C28/C27-1)*100)
 put('pep_g2', ((C28/C26)**0.5-1)*100)
@@ -55,17 +66,19 @@ put('pe_c28', PRICE/C28)
 EPS = {2016:[0.89,1.35,1.40,1.20], 2017:[0.94,1.50,1.48,1.31], 2018:[0.96,1.61,1.59,1.49],
        2019:[0.97,1.54,1.56,1.45], 2020:[1.07,1.32,1.66,1.47], 2021:[1.21,1.72,1.79,1.53],
        2022:[1.29,1.86,1.97,1.67], 2023:[1.50,2.09,2.25,1.78], 2024:[1.61,2.28,2.31,1.96],
-       2025:[1.48,2.12,2.29,2.26], 2026:[1.61,2.20]}
+       2025:[1.48,2.12,2.29,2.26], 2026:[1.61,2.20,2.34]}
 FYEPS = {2016:4.85, 2017:5.23, 2018:5.66, 2019:5.53, 2020:5.52, 2021:6.26, 2022:6.79, 2023:7.62, 2024:8.16, 2025:8.14}
 GAAP = {2016:4.36, 2017:3.38, 2018:8.78, 2019:5.20, 2020:5.12, 2021:5.49, 2022:6.42, 2023:6.56, 2024:6.95, 2025:6.00}
 for y, v in FYEPS.items():
     assert abs(sum(EPS[y]) - v) < 0.025, (y, sum(EPS[y]), v)
-# 2S26 con el consenso anual y la estacionalidad de 2025 (el 4T es de 16 semanas); 2027-2028 con el consenso
+# 4T26 (16 semanas) = consenso anual menos los tres trimestres reportados; 2027-2028 con el consenso y la estacionalidad de 2025
 s25 = [x/sum(EPS[2025]) for x in EPS[2025]]
-h2 = C26 - sum(EPS[2026])
-EPS[2026] = EPS[2026] + [h2*s25[2]/(s25[2]+s25[3]), h2*s25[3]/(s25[2]+s25[3])]
+q4 = C26 - sum(EPS[2026])
+EPS[2026] = EPS[2026] + [q4]
 EPS[2027] = [C27*s for s in s25]; EPS[2028] = [C28*s for s in s25]
-put('eps_2h26_impl', h2)
+put('eps_4t26_impl', q4); put('eps_4t26_g', (q4/EPS[2025][3]-1)*100)
+put('eps_3t26', EPS[2026][2]); put('eps_3t26_g', (EPS[2026][2]/EPS[2025][2]-1)*100)
+put('eps_9m26', sum(EPS[2026][:3])); put('eps_9m26_g', (sum(EPS[2026][:3])/sum(EPS[2025][:3])-1)*100)
 M['gaap_gap'] = {str(y): (GAAP[y]/FYEPS[y]-1)*100 for y in GAAP}
 # Regla de ventana limpia (declarada): se excluye el año si los deterioros de marcas/inversiones y los efectos de leyes
 # impositivas (no la reestructuración, que PepsiCo registra todos los años desde el plan de 2019) superan 10% del EPS core.
@@ -90,7 +103,7 @@ put('excl_ko_rule_n', len(EXCL_KO))
 put('excl_ko_rule_list', ', '.join(str(y) for y in EXCL_KO[:-1]) + ' y ' + str(EXCL_KO[-1]))
 
 # ---------------- Descomposición del orgánico (comunicados; % sobre el trimestre del año anterior) ----------------
-Q = ['3T23','4T23','1T24','2T24','3T24','4T24','1T25','2T25','3T25','4T25','1T26','2T26']
+Q = ['4T23','1T24','2T24','3T24','4T24','1T25','2T25','3T25','4T25','1T26','2T26','3T26']
 # reportado, ajuste por monedas, ajuste por compras/ventas, ajuste por la semana 53 (tal como figuran en la tabla de PepsiCo:
 # lo que se suma al reportado para llegar al orgánico), orgánico, volumen orgánico (efecto en ventas), precio efectivo neto,
 # volumen unitario de snacks ("convenient foods") y de bebidas (incluye cajas de embotelladoras franquiciadas)
@@ -100,7 +113,8 @@ ORG = {
  '3T24':(-1, 2, 0, 0, 1, -2, 3, -2, -2),    '4T24':(0, 2, 0, 0, 2, -1, 3, 1, 1),
  '1T25':(-2, 3, 0, 0, 1, -2, 3, -3, 0),     '2T25':(1, 1.5, 0, 0, 2, -1.5, 4, -1.5, 0),
  '3T25':(3, -0.5, -1, 0, 1, -3, 4, -1, -1), '4T25':(6, -2, -1, 0, 2, -2, 4.5, -2, 1),
- '1T26':(9, -3, -2.5, 0, 3, 0, 2, 4, 0),    '2T26':(6, -2, -2, 0, 2, 1, 2, 3, 2)}
+ '1T26':(9, -3, -2.5, 0, 3, 0, 2, 4, 0),    '2T26':(6, -2, -2, 0, 2, 1, 2, 3, 2),
+ '3T26':(6, -1, -2, 0, 3, 0.5, 3, 1, 3)}
 M['org'] = {q: dict(rep=v[0], fx=-v[1], ad=-v[2], w53=-v[3], org=v[4], vol=v[5], price=v[6], cf=v[7], bev=v[8]) for q, v in ORG.items()}
 L8 = Q[-8:]; L4 = Q[-4:]
 def avg(key, qs): return st.mean(M['org'][q][key] for q in qs)
@@ -115,11 +129,12 @@ OLD = {'3T24': dict(w=(5954, 747), flna=(-1, -1, 0.5), qfna=(-13, -13, 0), pbna=
        '4T24': dict(w=(7473, 893), flna=(-2, -3, 1), qfna=(-2, -6, 4), pbna=(0, -3, 3))}
 NA = {'1T25': dict(pfna=(-2, -3, 1), pbna=(1, -1, 2)), '2T25': dict(pfna=(-2, -1.5, 0), pbna=(1, -4, 4.5)),
       '3T25': dict(pfna=(-3, -4, 2), pbna=(2, -4, 6)), '4T25': dict(pfna=(-1, -2, 1), pbna=(2, -5, 7)),
-      '1T26': dict(pfna=(1, 2, -1), pbna=(2, -4, 6)), '2T26': dict(pfna=(-2, 0, -2), pbna=(1, -2, 3))}
+      '1T26': dict(pfna=(1, 2, -1), pbna=(2, -4, 6)), '2T26': dict(pfna=(-2, 0, -2), pbna=(1, -2, 3)),
+      '3T26': dict(pfna=(0, 0.5, -1), pbna=(0, -3, 3))}
 for q, o in OLD.items():
     a, b = o['w']
     NA[q] = dict(pfna=tuple((a*o['flna'][i] + b*o['qfna'][i])/(a+b) for i in range(3)), pbna=o['pbna'])
-NQS = ['3T24','4T24','1T25','2T25','3T25','4T25','1T26','2T26']
+NQS = ['4T24','1T25','2T25','3T25','4T25','1T26','2T26','3T26']
 M['na'] = {q: dict(pfna_org=NA[q]['pfna'][0], pfna_vol=NA[q]['pfna'][1], pfna_price=NA[q]['pfna'][2],
                    pbna_org=NA[q]['pbna'][0], pbna_vol=NA[q]['pbna'][1], pbna_price=NA[q]['pbna'][2]) for q in NQS}
 for k in ('pfna_org', 'pfna_vol', 'pfna_price', 'pbna_org', 'pbna_vol', 'pbna_price'):
@@ -135,23 +150,33 @@ put('rev_cagr_1625', ((REV[2025]/REV[2016])**(1/9)-1)*100)
 COREGP = {2022:46.102, 2023:49.737, 2024:50.611, 2025:51.155}
 COREOP = {2022:12.325, 2023:13.875, 2024:14.698, 2025:14.912}
 M['comp_gm'] = {str(y): COREGP[y]/REV[y]*100 for y in COREGP}; M['comp_om'] = {str(y): COREOP[y]/REV[y]*100 for y in COREOP}
-REV_1H26, REV_1H25 = 43.624, 40.645
-COREOP_1H26, COREOP_1H25 = 7.117, 6.700
-COREGP_1H26, COREGP_1H25 = 23.833, 22.509
-M['comp_om']['1S26'] = COREOP_1H26/REV_1H26*100; M['comp_gm']['1S26'] = COREGP_1H26/REV_1H26*100
-put('om_1h25', COREOP_1H25/REV_1H25*100); put('gm_1h25', COREGP_1H25/REV_1H25*100)
+REV_9M26, REV_9M25 = 68.898, 64.582          # 36 semanas (comunicado del 3T26)
+COREOP_9M26, COREOP_9M25 = 11.394, 10.837
+COREGP_9M26, COREGP_9M25 = 37.581, 35.413
+M['comp_om']['9M26'] = COREOP_9M26/REV_9M26*100; M['comp_gm']['9M26'] = COREGP_9M26/REV_9M26*100
+put('om_9m25', COREOP_9M25/REV_9M25*100); put('gm_9m25', COREGP_9M25/REV_9M25*100)
+# 3T26 solo (12 semanas)
+REV_3T26, REV_3T25 = 25.274, 23.937; COREOP_3T26, COREOP_3T25 = 4.277, 4.137; COREGP_3T26, COREGP_3T25 = 13.748, 12.904
+put('rev_3t26_g', (REV_3T26/REV_3T25-1)*100); put('coi_3t26_g', (COREOP_3T26/COREOP_3T25-1)*100)
+put('om_3t26', COREOP_3T26/REV_3T26*100); put('om_3t25', COREOP_3T25/REV_3T25*100); put('om_3t26_bp', (M['om_3t26']-M['om_3t25'])*100)
+put('gm_3t26', COREGP_3T26/REV_3T26*100); put('gm_3t25', COREGP_3T25/REV_3T25*100)
+TARIFF_PP = put('tariff_pp', 4.0)            # "4-percentage-point favorable impact of tariff refunds" en el resultado operativo del 3T
+put('tariff_m', TARIFF_PP/100*COREOP_3T25*1000)                 # US$ millones (aproximación: 4 puntos sobre la base del 3T25)
+put('tariff_ps', M['tariff_m']*(1-0.212)/SH_DIL)               # por acción, a la tasa core del 3T26 (21.2%)
+put('coi_3t26_g_ex', M['coi_3t26_g'] - TARIFF_PP)
+put('eps_3t26_ex', EPS[2026][2] - M['tariff_ps']); put('eps_3t26_g_ex', (M['eps_3t26_ex']/EPS[2025][2]-1)*100)
 AM = {2021:5.1, 2022:5.2, 2023:5.7, 2024:5.9, 2025:5.4}     # publicidad y otras actividades de marketing (10-K)
 ADV = {2021:3.5, 2022:3.5, 2023:3.8, 2024:3.9, 2025:3.4}    # de los cuales, publicidad
 M['am_pct'] = {str(y): AM[y]/REV[y]*100 for y in AM}; M['adv_pct'] = {str(y): ADV[y]/REV[y]*100 for y in ADV}
 put('am_cut25', AM[2024]-AM[2025]); put('am_cut25_pct_op', (AM[2024]-AM[2025])/COREOP[2025]*100)
-DA25, DA_1H25, DA_1H26 = 3.451, 1.491, 1.639
-TTM_REV = put('ttm_rev', REV[2025] - REV_1H25 + REV_1H26)
-TTM_COI = put('ttm_coi', COREOP[2025] - COREOP_1H25 + COREOP_1H26)
-TTM_DA = put('ttm_da', DA25 - DA_1H25 + DA_1H26)
+DA25, DA_9M25, DA_9M26 = 3.451, 2.315, 2.531
+TTM_REV = put('ttm_rev', REV[2025] - REV_9M25 + REV_9M26)
+TTM_COI = put('ttm_coi', COREOP[2025] - COREOP_9M25 + COREOP_9M26)
+TTM_DA = put('ttm_da', DA25 - DA_9M25 + DA_9M26)
 EBITDA_TTM = put('ebitda_ttm', TTM_COI + TTM_DA)
 put('ttm_om', TTM_COI/TTM_REV*100)
-put('coi_1h26_g', (COREOP_1H26/COREOP_1H25-1)*100)
-put('rev_1h26_g', (REV_1H26/REV_1H25-1)*100)
+put('coi_9m26_g', (COREOP_9M26/COREOP_9M25-1)*100)
+put('rev_9m26_g', (REV_9M26/REV_9M25-1)*100)
 
 # Segmentos 2025 (10-K, nota 1): ventas, resultado operativo core (comunicado del 4T25), capex y D&A.
 SEG = {  # ventas, OP core, capex, D&A (US$ miles de millones), fracción de alimentos
@@ -159,14 +184,14 @@ SEG = {  # ventas, OP core, capex, D&A (US$ miles de millones), fracción de ali
  'IBF':  (4.997, 1.856, 0.124, 0.109, 0.0),  'EMEA': (18.025, 2.571, 0.744, 0.549, 0.63),
  'LAF':  (10.549, 2.144, 0.672, 0.417, 1.0), 'APF':  (4.629, 0.464, 0.257, 0.153, 1.0)}
 CORP = dict(op=-1.953, capex=0.223, da=0.161)
-SEG_1H = {'PFNA': ((12.700, 2.874), (12.689, 3.063)), 'PBNA': ((13.634, 1.631), (12.672, 1.589)),
-          'IBF': ((2.347, 0.966), (2.127, 0.817)), 'EMEA': ((7.806, 1.068), (6.924, 0.890)),
-          'LAF': ((4.874, 1.051), (4.209, 0.896)), 'APF': ((2.263, 0.352), (2.024, 0.254))}
+SEG_9M = {'PFNA': ((19.204, 4.256), (19.215, 4.633)), 'PBNA': ((21.340, 2.643), (19.999, 2.564)),   # 36 semanas 2026 y 2025
+          'IBF': ((3.748, 1.530), (3.418, 1.328)), 'EMEA': ((13.219, 2.008), (11.946, 1.698)),          # (ventas, resultado core)
+          'LAF': ((7.895, 1.677), (6.865, 1.419)), 'APF': ((3.492, 0.531), (3.139, 0.410))}
 SEG24 = {'PFNA': (27.431, 6.982), 'PBNA': (27.769, 3.104), 'IBF': (4.879, 1.708), 'EMEA': (16.658, 2.232), 'LAF': (10.568, 2.101), 'APF': (4.549, 0.391)}
 M['seg'] = {}
 for k, (r, op, cx, da, ff) in SEG.items():
-    (r1, o1), (r0, o0) = SEG_1H[k]
-    M['seg'][k] = dict(rev=r, op=op, om=op/r*100, om24=SEG24[k][1]/SEG24[k][0]*100, om_1h26=o1/r1*100, om_1h25=o0/r0*100,
+    (r1, o1), (r0, o0) = SEG_9M[k]
+    M['seg'][k] = dict(rev=r, op=op, om=op/r*100, om24=SEG24[k][1]/SEG24[k][0]*100, om_9m26=o1/r1*100, om_9m25=o0/r0*100,
                        capex=cx, da=da, share=r/REV[2025]*100, foods=ff)
 put('corp_op', CORP['op'])
 # Snacks (alimentos) vs. bebidas: EMEA se reparte 63/37 por ventas (10-K) y su resultado en la misma proporción (supuesto);
@@ -204,10 +229,11 @@ BUY = {2021:0.106, 2022:1.500, 2023:1.000, 2024:1.000, 2025:1.000}
 M['divp'] = {str(y): v for y, v in DIVP.items()}; M['buy'] = {str(y): v for y, v in BUY.items()}
 M['ret_fcf'] = {str(y): (DIVP[y]+BUY[y])/(OCF_ADJ[y]-CAPEX[y])*100 for y in DIVP}
 M['ocf_adj_m'] = {str(y): OCF_ADJ[y]*1000 for y in OCF}; M['fcf_adj_m'] = {str(y): (OCF_ADJ[y]-CAPEX[y])*1000 for y in OCF}
-TCJA26 = put('tcja26', 0.965)       # cuota final pagada en el 1S26 (10-Q); "cerca de US$ 1 mil millones" según la guía
+TCJA26 = put('tcja26', 0.965)       # cuota final, pagada en las 36 semanas (10-Q 3T26); "cerca de US$ 1 mil millones" según la guía
 PPE_SALES25 = put('ppe_sales25', 0.528)
-put('ocf_1h26', 2.365); put('ocf_1h25', 0.996); put('capex_1h26', 1.266)
-TAX = put('tax', 22.0)                      # tasa efectiva core guiada 2026
+put('ocf_9m26', 7.950); put('ocf_9m25', 5.468); put('capex_9m26', 2.182); put('capex_9m25', 2.499); put('ppe_sales_9m26', 0.089)
+put('fcf_9m26_pep', 7.950 - 2.182 + 0.089); put('fcf_9m25_pep', 5.468 - 2.499 + 0.272)
+TAX = put('tax', 21.0)                      # tasa efectiva core guiada 2026 (8-oct-2026; antes 22%)
 TAX25 = put('tax25', 19.5)                  # tasa efectiva core 2025
 t = TAX/100
 NI_C25 = put('ni_c25', 11.176)              # utilidad core 2025 (comunicado del 4T25)
@@ -222,7 +248,7 @@ put('conv25_raw', (OCF[2025]-CAPEX[2025])/NI_C25*100)
 put('capex_pct25', CAPEX[2025]/REV[2025]*100); put('capex_pct24', CAPEX[2024]/REV[2024]*100)
 put('capex_pct23', CAPEX[2023]/REV[2023]*100)
 put('conv_c26', FCF_C26/NI_C26_SA*100)
-NETINT25 = put('netint25', 1.121); NETINT26 = put('netint26', 2*0.531)   # "net interest expense and other"; 1S26 anualizado
+NETINT25 = put('netint25', 1.121); NETINT26 = put('netint26', 0.773*52/36)   # "net interest expense and other"; 36 semanas anualizadas
 
 # ---------------- Dividendo ----------------
 DPS = {2016:2.96, 2017:3.1675, 2018:3.5875, 2019:3.7925, 2020:4.0225, 2021:4.2475, 2022:4.525, 2023:4.945, 2024:5.33, 2025:5.6225}
@@ -241,22 +267,22 @@ put('div_streak', 54)
 put('fcf_yield', FCF_C26/MKT_CAP*100)       # consenso de FCF 2026 / capitalización (misma definición para KO)
 put('buyback_g26', 1.0); put('cash_ret_g26', 8.9)
 
-# ---------------- Balance (10-Q 2T26, 13-jun-2026) ----------------
-DEBT = put('debt', 10.602 + 42.612)
-CASH = put('cash', 10.251 + 0.465)
+# ---------------- Balance (10-Q 3T26, 5-sep-2026) ----------------
+DEBT = put('debt', 9.223 + 42.658)
+CASH = put('cash', 10.675 + 0.488)
 NETDEBT = put('net_debt', DEBT - CASH)
 LEASES = put('leases', 3.846)               # pasivo por arrendamientos operativos (10-K 2025)
 NETDEBT_L = put('net_debt_l', NETDEBT + LEASES)
-NCI = put('nci', 0.172)
+NCI = put('nci', 0.195)
 put('nd_ebitda', NETDEBT/EBITDA_TTM); put('nd_ebitda_l', NETDEBT_L/(EBITDA_TTM))
-BS = {'jun': dict(cash=10251+465, dst=10602, dlt=42612, eqm=2180, gw=19093+13990+1187, eq=22098, ta=112189, ar=13496, inv=6734, ap=24504),
+BS = {'sep': dict(cash=10675+488, dst=9223, dlt=42658, eqm=2215, gw=18884+13977+1165, eq=22292, ta=111976, ar=13623, inv=6434, ap=25306),
       'dec': dict(cash=9159+371, dst=6861, dlt=42321, eqm=2038, gw=18916+13847+1219, eq=20406, ta=107399, ar=11506, inv=5845, ap=25903)}
 for v in BS.values(): v['nd'] = v['dst'] + v['dlt'] - v['cash']
 M['bs'] = BS
-assert abs(BS['jun']['nd']/1000 - NETDEBT) < 1e-9
-put('gw_int_pct', BS['jun']['gw']/BS['jun']['ta']*100)
-put('debt_st', 10.602)
-EQM = put('eqm', 2.180)                     # participaciones por el método de participación (valor contable)
+assert abs(BS['sep']['nd']/1000 - NETDEBT) < 1e-9
+put('gw_int_pct', BS['sep']['gw']/BS['sep']['ta']*100)
+put('debt_st', 9.223)
+EQM = put('eqm', 2.215)                     # participaciones por el método de participación (valor contable)
 
 # ---------------- Celsius: acciones preferidas convertibles (10-K 2025, notas 4 y 9) ----------------
 CELH_A, CELH_B = 0.550, 0.585               # costo de las series A (2022, a $25 por acción) y B (2025, a $51.75)
@@ -265,6 +291,7 @@ CELH_PX = put('celh_px', yh_close('CELH'))
 put('celh_conv', M['celh_sh']*CELH_PX)
 put('celh_redeem', CELH_A + CELH_B)
 put('celh_fv25', 1.852)                     # valor razonable en libros al 27-dic-2025 (nivel 3)
+put('celh_fv_q3', 1.482)                    # valor razonable en libros al 5-sep-2026 (nivel 3, 10-Q 3T26)
 CELH = put('celh_val', max(M['celh_conv'], M['celh_redeem']))
 put('celh_conv_px', M['celh_redeem']/M['celh_sh'])   # precio de Celsius al que convertir iguala el rescate
 NONOP = put('nonop', CELH + EQM)
@@ -291,7 +318,8 @@ WACC = put('wacc', wacc(KE)); WACC_OWN = put('wacc_own', wacc(KE_OWN))
 # FCF sin apalancar = OCF + cuota del TCJA (pago que no se repite: la última fue en 2026) + intereses netos x (1-t) - capex.
 # No suma las ventas de activo fijo (misma definición que KO). Las participaciones (Celsius, participadas) se suman aparte.
 F25 = put('f25', OCF_ADJ[2025] + NETINT25*(1-t) - CAPEX[2025])
-F26 = put('f26', FCF_G26 + TCJA26 + NETINT26*(1-t) - 2*0.071)   # piso de la guía (menos ventas de activo fijo: 1S26 x 2)
+PPE_S26 = put('ppe_s26', 0.089*52/36)       # ventas de activo fijo 2026: 36 semanas anualizadas
+F26 = put('f26', FCF_G26 + TCJA26 + NETINT26*(1-t) - PPE_S26)   # piso de la guía (sin ventas de activo fijo, como KO)
 put('f25_m', F25/REV[2025]*100); put('f26_m', F26/REV_C26*100)
 M_BASE = put('m_base', (F25+F26)/(REV[2025]+REV_C26)*100)
 put('m_raw25', (OCF[2025] + NETINT25*(1-t) - CAPEX[2025])/REV[2025]*100)   # sin sumar el TCJA
@@ -304,7 +332,7 @@ put('m_foods', k_m*CASH_F/FOODS_REV*100); put('m_bev', k_m*CASH_B/BEV_REV*100)
 assert abs((M['m_foods']*SH_F + M['m_bev']*(1-SH_F)) - M_BASE) < 1e-9
 # chequeo pendiente desde KO: margen del DCF contra el FCF implícito del consenso (FCF de consenso 2026, sumándole de vuelta
 # la cuota del TCJA y los intereses netos después de impuestos, y restando ventas de activo fijo como en F26)
-put('m_cons_fcf', (FCF_C26 + TCJA26 + NETINT26*(1-t) - 2*0.071)/REV_C26*100)
+put('m_cons_fcf', (FCF_C26 + TCJA26 + NETINT26*(1-t) - PPE_S26)/REV_C26*100)
 put('m_vs_cons', M_BASE - M['m_cons_fcf'])
 
 # ---------------- DCF (15%, o 7.5% si entra la suma de partes) ----------------
@@ -364,7 +392,7 @@ put('dcf_base_ownbeta', dcf(SC['base'], w=WACC_OWN)); put('ownbeta_diff', M['dcf
 put('dcf_m_raw25', dcf(SC['base'], m_shift=M['m_raw25']-M_BASE))
 put('dcf_m_f25', dcf(SC['base'], m_shift=M['f25_m']-M_BASE)); put('dcf_m_f26', dcf(SC['base'], m_shift=M['f26_m']-M_BASE))
 put('dcf_m_cons', dcf(SC['base'], m_shift=M['m_cons_fcf']-M_BASE))
-put('dcf_no_nonop', dcf(SC['base'], nonop=0.0)); put('dcf_celh_fv', dcf(SC['base'], nonop=M['celh_fv25'] + EQM))
+put('dcf_no_nonop', dcf(SC['base'], nonop=0.0)); put('dcf_celh_fv', dcf(SC['base'], nonop=M['celh_fv_q3'] + EQM))
 put('sbc25', 0.288)
 put('dcf_sbc', dcf(SC['base'], m_shift=-0.288/REV[2025]*100)); put('sbc_effect', M['dcf_sbc'] - DCF)
 put('dcf_margin_target', dcf(dict(SC['base'], dm=SC['bull']['dm'])))
@@ -407,19 +435,19 @@ put('dcf_glp1', dcf(SC['base'], dvf=-M['glp1_drag_f'], dvb=-M['glp1_drag_b']))
 put('glp1_effect', M['dcf_glp1'] - DCF)
 
 # ---------------- Pares: precios al corte, consenso y múltiplos ----------------
-# P/E sobre EPS de los próximos 12 meses; EV/EBITDA (últimos 12 meses, con arrendamientos) de stockanalysis (2-oct-2026),
-# llevado al cierre del 1-oct por la variación de la capitalización; EV/(EBITDA − capex) con los mismos datos.
+# P/E sobre EPS de los próximos 12 meses; EV/EBITDA (últimos 12 meses, con arrendamientos) de stockanalysis (12-nov-2026, al
+# cierre del 12-nov), llevado al cierre del 11-nov por la variación de la capitalización; EV/(EBITDA − capex) con los mismos datos.
 PEERS = {
- 'KO':   dict(name='Coca-Cola', grp='bebidas', fy='dic', org='+6% (2T26)', vol=5.0, vol_t='+5% (cajas)'),
- 'KDP':  dict(name='Keurig Dr Pepper', grp='bebidas', fy='dic', org='+7.3% sin JDE Peet\'s (2T26)', vol=3.1, vol_t='+3.1% (volumen/mezcla)'),
- 'MNST': dict(name='Monster Beverage', grp='bebidas', fy='dic', org='+17.9% a moneda constante (2T26)', vol=None, vol_t='n. c.'),
- 'MDLZ': dict(name='Mondelez', grp='snacks', fy='dic', org='+2.2% (2T26)', vol=0.7, vol_t='+0.7% (volumen/mezcla)'),
- 'PG':   dict(name='Procter & Gamble', grp='staples', fy='jun', org='0% (4T FY26)', vol=0.0, vol_t='0%'),
- 'CL':   dict(name='Colgate-Palmolive', grp='staples', fy='dic', org='+2.4% (2T26)', vol=0.9, vol_t='+0.9%'),
- 'PM':   dict(name='Philip Morris International', grp='staples', fy='dic', org='+7.6% (2T26)', vol=2.5, vol_t='+2.5% (envíos)'),
+ 'KO':   dict(name='Coca-Cola', grp='bebidas', fy='dic', org='+7% (3T26)', vol=5.0, vol_t='+5% (cajas)'),
+ 'KDP':  dict(name='Keurig Dr Pepper', grp='bebidas', fy='dic', org='+8.6% sin JDE Peet\'s (3T26)', vol=6.5, vol_t='+6.5% sin JDE Peet\'s (volumen/mezcla)'),
+ 'MNST': dict(name='Monster Beverage', grp='bebidas', fy='dic', org='+16.3% a moneda constante (3T26)', vol=None, vol_t='n. c.'),
+ 'MDLZ': dict(name='Mondelez', grp='snacks', fy='dic', org='+2.1% (3T26)', vol=1.8, vol_t='+1.8% (volumen/mezcla)'),
+ 'PG':   dict(name='Procter & Gamble', grp='staples', fy='jun', org='+4% (1T FY27)', vol=2.0, vol_t='+2%'),
+ 'CL':   dict(name='Colgate-Palmolive', grp='staples', fy='dic', org='+3.6% (3T26)', vol=1.7, vol_t='+1.7%'),
+ 'PM':   dict(name='Philip Morris International', grp='staples', fy='dic', org='+7.1% (3T26)', vol=0.6, vol_t='+0.6% (envíos)'),
 }
 REF = {  # pares puros para la suma de partes que no están en el grupo de comparables
- 'HSY':  dict(name='Hershey', grp='snacks', fy='dic', org='+3.6% (2T26)', vol=-8.0, vol_t='−8% (precio +12)'),
+ 'HSY':  dict(name='Hershey', grp='snacks', fy='dic', org='+0.8% (3T26)', vol=-10.0, vol_t='−10% (precio +11)'),
  'GIS':  dict(name='General Mills', grp='alimentos', fy='may', org='0% (1T FY27)', vol=-4.0, vol_t='−4%'),
 }
 def fill(k, p):
@@ -454,7 +482,7 @@ PEP_EV = put('pep_ev', MKT_CAP + NETDEBT_L + NCI - NONOP)
 put('pep_ev_ebitda', PEP_EV/EBITDA_TTM)
 put('pep_evx_sa', SA['PEP']['evx'])
 put('pep_pe_vs_med', (M['pe_ntm_now']/PE_MED-1)*100)
-put('pep_capex_ttm', 4.415 - 1.507 + 1.266)
+put('pep_capex_ttm', 4.415 - 2.499 + 2.182)
 put('pep_evxc', PEP_EV/(EBITDA_TTM - M['pep_capex_ttm']))
 def reg(xs, ys):
     mx = st.mean(xs); my = st.mean(ys)
@@ -504,7 +532,7 @@ SOTP_B_X = put('sotp_b_x', st.median(p['evxc'] for p in BV.values()))
 put('sotp_b_x_kdp', BV['KDP']['evxc']); put('sotp_f_x_min', min(p['evxc'] for p in SN.values()))
 put('sotp_b_x_min', min(p['evxc'] for p in BV.values()))
 # EBITDA − capex de cada negocio: resultado core de los últimos 12 meses (segmentos) + D&A − capex (2025), corporativo por ventas
-seg_ttm = {k: M['seg'][k]['op'] - SEG_1H[k][1][1] + SEG_1H[k][0][1] for k in SEG}
+seg_ttm = {k: M['seg'][k]['op'] - SEG_9M[k][1][1] + SEG_9M[k][0][1] for k in SEG}
 corp_ttm = TTM_COI - sum(seg_ttm.values())
 put('corp_ttm', corp_ttm)
 F_OP_TTM = sum(seg_ttm[k]*SEG[k][4] for k in SEG) + FS*corp_ttm
@@ -576,7 +604,7 @@ for i in range(20, len(win)):
     if all(w['pe'] < floor for w in win[i:]) and len(win) - i >= STEP_N:
         step_i = i; break
 M['step_ok'] = step_i is not None
-assert M['step_ok'], 'el texto asume que la regla de cambio de escalón se cumple'
+chk(M['step_ok'], 'el texto asume que la regla de cambio de escalón se cumple')
 put('step_start', win[step_i]['date']); put('step_floor', min(w['pe'] for w in win[step_i-20:step_i]))
 put('step_n', len(win) - step_i)
 step_w = [w for w in win[step_i:] if not w['excl'] and not w['covid']]
@@ -601,18 +629,18 @@ put('rev_low', min(w['pe'] for w in step_w)*NTM); put('rev_high', M['rev_pe_max'
 put('rev_10y', (M['rev1_10y'] + R2)/2)
 put('rev_gap', (REVV/PRICE-1)*100)
 put('rel_min', min(w['pe'] for w in nocovid)/SPX_PE10); put('rel_max', max(w['pe'] for w in nocovid)/SPX_PE10)
-assert M['rel_now'] < M['rel_min'], 'el texto dice que el relativo actual está debajo del rango'
 put('rev2_withcovid', M['rev_pe_avg_raw']/SPX_PE10*SPX_PE*NTM)
 put('rel_now_vs_avg', (REL_NOW/REL-1)*100)
 # P/E del último cierre de junio-2026 en la serie y de PEP al corte
 put('pe_jun26', win[-1]['pe'])
 
 # ---------------- Consenso (25%) ----------------
-CONS = put('cons', 151.09); put('cons_med', 152.0); put('cons_low', 124.0); put('cons_high', 180.0); put('cons_n', 24)
-put('cons_sb', 4); put('cons_b', 3); put('cons_h', 16); put('cons_s', 0); put('cons_ss', 1)
+CONS = put('cons', 141.59); put('cons_med', 140.5); put('cons_low', 106.0); put('cons_high', 169.0); put('cons_n', 24)   # S&P Global vía stockanalysis, 12-nov-2026
+put('cons_sb', 3); put('cons_b', 3); put('cons_h', 17); put('cons_s', 0); put('cons_ss', 1)
 put('cons_gap', (CONS/PRICE-1)*100)
 put('cons_buy', M['cons_sb'] + M['cons_b'])
-put('jpm_tp', 138.0); put('jpm_tp_old', 170.0)
+put('jpm_tp', 137.0); put('jpm_tp_old', 138.0)   # J.P. Morgan, 9-oct-2026 (TipRanks vía stockanalysis)
+put('bac_tp', 145.0); put('barc_tp', 126.0); put('barc_tp_old', 133.0); put('bern_tp', 131.0)
 
 # ---------------- Blend ----------------
 W = {'dcf': 0.075, 'sotp': 0.075, 'comp': 0.25, 'rev': 0.35, 'cons': 0.25}
@@ -641,9 +669,39 @@ put('blend_indep_only', M['indep'])
 put('blend_no_rev', sum(W[k]*V[k] for k in W if k != 'rev')/(1-W['rev']))
 put('blend_glp1', blend_with(dcf=M['dcf_glp1']))
 
+# ---------------- Puente contra la edición anterior (2T 2026, precios al 1-oct-2026) ----------------
+OLD = json.load(open('model_2t26.json'))
+for k in ('blend', 'price', 'dcf_base', 'sotp', 'comp', 'rev', 'cons', 'indep', 'anch', 'blend_gap', 'rev1', 'rev2', 'eps_ntm', 'wacc',
+          'm_base', 'peer_pe_med', 'peer_ev_med', 'rev_pe_step', 'rel_avg', 'spx_pe', 'net_debt', 'rf', 'c26', 'c27', 'cf_8q', 'bev_8q',
+          'vol_8q', 'price_8q', 'org_8q', 'nonop', 'celh_val', 'beta_med'):
+    put(f'old_{k}', OLD[k])
+put('fv_chg', BLEND - OLD['blend']); put('fv_chg_pct', (BLEND/OLD['blend']-1)*100)
+put('px_chg_pct', (PRICE/OLD['price']-1)*100)
+for k in ('dcf', 'sotp', 'comp', 'rev', 'cons'):
+    oldv = OLD['dcf_base'] if k == 'dcf' else OLD[k]
+    put(f'bridge_{k}', W[k]*(V[k]-oldv))
+assert abs(sum(M[f'bridge_{k}'] for k in ('dcf', 'sotp', 'comp', 'rev', 'cons')) - M['fv_chg']) < 1e-9
+if TXT:
+    # 1) puente: el modelo nuevo con el precio de octubre. La diferencia contra el blend publicado es "modelo"; el resto es
+    #    "precio" (entra solo por el peso del patrimonio en el WACC del DCF).
+    # 2) anti-circularidad: con otro precio, comparables, suma de partes, reversión y consenso tienen que dar exactamente lo mismo.
+    def rerun(px):
+        env = dict(os.environ, PEP_PRICE=repr(px), PEP_OUT='model_tmp.json')
+        subprocess.run([sys.executable, 'model.py'], env=env, check=True, capture_output=True)
+        r = json.load(open('model_tmp.json')); os.remove('model_tmp.json'); return r
+    A = rerun(OLD['price'])
+    put('blend_at_old_price', A['blend']); put('dcf_at_old_price', A['dcf_base'])
+    put('fv_chg_model', A['blend'] - OLD['blend']); put('fv_chg_price', BLEND - A['blend'])
+    put('gap_at_old_fv', (OLD['blend']/PRICE-1)*100)
+    B = rerun(PRICE*1.25)
+    for k in ('comp', 'comp_pe', 'comp_ev', 'sotp', 'rev', 'cons', 'comp_noko'):
+        assert abs(B[k] - M[k]) < 1e-9, ('anti-circularidad', k)
+    put('dcf_at_px125', B['dcf_base'])
+
 # ---------------- Comparación PepsiCo vs. Coca-Cola bajo la misma vara ----------------
 # Los números de KO salen de modelos/ko/model.json. Lo único que se actualiza es lo que depende del precio: el cierre de KO
-# al 1-oct-2026 (Yahoo, misma fecha de corte que PEP); el blend y los fair values de KO quedan como se publicaron.
+# al 11-nov-2026 (Yahoo, misma fecha de corte que PEP y que la edición 3T 2026 de KO); el blend y los fair values de KO
+# quedan como se publicaron el 12-nov-2026.
 K = json.load(open('../ko/model.json'))
 KPX = put('ko_px', yh_close('KO'))
 put('ko_px_model', K['price'])
@@ -662,7 +720,7 @@ both('org4', M['org_4q'], st.mean(ko_org[q]['org'] for q in KQ[-4:]))
 both('price4', M['price_4q'], st.mean(ko_org[q]['pm'] for q in KQ[-4:]))
 both('vol4', M['vol_4q'], st.mean(ko_org[q]['conc'] for q in KQ[-4:]))
 both('gm', M['comp_gm']['2025'], K['comp_gm']['2025'])
-both('gm_1h', M['comp_gm']['1S26'], K['comp_gm']['1S26'])
+both('gm_9m', M['comp_gm']['9M26'], K['comp_gm']['9M26'])
 both('om', M['comp_om']['2025'], K['comp_om']['2025'])
 both('om_ttm', M['ttm_om'], K['ttm_coi']/K['ttm_rev']*100)
 both('conv', M['conv25'], K['conv25'])                   # OCF ajustado por pagos extraordinarios − capex, / utilidad core
@@ -670,8 +728,8 @@ both('capex_pct', M['capex_pct25'], K['capex_pct25'])
 both('da_pct', DA25/REV[2025]*100, K['ttm_da']/K['ttm_rev']*100)
 # ROIC sobre capital operativo (misma fórmula): resultado core de los últimos 12 meses x (1 − tasa core) /
 # (patrimonio + minoritarios + deuda − caja − participaciones por el método de participación). Excluye participadas de ambos lados.
-PEP_IC = put('pep_ic', BS['jun']['eq']/1000 + NCI + DEBT - CASH - EQM)
-KO_IC = put('ko_ic', K['equity_ko'] + K['nci'] + K['debt'] - K['cash'] - K['bs']['jul']['eqm']/1000)
+PEP_IC = put('pep_ic', BS['sep']['eq']/1000 + NCI + DEBT - CASH - EQM)
+KO_IC = put('ko_ic', K['equity_ko'] + K['nci'] + K['debt'] - K['cash'] - K['bs']['oct']['eqm']/1000)
 both('roic', TTM_COI*(1-t)/PEP_IC*100, K['ttm_coi']*(1-K['tax']/100)/KO_IC*100)
 both('nd_ebitda', M['nd_ebitda'], K['nd_ebitda']); both('nd_ebitda_l', M['nd_ebitda_l'], K['nd_ebitda_l'])
 both('div_yield', M['div_yield'], K['div_annual']/KPX*100)
@@ -679,7 +737,7 @@ both('payout_eps', M['payout_eps'], K['payout_eps'])
 both('payout_fcf', M['payout_fcf'], K['payout_fcf'])     # dividendos guiados / FCF guiado de cada compañía
 both('streak', 54, K['div_streak'])
 # múltiplos forward con la misma fuente para las dos: resultado operativo y FCF de consenso 2026 (S&P Global)
-KO_OI_C26, KO_FCF_C26 = put('ko_oi_c26', 16.12), put('ko_fcf_c26', 12.12)
+KO_OI_C26, KO_FCF_C26 = put('ko_oi_c26', 16.36), put('ko_fcf_c26', 12.82)   # S&P Global vía stockanalysis, 12-nov-2026
 KO_EV = put('ko_ev', KMC + K['net_debt_l'] + K['nci'] - K['nonop'])     # mismo ajuste que en el modelo de KO (participaciones y CCBA)
 both('ev_ebitda', PEP_EV/EBITDA_TTM, KO_EV/K['ebitda_ttm'])
 both('ev_ebitda_f', PEP_EV/(OI_C26 + TTM_DA), KO_EV/(KO_OI_C26 + K['ttm_da']))
@@ -705,6 +763,8 @@ both('tv_share', M['dcf_base_tv_share'], K['dcf_base_tv_share'])
 M['cmp'] = C
 put('ko_ret_ytd', (KPX/K['px_dec25']-1)*100); put('pep_ret_ytd', (PRICE/closes[(2025, 12)]-1)*100)
 put('ko_blend_gap_model', K['blend_gap'])
+put('ko_impl_wacc', K['impl_wacc']); put('ko_impl_wacc_rf', K['impl_wacc'] - K['rf'])
+chk(M['ko_impl_wacc_rf'] < 1, 'el texto dice que el precio de KO exige un costo de capital a menos de un punto del Treasury')
 # ¿Qué parte de la brecha de P/E explica el modelo de negocio? (1) conversión de caja: P/E x conversión = P/FCF-utilidad;
 # llevar el P/E de PEP a la conversión de KO. (2) crecimiento: P/E que la regresión de los pares asigna a cada crecimiento.
 GAP_PE = put('gap_pe', C['pe']['ko'] - C['pe']['pep'])
@@ -735,8 +795,8 @@ M['js_ann_y'] = json.dumps([str(y) for y in ANN]); M['js_ann_org'] = json.dumps(
 M['js_ann_cf'] = json.dumps([v[1] for v in ANN.values()]); M['js_ann_bev'] = json.dumps([v[2] for v in ANN.values()])
 put('px_dec25', closes[(2025, 12)]); put('ret_ytd', (PRICE/closes[(2025, 12)]-1)*100)
 put('ret_from_hi', (PRICE/M['px_feb_hi']-1)*100); put('ret_from_hi_abs', -M['ret_from_hi'])
-put('hi52', max(c for (y, m), c in closes.items() if (2025, 10) <= (y, m) <= (2026, 9)))
-put('lo52', min(c for (y, m), c in closes.items() if (2025, 10) <= (y, m) <= (2026, 9)))
+put('hi52', max(c for (y, m), c in closes.items() if (2025, 11) <= (y, m) <= (2026, 10)))
+put('lo52', min(c for (y, m), c in closes.items() if (2025, 11) <= (y, m) <= (2026, 10)))
 put('dcf_base_rev27', M['dcf_base_rows'][0]['rev']); put('dcf_base_rev31', M['dcf_base_rows'][-1]['rev'])
 put('dcf_base_fcf27', M['dcf_base_rows'][0]['fcf'])
 put('netdebt_ps', NETDEBT/SH_DIL*1000); put('nci_ps', NCI/SH_DIL*1000); put('netdebt_l_ps', NETDEBT_L/SH_DIL*1000)
@@ -746,7 +806,7 @@ put('ke_minus_floor', KE - KE_FLOOR)
 put('div_minus_rf', M['div_yield'] - RF); put('fcf_minus_rf', M['fcf_yield'] - RF)
 put('rf_minus_fcf', RF - M['fcf_yield'])
 put('da_ebitda', TTM_DA/EBITDA_TTM*100)
-put('inst_pct', 80.16); put('insider_pct', 0.12); put('short_pct', 1.90)
+put('inst_pct', 79.97); put('insider_pct', 0.13); put('short_pct', 2.04)   # stockanalysis, 12-nov-2026
 put('elliott_stake', 4.0); put('elliott_pct', 2.0); put('elliott_upside', 50.0)
 put('ttm_rev_g', (TTM_REV/(REV[2025])-1)*100)
 put('celh_ytd', (CELH_PX/[r for r in yh_rows('CELH') if r[0] <= '2025-12-31'][-1][1]-1)*100)
@@ -770,12 +830,12 @@ put('debt_dec24', 7082 + 37224); put('debt_dec25', 6861 + 42321)
 put('pep_pe_vs_med_abs', -M['pep_pe_vs_med'])
 put('gap_just_pct', M['gap_conv_pct'] + M['gap_growth_pct'])
 put('ko_dcf_gap_abs', -(K['dcf_base']/KPX-1)*100)
-assert M['fcf_yield'] > RF and M['div_yield'] < RF, 'el texto describe FCF yield > Treasury > dividendo'
+chk(M['fcf_yield'] > RF and M['div_yield'] < RF, 'el texto describe FCF yield > Treasury > dividendo')
 put('rf_minus_div', RF - M['div_yield'])
 put('stub_pct', STUB*100)
-assert M['m_vs_cons'] < 0; put('m_vs_cons_abs', -M['m_vs_cons'])
-assert M['margin_target_effect'] > 0
-assert M['impl_wacc'] > WACC; put('impl_wacc_diff', M['impl_wacc'] - WACC)
+chk(M['m_vs_cons'] < 0, 'm_vs_cons < 0'); put('m_vs_cons_abs', -M['m_vs_cons'])
+chk(M['margin_target_effect'] > 0, 'margin_target_effect > 0')
+put('impl_wacc_diff', M['impl_wacc'] - WACC)
 put('bull_dm', 1 - t)
 put('sotp_ec_tot', F_EC + B_EC)
 put('netdebt_l_nci', NETDEBT_L + NCI); put('netdebt_l_nci_ps', (NETDEBT_L + NCI)/SH_DIL*1000)
@@ -785,27 +845,62 @@ MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','sept
 put('step_start_txt', f"{MESES[int(M['step_start'][5:])-1]} de {M['step_start'][:4]}")
 put('rel_now_vs_avg_abs', -M['rel_now_vs_avg'])
 put('w53_4t23', M['org']['4T23']['ad'] + M['org']['4T23']['w53'])
-assert M['gap_just_pct'] < 50, 'el título de la Sección 09 dice "menos de la mitad"'
-assert M['rev_pe_min'] == min(w['pe'] for w in win), 'el texto dice que septiembre-2026 es el P/E más bajo de la década'
-assert M['pep_ev_ebitda'] < min(p['evx'] for p in PEERS.values()), 'el texto dice que PEP tiene el EV/EBITDA más bajo del grupo'
-assert sorted(p['pe'] for p in PEERS.values())[0] < M['pe_ntm_now'] < sorted(p['pe'] for p in PEERS.values())[1], 'solo KDP más barata'
-assert M['pep_g2'] < min(p['g2'] for p in PEERS.values()), 'PEP es la que menos crece'
-assert all(M[k] > PRICE for k in ('blend_no_sotp', 'blend_rev_10y', 'blend_no_rev')), 'el texto dice que todas las variantes quedan sobre el precio'
+chk(M['gap_just_pct'] < 50, 'el título de la Sección 09 dice "menos de la mitad"')
+chk(M['rev_pe_min'] == min(w['pe'] for w in win), 'el texto dice que septiembre-2026 es el P/E más bajo de la década')
+chk(M['pep_ev_ebitda'] < min(p['evx'] for p in PEERS.values()), 'el texto dice que PEP tiene el EV/EBITDA más bajo del grupo')
+chk(sorted(p['pe'] for p in PEERS.values())[0] < M['pe_ntm_now'] < sorted(p['pe'] for p in PEERS.values())[1], 'el texto dice que solo KDP es más barata')
+chk(M['pep_g2'] < min(p['g2'] for p in PEERS.values()), 'el texto dice que PEP es la que menos crece')
+chk(all(M[k] > PRICE for k in ('blend_no_sotp', 'blend_rev_10y', 'blend_no_rev')), 'el texto dice que todas las variantes quedan sobre el precio')
 
-put('ko_blend_gap_abs', -C['blend_gap']['ko']); assert C['blend_gap']['ko'] < 0
+put('ko_blend_gap_abs', -C['blend_gap']['ko']); chk(C['blend_gap']['ko'] < 0, 'ko blend gap < 0')
 put('eps_g25', (EPS25/EPS24-1)*100)
 put('vote_laguarta', 947731772/(947731772+49828733)*100); put('vote_pohlad', 914405632/(914405632+86817565)*100)
 put('om25_cf', M['comp_om']['2025'] - (M['am_pct']['2024'] - M['am_pct']['2025']))
 
 M['shock_ps'] = {str(y): v for y, v in SHOCK.items()}; put('shock_2022_brands', 0.69+0.78)
-assert M['impl_vf'] < 0; put('impl_vf_abs', -M['impl_vf'])
+put('impl_vf_abs', -M['impl_vf'])
 
-assert M['pbna_vol_neg_q'] == 8, 'el texto dice que PBNA perdió volumen en los ocho trimestres'
-SPARK = [closes[(2026, m)] for m in range(4, 10)] + [PRICE]   # cierres mensuales abr-sep 2026 + cierre de corte
+chk(M['pbna_vol_neg_q'] == 8, 'el texto dice que PBNA perdió volumen en los ocho trimestres')
+SPARK = [closes[(2026, m)] for m in range(5, 11)] + [PRICE]   # cierres mensuales may-oct 2026 + cierre de corte
 M['spark'] = [round(x, 2) for x in SPARK]
 
-json.dump(M, open('model.json', 'w'), indent=1, default=float)
-if __name__ == '__main__':
+# ---------------- Edición 3T 2026: tokens adicionales ----------------
+# comparables sin Monster (el par que más infla el promedio, como en KO) y blends de control
+pes_nom = [p['pe'] for k, p in PEERS.items() if k != 'MNST']; evs_nom = [p['evx'] for k, p in PEERS.items() if k != 'MNST']
+put('peer_pe_med_nomnst', st.median(pes_nom)); put('peer_ev_med_nomnst', st.median(evs_nom))
+put('comp_nomnst', (st.median(pes_nom)*NTM + ev_to_ps(st.median(evs_nom)))/2)
+put('blend_nomnst', blend_with(comp=M['comp_nomnst'])); put('blend_noko', blend_with(comp=M['comp_noko']))
+put('peer_pe_mean_x', st.mean(p['pe'] for p in PEERS.values()))
+# valores absolutos para la prosa (sin dobles negativos)
+for k in ('fv_chg', 'bridge_sotp', 'bridge_rev', 'bridge_cons', 'cons_gap', 'eps_3t26_g_ex', 'coi_3t26_g_ex', 'om_3t26_bp', 'dcf_gap',
+          'rel_now_vs_avg', 'spx_vs_avg', 'ret_from_hi'):
+    put(f'{k}_abs', abs(M[k]))
+if 'fv_chg_model' in M:
+    put('fv_chg_model_abs', abs(M['fv_chg_model'])); put('fv_chg_price_abs', abs(M['fv_chg_price']))
+put('wacc_minus_impl_abs', abs(M['wacc_minus_impl']))
+put('old_sotp_disc', OLD['sotp_disc']); put('old_guide_eps_lo', OLD['guide_eps_lo']); put('old_guide_eps_hi', OLD['guide_eps_hi']); put('old_impl_vf_abs', abs(OLD['impl_vf'])); put('old_rel_now', OLD['rel_now']); put('old_impl_vf', OLD['impl_vf'])
+put('old_cons_gap', OLD['cons_gap']); put('old_pe_ntm_now', OLD['pe_ntm_now']); put('old_comp_gap', OLD['comp_gap'])
+put('old_dcf_gap', OLD['dcf_gap']); put('old_sotp_gap', OLD['sotp_gap']); put('old_pfna_vol_8q', OLD['pfna_vol_8q'])
+put('rev_pe_sep25', [w['pe'] for w in win if w['date'] == '2025-09'][0])
+put('pe_sep26', [w['pe'] for w in win if w['date'] == '2026-09'][0])
+put('px_sep26', closes[(2026, 9)]); put('px_oct26', closes[(2026, 10)])
+put('celh_dec25', M['celh_dec25'])
+chk(M['rel_now'] > M['rel_min'] and M['rel_now'] < M['rel_avg'], 'el texto dice que el relativo actual está entre el mínimo y el promedio')
+chk(M['impl_wacc'] < WACC and M['impl_vf'] > M['cf_8q'], 'el texto dice que el precio exige apenas un poco más que el Base')
+chk(M['cons'] < PRICE, 'el texto dice que el consenso queda debajo del precio')
+chk(abs(M['dcf_gap']) < 1, 'el texto dice que el DCF queda en el precio')
+chk(M['sotp_disc'] < 2, 'el texto dice que el descuento contra la suma de partes casi desapareció')
+chk(M['org']['3T26']['vol'] > 0 and M['org']['2T26']['vol'] > 0, 'el texto dice que el volumen orgánico fue positivo dos trimestres seguidos')
+chk(all(M['na'][q]['pbna_vol'] < 0 for q in NQS) and OLD['na']['3T24']['pbna_vol'] < 0, 'el texto dice que PBNA lleva nueve trimestres perdiendo volumen')
+chk(M['reg_v_ex']['r2'] >= 0.5 and M['reg_v']['r2'] < 0.5, 'el texto dice que la de volumen pasa solo sin KDP')
+chk(M['eps_3t26_g_ex'] < 0 and M['coi_3t26_g_ex'] < 0, 'el texto dice que sin aranceles el EPS core y el resultado core caen')
+chk(M['comp_nomnst'] < M['comp'], 'el texto dice que sin Monster los comparables bajan')
+_o = ['MNST', 'KO', 'CL', 'PG', 'PM', 'MDLZ', None, 'KDP']; _v = [PEERS[k]['pe'] if k else M['pe_ntm_now'] for k in _o]
+chk(_v == sorted(_v, reverse=True), 'el orden del gráfico de comparables (charts_pep.js) no está ordenado')
+if FAILS: print('FRASES A REVISAR:', *FAILS, sep=chr(10) + '  ')
+M['fails'] = FAILS
+json.dump(M, open(os.environ.get('PEP_OUT', 'model.json'), 'w'), indent=1, default=float)
+if __name__ == '__main__' and 'PEP_OUT' not in os.environ:
     for k, v in M.items():
         if isinstance(v, (int, float)) and not isinstance(v, bool): print(f'{k:24s} {v:,.4f}')
     print('peers:'); [print(' ', k, round(p['pe'], 2), round(p['g2'], 1), p['vol'], round(p['evx'], 2), round(p['evxc'], 2)) for k, p in list(PEERS.items()) + list(REF.items())]

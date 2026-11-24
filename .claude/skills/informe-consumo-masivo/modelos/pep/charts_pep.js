@@ -62,8 +62,8 @@
     });
 
     drawHBars(document.getElementById('compsChart'), {
-      labels:['Monster Beverage','Coca-Cola','Colgate-Palmolive','Philip Morris','Procter & Gamble','Mondelez','PepsiCo','Keurig Dr Pepper'],
-      values:[{{peers.MNST.pe|js2}},{{peers.KO.pe|js2}},{{peers.CL.pe|js2}},{{peers.PM.pe|js2}},{{peers.PG.pe|js2}},{{peers.MDLZ.pe|js2}},{{pe_ntm_now|js2}},{{peers.KDP.pe|js2}}],
+      labels:['Monster Beverage','Coca-Cola','Colgate-Palmolive','Procter & Gamble','Philip Morris','Mondelez','PepsiCo','Keurig Dr Pepper'],
+      values:[{{peers.MNST.pe|js2}},{{peers.KO.pe|js2}},{{peers.CL.pe|js2}},{{peers.PG.pe|js2}},{{peers.PM.pe|js2}},{{peers.MDLZ.pe|js2}},{{pe_ntm_now|js2}},{{peers.KDP.pe|js2}}],
       colors:[PALETTE.blueLight,PALETTE.gold,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.navy,PALETTE.blueLight],
       padL:170,
       valueFmt:function(v){ return v.toFixed(1)+'x'; }

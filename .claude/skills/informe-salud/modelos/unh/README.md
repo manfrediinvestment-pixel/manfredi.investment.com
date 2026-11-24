@@ -28,3 +28,19 @@ tiene que dar **0 diferencias** antes de publicar.
 5. `python model.py && python build.py && python verify.py` → 0 diferencias. Grep "hoy/ayer/mañana" ya lo hace verify.
 6. Revisar el texto de la plantilla: fechas de corte, hechos del trimestre, riesgos y catalizadores (lo que no es número).
 7. Navegador: `?preview=full` en escritorio y 390 px, y sin `?preview=full` para el gate.
+
+## Edición 3T26 (13-nov-2026) y puente con septiembre
+- **Puente:** `model_2t26.py` (congelado, lee `yh/UNH.mo_2t26.json`) reproduce `model_2t26.json` al bit, y con
+  `unh.tpl_2t26.html` + `charts_unh_2t26.js` + el motor congelado da el `informes/unh.html` de septiembre idéntico byte a byte
+  (blend $404.16). `model.py` lee `model_2t26.json` para el bloque "contra septiembre" (aportes por método, brecha previa).
+- **Motor:** `build.py` usa `../../informe-consumo-masivo/modelos/_motor/pg_motor_sep2026.html` (PG ya mergeado) y pasa
+  `.verdict-note` a `var(--muted)` (CERO texto gris).
+- **Qué cambió en el método:** sin guía de MLR ni por segmento desde octubre, el 2026 es **2026E** = 9M26 real + 4T26 propio
+  (MLR: 3T26 + salto estacional 4T-3T promedio 2023-2025; resultado: piso de EPS ajustado → resultado operativo; Insight y Rx al
+  ritmo del 3T, Optum Health 4T = −3T, UHC residuo). k de conversión a caja sin cambios (no hubo guía de flujo nueva).
+- **Comparables:** la regla (EPS 12 m ≥ 75% del máximo 2023-24) es automática (`peers.X.entra`); Centene entra en el límite y se
+  publica el blend con y sin el par en el límite (`comp_core`, `blend_comp_core`).
+- **Fuentes del 3T26:** `sec.py` (User-Agent tomado del script de KO) baja a `raw3t/` el 8-K del 13-oct (comunicado y
+  presentación), el 10-Q del 3-nov y XBRL; `raw3t/txt.py` los pasa a texto (`*.txt` quedan versionados). Consenso de Nasdaq
+  leído desde Chrome (`fetch` a api.nasdaq.com dentro de una pestaña de nasdaq.com); precios objetivo, betas y EV/EBIT de
+  stockanalysis también desde Chrome.

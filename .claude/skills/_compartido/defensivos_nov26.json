@@ -1,0 +1,2078 @@
+{
+ "_meta": {
+  "creado": "2026-11-22",
+  "fecha_corte_mercado": "2026-11-20",
+  "para": [
+   "COST (informe-consumo-masivo, bloque retail)",
+   "PFE (informe-salud, módulo A)",
+   "ABBV (informe-salud, módulo A)"
+  ],
+  "scripts": "defensivos_nov26/{fetch_mercado.py, fetch_sa.py, mercado.py, construir.py}; crudos en defensivos_nov26/yh y defensivos_nov26/sa",
+  "regla": "Leer de acá; no volver a buscar estos datos. Si un informe necesita un dato que no está, buscarlo y declararlo como propio del informe."
+ },
+ "mercado": {
+  "fecha_cierre": "2026-11-20",
+  "treasury_10y": {
+   "valor_pct": 4.912,
+   "fuente": "Yahoo Finance chart API v8, cierre diario; bajado 22-nov-2026 (^TNX)",
+   "fecha": "2026-11-20"
+  },
+  "prima_riesgo": {
+   "erp_casa_pct": 5.0,
+   "nota": "ERP fija de la casa (skills informe-bigtech/salud/consumo; misma que WMT, JNJ y LLY)",
+   "erp_damodaran_pct": 4.41,
+   "erp_damodaran_fecha": "2026-11-01",
+   "erp_damodaran_base": "trailing 12m con payout ajustado; rf usada 4.94%",
+   "erp_damodaran_variantes": {
+    "cash_yield": 3.79,
+    "promedio_cf_10a": 5.81,
+    "net_cash_yield": 3.43,
+    "normalizada": 3.39
+   },
+   "fuente": "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/home.htm (leído 22-nov-2026)",
+   "uso": "La valuación usa 5.0% (casa). 4.41% se reporta como sensibilidad, igual que WMT (erp_dam)."
+  },
+  "sp500": {
+   "cierre_20nov": 6910.39,
+   "cierre_19nov_factset": 7175.83,
+   "caida_20nov_pct": -3.7,
+   "pe_fwd_factset": 17.1,
+   "pe_fwd_5a": 19.8,
+   "pe_fwd_10a": 19.1,
+   "pe_ttm_factset": 22.9,
+   "pe_fwd_ajustado_20nov": 16.47,
+   "nota": "FactSet usa el cierre del 19-nov (7,175.83). El 20-nov el S&P cayó 3.7%; pe_fwd_ajustado_20nov = 17.1 x 6,910.39 / 7,175.83 con EPS constante. Usar el ajustado para el P/E relativo al cierre del 20-nov y declarar los dos.",
+   "fuente": "FactSet Earnings Insight 20-nov-2026, págs. 1, 12 y 26 (EarningsInsight_112026.pdf)"
+  },
+  "sectores_pe_fwd": {
+   "consumer_staples": {
+    "pe_fwd": 23.3,
+    "prom_5a": 20.9,
+    "prom_10a": 20.2,
+    "pe_ajustado_20nov": 23.46
+   },
+   "health_care": {
+    "pe_fwd": 18.8,
+    "prom_5a": 17.5,
+    "prom_10a": 16.7,
+    "pe_ajustado_20nov": 18.78
+   },
+   "nota": "Ajuste al 20-nov por la variación de XLP / XLV del 19 al 20-nov (Yahoo), EPS constante.",
+   "fuente": "FactSet Earnings Insight 20-nov-2026, pág. 26, \"S&P 500 Sector-Level Forward 12-Month P/E Ratios\""
+  },
+  "sector_etf_cierre_20nov": {
+   "XLP": 90.46,
+   "XLV": 177.24,
+   "SPY": 689.81
+  }
+ },
+ "consenso_tres": {
+  "fuente": "stockanalysis.com (/forecast y /statistics), consenso de S&P Global; bajado el 22-nov-2026 (sin sesiones desde el cierre del 20-nov)",
+  "fecha_precio": "2026-11-20",
+  "tickers": {
+   "COST": {
+    "pt_prom": 1085.0,
+    "pt_min": 770.0,
+    "pt_max": 1315.0,
+    "n_analistas": 42,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": -1.56,
+    "eps_ajustado_fy_actual": 22.8005,
+    "eps_ajustado_fy_siguiente": 25.0437,
+    "ventas_fy_actual": 329860535260.0,
+    "ventas_fy_siguiente": 354502595340.0,
+    "eps_fy_anterior_real": 20.61,
+    "fy_actual_cierra": "ago-2027 (FY2027)",
+    "fy_siguiente_cierra": "ago-2028 (FY2028)",
+    "cierre_20nov": 1102.15
+   },
+   "PFE": {
+    "pt_prom": 30.22,
+    "pt_min": 25.0,
+    "pt_max": 37.0,
+    "n_analistas": 28,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 10.29,
+    "eps_ajustado_fy_actual": 3.0522,
+    "eps_ajustado_fy_siguiente": 2.9541,
+    "ventas_fy_actual": 63129063120.0,
+    "ventas_fy_siguiente": 60822368210.0,
+    "eps_fy_anterior_real": 3.22,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027",
+    "cierre_20nov": 27.4
+   },
+   "ABBV": {
+    "pt_prom": 315.88,
+    "pt_min": 237.0,
+    "pt_max": 350.0,
+    "n_analistas": 29,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 10.37,
+    "eps_ajustado_fy_actual": 13.9842,
+    "eps_ajustado_fy_siguiente": 16.2177,
+    "ventas_fy_actual": 67793295419.99999,
+    "ventas_fy_siguiente": 74021675910.0,
+    "eps_fy_anterior_real": 10.0,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027",
+    "cierre_20nov": 286.2
+   }
+  },
+  "nota": "Usar ESTE pt_prom en el Método 4 de los tres informes. La página gratis no da el desglose por categoría de recomendación."
+ },
+ "pharma": {
+  "tasa_descuento_comun": {
+   "regla": "PFE y ABBV usan EXACTAMENTE esta tasa en el SOTP + rNPV (Base). La WACC propia de cada una se muestra solo como referencia / sensibilidad.",
+   "rf_pct": 4.912,
+   "erp_pct": 5.0,
+   "beta_media_cruda_pares": 0.2749,
+   "beta_blume": 0.5142,
+   "ke_pct": 7.483,
+   "kd_pre_impuestos_pct": 5.1,
+   "tasa_impositiva_pct": 17.5,
+   "kd_pct": 4.2075,
+   "d_sobre_v_mediana_pares": 0.1127,
+   "wacc_pct": 7.114,
+   "wacc_bear_pct": 7.864,
+   "wacc_bull_pct": 6.364,
+   "grilla_sensibilidad_pct": [
+    6.114,
+    6.614,
+    7.114,
+    7.614,
+    8.114
+   ],
+   "construccion": "CAPM: rf ^TNX 20-nov + beta Blume (0.67 x media cruda de 5 años de los 13 pares + 0.33) x ERP 5%; Kd 5.1% y tasa 17.5% como JNJ 3T26; D/V = mediana de los 13 pares (deuda total / (deuda + mcap al 20-nov)). Bear/Bull ±75 pb como JNJ.",
+   "pares_usados": [
+    "LLY",
+    "JNJ",
+    "MRK",
+    "BMY",
+    "AMGN",
+    "GILD",
+    "NVO",
+    "AZN",
+    "NVS",
+    "GSK",
+    "SNY",
+    "REGN",
+    "VRTX"
+   ]
+  },
+  "comparables": {
+   "regla": "Mismo set de 13 pares para PFE y ABBV (sin PFE ni ABBV: anti-circularidad). Cada uno muestra al otro solo como referencia cruzada fuera del set. Múltiplo principal: P/E forward; correr la regresión P/E vs crecimiento antes de cualquier ajuste (skill informe-salud).",
+   "pares": {
+    "LLY": {
+     "cierre_20nov": 1347.11,
+     "pe_fwd": 28.697,
+     "peg": 1.381,
+     "ev_ebitda": 26.75,
+     "beta_5y": 0.39,
+     "div_yield_pct": 0.514,
+     "roic_pct": 42.68,
+     "deuda_ebitda": 1.06,
+     "eps_fy26": 35.4809,
+     "eps_fy27": 50.8704,
+     "pe_fy27": 26.481,
+     "d_sobre_v": 0.0396,
+     "pt_prom": 1470.0,
+     "n_analistas": 31,
+     "recomendacion": "Buy"
+    },
+    "JNJ": {
+     "cierre_20nov": 270.47,
+     "pe_fwd": 24.273,
+     "peg": 3.435,
+     "ev_ebitda": 19.67,
+     "beta_5y": 0.201,
+     "div_yield_pct": 1.982,
+     "roic_pct": 21.572,
+     "deuda_ebitda": 1.29,
+     "eps_fy26": 11.1184,
+     "eps_fy27": 11.612,
+     "pe_fy27": 23.292,
+     "d_sobre_v": 0.0642,
+     "pt_prom": 279.85,
+     "n_analistas": 23,
+     "recomendacion": "Buy"
+    },
+    "MRK": {
+     "cierre_20nov": 133.72,
+     "pe_fwd": 15.907,
+     "peg": 3.607,
+     "ev_ebitda": 12.68,
+     "beta_5y": 0.12,
+     "div_yield_pct": 2.632,
+     "roic_pct": 13.693,
+     "deuda_ebitda": 1.8,
+     "eps_fy26": 2.7876,
+     "eps_fy27": 8.963,
+     "pe_fy27": 14.919,
+     "d_sobre_v": 0.1405,
+     "pt_prom": 161.53,
+     "n_analistas": 28,
+     "recomendacion": "Buy",
+     "nota_eps": "EPS FY2026 de consenso deprimido por IPR&D adquirida dentro del no-GAAP (MRK ~2.79, GILD negativo): no usar FY2026; usar FY2027 o pe_fwd."
+    },
+    "BMY": {
+     "cierre_20nov": 58.8,
+     "pe_fwd": 9.123,
+     "peg": null,
+     "ev_ebitda": 8.33,
+     "beta_5y": 0.186,
+     "div_yield_pct": 4.286,
+     "roic_pct": 23.598,
+     "deuda_ebitda": 2.41,
+     "eps_fy26": 6.4509,
+     "eps_fy27": 6.6964,
+     "pe_fy27": 8.781,
+     "d_sobre_v": 0.2716,
+     "pt_prom": 65.25,
+     "n_analistas": 28,
+     "recomendacion": "Hold"
+    },
+    "AMGN": {
+     "cierre_20nov": 435.64,
+     "pe_fwd": 17.989,
+     "peg": 3.285,
+     "ev_ebitda": 15.68,
+     "beta_5y": 0.417,
+     "div_yield_pct": 2.314,
+     "roic_pct": 20.475,
+     "deuda_ebitda": 3.02,
+     "eps_fy26": 23.5527,
+     "eps_fy27": 25.1257,
+     "pe_fy27": 17.338,
+     "d_sobre_v": 0.1865,
+     "pt_prom": 440.78,
+     "n_analistas": 35,
+     "recomendacion": "Hold"
+    },
+    "GILD": {
+     "cierre_20nov": 166.43,
+     "pe_fwd": 19.952,
+     "peg": 2.742,
+     "ev_ebitda": 15.33,
+     "beta_5y": 0.372,
+     "div_yield_pct": 1.971,
+     "roic_pct": 36.821,
+     "deuda_ebitda": 1.77,
+     "eps_fy26": -0.9854,
+     "eps_fy27": 10.1491,
+     "pe_fy27": 16.398,
+     "d_sobre_v": 0.1127,
+     "pt_prom": 175.92,
+     "n_analistas": 27,
+     "recomendacion": "Buy",
+     "nota_eps": "EPS FY2026 de consenso deprimido por IPR&D adquirida dentro del no-GAAP (MRK ~2.79, GILD negativo): no usar FY2026; usar FY2027 o pe_fwd."
+    },
+    "NVO": {
+     "cierre_20nov": 37.82,
+     "pe_fwd": 11.663,
+     "peg": null,
+     "ev_ebitda": 6.68,
+     "beta_5y": 0.368,
+     "div_yield_pct": 3.388,
+     "roic_pct": 48.689,
+     "deuda_ebitda": 0.73,
+     "eps_fy26": 22.7915,
+     "eps_fy27": 22.5689,
+     "pe_fy27": 1.676,
+     "d_sobre_v": 0.1092,
+     "pt_prom": 45.73,
+     "n_analistas": 13,
+     "recomendacion": "Hold",
+     "nota_adr": "ADR: el EPS de consenso puede venir en moneda local o por acción ordinaria (NVO 22.8 es en DKK); usar pe_fwd de stockanalysis, no cierre/eps."
+    },
+    "AZN": {
+     "cierre_20nov": 174.35,
+     "pe_fwd": 15.763,
+     "peg": null,
+     "ev_ebitda": 14.02,
+     "beta_5y": 0.155,
+     "div_yield_pct": 1.853,
+     "roic_pct": 17.995,
+     "deuda_ebitda": 1.58,
+     "eps_fy26": 10.2443,
+     "eps_fy27": 11.3733,
+     "pe_fy27": 15.33,
+     "d_sobre_v": 0.1126,
+     "pt_prom": 209.91,
+     "n_analistas": 12,
+     "recomendacion": "Buy",
+     "nota_adr": "ADR: el EPS de consenso puede venir en moneda local o por acción ordinaria (NVO 22.8 es en DKK); usar pe_fwd de stockanalysis, no cierre/eps."
+    },
+    "NVS": {
+     "cierre_20nov": 150.47,
+     "pe_fwd": 15.766,
+     "peg": null,
+     "ev_ebitda": 13.59,
+     "beta_5y": 0.453,
+     "div_yield_pct": 2.048,
+     "roic_pct": 19.257,
+     "deuda_ebitda": 1.98,
+     "eps_fy26": 9.1096,
+     "eps_fy27": 10.0312,
+     "pe_fy27": 15.0,
+     "d_sobre_v": 0.1453,
+     "pt_prom": 157.1,
+     "n_analistas": 11,
+     "recomendacion": "Hold",
+     "nota_adr": "ADR: el EPS de consenso puede venir en moneda local o por acción ordinaria (NVO 22.8 es en DKK); usar pe_fwd de stockanalysis, no cierre/eps."
+    },
+    "GSK": {
+     "cierre_20nov": 47.76,
+     "pe_fwd": 10.083,
+     "peg": null,
+     "ev_ebitda": 8.1,
+     "beta_5y": 0.28,
+     "div_yield_pct": 3.778,
+     "roic_pct": 25.647,
+     "deuda_ebitda": 2.03,
+     "eps_fy26": 1.7957,
+     "eps_fy27": 1.8734,
+     "pe_fy27": 25.494,
+     "d_sobre_v": 0.1417,
+     "pt_prom": 59.12,
+     "n_analistas": 9,
+     "recomendacion": "Hold",
+     "nota_adr": "ADR: el EPS de consenso puede venir en moneda local o por acción ordinaria (NVO 22.8 es en DKK); usar pe_fwd de stockanalysis, no cierre/eps."
+    },
+    "SNY": {
+     "cierre_20nov": 46.52,
+     "pe_fwd": 9.427,
+     "peg": null,
+     "ev_ebitda": 7.59,
+     "beta_5y": 0.256,
+     "div_yield_pct": 5.2,
+     "roic_pct": 9.289,
+     "deuda_ebitda": 1.32,
+     "eps_fy26": 8.9437,
+     "eps_fy27": 9.5281,
+     "pe_fy27": 4.882,
+     "d_sobre_v": 0.2876,
+     "pt_prom": 54.92,
+     "n_analistas": 11,
+     "recomendacion": "Buy",
+     "nota_adr": "ADR: el EPS de consenso puede venir en moneda local o por acción ordinaria (NVO 22.8 es en DKK); usar pe_fwd de stockanalysis, no cierre/eps."
+    },
+    "REGN": {
+     "cierre_20nov": 920.69,
+     "pe_fwd": 11.393,
+     "peg": 0.941,
+     "ev_ebitda": 13.5,
+     "beta_5y": 0.096,
+     "div_yield_pct": 0.408,
+     "roic_pct": 16.686,
+     "deuda_ebitda": 0.48,
+     "eps_fy26": 69.0113,
+     "eps_fy27": 71.6589,
+     "pe_fy27": 12.848,
+     "d_sobre_v": 0.0285,
+     "pt_prom": 991.0,
+     "n_analistas": 28,
+     "recomendacion": "Buy"
+    },
+    "VRTX": {
+     "cierre_20nov": 515.02,
+     "pe_fwd": 27.297,
+     "peg": 2.235,
+     "ev_ebitda": 24.94,
+     "beta_5y": 0.28,
+     "div_yield_pct": null,
+     "roic_pct": 23.066,
+     "deuda_ebitda": 1.2,
+     "eps_fy26": 18.135,
+     "eps_fy27": 19.9172,
+     "pe_fy27": 25.858,
+     "d_sobre_v": 0.0473,
+     "pt_prom": 595.36,
+     "n_analistas": 32,
+     "recomendacion": "Buy"
+    }
+   },
+   "referencia_cruzada": {
+    "PFE": {
+     "cierre_20nov": 27.4,
+     "pe_fwd": 9.693,
+     "pe_ttm": 39.041,
+     "peg": null,
+     "ev_ebitda": 8.23,
+     "ev_ventas": 3.23,
+     "beta_5y": 0.298,
+     "div_yield_pct": 6.277,
+     "ev_usd": 205304992284.0,
+     "roic_pct": 12.83,
+     "payout_pct": 245.076,
+     "deuda_ebitda": 2.45,
+     "eps_fy26": 3.0522,
+     "eps_fy27": 2.9541
+    },
+    "ABBV": {
+     "cierre_20nov": 286.2,
+     "pe_fwd": 18.151,
+     "pe_ttm": 49.276,
+     "peg": 1.353,
+     "ev_ebitda": 18.1,
+     "ev_ventas": 8.73,
+     "beta_5y": 0.192,
+     "div_yield_pct": 2.544,
+     "ev_usd": 576434786777.0,
+     "roic_pct": 19.62,
+     "payout_pct": 125.343,
+     "deuda_ebitda": 2.52,
+     "eps_fy26": 13.9842,
+     "eps_fy27": 16.2177
+    }
+   },
+   "estadisticos": {
+    "pe_fwd_mediana": 15.766,
+    "pe_fwd_q3": 19.952,
+    "pe_fwd_min": 9.123,
+    "pe_fwd_max": 28.697
+   },
+   "fuente": "stockanalysis.com (/forecast y /statistics), consenso de S&P Global; bajado el 22-nov-2026 (sin sesiones desde el cierre del 20-nov); cierres: Yahoo Finance chart API v8, cierre diario; bajado 22-nov-2026"
+  },
+  "exito_clinico": {
+   "fuente": "BIO / Informa Pharma Intelligence / QLS Advisors, Clinical Development Success Rates and Contributing Factors 2011-2020 (feb-2021), Figura 2 (pág. 7) y Figura 5b (pág. 11); 12,728 transiciones",
+   "url": "https://go.bio.org/rs/490-EHZ-999/images/ClinicalDevelopmentSuccessRates2011_2020.pdf",
+   "regla": "PFE y ABBV usan EXACTAMENTE estas probabilidades (por área terapéutica si el activo tiene área en la tabla; si no, \"todas\"). Ajustes solo con razón explícita y declarada, y el mismo ajuste en los dos informes si el caso es análogo.",
+   "columnas_transicion": "Fase 1->2, Fase 2->3, Fase 3->presentación, presentación->aprobación (%)",
+   "transicion_por_fase": {
+    "todas": [
+     52.0,
+     28.9,
+     57.8,
+     90.6
+    ],
+    "hematologia": [
+     69.6,
+     48.1,
+     76.8,
+     93.1
+    ],
+    "metabolica": [
+     61.8,
+     45.0,
+     63.6,
+     87.5
+    ],
+    "infecciosas": [
+     57.8,
+     38.4,
+     64.0,
+     92.9
+    ],
+    "oftalmologia": [
+     71.6,
+     35.5,
+     51.2,
+     91.1
+    ],
+    "autoinmune": [
+     55.2,
+     31.4,
+     65.3,
+     94.1
+    ],
+    "alergia": [
+     56.4,
+     28.3,
+     64.7,
+     100.0
+    ],
+    "gastroenterologia_no_eii": [
+     46.7,
+     34.2,
+     57.1,
+     90.9
+    ],
+    "respiratoria": [
+     55.9,
+     21.9,
+     64.5,
+     95.6
+    ],
+    "psiquiatria": [
+     52.7,
+     26.8,
+     56.3,
+     91.2
+    ],
+    "endocrina": [
+     43.3,
+     26.6,
+     66.2,
+     86.3
+    ],
+    "neurologia": [
+     47.7,
+     26.8,
+     53.1,
+     86.7
+    ],
+    "oncologia": [
+     48.8,
+     24.6,
+     47.7,
+     92.0
+    ],
+    "cardiovascular": [
+     50.0,
+     21.0,
+     55.2,
+     82.5
+    ],
+    "urologia": [
+     40.9,
+     15.0,
+     69.2,
+     84.6
+    ],
+    "otras": [
+     63.6,
+     38.6,
+     60.0,
+     88.4
+    ]
+   },
+   "columnas_acumulada": "Probabilidad de aprobación desde Fase 1, Fase 2, Fase 3, presentación (%)",
+   "probabilidad_acumulada_hasta_aprobacion": {
+    "todas": [
+     7.9,
+     15.1,
+     52.4,
+     90.6
+    ],
+    "hematologia": [
+     23.9,
+     34.4,
+     71.5,
+     93.1
+    ],
+    "metabolica": [
+     15.5,
+     25.0,
+     55.7,
+     87.5
+    ],
+    "infecciosas": [
+     13.2,
+     22.8,
+     59.4,
+     92.9
+    ],
+    "oftalmologia": [
+     11.9,
+     16.6,
+     46.7,
+     91.1
+    ],
+    "autoinmune": [
+     10.7,
+     19.3,
+     61.4,
+     94.1
+    ],
+    "alergia": [
+     10.3,
+     18.3,
+     64.7,
+     100.0
+    ],
+    "gastroenterologia_no_eii": [
+     8.3,
+     17.8,
+     51.9,
+     90.9
+    ],
+    "respiratoria": [
+     7.5,
+     13.5,
+     61.6,
+     95.6
+    ],
+    "psiquiatria": [
+     7.3,
+     13.8,
+     51.4,
+     91.2
+    ],
+    "endocrina": [
+     6.6,
+     15.2,
+     57.1,
+     86.3
+    ],
+    "neurologia": [
+     5.9,
+     12.3,
+     46.0,
+     86.7
+    ],
+    "oncologia": [
+     5.3,
+     10.8,
+     43.9,
+     92.0
+    ],
+    "cardiovascular": [
+     4.8,
+     9.6,
+     45.6,
+     82.5
+    ],
+    "urologia": [
+     3.6,
+     8.8,
+     58.6,
+     84.6
+    ],
+    "otras": [
+     13.0,
+     20.5,
+     53.0,
+     88.4
+    ]
+   },
+   "notas": [
+    "La Fig. 5b (LOA) usa n propios por fase y no es exactamente el producto de la Fig. 2: usar la Fig. 5b para la probabilidad acumulada.",
+    "Vacunas no tienen fila propia: usar \"infecciosas\" (vacunas de PFE) y declararlo.",
+    "Obesidad / diabetes (Metsera, PFE) = \"metabolica\". Inmunología (nuevas indicaciones de Skyrizi / Rinvoq) = \"autoinmune\". Migraña / Parkinson = \"neurologia\". Esquizofrenia / depresión = \"psiquiatria\". Oncología y ADC (Seagen, Elahere, Emrelis) = \"oncologia\".",
+    "Extensión de indicación de un producto ya aprobado: la skill permite subir la probabilidad con razón explícita (mecanismo validado); declararlo y aplicar el mismo criterio en PFE y ABBV."
+   ]
+  },
+  "ira_medicare": {
+   "fuente_2026": "CMS, fact sheet \"Negotiated Prices for Initial Price Applicability Year 2026\"; precio de lista de 30 días de 2023",
+   "fuente_2027": "CMS, fact sheet \"Negotiated Prices for Initial Price Applicability Year 2027\"; precio de lista de 30 días de 2024",
+   "fuente_2028": "CMS, fact sheet \"Selected Drugs for Initial Price Applicability Year 2028\" (27-ene-2026); gasto Medicare B+D nov-2024 a oct-2025",
+   "url": "https://www.cms.gov/initiatives/medicare-prescription-drug-affordability/overview/medicare-drug-price-negotiation-program/selected-drugs-negotiated-prices",
+   "precios_2028": "Los precios de la ronda 2028 se publican a más tardar el 30-nov-2026: NO estaban publicados al corte del 20-nov-2026. Modelar con un supuesto declarado (descuentos sobre lista de rondas previas: 2026 38%-79%, 2027 38%-85%).",
+   "farmacos": [
+    {
+     "farmaco": "Eliquis",
+     "compania": "PFE (alianza con BMS, que figura como fabricante ante CMS)",
+     "ronda": 2026,
+     "vigencia": "2026-01-01",
+     "precio_lista_30d": 521.0,
+     "precio_negociado_30d": 231.0,
+     "descuento_pct": 56,
+     "gasto_medicare_usd": 18275108000,
+     "usuarios": 3928000
+    },
+    {
+     "farmaco": "Imbruvica",
+     "compania": "ABBV (Pharmacyclics; J&J comparte fuera de EE.UU.)",
+     "ronda": 2026,
+     "vigencia": "2026-01-01",
+     "precio_lista_30d": 14934.0,
+     "precio_negociado_30d": 9319.0,
+     "descuento_pct": 38,
+     "gasto_medicare_usd": 2371858000,
+     "usuarios": 17000
+    },
+    {
+     "farmaco": "Ibrance",
+     "compania": "PFE",
+     "ronda": 2027,
+     "vigencia": "2027-01-01",
+     "precio_lista_30d": 15741,
+     "precio_negociado_30d": 7871,
+     "descuento_pct": 50,
+     "gasto_medicare_usd": 2036178000,
+     "usuarios": 16000
+    },
+    {
+     "farmaco": "Xtandi",
+     "compania": "PFE (Astellas figura como fabricante; PFE comparte el resultado en EE.UU.)",
+     "ronda": 2027,
+     "vigencia": "2027-01-01",
+     "precio_lista_30d": 13480,
+     "precio_negociado_30d": 7004,
+     "descuento_pct": 48,
+     "gasto_medicare_usd": 3401099000,
+     "usuarios": 35000
+    },
+    {
+     "farmaco": "Linzess",
+     "compania": "ABBV (con Ironwood)",
+     "ronda": 2027,
+     "vigencia": "2027-01-01",
+     "precio_lista_30d": 539,
+     "precio_negociado_30d": 136,
+     "descuento_pct": 75,
+     "gasto_medicare_usd": 1982587000
+    },
+    {
+     "farmaco": "Vraylar",
+     "compania": "ABBV",
+     "ronda": 2027,
+     "vigencia": "2027-01-01",
+     "precio_lista_30d": 1376,
+     "precio_negociado_30d": 770,
+     "descuento_pct": 44,
+     "gasto_medicare_usd": 1136814000
+    },
+    {
+     "farmaco": "Botox; Botox Cosmetic",
+     "compania": "ABBV",
+     "ronda": 2028,
+     "vigencia": "2028-01-01",
+     "precio_negociado_30d": null,
+     "descuento_pct": null,
+     "gasto_medicare_usd": 1143070000,
+     "usuarios": 390000,
+     "nota": "Parte B (primera ronda con Parte B). CMS aclara que el nombre \"Cosmetic\" no cambia la cobertura: el uso estético no lo paga Medicare."
+    },
+    {
+     "farmaco": "Xeljanz; Xeljanz XR",
+     "compania": "PFE",
+     "ronda": 2028,
+     "vigencia": "2028-01-01",
+     "precio_negociado_30d": null,
+     "descuento_pct": null,
+     "gasto_medicare_usd": 1013332000,
+     "usuarios": 22000
+    }
+   ],
+   "nota_mfp": "Descuento = (lista - negociado) / lista, sobre precio de LISTA; el efecto sobre el precio NETO es menor (ya había rebates). Estimar el impacto neto con lo que diga la compañía (10-K / 10-Q / call) y declararlo.",
+   "reglas_elegibilidad": "Molécula pequeña: elegible a 7 años de la aprobación (precio efectivo a los 9); biológico: 11 (efectivo a los 13). Exclusión de huérfanos ampliada por la P.L. 119-21, según la fact sheet 2028."
+  },
+  "politica_precios_y_aranceles": {
+   "mfn_trumprx": {
+    "PFE": {
+     "fecha": "2025-09-30",
+     "terminos": [
+      "Precios MFN (igual al menor de países pares) en Medicaid desde 2026",
+      "Precio MFN garantizado en lanzamientos nuevos (Medicare, Medicaid y comercial)",
+      "Venta directa con descuento vía TrumpRx (descuentos promedio ~50%, hasta 85% sobre lista)",
+      "Inversión de US$70 mil millones en I+D y manufactura en EE.UU.",
+      "Período de gracia de 3 años sin aranceles de la Sección 232, condicionado a invertir"
+     ],
+     "fuentes": [
+      "https://www.cnbc.com/2025/09/30/trump-pfizer-drug-price-agreement.html",
+      "https://www.fiercepharma.com/pharma/pfizer-plans-offer-price-concessions-trumps-most-favored-nation-push-reports"
+     ]
+    },
+    "ABBV": {
+     "fecha": "2026-01-12",
+     "terminos": [
+      "Precios MFN en Medicaid (ej. Synthroid, Combigan)",
+      "Venta directa vía TrumpRx (en vivo desde feb-2026)",
+      "Inversión de US$100 mil millones en 10 años (I+D y capital en EE.UU.)",
+      "Exención de 3 años del arancel de 100% a fármacos de marca, condicionada a ampliar la manufactura local"
+     ],
+     "fuentes": [
+      "https://www.cnn.com/2026/01/12/politics/drug-prices-abbvie-trump",
+      "https://www.fiercepharma.com/pharma/abbvie-inks-latest-white-house-drug-pricing-deal-scoring-tariff-reprieve-it-makes-100b-us"
+     ]
+    },
+    "verificar": "Términos de prensa. Cada informe confirma en el 10-Q del 3T26 (Risk Factors / MD&A) qué dice la compañía y cuantifica el impacto si lo da."
+   },
+   "aranceles_seccion_232": {
+    "proclama": "Proclama 11020, 2-abr-2026, \"Adjusting Imports of Pharmaceuticals and Pharmaceutical Ingredients into the United States\"",
+    "tasas": {
+     "general_patentados": "100% (9903.04.60)",
+     "UE_Japon_Corea_Suiza": "hasta 15% (9903.04.62)",
+     "Reino_Unido": "0% según guía de CBP del 1-ago-2026 (Troutman, abr-2026, decía 10%)",
+     "solo_plan_de_relocalizacion": "20% (9903.04.64), sube a 100% el 2-abr-2030",
+     "relocalizacion_mas_acuerdo_MFN": "0% hasta el 20-ene-2029 (9903.04.65)",
+     "especialidades": "0% huérfanos, terapias celulares / génicas, ADC, plasma, etc., con condiciones (9903.04.66)",
+     "genericos_y_biosimilares": "excluidos (revisión en un año)"
+    },
+    "vigencia": "31-jul-2026 para las 17 compañías del Anexo III (entre ellas Pfizer y AbbVie); 29-sep-2026 para el resto",
+    "estado_pfe_abbv": "Ambas firmaron acuerdo MFN + plan de inversión, lo que las encuadraría en 0% (9903.04.65) hasta ene-2029. NO verificado contra el anexo oficial: confirmar en el 10-Q del 3T26 y declararlo.",
+    "fuentes": [
+     "https://www.troutman.com/insights/from-zero-to-100-new-section-232-tariffs-on-patented-drugs-and-the-high-stakes-onshoring-and-mfn-choices-ahead/ (7-abr-2026)",
+     "https://www.ghy.com/trade-compliance/us-imposes-100-section-232-tariffs-on-patented-pharmaceuticals-and-ingredients/ (actualizado 28-sep-2026)",
+     "https://www.mallorygroup.com/blog-posts/100-duties-two-deadlines-section-232-pharmaceutical-tariffs-take-effect-july-31-2026 (30-jul-2026)"
+    ]
+   }
+  },
+  "lly_jnj_3t26": {
+   "regla": "Los fair values publicados NO se tocan: se muestran contra el precio con que se publicaron y se recalcula solo lo que depende del precio al 20-nov (regla PEP vs KO).",
+   "LLY": {
+    "fair_value_publicado": 1089.85,
+    "precio_de_publicacion": 1427.28,
+    "gap_publicado_pct": -23.64,
+    "cierre_20nov": 1347.11,
+    "gap_al_20nov_pct": -19.1,
+    "pe_fy27_20nov": 26.48,
+    "div_yield_20nov_pct": 0.514,
+    "consenso_pt_20nov": 1470.0,
+    "m1_sotp": 481.04,
+    "m2_comp": 878.49,
+    "m3_rev": 1197.89,
+    "m4_cons": 1515.22,
+    "indep": 729.45,
+    "wacc_pct": 7.912,
+    "rd_ventas_ttm_pct": 17.78,
+    "margen_bruto_3t_pct": 83.88,
+    "deuda_neta_usd_mm": 44618,
+    "deuda_neta_ebitda": 1.17,
+    "ventas_en_riesgo_loe_ttm_pct": 21.0
+   },
+   "JNJ": {
+    "fair_value_publicado": 205.56,
+    "precio_de_publicacion": 283.52,
+    "gap_publicado_pct": -27.5,
+    "cierre_20nov": 270.47,
+    "gap_al_20nov_pct": -24.0,
+    "pe_fy27_20nov": 23.29,
+    "div_yield_20nov_pct": 1.982,
+    "consenso_pt_20nov": 279.85,
+    "m1_sotp": 85.94,
+    "m2_comp": 200.91,
+    "m3_rev": 201.36,
+    "m4_cons": 287.88,
+    "wacc_im_pct": 7.467,
+    "rd_ventas_ttm_pct": 16.19,
+    "margen_bruto_3t_pct": 68.12,
+    "deuda_neta_usd_mm": 27423,
+    "deuda_neta_ebitda": 0.87,
+    "ventas_en_riesgo_loe_pct": 47.48,
+    "ventas_en_riesgo_loe_im_pct": 73.31,
+    "anios_suba_dividendo": 64
+   },
+   "fuente": ".claude/skills/informe-salud/modelos/{lly,jnj}/model.json (3T26); precios y consenso al 20-nov: stockanalysis.com (/forecast y /statistics), consenso de S&P Global; bajado el 22-nov-2026 (sin sesiones desde el cierre del 20-nov)",
+   "nota_wacc": "LLY y JNJ se publicaron con rf 5.103% (13-nov). PFE / ABBV usan la rf del 20-nov: decirlo en el cuadro comparativo."
+  }
+ },
+ "retail": {
+  "pares": {
+   "WMT": {
+    "cierre_20nov": 127.95,
+    "pe_fwd": 41.169,
+    "pe_ttm": 48.852,
+    "peg": 4.028,
+    "ev_ebitda": 22.24,
+    "ev_ventas": 1.45,
+    "beta_5y": 0.526,
+    "div_yield_pct": 0.774,
+    "ev_usd": 1082842831536.0,
+    "roic_pct": 15.291,
+    "payout_pct": 37.798,
+    "deuda_ebitda": 1.55,
+    "eps_fy_actual": 2.8856,
+    "eps_fy_siguiente": 3.2281,
+    "fy_actual_cierra": "ene-2027 (FY2027)",
+    "pt_prom": 135.9,
+    "d_sobre_v": 0.074
+   },
+   "BJ": {
+    "cierre_20nov": 104.82,
+    "pe_fwd": 20.863,
+    "pe_ttm": 20.39,
+    "peg": 3.004,
+    "ev_ebitda": 15.45,
+    "ev_ventas": 0.67,
+    "beta_5y": 0.138,
+    "div_yield_pct": null,
+    "ev_usd": 15865701015.0,
+    "roic_pct": 10.63,
+    "payout_pct": null,
+    "deuda_ebitda": 1.88,
+    "eps_fy_actual": 4.7339,
+    "eps_fy_siguiente": 5.0724,
+    "fy_actual_cierra": "ene-2027",
+    "pt_prom": 110.24,
+    "d_sobre_v": 0.167
+   },
+   "TGT": {
+    "cierre_20nov": 165.83,
+    "pe_fwd": 17.202,
+    "pe_ttm": 15.41,
+    "peg": 2.431,
+    "ev_ebitda": 10.07,
+    "ev_ventas": 0.82,
+    "beta_5y": 0.933,
+    "div_yield_pct": 2.798,
+    "ev_usd": 89661982532.0,
+    "roic_pct": 13.462,
+    "payout_pct": 43.117,
+    "deuda_ebitda": 1.98,
+    "eps_fy_actual": 11.0375,
+    "eps_fy_siguiente": 9.7677,
+    "fy_actual_cierra": "ene-2027",
+    "pt_prom": 172.34,
+    "d_sobre_v": 0.2024
+   },
+   "DG": {
+    "cierre_20nov": 130.53,
+    "pe_fwd": 16.317,
+    "pe_ttm": 16.948,
+    "peg": 1.432,
+    "ev_ebitda": 12.0,
+    "ev_ventas": 0.98,
+    "beta_5y": 0.191,
+    "div_yield_pct": 1.808,
+    "ev_usd": 42980619599.0,
+    "roic_pct": 8.147,
+    "payout_pct": 30.642,
+    "deuda_ebitda": 2.62,
+    "eps_fy_actual": 7.8969,
+    "eps_fy_siguiente": 8.3008,
+    "fy_actual_cierra": "ene-2027",
+    "pt_prom": 142.0,
+    "d_sobre_v": 0.3539
+   },
+   "DLTR": {
+    "cierre_20nov": 137.96,
+    "pe_fwd": 20.003,
+    "pe_ttm": 16.924,
+    "peg": 1.401,
+    "ev_ebitda": 12.98,
+    "ev_ventas": 1.62,
+    "beta_5y": 0.686,
+    "div_yield_pct": null,
+    "ev_usd": 32498176050.0,
+    "roic_pct": 13.57,
+    "payout_pct": null,
+    "deuda_ebitda": 1.88,
+    "eps_fy_actual": 7.9288,
+    "eps_fy_siguiente": 7.8869,
+    "fy_actual_cierra": "ene-2027",
+    "pt_prom": 137.67,
+    "d_sobre_v": 0.2286
+   },
+   "KR": {
+    "cierre_20nov": 68.44,
+    "pe_fwd": 12.768,
+    "pe_ttm": 39.775,
+    "peg": 1.473,
+    "ev_ebitda": 7.82,
+    "ev_ventas": 0.42,
+    "beta_5y": 0.357,
+    "div_yield_pct": 2.279,
+    "ev_usd": 62901890628.0,
+    "roic_pct": 13.872,
+    "payout_pct": 90.662,
+    "deuda_ebitda": 2.71,
+    "eps_fy_actual": 5.1899,
+    "eps_fy_siguiente": 5.4837,
+    "fy_actual_cierra": "ene-2027",
+    "pt_prom": 69.96,
+    "d_sobre_v": 0.3741
+   },
+   "AMZN": {
+    "cierre_20nov": 246.82,
+    "pe_fwd": 24.958,
+    "pe_ttm": 19.947,
+    "peg": 1.057,
+    "ev_ebitda": 15.56,
+    "ev_ventas": 3.59,
+    "beta_5y": 1.503,
+    "div_yield_pct": null,
+    "ev_usd": 2859513796687.0,
+    "roic_pct": 10.913,
+    "payout_pct": null,
+    "deuda_ebitda": 1.5,
+    "eps_fy_actual": 9.6025,
+    "eps_fy_siguiente": 10.9261,
+    "fy_actual_cierra": "dic-2026",
+    "pt_prom": 326.51,
+    "d_sobre_v": 0.1025
+   }
+  },
+  "pares_modelo_wmt": {
+   "fuente": ".claude/skills/informe-consumo-masivo/modelos/wmt/model.py líneas 464-486 (PEERS: trimestres de consenso q, comparables sin combustible del último trimestre, NTM por ntm_rule) y model.json[\"peers\"]",
+   "comparables_ultimo_trimestre_pct": {
+    "COST": 6.7,
+    "TGT": 5.6,
+    "KR": 0.2,
+    "BJ": 4.1,
+    "DG": 3.5,
+    "DLTR": 3.7
+   },
+   "nota_BJ": "El consenso anual de BJ en stockanalysis no estaba actualizado tras su 3T: WMT usa f1 = nueve meses reales (4.20) + 4T de consenso (1.04). Mantener el criterio.",
+   "nota_TGT": "Su año fiscal incluye devoluciones de aranceles IEEPA (2T y 3T): excluir de la regresión contra crecimiento del EPS (criterio WMT).",
+   "WMT_publicado": {
+    "fair_value": 88.19,
+    "precio": 127.95,
+    "gap_pct": -31.07,
+    "wacc_pct": 8.09
+   }
+  },
+  "consumidor_eeuu": {
+   "texto_fuente": ".claude/skills/informe-consumo-masivo/modelos/wmt/wmt.tpl.html, párrafo \"El consumidor de EE.UU. al cierre de este informe\" (Sección 05, 21-nov-2026)",
+   "ventas_minoristas_oct": {
+    "mm_pct": 0.2,
+    "ia_pct": 6.8,
+    "grupo_control_mm_pct": 0.6,
+    "fuente": "Census, avance del 17-nov-2026"
+   },
+   "michigan_nov_preliminar": {
+    "valor": 51.0,
+    "previo_oct": 48.0,
+    "expectativa_inflacion_1a_pct": 4.3,
+    "fuente": "Universidad de Michigan, lectura preliminar de noviembre 2026"
+   },
+   "ipc_oct_mm_pct": 0.4,
+   "nota_ipc": "El BLS no publica la variación interanual de octubre por la falta de datos de octubre de 2025.",
+   "diesel_semana_16nov": {
+    "usd_galon": 5.94,
+    "vs_anio_previo": 2.07,
+    "fuente": "EIA"
+   },
+   "nrf_navidad": {
+    "crecimiento_pct": 4.2,
+    "nota": "mitad volumen, mitad precio",
+    "fuente": "NRF"
+   },
+   "aranceles_consumo": "IEEPA: se devuelven desde abril-2026; recargo de 10% de la Sección 122 vencido el 24-jul-2026; siguen Secciones 232 y 301.",
+   "lectura_wmt": "WMT gana participación en todos los niveles de ingreso, liderada por hogares de ingresos altos.",
+   "nota_nafta": "Para COST: con el combustible caro, las ventas totales y las comparables CON nafta están infladas; usar siempre comparables sin nafta ni tipo de cambio."
+  },
+  "fuente_multiplos": "stockanalysis.com (/forecast y /statistics), consenso de S&P Global; bajado el 22-nov-2026 (sin sesiones desde el cierre del 20-nov)"
+ },
+ "cost_precio": {
+  "cierre_20nov": 1102.15,
+  "max_52s": 1123.67,
+  "min_52s": 844.06,
+  "multiplos": {
+   "pe_fwd": 48.365,
+   "pe_ttm": 53.09,
+   "peg": 4.57,
+   "ev_ebitda": 33.65,
+   "ev_ventas": 1.57,
+   "beta_5y": 0.852,
+   "div_yield_pct": 0.534,
+   "ev_usd": 477275012000.0,
+   "roic_pct": 35.749,
+   "payout_pct": 27.505,
+   "deuda_ebitda": 0.69
+  },
+  "balance": {
+   "acciones_mm": 443.1,
+   "deuda_total_usd_mm": 10181,
+   "caja_neta_usd_mm": 11120,
+   "mcap_usd_mm": 488395,
+   "d_sobre_v": 0.0204,
+   "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+  },
+  "serie_mensual": "defensivos_nov26/yh/COST.mo.json (15 años) y COST.d.json (2 años)"
+ },
+ "pfe_precio": {
+  "cierre_20nov": 27.4,
+  "max_52s": 31.44,
+  "min_52s": 23.62,
+  "multiplos": {
+   "pe_fwd": 9.693,
+   "pe_ttm": 39.041,
+   "peg": null,
+   "ev_ebitda": 8.23,
+   "ev_ventas": 3.23,
+   "beta_5y": 0.298,
+   "div_yield_pct": 6.277,
+   "ev_usd": 205304992284.0,
+   "roic_pct": 12.83,
+   "payout_pct": 245.076,
+   "deuda_ebitda": 2.45
+  },
+  "balance": {
+   "acciones_mm": 5699.9,
+   "deuda_total_usd_mm": 63408,
+   "caja_neta_usd_mm": -49129,
+   "mcap_usd_mm": 156176,
+   "d_sobre_v": 0.2888,
+   "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+  },
+  "serie_mensual": "defensivos_nov26/yh/PFE.mo.json (15 años) y PFE.d.json (2 años)"
+ },
+ "abbv_precio": {
+  "cierre_20nov": 286.2,
+  "max_52s": 302.93,
+  "min_52s": 190.75,
+  "multiplos": {
+   "pe_fwd": 18.151,
+   "pe_ttm": 49.276,
+   "peg": 1.353,
+   "ev_ebitda": 18.1,
+   "ev_ventas": 8.73,
+   "beta_5y": 0.192,
+   "div_yield_pct": 2.544,
+   "ev_usd": 576434786777.0,
+   "roic_pct": 19.62,
+   "payout_pct": 125.343,
+   "deuda_ebitda": 2.52
+  },
+  "balance": {
+   "acciones_mm": 1767.6,
+   "deuda_total_usd_mm": 81317,
+   "caja_neta_usd_mm": -70543,
+   "mcap_usd_mm": 505892,
+   "d_sobre_v": 0.1385,
+   "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+  },
+  "serie_mensual": "defensivos_nov26/yh/ABBV.mo.json (15 años) y ABBV.d.json (2 años)"
+ },
+ "todos_los_tickers": {
+  "COST": {
+   "cierre_20nov": 1102.15,
+   "max_52s": 1123.67,
+   "min_52s": 844.06,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 1085.0,
+    "pt_min": 770.0,
+    "pt_max": 1315.0,
+    "n_analistas": 42,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": -1.56,
+    "eps_ajustado_fy_actual": 22.8005,
+    "eps_ajustado_fy_siguiente": 25.0437,
+    "ventas_fy_actual": 329860535260.0,
+    "ventas_fy_siguiente": 354502595340.0,
+    "eps_fy_anterior_real": 20.61,
+    "fy_actual_cierra": "ago-2027 (FY2027)",
+    "fy_siguiente_cierra": "ago-2028 (FY2028)"
+   },
+   "multiplos": {
+    "pe_fwd": 48.365,
+    "pe_ttm": 53.09,
+    "peg": 4.57,
+    "ev_ebitda": 33.65,
+    "ev_ventas": 1.57,
+    "beta_5y": 0.852,
+    "div_yield_pct": 0.534,
+    "ev_usd": 477275012000.0,
+    "roic_pct": 35.749,
+    "payout_pct": 27.505,
+    "deuda_ebitda": 0.69
+   },
+   "balance_sa": {
+    "acciones_mm": 443.1,
+    "deuda_total_usd_mm": 10181,
+    "caja_neta_usd_mm": 11120,
+    "mcap_usd_mm": 488395,
+    "d_sobre_v": 0.0204,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "PFE": {
+   "cierre_20nov": 27.4,
+   "max_52s": 31.44,
+   "min_52s": 23.62,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 30.22,
+    "pt_min": 25.0,
+    "pt_max": 37.0,
+    "n_analistas": 28,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 10.29,
+    "eps_ajustado_fy_actual": 3.0522,
+    "eps_ajustado_fy_siguiente": 2.9541,
+    "ventas_fy_actual": 63129063120.0,
+    "ventas_fy_siguiente": 60822368210.0,
+    "eps_fy_anterior_real": 3.22,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 9.693,
+    "pe_ttm": 39.041,
+    "peg": null,
+    "ev_ebitda": 8.23,
+    "ev_ventas": 3.23,
+    "beta_5y": 0.298,
+    "div_yield_pct": 6.277,
+    "ev_usd": 205304992284.0,
+    "roic_pct": 12.83,
+    "payout_pct": 245.076,
+    "deuda_ebitda": 2.45
+   },
+   "balance_sa": {
+    "acciones_mm": 5699.9,
+    "deuda_total_usd_mm": 63408,
+    "caja_neta_usd_mm": -49129,
+    "mcap_usd_mm": 156176,
+    "d_sobre_v": 0.2888,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "ABBV": {
+   "cierre_20nov": 286.2,
+   "max_52s": 302.93,
+   "min_52s": 190.75,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 315.88,
+    "pt_min": 237.0,
+    "pt_max": 350.0,
+    "n_analistas": 29,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 10.37,
+    "eps_ajustado_fy_actual": 13.9842,
+    "eps_ajustado_fy_siguiente": 16.2177,
+    "ventas_fy_actual": 67793295419.99999,
+    "ventas_fy_siguiente": 74021675910.0,
+    "eps_fy_anterior_real": 10.0,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 18.151,
+    "pe_ttm": 49.276,
+    "peg": 1.353,
+    "ev_ebitda": 18.1,
+    "ev_ventas": 8.73,
+    "beta_5y": 0.192,
+    "div_yield_pct": 2.544,
+    "ev_usd": 576434786777.0,
+    "roic_pct": 19.62,
+    "payout_pct": 125.343,
+    "deuda_ebitda": 2.52
+   },
+   "balance_sa": {
+    "acciones_mm": 1767.6,
+    "deuda_total_usd_mm": 81317,
+    "caja_neta_usd_mm": -70543,
+    "mcap_usd_mm": 505892,
+    "d_sobre_v": 0.1385,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "LLY": {
+   "cierre_20nov": 1347.11,
+   "max_52s": 1475.25,
+   "min_52s": 850.51,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 1470.0,
+    "pt_min": 940.0,
+    "pt_max": 1700.0,
+    "n_analistas": 31,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 9.12,
+    "eps_ajustado_fy_actual": 35.4809,
+    "eps_ajustado_fy_siguiente": 50.8704,
+    "ventas_fy_actual": 91684644000.0,
+    "ventas_fy_siguiente": 106582893730.0,
+    "eps_fy_anterior_real": 24.21,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 28.697,
+    "pe_ttm": 43.721,
+    "peg": 1.381,
+    "ev_ebitda": 26.75,
+    "ev_ventas": 14.39,
+    "beta_5y": 0.39,
+    "div_yield_pct": 0.514,
+    "ev_usd": 1243797747999.0,
+    "roic_pct": 42.68,
+    "payout_pct": 22.459,
+    "deuda_ebitda": 1.06
+   },
+   "balance_sa": {
+    "acciones_mm": 890.8,
+    "deuda_total_usd_mm": 49503,
+    "caja_neta_usd_mm": -43858,
+    "mcap_usd_mm": 1199940,
+    "d_sobre_v": 0.0396,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "JNJ": {
+   "cierre_20nov": 270.47,
+   "max_52s": 290.25,
+   "min_52s": 199.91,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 279.85,
+    "pt_min": 190.0,
+    "pt_max": 320.0,
+    "n_analistas": 23,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 3.47,
+    "eps_ajustado_fy_actual": 11.1184,
+    "eps_ajustado_fy_siguiente": 11.612,
+    "ventas_fy_actual": 101195925680.0,
+    "ventas_fy_siguiente": 107621809920.0,
+    "eps_fy_anterior_real": 10.79,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 24.273,
+    "pe_ttm": 41.076,
+    "peg": 3.435,
+    "ev_ebitda": 19.67,
+    "ev_ventas": 6.83,
+    "beta_5y": 0.201,
+    "div_yield_pct": 1.982,
+    "ev_usd": 678528207645.0,
+    "roic_pct": 21.572,
+    "payout_pct": 81.403,
+    "deuda_ebitda": 1.29
+   },
+   "balance_sa": {
+    "acciones_mm": 2407.3,
+    "deuda_total_usd_mm": 44651,
+    "caja_neta_usd_mm": -27423,
+    "mcap_usd_mm": 651105,
+    "d_sobre_v": 0.0642,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "MRK": {
+   "cierre_20nov": 133.72,
+   "max_52s": 156.92,
+   "min_52s": 96.06,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 161.53,
+    "pt_min": 105.0,
+    "pt_max": 186.0,
+    "n_analistas": 28,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 20.8,
+    "eps_ajustado_fy_actual": 2.7876,
+    "eps_ajustado_fy_siguiente": 8.963,
+    "ventas_fy_actual": 67241417520.0,
+    "ventas_fy_siguiente": 69440611100.0,
+    "eps_fy_anterior_real": 8.98,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 15.907,
+    "pe_ttm": 135.24,
+    "peg": 3.607,
+    "ev_ebitda": 12.68,
+    "ev_ventas": 5.55,
+    "beta_5y": 0.12,
+    "div_yield_pct": 2.632,
+    "ev_usd": 373905653399.0,
+    "roic_pct": 13.693,
+    "payout_pct": 356.002,
+    "deuda_ebitda": 1.8
+   },
+   "balance_sa": {
+    "acciones_mm": 2465.2,
+    "deuda_total_usd_mm": 53903,
+    "caja_neta_usd_mm": -44253,
+    "mcap_usd_mm": 329653,
+    "d_sobre_v": 0.1405,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "BMY": {
+   "cierre_20nov": 58.8,
+   "max_52s": 68.64,
+   "min_52s": 47.58,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 65.25,
+    "pt_min": 40.0,
+    "pt_max": 80.0,
+    "n_analistas": 28,
+    "recomendacion": "Hold",
+    "pt_vs_cierre_pct": 10.97,
+    "eps_ajustado_fy_actual": 6.4509,
+    "eps_ajustado_fy_siguiente": 6.6964,
+    "ventas_fy_actual": 50234511540.0,
+    "ventas_fy_siguiente": 48801198060.0,
+    "eps_fy_anterior_real": 6.15,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 9.123,
+    "pe_ttm": 13.029,
+    "peg": null,
+    "ev_ebitda": 8.33,
+    "ev_ventas": 3.04,
+    "beta_5y": 0.186,
+    "div_yield_pct": 4.286,
+    "ev_usd": 152043246863.0,
+    "roic_pct": 23.598,
+    "payout_pct": 55.84,
+    "deuda_ebitda": 2.41
+   },
+   "balance_sa": {
+    "acciones_mm": 2044.1,
+    "deuda_total_usd_mm": 44810,
+    "caja_neta_usd_mm": -31851,
+    "mcap_usd_mm": 120192,
+    "d_sobre_v": 0.2716,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "AMGN": {
+   "cierre_20nov": 435.64,
+   "max_52s": 483.99,
+   "min_52s": 312.39,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 440.78,
+    "pt_min": 230.0,
+    "pt_max": 550.0,
+    "n_analistas": 35,
+    "recomendacion": "Hold",
+    "pt_vs_cierre_pct": 1.18,
+    "eps_ajustado_fy_actual": 23.5527,
+    "eps_ajustado_fy_siguiente": 25.1257,
+    "ventas_fy_actual": 39502088230.0,
+    "ventas_fy_siguiente": 41295538170.0,
+    "eps_fy_anterior_real": 21.84,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 17.989,
+    "pe_ttm": 25.24,
+    "peg": 3.285,
+    "ev_ebitda": 15.68,
+    "ev_ventas": 7.11,
+    "beta_5y": 0.417,
+    "div_yield_pct": 2.314,
+    "ev_usd": 276459681504.0,
+    "roic_pct": 20.475,
+    "payout_pct": 58.4,
+    "deuda_ebitda": 3.02
+   },
+   "balance_sa": {
+    "acciones_mm": 540.9,
+    "deuda_total_usd_mm": 54007,
+    "caja_neta_usd_mm": -40817,
+    "mcap_usd_mm": 235643,
+    "d_sobre_v": 0.1865,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "GILD": {
+   "cierre_20nov": 166.43,
+   "max_52s": 176.58,
+   "min_52s": 116.88,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 175.92,
+    "pt_min": 131.0,
+    "pt_max": 200.0,
+    "n_analistas": 27,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 5.7,
+    "eps_ajustado_fy_actual": -0.9854,
+    "eps_ajustado_fy_siguiente": 10.1491,
+    "ventas_fy_actual": 31382896090.0,
+    "ventas_fy_siguiente": 33603204120.000004,
+    "eps_fy_anterior_real": 8.15,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 19.952,
+    "pe_ttm": null,
+    "peg": 2.742,
+    "ev_ebitda": 15.33,
+    "ev_ventas": 7.25,
+    "beta_5y": 0.372,
+    "div_yield_pct": 1.971,
+    "ev_usd": 224708555528.0,
+    "roic_pct": 36.821,
+    "payout_pct": null,
+    "deuda_ebitda": 1.77
+   },
+   "balance_sa": {
+    "acciones_mm": 1240.3,
+    "deuda_total_usd_mm": 26231,
+    "caja_neta_usd_mm": -18279,
+    "mcap_usd_mm": 206430,
+    "d_sobre_v": 0.1127,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "NVO": {
+   "cierre_20nov": 37.82,
+   "max_52s": 64.16,
+   "min_52s": 35.12,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 45.73,
+    "pt_min": 39.39,
+    "pt_max": 64.02,
+    "n_analistas": 13,
+    "recomendacion": "Hold",
+    "pt_vs_cierre_pct": 20.91,
+    "eps_ajustado_fy_actual": 22.7915,
+    "eps_ajustado_fy_siguiente": 22.5689,
+    "ventas_fy_actual": 310519016100.0,
+    "ventas_fy_siguiente": 313505733670.0,
+    "eps_fy_anterior_real": 23.03,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 11.663,
+    "pe_ttm": 10.377,
+    "peg": null,
+    "ev_ebitda": 6.68,
+    "ev_ventas": 3.63,
+    "beta_5y": 0.368,
+    "div_yield_pct": 3.388,
+    "ev_usd": 184287529235.0,
+    "roic_pct": 48.689,
+    "payout_pct": 35.162,
+    "deuda_ebitda": 0.73
+   },
+   "balance_sa": {
+    "acciones_mm": 4409.2,
+    "deuda_total_usd_mm": 20435,
+    "caja_neta_usd_mm": -13392,
+    "mcap_usd_mm": 166758,
+    "d_sobre_v": 0.1092,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "AZN": {
+   "cierre_20nov": 174.35,
+   "max_52s": 212.71,
+   "min_52s": 153.41,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 209.91,
+    "pt_min": 158.0,
+    "pt_max": 240.0,
+    "n_analistas": 12,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 20.4,
+    "eps_ajustado_fy_actual": 10.2443,
+    "eps_ajustado_fy_siguiente": 11.3733,
+    "ventas_fy_actual": 63376388730.0,
+    "ventas_fy_siguiente": 67393207389.99999,
+    "eps_fy_anterior_real": 9.16,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 15.763,
+    "pe_ttm": 25.067,
+    "peg": null,
+    "ev_ebitda": 14.02,
+    "ev_ventas": 4.78,
+    "beta_5y": 0.155,
+    "div_yield_pct": 1.853,
+    "ev_usd": 298390734149.0,
+    "roic_pct": 17.995,
+    "payout_pct": 46.439,
+    "deuda_ebitda": 1.58
+   },
+   "balance_sa": {
+    "acciones_mm": 1551.0,
+    "deuda_total_usd_mm": 34325,
+    "caja_neta_usd_mm": -26159,
+    "mcap_usd_mm": 270417,
+    "d_sobre_v": 0.1126,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "NVS": {
+   "cierre_20nov": 150.47,
+   "max_52s": 170.46,
+   "min_52s": 126.5,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 157.1,
+    "pt_min": 130.0,
+    "pt_max": 185.0,
+    "n_analistas": 11,
+    "recomendacion": "Hold",
+    "pt_vs_cierre_pct": 4.41,
+    "eps_ajustado_fy_actual": 9.1096,
+    "eps_ajustado_fy_siguiente": 10.0312,
+    "ventas_fy_actual": 57754031120.0,
+    "ventas_fy_siguiente": 61698673730.0,
+    "eps_fy_anterior_real": 8.98,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 15.766,
+    "pe_ttm": 28.967,
+    "peg": null,
+    "ev_ebitda": 13.59,
+    "ev_ventas": 5.7,
+    "beta_5y": 0.453,
+    "div_yield_pct": 2.048,
+    "ev_usd": 327048658713.0,
+    "roic_pct": 19.257,
+    "payout_pct": 59.51,
+    "deuda_ebitda": 1.98
+   },
+   "balance_sa": {
+    "acciones_mm": 1888.6,
+    "deuda_total_usd_mm": 48310,
+    "caja_neta_usd_mm": -39438,
+    "mcap_usd_mm": 284181,
+    "d_sobre_v": 0.1453,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "GSK": {
+   "cierre_20nov": 47.76,
+   "max_52s": 61.7,
+   "min_52s": 45.83,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 59.12,
+    "pt_min": 49.0,
+    "pt_max": 70.0,
+    "n_analistas": 9,
+    "recomendacion": "Hold",
+    "pt_vs_cierre_pct": 23.79,
+    "eps_ajustado_fy_actual": 1.7957,
+    "eps_ajustado_fy_siguiente": 1.8734,
+    "ventas_fy_actual": 33832566240.0,
+    "ventas_fy_siguiente": 35275949280.0,
+    "eps_fy_anterior_real": 1.72,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 10.083,
+    "pe_ttm": 17.115,
+    "peg": null,
+    "ev_ebitda": 8.1,
+    "ev_ventas": 2.77,
+    "beta_5y": 0.28,
+    "div_yield_pct": 3.778,
+    "ev_usd": 123541353186.0,
+    "roic_pct": 25.647,
+    "payout_pct": 64.666,
+    "deuda_ebitda": 2.03
+   },
+   "balance_sa": {
+    "acciones_mm": 4009.0,
+    "deuda_total_usd_mm": 31600,
+    "caja_neta_usd_mm": -27668,
+    "mcap_usd_mm": 191470,
+    "d_sobre_v": 0.1417,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "SNY": {
+   "cierre_20nov": 46.52,
+   "max_52s": 50.61,
+   "min_52s": 39.07,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 54.92,
+    "pt_min": 45.0,
+    "pt_max": 63.0,
+    "n_analistas": 11,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 18.06,
+    "eps_ajustado_fy_actual": 8.9437,
+    "eps_ajustado_fy_siguiente": 9.5281,
+    "ventas_fy_actual": 48572884100.0,
+    "ventas_fy_siguiente": 51861649480.0,
+    "eps_fy_anterior_real": 7.83,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 9.427,
+    "pe_ttm": 24.536,
+    "peg": null,
+    "ev_ebitda": 7.59,
+    "ev_ventas": 2.2,
+    "beta_5y": 0.256,
+    "div_yield_pct": 5.2,
+    "ev_usd": 127339725319.0,
+    "roic_pct": 9.289,
+    "payout_pct": 127.223,
+    "deuda_ebitda": 1.32
+   },
+   "balance_sa": {
+    "acciones_mm": 1200.0,
+    "deuda_total_usd_mm": 22536,
+    "caja_neta_usd_mm": -15761,
+    "mcap_usd_mm": 55824,
+    "d_sobre_v": 0.2876,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "REGN": {
+   "cierre_20nov": 920.69,
+   "max_52s": 991.73,
+   "min_52s": 591.52,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 991.0,
+    "pt_min": 812.0,
+    "pt_max": 1175.0,
+    "n_analistas": 28,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 7.64,
+    "eps_ajustado_fy_actual": 69.0113,
+    "eps_ajustado_fy_siguiente": 71.6589,
+    "ventas_fy_actual": 18814831890.0,
+    "ventas_fy_siguiente": 20167123360.0,
+    "eps_fy_anterior_real": 44.31,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 11.393,
+    "pe_ttm": 20.384,
+    "peg": 0.941,
+    "ev_ebitda": 13.5,
+    "ev_ventas": 4.51,
+    "beta_5y": 0.096,
+    "div_yield_pct": 0.408,
+    "ev_usd": 76237770303.0,
+    "roic_pct": 16.686,
+    "payout_pct": 8.325,
+    "deuda_ebitda": 0.48
+   },
+   "balance_sa": {
+    "acciones_mm": 100.3,
+    "deuda_total_usd_mm": 2707,
+    "caja_neta_usd_mm": 16151,
+    "mcap_usd_mm": 92389,
+    "d_sobre_v": 0.0285,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "VRTX": {
+   "cierre_20nov": 515.02,
+   "max_52s": 568.67,
+   "min_52s": 412.27,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 595.36,
+    "pt_min": 350.0,
+    "pt_max": 725.0,
+    "n_analistas": 32,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 15.6,
+    "eps_ajustado_fy_actual": 18.135,
+    "eps_ajustado_fy_siguiente": 19.9172,
+    "ventas_fy_actual": 13257019050.0,
+    "ventas_fy_siguiente": 14653037680.0,
+    "eps_fy_anterior_real": 18.4,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 27.297,
+    "pe_ttm": 33.121,
+    "peg": 2.235,
+    "ev_ebitda": 24.94,
+    "ev_ventas": 9.82,
+    "beta_5y": 0.28,
+    "div_yield_pct": null,
+    "ev_usd": 127234172863.0,
+    "roic_pct": 23.066,
+    "payout_pct": null,
+    "deuda_ebitda": 1.2
+   },
+   "balance_sa": {
+    "acciones_mm": 253.5,
+    "deuda_total_usd_mm": 6478,
+    "caja_neta_usd_mm": 3343,
+    "mcap_usd_mm": 130577,
+    "d_sobre_v": 0.0473,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "WMT": {
+   "cierre_20nov": 127.95,
+   "max_52s": 135.16,
+   "min_52s": 102.15,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 135.9,
+    "pt_min": 81.0,
+    "pt_max": 155.0,
+    "n_analistas": 44,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 6.21,
+    "eps_ajustado_fy_actual": 2.8856,
+    "eps_ajustado_fy_siguiente": 3.2281,
+    "ventas_fy_actual": 753770313360.0,
+    "ventas_fy_siguiente": 785407607660.0,
+    "eps_fy_anterior_real": 2.64,
+    "fy_actual_cierra": "ene-2027 (FY2027)",
+    "fy_siguiente_cierra": "ene-2028 (FY2028)"
+   },
+   "multiplos": {
+    "pe_fwd": 41.169,
+    "pe_ttm": 48.852,
+    "peg": 4.028,
+    "ev_ebitda": 22.24,
+    "ev_ventas": 1.45,
+    "beta_5y": 0.526,
+    "div_yield_pct": 0.774,
+    "ev_usd": 1082842831536.0,
+    "roic_pct": 15.291,
+    "payout_pct": 37.798,
+    "deuda_ebitda": 1.55
+   },
+   "balance_sa": {
+    "acciones_mm": 7933.7,
+    "deuda_total_usd_mm": 81152,
+    "caja_neta_usd_mm": -67720,
+    "mcap_usd_mm": 1015123,
+    "d_sobre_v": 0.074,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "BJ": {
+   "cierre_20nov": 104.82,
+   "max_52s": 113.35,
+   "min_52s": 83.212,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 110.24,
+    "pt_min": 82.0,
+    "pt_max": 132.0,
+    "n_analistas": 24,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 5.17,
+    "eps_ajustado_fy_actual": 4.7339,
+    "eps_ajustado_fy_siguiente": 5.0724,
+    "ventas_fy_actual": 24273452000.0,
+    "ventas_fy_siguiente": 25617676060.0,
+    "eps_fy_anterior_real": 4.4,
+    "fy_actual_cierra": "ene-2027",
+    "fy_siguiente_cierra": "ene-2028"
+   },
+   "multiplos": {
+    "pe_fwd": 20.863,
+    "pe_ttm": 20.39,
+    "peg": 3.004,
+    "ev_ebitda": 15.45,
+    "ev_ventas": 0.67,
+    "beta_5y": 0.138,
+    "div_yield_pct": null,
+    "ev_usd": 15865701015.0,
+    "roic_pct": 10.63,
+    "payout_pct": null,
+    "deuda_ebitda": 1.88
+   },
+   "balance_sa": {
+    "acciones_mm": 126.3,
+    "deuda_total_usd_mm": 2655,
+    "caja_neta_usd_mm": -2625,
+    "mcap_usd_mm": 13240,
+    "d_sobre_v": 0.167,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "TGT": {
+   "cierre_20nov": 165.83,
+   "max_52s": 171.91,
+   "min_52s": 84.52,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 172.34,
+    "pt_min": 130.0,
+    "pt_max": 210.0,
+    "n_analistas": 39,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 3.93,
+    "eps_ajustado_fy_actual": 11.0375,
+    "eps_ajustado_fy_siguiente": 9.7677,
+    "ventas_fy_actual": 111050403880.0,
+    "ventas_fy_siguiente": 115000085330.0,
+    "eps_fy_anterior_real": 7.57,
+    "fy_actual_cierra": "ene-2027",
+    "fy_siguiente_cierra": "ene-2028"
+   },
+   "multiplos": {
+    "pe_fwd": 17.202,
+    "pe_ttm": 15.41,
+    "peg": 2.431,
+    "ev_ebitda": 10.07,
+    "ev_ventas": 0.82,
+    "beta_5y": 0.933,
+    "div_yield_pct": 2.798,
+    "ev_usd": 89661982532.0,
+    "roic_pct": 13.462,
+    "payout_pct": 43.117,
+    "deuda_ebitda": 1.98
+   },
+   "balance_sa": {
+    "acciones_mm": 452.7,
+    "deuda_total_usd_mm": 19049,
+    "caja_neta_usd_mm": -14585,
+    "mcap_usd_mm": 75077,
+    "d_sobre_v": 0.2024,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "DG": {
+   "cierre_20nov": 130.53,
+   "max_52s": 158.23,
+   "min_52s": 99.57,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 142.0,
+    "pt_min": 90.0,
+    "pt_max": 178.0,
+    "n_analistas": 32,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 8.79,
+    "eps_ajustado_fy_actual": 7.8969,
+    "eps_ajustado_fy_siguiente": 8.3008,
+    "ventas_fy_actual": 44548316310.0,
+    "ventas_fy_siguiente": 46347145660.0,
+    "eps_fy_anterior_real": 6.85,
+    "fy_actual_cierra": "ene-2027",
+    "fy_siguiente_cierra": "ene-2028"
+   },
+   "multiplos": {
+    "pe_fwd": 16.317,
+    "pe_ttm": 16.948,
+    "peg": 1.432,
+    "ev_ebitda": 12.0,
+    "ev_ventas": 0.98,
+    "beta_5y": 0.191,
+    "div_yield_pct": 1.808,
+    "ev_usd": 42980619599.0,
+    "roic_pct": 8.147,
+    "payout_pct": 30.642,
+    "deuda_ebitda": 2.62
+   },
+   "balance_sa": {
+    "acciones_mm": 220.6,
+    "deuda_total_usd_mm": 15773,
+    "caja_neta_usd_mm": -14184,
+    "mcap_usd_mm": 28797,
+    "d_sobre_v": 0.3539,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "DLTR": {
+   "cierre_20nov": 137.96,
+   "max_52s": 148.54,
+   "min_52s": 85.88,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 137.67,
+    "pt_min": 98.0,
+    "pt_max": 165.0,
+    "n_analistas": 30,
+    "recomendacion": "Hold",
+    "pt_vs_cierre_pct": -0.21,
+    "eps_ajustado_fy_actual": 7.9288,
+    "eps_ajustado_fy_siguiente": 7.8869,
+    "ventas_fy_actual": 20684358370.0,
+    "ventas_fy_siguiente": 21939232720.0,
+    "eps_fy_anterior_real": 5.75,
+    "fy_actual_cierra": "ene-2027",
+    "fy_siguiente_cierra": "ene-2028"
+   },
+   "multiplos": {
+    "pe_fwd": 20.003,
+    "pe_ttm": 16.924,
+    "peg": 1.401,
+    "ev_ebitda": 12.98,
+    "ev_ventas": 1.62,
+    "beta_5y": 0.686,
+    "div_yield_pct": null,
+    "ev_usd": 32498176050.0,
+    "roic_pct": 13.57,
+    "payout_pct": null,
+    "deuda_ebitda": 1.88
+   },
+   "balance_sa": {
+    "acciones_mm": 187.6,
+    "deuda_total_usd_mm": 7671,
+    "caja_neta_usd_mm": -6613,
+    "mcap_usd_mm": 25885,
+    "d_sobre_v": 0.2286,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "KR": {
+   "cierre_20nov": 68.44,
+   "max_52s": 76.58,
+   "min_52s": 54.15,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 69.96,
+    "pt_min": 57.0,
+    "pt_max": 85.0,
+    "n_analistas": 25,
+    "recomendacion": "Buy",
+    "pt_vs_cierre_pct": 2.22,
+    "eps_ajustado_fy_actual": 5.1899,
+    "eps_ajustado_fy_siguiente": 5.4837,
+    "ventas_fy_actual": 150773036300.0,
+    "ventas_fy_siguiente": 153134640780.0,
+    "eps_fy_anterior_real": 4.85,
+    "fy_actual_cierra": "ene-2027",
+    "fy_siguiente_cierra": "ene-2028"
+   },
+   "multiplos": {
+    "pe_fwd": 12.768,
+    "pe_ttm": 39.775,
+    "peg": 1.473,
+    "ev_ebitda": 7.82,
+    "ev_ventas": 0.42,
+    "beta_5y": 0.357,
+    "div_yield_pct": 2.279,
+    "ev_usd": 62901890628.0,
+    "roic_pct": 13.872,
+    "payout_pct": 90.662,
+    "deuda_ebitda": 2.71
+   },
+   "balance_sa": {
+    "acciones_mm": 590.6,
+    "deuda_total_usd_mm": 24158,
+    "caja_neta_usd_mm": -22482,
+    "mcap_usd_mm": 40420,
+    "d_sobre_v": 0.3741,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  },
+  "AMZN": {
+   "cierre_20nov": 246.82,
+   "max_52s": 287.2,
+   "min_52s": 196.0,
+   "moneda": "USD",
+   "consenso": {
+    "pt_prom": 326.51,
+    "pt_min": 230.0,
+    "pt_max": 405.0,
+    "n_analistas": 62,
+    "recomendacion": "Strong Buy",
+    "pt_vs_cierre_pct": 32.29,
+    "eps_ajustado_fy_actual": 9.6025,
+    "eps_ajustado_fy_siguiente": 10.9261,
+    "ventas_fy_actual": 829167641140.0,
+    "ventas_fy_siguiente": 959664976340.0,
+    "eps_fy_anterior_real": 7.17,
+    "fy_actual_cierra": "dic-2026",
+    "fy_siguiente_cierra": "dic-2027"
+   },
+   "multiplos": {
+    "pe_fwd": 24.958,
+    "pe_ttm": 19.947,
+    "peg": 1.057,
+    "ev_ebitda": 15.56,
+    "ev_ventas": 3.59,
+    "beta_5y": 1.503,
+    "div_yield_pct": null,
+    "ev_usd": 2859513796687.0,
+    "roic_pct": 10.913,
+    "payout_pct": null,
+    "deuda_ebitda": 1.5
+   },
+   "balance_sa": {
+    "acciones_mm": 10813.1,
+    "deuda_total_usd_mm": 304841,
+    "caja_neta_usd_mm": -190615,
+    "mcap_usd_mm": 2668899,
+    "d_sobre_v": 0.1025,
+    "fuente": "stockanalysis.com /statistics (último balance reportado), bajado 22-nov-2026; mcap = acciones x cierre 20-nov"
+   }
+  }
+ }
+}

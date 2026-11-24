@@ -31,12 +31,14 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <!-- Mercados · diseño Terminal: gráfico con TradingView Lightweight Charts (v5) -->
   <link rel="stylesheet" href="assets/mercados/terminal.css?v=20261026a" />
-<link rel="stylesheet" href="assets/pulso/pulso.css?v=20261010z" />
-<link rel="stylesheet" href="assets/noticias/noticias.css?v=20261010z" />
+<link rel="stylesheet" href="assets/pulso/pulso.css?v=20261120a" />
+<link rel="stylesheet" href="assets/comunidad/wa.css?v=20261112a" />
+<link rel="stylesheet" href="assets/home/lo-ultimo.css?v=20261120g" />
+<link rel="stylesheet" href="assets/noticias/noticias.css?v=20261112" />
 <link rel="stylesheet" href="assets/analistas/analistas.css?v=20261030" />
 <link rel="stylesheet" href="assets/portfolio/ratios.css?v=20261012" />
 <link rel="stylesheet" href="assets/pro/pro.css?v=20261028l" />
-<link rel="stylesheet" href="assets/comunidad/chat.css?v=20261028m" />
+<link rel="stylesheet" href="assets/comunidad/chat.css?v=20261119b" />
 <link rel="stylesheet" href="assets/asesoria/asesoria.css?v=20261103b" />
 <link rel="stylesheet" href="assets/calendario/calendario.css?v=20261102b" />
 <link rel="stylesheet" href="assets/informes/estanteria.css?v=20261103d" />
@@ -3932,14 +3934,14 @@
   /* hero */
   .htx-hero {
     max-width:1280px; margin:0 auto;
-    display:grid; grid-template-columns:1.15fr .85fr; gap:64px; align-items:center;
-    padding:96px 32px 80px;
+    display:grid; grid-template-columns:.8fr 1.2fr; gap:56px; align-items:start;
+    padding:56px 32px 72px;
   }
   .htx-hero__lead { padding:0; min-width:0; }
   .htx-metric { min-width:0; }
   .htx-h1 {
     margin:0 0 26px; font-family:var(--htx-serif); font-weight:400;
-    font-size:clamp(40px,4.5vw,64px); line-height:1.04; letter-spacing:-.012em;
+    font-size:clamp(38px,3.8vw,56px); line-height:1.04; letter-spacing:-.012em;
     color:var(--htx-ink); max-width:none; text-wrap:balance;
   }
   .htx-h1 em { font-style:normal; color:var(--htx-amber-ink); display:block; }
@@ -4160,34 +4162,15 @@
     <div class="htx-hero">
       <div class="htx-hero__lead">
         <h1 class="htx-h1">Tu mundo financiero, <em>en un solo lugar.</em></h1><script src="assets/aurora/aurora.js?v=20261010z"></script>
-        <div class="htx-cta">
-          <a class="htx-btn" href="#inversiones" data-tab-target="inversiones">Ver los informes</a>
-          <a class="htx-ghost" href="#portfolio" data-tab-target="portfolio">Probar el Portfolio</a>
-        </div>
         <!-- S&P 500 con 1D / 1M / 1A (assets/pulso/pulso.js) -->
         <div class="htx-spx" id="htxSpx"></div>
+        <!-- extras del lado izquierdo según el estilo (assets/home/lo-ultimo.js) -->
+        <div class="lu-left" id="luLeft"></div>
       </div>
 
-      <!-- Pulso del día: cotizaciones de Argentina y EE.UU. + titulares; "Ampliar" baja la cortina (assets/pulso/pulso.js) -->
-      <aside class="pls" id="plsCard" aria-label="Pulso del día"></aside>
-    </div>
-
-    <!-- anuncio: convocatoria de Análisis e informes (analistas invitados). Estilos en assets/analistas/analistas.css -->
-    <div class="htx-an" role="region" aria-label="Convocatoria de analistas">
-      <div class="htx-an__in">
-        <div class="htx-an__a">
-          <span class="htx-an__k"><i></i>Convocatoria abierta · Análisis e informes</span>
-          <h2 class="htx-an__t">Buscamos <em>analistas.</em></h2>
-          <p class="htx-an__s">Publicá tus análisis e informes en Manfredi Investment. Importa el contenido, no el título.</p>
-        </div>
-        <div class="htx-an__b">
-          <div class="htx-an__cupo"><b>5 a 10</b><span>lugares en la<br>primera convocatoria</span></div>
-          <div class="htx-an__acc">
-            <a class="htx-an__gold" data-postular href="mailto:manfredi.investment@gmail.com?subject=Quiero%20publicar%20en%20Manfredi&amp;body=Nombre%3A%0ALinkedIn%20o%20redes%3A%0ATemas%20que%20analiz%C3%A1s%3A%0ALink%20a%20un%20an%C3%A1lisis%20tuyo%3A%0A">Postulate</a>
-            <a class="htx-an__more" href="#analisis">Conocé la sección<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></a>
-          </div>
-        </div>
-      </div>
+      <!-- Lo último: noticia del día con foto + último análisis de invitado + último informe + canal de WhatsApp
+           en una línea (assets/home/lo-ultimo.{css,js}). Reemplazó al cuadro grande del canal (#waCard). -->
+      <section class="lu" id="luFront" aria-label="Lo último"></section>
     </div>
 
     <!-- membresia: video "la membresía en la app" + 3 planes simétricos (assets/membresia/membresia.{css,js}; video en videos/membresia-app) -->
@@ -4253,157 +4236,6 @@
       </section>
     </div>
 
-    <!-- mercados ahora -->
-    <div class="htx-markets">
-      <div class="htx-markets__head">
-        <span>Mercados <span class="htx-live">En vivo</span></span>
-        <a href="#mercados" data-tab-target="mercados">Ver todos los mercados</a>
-      </div>
-      <div class="htx-markets__grid">
-        <div class="htx-mk">
-          <div class="htx-mk__top"><span class="htx-mk__tk">MERV</span><span class="htx-mk__nm">Merval &middot; BYMA</span></div>
-          <div class="htx-mk__val htx-num" id="hspot-merv-price">&mdash;</div>
-          <div class="htx-mk__chg"><span id="hspot-merv-chg">&mdash;</span></div>
-          <svg class="htx-mk__spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,28 25,24 50,26 75,18 100,20 125,12 150,14 175,8 200,6" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-        </div>
-        <div class="htx-mk">
-          <div class="htx-mk__top"><span class="htx-mk__tk">NDX</span><span class="htx-mk__nm">Nasdaq &middot; cierre</span></div>
-          <div class="htx-mk__val htx-num" id="htx-ndx-price">&mdash;</div>
-          <div class="htx-mk__chg"><span id="htx-ndx-chg">&mdash;</span></div>
-          <svg class="htx-mk__spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,24 25,21 50,25 75,14 100,17 125,10 150,12 175,7 200,6" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-        </div>
-        <div class="htx-mk">
-          <div class="htx-mk__top"><span class="htx-mk__tk">BTC</span><span class="htx-mk__nm">Bitcoin</span></div>
-          <div class="htx-mk__val htx-num" id="hspot-btc-price">&mdash;</div>
-          <div class="htx-mk__chg"><span id="hspot-btc-chg">&mdash;</span></div>
-          <svg class="htx-mk__spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,30 25,24 50,27 75,19 100,15 125,17 150,10 175,12 200,5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-        </div>
-        <div class="htx-mk">
-          <div class="htx-mk__top"><span class="htx-mk__tk">UST 10Y</span><span class="htx-mk__nm">Treasury &middot; yield</span></div>
-          <div class="htx-mk__val htx-num" id="htx-ust10-price">&mdash;</div>
-          <div class="htx-mk__chg"><span id="htx-ust10-note">Rendimiento a 10 a&ntilde;os</span></div>
-          <svg class="htx-mk__spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,10 25,12 50,9 75,14 100,13 125,18 150,16 175,20 200,19" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-        </div>
-        <div class="htx-mk">
-          <div class="htx-mk__top"><span class="htx-mk__tk">ORO</span><span class="htx-mk__nm">XAU &middot; onza troy</span></div>
-          <div class="htx-mk__val htx-num" id="hspot-oro-price">&mdash;</div>
-          <div class="htx-mk__chg"><span id="hspot-oro-chg">&mdash;</span></div>
-          <svg class="htx-mk__spark" id="hspot-oro-spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,26 25,24 50,20 75,22 100,16 125,14 150,15 175,9 200,7" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- bento -->
-    <div class="htx-bento">
-      <div class="htx-tile htx-tile--informes">
-        <div class="htx-tile__head"><span class="htx-tile__title">Informes institucionales</span></div>
-        <!-- Lista fija: los 7 primeros informes. No sumar m&aacute;s (mantiene la home compacta). -->
-        <div class="htx-inf">
-          <a class="htx-inf__row" href="informes/msft.html" target="_blank" rel="noopener">
-            <img class="htx-inf__logo" src="assets/logos/msft.png" alt="" width="28" height="28">
-            <span class="htx-inf__tk">MSFT</span>
-            <span class="htx-inf__nm">Microsoft Corporation<span class="free">Gratis</span></span>
-            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/amd.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AMD')">
-            <img class="htx-inf__logo" src="assets/logos/amd.png" alt="" width="28" height="28">
-            <span class="htx-inf__tk">AMD</span>
-            <span class="htx-inf__nm">Advanced Micro Devices, Inc.</span>
-            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/pltr.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'PLTR')">
-            <img class="htx-inf__logo" src="assets/logos/pltr.png" alt="" width="28" height="28">
-            <span class="htx-inf__tk">PLTR</span>
-            <span class="htx-inf__nm">Palantir Technologies Inc.</span>
-            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/uber.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'UBER')">
-            <img class="htx-inf__logo" src="assets/logos/uber.png" alt="" width="28" height="28">
-            <span class="htx-inf__tk">UBER</span>
-            <span class="htx-inf__nm">Uber Technologies, Inc.</span>
-            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/intc.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'INTC')">
-            <img class="htx-inf__logo" src="assets/logos/intc.png" alt="" width="28" height="28">
-            <span class="htx-inf__tk">INTC</span>
-            <span class="htx-inf__nm">Intel Corporation</span>
-            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/mu.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MU')">
-            <img class="htx-inf__logo" src="assets/logos/mu.png" alt="" width="28" height="28">
-            <span class="htx-inf__tk">MU</span>
-            <span class="htx-inf__nm">Micron Technology, Inc.</span>
-            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="htx-inf__row" href="informes/meli.html" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'MELI')">
-            <img class="htx-inf__logo" src="assets/logos/meli.png" alt="" width="28" height="28">
-            <span class="htx-inf__tk">MELI</span>
-            <span class="htx-inf__nm">MercadoLibre, Inc.</span>
-            <span class="htx-inf__go" aria-hidden="true">&rarr;</span>
-          </a>
-          <!-- FIJO: 7 informes destacados en la home. NO agregar filas nuevas ac&aacute;.
-               Los informes nuevos van solo al picks-list de la secci&oacute;n #inversiones. -->
-        </div>
-        <a class="htx-tile__link" href="#inversiones" data-tab-target="inversiones">Ver todos los informes</a>
-      </div>
-
-      <div class="htx-tile htx-tile--pf">
-        <div class="htx-tile__head"><span class="htx-tile__title">Manfredi Portfolio</span></div>
-        <div class="htx-pf__tabs">
-          <button type="button">1S</button><button type="button" class="on">1M</button><button type="button">YTD</button><button type="button">1A</button>
-        </div>
-        <div class="htx-pf__stat">
-          <span class="htx-pf__big" id="htxPfBig">&hellip;</span>
-          <span class="htx-pf__bench" id="htxPfBench">Calculando con datos hist&oacute;ricos&hellip;</span>
-        </div>
-        <svg class="htx-pf__chart" id="htxPfChart" viewBox="0 0 460 132" preserveAspectRatio="none" aria-hidden="true">
-          <polyline points="0,66 115,64 230,62 345,60 460,58" fill="none" stroke="rgba(232,238,246,.18)" stroke-width="1.5" />
-        </svg>
-        <div class="htx-pf__legend">
-          <span><i style="background:#f2c94c;"></i>Manfredi</span>
-          <span><i style="background:rgba(232,238,246,.4);"></i>S&amp;P 500</span>
-        </div>
-        <div class="htx-pf__links">
-          <a class="htx-tile__link" href="#portfolio" data-tab-target="portfolio">Ver el Manfredi Portfolio</a>
-          <a class="htx-tile__link" href="#portfolio" data-tab-target="portfolio">Armar el m&iacute;o</a>
-        </div>
-      </div>
-
-      <div class="htx-tile htx-tile--cal">
-        <div class="htx-tile__head">
-          <span class="htx-tile__title">Calendario econ&oacute;mico</span>
-        </div>
-        <div class="htx-cal2">
-          <div class="htx-cal2__col">
-            <div class="htx-cal2__legend htx-cal2__legend--news">
-              <span id="htxCalEcoWeek">Cargando semana&hellip;</span>
-            </div>
-            <div id="htxCalEcoList" class="htx-cal2__evs">
-              <div class="htx-cal2__newsempty">Cargando agenda&hellip;</div>
-            </div>
-            <a class="htx-tile__link" href="#calendario" data-tab-target="calendario">Ver calendario completo</a>
-          </div>
-
-          <div class="htx-cal2__col">
-            <div class="htx-cal2__legend htx-cal2__legend--news">
-              <span>Noticias &middot; reportes diarios</span>
-              <span class="htx-cal2__newsasof" id="htxCalNewsAsof"></span>
-            </div>
-            <div id="htxCalNewsList" class="htx-cal2__evs">
-              <div class="htx-cal2__newsempty">Cargando noticias&hellip;</div>
-            </div>
-            <a class="htx-tile__link" href="#reportes" data-tab-target="informes">Ver reportes diarios</a>
-          </div>
-        </div>
-        <div class="htx-cal2__legendbar">
-          <span><i style="background:var(--htx-data);"></i>Argentina</span>
-          <span><i style="background:#9fb4c9;"></i>Estados Unidos</span>
-          <span><i style="background:var(--htx-amber);"></i>Alta relevancia de mercado</span>
-        </div>
-        <p class="htx-pf__note">Agenda econ&oacute;mica y noticias en vivo &middot; se actualiza junto con el calendario completo</p>
-      </div>
-    </div>
-
   </section>
   <script src="assets/membresia/membresia.js?v=20261103a" defer></script>
   <script src="assets/promo/wall.js?v=20261010z" defer></script>
@@ -4412,17 +4244,19 @@
   <!-- bienvenida: presentación de la página para quien entra por primera vez sin cuenta (assets/bienvenida/bienvenida.js, Shadow DOM) -->
   <script src="assets/bienvenida/bienvenida.js" defer></script>
   <!-- Pulso del día + gráfico del S&P 500 del hero -->
-  <script src="assets/pulso/pulso.js?v=20261010z" defer></script>
+  <script src="assets/pulso/pulso.js?v=20261120a" defer></script>
   <!-- Pestaña Noticias (usa window.MIPulso de pulso.js: va después) -->
-  <script src="assets/noticias/noticias.js?v=20261015" defer></script>
+  <script src="assets/noticias/noticias.js?v=20261112b" defer></script>
   <script src="assets/portfolio/ratios.js?v=20261012" defer></script>
   <script src="assets/analistas/api.js?v=20261030" defer></script>
   <script src="assets/analistas/social.js?v=20261012soc" defer></script>
-  <script src="assets/analistas/analistas.js?v=20261029a" defer></script>
+  <script src="assets/analistas/analistas.js?v=20261112" defer></script>
   <script src="assets/analistas/revision.js?v=20261028a" defer></script>
   <script src="assets/analistas/autor.js?v=20261030" defer></script>
-  <script src="assets/comunidad/tarjeta.js?v=20261028m" defer></script>
-  <script src="assets/comunidad/chat.js?v=20261028n" defer></script>
+  <script src="assets/comunidad/tarjeta.js?v=20261123a" defer></script>
+  <script src="assets/comunidad/wa.js?v=20261123b" defer></script>
+  <script src="assets/home/lo-ultimo.js?v=20261123b" defer></script>
+  <script src="assets/comunidad/chat.js?v=20261123b" defer></script>
   <script src="assets/pro/pro.js?v=20261028j" defer></script>
   <script src="assets/asesoria/asesoria.js?v=20261103a" defer></script>
   <!-- cartel con los pasos para postularse como analista -->
@@ -4695,8 +4529,10 @@
         </div>
         <button type="button" class="nt-more" id="ntMore" hidden>Ver más noticias</button>
       </div>
-      <aside class="nt-rail" aria-label="Cotizaciones">
+      <aside class="nt-rail" aria-label="Cotizaciones y análisis">
         <div class="nt-card" id="ntQuotes"><h3 class="nt-card__h">Cotizaciones</h3><span class="nt-skel" style="height:160px"></span></div>
+        <!-- últimos análisis de los analistas invitados (lo arma assets/analistas/analistas.js) -->
+        <section class="nt-card na" id="ntAnalisis" aria-label="Últimos análisis" hidden></section>
       </aside>
     </div>
   </section>
@@ -4881,7 +4717,7 @@
           <div class="inv-panel-progress">10 de 10 con informe completo</div>
           <div class="sector-cards">
             <div class="pick-card">
-              <div class="pick-accent neutral"></div>
+              <div class="pick-accent up"></div>
               <img class="pick-logo" src="assets/logos/nvda.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">NVDA</span><span class="pick-tag pick-tag-us">USA &middot; Semis</span></div>
@@ -4921,7 +4757,7 @@
               <div class="pick-right"><a href="informes/avgo.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'AVGO')">Ver análisis &rarr;</a></div>
             </div>
             <div class="pick-card">
-              <div class="pick-accent down"></div>
+              <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/arm.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">ARM</span><span class="pick-tag pick-tag-us">USA &middot; Semis</span></div>
@@ -5196,8 +5032,18 @@
         </div>
 
         <div class="inv-panel active" data-sector-panel="software">
-          <div class="inv-panel-progress">10 de 10 con informe completo</div>
+          <div class="inv-panel-progress">11 de 11 con informe completo</div>
           <div class="sector-cards">
+            <div class="pick-card">
+              <div class="pick-accent up"></div>
+              <img class="pick-logo" src="assets/logos/ant.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
+              <div class="pick-info">
+                <div class="pick-row1"><span class="pick-ticker">ANT</span><span class="pick-tag pick-tag-us">USA &middot; IA</span></div>
+                <div class="pick-name">Anthropic, PBC</div>
+              </div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,30 15,28 30,24 45,20 60,15 75,10 90,6" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/ant.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ANT')">Ver análisis &rarr;</a></div>
+            </div>
             <div class="pick-card">
               <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/msft.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
@@ -5279,7 +5125,7 @@
               <div class="pick-right"><a href="informes/orcl.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ORCL')">Ver análisis &rarr;</a></div>
             </div>
             <div class="pick-card">
-              <div class="pick-accent neutral"></div>
+              <div class="pick-accent up"></div>
               <img class="pick-logo" src="assets/logos/intu.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">INTU</span><span class="pick-tag pick-tag-us">USA &middot; Software</span></div>
@@ -5408,7 +5254,7 @@
         </div>
 
         <div class="inv-panel" data-sector-panel="defensivos">
-          <div class="inv-panel-progress">7 de 10 con informe completo</div>
+          <div class="inv-panel-progress">10 de 10 con informe completo</div>
           <div class="sector-cards">
             <div class="pick-card">
               <div class="pick-accent neutral"></div>
@@ -5447,7 +5293,7 @@
                 <div class="pick-row1"><span class="pick-ticker">UNH</span><span class="pick-tag pick-tag-us">USA &middot; Salud</span></div>
                 <div class="pick-name">UnitedHealth Group Incorporated</div>
               </div>
-              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,34 15,15 30,13 45,6 60,6 75,11 90,13" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,26 15,6 30,7 45,21 60,34 75,11 90,12" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/unh.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'UNH')">Ver análisis &rarr;</a></div>
             </div>
             <div class="pick-card">
@@ -5480,35 +5326,35 @@
               <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,6 15,18 30,26 45,22 60,21 75,33 90,34" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
               <div class="pick-right"><a href="informes/pep.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'PEP')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card">
+              <div class="pick-accent down"></div>
               <img class="pick-logo" src="assets/logos/cost.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">COST</span><span class="pick-tag pick-tag-us">USA &middot; Consumo</span></div>
                 <div class="pick-name">Costco Wholesale Corporation</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,27 15,30 30,28 45,29 60,34 75,19 90,6" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/cost.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'COST')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card">
+              <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/pfe.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">PFE</span><span class="pick-tag pick-tag-us">USA &middot; Salud</span></div>
                 <div class="pick-name">Pfizer Inc.</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,25 15,34 30,30 45,15 60,15 75,6 90,20" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/pfe.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'PFE')">Ver análisis &rarr;</a></div>
             </div>
-            <div class="pick-card pick-card--soon">
-              <div class="pick-accent soon"></div>
+            <div class="pick-card">
+              <div class="pick-accent neutral"></div>
               <img class="pick-logo" src="assets/logos/abbv.png" alt="" width="40" height="40" loading="lazy" onerror="this.outerHTML='&lt;svg class=&quot;pick-logo pick-logo--mi&quot; aria-hidden=&quot;true&quot;&gt;&lt;use href=&quot;#miMark&quot;/&gt;&lt;/svg&gt;'">
               <div class="pick-info">
                 <div class="pick-row1"><span class="pick-ticker">ABBV</span><span class="pick-tag pick-tag-us">USA &middot; Salud</span></div>
                 <div class="pick-name">AbbVie Inc.</div>
               </div>
-              <div class="pick-sparkline" style="width:90px;height:40px;"></div>
-              <div class="pick-right"><span class="pick-sentiment soon">Próximamente</span></div>
+              <div class="pick-sparkline"><svg width="90" height="40" viewBox="0 0 90 40"><polyline points="0,34 15,22 30,22 45,20 60,18 75,6 90,9" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+              <div class="pick-right"><a href="informes/abbv.html" class="pick-btn" target="_blank" rel="noopener" onclick="return miGateAnalysis(event,'ABBV')">Ver análisis &rarr;</a></div>
             </div>
           </div>
         </div>
@@ -12500,6 +12346,20 @@
   // ─── Modal de detalle: click en cualquier activo (tabla o buscador) ───────
   const MKT_DETAIL_CACHE = {};
 
+  // Desde otras secciones (los $TICKER del chat): abre Mercados con el detalle de ese activo.
+  // Espera a que lleguen los datos de Mercados (hasta 15 s) si todavía no estaban.
+  window.mktAbrirActivo = function (symbol, category) {
+    if (location.hash !== '#mercados') location.hash = 'mercados';
+    const t0 = Date.now();
+    (function intentar() {
+      const cat = MERCADOS && MERCADOS.categorias[category];
+      const item = cat && cat.items.find(i => i.symbol === symbol);
+      if (item) { openAssetModal(item, category, cat.currency); return; }
+      if (cat || Date.now() - t0 > 15000) { const inp = document.getElementById('mktSearchInput'); if (inp) { inp.value = symbol; inp.dispatchEvent(new Event('input', { bubbles: true })); } return; }
+      setTimeout(intentar, 200);
+    })();
+  };
+
   function mktCategoryLabel(key) {
     const c = MKT_CATEGORIES.find(c => c.key === key);
     return c ? c.label : key;
@@ -18176,7 +18036,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
 <!-- Pulido anti-look-IA (feat/rediseno-anti-ia): capa global, va al final para ganar la cascada -->
 <link rel="stylesheet" href="assets/polish/polish.css?v=20261102" />
   <!-- Fondo Aurora de todo el sitio (al final para ganarle a los estilos de cada sección; el título lo anima assets/aurora/aurora.js, junto al h1) -->
-  <link rel="stylesheet" href="assets/aurora/aurora.css?v=20261010z" />
+  <link rel="stylesheet" href="assets/aurora/aurora.css?v=20261120a" />
   <link rel="stylesheet" href="assets/university/university.css?v=20261027a" />
   <script defer src="assets/university/university.js?v=20261027a"></script>
   

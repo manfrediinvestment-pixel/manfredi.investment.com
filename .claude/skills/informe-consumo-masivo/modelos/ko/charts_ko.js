@@ -57,16 +57,16 @@
     });
 
     drawHBars(document.getElementById('compsChart'), {
-      labels:['Monster Beverage','Coca-Cola','Colgate-Palmolive','Philip Morris','Procter & Gamble','PepsiCo','Keurig Dr Pepper'],
-      values:[{{peers.MNST.pe|js2}},{{pe_ntm_now|js2}},{{peers.CL.pe|js2}},{{peers.PM.pe|js2}},{{peers.PG.pe|js2}},{{peers.PEP.pe|js2}},{{peers.KDP.pe|js2}}],
-      colors:[PALETTE.blueLight,PALETTE.navy,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight,PALETTE.blueLight],
+      labels:{{js_comps_labels}},
+      values:{{js_comps_vals}},
+      colors:{{js_comps_colors}},
       padL:170,
       valueFmt:function(v){ return v.toFixed(1)+'x'; }
     });
 
     drawVBars(document.getElementById('estChart'), {
-      labels:['2024 real','2025 real','2026 guía','2027 consenso','2028 consenso'],
-      values:[2.88,{{eps25|js2}},{{guide_mid|js2}},{{c27|js2}},{{c28|js2}}],
+      labels:['2024 real','2025 real','2026 consenso','2027 consenso','2028 consenso'],
+      values:[2.88,{{eps25|js2}},{{c26|js2}},{{c27|js2}},{{c28|js2}}],
       colors:[PALETTE.pale,PALETTE.blueLight,PALETTE.navy,PALETTE.blue,PALETTE.blueLight],
       valueFmt:function(v){ return '$'+v.toFixed(2); }
     });

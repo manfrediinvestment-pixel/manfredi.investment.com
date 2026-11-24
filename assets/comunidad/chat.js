@@ -15,13 +15,15 @@
   if (window.ProChat) return;
   var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   var API = LOCAL ? 'http://localhost:8790' : 'https://manfredi-comunidad.nachito2502.workers.dev';
-  // Link de invitación de la Comunidad de WhatsApp (vacío = "Muy pronto").
-  var WA_COMUNIDAD = '';
+  // Link de invitación de la Comunidad de WhatsApp: vive en assets/comunidad/wa.js (vacío = "Muy pronto").
+  var WA_COMUNIDAD = window.MI_WA_COMUNIDAD || '';
+  // Los chats de Manfredi Pro todavía no abren: se ven con el cartel "Próximamente".
+  var PRO_PRONTO = true;
   var EMOJIS = ['👍', '🔥', '📈', '📉', '🤔'];
   var COLORES = ['#e9d3a0', '#8ec5ff', '#9be3c4', '#f0a8b8', '#c9b6ff', '#ffc58f'];
   var SALAS = {
     gratis: { nombre: 'Mercados', tag: 'Gratis', sub: 'Comunidad abierta · resúmenes antes y después de Wall Street',
-      fijado: 'Resúmenes del mercado media hora antes de que abra Wall Street y media hora después del cierre. Las opiniones de los miembros no son recomendaciones de inversión. Nadie del equipo te va a escribir por privado ni a pedirte dinero.' },
+      fijado: 'Resúmenes del mercado un minuto después de que abre Wall Street, con precios en vivo, y media hora después del cierre. Las opiniones de los miembros no son recomendaciones de inversión. Nadie del equipo te va a escribir por privado ni a pedirte dinero.' },
     ideas: { nombre: 'Ideas de Ignacio', pro: true, soloCreador: true, sub: 'Publica solo Ignacio · ideas, seguimientos y cierres',
       fijado: 'Las ideas son análisis generales: no consideran tu situación particular. Antes de operar, mirá si encajan con tu perfil.' },
     socios: { nombre: 'Charla de socios', pro: true, sub: 'Solo socios Pro',
@@ -31,7 +33,21 @@
   };
   var PRO = ['ideas', 'socios', 'preguntas'];
   var TODAS = ['gratis'].concat(PRO);
+  // Stickers: catálogo propio (assets/comunidad/stickers/). Viajan como un mensaje de texto con la forma
+  // [sticker:<id>]; el chat los dibuja sin burbuja y, si tienen href, tocarlos abre el informe.
+  var STICKERS = [
+    { id: 'informe-ant', src: '/assets/comunidad/stickers/informe-ant.webp', alt: 'Informe de Anthropic', href: '/informes/ant' }
+  ];
+  function stickerDe(m) {
+    var k = m && m.tipo === 'texto' && /^\[sticker:([a-z0-9-]{1,40})\]$/.exec((m.texto || '').trim());
+    return k ? STICKERS.filter(function (x) { return x.id === k[1]; })[0] || null : null;
+  }
+  function informeDe(texto) {
+    var k = /manfredinvestment\.com\/informes\/([a-z0-9.-]+)/i.exec(texto || '');
+    return k ? STICKERS.filter(function (x) { return x.href === '/informes/' + k[1].toLowerCase().replace(/\.html$/, ''); })[0] || null : null;
+  }
   var IC = {
+    stk: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 12.5V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h5.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12.5 20v-4.5a3 3 0 0 1 3-3H20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="9" cy="10" r="1.1" fill="currentColor"/><circle cx="14" cy="10" r="1.1" fill="currentColor"/></svg>',
     send: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12l16-8-6 16-2.5-6.5z" fill="currentColor"/></svg>',
     back: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     pin: '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M9 3h6l-1 6 3 3H7l3-3zM12 12v9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -40,8 +56,11 @@
     trash: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     share: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M3.5 20.5l1.3-4.2A8.5 8.5 0 1 1 8 19.4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8.6c0 3.3 2.9 6.4 6.4 6.4l1.1-1.6-2-1-1 1c-1.2-.5-2.2-1.5-2.7-2.7l1-1-1-2z" fill="currentColor"/></svg>',
     check: '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 2l2.4 2.2 3.2-.4.9 3.1 2.9 1.5-1 3.1 1 3.1-2.9 1.5-.9 3.1-3.2-.4L12 22l-2.4-2.2-3.2.4-.9-3.1-2.9-1.5 1-3.1-1-3.1 2.9-1.5.9-3.1 3.2.4z" fill="currentColor"/><path d="M8.5 12.2l2.3 2.3 4.7-4.8" fill="none" stroke="#0b1629" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    copy: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
     lock: '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
     down: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    gente: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M15.5 5.6a3 3 0 0 1 0 5.8M17.5 14.3c1.8.7 3 2.300 3.500 4.700" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    foto: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="10" r="1.7" fill="currentColor"/><path d="M4.5 17.5l5-5 3.5 3.5 2.5-2.5 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
     x: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
     ideas: '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4 19l5-6 4 3 7-9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 7h5v5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     socios: '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h7A2.5 2.5 0 0 1 16 6.5v4A2.5 2.5 0 0 1 13.5 13H9l-3.5 3v-3H6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M19 9.5a2 2 0 0 1 1 1.7v3.6a2 2 0 0 1-2 2h-.5V19L15 16.8h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
@@ -63,7 +82,105 @@
   function guardar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   // El formato de WhatsApp (negrita, cursiva, citas, listas y tablas): el mismo del mensaje que va
   // a la Comunidad. Los links se pueden tocar solo en los mensajes oficiales (anti-estafa).
-  function formato(t, oficial) { return window.MiTarjeta.waHtml(t, oficial); }
+  function formato(t, oficial) { return tickers(window.MiTarjeta.waHtml(t, oficial)); }
+
+  // ---------- $TICKER en los mensajes: precio en vivo y gráfico (datos de Mercados) ----------
+  var MERC = 'https://manfredi-mercados.nachito2502.workers.dev';
+  // Si un símbolo está en varias categorías, gana la primera (NVDA = la acción en EE.UU., no el CEDEAR)
+  var ORDEN_CAT = ['arg_stocks', 'usa_stocks', 'usa_adrs', 'cripto', 'commodities', 'arg_cedears', 'arg_bonds', 'dolares'];
+  var PRECIOS = null, PRECIOS_TS = 0;
+  function tickers(html) {
+    // $NVDA, $ggal, $BRK.B (el punto final de una oración no es parte del ticker)
+    return html.replace(/(^|[\s>(¡¿"])\$([A-Za-z][A-Za-z0-9]{0,7}(?:\.[A-Za-z])?)(?=$|[\s<.,;:!?)"])/g, function (_, antes, s) {
+      s = s.toUpperCase();
+      return antes + '<button type="button" class="ch-tk" data-a="tk" data-s="' + s + '"><b>$' + s + '</b>' + chipPrecio(s) + '</button>';
+    });
+  }
+  function fmtNum(v) { var d = Math.abs(v) >= 1000 ? 0 : 2; return Number(v).toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function fmtPct(v) { if (v == null || isNaN(v)) return ''; return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%'; }
+  function chipPrecio(s) {
+    var p = PRECIOS && PRECIOS[s];
+    if (!p || p.price == null) return '<span class="ch-tk-p"></span>';
+    return '<span class="ch-tk-p">' + (p.cur === 'USD' ? 'US$ ' : '$ ') + fmtNum(p.price) + (p.change != null ? ' <i class="' + (p.change > 0 ? 'up' : p.change < 0 ? 'dn' : '') + '">' + fmtPct(p.change) + '</i>' : '') + '</span>';
+  }
+  function cargarPrecios() {
+    if (Date.now() - PRECIOS_TS < 110e3) return;
+    PRECIOS_TS = Date.now();
+    fetch(MERC + '/mercados').then(function (r) { return r.json(); }).then(function (d) {
+      var m = {};
+      ORDEN_CAT.slice().reverse().forEach(function (k) {
+        var c = d.categorias && d.categorias[k]; if (!c) return;
+        c.items.forEach(function (it) { m[it.symbol.toUpperCase()] = { cat: k, cur: c.currency, price: it.price, change: it.change, name: it.name, logo: it.logo }; });
+      });
+      PRECIOS = m;
+      S.root.querySelectorAll('.ch-tk').forEach(function (b) { b.querySelector('.ch-tk-p').outerHTML = chipPrecio(b.dataset.s); });
+      if (S.ficha) pintarFichaCab();
+    }).catch(function () { PRECIOS_TS = 0; });
+  }
+
+  // Ficha del activo: precio, gráfico en vivo (1 día se actualiza cada minuto) y "Ver en Mercados".
+  var TFS = [['1D', '1 día'], ['1M', '1 mes'], ['1A', '1 año'], ['5A', '5 años']];
+  function abrirFicha(s) {
+    var p = PRECIOS && PRECIOS[s];
+    cerrarFicha();
+    S.ficha = { s: s, cat: p ? p.cat : 'usa_stocks', tf: p && (p.cat === 'arg_bonds' || p.cat === 'dolares') ? '1M' : '1D' };
+    var el = S.root.querySelector('.ch-ficha');
+    el.innerHTML = '<div class="ch-ficha-card" role="dialog" aria-label="Gráfico de ' + esc(s) + '">' +
+      '<div class="ch-ficha-cab"></div>' +
+      '<div class="ch-ficha-tf" role="group" aria-label="Temporalidad">' + TFS.map(function (t) { return '<button type="button" data-a="tk-tf" data-tf="' + t[0] + '"' + (t[0] === S.ficha.tf ? ' aria-pressed="true"' : '') + '>' + t[1] + '</button>'; }).join('') + '</div>' +
+      '<div class="ch-ficha-gr"><div class="ch-ficha-msg">Cargando gráfico…</div></div>' +
+      '<div class="ch-ficha-pie"><span class="ch-ficha-vivo"><i></i>En vivo · datos de Mercados</span><button type="button" class="ch-btn ch-btn--gold" data-a="tk-mercados">Ver en Mercados</button></div>' +
+      '<button type="button" class="ch-ficha-x" data-a="tk-cerrar" aria-label="Cerrar">' + IC.x + '</button></div>';
+    el.hidden = false;
+    pintarFichaCab(); serieFicha();
+    S.ficha.timer = setInterval(function () { if (S.ficha && S.ficha.tf === '1D' && aLaVista()) { PRECIOS_TS = 0; cargarPrecios(); serieFicha(true); } }, 60e3);
+  }
+  function pintarFichaCab() {
+    var f = S.ficha, cab = f && S.root.querySelector('.ch-ficha-cab'); if (!cab) return;
+    var p = PRECIOS && PRECIOS[f.s];
+    cab.innerHTML = (p && p.logo ? '<img src="' + esc(p.logo) + '" alt="" class="ch-ficha-logo">' : '<span class="ch-ficha-logo ch-ficha-logo--txt">' + esc(f.s.slice(0, 2)) + '</span>') +
+      '<div class="ch-ficha-t"><b>' + esc(f.s) + '</b><span>' + esc(p && p.name && p.name !== f.s ? p.name : '') + '</span></div>' +
+      (p && p.price != null ? '<div class="ch-ficha-p"><b>' + (p.cur === 'USD' ? 'US$ ' : '$ ') + fmtNum(p.price) + '</b><i class="' + (p.change > 0 ? 'up' : p.change < 0 ? 'dn' : '') + '">' + fmtPct(p.change) + ' hoy</i></div>' : '');
+  }
+  function serieFicha(silencio) {
+    var f = S.ficha; if (!f) return;
+    var gr = S.root.querySelector('.ch-ficha-gr'), tf = f.tf, s = f.s;
+    fetch(MERC + '/serie?category=' + f.cat + '&symbol=' + encodeURIComponent(s) + '&tf=' + tf).then(function (r) { return r.json(); }).then(function (d) {
+      if (!S.ficha || S.ficha.s !== s || S.ficha.tf !== tf) return;
+      if (!d.points || d.points.length < 2) throw new Error(d.error || 'Sin datos');
+      conGraficos(function (LC) {
+        if (!S.ficha || !gr.isConnected) return;
+        if (!f.ch) {
+          gr.innerHTML = '';
+          f.ch = LC.createChart(gr, {
+            autoSize: true,
+            layout: { background: { type: 'solid', color: 'transparent' }, textColor: '#e9d3a0', fontFamily: "'IBM Plex Mono', ui-monospace, monospace", fontSize: 11, attributionLogo: false },
+            grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(233,211,160,.06)' } },
+            rightPriceScale: { borderVisible: false }, timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false },
+            handleScale: false, handleScroll: false,
+            localization: { locale: 'es-AR', timeFormatter: function (t) { return new Date(t * 1000).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); } }
+          });
+          f.serie = f.ch.addSeries(LC.AreaSeries, { lineWidth: 2, priceLineVisible: true });
+        }
+        // en 1 día el color sigue a la variación del día (contra el cierre anterior), igual que el número de arriba
+        var pd = PRECIOS && PRECIOS[s], pts = d.points;
+        var sube = tf === '1D' && pd && pd.change != null ? pd.change >= 0 : pts[pts.length - 1].c >= (pts[0].o || pts[0].c), hex = sube ? '#56c793' : '#ef7a6b', rgb = sube ? '86,199,147' : '239,122,107';
+        f.serie.applyOptions({ lineColor: hex, topColor: 'rgba(' + rgb + ',.22)', bottomColor: 'rgba(' + rgb + ',0)', priceLineColor: hex });
+        f.serie.setData(pts.map(function (p) { return { time: p.t, value: p.c }; }));
+        if (!silencio) f.ch.timeScale().fitContent();
+      });
+    }).catch(function () {
+      if (silencio || !S.ficha || S.ficha.s !== s) return;
+      if (f.ch) { f.ch.remove(); f.ch = null; }
+      gr.innerHTML = '<div class="ch-ficha-msg">No hay gráfico para esta temporalidad. Probá con otra o abrilo en Mercados.</div>';
+    });
+  }
+  function conGraficos(cb) { var t0 = Date.now(); (function w() { if (window.LightweightCharts) return cb(window.LightweightCharts); if (Date.now() - t0 < 10000) setTimeout(w, 100); })(); }
+  function cerrarFicha() {
+    var f = S.ficha; if (!f) return;
+    clearInterval(f.timer); if (f.ch) f.ch.remove(); S.ficha = null;
+    var el = S.root.querySelector('.ch-ficha'); if (el) { el.hidden = true; el.innerHTML = ''; }
+  }
   function hora(ms) { return new Date(ms).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }); }
   function diaClave(ms) { var d = new Date(ms); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); }
   function diaTexto(ms) {
@@ -136,7 +253,8 @@
       try { var q = new URLSearchParams(location.search); q.delete('r'); history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash); } catch (e) {}
     });
     PRO.forEach(function (k) {
-      if (usuario()) cargar(k);
+      if (PRO_PRONTO) S.salas[k].estado = 'pronto';
+      else if (usuario()) cargar(k);
       else { S.salas[k].estado = 'bloqueada'; S.salas[k].motivo = 'sin_sesion'; }
     });
     pintarLista();
@@ -190,24 +308,40 @@
           '<div class="ch-next" aria-live="off"></div>' +
           '<div class="ch-wa">' +
             '<span class="ch-wa-ic">' + IC.share + '</span>' +
-            '<div><b>También en WhatsApp</b><span>Los resúmenes del día, en tu celular.</span></div>' +
-            (WA_COMUNIDAD ? '<a class="ch-wa-btn" href="' + esc(WA_COMUNIDAD) + '" target="_blank" rel="noopener">Unirme</a>' : '<em class="ch-chip">Muy pronto</em>') +
+            '<div><b>Canal de WhatsApp</b><span>Los resúmenes del día, en tu celular.</span></div>' +
+            (WA_COMUNIDAD ? '<a class="ch-wa-btn" href="' + esc(WA_COMUNIDAD) + '" target="_blank" rel="noopener">Seguir</a>' : '<em class="ch-chip">Muy pronto</em>') +
           '</div>' +
         '</aside>' +
         '<section class="ch-main" aria-label="Conversación"></section>' +
       '</div>' +
-      '<div class="ch-lb" hidden><button type="button" class="ch-lb-x" aria-label="Cerrar">' + IC.x + '</button><img alt=""></div>';
+      '<div class="ch-lb" hidden><button type="button" class="ch-lb-x" aria-label="Cerrar">' + IC.x + '</button><img alt=""></div>' +
+      '<div class="ch-ficha" hidden></div>';
     S.root.addEventListener('click', clic);
     S.root.addEventListener('keydown', tecla);
-    S.root.addEventListener('input', function (e) { if (e.target.matches('.ch-ta')) ajustar(e.target); });
+    S.root.addEventListener('input', function (e) {
+      if (e.target.matches('.ch-ta')) ajustar(e.target);
+      if (e.target.matches('.ch-adj-zoom') && S.adjunto) { S.adjunto.zoom = +e.target.value; dibujarAdj(); }
+    });
+    // Encuadre: arrastrar la imagen (mouse o dedo)
+    var arr = null;
+    S.root.addEventListener('pointerdown', function (e) {
+      if (!e.target.matches('.ch-adj-cv')) return;
+      arr = { x: e.clientX, y: e.clientY }; e.target.setPointerCapture(e.pointerId); e.preventDefault();
+    });
+    S.root.addEventListener('pointermove', function (e) {
+      if (!arr) return;
+      moverAdj(e.clientX - arr.x, e.clientY - arr.y); arr = { x: e.clientX, y: e.clientY };
+    });
+    ['pointerup', 'pointercancel'].forEach(function (t) { S.root.addEventListener(t, function () { arr = null; }); });
   }
 
   function itemSala(k) {
     var z = S.salas[k], info = SALAS[k], ult = null;
     for (var i = z.orden.length - 1; i >= 0; i--) { var m = z.msgs[z.orden[i]]; if (m && !m.borrado) { ult = m; break; } }
     var noLeidos = z.estado === 'ok' && k !== S.sala ? z.orden.filter(function (id) { return id < 1e14 && id > (z.vistos[k] || 0) && z.msgs[id].h !== (S.yo && S.yo.h); }).length : 0;
-    var prev = z.estado === 'bloqueada' ? '<span class="ch-lock">' + IC.lock + ' Solo socios</span>'
-      : ult ? esc((ult.rol === 'oficial' ? '' : ult.nombre.split(' ')[0] + ': ') + (ult.tipo === 'resumen' ? (ult.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : ult.texto.replace(/[*_]/g, '')))
+    var prev = z.estado === 'pronto' ? '<em class="ch-chip">Próximamente</em>'
+      : z.estado === 'bloqueada' ? '<span class="ch-lock">' + IC.lock + ' Solo socios</span>'
+      : ult ? esc((ult.rol === 'oficial' ? '' : ult.nombre.split(' ')[0] + ': ') + (ult.tipo === 'resumen' ? (ult.datos.momento === 'apertura' ? 'Resumen de la apertura' : 'Resumen del cierre') : ult.tipo === 'imagen' && !ult.texto ? 'Imagen' : stickerDe(ult) ? 'Sticker' : ult.texto.replace(/[*_]/g, '')))
       : z.estado === 'cargando' ? 'Cargando…' : '';
     return '<li><button type="button" class="ch-item' + (info.pro ? ' ch-item--sub' : '') + '" data-ir="' + k + '"' + (k === S.sala ? ' aria-current="true"' : '') + '>' +
       avatarSala(k) +
@@ -229,7 +363,9 @@
       '<button type="button" class="ch-back" data-a="lista" aria-label="Volver a los chats">' + IC.back + '</button>' +
       avatarSala(k) +
       '<div class="ch-head-t"><b>' + (info.pro ? '<small>Manfredi Pro</small>' : '') + esc(info.nombre) + '</b><span>' + esc(info.sub) + '</span></div>' +
+      (k === 'gratis' ? '<div class="ch-gente"' + (S.gente ? '' : ' hidden') + '>' + IC.gente + '<span><b>' + (S.gente || 0).toLocaleString('es-AR') + '</b> personas en la comunidad</span></div>' : '') +
     '</header>';
+    if (z.estado === 'pronto') { main.innerHTML = cab + pronto(); return; }
     if (z.estado === 'bloqueada') { main.innerHTML = cab + bloqueo(); return; }
     main.innerHTML = cab +
       '<button type="button" class="ch-pin" data-a="pin" aria-expanded="false">' + IC.pin + '<span>' + esc(info.fijado) + '</span></button>' +
@@ -239,15 +375,26 @@
       compositor();
     var feed = main.querySelector('.ch-feed');
     feed.addEventListener('scroll', function () {
+      S.pegado = alFondoDe(feed);
       if (feed.scrollTop < 120) anteriores();
       if (alFondoDe(feed)) { main.querySelector('.ch-nuevos').hidden = true; marcarVisto(); }
     }, { passive: true });
+    // Al entrar, el chat queda pegado abajo (en el último mensaje) aunque después cambie el alto:
+    // las tarjetas de los resúmenes se dibujan un instante más tarde y el chat puede cargarse
+    // cuando todavía no se ve (otra pestaña). Se suelta cuando la persona sube a leer.
+    S.pegado = alFondo !== false;
+    if (S.ro) S.ro.disconnect();
+    if (window.ResizeObserver) {
+      S.ro = new ResizeObserver(function () { if (S.pegado) feed.scrollTop = feed.scrollHeight; });
+      S.ro.observe(feed); S.ro.observe(feed.querySelector('.ch-feed-in'));
+    }
     pintarFeed(alFondo !== false);
     pintarHoy();
+    dibujarAdj();
   }
 
   // Guía a los resúmenes de hoy: siempre a la vista, lleva al mensaje aunque haya quedado lejos.
-  var RES = [{ k: 'apertura', t: 'Antes de la apertura' }, { k: 'cierre', t: 'Cierre del mercado' }];
+  var RES = [{ k: 'apertura', t: 'Apertura del mercado' }, { k: 'cierre', t: 'Cierre del mercado' }];
   function pintarHoy() {
     var el = S.root.querySelector('.ch-hoy'); if (!el) return;
     var z = S.salas.gratis, hoy = window.MiTarjeta.horarios(new Date());
@@ -264,6 +411,7 @@
   // Mueve solo el chat (no la página) hasta el mensaje y lo destaca un instante.
   function resaltar(o) {
     var feed = S.root.querySelector('.ch-feed');
+    S.pegado = false;
     feed.scrollTo({ top: Math.max(0, o.offsetTop - 14), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     o.classList.remove('flash'); void o.offsetWidth; o.classList.add('flash');
   }
@@ -283,12 +431,33 @@
     if (!usuario()) return '<div class="ch-login"><span>Iniciá sesión para escribir en el chat.</span><button type="button" class="ch-btn ch-btn--gold" data-a="login">Iniciar sesión</button></div>';
     if (SALAS[S.sala].soloCreador && !(S.yo && S.yo.rol === 'creador'))
       return '<div class="ch-login"><span>Acá publica solo Ignacio. Para comentar una idea:</span><button type="button" class="ch-btn" data-ir="socios">Ir a Charla de socios</button></div>';
-    var r = S.responde;
+    var r = S.responde, adj = S.adjunto, cr = esCreador();
     return (r ? '<div class="ch-reply"><div><b>' + esc(r.nombre) + '</b><span>' + esc(r.texto) + '</span></div><button type="button" data-a="sin-reply" aria-label="Cancelar respuesta">' + IC.x + '</button></div>' : '') +
+      (adj ? editorAdj() : '') +
+      (S.stkAbierto ? '<div class="ch-stk-tray" role="listbox" aria-label="Stickers">' + STICKERS.map(function (x) {
+        return '<button type="button" class="ch-stk-opt" data-a="stk" data-stk="' + x.id + '" aria-label="Mandar sticker: ' + esc(x.alt) + '"><img src="' + x.src + '" alt=""></button>';
+      }).join('') + '</div>' : '') +
       '<form class="ch-comp" data-a="enviar">' +
-        '<textarea class="ch-ta" rows="1" maxlength="800" placeholder="Escribí un mensaje" aria-label="Mensaje">' + esc(S.borrador[S.sala] || '') + '</textarea>' +
+        '<button type="button" class="ch-clip ch-stk-btn' + (S.stkAbierto ? ' on' : '') + '" data-a="stk-abrir" title="Stickers" aria-label="Stickers" aria-expanded="' + !!S.stkAbierto + '">' + IC.stk + '</button>' +
+        (cr ? '<label class="ch-clip" title="Adjuntar imagen" aria-label="Adjuntar imagen">' + IC.foto + '<input type="file" accept="image/*" class="ch-file" hidden></label>' : '') +
+        '<textarea class="ch-ta" rows="1" maxlength="800" placeholder="' + (adj ? 'Agregá un texto (opcional)' : 'Escribí un mensaje · con $NVDA se ve el gráfico') + '" aria-label="Mensaje">' + esc(S.borrador[S.sala] || '') + '</textarea>' +
         '<button type="submit" class="ch-send" aria-label="Enviar">' + IC.send + '</button>' +
       '</form><div class="ch-toast" role="status"></div>';
+  }
+
+  function pronto() {
+    var fantasmas = [62, 38, 74, 46, 58, 30, 66].map(function (w, i) {
+      return '<div class="ch-fake' + (i % 3 === 1 ? ' mio' : '') + '"><i style="width:' + w + '%"></i><i style="width:' + (w * 0.6) + '%"></i></div>';
+    }).join('');
+    return '<div class="ch-locked"><div class="ch-locked-bg" aria-hidden="true">' + fantasmas + '</div>' +
+      '<div class="ch-locked-card">' +
+        '<span class="ch-kick">Manfredi Pro · Próximamente</span>' +
+        '<h3>Los chats de los socios</h3>' +
+        '<ul><li><b>Ideas de Ignacio</b>Cada análisis, sus seguimientos y sus cierres.</li>' +
+        '<li><b>Charla de socios</b>Un espacio para hablar de mercados entre socios.</li>' +
+        '<li><b>Preguntas a Ignacio</b>Consultás y te responde Ignacio, no un bot.</li></ul>' +
+        '<button type="button" class="ch-btn ch-btn--gold" data-ir="gratis">Ir al chat de Mercados</button>' +
+      '</div></div>';
   }
 
   function bloqueo() {
@@ -323,12 +492,13 @@
       antes = m;
     });
     feed.querySelector('.ch-feed-in').innerHTML = html;
+    cargarImagenes(feed);
     if (sinAnim) S.recien = {};
     if (alFondo || estaba) { feed.scrollTop = feed.scrollHeight; marcarVisto(); }
     else if (Object.keys(S.recien).length) {
       var res = Object.keys(S.recien).map(function (id) { return z.msgs[id]; }).filter(function (m) { return m && m.tipo === 'resumen'; })[0];
       var pill = S.root.querySelector('.ch-nuevos');
-      pill.querySelector('span').textContent = res ? 'Nuevo: ' + (res.datos.momento === 'apertura' ? 'resumen antes de la apertura' : 'resumen del cierre') : 'Mensajes nuevos';
+      pill.querySelector('span').textContent = res ? 'Nuevo: ' + (res.datos.momento === 'apertura' ? 'resumen de la apertura' : 'resumen del cierre') : 'Mensajes nuevos';
       pill.hidden = false;
     }
     S.recien = {};
@@ -336,10 +506,22 @@
 
   function fila(m, cont) {
     var mio = S.yo && m.h === S.yo.h && m.rol !== 'oficial';
-    var cls = 'ch-row' + (mio ? ' mio' : '') + (cont ? ' cont' : '') + (S.recien[m.id] ? ' entra' : '') + (m.tipo === 'resumen' ? ' res' : '');
+    var stk = !m.borrado && stickerDe(m);
+    var cls = 'ch-row' + (mio ? ' mio' : '') + (cont ? ' cont' : '') + (S.recien[m.id] ? ' entra' : '') + (m.tipo === 'resumen' ? ' res' : '') + (m.tipo === 'imagen' ? ' img' : '') + (stk ? ' stk' : '');
     var h = '<div class="' + cls + '" data-id="' + m.id + '">';
     if (!mio) h += cont ? '<span class="ch-av-sp"></span>' : avatar(m, 'sm');
-    h += '<div class="ch-bub' + (m.rol === 'oficial' ? ' of' : '') + (m.borrado ? ' borrado' : '') + '">';
+    // Imagen: nunca más alta que ~420 px (una vertical larga queda angosta, no gigante)
+    var anchoImg = m.tipo === 'imagen' && m.datos ? Math.round(Math.min(380, 420 * (+m.datos.w || 4) / (+m.datos.h || 5))) : 0;
+    if (stk) {
+      h += '<div class="ch-bub ch-stk">' + (!mio && !cont ? '<div class="ch-who"><b style="color:' + (m.rol === 'oficial' || m.rol === 'creador' ? '#e9d3a0' : color(m.h)) + '">' + esc(m.nombre) + '</b>' + chip(m) + '</div>' : '') +
+        (stk.href ? '<a class="ch-stk-img" href="' + stk.href + '" target="_blank" rel="noopener" aria-label="' + esc(stk.alt) + '">' : '<span class="ch-stk-img">') +
+        '<img src="' + stk.src + '" alt="' + esc(stk.alt) + '" width="160" height="160">' + (stk.href ? '</a>' : '</span>') +
+        '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span>' +
+        (esCreador() && !m.pendiente ? '<div class="ch-res-pie"><span class="ch-res-acc"><a class="ch-share" href="' + stk.src + '" download="sticker-' + stk.id + '.webp">' + IC.copy + 'Bajar para WhatsApp</a></span><span></span></div>' : '');
+      if (!m.pendiente) h += herramientas(m, mio);
+      return h + '</div></div>';
+    }
+    h += '<div class="ch-bub' + (m.rol === 'oficial' ? ' of' : '') + (m.borrado ? ' borrado' : '') + '"' + (anchoImg && !m.borrado ? ' style="width:min(' + Math.max(anchoImg, 230) + 'px, 80%)"' : '') + '>';
     if (!mio && !cont) h += '<div class="ch-who"><b style="color:' + (m.rol === 'oficial' || m.rol === 'creador' ? '#e9d3a0' : color(m.h)) + '">' + esc(m.nombre) + '</b>' + chip(m) + '</div>';
     if (m.borrado) {
       h += '<div class="ch-txt"><i>Mensaje eliminado</i><span class="ch-time">' + hora(m.creado) + '</span></div></div></div>';
@@ -347,6 +529,24 @@
     }
     if (m.cita) h += '<div class="ch-quote" data-a="ir" data-ir-id="' + (m.responde || '') + '"><b>' + esc(m.cita.nombre) + '</b><span>' + esc(m.cita.texto.replace(/[*_]/g, '')) + '</span></div>';
     if (m.tipo === 'resumen' && m.datos) h += resumen(m);
+    else if (m.tipo === 'imagen' && m.datos) {
+      h += '<button type="button" class="ch-img" data-a="ver-img" aria-label="Ver imagen" style="aspect-ratio:' + (+m.datos.w || 4) + '/' + (+m.datos.h || 5) + '">' +
+        '<img alt="" ' + (m.datos.url ? 'src="' + m.datos.url + '"' : 'data-img="' + esc(m.datos.img) + '"') + '>' +
+        (m.texto ? '' : '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span>') + '</button>';
+      if (m.texto) h += '<div class="ch-txt">' + formato(m.texto, false) + '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span></div>';
+      // Si el texto lleva el link de un informe que tiene sticker, el sticker va adentro del mismo mensaje y abre el informe
+      var inf = informeDe(m.texto);
+      if (inf) h += '<a class="ch-inf" href="' + inf.href + '" target="_blank" rel="noopener">' +
+        '<img src="' + inf.src + '" alt="" width="96" height="96">' +
+        '<span><b>' + esc(inf.alt) + '</b><em>Ver el informe completo →</em></span></a>';
+      // Pasarla al Canal de WhatsApp: copia la imagen y abre el canal para pegarla; después, el texto.
+      // En el celular además está Compartir (imagen + texto juntos, para mandarla a un chat).
+      if (esCreador() && !m.pendiente) h += '<div class="ch-res-pie"><span class="ch-res-acc">' +
+        '<button type="button" class="ch-share" data-a="copiar-img">' + IC.share + (WA_COMUNIDAD ? 'Copiar y abrir el canal' : 'Copiar imagen') + '</button>' +
+        (m.texto ? '<button type="button" class="ch-share" data-a="copiar-txt">' + IC.copy + 'Copiar texto</button>' : '') +
+        (window.MiTarjeta.movil ? '<button type="button" class="ch-share" data-a="compartir-img">' + IC.share + 'Compartir</button>' : '') +
+        '</span><span></span></div>';
+    }
     else h += '<div class="ch-txt">' + formato(m.texto, m.rol === 'oficial') + '<span class="ch-time">' + (m.pendiente ? 'Enviando' : hora(m.creado)) + '</span></div>';
     var re = Object.keys(m.reacciones || {});
     if (re.length) h += '<div class="ch-reacts">' + re.map(function (e) {
@@ -357,18 +557,24 @@
     return h + '</div></div>';
   }
 
+  // Compartir y copiar los resúmenes para el Canal de WhatsApp: solo el creador.
+  function esCreador() { return !!(S.yo && S.yo.rol === 'creador'); }
+
   function resumen(m) {
     var d = m.datos, t = tarjeta(m);
     // el texto completo es el mismo de WhatsApp: arriba la introducción, el resto se despliega
     // el texto completo es el mismo de WhatsApp: arriba la clave y el párrafo, el resto se despliega
     var k = d.texto.indexOf(d.intro), cuerpo = (k > -1 ? d.texto.slice(k + d.intro.length) : d.texto).trim();
     return '<button type="button" class="ch-card' + (t.url ? ' on' : '') + '" data-a="ver" aria-label="Ver la tarjeta en grande">' +
-        '<img data-card="' + m.id + '" src="' + (t.url || '') + '" alt="Tarjeta: ' + (d.momento === 'apertura' ? 'antes de la apertura' : 'cierre del mercado') + '"></button>' +
-      '<div class="ch-res-k">' + (d.momento === 'apertura' ? 'Antes de la apertura' : 'Cierre del mercado') + '</div>' +
+        '<img data-card="' + m.id + '" src="' + (t.url || '') + '" alt="Tarjeta: ' + (d.momento === 'apertura' ? 'apertura del mercado' : 'cierre del mercado') + '"></button>' +
+      '<div class="ch-res-k">' + (d.momento === 'apertura' ? 'Apertura del mercado' : 'Cierre del mercado') + '</div>' +
       (d.clave ? '<p class="ch-res-clave">' + esc(d.clave) + '</p>' : '') +
       '<div class="ch-txt">' + formato(d.intro, true) + '</div>' +
       '<details class="ch-det"><summary><span>Ver el resumen completo</span>' + IC.down + '</summary><div class="ch-txt">' + formato(cuerpo, true) + '</div></details>' +
-      '<div class="ch-res-pie"><button type="button" class="ch-share" data-a="compartir">' + IC.share + 'Compartir</button><span class="ch-time">' + hora(m.creado) + '</span></div>';
+      '<div class="ch-res-pie">' + (esCreador()
+        ? '<span class="ch-res-acc"><button type="button" class="ch-share" data-a="copiar-res">' + IC.copy + (WA_COMUNIDAD ? 'Copiar y abrir el canal' : 'Copiar para el canal') + '</button>' +
+          '<button type="button" class="ch-share" data-a="compartir">' + IC.share + 'Compartir</button></span>'
+        : '<span></span>') + '<span class="ch-time">' + hora(m.creado) + '</span></div>';
   }
 
   function herramientas(m, mio) {
@@ -402,8 +608,30 @@
     if (a === 'pin') { var x = b.getAttribute('aria-expanded') === 'true'; b.setAttribute('aria-expanded', String(!x)); return; }
     if (a === 'bajar') { var f = S.root.querySelector('.ch-feed'); f.scrollTo({ top: f.scrollHeight, behavior: 'smooth' }); b.hidden = true; return; }
     if (a === 'sin-reply') { S.responde = null; repintarCompositor(); return; }
+    if (a === 'tk') { abrirFicha(b.dataset.s); return; }
+    if (a === 'tk-cerrar') { cerrarFicha(); return; }
+    if (a === 'tk-tf' && S.ficha) {
+      S.ficha.tf = b.dataset.tf;
+      b.parentNode.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      serieFicha(); return;
+    }
+    if (a === 'tk-mercados' && S.ficha) {
+      var fi = S.ficha; cerrarFicha();
+      if (window.mktAbrirActivo) window.mktAbrirActivo(fi.s, fi.cat); else location.hash = 'mercados';
+      return;
+    }
+    if (a === 'stk-abrir') { S.stkAbierto = !S.stkAbierto; repintarCompositor(); return; }
+    if (a === 'stk') { S.stkAbierto = false; repintarCompositor(); enviarSticker(b.dataset.stk); return; }
+    if (a === 'sin-adj') { quitarAdjunto(); repintarCompositor(); return; }
+    if (a === 'adj-fmt' && S.adjunto) {
+      S.adjunto.fmt = b.dataset.f; S.adjunto.ox = S.adjunto.oy = 0.5;
+      b.parentNode.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      dibujarAdj(); return;
+    }
+    if (a === 'ver-img') { var im = b.querySelector('img'); if (!im || !im.src) return; var lb2 = S.root.querySelector('.ch-lb'); lb2.querySelector('img').src = im.src; lb2.hidden = false; return; }
+    if ((a === 'copiar-img' || a === 'compartir-img' || a === 'copiar-txt') && m && esCreador()) { pasarAWhatsApp(a, m, b); return; }
     if (a === 'responder' && m) {
-      S.responde = { id: m.id, nombre: m.nombre, texto: m.tipo === 'resumen' ? (m.datos.momento === 'apertura' ? 'Resumen antes de la apertura' : 'Resumen del cierre') : m.texto.replace(/[*_]/g, '').slice(0, 140) };
+      S.responde = { id: m.id, nombre: m.nombre, texto: m.tipo === 'resumen' ? (m.datos.momento === 'apertura' ? 'Resumen de la apertura' : 'Resumen del cierre') : m.tipo === 'imagen' && !m.texto ? 'Imagen' : stickerDe(m) ? 'Sticker' : m.texto.replace(/[*_]/g, '').slice(0, 140) };
       repintarCompositor(); var ta = S.root.querySelector('.ch-ta'); if (ta) ta.focus();
       return;
     }
@@ -420,7 +648,16 @@
     }
     if (a === 'ir') { var o = S.root.querySelector('.ch-row[data-id="' + b.dataset.irId + '"]'); if (o) resaltar(o); return; }
     if (a === 'ver' && m) { var t = tarjeta(m); if (!t.url) return; var lb = S.root.querySelector('.ch-lb'); lb.querySelector('img').src = t.url; lb.hidden = false; return; }
-    if (a === 'compartir' && m) {
+    if (a === 'copiar-res' && m && esCreador()) {
+      // el mensaje entero, igual al de la web (tablas, bonos, agenda y titulares); si faltara, el epígrafe
+      var txt = m.datos.texto || window.MiTarjeta.epigrafe(m.datos, m.id);
+      (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () {
+        b.classList.add('ok'); setTimeout(function () { b.classList.remove('ok'); }, 1600);
+        toast(abrirCanal() ? 'Copiado. Se abrió el canal: pegalo ahí.' : 'Copiado. Pegalo en el canal de WhatsApp.');
+      }, function () { toast('No se pudo copiar. Probá con Compartir.'); });
+      return;
+    }
+    if (a === 'compartir' && m && esCreador()) {
       var tj = tarjeta(m);
       var epi = window.MiTarjeta.epigrafe(m.datos, m.id);
       window.MiTarjeta.compartirImagen(tj.blob, m.datos, epi).then(function (r) {
@@ -430,21 +667,22 @@
   }
   function tecla(e) {
     if (e.target.matches('.ch-ta') && e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); enviar(); }
-    if (e.key === 'Escape') { var lb = S.root.querySelector('.ch-lb'); if (!lb.hidden) lb.hidden = true; }
+    if (e.key === 'Escape') { var lb = S.root.querySelector('.ch-lb'); if (!lb.hidden) lb.hidden = true; cerrarFicha(); }
   }
   function abrir(k) {
     S.borrador[S.sala] = (S.root.querySelector('.ch-ta') || {}).value || '';
     S.sala = k; S.responde = null;
     S.root.querySelector('.ch-app').dataset.vista = 'chat';
     pintarLista(); pintarSala(true);
-    if (S.salas[k].estado !== 'ok') cargar(k);
+    if (S.salas[k].estado !== 'ok' && S.salas[k].estado !== 'pronto') cargar(k);
   }
   function repintarCompositor() {
     var main = S.root.querySelector('.ch-main');
     S.borrador[S.sala] = (main.querySelector('.ch-ta') || {}).value || S.borrador[S.sala] || '';
-    main.querySelectorAll('.ch-reply,.ch-comp,.ch-login,.ch-toast').forEach(function (n) { n.remove(); });
+    main.querySelectorAll('.ch-reply,.ch-adj,.ch-comp,.ch-login,.ch-toast').forEach(function (n) { n.remove(); });
     main.insertAdjacentHTML('beforeend', compositor());
     var ta = main.querySelector('.ch-ta'); if (ta) ajustar(ta);
+    dibujarAdj();
   }
   function ajustar(ta) { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 140) + 'px'; }
   function toast(t) {
@@ -453,23 +691,173 @@
     S.tt = setTimeout(function () { el.classList.remove('on'); }, 3200);
   }
 
+  // Cuánta gente hay en la comunidad (registrados en el sitio): arriba del chat de Mercados.
+  function cargarGente() {
+    fetch('https://log-user.nachito2502.workers.dev/comunidad/cantidad').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d || !(d.usuarios > 0)) return;
+      S.gente = d.usuarios;
+      var el = S.root.querySelector('.ch-gente'); if (!el) return;
+      el.querySelector('b').textContent = S.gente.toLocaleString('es-AR'); el.hidden = false;
+    }).catch(function () {});
+  }
+
+  // ---------- imágenes (solo el creador sube) ----------
+  // Se cargan aparte, una vez por sesión: el worker devuelve la data URL y el navegador la arma.
+  var IMGS = {};
+  function cargarImagenes(feed) {
+    feed.querySelectorAll('img[data-img]').forEach(function (el) {
+      var k = el.getAttribute('data-img');
+      if (!IMGS[k]) IMGS[k] = fetch(API + '/img/' + k).then(function (r) { if (!r.ok) throw new Error(); return r.text(); }).catch(function () { delete IMGS[k]; return ''; });
+      IMGS[k].then(function (u) { if (u && el.isConnected) { el.src = u; el.removeAttribute('data-img'); } });
+    });
+  }
+  // La imagen del mensaje en PNG (el portapapeles del navegador solo acepta PNG).
+  function imagenPng(el) {
+    return new Promise(function (ok, mal) {
+      if (!el || !el.src) return mal(new Error('La imagen todavía se está cargando.'));
+      var cv = document.createElement('canvas'); cv.width = el.naturalWidth; cv.height = el.naturalHeight;
+      cv.getContext('2d').drawImage(el, 0, 0);
+      cv.toBlob(function (b) { b ? ok(b) : mal(new Error('No se pudo preparar la imagen.')); }, 'image/png');
+    });
+  }
+  // Abre el Canal de WhatsApp (link de wa.js) en otra pestaña o en la app. Se llama DESPUÉS de copiar:
+  // si la página pierde el foco antes, el navegador no deja escribir en el portapapeles.
+  function abrirCanal() {
+    if (!WA_COMUNIDAD) return false;
+    var w = window.open(WA_COMUNIDAD, '_blank');
+    if (!w) return false; // el navegador bloqueó la ventana nueva
+    try { w.opener = null; } catch (e) {}
+    return true;
+  }
+  function hecho(b, t) { b.classList.add('ok'); setTimeout(function () { b.classList.remove('ok'); }, 1600); toast(t); }
+  function pasarAWhatsApp(a, m, b) {
+    var texto = m.texto || '';
+    if (a === 'copiar-txt') {
+      (navigator.clipboard ? navigator.clipboard.writeText(texto) : Promise.reject()).then(function () { hecho(b, 'Texto copiado. Pegalo como epígrafe en WhatsApp.'); }, function () { toast('No se pudo copiar el texto.'); });
+      return;
+    }
+    var el = b.closest('.ch-bub').querySelector('.ch-img img');
+    imagenPng(el).then(function (png) {
+      if (a === 'compartir-img') {
+        var file = new File([png], 'manfredi-' + m.id + '.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          // por si WhatsApp descarta el texto: también queda copiado para pegarlo
+          if (texto && navigator.clipboard) navigator.clipboard.writeText(texto).catch(function () {});
+          return navigator.share(texto ? { files: [file], text: texto } : { files: [file] }).catch(function () {});
+        }
+      }
+      if (!navigator.clipboard || !window.ClipboardItem) throw new Error('Este navegador no deja copiar imágenes.');
+      return navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]).then(function () {
+        var abierto = a === 'copiar-img' && abrirCanal();
+        hecho(b, (abierto ? 'Imagen copiada y canal abierto: pegala ahí (Ctrl+V)' : 'Imagen copiada. En WhatsApp: Ctrl+V') + (texto ? '. Después tocá Copiar texto para el epígrafe.' : '.'));
+      });
+    }).catch(function (err) { toast(err.message || 'No se pudo copiar la imagen.'); });
+  }
+
+  // ---------- ajustar la imagen antes de mandarla: formato, zoom y encuadre ----------
+  var FORMATOS = [{ k: 'orig', t: 'Original' }, { k: '4:5', t: '4:5', r: 4 / 5 }, { k: '1:1', t: '1:1', r: 1 }, { k: '16:9', t: '16:9', r: 16 / 9 }];
+  function quitarAdjunto() { if (S.adjunto && S.adjunto.src) URL.revokeObjectURL(S.adjunto.src); S.adjunto = null; }
+  function prepararImagen(file) {
+    if (!file || !/^image\//.test(file.type)) return;
+    var url = URL.createObjectURL(file), img = new Image();
+    img.onload = function () {
+      quitarAdjunto();
+      S.adjunto = { img: img, src: url, nw: img.naturalWidth, nh: img.naturalHeight, fmt: 'orig', zoom: 1, ox: 0.5, oy: 0.5 };
+      repintarCompositor();
+      var ta = S.root.querySelector('.ch-ta'); if (ta) ta.focus();
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); toast('No se pudo leer la imagen.'); };
+    img.src = url;
+  }
+  // Dibuja el recorte elegido con el lado más largo en `lado` px.
+  function recorte(A, lado) {
+    var f = FORMATOS.filter(function (x) { return x.k === A.fmt; })[0];
+    var r = f.r || A.nw / A.nh;
+    var W = r >= 1 ? lado : Math.round(lado * r), H = Math.round(W / r);
+    var s = Math.max(W / A.nw, H / A.nh) * A.zoom, sw = W / s, sh = H / s;
+    var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    var cx = cv.getContext('2d'); cx.fillStyle = '#0b1629'; cx.fillRect(0, 0, W, H);
+    cx.drawImage(A.img, (A.nw - sw) * A.ox, (A.nh - sh) * A.oy, sw, sh, 0, 0, W, H);
+    return { cv: cv, sw: sw, sh: sh };
+  }
+  function dibujarAdj() {
+    var A = S.adjunto, cv = S.root.querySelector('.ch-adj-cv'); if (!A || !cv) return;
+    var r = recorte(A, 520); A._vista = r;
+    cv.width = r.cv.width; cv.height = r.cv.height; cv.getContext('2d').drawImage(r.cv, 0, 0);
+  }
+  // Lo que se sube: lado más largo hasta 1600 px en JPEG; si pesa más de ~900 KB baja la calidad.
+  function exportarAdj(A) {
+    var cv = recorte(A, Math.min(1600, Math.max(A.nw, A.nh))).cv;
+    var q = 0.88, du = cv.toDataURL('image/jpeg', q);
+    while (du.length > 1.2e6 && q > 0.45) { q -= 0.1; du = cv.toDataURL('image/jpeg', q); }
+    if (du.length > 1.8e6) return null;
+    return { url: du, b64: du.split(',')[1], mime: 'image/jpeg', w: cv.width, h: cv.height };
+  }
+  function editorAdj() {
+    var A = S.adjunto;
+    return '<div class="ch-adj">' +
+      '<div class="ch-adj-marco"><canvas class="ch-adj-cv" title="Arrastrá para encuadrar"></canvas></div>' +
+      '<div class="ch-adj-ctl">' +
+        '<div class="ch-adj-h"><b>Ajustar imagen</b><button type="button" data-a="sin-adj" aria-label="Quitar imagen">' + IC.x + '</button></div>' +
+        '<div class="ch-adj-k">Formato</div>' +
+        '<div class="ch-adj-fmt" role="group" aria-label="Formato">' + FORMATOS.map(function (f) {
+          return '<button type="button" data-a="adj-fmt" data-f="' + f.k + '"' + (A.fmt === f.k ? ' aria-pressed="true"' : '') + '>' + f.t + '</button>';
+        }).join('') + '</div>' +
+        '<label class="ch-adj-k" for="ch-adj-zoom">Zoom</label>' +
+        '<input id="ch-adj-zoom" class="ch-adj-zoom" type="range" min="1" max="3" step="0.01" value="' + A.zoom + '">' +
+        '<p class="ch-adj-ayuda">Arrastrá la imagen para encuadrarla. Abajo podés sumarle un texto.</p>' +
+      '</div></div>';
+  }
+  function moverAdj(dx, dy) {
+    var A = S.adjunto, v = A && A._vista, cv = S.root.querySelector('.ch-adj-cv'); if (!v || !cv) return;
+    var k = cv.width / cv.getBoundingClientRect().width; // px de pantalla -> px del lienzo
+    var fx = A.nw - v.sw, fy = A.nh - v.sh, s = v.cv.width / v.sw;
+    if (fx > 0.5) A.ox = Math.min(1, Math.max(0, A.ox - dx * k / s / fx));
+    if (fy > 0.5) A.oy = Math.min(1, Math.max(0, A.oy - dy * k / s / fy));
+    dibujarAdj();
+  }
+
   function enviar() {
     var ta = S.root.querySelector('.ch-ta'); if (!ta) return;
-    var texto = ta.value.trim(); if (!texto || S.enviando) return;
+    var texto = ta.value.trim(); if ((!texto && !S.adjunto) || S.enviando) return;
+    var original = S.adjunto, adj = original ? exportarAdj(original) : null;
+    if (original && !adj) { toast('La imagen es muy pesada.'); return; }
     var sala = S.sala, z = S.salas[sala], resp = S.responde;
-    var tmp = { id: 1e15 + Date.now(), h: S.yo ? S.yo.h : 'yo', nombre: S.yo ? S.yo.nombre : '', rol: S.yo ? S.yo.rol : 'usuario', tipo: 'texto', texto: texto,
+    var tmp = { id: 1e15 + Date.now(), h: S.yo ? S.yo.h : 'yo', nombre: S.yo ? S.yo.nombre : '', rol: S.yo ? S.yo.rol : 'usuario', tipo: adj ? 'imagen' : 'texto', texto: texto,
+      datos: adj ? { url: adj.url, w: adj.w, h: adj.h } : null,
       cita: resp ? { nombre: resp.nombre, texto: resp.texto } : null, reacciones: {}, creado: Date.now(), editado: 0, pendiente: true };
-    S.enviando = true; ta.value = ''; ajustar(ta); S.borrador[sala] = ''; S.responde = null;
-    if (resp) repintarCompositor();
+    S.enviando = true; ta.value = ''; ajustar(ta); S.borrador[sala] = ''; S.responde = null; S.adjunto = null;
+    if (resp || adj) repintarCompositor();
     aplicar(sala, [tmp], true); pintarFeed(true);
-    api('/chat/' + sala, { method: 'POST', body: { texto: texto, responde: resp ? resp.id : null } }).then(function (d) {
+    var body = { texto: texto, responde: resp ? resp.id : null };
+    if (adj) body.imagen = { mime: adj.mime, b64: adj.b64, w: adj.w, h: adj.h };
+    api('/chat/' + sala, { method: 'POST', body: body }).then(function (d) {
       delete z.msgs[tmp.id]; z.orden = z.orden.filter(function (x) { return x !== tmp.id; });
+      if (adj && d.mensaje.datos) IMGS[d.mensaje.datos.img] = Promise.resolve(adj.url); // ya la tenemos: no se baja de nuevo
+      if (original && S.adjunto !== original) URL.revokeObjectURL(original.src);
       aplicar(sala, [d.mensaje]); pintarFeed(true); pintarLista();
     }).catch(function (err) {
       delete z.msgs[tmp.id]; z.orden = z.orden.filter(function (x) { return x !== tmp.id; });
       pintarFeed(false);
+      if (original && !S.adjunto) { S.adjunto = original; repintarCompositor(); }
       var t2 = S.root.querySelector('.ch-ta'); if (t2 && !t2.value) { t2.value = texto; ajustar(t2); }
       toast(err.status === 401 ? 'Tu sesión venció: volvé a iniciar sesión.' : err.message);
+    }).then(function () { S.enviando = false; });
+  }
+
+  function enviarSticker(id) {
+    if (S.enviando || !STICKERS.some(function (x) { return x.id === id; })) return;
+    var sala = S.sala, z = S.salas[sala], texto = '[sticker:' + id + ']';
+    var tmp = { id: 1e15 + Date.now(), h: S.yo ? S.yo.h : 'yo', nombre: S.yo ? S.yo.nombre : '', rol: S.yo ? S.yo.rol : 'usuario', tipo: 'texto', texto: texto,
+      datos: null, cita: null, reacciones: {}, creado: Date.now(), editado: 0, pendiente: true };
+    S.enviando = true;
+    aplicar(sala, [tmp], true); pintarFeed(true);
+    api('/chat/' + sala, { method: 'POST', body: { texto: texto, responde: null } }).then(function (d) {
+      delete z.msgs[tmp.id]; z.orden = z.orden.filter(function (x) { return x !== tmp.id; });
+      aplicar(sala, [d.mensaje]); pintarFeed(true); pintarLista();
+    }).catch(function (err) {
+      delete z.msgs[tmp.id]; z.orden = z.orden.filter(function (x) { return x !== tmp.id; });
+      pintarFeed(false); toast(err.status === 401 ? 'Tu sesión venció: volvé a iniciar sesión.' : err.message);
     }).then(function () { S.enviando = false; });
   }
 
@@ -501,7 +889,7 @@
     for (var d = 0; d < 10 && !prox; d++) {
       var h = window.MiTarjeta.horarios(new Date(ahora + d * 864e5));
       if (!h.hay) continue;
-      [['apertura', 'Antes de la apertura'], ['cierre', 'Cierre del mercado']].some(function (x) {
+      [['apertura', 'Apertura del mercado'], ['cierre', 'Cierre del mercado']].some(function (x) {
         if (d === 0 && h[x[0]].min <= artMin) return false;
         prox = { d: d, t: x[1], hora: h[x[0]].hora, min: h[x[0]].min, iso: h.iso }; return true;
       });
@@ -562,6 +950,10 @@
       S = { root: el, sala: 'gratis', salas: nuevasSalas(), yo: null, responde: null, borrador: {}, recien: {}, vuelta: 0, sesion: sesion() };
       esqueleto(); pintarLista(); pintarSala(true); pintarProximo();
       cargarTodas();
+      cargarGente();
+      cargarPrecios();
+      setInterval(function () { if (aLaVista()) cargarPrecios(); }, 30e3);
+      S.root.querySelector('.ch-ficha').addEventListener('click', function (e) { if (e.target === e.currentTarget) cerrarFicha(); });
       setInterval(tic, 5000);
       setInterval(pintarProximo, 30000);
       setInterval(function () { if (sesion() !== S.sesion) { S.sesion = sesion(); reiniciar(); } }, 1500);
@@ -576,6 +968,13 @@
       window.addEventListener('load', function () { setTimeout(otraVez, 200); }, { once: true });
       S.root.querySelector('.ch-lb').addEventListener('click', function (e) { if (e.target === e.currentTarget || e.target.closest('.ch-lb-x')) e.currentTarget.hidden = true; });
       S.root.addEventListener('submit', function (e) { if (e.target.matches('.ch-comp')) { e.preventDefault(); enviar(); } });
+      // Imagen: con el botón o pegándola (Ctrl+V) en la caja de texto. Solo el creador.
+      S.root.addEventListener('change', function (e) { if (e.target.matches('.ch-file') && esCreador()) { prepararImagen(e.target.files[0]); e.target.value = ''; } });
+      S.root.addEventListener('paste', function (e) {
+        if (!e.target.matches('.ch-ta') || !esCreador() || !e.clipboardData) return;
+        var f = Array.prototype.filter.call(e.clipboardData.items || [], function (it) { return it.kind === 'file' && /^image\//.test(it.type); })[0];
+        if (f) { e.preventDefault(); prepararImagen(f.getAsFile()); }
+      });
     }
   };
 })();

@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="base.css" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+  /* Gancho: la IA que usás todos los días ↔ su salida a bolsa (19-nov-2026). */
+  #head { position: absolute; left: 96px; top: 84px; display: flex; align-items: center; gap: 34px; }
+  #logo { width: 118px; height: 118px; border-radius: 26px; background: #fff; display: grid; place-items: center; flex: none;
+    box-shadow: 0 12px 34px rgba(217,119,87,.35), 0 0 0 1.5px rgba(230,207,150,.35); }
+  #logo img { width: 104px; height: 104px; }
+  #head .kicker { margin-bottom: 10px; }
+  #head .title { font-size: 76px; }
+  #head .title em { color: #e9a189; }
+
+  .card { position: absolute; left: 96px; width: 640px; padding: 30px 36px 34px; border-radius: 22px;
+    background: rgba(11,23,48,.88); border: 1.5px solid rgba(230,207,150,.28); box-shadow: 0 22px 60px rgba(0,0,0,.5); }
+  .card .kicker { font-size: 22px; }
+  .card .row { display: flex; align-items: center; gap: 26px; margin-top: 14px; }
+  #cardA { top: 330px; }
+  #cardB { top: 660px; border-color: rgba(217,119,87,.55); }
+  #spark { width: 96px; height: 96px; flex: none; }
+  #cardA .txt { font-family: 'DM Serif Display', serif; font-size: 44px; line-height: 1.08; color: var(--gold2); }
+  #cardB .big { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 108px; line-height: 1; color: #f0dcaa; white-space: nowrap;
+    text-shadow: 0 0 50px rgba(230,207,150,.35); }
+  #cardB .txt { white-space: nowrap; font-family: 'DM Serif Display', serif; font-size: 40px; line-height: 1.1; color: var(--gold2); }
+  #cardB .txt span { display: block; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 22px; color: var(--gold-deep); margin-top: 6px; }
+
+  #chart { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+  .lbl { position: absolute; font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--gold); white-space: nowrap; }
+  .lbl span { display: block; font-size: 21px; color: var(--gold-deep); letter-spacing: .06em; margin-top: 2px; }
+  #lblStart, #lblOpen, #lblEnd { font-size: 30px; }
+  #lblOpen { color: #f0dcaa; text-align: center; transform: translateX(-50%); }
+  #lblEnd { color: #d97757; text-align: right; }
+  #ipoLine { stroke: rgba(230,207,150,.55); stroke-width: 3; stroke-dasharray: 10 10; }
+  #ipoTag { position: absolute; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 22px; color: var(--gold-deep); letter-spacing: .08em; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="gancho" data-start="0" data-duration="5" data-width="1920" data-height="1080" data-fps="30">
+  <section id="scene" class="clip" data-start="0" data-duration="5" data-track-index="1">
+    <div class="glow"></div>
+    <div class="frame"></div>
+
+    <svg id="chart" viewBox="0 0 1920 1080">
+      <defs>
+        <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#d97757" stop-opacity=".32" />
+          <stop offset="1" stop-color="#d97757" stop-opacity="0" />
+        </linearGradient>
+        <clipPath id="reveal"><rect id="revealRect" x="0" y="0" width="0" height="1080" /></clipPath>
+      </defs>
+      <line id="ipoLine" />
+      <g clip-path="url(#reveal)">
+        <path id="areaPath" fill="url(#area)" />
+        <path id="linePath" fill="none" stroke="#d97757" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
+      </g>
+      <circle id="dotStart" r="11" fill="#e6cf96" />
+      <circle id="dotOpen" r="13" fill="#f0dcaa" />
+      <circle id="dotEnd" r="14" fill="#d97757" />
+      <circle id="pulse" r="16" fill="none" stroke="#f0dcaa" stroke-width="4" />
+    </svg>
+
+    <div id="head">
+      <div id="logo"><img src="ant.png" alt="Anthropic" /></div>
+      <div>
+        <div class="kicker">Anthropic · ANT · Claude</div>
+        <div class="title">La IA que usás salió a la bolsa. <em>Abrió +34%.</em></div>
+      </div>
+    </div>
+
+    <div class="card" id="cardA">
+      <div class="kicker">Lo que usás vos</div>
+      <div class="row">
+        <img id="spark" src="claude.svg" alt="" />
+        <div class="txt">Claude: escribe,<br>programa y resume</div>
+      </div>
+    </div>
+
+    <div class="card" id="cardB">
+      <div class="kicker">Su primer día en la bolsa</div>
+      <div class="row">
+        <div class="big">+<span id="pct">0</span>%</div>
+        <div class="txt">al abrir<span>US$ 83 → US$ 111,50</span></div>
+      </div>
+    </div>
+
+    <div class="lbl" id="lblStart">US$ 83<span>PRECIO DE SALIDA</span></div>
+    <div class="lbl" id="lblOpen">US$ 111,50<span>APERTURA</span></div>
+    <div class="lbl" id="lblEnd">__CLOSE_LBL__<span>19-NOV · 1.ª RUEDA</span></div>
+
+    <div class="brand"><span class="m serif">M</span>Manfredi Investment</div>
+  </section>
+</div>
+
+<script>
+  // ANT, 19-nov-2026: precio de salida (US$ 83) + cotizaciones de 5 minutos de la primera rueda (Yahoo Finance)
+  var PX = __PX__;
+  var X0 = 830, X1 = 1780, Y0 = 400, Y1 = 900, PMIN = 76, PMAX = 120;
+  function X(i) { return X0 + (X1 - X0) * i / (PX.length - 1); }
+  function Y(p) { return Y0 + (Y1 - Y0) * (PMAX - p) / (PMAX - PMIN); }
+
+  var d = '';
+  PX.forEach(function (p, i) { d += (i ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(p).toFixed(1); });
+  document.getElementById('linePath').setAttribute('d', d);
+  document.getElementById('areaPath').setAttribute('d', d + 'L' + X1 + ',' + Y1 + 'L' + X0 + ',' + Y1 + 'Z');
+  var ipo = document.getElementById('ipoLine');
+  ipo.setAttribute('x1', X0); ipo.setAttribute('x2', X1); ipo.setAttribute('y1', Y(83)); ipo.setAttribute('y2', Y(83));
+
+  function place(id, x, y) { var c = document.getElementById(id); c.setAttribute('cx', x); c.setAttribute('cy', y); }
+  var N = PX.length - 1;
+  place('dotStart', X(0), Y(PX[0]));
+  place('dotOpen', X(1), Y(PX[1]));
+  place('dotEnd', X(N), Y(PX[N]));
+  place('pulse', X(1), Y(PX[1]));
+  var ls = document.getElementById('lblStart'); ls.style.left = (X(0) - 10) + 'px'; ls.style.top = (Y(PX[0]) + 24) + 'px';
+  var lo = document.getElementById('lblOpen'); lo.style.left = (X(1) + 90) + 'px'; lo.style.top = (Y(PX[1]) - 92) + 'px';
+  var le = document.getElementById('lblEnd'); le.style.right = (1920 - X(N) + 4) + 'px'; le.style.top = (Y(PX[N]) + 26) + 'px';
+
+  window.__timelines = window.__timelines || {};
+  var tl = gsap.timeline({ paused: true });
+  var DRAW0 = 0.9, DRAW = 2.4, OPEN = DRAW0 + DRAW / N, END = DRAW0 + DRAW;
+
+  gsap.set('#logo', { opacity: 0, scale: .6, transformOrigin: '50% 50%' });
+  gsap.set('#head .kicker, #head .title', { opacity: 0, y: 26 });
+  gsap.set('#cardA, #cardB', { opacity: 0, x: -40 });
+  gsap.set('#spark', { rotation: -90, scale: .4, opacity: 0, transformOrigin: '50% 50%' });
+  gsap.set('#dotStart, #dotOpen, #dotEnd', { opacity: 0, scale: 0, transformOrigin: 'center', transformBox: 'fill-box' });
+  gsap.set('#pulse', { opacity: 0, transformOrigin: 'center', transformBox: 'fill-box' });
+  gsap.set('#lblStart, #lblOpen, #lblEnd, #ipoLine', { opacity: 0 });
+  gsap.set('.brand', { opacity: 0 });
+
+  tl.to('#logo', { opacity: 1, scale: 1, duration: .45, ease: 'back.out(1.8)' }, 0)
+    .to('#head .kicker', { opacity: 1, y: 0, duration: .35, ease: 'power3.out' }, .1)
+    .to('#head .title', { opacity: 1, y: 0, duration: .45, ease: 'power3.out' }, .18)
+    .to('.brand', { opacity: 1, duration: .4 }, .3)
+    .to('#cardA', { opacity: 1, x: 0, duration: .45, ease: 'power3.out' }, .45)
+    .to('#spark', { rotation: 0, scale: 1, opacity: 1, duration: .7, ease: 'back.out(1.8)' }, .6)
+    .to('#spark', { rotation: 45, duration: 3.2, ease: 'none' }, 1.3)
+    .to('#ipoLine', { opacity: 1, duration: .3 }, DRAW0 - .2)
+    .to('#dotStart', { opacity: 1, scale: 1, duration: .25, ease: 'back.out(2)' }, DRAW0 - .1)
+    .to('#lblStart', { opacity: 1, duration: .3 }, DRAW0)
+    .to('#revealRect', { attr: { width: X1 + 20 }, duration: DRAW, ease: 'none' }, DRAW0)
+    .to('#dotOpen', { opacity: 1, scale: 1, duration: .3, ease: 'back.out(2.4)' }, OPEN)
+    .to('#pulse', { opacity: .9, duration: .01 }, OPEN)
+    .to('#pulse', { scale: 3.2, opacity: 0, duration: .8, ease: 'power2.out' }, OPEN + .02)
+    .to('#lblOpen', { opacity: 1, duration: .3 }, OPEN)
+    .to('#cardB', { opacity: 1, x: 0, duration: .45, ease: 'power3.out' }, OPEN - .1)
+    .to('#dotEnd', { opacity: 1, scale: 1, duration: .3, ease: 'back.out(2.4)' }, END - .05)
+    .to('#lblEnd', { opacity: 1, duration: .3 }, END);
+
+  var cnt = { v: 0 };
+  tl.to(cnt, { v: 34, duration: .8, ease: 'power2.out',
+    onUpdate: function () { document.getElementById('pct').textContent = Math.round(cnt.v); } }, OPEN);
+
+  window.__timelines['gancho'] = tl;
+</script>
+</body>
+</html>
