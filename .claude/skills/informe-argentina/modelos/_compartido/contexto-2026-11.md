@@ -131,3 +131,20 @@ desde ene-2020)**: para la reversión se usa 1T20 → 3T26 (27 trimestres).
   Stanley ve la reclasificación a emergente recién hacia 2028; Rava, no antes de 2027. Próxima revisión
   anual: jun-2027.
 - **Impuesto a los dividendos**: retención 7% (art. 97 Ley de Ganancias), según el 6-K de Macro.
+
+## Actualización 24-nov-2026 (corte de los informes de YPF y VIST)
+
+Solo se actualizan las variables que se mueven día a día; el resto del archivo sigue vigente. Espejo de
+máquina: `contexto_energia_2026_11.py` (bloque "Macro actualizada").
+
+| Dato | Valor | Fecha | Fuente |
+|---|---|---|---|
+| Riesgo país EMBI | **1.035 pb** (último publicado al cierre del 24-nov; 20-nov: 1.070) | 23-nov-2026 | api.argentinadatos.com |
+| Riesgo país, promedio 90 días (26-ago → 23-nov) | **663 pb** (mín. 485, máx. 1.070; 64 ruedas) | 23-nov-2026 | cálculo sobre argentinadatos |
+| CCL (venta) | ARS 1.806,2 | 24-nov-2026 | argentinadatos /dolares/contadoconliqui |
+| CCL implícito YPF / VIST | 1.808,6 (YPFD 5.735 × 10 / 31,71) / 1.812,9 (CEDEAR 29.980 × 3 / 49,61) | 24-nov-2026 | cálculo sobre Yahoo |
+| MEP (venta) | ARS 1.743,1 | 24-nov-2026 | argentinadatos /dolares/bolsa |
+| Oficial mayorista | ARS 1.580 (Yahoo ARS=X: 1.592) | 24-nov-2026 | argentinadatos /dolares/mayorista |
+| Brecha CCL / mayorista | 14,3% | 24-nov-2026 | cálculo |
+| Treasury 10Y | **4,90%** | 24-nov-2026 | Yahoo ^TNX |
+| Escenarios recalculados con las mismas reglas | Bear 1.500 → 1.000 (30%) · Base 1.035 → 792,5 (45%) · Bull 1.035 → 500 (25%) | 24-nov-2026 | `contexto_energia_2026_11.ESCENARIOS` |
