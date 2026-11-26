@@ -174,6 +174,241 @@ async function seriesFetch(path, sp) {
   return r.json();
 }
 
+/* ───────────────────────── tablero (todo lo de la primera vista) ─────────────────────────
+ * Un solo JSON chico, armado acá y cacheado 3 h, para que la página haga UN pedido.
+ * Ojo con los datos del catálogo (beta): las descripciones cambian de mayúsculas y de
+ * plural entre filas ("NIVEL GENERAL"/"Nivel general", "Estacional"/"Estacionales"), así
+ * que se filtra SIEMPRE por código. Las incidencias del IPC solo vienen por región.
+ */
+
+const per = s => s.slice(0, 4) + '-' + s.slice(4, 6);           // '202610' → '2026-10'
+const r1 = v => (v == null || !Number.isFinite(+v) ? null : Math.round(+v * 10) / 10);
+const r2 = v => (v == null || !Number.isFinite(+v) ? null : Math.round(+v * 100) / 100);
+async function filas(env, ds, obj) { return (await indecTodo(env, ds, new URLSearchParams(obj))).filas; }
+async function agregado(env, ds, obj) { return (await indecFetch(env, ds, new URLSearchParams({ limit: '1000', ...obj }))).filas; }
+function porPeriodo(rows, key = 'periodo') {
+  const m = new Map();
+  for (const x of rows) { const p = x[key]; if (!m.has(p)) m.set(p, { p: per(p) }); }
+  return m;
+}
+const ordenar = m => [...m.values()].sort((a, b) => (a.p < b.p ? -1 : 1));
+
+async function secIPC(env) {
+  const rows = await filas(env, 'ipc_nacional', { region: 'eq.Nacional', codigo: 'in.(0,N,R,E,B,S)', tipo_de_indicador: 'in.(v_m,v_ia,Indice)' });
+  const m = porPeriodo(rows);
+  const K = { '0': '', N: 'n', R: 'r', E: 'e', B: 'b', S: 's' };
+  for (const x of rows) {
+    const o = m.get(x.periodo), k = K[x.codigo]; if (k == null) continue;
+    const campo = x.tipo_de_indicador === 'Indice' ? 'idx' : x.tipo_de_indicador === 'v_m' ? 'm' : 'ia';
+    o[(k ? k + '_' : '') + campo] = campo === 'idx' ? r2(x.valor) : r1(x.valor);
+  }
+  const serie = ordenar(m).filter(o => o.idx != null);
+  const ult = [...serie].reverse().find(o => o.m != null);
+  const lat = ult.p.replace('-', '');
+  const [acum, reg, rub] = await Promise.all([
+    filas(env, 'ipc_nacional', { periodo: 'eq.' + lat, region: 'eq.Nacional', codigo: 'eq.0', tipo_de_indicador: 'eq.v_acum' }),
+    filas(env, 'ipc_nacional', { periodo: 'eq.' + lat, codigo: 'eq.0', tipo_de_indicador: 'in.(v_m,v_ia)' }),
+    filas(env, 'ipc_nacional', { periodo: 'eq.' + lat, region: 'eq.Nacional', nivel: 'eq.División', tipo_de_indicador: 'in.(v_m,v_ia)' }),
+  ]);
+  const regiones = {}; for (const x of reg) { (regiones[x.region] ||= { region: x.region })[x.tipo_de_indicador === 'v_m' ? 'm' : 'ia'] = r1(x.valor); }
+  const rubros = {}; for (const x of rub) { (rubros[x.codigo] ||= { codigo: x.codigo, nombre: x.descripcion })[x.tipo_de_indicador === 'v_m' ? 'm' : 'ia'] = r1(x.valor); }
+  return {
+    ultimo: { ...ult, acum: acum[0] ? r1(acum[0].valor) : null },
+    serie,
+    regiones: Object.values(regiones).sort((a, b) => (a.region === 'Nacional' ? -1 : b.region === 'Nacional' ? 1 : (b.m ?? 0) - (a.m ?? 0))),
+    rubros: Object.values(rubros).sort((a, b) => (b.m ?? 0) - (a.m ?? 0)),
+  };
+}
+
+async function secCanasta(env) {
+  const rows = await filas(env, 'valorizacion_canastas_cba_cbt', { anio: 'gte.2016' });
+  const m = porPeriodo(rows);
+  for (const x of rows) {
+    const o = m.get(x.periodo), c = x.codigo, t = x.tipo_de_indicador;
+    if ((c === 'CBA' || c === 'CBT') && t === c) o[c.toLowerCase()] = r2(x.valor);
+    else if ((c === 'CBA' || c === 'CBT') && (t === 'v_m' || t === 'v_ia')) o[c.toLowerCase() + '_' + t.slice(2)] = r1(x.valor);
+    else if (c === 'CBT H2') o.cbt_h2 = Math.round(x.valor);
+    else if (c === 'CBA H2') o.cba_h2 = Math.round(x.valor);
+  }
+  const serie = ordenar(m).filter(o => o.cbt != null);
+  return { ultimo: serie[serie.length - 1], serie, region: 'GBA', nota: 'Hogar 2: dos adultos de 35 y 31 años con dos hijos de 6 y 8 (la "familia tipo" del INDEC).' };
+}
+
+async function secSalarios(env, ipcSerie) {
+  const rows = await filas(env, 'indice_salarios', { codigo: 'in.(0,110,120,200)', tipo_de_indicador: 'in.(Indice,v_m,v_ia)' });
+  const m = porPeriodo(rows);
+  const K = { '0': 'tot', '110': 'priv', '120': 'pub', '200': 'noreg' };
+  for (const x of rows) {
+    const o = m.get(x.periodo), k = K[x.codigo]; if (!k) continue;
+    const t = x.tipo_de_indicador;
+    o[k + (t === 'Indice' ? '' : t === 'v_m' ? '_m' : '_ia')] = t === 'Indice' ? r2(x.valor) : r1(x.valor);
+  }
+  const serie = ordenar(m).filter(o => o.tot != null || o.priv != null);
+  // Salario real = índice de salarios / IPC nacional, base 100 en el primer mes con ambos.
+  const ipc = new Map(ipcSerie.map(o => [o.p, o.idx]));
+  const base = {};
+  const real = [];
+  for (const o of serie) {
+    const pi = ipc.get(o.p); if (!pi) continue;
+    const r = { p: o.p };
+    for (const k of ['tot', 'priv', 'pub', 'noreg']) {
+      if (o[k] == null) continue;
+      const v = o[k] / pi;
+      if (base[k] == null) base[k] = v;
+      r[k] = r1((v / base[k]) * 100);
+    }
+    real.push(r);
+  }
+  const conIa = (lista, k) => {
+    const idx = new Map(lista.map(o => [o.p, o[k]]));
+    const u = [...lista].reverse().find(o => o[k] != null); if (!u) return null;
+    const [a, mm] = u.p.split('-').map(Number), atras = `${a - 1}-${String(mm).padStart(2, '0')}`;
+    const prev = idx.get(atras); return prev ? { p: u.p, ia: r1((u[k] / prev - 1) * 100) } : null;
+  };
+  return {
+    ultimo: { ...serie[serie.length - 1], real_tot: conIa(real, 'tot'), real_priv: conIa(real, 'priv'), real_pub: conIa(real, 'pub') },
+    serie, real,
+  };
+}
+
+async function secEMAE(env) {
+  const rows = await filas(env, 'estimador-mensual-de-actividad-economica-nivel-general', { anio: 'gte.2016' });
+  const m = porPeriodo(rows);
+  for (const x of rows) {
+    const o = m.get(x.periodo), d = (x.tipo_de_indicador_descripcion || '').toLowerCase();
+    if (d.includes('interanual')) o.ia = r1(x.valor);
+    else if (d.includes('mensual') && d.includes('desest')) o.m = r1(x.valor);
+    else if (d.includes('ndice') && d.includes('desest')) o.desest = r1(x.valor);
+    else if (d.includes('ndice') && d.includes('original')) o.orig = r1(x.valor);
+    else if (d.includes('ndice') && d.includes('tendencia')) o.tc = r1(x.valor);
+  }
+  const serie = ordenar(m).filter(o => o.desest != null || o.orig != null);
+  const ult = serie[serie.length - 1];
+  // Máximo histórico de la serie desestacionalizada: "¿estamos en récord?"
+  const max = serie.reduce((a, o) => (o.desest != null && (!a || o.desest > a.desest) ? o : a), null);
+  const sec = await filas(env, 'estimador-mensual-de-actividad-economica-sectores', { periodo: 'eq.' + ult.p.replace('-', ''), tipo_de_indicador: 'ilike.*interanual*' });
+  return {
+    ultimo: { ...ult, maximo: max && { p: max.p, desest: max.desest } },
+    serie,
+    sectores: sec.map(x => ({ codigo: x.codigo, nombre: x.descripcion, ia: r1(x.valor) })).filter(x => x.ia != null).sort((a, b) => b.ia - a.ia),
+  };
+}
+
+const trim = p => (p.length === 6 ? p.slice(4, 5) + (p[5] === 'T' ? 'T ' : 'S ') + p.slice(0, 4) : p); // '20262T' → '2T 2026'
+async function secTrabajo(env) {
+  const rows = await filas(env, 'mercado_trabajo_eph', {});
+  const serie = rows.filter(x => x.tasa_de_desocupacion != null)
+    .map(x => ({ p: x.anio + '-T' + x.trimestre, label: trim(x.periodo), desoc: r1(x.tasa_de_desocupacion), act: r1(x.tasa_de_actividad), emp: r1(x.tasa_de_empleo), informal: x.tasa_de_empleo && x.tasa_de_empleo_informal != null ? r1((x.tasa_de_empleo_informal / x.tasa_de_empleo) * 100) : null, subocup: r1(x.tasa_de_subocupacion), prov: !!x.observaciones }))
+    .sort((a, b) => (a.p < b.p ? -1 : 1));
+  return { ultimo: serie[serie.length - 1], serie, area: '31 aglomerados urbanos (EPH)' };
+}
+
+async function secPobreza(env) {
+  const rows = await filas(env, 'pobreza_eph', {});
+  const serie = rows.filter(x => x.tasa_pobreza_personas != null)
+    .map(x => ({ p: x.anio + '-S' + x.semestre, label: trim(x.periodo), pers: r1(x.tasa_pobreza_personas), hog: r1(x.tasa_pobreza_hogares), indig: r1(x.tasa_indigencia_personas), prov: !!x.observaciones }))
+    .sort((a, b) => (a.p < b.p ? -1 : 1));
+  return { ultimo: serie[serie.length - 1], serie, area: '31 aglomerados urbanos (EPH)' };
+}
+
+async function secComex(env) {
+  const [x, m] = await Promise.all([
+    agregado(env, 'comercio_exterior_exportacion_bienes', { select: 'Periodo,valor_FOB.sum()', Anio: 'gte.2017' }),
+    agregado(env, 'comercio_exterior_importacion_bienes', { select: 'Periodo,valor_CIF.sum()', Anio: 'gte.2017' }),
+  ]);
+  const mp = new Map();
+  for (const r of x) (mp.get(r.Periodo) || mp.set(r.Periodo, { p: per(r.Periodo) }).get(r.Periodo)).x = Math.round(r.sum / 1e6);
+  for (const r of m) (mp.get(r.Periodo) || mp.set(r.Periodo, { p: per(r.Periodo) }).get(r.Periodo)).m = Math.round(r.sum / 1e6);
+  const serie = ordenar(mp).filter(o => o.x != null && o.m != null).map(o => ({ ...o, saldo: o.x - o.m }));
+  const ult = serie[serie.length - 1];
+  const ult12 = serie.slice(-12), sum = k => ult12.reduce((a, o) => a + o[k], 0);
+  const lat = ult.p.replace('-', '');
+  const [rub, pais, nom] = await Promise.all([
+    agregado(env, 'comercio_exterior_exportacion_bienes', { select: 'rubro_cod,valor_FOB.sum()', Periodo: 'eq.' + lat }),
+    agregado(env, 'comercio_exterior_exportacion_bienes', { select: 'pais_cod,valor_FOB.sum()', Periodo: 'eq.' + lat }),
+    agregado(env, 'comercio_exterior_nomenclaturas', { nombre_columna: 'in.(rubro_cod,pais_cod)' }),
+  ]);
+  const nombre = {}; for (const n of nom) nombre[n.nombre_columna + ':' + n.codigo] = n.codigo_descripcion;
+  const RUBROS = { '1': 'Productos primarios', '2': 'Manufacturas de origen agropecuario (MOA)', '3': 'Manufacturas de origen industrial (MOI)', '4': 'Combustibles y energía', '9': 'Confidencial' };
+  return {
+    ultimo: { ...ult, x12: sum('x'), m12: sum('m'), saldo12: sum('saldo') },
+    serie,
+    rubros: rub.map(r => ({ codigo: r.rubro_cod, nombre: RUBROS[r.rubro_cod] || nombre['rubro_cod:' + r.rubro_cod] || r.rubro_cod, x: Math.round(r.sum / 1e6) })).sort((a, b) => b.x - a.x),
+    destinos: pais.filter(r => r.sum && !/^X/.test(r.pais_cod) && !/indeterminado|confidencial|desconocido/i.test(nombre['pais_cod:' + r.pais_cod] || '')).map(r => ({ codigo: r.pais_cod, nombre: nombre['pais_cod:' + r.pais_cod] || r.pais_cod, x: Math.round(r.sum / 1e6) })).sort((a, b) => b.x - a.x).slice(0, 10),
+    unidad: 'millones de USD',
+  };
+}
+
+async function secPBI() {
+  const d = await seriesFetch('series/', new URLSearchParams({ ids: '4.2_OGP_2004_T_17', limit: '80', sort: 'desc', format: 'json' }));
+  const lv = (d.data || []).map(([f, v]) => ({ f, v })).reverse();
+  const serie = [];
+  for (let i = 4; i < lv.length; i++) {
+    const [a, mm] = lv[i].f.split('-').map(Number);
+    serie.push({ p: a + '-T' + ((mm - 1) / 3 + 1), label: ((mm - 1) / 3 + 1) + 'T ' + a, ia: r1((lv[i].v / lv[i - 4].v - 1) * 100) });
+  }
+  return { ultimo: serie[serie.length - 1], serie, fuente: 'INDEC vía datos.gob.ar (PIB a precios de 2004)' };
+}
+
+// Corre las tareas de a `n` para no recibir 429 del catálogo.
+async function enTandas(tareas, n = 3) {
+  const out = new Array(tareas.length); let i = 0;
+  await Promise.all(Array.from({ length: n }, async () => {
+    while (i < tareas.length) { const k = i++; try { out[k] = { ok: true, v: await tareas[k]() }; } catch (e) { out[k] = { ok: false, e: e.message }; } }
+  }));
+  return out;
+}
+
+async function armarTablero(env, ctx) {
+  const ipc = await secIPC(env); // va primero: salarios lo necesita para el salario real
+  const nombres = ['canasta', 'salarios', 'emae', 'trabajo', 'pobreza', 'comex', 'pbi', 'proximos'];
+  const res = await enTandas([
+    () => secCanasta(env), () => secSalarios(env, ipc.serie), () => secEMAE(env), () => secTrabajo(env),
+    () => secPobreza(env), () => secComex(env), () => secPBI(),
+    async () => {
+      const hoy = new Date(Date.now() - 3 * 3600e3); const out = [];
+      for (let i = 0; i < 2; i++) {
+        const d = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth() + i, 1));
+        const c = await cacheado(ctx, 'cal:' + d.getUTCFullYear() + '-' + (d.getUTCMonth() + 1), TTL.calendario, () => calendarioMes(d.getUTCFullYear(), d.getUTCMonth() + 1));
+        out.push(...c.data.eventos.map(clasificar));
+      }
+      const desde = hoy.toISOString().slice(0, 10);
+      return out.filter(e => e.fecha >= desde);
+    },
+  ]);
+  const t = { actualizado: new Date().toISOString(), ipc, errores: {} };
+  nombres.forEach((n, i) => { if (res[i].ok) t[n] = res[i].v; else { t[n] = null; t.errores[n] = res[i].e; } });
+  return t;
+}
+
+/* ───────────────────────── IPC a fondo (por región) ───────────────────────── */
+
+const REGIONES = ['Nacional', 'GBA', 'Pampeana', 'Noreste', 'Noroeste', 'Cuyo', 'Patagonia'];
+async function ipcDetalle(env, region) {
+  // Rubros (divisiones) de los últimos 37 meses: alcanza para 3 años de interanuales.
+  const ult = await filas(env, 'ipc_nacional', { region: 'eq.Nacional', codigo: 'eq.0', tipo_de_indicador: 'eq.v_m', order: 'periodo.desc', limit: '1' });
+  const lat = ult[0].periodo;
+  const [a, m] = [+lat.slice(0, 4), +lat.slice(4)];
+  const d = new Date(Date.UTC(a, m - 1 - 36, 1)), desde = '' + d.getUTCFullYear() + String(d.getUTCMonth() + 1).padStart(2, '0');
+  const [div, inc, clases, cats] = await Promise.all([
+    filas(env, 'ipc_nacional', { region: 'eq.' + region, nivel: 'eq.División', tipo_de_indicador: 'in.(v_m,v_ia)', periodo: 'gte.' + desde }),
+    region === 'Nacional' ? Promise.resolve([]) : filas(env, 'ipc_nacional', { region: 'eq.' + region, periodo: 'eq.' + lat, tipo_de_indicador: 'eq.Incidencia_m' }),
+    filas(env, 'ipc_nacional', { region: 'eq.' + region, periodo: 'eq.' + lat, nivel: 'in.(Grupo,Clase)', tipo_de_indicador: 'in.(v_m,v_ia)' }),
+    filas(env, 'ipc_nacional', { region: 'eq.' + region, codigo: 'in.(0,N,R,E,B,S)', tipo_de_indicador: 'in.(v_m,v_ia)', periodo: 'gte.' + desde }),
+  ]);
+  const rub = {};
+  for (const x of div) {
+    const r = (rub[x.codigo] ||= { codigo: x.codigo, nombre: x.descripcion, serie: {} });
+    (r.serie[per(x.periodo)] ||= { p: per(x.periodo) })[x.tipo_de_indicador === 'v_m' ? 'm' : 'ia'] = r1(x.valor);
+  }
+  const rubros = Object.values(rub).map(r => ({ ...r, serie: ordenar(new Map(Object.entries(r.serie))) })).sort((a, b) => a.codigo.localeCompare(b.codigo));
+  const incid = inc.map(x => ({ codigo: x.codigo, nombre: x.descripcion, inc: r2(x.valor) }));
+  const cl = {}; for (const x of clases) (cl[x.codigo] ||= { codigo: x.codigo, nivel: x.nivel, nombre: x.descripcion })[x.tipo_de_indicador === 'v_m' ? 'm' : 'ia'] = r1(x.valor);
+  const cat = porPeriodo(cats); const K = { '0': 'ng', N: 'n', R: 'r', E: 'e', B: 'b', S: 's' };
+  for (const x of cats) cat.get(x.periodo)[K[x.codigo] + '_' + (x.tipo_de_indicador === 'v_m' ? 'm' : 'ia')] = r1(x.valor);
+  return { region, periodo: per(lat), rubros, incidencias: incid, aperturas: Object.values(cl).sort((a, b) => a.codigo.localeCompare(b.codigo)), categorias: ordenar(cat) };
+}
+
 /* ───────────────────────── router ───────────────────────── */
 
 export default {
@@ -191,6 +426,33 @@ export default {
           endpoints: ['/v1/d/<dataset>?<filtros PostgREST>[&todo=1]', '/v1/calendario?mes=AAAA-MM', '/v1/calendario/proximos?dias=30', '/v1/series?ids=...', '/v1/buscar?q=...'],
           datasets: Object.keys(DATASETS),
         });
+      }
+
+      // /v1/tablero → primera vista entera. Si el INDEC falla, sirve el último bueno (7 días).
+      if (path === '/v1/tablero') {
+        const cache = caches.default;
+        const kFresco = new Request('https://cache.manfredi-indec/tablero-v1');
+        const kBueno = new Request('https://cache.manfredi-indec/tablero-v1-ok');
+        if (!sinCache) { const hit = await cache.match(kFresco); if (hit) return json(req, { ...(await hit.json()), cache: 'hit' }, 200, 900); }
+        let t;
+        try { t = await armarTablero(env, ctx); } catch (e) { t = null; console.error('[indec] tablero', e.message); }
+        if (!t) {
+          const viejo = await cache.match(kBueno);
+          if (viejo) return json(req, { ...(await viejo.json()), cache: 'stale' }, 200, 300);
+          return json(req, { error: 'El INDEC no respondió y no hay copia guardada' }, 503, 60);
+        }
+        const body = JSON.stringify(t);
+        ctx.waitUntil(cache.put(kFresco, new Response(body, { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=' + TTL.tablero } })));
+        if (!Object.keys(t.errores).length) ctx.waitUntil(cache.put(kBueno, new Response(body, { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=' + 7 * 86400 } })));
+        return json(req, { ...t, cache: 'miss' }, 200, 900);
+      }
+
+      // /v1/ipc?region=GBA → rubros 3 años, incidencias, grupos/clases y categorías
+      if (path === '/v1/ipc') {
+        const region = REGIONES.find(r => r.toLowerCase() === (url.searchParams.get('region') || 'Nacional').toLowerCase());
+        if (!region) return json(req, { error: 'Región inválida', regiones: REGIONES }, 400);
+        const r = await cacheado(ctx, 'ipc-det:' + region, TTL.datos, () => ipcDetalle(env, region));
+        return json(req, r.data, 200, 900);
       }
 
       // /v1/d/<dataset> → proxy cacheado al Catálogo API-INDEC
