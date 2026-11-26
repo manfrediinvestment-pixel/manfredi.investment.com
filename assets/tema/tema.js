@@ -10,7 +10,7 @@
    La hoja generada se guarda en localStorage y el <head> la aplica antes de pintar (sin parpadeo). */
 (function () {
   'use strict';
-  var KEY = 'mi_tema', KCSS = 'mi_tema_css', VER = 'v6', root = document.documentElement;
+  var KEY = 'mi_tema', KCSS = 'mi_tema_css', VER = 'v9', root = document.documentElement;
   var CLARO = 'html[data-tema="claro"]';
   // ilustraciones que se ven igual en los dos modos (tapas y lomos de los informes)
   var FIJO = /\.(bk3|est-cover|spn|lec__light)(?![\w-])/, FIJO_SEL = '.bk3, .est-cover, .spn, [data-tema-fijo]';
@@ -63,6 +63,7 @@
     if (tipo === 'b') {
       if (neutro) {
         if (L < .5) return txt(deLab(Math.min(.995, .99 - L * .2), Math.min(C * .5, .012), h), a);
+        if (a >= .6) return null;                          // superficies claras opacas (botones crema): quedan igual
         return txt(deLab(.3, Math.min(C, .03), h), a); // velos blancos sobre oscuro → velos tinta sobre claro
       }
       return L < .35 ? txt(deLab(.95, C * .35, h), a) : null;
@@ -85,7 +86,8 @@
   }
   function tipoDe(prop) {
     if (prop.indexOf('--') === 0) return 'v';
-    if (/^(color|fill|stroke|caret-color|-webkit-text-fill-color|text-decoration-color|accent-color)$/.test(prop)) return 't';
+    if (prop === 'fill' || prop === 'stroke') return 'v'; // en SVG un relleno oscuro es fondo y uno claro es letra
+    if (/^(color|caret-color|-webkit-text-fill-color|text-decoration-color|accent-color)$/.test(prop)) return 't';
     if (/^background/.test(prop)) return 'b';
     if (/^(border|outline|column-rule)/.test(prop) && /color|^border(-(top|right|bottom|left))?$|^outline$/.test(prop)) return 'l';
     if (/shadow$/.test(prop)) return 's';
@@ -147,7 +149,8 @@
     CLARO + ' body{background-color:#f5f7fb;}',
     CLARO + ' .ml-side{box-shadow:1px 0 0 rgba(15,30,60,.06);}',
     CLARO + ' :is(.bk3, .est-cover, .spn){color:#f4f7fb;}',
-    CLARO + ' img, ' + CLARO + ' video{filter:none !important;}'
+    // logos blancos en imagen (Balanz): en claro van en tinta
+    CLARO + ' img.as-logo, ' + CLARO + ' img[src$="balanz.svg"]{filter:brightness(0) invert(.14);}'
   ].join('\n');
 
   /* ---------- estilos en línea (los arma el JS) ---------- */
@@ -167,6 +170,22 @@
     origen.set(el, cur); escrito.set(el, nuevo); tocados.add(el);
     el.setAttribute('style', nuevo);
   }
+  var attrOrig = new WeakMap(), attrTocados = new Set();
+  function remapAtributos(el) {
+    if (!el.getAttribute || el.closest(FIJO_SEL)) return;
+    ['fill', 'stroke', 'stop-color'].forEach(function (at) {
+      var v = el.getAttribute(at); if (!v) return;
+      var o = attrOrig.get(el) || {};
+      if (o[at] && o[at].nuevo === v) return;
+      var n = remapValor(v, 'v'); if (n == null) return;
+      o[at] = { orig: v, nuevo: n }; attrOrig.set(el, o); attrTocados.add(el);
+      el.setAttribute(at, n);
+    });
+  }
+  function restaurarAtributos() {
+    attrTocados.forEach(function (el) { var o = attrOrig.get(el) || {}; Object.keys(o).forEach(function (at) { if (el.getAttribute(at) === o[at].nuevo) el.setAttribute(at, o[at].orig); }); attrOrig.delete(el); });
+    attrTocados.clear();
+  }
   function restaurarEstilos() {
     tocados.forEach(function (el) { if (el.getAttribute('style') === escrito.get(el)) el.setAttribute('style', origen.get(el)); escrito.delete(el); });
     tocados.clear();
@@ -175,14 +194,15 @@
   function observar(on) {
     if (on && !obs) {
       document.querySelectorAll('[style]').forEach(remapEstilo);
+      document.querySelectorAll('svg [fill], svg [stroke], svg[fill], svg[stroke], svg stop').forEach(remapAtributos);
       obs = new MutationObserver(function (ms) {
         ms.forEach(function (m) {
-          if (m.type === 'attributes') { if (m.target.nodeType === 1) remapEstilo(m.target); }
-          else m.addedNodes.forEach(function (n) { if (n.nodeType !== 1) return; if (n.hasAttribute('style')) remapEstilo(n); if (n.querySelectorAll) n.querySelectorAll('[style]').forEach(remapEstilo); });
+          if (m.type === 'attributes') { if (m.target.nodeType === 1) { if (m.attributeName === 'style') remapEstilo(m.target); else remapAtributos(m.target); } }
+          else m.addedNodes.forEach(function (n) { if (n.nodeType !== 1) return; if (n.hasAttribute('style')) remapEstilo(n); remapAtributos(n); if (n.querySelectorAll) { n.querySelectorAll('[style]').forEach(remapEstilo); n.querySelectorAll('[fill], [stroke], stop').forEach(remapAtributos); } });
         });
       });
-      obs.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['style'] });
-    } else if (!on && obs) { obs.disconnect(); obs = null; restaurarEstilos(); }
+      obs.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['style', 'fill', 'stroke'] });
+    } else if (!on && obs) { obs.disconnect(); obs = null; restaurarEstilos(); restaurarAtributos(); }
   }
 
   /* ---------- gráficos (LightweightCharts): los colores van por JS, se cambian con applyOptions ---------- */
