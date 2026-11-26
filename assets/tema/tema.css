@@ -1,0 +1,45 @@
+/* Tema del sitio (feat/modo-claro).
+   1) Modo claro: html[data-tema="claro"]. El sitio es oscuro de punta a punta, así que el modo claro
+      invierte la luz de toda la página (invert + hue-rotate conserva los tonos: el dorado sigue dorado,
+      el azul sigue azul) y vuelve a invertir fotos, videos y logos para que queden con sus colores reales.
+      El filtro va en <html>: así los elementos fijos (menú lateral, avisos, Warren) siguen fijos.
+   2) Barra de la cuenta (campanita + perfil) en azul oscuro, como el resto de la barra de arriba. */
+
+html[data-tema="claro"] { background: #0b1220 !important; filter: invert(1) hue-rotate(180deg); }
+html[data-tema="claro"] :is(img, video, picture, iframe, .mi-mark, [style*="background-image"]) { filter: invert(1) hue-rotate(180deg); }
+html[data-tema="claro"] :is(picture, [style*="background-image"]) :is(img, video) { filter: none; }
+
+/* botón sol / luna */
+.mi-tema { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; flex: none; margin-right: 8px;
+  border-radius: 50%; border: 1px solid rgba(214,226,244,.14); background: rgba(214,226,244,.05); color: #eef3fa; cursor: pointer;
+  transition: border-color .2s ease, background-color .2s ease, transform .2s cubic-bezier(.23,1,.32,1); }
+.mi-tema:hover { border-color: rgba(242,201,76,.55); }
+.mi-tema:active { transform: scale(.94); }
+.mi-tema:focus-visible { outline: 2px solid #f2c94c; outline-offset: 2px; }
+.mi-tema svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .35s cubic-bezier(.23,1,.32,1), opacity .2s; }
+.mi-tema .sol { position: absolute; opacity: 0; transform: rotate(-60deg) scale(.6); }
+html[data-tema="claro"] .mi-tema .luna { opacity: 0; transform: rotate(60deg) scale(.6); }
+html[data-tema="claro"] .mi-tema .sol { opacity: 1; transform: none; }
+/* en el celular la barra es blanca: el botón va en oscuro sobre blanco */
+html:not(.ml-on) .mi-tema { border-color: var(--border, #e5e7eb); background: #fff; color: #0a0f1e; }
+
+/* ---------- barra de la cuenta en azul oscuro (escritorio, barra de arriba oscura) ---------- */
+html.ml-on #navUserArea { display: flex; align-items: center; }
+html.ml-on .nb-btn, html.ml-on .np-btn { background: rgba(214,226,244,.05) !important; border-color: rgba(214,226,244,.14) !important; color: #eef3fa !important; }
+html.ml-on .nb-btn:hover, html.ml-on .nb-btn[aria-expanded="true"], html.ml-on .np-btn:hover, html.ml-on .np-btn[aria-expanded="true"] { border-color: rgba(242,201,76,.55) !important; }
+html.ml-on .np-btn { font-family: 'Instrument Sans', 'IBM Plex Sans', sans-serif; font-weight: 500; }
+html.ml-on .np-av { background: #13243b; color: #f2c94c; }
+html.ml-on .nb-count { background: #f2c94c; color: #0a1322; }
+html.ml-on .np-menu, html.ml-on .nb-menu { background: #0c1729 !important; border-color: rgba(214,226,244,.12) !important; color: #eef3fa !important; box-shadow: 0 24px 60px -20px rgba(0,0,0,.85) !important; }
+html.ml-on .np-menu *, html.ml-on .nb-menu * { color: inherit; }
+html.ml-on .np-who span, html.ml-on .np-item, html.ml-on .nb-item, html.ml-on .np-msg, html.ml-on .np-follow, html.ml-on .np-sw, html.ml-on .nb-empty, html.ml-on .nb-when, html.ml-on .nb-det { color: #eef3fa !important; }
+html.ml-on .np-item:hover, html.ml-on .nb-item:hover { background: rgba(214,226,244,.06) !important; }
+html.ml-on .np-tag, html.ml-on .nb-kind, html.ml-on .nb-group, html.ml-on .np-item--gold, html.ml-on .nb-head button { color: #f2c94c !important; }
+html.ml-on .np-tag { border-color: rgba(242,201,76,.4) !important; }
+html.ml-on .np-sep { background: rgba(214,226,244,.1) !important; }
+html.ml-on .np-nameform, html.ml-on .nb-head { border-color: rgba(214,226,244,.1) !important; }
+html.ml-on .np-namerow input { background: #070e1b !important; color: #eef3fa !important; border-color: rgba(214,226,244,.16) !important; }
+html.ml-on .np-namerow button { background: #f2c94c !important; border-color: #f2c94c !important; color: #0a1322 !important; }
+html.ml-on .nb-item--nuevo::before { background: #f2c94c; }
+
+@media (prefers-reduced-motion: reduce) { .mi-tema, .mi-tema svg { transition: none; } }
