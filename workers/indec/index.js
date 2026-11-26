@@ -133,8 +133,8 @@ function desHtml(s) {
 // Ojo: las siglas (ICA, IPC, EMAE…) se buscan con \b y distinguiendo mayúsculas:
 // con /i "ica" aparece en "estadísticas", "farmacéutica", "pública".
 const TEMAS = [
+  ['externo', [/\b(ICA)\b/, /comercio exterior|intercambio comercial|exportaci|importaci|balanza de pagos|deuda externa|posici[oó]n de inversi|t[eé]rminos del intercambio|foreign trade/i]],
   ['precios', [/\b(IPC|ICC|SIPM|CBA|CBT)\b/, /precios|canasta|costo de la construcci/i]],
-  ['externo', [/\b(ICA)\b/, /comercio exterior|intercambio comercial|exportaci|importaci|balanza de pagos|deuda externa|posici[oó]n de inversi|t[eé]rminos del intercambio/i]],
   ['trabajo', [/\b(EPH)\b/, /salarios|mercado de trabajo|empleo|desocupaci|pobreza|indigencia|distribuci[oó]n del ingreso|dotaci[oó]n de personal/i]],
   ['actividad', [/\b(EMAE|PIB|IPI|ISSP|UCII|EPI)\b/, /actividad|producto interno|industria|construcci|capacidad instalada|servicios p[uú]blicos|supermercados|autoservicios|centros de compras|turismo|hotelera|energ[eé]tic|tendencia de negocios|cuentas nacionales|capital fijo/i]],
 ];
@@ -317,11 +317,14 @@ async function secComex(env) {
     agregado(env, 'comercio_exterior_importacion_bienes', { select: 'Periodo,valor_CIF.sum()', Anio: 'gte.2017' }),
   ]);
   const mp = new Map();
-  for (const r of x) (mp.get(r.Periodo) || mp.set(r.Periodo, { p: per(r.Periodo) }).get(r.Periodo)).x = Math.round(r.sum / 1e6);
-  for (const r of m) (mp.get(r.Periodo) || mp.set(r.Periodo, { p: per(r.Periodo) }).get(r.Periodo)).m = Math.round(r.sum / 1e6);
-  const serie = ordenar(mp).filter(o => o.x != null && o.m != null).map(o => ({ ...o, saldo: o.x - o.m }));
+  // Se suma y resta en dólares y se redondea al final (redondear antes corría el saldo en 1 M).
+  for (const r of x) (mp.get(r.Periodo) || mp.set(r.Periodo, { p: per(r.Periodo) }).get(r.Periodo)).xr = r.sum;
+  for (const r of m) (mp.get(r.Periodo) || mp.set(r.Periodo, { p: per(r.Periodo) }).get(r.Periodo)).mr = r.sum;
+  const crudo = ordenar(mp).filter(o => o.xr != null && o.mr != null);
+  const M = v => Math.round(v / 1e6);
+  const serie = crudo.map(o => ({ p: o.p, x: M(o.xr), m: M(o.mr), saldo: M(o.xr - o.mr) }));
   const ult = serie[serie.length - 1];
-  const ult12 = serie.slice(-12), sum = k => ult12.reduce((a, o) => a + o[k], 0);
+  const c12 = crudo.slice(-12), sum = k => M(c12.reduce((a, o) => a + (k === 'saldo' ? o.xr - o.mr : o[k + 'r']), 0));
   const lat = ult.p.replace('-', '');
   const [rub, pais, nom] = await Promise.all([
     agregado(env, 'comercio_exterior_exportacion_bienes', { select: 'rubro_cod,valor_FOB.sum()', Periodo: 'eq.' + lat }),
@@ -431,8 +434,8 @@ export default {
       // /v1/tablero → primera vista entera. Si el INDEC falla, sirve el último bueno (7 días).
       if (path === '/v1/tablero') {
         const cache = caches.default;
-        const kFresco = new Request('https://cache.manfredi-indec/tablero-v1');
-        const kBueno = new Request('https://cache.manfredi-indec/tablero-v1-ok');
+        const kFresco = new Request('https://cache.manfredi-indec/tablero-v3');
+        const kBueno = new Request('https://cache.manfredi-indec/tablero-v3-ok');
         if (!sinCache) { const hit = await cache.match(kFresco); if (hit) return json(req, { ...(await hit.json()), cache: 'hit' }, 200, 900); }
         let t;
         try { t = await armarTablero(env, ctx); } catch (e) { t = null; console.error('[indec] tablero', e.message); }

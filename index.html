@@ -36,6 +36,7 @@
 <link rel="stylesheet" href="assets/home/lo-ultimo.css?v=20261120g" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261112" />
 <link rel="stylesheet" href="assets/analistas/analistas.css?v=20261030" />
+<link rel="stylesheet" href="assets/datos-ar/datos-ar.css?v=20261126" />
 <link rel="stylesheet" href="assets/portfolio/ratios.css?v=20261012" />
 <link rel="stylesheet" href="assets/pro/pro.css?v=20261028l" />
 <link rel="stylesheet" href="assets/comunidad/chat.css?v=20261119b" />
@@ -4250,7 +4251,9 @@
   <script src="assets/portfolio/ratios.js?v=20261012" defer></script>
   <script src="assets/analistas/api.js?v=20261030" defer></script>
   <script src="assets/analistas/social.js?v=20261012soc" defer></script>
-  <script src="assets/analistas/analistas.js?v=20261112" defer></script>
+  <!-- Noticias · Argentina en datos (INDEC): worker manfredi-indec -->
+  <script src="assets/datos-ar/datos-ar.js?v=20261126" defer></script>
+  <script src="assets/analistas/analistas.js?v=20261126" defer></script>
   <script src="assets/analistas/revision.js?v=20261028a" defer></script>
   <script src="assets/analistas/autor.js?v=20261030" defer></script>
   <script src="assets/comunidad/tarjeta.js?v=20261123a" defer></script>
@@ -4460,6 +4463,7 @@
         <h2 class="nt-switch" role="tablist" aria-label="Noticias o análisis">
           <button type="button" role="tab" data-nt-sub="noticias" class="on" aria-selected="true">Noticias</button>
           <button type="button" role="tab" data-nt-sub="analisis" aria-selected="false">Análisis e informes</button>
+          <button type="button" role="tab" data-nt-sub="datos" aria-selected="false"><span class="ad-largo">Argentina en datos</span><span class="ad-corto">Datos</span></button>
           <i class="nt-switch__ind" aria-hidden="true"></i>
           <a class="an-mio" id="anMio" href="#autor" hidden>Mi espacio de autor</a>
         </h2>
@@ -4517,6 +4521,8 @@
       <div class="an-perfil" id="anNota" hidden></div>
       <div class="an-perfil an-autor" id="anAutor" hidden></div>
     </div>
+    <!-- Argentina en datos: tablero, inflación, explorador y calendario del INDEC (assets/datos-ar/datos-ar.js) -->
+    <div class="nt-wrap ad" id="adPanel" hidden></div>
     <div class="nt-wrap nt-grid" id="ntPanel">
       <div class="nt-main">
         <div class="nt-bar" id="ntBar"><div class="nt-chips" id="ntChips" role="group" aria-label="Filtrar noticias"></div></div>
@@ -17911,6 +17917,7 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
       if (hash === 'reportes') return 'informes';
       if (hash === 'pro' || hash === 'pro-warren') return 'inversiones';
       if (hash === 'analisis' || hash.indexOf('analista-') === 0 || hash.indexOf('nota-') === 0 || hash === 'autor') return 'informes';
+      if (hash === 'datos' || hash.indexOf('datos-') === 0) return 'informes';
       if (hash === 'finanzas') return 'herramientas';
       if (hash.indexOf('asesoria-') === 0) return 'asesoria';
       if (TAB_IDS.indexOf(hash) !== -1) return hash;

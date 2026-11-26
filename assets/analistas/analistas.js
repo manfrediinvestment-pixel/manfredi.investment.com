@@ -269,17 +269,21 @@
     if (h.indexOf('analista-') === 0) return { v: 'perfil', slug: h.slice(9) };
     if (h.indexOf('nota-') === 0) return { v: 'nota', id: h.slice(5) };
     if (h === 'autor') return { v: 'autor' };
+    if (h === 'datos' || h.indexOf('datos-') === 0) return { v: 'datos', sec: h };
     return { v: 'noticias' };
   }
   function mostrar() {
-    var w = vista(), an = w.v !== 'noticias';
+    var w = vista(), datos = w.v === 'datos', an = w.v !== 'noticias' && !datos;
     document.querySelectorAll('[data-nt-sub]').forEach(function (b) {
-      var on = b.dataset.ntSub === (an ? 'analisis' : 'noticias');
+      var on = b.dataset.ntSub === (datos ? 'datos' : an ? 'analisis' : 'noticias');
       b.classList.toggle('on', on); b.setAttribute('aria-selected', on);
     });
-    $('ntPanel').hidden = an; root.hidden = !an;
-    $('ntDate').hidden = an;
+    $('ntPanel').hidden = an || datos; root.hidden = !an;
+    $('ntDate').hidden = an || datos;
+    // sub-pestaña "Argentina en datos" (assets/datos-ar/datos-ar.js)
+    var ad = $('adPanel'); if (ad) ad.hidden = !datos;
     marcarSub();
+    if (datos) { if (window.DatosAR) window.DatosAR.mostrar(w.sec); return; }
     if (!an) { window.dispatchEvent(new Event('resize')); return; }
     // sección abierta: el cartel de la convocatoria solo aparece si no hay ninguna publicación
     var guia = w.v === 'analisis' && st.listo && !st.pubs.length;
@@ -296,7 +300,7 @@
 
   document.querySelectorAll('[data-nt-sub]').forEach(function (b) {
     b.addEventListener('click', function () {
-      var h = b.dataset.ntSub === 'analisis' ? '#analisis' : '#informes';
+      var h = b.dataset.ntSub === 'analisis' ? '#analisis' : b.dataset.ntSub === 'datos' ? '#datos' : '#informes';
       if (location.hash !== h) history.replaceState(null, '', h);
       mostrar();
     });
