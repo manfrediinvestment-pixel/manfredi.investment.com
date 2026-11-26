@@ -1,44 +1,166 @@
-/* Menú lateral de todo el sitio (feat/menu-lateral). Lo arma assets/menu-lateral/menu-lateral.js.
-   Solo con html.ml-on (pantallas ≥1100px): la barra izquierda reemplaza los links del navbar y
-   las pestañas internas de cada sección. Cero texto gris: jerarquía por peso y tamaño. */
-:root { --ml-w: 244px; --ml-ink: #eef3fa; --ml-gold: #f2c94c; --ml-bg: #070e1b; --ml-line: rgba(214,226,244,.1); --ml-hover: rgba(214,226,244,.06); --ml-sel: rgba(242,201,76,.1); }
+/* Menú lateral de todo el sitio (feat/menu-lateral) — "app shell". Lo arma assets/menu-lateral/menu-lateral.js.
+   Solo con html.ml-on (pantallas ≥1100px). html.ml-mini = barra achicada a solo íconos.
+   Cero texto gris: la jerarquía sale del peso y el tamaño; el dorado marca dónde estás. */
+:root {
+  --ml-w: 272px; --ml-w-mini: 78px;
+  --ml-bg: #070e1b; --ml-top: rgba(7,14,27,.82); --ml-ink: #eef3fa; --ml-gold: #f2c94c; --ml-gold2: #f7dc8a;
+  --ml-line: rgba(214,226,244,.09); --ml-line2: rgba(214,226,244,.15); --ml-hover: rgba(214,226,244,.055);
+  --ml-sel: rgba(242,201,76,.11); --ml-sel2: rgba(242,201,76,.07);
+  --ml-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ml-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --ml-ease: cubic-bezier(.23,1,.32,1);
+}
+.ml-side, .ml-crumb { display: none; }
 
-.ml-side { display: none; }
+/* ---------- estructura ---------- */
+html.ml-on { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+html.ml-on body { padding-left: var(--ml-w); transition: padding-left .32s var(--ml-ease); }
+html.ml-on.ml-mini body { padding-left: var(--ml-w-mini); }
 html.ml-on .ml-side {
-  display: flex; flex-direction: column; gap: 2px;
-  position: fixed; left: 0; bottom: 0; width: var(--ml-w); z-index: 90;
-  padding: 16px 12px 28px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin;
-  background: var(--ml-bg); border-right: 1px solid var(--ml-line);
-  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 120;
+  width: var(--ml-w); background: var(--ml-bg); border-right: 1px solid var(--ml-line);
+  font-family: var(--ml-sans); color: var(--ml-ink); transition: width .32s var(--ml-ease);
 }
-/* el contenido se corre a la derecha; el navbar queda a lo ancho */
-html.ml-on body { padding-left: var(--ml-w); }
-html.ml-on .navbar { margin-left: calc(-1 * var(--ml-w)); }
-html.ml-on .nav-links { display: none !important; }
+html.ml-on.ml-mini .ml-side { width: var(--ml-w-mini); }
 
-/* las pestañas internas ya están en la barra: se esconden para no repetir */
-html.ml-on #mktTabs, html.ml-on #calTabs, html.ml-on #pfSecNav, html.ml-on #proNav,
-html.ml-on .nt-switch, html.ml-on #adNav { display: none !important; }
+/* ---------- barra de arriba ---------- */
+html.ml-on .navbar { background: var(--ml-top); -webkit-backdrop-filter: blur(16px) saturate(140%); backdrop-filter: blur(16px) saturate(140%); border-bottom: 1px solid var(--ml-line); box-shadow: none; }
+html.ml-on .navbar .nav-inner { max-width: none; height: 68px; padding: 0 36px; gap: 20px; }
+html.ml-on .navbar .logo, html.ml-on .nav-links, html.ml-on .nav-burger { display: none !important; }
+html.ml-on .ml-crumb { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; font: 500 15px/1 var(--ml-sans); color: var(--ml-ink); }
+html.ml-on .ml-crumb .ml-cr-ic { width: 34px; height: 34px; flex: none; display: grid; place-items: center; border-radius: 10px; background: var(--ml-sel); color: var(--ml-gold); }
+html.ml-on .ml-crumb .ml-cr-ic svg { width: 18px; height: 18px; }
+html.ml-on .ml-crumb .ml-cr-g { font-weight: 600; letter-spacing: -.005em; }
+html.ml-on .ml-crumb .ml-cr-s { width: 5px; height: 5px; border-radius: 50%; background: var(--ml-gold); flex: none; }
+html.ml-on .ml-crumb .ml-cr-o { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; animation: mlFade .35s var(--ml-ease) both; }
+html.ml-on #navUserArea { margin-left: auto; }
+html.ml-on .nav-login-btn { background: none !important; border: 1px solid rgba(242,201,76,.55) !important; color: var(--ml-gold) !important; font: 600 14px/1 var(--ml-sans) !important; padding: 10px 18px !important; border-radius: 10px !important; transition: background-color .2s var(--ml-ease); }
+html.ml-on .nav-login-btn:hover { background: var(--ml-sel) !important; }
+/* la cinta de precios va debajo de la barra, fina y discreta */
+html.ml-on .ticker-bar { border-bottom: 1px solid var(--ml-line); background: rgba(7,14,27,.55); }
 
-.ml-side .ml-item, .ml-side .ml-gh {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;
-  background: none; border: 0; text-align: left; cursor: pointer; text-decoration: none;
-  color: var(--ml-ink); border-radius: 8px; transition: background-color .15s ease, color .15s ease;
+/* las pestañas internas que ya están en el menú se esconden; Mercados las conserva debajo del título */
+html.ml-on #calTabs, html.ml-on #pfSecNav, html.ml-on #proNav, html.ml-on .nt-switch, html.ml-on #adNav { display: none !important; }
+
+/* ---------- cabecera del menú ---------- */
+.ml-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 96px; padding: 0 14px 0 20px; border-bottom: 1px solid var(--ml-line); flex: none; }
+.ml-logo { display: flex; align-items: center; gap: 13px; min-width: 0; text-decoration: none; color: var(--ml-ink); border-radius: 12px; }
+.ml-mark { width: 46px; height: 46px; flex: none; display: grid; place-items: center; filter: drop-shadow(0 6px 18px rgba(242,201,76,.18)); }
+.ml-mark .mi-mark { width: 46px; height: 46px; }
+.ml-brand { display: flex; flex-direction: column; line-height: 1; white-space: nowrap; overflow: hidden; }
+.ml-brand b { font: 400 22px/1 'DM Serif Display', Georgia, serif; letter-spacing: .005em; color: var(--ml-ink); }
+.ml-brand small { font: 600 10px/1 var(--ml-sans); letter-spacing: .18em; text-transform: uppercase; color: var(--ml-gold); margin-top: 7px; }
+.ml-col { width: 32px; height: 32px; flex: none; display: grid; place-items: center; border-radius: 9px; border: 1px solid var(--ml-line); background: none; color: var(--ml-ink); cursor: pointer; transition: background-color .15s, border-color .15s, transform .32s var(--ml-ease); }
+.ml-col svg { width: 17px; height: 17px; }
+.ml-col:hover { background: var(--ml-hover); border-color: var(--ml-line2); }
+
+/* ---------- lista ---------- */
+.ml-list { flex: 1; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding: 20px 12px 28px; display: flex; flex-direction: column; gap: 3px; scrollbar-width: thin; scrollbar-color: rgba(214,226,244,.14) transparent; }
+.ml-sep { border: 0; height: 1px; background: var(--ml-line); margin: 13px 10px; flex: none; }
+.ml-ic { width: 20px; height: 20px; flex: none; }
+.ml-ic--s { width: 17px; height: 17px; }
+
+.ml-gh { position: relative; display: flex; align-items: center; border-radius: 11px; transition: background-color .2s var(--ml-ease); }
+.ml-gl, .ml-chev, .ml-item { background: none; border: 0; color: var(--ml-ink); cursor: pointer; font-family: var(--ml-sans); }
+.ml-gl { flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px; padding: 11px 13px; font-size: 15px; font-weight: 500; letter-spacing: -.003em; text-align: left; border-radius: 11px; }
+.ml-gl:active, .ml-item:active { transform: scale(.985); }
+.ml-chev { width: 34px; height: 34px; flex: none; display: grid; place-items: center; border-radius: 9px; margin-right: 4px; }
+.ml-chev svg { width: 16px; height: 16px; transition: transform .3s var(--ml-ease); }
+.ml-g.open .ml-chev svg { transform: rotate(180deg); }
+@media (hover: hover) { .ml-gh:hover { background: var(--ml-hover); } .ml-chev:hover { background: var(--ml-hover); } .ml-item:hover:not(.on) { background: var(--ml-hover); } }
+.ml-g.act > .ml-gh { background: var(--ml-sel); }
+.ml-g.act > .ml-gh::before { content: ""; position: absolute; left: -12px; top: 9px; bottom: 9px; width: 3px; border-radius: 0 3px 3px 0; background: var(--ml-gold); box-shadow: 0 0 12px rgba(242,201,76,.55); }
+.ml-g.act > .ml-gh .ml-gl, .ml-g.act > .ml-gh .ml-chev { color: var(--ml-gold); }
+.ml-g.act > .ml-gh .ml-gl { font-weight: 600; }
+.ml-t { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ml-pro { font: 600 9px/1 var(--ml-sans); letter-spacing: .12em; color: var(--ml-gold); margin-left: 9px; padding: 3px 5px; border: 1px solid rgba(242,201,76,.45); border-radius: 4px; vertical-align: 2px; }
+
+.ml-gb { display: flex; flex-direction: column; gap: 1px; padding: 6px 0 10px; animation: mlDrop .32s var(--ml-ease) both; }
+.ml-gb .ml-item { animation: mlFade .4s var(--ml-ease) both; }
+.ml-gb .ml-item:nth-child(2) { animation-delay: .02s; } .ml-gb .ml-item:nth-child(3) { animation-delay: .04s; } .ml-gb .ml-item:nth-child(4) { animation-delay: .06s; }
+.ml-gb .ml-item:nth-child(5) { animation-delay: .08s; } .ml-gb .ml-item:nth-child(n+6) { animation-delay: .1s; }
+.ml-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 9px 12px 9px 27px; font-size: 14px; font-weight: 400; text-align: left; border-radius: 9px; transition: background-color .18s var(--ml-ease), color .18s var(--ml-ease); }
+.ml-item.on { color: var(--ml-gold); font-weight: 600; background: var(--ml-sel2); }
+.ml-new { font: 600 9px/1 var(--ml-sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ml-gold); margin-left: auto; }
+.ml-cant { margin-left: auto; min-width: 22px; text-align: center; font: 500 11.5px/20px var(--ml-mono); color: var(--ml-ink); background: rgba(214,226,244,.07); border-radius: 6px; padding: 0 6px; }
+.ml-item.on .ml-cant { background: rgba(242,201,76,.16); color: var(--ml-gold); }
+.ml-new + .ml-cant { margin-left: 8px; }
+.ml-vacio { font: 400 13px var(--ml-sans); color: var(--ml-ink); padding: 8px 12px 8px 27px; }
+.ml-gl:focus-visible, .ml-chev:focus-visible, .ml-item:focus-visible, .ml-col:focus-visible, .ml-logo:focus-visible { outline: 2px solid var(--ml-gold); outline-offset: 1px; }
+
+/* pie del menú: Ayuda */
+.ml-foot { flex: none; padding: 10px 12px 14px; border-top: 1px solid var(--ml-line); }
+.ml-foot .ml-gl:hover { background: var(--ml-hover); }
+
+/* ---------- versión achicada: solo íconos ---------- */
+html.ml-mini .ml-top { padding: 0; justify-content: center; flex-direction: column; gap: 8px; height: 118px; }
+html.ml-mini .ml-brand { display: none; }
+html.ml-mini .ml-col { transform: rotate(180deg); }
+html.ml-mini .ml-list { padding: 20px 11px; }
+html.ml-mini .ml-gl { justify-content: center; padding: 12px 0; }
+html.ml-mini .ml-gl .ml-t, html.ml-mini .ml-chev { display: none; }
+html.ml-mini .ml-g.act > .ml-gh::before { left: -11px; }
+html.ml-mini .ml-sep { margin: 10px 8px; }
+
+/* ---------- movimiento: cada sección entra con un fundido suave al mostrarse ---------- */
+@keyframes mlFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes mlDrop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@keyframes mlRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+html.ml-on section[data-tab]:not(.tab-hidden) > div:first-child { animation: mlRise .5s var(--ml-ease) both; }
+
+/* ====================================================================
+   MERCADOS · panel derecho más prolijo
+   ==================================================================== */
+html.ml-on #mercados.mt { padding: 30px 0 48px; background: transparent; }
+html.ml-on #mercados .mt-wrap { width: min(1480px, 100% - 72px); }
+/* título sobrio, con subtítulo; las pestañas de activos quedan justo debajo */
+html.ml-on #mercados .mt-top { padding-bottom: 0; align-items: flex-end; }
+html.ml-on #mercados .mt-title { font-size: 38px; gap: 14px; letter-spacing: -.01em; }
+html.ml-on #mercados .mt-live { width: 9px; height: 9px; }
+html.ml-on #mercados .mt-sub { display: block; font: 400 14.5px/1.4 var(--ml-sans); color: var(--ml-ink); margin: 10px 0 0 23px; }
+
+/* pestañas de tipos de activo: subrayado dorado que se desliza, con ícono */
+html.ml-on #mercados .mt-bar { margin: 22px 0 24px; padding: 0; border-bottom: 1px solid var(--ml-line); gap: 16px; align-items: flex-end; }
+html.ml-on #mercados .mt-bar .mt-tabs { position: relative; gap: 2px; margin: 0; padding: 0; overflow-x: auto; }
+html.ml-on #mercados .mt-tabs .mkt-tab {
+  display: inline-flex; align-items: center; gap: 8px; height: 46px; padding: 0 14px; border-radius: 0 !important;
+  background: none !important; border: 0 !important; color: var(--ml-ink) !important; font: 500 14px/1 var(--ml-sans) !important;
+  letter-spacing: -.003em; transition: color .2s var(--ml-ease);
 }
-.ml-side .ml-inicio { font: 600 14px/1.2 'IBM Plex Sans', system-ui, sans-serif; padding: 10px 12px; margin-bottom: 6px; }
-.ml-side .ml-gh { font: 600 14px/1.2 'IBM Plex Sans', system-ui, sans-serif; padding: 10px 12px; }
-.ml-side .ml-gh i { font: 500 15px/1 'IBM Plex Mono', ui-monospace, monospace; font-style: normal; color: var(--ml-gold); }
-.ml-side .ml-g.act > .ml-gh { color: var(--ml-gold); }
-.ml-side .ml-gb { display: flex; flex-direction: column; gap: 1px; margin: 2px 0 10px; padding-left: 10px; border-left: 1px solid var(--ml-line); margin-left: 14px; }
-.ml-side .ml-gb .ml-item { font: 400 13.5px/1.3 'IBM Plex Sans', system-ui, sans-serif; padding: 7px 10px; }
-.ml-side .ml-item.on { background: var(--ml-sel); font-weight: 600; box-shadow: inset 2px 0 0 var(--ml-gold); }
-.ml-side .ml-inicio.on { background: var(--ml-sel); box-shadow: inset 2px 0 0 var(--ml-gold); }
-@media (hover: hover) {
-  .ml-side .ml-item:hover:not(.on), .ml-side .ml-gh:hover { background: var(--ml-hover); }
+html.ml-on #mercados .mt-tabs .mkt-tab:hover { color: var(--ml-gold2) !important; }
+html.ml-on #mercados .mt-tabs .mkt-tab.active { color: var(--ml-gold) !important; font-weight: 600 !important; }
+html.ml-on #mercados .mt-tabs .mkt-tab > svg { width: 15px; height: 15px; }
+html.ml-on #mercados .mt-tabs .mkt-tab::before { content: ""; width: 16px; height: 16px; flex: none; background: currentColor; -webkit-mask: var(--ml-tab-ic) center / contain no-repeat; mask: var(--ml-tab-ic) center / contain no-repeat; }
+html.ml-on #mercados .mt-tabs .mkt-tab-fav::before { display: none; }
+html.ml-on #mercados .mt-tabs .mkt-tab-fav-count { font: 500 11px/18px var(--ml-mono); padding: 0 6px; border-radius: 5px; background: rgba(214,226,244,.08); color: var(--ml-ink); }
+html.ml-on #mercados .mt-new { background: none !important; color: var(--ml-gold) !important; font: 600 9px/1 var(--ml-sans); letter-spacing: .12em; text-transform: uppercase; padding: 0; margin-left: 2px; }
+html.ml-on #mercados .ml-tab-ind { position: absolute; left: 0; bottom: 0; height: 2px; width: 0; border-radius: 2px 2px 0 0; background: var(--ml-gold); box-shadow: 0 0 14px rgba(242,201,76,.55); transition: transform .42s var(--ml-ease), width .42s var(--ml-ease); pointer-events: none; }
+html.ml-on #mercados .mt-search { flex: 0 0 240px; margin-bottom: 7px; }
+
+/* carteles de arriba: más aire y cifras más nítidas */
+html.ml-on #mercados .mt-strip { gap: 14px; margin-bottom: 28px; }
+html.ml-on #mercados .mt-card { border-radius: 16px; padding: 18px 18px 14px; transition: border-color .25s var(--ml-ease), transform .25s var(--ml-ease); }
+@media (hover: hover) { html.ml-on #mercados .mt-card:hover { border-color: rgba(242,201,76,.32); transform: translateY(-2px); } }
+html.ml-on #mercados .mt-c-top { font: 500 13.5px var(--ml-sans); }
+html.ml-on #mercados .mt-card b, html.ml-on #mercados .mt-dl b { letter-spacing: -.02em; }
+
+/* cuerpo: lista + detalle dentro de un panel con borde, como una app */
+html.ml-on #mercados .mt-body { gap: 0; border: 1px solid var(--ml-line); border-radius: 18px; background: linear-gradient(180deg, rgba(15,30,54,.55), rgba(8,16,31,.55)); overflow: clip; }
+html.ml-on #mercados .mt-left { padding: 6px 6px 8px; }
+html.ml-on #mercados .mt-table { border-top: 0; }
+html.ml-on #mercados .mt-head { padding: 15px 14px 13px; font: 600 10.5px/1 var(--ml-sans); letter-spacing: .14em; color: var(--ml-ink); }
+html.ml-on #mercados .mt-body .mkt-row { padding: 13px 14px; border-radius: 10px; border-bottom-color: rgba(214,226,244,.05); transition: background-color .2s var(--ml-ease); }
+html.ml-on #mercados .mt-body .mkt-row:hover { background: rgba(214,226,244,.04); }
+html.ml-on #mercados .mt-body .mkt-row.mt-sel { background: var(--ml-sel2); box-shadow: inset 3px 0 0 var(--ml-gold); }
+html.ml-on #mercados .mkt-row .mr-ticker { font: 600 14px/1.2 var(--ml-sans); }
+html.ml-on #mercados .mkt-row .mr-name { font-size: 12.5px; color: var(--ml-ink); }
+html.ml-on #mercados .mkt-row .mr-price, html.ml-on #mercados .mkt-row .mr-chg { font-size: 13.5px; }
+html.ml-on #mercados .mt-detail { top: 88px; padding: 26px 28px 24px; border-left: 1px solid var(--ml-line); background: rgba(7,14,27,.35); }
+html.ml-on #mercados .mt-d-h h3 { font-size: 24px; }
+html.ml-on #mercados .mt-d-px b { font-size: 34px; }
+html.ml-on #mercados .mt-seg button.on { background: var(--ml-sel); color: var(--ml-gold); }
+
+@media (prefers-reduced-motion: reduce) {
+  html.ml-on body, html.ml-on .ml-side, .ml-col, .ml-chev svg, .ml-item, .ml-gh, html.ml-on #mercados .ml-tab-ind { transition: none; }
+  .ml-gb, .ml-gb .ml-item, html.ml-on section[data-tab] > div:first-child, html.ml-on .ml-crumb .ml-cr-o { animation: none; }
 }
-.ml-side .ml-item:focus-visible, .ml-side .ml-gh:focus-visible { outline: 2px solid var(--ml-gold); outline-offset: 1px; }
-.ml-side .ml-pro, .ml-side .ml-new { font: 600 9.5px/1 'IBM Plex Sans', sans-serif; letter-spacing: .08em; color: var(--ml-gold); margin-left: 4px; }
-.ml-side .ml-new { text-transform: uppercase; }
-.ml-side .ml-cant { font: 500 11.5px 'IBM Plex Mono', ui-monospace, monospace; color: var(--ml-ink); margin-left: auto; }
-.ml-side .ml-vacio { font: 400 12.5px 'IBM Plex Sans', sans-serif; color: var(--ml-ink); padding: 6px 10px; }
-@media (prefers-reduced-motion: reduce) { .ml-side .ml-item, .ml-side .ml-gh { transition: none; } }
