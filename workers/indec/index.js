@@ -1,0 +1,261 @@
+/*
+ * manfredi-indec
+ * Datos oficiales del INDEC para la sub-pestaña "Argentina en datos" (Noticias).
+ *
+ * Fuentes:
+ *  1. Catálogo API-INDEC (api.indec.gob.ar/v1, beta desde nov-2026). Pide un JWT
+ *     (secreto INDEC_TOKEN) que NUNCA puede llegar al navegador: por eso este worker.
+ *     Estilo PostgREST, máx. 1000 filas por pedido, 429 si se abusa → todo se cachea.
+ *  2. Calendario de difusión del INDEC (indec.gob.ar/Calendario/FiltrosCalendario/mes/...):
+ *     fragmento HTML sin CORS, se parsea acá.
+ *  3. apis.datos.gob.ar/series: para lo que el catálogo todavía no tiene (PBI trimestral)
+ *     y para el buscador del Explorador. Rechaza clientes sin User-Agent de navegador.
+ *
+ * Caché: Cache API de Cloudflare (no KV: el cupo de 1.000 escrituras/día ya se agotó una vez).
+ */
+
+const INDEC_API = 'https://api.indec.gob.ar/v1/';
+const INDEC_WEB = 'https://www.indec.gob.ar';
+const SERIES_API = 'https://apis.datos.gob.ar/series/api/';
+const UA = 'Mozilla/5.0 (compatible; ManfrediDatos/1.0)';
+
+// Servicios del catálogo que se pueden consultar a través del worker.
+const DATASETS = {
+  ipc_nacional: 'clasificador,nivel,codigo,descripcion,periodo,anio,mes,indicador,tipo_de_indicador,tipo_de_indicador_descripcion,region,unidad_de_medida',
+  valorizacion_canastas_cba_cbt: 'clasificador,nivel,codigo,descripcion,periodo,anio,mes,indicador,tipo_de_indicador,tipo_de_indicador_descripcion,region,unidad_de_medida',
+  indice_salarios: 'clasificador,nivel,codigo,descripcion,periodo,anio,mes,indicador,tipo_de_indicador,tipo_de_indicador_descripcion,unidad_de_medida',
+  icc_precios_construccion: 'indicador,codigo_apertura,codigo_CPC_1,clasificador,nivel,descripcion,periodo,anio,mes,tipo_de_indicador,tipo_de_indicador_descripcion,region,unidad_de_medida',
+  sipm_precios_mayoristas: 'operativo,indicador,clasificador,nivel,codigo_apertura,descripcion,periodo,anio,mes,tipo_de_indicador,tipo_de_indicador_descripcion,region,unidad_de_medida',
+  'estimador-mensual-de-actividad-economica-nivel-general': 'tipo_de_indicador_descripcion,anio,mes,periodo,tipo_de_indicador',
+  'estimador-mensual-de-actividad-economica-sectores': 'anio,mes,codigo,descripcion,periodo,tipo_de_indicador',
+  pobreza_eph: 'area_geografica_cod,periodo',
+  mercado_trabajo_eph: 'area_geografica_cod,periodo',
+  'canasta-crianza': 'Periodo',
+  ipi_manufacturero: 'periodo,indicador,codigo_CLaNAE_2004,serie,tipo_de_indicador',
+  ipi_minero: 'periodo,indicador,codigo_ClaNAE_2010,codigo_CPC_2_1,serie,tipo_de_indicador',
+  comercio_exterior_nomenclaturas: 'nombre_columna,codigo',
+  comercio_exterior_exportacion_bienes: 'Anio,Mes,Periodo,rubro_cod,subrubro_cod,pais_cod',
+  comercio_exterior_importacion_bienes: 'Anio,Mes,Periodo,uso_economico_cod,gce_cod,pais_cod',
+  proyecciones_poblacion_nacional_2022_2040: 'edad,sexo_cod,fecha',
+  proyecciones_poblacion_jurisdiccion_2022_2040: 'jurisdiccion_cod,sexo_cod,edad_cod,fecha',
+};
+
+const TTL = { datos: 6 * 3600, calendario: 6 * 3600, series: 6 * 3600, buscar: 24 * 3600, tablero: 3 * 3600 };
+const MAX_PAGINAS = 30; // 30.000 filas como techo para ?todo=1
+
+const ORIGENES = [/^https:\/\/(www\.)?manfredinvestment\.com$/, /^https:\/\/[a-z0-9-]+\.manfredi[a-z0-9-]*\.pages\.dev$/, /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
+
+function cors(req) {
+  const o = req.headers.get('Origin') || '';
+  return {
+    'Access-Control-Allow-Origin': ORIGENES.some(r => r.test(o)) ? o : 'https://manfredinvestment.com',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    Vary: 'Origin',
+  };
+}
+function json(req, data, status = 200, maxAge = 300) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=' + maxAge, ...cors(req) },
+  });
+}
+
+// Cache API: guarda la respuesta JSON ya procesada bajo una URL sintética.
+async function cacheado(ctx, clave, ttl, producir) {
+  const cache = caches.default;
+  const key = new Request('https://cache.manfredi-indec/' + encodeURIComponent(clave));
+  const hit = await cache.match(key);
+  if (hit) return { data: await hit.json(), cache: 'hit' };
+  const data = await producir();
+  ctx.waitUntil(cache.put(key, new Response(JSON.stringify(data), {
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=' + ttl },
+  })));
+  return { data, cache: 'miss' };
+}
+
+/* ───────────────────────── Catálogo API-INDEC ───────────────────────── */
+
+async function indecFetch(env, dataset, params) {
+  if (!env.INDEC_TOKEN) throw new Error('Falta el secreto INDEC_TOKEN');
+  const url = INDEC_API + dataset + '?' + params.toString();
+  const r = await fetch(url, {
+    headers: { Authorization: 'Bearer ' + env.INDEC_TOKEN, Accept: 'application/json', 'User-Agent': UA, Prefer: 'count=exact' },
+    cf: { cacheTtl: 0 },
+  });
+  if (!r.ok && r.status !== 206) {
+    const txt = (await r.text()).slice(0, 300);
+    const e = new Error('INDEC ' + r.status + ': ' + txt); e.status = r.status; throw e;
+  }
+  const total = Number(((r.headers.get('Content-Range') || '').split('/')[1]) || NaN);
+  return { filas: await r.json(), total: Number.isFinite(total) ? total : null };
+}
+
+// Pide todas las páginas (limit 1000) ordenando por la clave completa, como pide la doc.
+async function indecTodo(env, dataset, params) {
+  const p = new URLSearchParams(params);
+  if (!p.get('order')) p.set('order', DATASETS[dataset]);
+  p.set('limit', '1000');
+  let offset = 0, filas = [], total = null;
+  for (let i = 0; i < MAX_PAGINAS; i++) {
+    p.set('offset', String(offset));
+    const r = await indecFetch(env, dataset, p);
+    filas = filas.concat(r.filas); total = r.total;
+    if (r.filas.length < 1000 || (total != null && filas.length >= total)) break;
+    offset += 1000;
+  }
+  return { filas, total };
+}
+
+function limpiarParams(sp) {
+  const p = new URLSearchParams();
+  for (const [k, v] of sp) {
+    if (k === 'todo' || k === 'nocache') continue;
+    if (!/^[A-Za-z0-9_]+$/.test(k) || v.length > 400) continue;
+    p.append(k, v);
+  }
+  if (!p.get('limit')) p.set('limit', '1000');
+  return p;
+}
+
+/* ───────────────────────── Calendario de difusión ───────────────────────── */
+
+const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+function desHtml(s) {
+  return s.replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)))
+    .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+}
+
+// Agrupa cada publicación en un tema del sitio (sirve para filtrar y para el ícono).
+// Ojo: las siglas (ICA, IPC, EMAE…) se buscan con \b y distinguiendo mayúsculas:
+// con /i "ica" aparece en "estadísticas", "farmacéutica", "pública".
+const TEMAS = [
+  ['precios', [/\b(IPC|ICC|SIPM|CBA|CBT)\b/, /precios|canasta|costo de la construcci/i]],
+  ['externo', [/\b(ICA)\b/, /comercio exterior|intercambio comercial|exportaci|importaci|balanza de pagos|deuda externa|posici[oó]n de inversi|t[eé]rminos del intercambio/i]],
+  ['trabajo', [/\b(EPH)\b/, /salarios|mercado de trabajo|empleo|desocupaci|pobreza|indigencia|distribuci[oó]n del ingreso|dotaci[oó]n de personal/i]],
+  ['actividad', [/\b(EMAE|PIB|IPI|ISSP|UCII|EPI)\b/, /actividad|producto interno|industria|construcci|capacidad instalada|servicios p[uú]blicos|supermercados|autoservicios|centros de compras|turismo|hotelera|energ[eé]tic|tendencia de negocios|cuentas nacionales|capital fijo/i]],
+];
+// Se aplica DESPUÉS de la caché: cambiar las reglas no obliga a esperar 6 h.
+function clasificar(e) { return { ...e, tema: tema(e.titulo), clave: CLAVE.test(e.titulo) }; }
+function tema(t) { for (const [k, res] of TEMAS) if (res.some(re => re.test(t))) return k; return 'otros'; }
+// Las que mueven al mercado: se destacan en la grilla.
+const CLAVE = /IPC\)|Índice de precios al consumidor|canasta b[aá]sica alimentaria|Estimador mensual de actividad|Informe de avance del nivel de actividad|Índice de salarios|Intercambio comercial argentino|Mercado de trabajo. Tasas|Incidencia de la pobreza|Balanza de pagos/i;
+
+async function calendarioMes(anio, mes) {
+  const url = `${INDEC_WEB}/Calendario/FiltrosCalendario/mes/${MESES[mes - 1]}-${anio}/1`;
+  const r = await fetch(url, { headers: { 'User-Agent': UA }, cf: { cacheTtl: 0 } });
+  if (!r.ok) throw new Error('INDEC calendario ' + r.status);
+  const html = await r.text();
+  const tok = /class="nro-dia">\s*(\d{1,2})\s*<|class="cal-content text-calendario(?: text-center)?">\s*([\s\S]*?)\s*<\/div>/g;
+  const eventos = [];
+  let dia = null, m;
+  while ((m = tok.exec(html))) {
+    if (m[1]) { dia = +m[1]; continue; }
+    const txt = desHtml(m[2]);
+    if (!txt || dia == null) continue;
+    const hora = txt.match(/^(\d{1,2}):(\d{2})\s*hs$/i);
+    if (hora) { const ult = eventos[eventos.length - 1]; if (ult && !ult.hora) ult.hora = hora[1].padStart(2, '0') + ':' + hora[2]; continue; }
+    eventos.push({
+      fecha: `${anio}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`,
+      hora: null, titulo: txt,
+    });
+  }
+  return { mes: `${anio}-${String(mes).padStart(2, '0')}`, fuente: url, eventos };
+}
+
+/* ───────────────────────── datos.gob.ar series ───────────────────────── */
+
+async function seriesFetch(path, sp) {
+  const r = await fetch(SERIES_API + path + '?' + sp.toString(), { headers: { 'User-Agent': UA, Accept: 'application/json' } });
+  if (!r.ok) throw new Error('series ' + r.status);
+  return r.json();
+}
+
+/* ───────────────────────── router ───────────────────────── */
+
+export default {
+  async fetch(req, env, ctx) {
+    if (req.method === 'OPTIONS') return new Response(null, { headers: cors(req) });
+    if (req.method !== 'GET') return json(req, { error: 'Solo GET' }, 405);
+    const url = new URL(req.url);
+    const path = url.pathname.replace(/\/+$/, '') || '/';
+    const sinCache = url.searchParams.has('nocache') && env.ADMIN_KEY && url.searchParams.get('nocache') === env.ADMIN_KEY;
+
+    try {
+      if (path === '/' || path === '/v1') {
+        return json(req, {
+          servicio: 'manfredi-indec',
+          endpoints: ['/v1/d/<dataset>?<filtros PostgREST>[&todo=1]', '/v1/calendario?mes=AAAA-MM', '/v1/calendario/proximos?dias=30', '/v1/series?ids=...', '/v1/buscar?q=...'],
+          datasets: Object.keys(DATASETS),
+        });
+      }
+
+      // /v1/d/<dataset> → proxy cacheado al Catálogo API-INDEC
+      if (path.startsWith('/v1/d/')) {
+        const ds = decodeURIComponent(path.slice(6));
+        if (!DATASETS[ds]) return json(req, { error: 'Dataset no habilitado', datasets: Object.keys(DATASETS) }, 404);
+        const p = limpiarParams(url.searchParams);
+        const todo = url.searchParams.get('todo') === '1';
+        const clave = 'd:' + ds + ':' + (todo ? 'todo:' : '') + p.toString();
+        const producir = () => (todo ? indecTodo(env, ds, p) : indecFetch(env, ds, p));
+        const r = sinCache ? { data: await producir(), cache: 'bypass' } : await cacheado(ctx, clave, TTL.datos, producir);
+        return json(req, { dataset: ds, total: r.data.total, filas: r.data.filas, cache: r.cache, fuente: 'INDEC · Catálogo API-INDEC' }, 200, 900);
+      }
+
+      // /v1/calendario?mes=2026-12
+      if (path === '/v1/calendario') {
+        const hoy = new Date(Date.now() - 3 * 3600e3);
+        const q = (url.searchParams.get('mes') || '').match(/^(\d{4})-(\d{2})$/);
+        const anio = q ? +q[1] : hoy.getUTCFullYear(), mes = q ? +q[2] : hoy.getUTCMonth() + 1;
+        if (mes < 1 || mes > 12) return json(req, { error: 'mes inválido' }, 400);
+        const r = await cacheado(ctx, 'cal:' + anio + '-' + mes, TTL.calendario, () => calendarioMes(anio, mes));
+        return json(req, { ...r.data, eventos: r.data.eventos.map(clasificar) }, 200, 1800);
+      }
+
+      // /v1/calendario/proximos?dias=30 → desde hoy (hora AR), une este mes y el siguiente
+      if (path === '/v1/calendario/proximos') {
+        const dias = Math.min(Math.max(+url.searchParams.get('dias') || 30, 1), 62);
+        const hoy = new Date(Date.now() - 3 * 3600e3);
+        const meses = [];
+        for (let i = 0; i < 3; i++) { const d = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth() + i, 1)); meses.push([d.getUTCFullYear(), d.getUTCMonth() + 1]); }
+        const desde = hoy.toISOString().slice(0, 10);
+        const hasta = new Date(hoy.getTime() + dias * 864e5).toISOString().slice(0, 10);
+        const partes = await Promise.all(meses.map(([a, m]) => cacheado(ctx, 'cal:' + a + '-' + m, TTL.calendario, () => calendarioMes(a, m)).then(r => r.data).catch(() => ({ eventos: [] }))));
+        const eventos = partes.flatMap(p => p.eventos).filter(e => e.fecha >= desde && e.fecha <= hasta).map(clasificar);
+        return json(req, { desde, hasta, eventos, fuente: INDEC_WEB + '/indec/web/Calendario-Fecha-0' }, 200, 1800);
+      }
+
+      // /v1/series?ids=...&limit=...  (datos.gob.ar)
+      if (path === '/v1/series') {
+        const sp = new URLSearchParams();
+        for (const k of ['ids', 'limit', 'start_date', 'end_date', 'representation_mode', 'collapse', 'collapse_aggregation', 'sort']) if (url.searchParams.get(k)) sp.set(k, url.searchParams.get(k));
+        if (!sp.get('ids')) return json(req, { error: 'ids requerido' }, 400);
+        sp.set('format', 'json'); sp.set('metadata', 'simple');
+        const r = await cacheado(ctx, 's:' + sp.toString(), TTL.series, () => seriesFetch('series/', sp));
+        return json(req, r.data, 200, 1800);
+      }
+
+      // /v1/buscar?q=...  (buscador de series de datos.gob.ar, para el Explorador)
+      if (path === '/v1/buscar') {
+        const q = (url.searchParams.get('q') || '').trim().slice(0, 80);
+        if (q.length < 2) return json(req, { data: [] });
+        const sp = new URLSearchParams({ q, limit: String(Math.min(+url.searchParams.get('limit') || 20, 50)) });
+        const r = await cacheado(ctx, 'b:' + sp.toString(), TTL.buscar, () => seriesFetch('search/', sp));
+        const data = (r.data.data || []).map(x => ({
+          id: x.field.id, titulo: x.field.description, frecuencia: x.field.frequency,
+          desde: x.field.time_index_start, hasta: x.field.time_index_end, unidad: x.field.units,
+          fuente: x.dataset && x.dataset.source, dataset: x.dataset && x.dataset.title,
+        }));
+        return json(req, { count: r.data.count, data }, 200, 3600);
+      }
+
+      return json(req, { error: 'No encontrado' }, 404);
+    } catch (e) {
+      console.error('[indec]', e.message);
+      return json(req, { error: e.message }, e.status === 429 ? 503 : 502, 60);
+    }
+  },
+};
