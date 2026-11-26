@@ -13,7 +13,7 @@
   var API = window.MI_INDEC_API || (LOCAL ? 'http://localhost:8789' : 'https://manfredi-indec.nachito2502.workers.dev');
   var C = ['#c09520', '#5b9cf5', '#e8725f', '#a77ff0']; // orden fijo (validado CVD sobre #0b1629)
   var ORO = '#f2c94c';
-  var SECS = [['datos', 'Tablero'], ['datos-inflacion', 'Inflación'], ['datos-explorador', 'Explorador'], ['datos-calendario', 'Calendario INDEC']];
+  var SECS = [['datos', 'Resumen'], ['datos-inflacion', 'Inflación'], ['datos-rubros', 'Por rubro'], ['datos-regiones', 'Por región'], ['datos-canastas', 'Canastas'], ['datos-calculadora', 'Calculadora'], ['datos-salarios', 'Salarios'], ['datos-pobreza', 'Pobreza'], ['datos-actividad', 'Actividad y PBI'], ['datos-empleo', 'Empleo'], ['datos-comex', 'Comercio exterior'], ['datos-explorador', 'Explorador'], ['datos-calendario', 'Calendario INDEC']];
   var MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
   var MESL = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
   var DIAS = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
@@ -210,12 +210,12 @@
 
   var IND = {
     inflacion: {
-      t: 'Inflación', d: 'Variación del índice de precios al consumidor (IPC), nivel general, total del país.',
+      t: 'Inflación', corto: 'Nivel general', d: 'Variación del índice de precios al consumidor (IPC), nivel general, total del país.',
       modos: [['m', 'Mensual'], ['ia', 'Interanual']],
       armar: function (t, m) { return { defs: [{ nombre: m === 'm' ? 'Mensual' : 'Interanual', color: ORO, tipo: m === 'm' ? 'barras' : 'linea', datos: serieDe(t.ipc.serie, m) }], fmt: fPct, et: etiquetaPer }; }
     },
     nucleo: {
-      t: 'Núcleo, regulados y nivel general', d: 'La inflación núcleo saca los precios estacionales y los regulados por el Estado: muestra la tendencia de fondo.',
+      t: 'Núcleo, regulados y nivel general', corto: 'Núcleo y regulados', d: 'La inflación núcleo saca los precios estacionales y los regulados por el Estado: muestra la tendencia de fondo.',
       modos: [['m', 'Mensual'], ['ia', 'Interanual']],
       armar: function (t, m) {
         return { defs: [{ nombre: 'Nivel general', color: C[0], datos: serieDe(t.ipc.serie, m) }, { nombre: 'Núcleo', color: C[1], datos: serieDe(t.ipc.serie, 'n_' + m) }, { nombre: 'Regulados', color: C[2], datos: serieDe(t.ipc.serie, 'r_' + m) }], fmt: fPct, et: etiquetaPer };
@@ -244,7 +244,7 @@
       }
     },
     emae: {
-      t: 'Actividad económica (EMAE)', d: 'El "PBI mensual" del INDEC. La serie desestacionalizada permite comparar un mes con el anterior.',
+      t: 'Actividad económica (EMAE)', corto: 'EMAE (mensual)', d: 'El "PBI mensual" del INDEC. La serie desestacionalizada permite comparar un mes con el anterior.',
       modos: [['nivel', 'Nivel'], ['ia', 'Interanual'], ['m', 'Mensual']],
       armar: function (t, m) {
         if (m === 'nivel') return { defs: [{ nombre: 'Desestacionalizado', color: C[0], datos: serieDe(t.emae.serie, 'desest') }, { nombre: 'Tendencia-ciclo', color: C[1], datos: serieDe(t.emae.serie, 'tc') }], fmt: function (v) { return nf(v, 1); }, et: etiquetaPer };
@@ -275,7 +275,7 @@
       }
     },
     pbi: {
-      t: 'PBI', d: 'Producto interno bruto a precios constantes, variación contra el mismo trimestre del año anterior.',
+      t: 'PBI', corto: 'PBI (trimestral)', d: 'Producto interno bruto a precios constantes, variación contra el mismo trimestre del año anterior.',
       modos: [['ia', 'Interanual']],
       armar: function (t) { return { defs: [{ nombre: 'PBI interanual', color: ORO, tipo: 'barras', datos: serieDe(t.pbi.serie, 'ia').map(function (d) { return { time: d.time, value: d.value, color: d.value < 0 ? C[2] : ORO }; }) }], fmt: fPct, et: etiquetaTrim, cero: true }; }
     }
@@ -285,7 +285,7 @@
     var out = [], ipc = t.ipc, u = ipc.ultimo;
     function sig(id) { var e = proximoDe(PROX[id]); return e ? '<br>Próximo dato: ' + esc(fechaCorta(e.fecha)) : ''; }
     function tile(id, nombre, per, valor, sub, sp, prov) {
-      return '<button type="button" class="ad-kpi' + (st.ind === id ? ' on' : '') + '" data-ind="' + id + '" aria-pressed="' + (st.ind === id) + '">' +
+      return '<button type="button" class="ad-kpi" data-ind="' + id + '" data-ad-ir="' + PAGINA[id] + '">' +
         '<span class="ad-kpi__l"><span>' + esc(nombre) + (prov ? '<span class="ad-prov">provisorio</span>' : '') + '</span><span>' + esc(per) + '</span></span>' +
         '<span class="ad-kpi__v">' + valor + '</span>' + sp + '<span class="ad-kpi__s">' + sub + sig(id) + '</span></button>';
     }
@@ -324,30 +324,127 @@
     return out.join('');
   }
 
-  /* ───────────── Tablero ───────────── */
+  /* ───────────── Páginas (una por tema) ─────────────
+     Resumen = los indicadores agrupados por tema; cada tarjeta lleva a su página.
+     Cada página: fila de cifras clave → gráfico (con su selector) → cuadros de detalle. */
+  var PAGINA = { inflacion: 'datos-inflacion', nucleo: 'datos-inflacion', canasta: 'datos-canastas', salario: 'datos-salarios', emae: 'datos-actividad', desempleo: 'datos-empleo', pobreza: 'datos-pobreza', balanza: 'datos-comex', pbi: 'datos-actividad' };
+  var GRUPOS_RES = [
+    ['Precios', 'datos-inflacion', ['inflacion', 'nucleo', 'canasta']],
+    ['Ingresos', 'datos-salarios', ['salario', 'pobreza']],
+    ['Actividad y empleo', 'datos-actividad', ['emae', 'pbi', 'desempleo']],
+    ['Sector externo', 'datos-comex', ['balanza']]
+  ];
   function renderTablero(body) {
-    body.innerHTML = skel(64) + '<div class="ad-kpis">' + [1, 2, 3, 4, 5, 6].map(function () { return skel(118); }).join('') + '</div>' + skel(380);
+    body.innerHTML = skel(64) + '<div class="ad-kpis">' + [1, 2, 3, 4, 5, 6].map(function () { return skel(150); }).join('') + '</div>';
     cargarTablero().then(function (t) {
       if (st.sec !== 'datos') return;
-      // si la sección del indicador elegido no vino (el INDEC falló en esa parte), volver a inflación
-      var SEC_DE = { inflacion: 'ipc', nucleo: 'ipc', canasta: 'canasta', salario: 'salarios', emae: 'emae', desempleo: 'trabajo', pobreza: 'pobreza', balanza: 'comex', pbi: 'pbi' };
-      if (!t[SEC_DE[st.ind]]) st.ind = 'inflacion';
-      var ipc = t.ipc, u = ipc.ultimo;
-      body.innerHTML = bloqueProximo() +
-        '<div class="ad-kpis" id="adKpis">' + tarjetas(t) + '</div>' +
-        '<section class="ad-chart" id="adChart" aria-live="polite"></section>' +
-        '<div class="ad-grid">' +
-        '<div class="ad-card"><div class="ad-card__h"><h3>Inflación por región</h3><span>' + esc(perCorto(u.p)) + ' · mensual</span></div>' +
-        barras(ipc.regiones.map(function (r) { return { n: r.region === 'GBA' ? 'Gran Buenos Aires' : r.region, v: r.m, yo: r.region === 'Nacional' }; }), fPct) + '</div>' +
-        '<div class="ad-card"><div class="ad-card__h"><h3>Qué subió más en ' + esc(MESL[+u.p.slice(5) - 1]) + '</h3><a href="#datos-inflacion" data-ad-ir="datos-inflacion">Inflación a fondo →</a></div>' +
-        barras(ipc.rubros.slice(0, 8).map(function (r) { return { n: r.nombre, v: r.m }; }), fPct) + '</div>' +
-        (t.emae ? '<div class="ad-card"><div class="ad-card__h"><h3>Actividad por sector</h3><span>' + esc(perCorto(t.emae.ultimo.p)) + ' · interanual</span></div>' +
-          barras(t.emae.sectores.map(function (s) { return { n: s.nombre, v: s.ia }; }), function (v) { return pct(v, 1, true); }) + '</div>' : '') +
-        (t.comex ? '<div class="ad-card"><div class="ad-card__h"><h3>Qué exporta y a quién</h3><span>' + esc(perCorto(t.comex.ultimo.p)) + ' · US$ M</span></div>' +
-          barras(t.comex.rubros.filter(function (r) { return r.codigo !== '9'; }).map(function (r) { return { n: r.nombre, v: r.x }; }), function (v) { return nf(v, 0); }) +
-          '<div style="height:18px"></div>' + barras(t.comex.destinos.slice(0, 6).map(function (r) { return { n: r.nombre, v: r.x }; }), function (v) { return nf(v, 0); }) + '</div>' : '') +
-        '</div>' + pie(t);
+      var tiles = {}; var tmp = document.createElement('div'); tmp.innerHTML = tarjetas(t);
+      tmp.querySelectorAll('.ad-kpi').forEach(function (b) { tiles[b.dataset.ind] = b.outerHTML; });
+      body.innerHTML = bloqueProximo() + GRUPOS_RES.map(function (g) {
+        var ts = g[2].filter(function (k) { return tiles[k]; });
+        if (!ts.length) return '';
+        return '<section class="ad-grupo"><div class="ad-grupo__h"><h2>' + esc(g[0]) + '</h2><a href="#' + g[1] + '" data-ad-ir="' + g[1] + '">Ver a fondo</a></div>' +
+          '<div class="ad-kpis ad-kpis--' + ts.length + '">' + ts.map(function (k) { return tiles[k]; }).join('') + '</div></section>';
+      }).join('') + pie(t);
+    }).catch(function (e) { body.innerHTML = error(); console.warn('[datos-ar]', e.message); });
+  }
+
+  // cifra clave de una página
+  function cifra(l, v, s, tono) { return '<div class="ad-c"><span class="ad-c__l">' + esc(l) + '</span><span class="ad-c__v' + (tono ? ' ' + tono : '') + '">' + v + '</span>' + (s ? '<span class="ad-c__s">' + s + '</span>' : '') + '</div>'; }
+  function cifras(a) { return '<div class="ad-cs ad-cs--' + a.length + '">' + a.join('') + '</div>'; }
+  function tarjeta(titulo, sub, cuerpo, extra) { return '<section class="ad-card' + (extra ? ' ' + extra : '') + '"><div class="ad-card__h"><h3>' + esc(titulo) + '</h3>' + (sub ? '<span>' + sub + '</span>' : '') + '</div>' + cuerpo + '</section>'; }
+  function signo(v) { return v == null ? '' : v >= 0 ? 'bien' : 'mal'; }
+
+  var PAGINAS = {
+    'datos-inflacion': { inds: ['inflacion', 'nucleo'], armar: function (t) {
+      var u = t.ipc.ultimo, pm = prevDe(t.ipc.serie, 'm');
+      return { cifras: cifras([
+        cifra('Inflación de ' + MESL[+u.p.slice(5) - 1], pct(u.m), delta(u.m, pm && pm.m, true, 'pp', pm ? perCorto(pm.p) : '')),
+        cifra('Últimos 12 meses', pct(u.ia), 'Interanual, total país'),
+        cifra('En lo que va del año', pct(u.acum), 'Acumulada desde enero'),
+        cifra('Núcleo', pct(u.n_m), 'La tendencia de fondo · ' + pct(u.n_ia) + ' anual')]),
+        despues: '<div class="ad-grid ad-grid--2">' +
+          tarjeta('Cómo se compone el mes', esc(perCorto(u.p)) + ' · mensual', barras([{ n: 'Nivel general', v: u.m, yo: true }, { n: 'Núcleo', v: u.n_m }, { n: 'Regulados', v: u.r_m }, { n: 'Estacionales', v: u.e_m }, { n: 'Bienes', v: u.b_m }, { n: 'Servicios', v: u.s_m }], fPct)) +
+          tarjeta('Qué subió más', esc(perCorto(u.p)) + ' · <a href="#datos-rubros" data-ad-ir="datos-rubros">Todos los rubros</a>', barras(t.ipc.rubros.slice(0, 6).map(function (r) { return { n: r.nombre, v: r.m }; }), fPct)) + '</div>' };
+    } },
+    'datos-canastas': { inds: ['canasta'], armar: function (t) {
+      var c = t.canasta.ultimo;
+      return { cifras: cifras([
+        cifra('Canasta básica total', pesos(c.cbt_h2), 'Familia tipo · línea de pobreza'),
+        cifra('Canasta alimentaria', pesos(c.cba_h2), 'Familia tipo · línea de indigencia'),
+        cifra('Variación del mes', pct(c.cbt_m, 1, true), 'Canasta total, ' + esc(perCorto(c.p))),
+        cifra('Variación anual', pct(c.cbt_ia, 1, true), 'Canasta total')]),
+        despues: '<p class="ad-nota">Familia tipo: dos adultos y dos chicos en el Gran Buenos Aires. Un hogar que gana menos que la canasta total es pobre; menos que la alimentaria, indigente.</p>' };
+    } },
+    'datos-salarios': { inds: ['salario'], armar: function (t) {
+      var s = t.salarios.ultimo, ipcMes = t.ipc.serie.filter(function (o) { return o.p === s.p; })[0];
+      var rp = s.real_priv && s.real_priv.ia, rpu = s.real_pub && s.real_pub.ia, rt = s.real_tot && s.real_tot.ia;
+      return { cifras: cifras([
+        cifra('Salario real privado', pct(rp, 1, true), 'Registrado, contra hace un año', signo(rp)),
+        cifra('Salario real público', pct(rpu, 1, true), 'Contra hace un año', signo(rpu)),
+        cifra('Salario real total', pct(rt, 1, true), 'Todos los asalariados', signo(rt)),
+        cifra('Subieron los sueldos', pct(s.tot_ia), 'Nominal · inflación ' + pct(ipcMes && ipcMes.ia))]),
+        despues: tarjeta('Cuánto subió cada sueldo en un año', esc(perCorto(s.p)) + ' · nominal', barras([{ n: 'Inflación', v: ipcMes && ipcMes.ia, yo: true }, { n: 'Registrado privado', v: s.priv_ia }, { n: 'Público', v: s.pub_ia }, { n: 'No registrado', v: s.noreg_ia }], fPct)) };
+    } },
+    'datos-pobreza': { inds: ['pobreza'], armar: function (t) {
+      var p = t.pobreza.ultimo, pa = prevDe(t.pobreza.serie, 'pers', 2);
+      return { cifras: cifras([
+        cifra('Personas pobres', pct(p.pers), delta(p.pers, pa && pa.pers, true, 'pp', pa ? pa.label : '')),
+        cifra('Hogares pobres', pct(p.hog), esc(p.label)),
+        cifra('Indigencia', pct(p.indig), 'Personas')]) };
+    } },
+    'datos-actividad': { inds: ['emae', 'pbi'], armar: function (t) {
+      var e = t.emae.ultimo, b = t.pbi && t.pbi.ultimo, dist = e.maximo && e.desest ? (e.desest / e.maximo.desest - 1) * 100 : null;
+      return { cifras: cifras([
+        cifra('Actividad (EMAE)', pct(e.ia, 1, true), 'Contra hace un año · ' + esc(perCorto(e.p)), signo(e.ia)),
+        cifra('Contra el mes anterior', pct(e.m, 1, true), 'Desestacionalizado', signo(e.m)),
+        cifra('PBI', b ? pct(b.ia, 1, true) : '—', b ? 'Interanual · ' + esc(b.label) : '', b ? signo(b.ia) : ''),
+        cifra('Distancia al récord', dist == null ? '—' : dist > -0.05 ? 'Récord' : pct(dist, 1), dist == null ? '' : 'Máximo: ' + esc(perCorto(e.maximo.p)))]),
+        despues: t.emae.sectores ? tarjeta('Cómo le fue a cada sector', esc(perCorto(e.p)) + ' · interanual', barras(t.emae.sectores.map(function (x) { return { n: x.nombre, v: x.ia }; }), function (v) { return pct(v, 1, true); })) : '' };
+    } },
+    'datos-empleo': { inds: ['desempleo'], armar: function (t) {
+      var w = t.trabajo.ultimo, wa = prevDe(t.trabajo.serie, 'desoc', 4);
+      return { cifras: cifras([
+        cifra('Desocupación', pct(w.desoc), delta(w.desoc, wa && wa.desoc, true, 'pp', wa ? wa.label : '')),
+        cifra('Informalidad', pct(w.informal), 'Ocupados sin aportes'),
+        cifra('Tasa de empleo', pct(w.emp), 'Sobre la población total'),
+        cifra('Subocupación', pct(w.subocup), 'Quieren trabajar más horas')]) };
+    } },
+    'datos-comex': { inds: ['balanza'], armar: function (t) {
+      var x = t.comex.ultimo;
+      return { cifras: cifras([
+        cifra('Exportaciones', usdM(x.x), esc(perCorto(x.p))),
+        cifra('Importaciones', usdM(x.m), esc(perCorto(x.p))),
+        cifra('Saldo del mes', usdM(x.saldo), x.saldo >= 0 ? 'Superávit' : 'Déficit', signo(x.saldo)),
+        cifra('Saldo de 12 meses', usdM(x.saldo12), 'Acumulado', signo(x.saldo12))]),
+        despues: '<div class="ad-grid ad-grid--2">' +
+          tarjeta('Qué exporta', esc(perCorto(x.p)) + ' · US$ M', barras(t.comex.rubros.filter(function (r) { return r.codigo !== '9'; }).map(function (r) { return { n: r.nombre, v: r.x }; }), function (v) { return nf(v, 0); })) +
+          tarjeta('A quién le vende', esc(perCorto(x.p)) + ' · US$ M', barras(t.comex.destinos.slice(0, 8).map(function (r) { return { n: r.nombre, v: r.x }; }), function (v) { return nf(v, 0); })) + '</div>' };
+    } }
+  };
+  var SEC_DE = { inflacion: 'ipc', nucleo: 'ipc', canasta: 'canasta', salario: 'salarios', emae: 'emae', desempleo: 'trabajo', pobreza: 'pobreza', balanza: 'comex', pbi: 'pbi' };
+  function renderPagina(body, sec) {
+    var P = PAGINAS[sec];
+    body.innerHTML = '<div class="ad-cs">' + [1, 2, 3, 4].map(function () { return skel(104); }).join('') + '</div>' + skel(420);
+    cargarTablero().then(function (t) {
+      if (st.sec !== sec) return;
+      var inds = P.inds.filter(function (k) { return t[SEC_DE[k]]; });
+      if (!inds.length) { body.innerHTML = error(); return; }
+      st.inds = inds;
+      if (inds.indexOf(st.ind) < 0) st.ind = inds[0];
+      var a = P.armar(t);
+      body.innerHTML = a.cifras + '<section class="ad-chart" id="adChart" aria-live="polite"></section>' + (a.despues || '') + pie(t);
       pintarIndicador();
+    }).catch(function (e) { body.innerHTML = error(); console.warn('[datos-ar]', e.message); });
+  }
+
+  /* Calculadora: página propia */
+  function renderCalculadora(body) {
+    body.innerHTML = skel(300);
+    cargarTablero().then(function (t) {
+      if (st.sec !== 'datos-calculadora') return;
+      body.innerHTML = '<p class="ad-intro">¿Cuánto vale hoy la plata de antes? Elegí un monto y dos meses: la cuenta usa el índice de precios oficial del INDEC.</p>' + calculadora(t) + pie(t);
+      armarCalculadora(t);
     }).catch(function (e) { body.innerHTML = error(); console.warn('[datos-ar]', e.message); });
   }
   function pie(t) {
@@ -362,8 +459,9 @@
     var trimestral = st.ind === 'desempleo' || st.ind === 'pobreza' || st.ind === 'pbi';
     var rangos = trimestral ? ['5A', '10A', 'Todo'] : ['1A', '3A', '5A', 'Todo'];
     var rango = rangos.indexOf(st.rango) >= 0 ? st.rango : (trimestral ? '10A' : '5A');
+    var selInd = (st.inds || []).length > 1 ? '<div class="ad-seg ad-seg--ind" role="group" aria-label="Indicador">' + st.inds.map(function (k) { return '<button type="button" data-ind="' + k + '" class="' + (k === st.ind ? 'on' : '') + '">' + esc(IND[k].corto || IND[k].t) + '</button>'; }).join('') + '</div>' : '';
     box.innerHTML = '<div class="ad-chart__top"><div><h3 class="ad-chart__t">' + esc(def.t) + '</h3><p class="ad-chart__d">' + esc(def.d) + '</p></div>' +
-      '<div class="ad-ctrls">' + (def.modos.length > 1 ? '<div class="ad-seg" role="group" aria-label="Unidad">' + def.modos.map(function (m) { return '<button type="button" data-modo="' + m[0] + '" class="' + (m[0] === modo ? 'on' : '') + '">' + esc(m[1]) + '</button>'; }).join('') + '</div>' : '') +
+      '<div class="ad-ctrls">' + selInd + (def.modos.length > 1 ? '<div class="ad-seg" role="group" aria-label="Unidad">' + def.modos.map(function (m) { return '<button type="button" data-modo="' + m[0] + '" class="' + (m[0] === modo ? 'on' : '') + '">' + esc(m[1]) + '</button>'; }).join('') + '</div>' : '') +
       '<div class="ad-seg" role="group" aria-label="Período">' + rangos.map(function (r) { return '<button type="button" data-rango="' + r + '" class="' + (r === rango ? 'on' : '') + '">' + (r === 'Todo' ? 'Todo' : r.replace('A', ' años').replace(/^1 años/, '1 año')) + '</button>'; }).join('') + '</div></div></div>' +
       '<div class="ad-leg" id="adLeg"></div><div class="ad-plot" id="adPlot"></div>' +
       '<div class="ad-chart__pie"><span>Pasá el dedo o el mouse por el gráfico para ver cada período.</span><a href="#" data-csv="1">Descargar datos (CSV)</a></div>';
@@ -394,21 +492,20 @@
     var reg = st.region;
     var pDet = st.det[reg] ? Promise.resolve(st.det[reg]) : getJSON('/v1/ipc?region=' + encodeURIComponent(reg)).then(function (d) { st.det[reg] = d; return d; });
     Promise.all([pDet, cargarTablero()]).then(function (r) {
-      if (st.sec !== 'datos-inflacion' || st.region !== reg) return;
+      var sec = st.sec; if ((sec !== 'datos-rubros' && sec !== 'datos-regiones') || st.region !== reg) return;
       var d = r[0], t = r[1], box = $('adInf');
       var u = d.categorias[d.categorias.length - 1];
-      box.innerHTML = '<section class="ad-chart"><div class="ad-chart__top"><div><h3 class="ad-chart__t">Qué está empujando los precios</h3><p class="ad-chart__d">' +
+      if (sec === 'datos-rubros') box.innerHTML = '<section class="ad-card" style="margin-bottom:22px"><div class="ad-card__h"><h3>Los 12 rubros del IPC</h3><span>' + esc(perCorto(d.periodo)) + '</span></div><div class="ad-scroll" id="adRubros"></div>' +
+        '<p class="ad-nota">' + (reg === 'Nacional' ? 'La incidencia (cuántos puntos del índice aporta cada rubro) el INDEC la publica por región: elegí una arriba para verla.' : 'Incidencia: cuántos puntos porcentuales de la inflación del mes explica cada rubro (pesa más el que tiene más peso en la canasta).') + ' Tocá un rubro para ver sus aperturas.</p></section>' + pie(t);
+      else box.innerHTML = '<div class="ad-grid ad-grid--2">' + tarjeta('Inflación del mes por región', esc(perCorto(t.ipc.ultimo.p)) + ' · mensual', barras(t.ipc.regiones.map(function (r) { return { n: r.region === 'GBA' ? 'Gran Buenos Aires' : r.region === 'Nacional' ? 'Total país' : r.region, v: r.m, yo: r.region === reg }; }), fPct)) +
+        tarjeta('Últimos 12 meses por región', esc(perCorto(t.ipc.ultimo.p)) + ' · interanual', barras(t.ipc.regiones.map(function (r) { return { n: r.region === 'GBA' ? 'Gran Buenos Aires' : r.region === 'Nacional' ? 'Total país' : r.region, v: r.ia, yo: r.region === reg }; }), fPct)) + '</div>' +
+        '<section class="ad-chart"><div class="ad-chart__top"><div><h3 class="ad-chart__t">Qué está empujando los precios</h3><p class="ad-chart__d">' +
         (st.catVista === 'cat' ? 'Núcleo (la tendencia de fondo), regulados (tarifas, combustibles, prepagas: los fija o autoriza el Estado) y estacionales (frutas, verduras, ropa, turismo).' : 'Bienes (lo que se puede tocar: alimentos, ropa, autos) contra servicios (alquileres, tarifas, educación, salud).') +
         '</p></div><div class="ad-ctrls"><div class="ad-seg" role="group"><button type="button" data-catv="cat" class="' + (st.catVista === 'cat' ? 'on' : '') + '">Por categoría</button><button type="button" data-catv="bys" class="' + (st.catVista === 'bys' ? 'on' : '') + '">Bienes y servicios</button></div>' +
         '<div class="ad-seg" role="group"><button type="button" data-catm="m" class="' + (st.catModo === 'm' ? 'on' : '') + '">Mensual</button><button type="button" data-catm="ia" class="' + (st.catModo === 'ia' ? 'on' : '') + '">Interanual</button></div></div></div>' +
         '<div class="ad-leg" id="adLeg2"></div><div class="ad-plot" id="adPlot2"></div>' +
-        '<div class="ad-chart__pie"><span>' + esc(REGIONES.filter(function (x) { return x[0] === reg; })[0][1]) + ' · últimos 3 años</span><span>Nivel general ' + esc(perCorto(d.periodo)) + ': ' + pct(u.ng_m) + ' mensual, ' + pct(u.ng_ia) + ' interanual</span></div></section>' +
-        '<section class="ad-card" style="margin-bottom:22px"><div class="ad-card__h"><h3>Los 12 rubros del IPC</h3><span>' + esc(perCorto(d.periodo)) + '</span></div><div class="ad-scroll" id="adRubros"></div>' +
-        '<p class="ad-nota">' + (reg === 'Nacional' ? 'La incidencia (cuántos puntos del índice aporta cada rubro) el INDEC la publica por región: elegí una arriba para verla.' : 'Incidencia: cuántos puntos porcentuales de la inflación del mes explica cada rubro (pesa más el que tiene más peso en la canasta).') + ' Tocá un rubro para ver sus aperturas.</p></section>' +
-        calculadora(t) + pie(t);
-      pintarCategorias(d);
-      pintarRubros(d);
-      armarCalculadora(t);
+        '<div class="ad-chart__pie"><span>' + esc(REGIONES.filter(function (x) { return x[0] === reg; })[0][1]) + ' · últimos 3 años</span><span>Nivel general ' + esc(perCorto(d.periodo)) + ': ' + pct(u.ng_m) + ' mensual, ' + pct(u.ng_ia) + ' interanual</span></div></section>' + pie(t);
+      if (sec === 'datos-rubros') pintarRubros(d); else pintarCategorias(d);
     }).catch(function (e) { $('adInf').innerHTML = error(); console.warn('[datos-ar]', e.message); });
   }
   function pintarCategorias(d) {
@@ -608,8 +705,7 @@
     ind.style.left = on.offsetLeft + 'px'; ind.style.width = on.offsetWidth + 'px';
   }
   function ir(sec) {
-    if (location.hash !== '#' + sec) history.replaceState(null, '', '#' + sec);
-    mostrar(sec, true);
+    if (location.hash !== '#' + sec) location.hash = sec; else mostrar(sec, true);
   }
   function mostrar(hash, forzar) {
     armar();
@@ -621,17 +717,18 @@
     limpiarCharts();
     var body = $('adBody');
     if (sec === 'datos') renderTablero(body);
-    else if (sec === 'datos-inflacion') renderInflacion(body);
+    else if (PAGINAS[sec]) renderPagina(body, sec);
+    else if (sec === 'datos-rubros' || sec === 'datos-regiones') renderInflacion(body);
+    else if (sec === 'datos-calculadora') renderCalculadora(body);
     else if (sec === 'datos-explorador') renderExplorador(body);
     else renderCalendario(body);
   }
   function onClick(e) {
     var el = e.target.closest('button, a, tr.rub, th[data-ord]'); if (!el || !root.contains(el)) return;
     var ds = el.dataset;
-    if (ds.adIr) { e.preventDefault(); ir(ds.adIr); window.scrollTo({ top: Math.max(0, root.getBoundingClientRect().top + scrollY - 90), behavior: 'smooth' }); return; }
+    if (ds.adIr) { e.preventDefault(); ir(ds.adIr); window.scrollTo(0, 0); return; }
     if (ds.ind) {
       st.ind = ds.ind;
-      root.querySelectorAll('.ad-kpi').forEach(function (k) { var on = k.dataset.ind === st.ind; k.classList.toggle('on', on); k.setAttribute('aria-pressed', on); });
       pintarIndicador();
       var ch = $('adChart'); if (ch && window.innerWidth < 860) ch.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
@@ -644,7 +741,7 @@
       if (g) descargarCSV(g.nombre, g.defs);
       return;
     }
-    if (ds.region) { st.region = ds.region; st.abiertos = {}; mostrar('datos-inflacion', true); return; }
+    if (ds.region) { st.region = ds.region; st.abiertos = {}; mostrar(st.sec, true); return; }
     if (ds.catv) { st.catVista = ds.catv; root.querySelectorAll('[data-catv]').forEach(function (b) { b.classList.toggle('on', b.dataset.catv === st.catVista); }); var d = st.det[st.region]; if (d) { pintarCategorias(d); var p = root.querySelector('#adInf .ad-chart__d'); if (p) p.textContent = st.catVista === 'cat' ? 'Núcleo (la tendencia de fondo), regulados (tarifas, combustibles, prepagas: los fija o autoriza el Estado) y estacionales (frutas, verduras, ropa, turismo).' : 'Bienes (lo que se puede tocar: alimentos, ropa, autos) contra servicios (alquileres, tarifas, educación, salud).'; } return; }
     if (ds.catm) { st.catModo = ds.catm; root.querySelectorAll('[data-catm]').forEach(function (b) { b.classList.toggle('on', b.dataset.catm === st.catModo); }); if (st.det[st.region]) pintarCategorias(st.det[st.region]); return; }
     if (ds.ord) { st.ordCol = ds.ord; if (st.det[st.region]) pintarRubros(st.det[st.region]); return; }

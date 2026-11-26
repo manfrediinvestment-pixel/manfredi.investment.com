@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="assets/home/lo-ultimo.css?v=20261120g" />
 <link rel="stylesheet" href="assets/noticias/noticias.css?v=20261112" />
 <link rel="stylesheet" href="assets/analistas/analistas.css?v=20261030" />
-<link rel="stylesheet" href="assets/datos-ar/datos-ar.css?v=20261126" />
+<link rel="stylesheet" href="assets/datos-ar/datos-ar.css?v=20261126c" />
 <link rel="stylesheet" href="assets/portfolio/ratios.css?v=20261012" />
 <link rel="stylesheet" href="assets/pro/pro.css?v=20261028l" />
 <link rel="stylesheet" href="assets/comunidad/chat.css?v=20261119b" />
@@ -4252,7 +4252,7 @@
   <script src="assets/analistas/api.js?v=20261030" defer></script>
   <script src="assets/analistas/social.js?v=20261012soc" defer></script>
   <!-- Noticias · Argentina en datos (INDEC): worker manfredi-indec -->
-  <script src="assets/datos-ar/datos-ar.js?v=20261126" defer></script>
+  <script src="assets/datos-ar/datos-ar.js?v=20261126c" defer></script>
   <script src="assets/analistas/analistas.js?v=20261126" defer></script>
   <script src="assets/analistas/revision.js?v=20261028a" defer></script>
   <script src="assets/analistas/autor.js?v=20261030" defer></script>
@@ -11883,7 +11883,7 @@
     { key: 'arg_stocks',  label: 'Acciones AR' },
     { key: 'arg_cedears', label: 'CEDEARs' },
     { key: 'usa_stocks',  label: 'Acciones USA' },
-    { key: 'usa_adrs',    label: 'ADRs' },
+    // ADRs: van dentro de 'Acciones USA' (ver renderCategoryTable), sin pestaña propia
     { key: 'arg_bonds',   label: 'Bonos' },
     { key: 'cripto',      label: 'Cripto' },
     { key: 'commodities', label: 'Commodities' },
@@ -12263,14 +12263,20 @@
       if (btn) btn.hidden = true;
       return;
     }
-    const items = mktShowingAll ? cat.items : cat.items.slice(0, 10);
-    body.innerHTML = items.map(item => mktRowHTML(item, cat.currency, mktActiveCategory)).join('');
+    // Acciones USA incluye los ADRs (cada fila conserva su categoría para el gráfico)
+    let lista = cat.items;
+    if (mktActiveCategory === 'usa_stocks' && MERCADOS.categorias.usa_adrs) {
+      const vistos = new Set(lista.map(i => i.symbol));
+      lista = lista.concat(MERCADOS.categorias.usa_adrs.items.filter(i => !vistos.has(i.symbol)).map(i => Object.assign({}, i, { _cat: 'usa_adrs' })));
+    }
+    const items = mktShowingAll ? lista : lista.slice(0, 10);
+    body.innerHTML = items.map(item => mktRowHTML(item, cat.currency, item._cat || mktActiveCategory)).join('');
     if (window.mktDetail && !window.mktDetail.current() && items[0] && window.matchMedia('(min-width: 1001px)').matches) {
       openAssetModal._auto = true;
       openAssetModal(items.find(i => i.symbol === 'GGAL') || items[0], mktActiveCategory, cat.currency);
       openAssetModal._auto = false;
     } else if (window.mktDetail) window.mktDetail.mark();
-    const remaining = cat.items.length - 10;
+    const remaining = lista.length - 10;
     if (btn) {
       if (!mktShowingAll && remaining > 0) {
         btn.hidden = false;
@@ -18045,8 +18051,8 @@ function closeQuiz(){var m=document.getElementById('quizModal');if(m) m.style.di
   <!-- Fondo Aurora de todo el sitio (al final para ganarle a los estilos de cada sección; el título lo anima assets/aurora/aurora.js, junto al h1) -->
   <link rel="stylesheet" href="assets/aurora/aurora.css?v=20261120a" />
   <!-- Menú lateral de todo el sitio (feat/menu-lateral): solo en pantallas anchas -->
-  <link rel="stylesheet" href="assets/menu-lateral/menu-lateral.css?v=20261126" />
-  <script defer src="assets/menu-lateral/menu-lateral.js?v=20261126"></script>
+  <link rel="stylesheet" href="assets/menu-lateral/menu-lateral.css?v=20261126c" />
+  <script defer src="assets/menu-lateral/menu-lateral.js?v=20261126c"></script>
   <link rel="stylesheet" href="assets/university/university.css?v=20261027a" />
   <script defer src="assets/university/university.js?v=20261027a"></script>
   

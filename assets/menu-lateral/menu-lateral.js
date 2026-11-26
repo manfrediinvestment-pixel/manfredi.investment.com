@@ -66,8 +66,13 @@
     [
       { id: 'mercados', n: 'Mercados', ic: 'mercados', tab: 'mercados', hash: 'mercados', src: '#mktTabs .mkt-tab' },
       { id: 'datos', n: 'Argentina en datos', ic: 'datos', hash: 'datos', items: [
-        { n: 'Tablero', hash: 'datos' }, { n: 'Inflación', hash: 'datos-inflacion' },
-        { n: 'Explorador de series', hash: 'datos-explorador' }, { n: 'Calendario INDEC', hash: 'datos-calendario' }] },
+        { n: 'Resumen', hash: 'datos' },
+        { h: 'Precios' }, { n: 'Inflación', hash: 'datos-inflacion' }, { n: 'Por rubro', hash: 'datos-rubros' }, { n: 'Por región', hash: 'datos-regiones' },
+        { n: 'Canastas', hash: 'datos-canastas' }, { n: 'Calculadora', hash: 'datos-calculadora' },
+        { h: 'Ingresos' }, { n: 'Salarios', hash: 'datos-salarios' }, { n: 'Pobreza', hash: 'datos-pobreza' },
+        { h: 'Actividad' }, { n: 'Actividad y PBI', hash: 'datos-actividad' }, { n: 'Empleo', hash: 'datos-empleo' },
+        { h: 'Sector externo' }, { n: 'Comercio exterior', hash: 'datos-comex' },
+        { h: 'Herramientas' }, { n: 'Explorador de series', hash: 'datos-explorador' }, { n: 'Calendario INDEC', hash: 'datos-calendario' }] },
       { id: 'noticias', n: 'Noticias', ic: 'noticias', hash: 'reportes', items: [
         { n: 'Noticias', hash: 'reportes', sub: 'noticias' }, { n: 'Análisis e informes', hash: 'analisis' }] },
       { id: 'calendario', n: 'Calendario', ic: 'calendario', tab: 'calendario', hash: 'calendario', src: '#calTabs button' }
@@ -118,6 +123,7 @@
     }
     var h = hashActual(), act = grupoActivo() === g.id;
     return (g.items || []).map(function (it, i) {
+      if (it.h) return { h: it.h, i: i };
       var on = false;
       if (act && it.hash) on = it.hash === h;
       if (act && it.finview) { var fb = document.querySelector('#finViewTabs [data-finview="' + it.finview + '"]'); on = !!(fb && prendido(fb)) && (h === 'herramientas' || h === 'finanzas'); }
@@ -144,6 +150,7 @@
           h += '<div class="ml-gb">';
           if (!ops.length) h += '<span class="ml-vacio">Cargando…</span>';
           ops.forEach(function (o) {
+            if (o.h) { h += '<span class="ml-sub-h">' + o.h + '</span>'; return; }
             var on = esAct && o.on; if (on) subAct = o.n;
             h += '<button type="button" class="ml-item' + (on ? ' on' : '') + '" data-ml-g="' + g.id + '" data-ml-i="' + o.i + '">' +
               '<span class="ml-t">' + o.n + '</span>' + (o.nuevo ? '<b class="ml-new">Nuevo</b>' : '') + (o.cant ? '<span class="ml-cant">' + o.cant + '</span>' : '') + '</button>';
@@ -167,7 +174,6 @@
 
   // ---------- Encabezado parejo para todas las secciones: mismo lugar, misma letra, sin movimiento ----------
   var DESC = {
-    mercados: 'Acciones, CEDEARs, bonos, cripto y dólares, con precios en tiempo real.',
     datos: 'Los números oficiales de la economía argentina, directo del INDEC.',
     noticias: 'Lo que mueve a los mercados hoy y el análisis de nuestros invitados.',
     calendario: 'Los datos económicos, resultados y dividendos de la semana.',
