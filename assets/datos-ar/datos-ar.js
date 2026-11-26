@@ -207,6 +207,15 @@
   function etiquetaTrim(t) { var m = /^(\d{4})-(\d{2})/.exec(t); return m ? ((+m[2] - 1) / 3 + 1) + '° trim. ' + m[1] : t; }
   function etiquetaSem(t) { var m = /^(\d{4})-(\d{2})/.exec(t); return m ? (m[2] === '01' ? '1er' : '2do') + ' semestre ' + m[1] : t; }
   var fPct = function (v) { return pct(v, 1); };
+  // salario real: variación contra el mes anterior (último dato vs. el previo), no contra hace un año
+  function realMes(t, k) {
+    var sn = t.salarios.serie.filter(function (o) { return o[k] != null; }), ipc = {};
+    t.ipc.serie.forEach(function (o) { ipc[o.p] = o.idx; });
+    if (sn.length < 2) return null;
+    var n1 = sn[sn.length - 1], n0 = sn[sn.length - 2], i1 = ipc[n1.p], i0 = ipc[n0.p];
+    if (!i1 || !i0 || !n0[k]) return null;
+    return Math.round(((n1[k] / n0[k]) / (i1 / i0) - 1) * 1000) / 10; // índice nominal deflactado por IPC, sin redondeos intermedios
+  }
 
   var IND = {
     inflacion: {
@@ -296,21 +305,21 @@
     if (t.canasta) { var cu = t.canasta.ultimo; out.push(tile('canasta', 'Canasta básica total', perCorto(cu.p), pesos(cu.cbt_h2), 'Familia tipo, para no ser pobre · ' + pct(cu.cbt_m, 1, true) + ' en el mes, ' + pct(cu.cbt_ia, 1, true) + ' en un año', spark(t.canasta.serie.slice(-24).map(function (o) { return o.cbt_h2; }), 'ad-kpi__sp'))); }
     if (t.salarios) {
       var su = t.salarios.ultimo, ipcMes = ipc.serie.filter(function (o) { return o.p === su.p; })[0];
-      var r = su.real_priv && su.real_priv.ia;
-      out.push(tile('salario', 'Salario real registrado', perCorto(su.p), '<span class="ad-d ' + (r >= 0 ? 'bien' : 'mal') + '">' + pct(r, 1, true) + '</span><small>interanual</small>',
-        'Privado registrado: subió ' + pct(su.priv_ia) + ' contra una inflación de ' + pct(ipcMes && ipcMes.ia), spark(t.salarios.real.slice(-24).map(function (o) { return o.priv; }), 'ad-kpi__sp')));
+      var r = realMes(t, 'priv');
+      out.push(tile('salario', 'Salario real registrado', perCorto(su.p), '<span class="ad-d ' + (r >= 0 ? 'bien' : 'mal') + '">' + pct(r, 1, true) + '</span><small>en el mes</small>',
+        'Privado registrado: subió ' + pct(su.priv_m) + ' contra una inflación de ' + pct(ipcMes && ipcMes.m), spark(t.salarios.real.slice(-24).map(function (o) { return o.priv; }), 'ad-kpi__sp')));
     }
     if (t.emae) {
       var eu = t.emae.ultimo, dist = eu.maximo && eu.desest ? (eu.desest / eu.maximo.desest - 1) * 100 : null;
-      out.push(tile('emae', 'Actividad (EMAE)', perCorto(eu.p), pct(eu.ia, 1, true) + '<small>interanual</small>',
-        'Mensual desestacionalizado ' + pct(eu.m, 1, true) + '<br>' + (dist != null && dist > -0.05 ? 'En máximo histórico' : pct(Math.abs(dist), 1) + ' debajo del récord (' + perCorto(eu.maximo.p) + ')'), spark(t.emae.serie.slice(-24).map(function (o) { return o.desest; }), 'ad-kpi__sp')));
+      out.push(tile('emae', 'Actividad (EMAE)', perCorto(eu.p), pct(eu.m, 1, true) + '<small>en el mes</small>',
+        'Contra el mes anterior, sin estacionalidad<br>' + (dist != null && dist > -0.05 ? 'En máximo histórico' : pct(Math.abs(dist), 1) + ' debajo del récord (' + perCorto(eu.maximo.p) + ')'), spark(t.emae.serie.slice(-24).map(function (o) { return o.desest; }), 'ad-kpi__sp')));
     }
     if (t.trabajo) {
-      var tu = t.trabajo.ultimo, ta = prevDe(t.trabajo.serie, 'desoc', 4);
+      var tu = t.trabajo.ultimo, ta = prevDe(t.trabajo.serie, 'desoc', 1);
       out.push(tile('desempleo', 'Desocupación', tu.label, pct(tu.desoc), 'Informalidad ' + pct(tu.informal) + ' de los ocupados<br>' + delta(tu.desoc, ta && ta.desoc, true, 'pp', ta ? ta.label : ''), spark(t.trabajo.serie.slice(-12).map(function (o) { return o.desoc; }), 'ad-kpi__sp'), tu.prov));
     }
     if (t.pobreza) {
-      var pu = t.pobreza.ultimo, pa = prevDe(t.pobreza.serie, 'pers', 2);
+      var pu = t.pobreza.ultimo, pa = prevDe(t.pobreza.serie, 'pers', 1);
       out.push(tile('pobreza', 'Pobreza', pu.label, pct(pu.pers), 'Indigencia ' + pct(pu.indig) + ' de las personas<br>' + delta(pu.pers, pa && pa.pers, true, 'pp', pa ? pa.label : ''), spark(t.pobreza.serie.slice(-10).map(function (o) { return o.pers; }), 'ad-kpi__sp'), pu.prov));
     }
     if (t.comex) {
@@ -353,7 +362,7 @@
   function cifra(l, v, s, tono) { return '<div class="ad-c"><span class="ad-c__l">' + esc(l) + '</span><span class="ad-c__v' + (tono ? ' ' + tono : '') + '">' + v + '</span>' + (s ? '<span class="ad-c__s">' + s + '</span>' : '') + '</div>'; }
   function cifras(a) { return '<div class="ad-cs ad-cs--' + a.length + '">' + a.join('') + '</div>'; }
   function tarjeta(titulo, sub, cuerpo, extra) { return '<section class="ad-card' + (extra ? ' ' + extra : '') + '"><div class="ad-card__h"><h3>' + esc(titulo) + '</h3>' + (sub ? '<span>' + sub + '</span>' : '') + '</div>' + cuerpo + '</section>'; }
-  function signo(v) { return v == null ? '' : v >= 0 ? 'bien' : 'mal'; }
+  function signo(v) { return v == null || v === 0 ? '' : v > 0 ? 'bien' : 'mal'; }
 
   var PAGINAS = {
     'datos-inflacion': { inds: ['inflacion', 'nucleo'], armar: function (t) {
@@ -378,16 +387,16 @@
     } },
     'datos-salarios': { inds: ['salario'], armar: function (t) {
       var s = t.salarios.ultimo, ipcMes = t.ipc.serie.filter(function (o) { return o.p === s.p; })[0];
-      var rp = s.real_priv && s.real_priv.ia, rpu = s.real_pub && s.real_pub.ia, rt = s.real_tot && s.real_tot.ia;
+      var rp = realMes(t, 'priv'), rpu = realMes(t, 'pub'), rt = realMes(t, 'tot');
       return { cifras: cifras([
-        cifra('Salario real privado', pct(rp, 1, true), 'Registrado, contra hace un año', signo(rp)),
-        cifra('Salario real público', pct(rpu, 1, true), 'Contra hace un año', signo(rpu)),
-        cifra('Salario real total', pct(rt, 1, true), 'Todos los asalariados', signo(rt)),
-        cifra('Subieron los sueldos', pct(s.tot_ia), 'Nominal · inflación ' + pct(ipcMes && ipcMes.ia))]),
-        despues: tarjeta('Cuánto subió cada sueldo en un año', esc(perCorto(s.p)) + ' · nominal', barras([{ n: 'Inflación', v: ipcMes && ipcMes.ia, yo: true }, { n: 'Registrado privado', v: s.priv_ia }, { n: 'Público', v: s.pub_ia }, { n: 'No registrado', v: s.noreg_ia }], fPct)) };
+        cifra('Salario real privado', pct(rp, 1, true), 'Registrado · ' + esc(perCorto(s.p)) + ' vs. mes anterior', signo(rp)),
+        cifra('Salario real público', pct(rpu, 1, true), 'Contra el mes anterior', signo(rpu)),
+        cifra('Salario real total', pct(rt, 1, true), 'Todos los asalariados, vs. mes anterior', signo(rt)),
+        cifra('Subieron los sueldos', pct(s.tot_m), 'En el mes · inflación ' + pct(ipcMes && ipcMes.m))]),
+        despues: tarjeta('Cuánto subió cada sueldo en el mes', esc(perCorto(s.p)) + ' · nominal', barras([{ n: 'Inflación', v: ipcMes && ipcMes.m, yo: true }, { n: 'Registrado privado', v: s.priv_m }, { n: 'Público', v: s.pub_m }, { n: 'No registrado', v: s.noreg_m }], fPct)) };
     } },
     'datos-pobreza': { inds: ['pobreza'], armar: function (t) {
-      var p = t.pobreza.ultimo, pa = prevDe(t.pobreza.serie, 'pers', 2);
+      var p = t.pobreza.ultimo, pa = prevDe(t.pobreza.serie, 'pers', 1);
       return { cifras: cifras([
         cifra('Personas pobres', pct(p.pers), delta(p.pers, pa && pa.pers, true, 'pp', pa ? pa.label : '')),
         cifra('Hogares pobres', pct(p.hog), esc(p.label)),
@@ -396,14 +405,14 @@
     'datos-actividad': { inds: ['emae', 'pbi'], armar: function (t) {
       var e = t.emae.ultimo, b = t.pbi && t.pbi.ultimo, dist = e.maximo && e.desest ? (e.desest / e.maximo.desest - 1) * 100 : null;
       return { cifras: cifras([
-        cifra('Actividad (EMAE)', pct(e.ia, 1, true), 'Contra hace un año · ' + esc(perCorto(e.p)), signo(e.ia)),
-        cifra('Contra el mes anterior', pct(e.m, 1, true), 'Desestacionalizado', signo(e.m)),
+        cifra('Actividad (EMAE)', pct(e.m, 1, true), esc(perCorto(e.p)) + ' vs. mes anterior, sin estacionalidad', signo(e.m)),
+        cifra('Nivel del índice', nf(e.desest, 1), 'Desestacionalizado · 2004 = 100'),
         cifra('PBI', b ? pct(b.ia, 1, true) : '—', b ? 'Interanual · ' + esc(b.label) : '', b ? signo(b.ia) : ''),
         cifra('Distancia al récord', dist == null ? '—' : dist > -0.05 ? 'Récord' : pct(dist, 1), dist == null ? '' : 'Máximo: ' + esc(perCorto(e.maximo.p)))]),
         despues: t.emae.sectores ? tarjeta('Cómo le fue a cada sector', esc(perCorto(e.p)) + ' · interanual', barras(t.emae.sectores.map(function (x) { return { n: x.nombre, v: x.ia }; }), function (v) { return pct(v, 1, true); })) : '' };
     } },
     'datos-empleo': { inds: ['desempleo'], armar: function (t) {
-      var w = t.trabajo.ultimo, wa = prevDe(t.trabajo.serie, 'desoc', 4);
+      var w = t.trabajo.ultimo, wa = prevDe(t.trabajo.serie, 'desoc', 1);
       return { cifras: cifras([
         cifra('Desocupación', pct(w.desoc), delta(w.desoc, wa && wa.desoc, true, 'pp', wa ? wa.label : '')),
         cifra('Informalidad', pct(w.informal), 'Ocupados sin aportes'),
