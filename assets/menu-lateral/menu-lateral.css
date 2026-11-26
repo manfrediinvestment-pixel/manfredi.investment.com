@@ -7,6 +7,8 @@
   --ml-line: rgba(214,226,244,.09); --ml-line2: rgba(214,226,244,.15); --ml-hover: rgba(214,226,244,.055);
   --ml-sel: rgba(242,201,76,.11); --ml-sel2: rgba(242,201,76,.07);
   --ml-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ml-ui: 'Instrument Sans', 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ml-serif: 'DM Serif Display', Georgia, serif;
   --ml-mono: 'IBM Plex Mono', ui-monospace, monospace;
   --ml-ease: cubic-bezier(.23,1,.32,1);
 }
@@ -27,7 +29,7 @@ html.ml-on.ml-mini .ml-side { width: var(--ml-w-mini); }
 html.ml-on .navbar { background: var(--ml-top); -webkit-backdrop-filter: blur(16px) saturate(140%); backdrop-filter: blur(16px) saturate(140%); border-bottom: 1px solid var(--ml-line); box-shadow: none; }
 html.ml-on .navbar .nav-inner { max-width: none; height: 68px; padding: 0 36px; gap: 20px; }
 html.ml-on .navbar .logo, html.ml-on .nav-links, html.ml-on .nav-burger { display: none !important; }
-html.ml-on .ml-crumb { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; font: 500 15px/1 var(--ml-sans); color: var(--ml-ink); }
+html.ml-on .ml-crumb { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; font: 500 15px/1 var(--ml-ui); color: var(--ml-ink); }
 html.ml-on .ml-crumb .ml-cr-ic { width: 34px; height: 34px; flex: none; display: grid; place-items: center; border-radius: 10px; background: var(--ml-sel); color: var(--ml-gold); }
 html.ml-on .ml-crumb .ml-cr-ic svg { width: 18px; height: 18px; }
 html.ml-on .ml-crumb .ml-cr-g { font-weight: 600; letter-spacing: -.005em; }
@@ -61,8 +63,8 @@ html.ml-on #calTabs, html.ml-on #pfSecNav, html.ml-on #proNav, html.ml-on .nt-sw
 .ml-ic--s { width: 17px; height: 17px; }
 
 .ml-gh { position: relative; display: flex; align-items: center; border-radius: 11px; transition: background-color .2s var(--ml-ease); }
-.ml-gl, .ml-chev, .ml-item { background: none; border: 0; color: var(--ml-ink); cursor: pointer; font-family: var(--ml-sans); }
-.ml-gl { flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px; padding: 11px 13px; font-size: 15px; font-weight: 500; letter-spacing: -.003em; text-align: left; border-radius: 11px; }
+.ml-gl, .ml-chev, .ml-item { background: none; border: 0; color: var(--ml-ink); cursor: pointer; font-family: var(--ml-ui); }
+.ml-gl { flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px; padding: 11px 13px; font-size: 15.5px; font-weight: 500; letter-spacing: -.01em; text-align: left; border-radius: 11px; }
 .ml-gl:active, .ml-item:active { transform: scale(.985); }
 .ml-chev { width: 34px; height: 34px; flex: none; display: grid; place-items: center; border-radius: 9px; margin-right: 4px; }
 .ml-chev svg { width: 16px; height: 16px; transition: transform .3s var(--ml-ease); }
@@ -75,17 +77,20 @@ html.ml-on #calTabs, html.ml-on #pfSecNav, html.ml-on #proNav, html.ml-on .nt-sw
 .ml-t { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ml-pro { font: 600 9px/1 var(--ml-sans); letter-spacing: .12em; color: var(--ml-gold); margin-left: 9px; padding: 3px 5px; border: 1px solid rgba(242,201,76,.45); border-radius: 4px; vertical-align: 2px; }
 
-.ml-gb { display: flex; flex-direction: column; gap: 1px; padding: 6px 0 10px; animation: mlDrop .32s var(--ml-ease) both; }
+.ml-gb { position: relative; display: flex; flex-direction: column; gap: 0; margin: 4px 0 10px 23px; padding: 2px 0 2px 0; border-left: 1px solid var(--ml-line2); animation: mlDrop .32s var(--ml-ease) both; }
 .ml-gb .ml-item { animation: mlFade .4s var(--ml-ease) both; }
 .ml-gb .ml-item:nth-child(2) { animation-delay: .02s; } .ml-gb .ml-item:nth-child(3) { animation-delay: .04s; } .ml-gb .ml-item:nth-child(4) { animation-delay: .06s; }
 .ml-gb .ml-item:nth-child(5) { animation-delay: .08s; } .ml-gb .ml-item:nth-child(n+6) { animation-delay: .1s; }
-.ml-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 9px 12px 9px 27px; font-size: 14px; font-weight: 400; text-align: left; border-radius: 9px; transition: background-color .18s var(--ml-ease), color .18s var(--ml-ease); }
+.ml-item { position: relative; display: flex; align-items: center; gap: 10px; width: calc(100% - 8px); margin-left: 8px; padding: 8px 12px; font-size: 14.5px; font-weight: 500; letter-spacing: -.006em; text-align: left; border-radius: 8px; transition: background-color .18s var(--ml-ease), color .18s var(--ml-ease); }
+.ml-item::before { content: ""; position: absolute; left: -9px; top: 50%; width: 5px; height: 1px; background: var(--ml-line2); transition: background-color .18s, width .18s var(--ml-ease); }
 .ml-item.on { color: var(--ml-gold); font-weight: 600; background: var(--ml-sel2); }
+.ml-item.on::after { content: ""; position: absolute; left: -10px; top: 7px; bottom: 7px; width: 3px; border-radius: 3px; background: var(--ml-gold); box-shadow: 0 0 10px rgba(242,201,76,.5); }
+.ml-item.on::before { background: var(--ml-gold); width: 7px; }
 .ml-new { font: 600 9px/1 var(--ml-sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ml-gold); margin-left: auto; }
 .ml-cant { margin-left: auto; min-width: 22px; text-align: center; font: 500 11.5px/20px var(--ml-mono); color: var(--ml-ink); background: rgba(214,226,244,.07); border-radius: 6px; padding: 0 6px; }
 .ml-item.on .ml-cant { background: rgba(242,201,76,.16); color: var(--ml-gold); }
 .ml-new + .ml-cant { margin-left: 8px; }
-.ml-vacio { font: 400 13px var(--ml-sans); color: var(--ml-ink); padding: 8px 12px 8px 27px; }
+.ml-vacio { font: 400 13.5px var(--ml-ui); color: var(--ml-ink); padding: 8px 12px 8px 20px; }
 .ml-gl:focus-visible, .ml-chev:focus-visible, .ml-item:focus-visible, .ml-col:focus-visible, .ml-logo:focus-visible { outline: 2px solid var(--ml-gold); outline-offset: 1px; }
 
 /* pie del menú: Ayuda */
@@ -106,7 +111,6 @@ html.ml-mini .ml-sep { margin: 10px 8px; }
 @keyframes mlFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @keyframes mlDrop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 @keyframes mlRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-html.ml-on section[data-tab]:not(.tab-hidden) > div:first-child { animation: mlRise .5s var(--ml-ease) both; }
 
 /* ====================================================================
    MERCADOS · panel derecho más prolijo
@@ -117,21 +121,21 @@ html.ml-on #mercados .mt-wrap { width: min(1480px, 100% - 72px); }
 html.ml-on #mercados .mt-top { padding-bottom: 0; align-items: flex-end; }
 html.ml-on #mercados .mt-title { font-size: 38px; gap: 14px; letter-spacing: -.01em; }
 html.ml-on #mercados .mt-live { width: 9px; height: 9px; }
-html.ml-on #mercados .mt-sub { display: block; font: 400 14.5px/1.4 var(--ml-sans); color: var(--ml-ink); margin: 10px 0 0 23px; }
 
 /* pestañas de tipos de activo: subrayado dorado que se desliza, con ícono */
 html.ml-on #mercados .mt-bar { margin: 22px 0 24px; padding: 0; border-bottom: 1px solid var(--ml-line); gap: 16px; align-items: flex-end; }
 html.ml-on #mercados .mt-bar .mt-tabs { position: relative; gap: 2px; margin: 0; padding: 0; overflow-x: auto; }
 html.ml-on #mercados .mt-tabs .mkt-tab {
   display: inline-flex; align-items: center; gap: 8px; height: 46px; padding: 0 14px; border-radius: 0 !important;
-  background: none !important; border: 0 !important; color: var(--ml-ink) !important; font: 500 14px/1 var(--ml-sans) !important;
+  background: none !important; border: 0 !important; color: var(--ml-ink) !important; font: 500 14.5px/1 var(--ml-ui) !important;
   letter-spacing: -.003em; transition: color .2s var(--ml-ease);
 }
 html.ml-on #mercados .mt-tabs .mkt-tab:hover { color: var(--ml-gold2) !important; }
 html.ml-on #mercados .mt-tabs .mkt-tab.active { color: var(--ml-gold) !important; font-weight: 600 !important; }
-html.ml-on #mercados .mt-tabs .mkt-tab > svg { width: 15px; height: 15px; }
-html.ml-on #mercados .mt-tabs .mkt-tab::before { content: ""; width: 16px; height: 16px; flex: none; background: currentColor; -webkit-mask: var(--ml-tab-ic) center / contain no-repeat; mask: var(--ml-tab-ic) center / contain no-repeat; }
-html.ml-on #mercados .mt-tabs .mkt-tab-fav::before { display: none; }
+html.ml-on #mercados .mt-tabs .mkt-tab > svg { display: none; }
+html.ml-on #mercados .mt-dl { padding: 0 10px; }
+html.ml-on #mercados .mt-dl b { font-size: 18px; }
+html.ml-on #mercados .mt-card b { font-size: 20px; }
 html.ml-on #mercados .mt-tabs .mkt-tab-fav-count { font: 500 11px/18px var(--ml-mono); padding: 0 6px; border-radius: 5px; background: rgba(214,226,244,.08); color: var(--ml-ink); }
 html.ml-on #mercados .mt-new { background: none !important; color: var(--ml-gold) !important; font: 600 9px/1 var(--ml-sans); letter-spacing: .12em; text-transform: uppercase; padding: 0; margin-left: 2px; }
 html.ml-on #mercados .ml-tab-ind { position: absolute; left: 0; bottom: 0; height: 2px; width: 0; border-radius: 2px 2px 0 0; background: var(--ml-gold); box-shadow: 0 0 14px rgba(242,201,76,.55); transition: transform .42s var(--ml-ease), width .42s var(--ml-ease); pointer-events: none; }
@@ -162,5 +166,33 @@ html.ml-on #mercados .mt-seg button.on { background: var(--ml-sel); color: var(-
 
 @media (prefers-reduced-motion: reduce) {
   html.ml-on body, html.ml-on .ml-side, .ml-col, .ml-chev svg, .ml-item, .ml-gh, html.ml-on #mercados .ml-tab-ind { transition: none; }
-  .ml-gb, .ml-gb .ml-item, html.ml-on section[data-tab] > div:first-child, html.ml-on .ml-crumb .ml-cr-o { animation: none; }
+  .ml-gb, .ml-gb .ml-item, html.ml-on .ml-crumb .ml-cr-o { animation: none; }
 }
+
+/* ====================================================================
+   ENCABEZADO PAREJO EN TODAS LAS SECCIONES
+   Mismo ancho, misma letra, misma posición; sin animación. Los títulos
+   originales de cada sección se esconden para no repetir.
+   ==================================================================== */
+html.ml-on section[data-tab]:not([data-tab="inicio"]):not([data-tab="asesoria"]) { padding-top: 0 !important; }
+html.ml-on section[data-tab]:not([data-tab="inicio"]):not([data-tab="asesoria"]) > .container,
+html.ml-on section[data-tab] > .mt-wrap, html.ml-on section[data-tab] > .cal-wrap, html.ml-on section[data-tab] > .nt-wrap,
+html.ml-on .ml-ph {
+  width: min(1360px, 100% - 96px) !important; max-width: none !important; margin-left: auto !important; margin-right: auto !important;
+  padding-left: 0 !important; padding-right: 0 !important; box-sizing: border-box;
+}
+html.ml-on .ml-ph { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 44px 0 26px !important; margin-bottom: 26px; border-bottom: 1px solid var(--ml-line); }
+.ml-ph-in { min-width: 0; }
+.ml-ph-t { margin: 0; font: 400 40px/1.05 var(--ml-serif); letter-spacing: -.012em; color: var(--ml-ink); font-style: normal; }
+.ml-ph-d { margin: 12px 0 0; font: 400 16px/1.5 var(--ml-ui); letter-spacing: -.004em; color: var(--ml-ink); max-width: 62ch; }
+.ml-ph-live { flex: none; display: inline-flex; align-items: center; gap: 8px; font: 500 13px/1 var(--ml-ui); color: var(--ml-ink); padding: 8px 12px; border: 1px solid var(--ml-line2); border-radius: 999px; }
+.ml-ph-live i { width: 7px; height: 7px; border-radius: 50%; background: #4fc48c; box-shadow: 0 0 0 3px rgba(79,196,140,.16); }
+
+/* títulos originales: fuera (el encabezado nuevo los reemplaza) */
+html.ml-on #mercados .mt-top { display: none !important; }
+html.ml-on section[data-tab]:not([data-tab="inicio"]):not([data-tab="asesoria"]) h2.section-title { display: none !important; }
+html.ml-on #mercados.mt { padding-top: 0 !important; }
+html.ml-on #mercados .mt-bar { margin-top: 0 !important; }
+
+/* Pro: la marca "Manfredi PRO" repetía el encabezado */
+html.ml-on #inversiones .pro-top { display: none !important; }

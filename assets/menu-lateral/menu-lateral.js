@@ -145,7 +145,7 @@
           if (!ops.length) h += '<span class="ml-vacio">Cargando…</span>';
           ops.forEach(function (o) {
             var on = esAct && o.on; if (on) subAct = o.n;
-            h += '<button type="button" class="ml-item' + (on ? ' on' : '') + '" data-ml-g="' + g.id + '" data-ml-i="' + o.i + '">' + svg(icono(o.n), 'ml-ic ml-ic--s') +
+            h += '<button type="button" class="ml-item' + (on ? ' on' : '') + '" data-ml-g="' + g.id + '" data-ml-i="' + o.i + '">' +
               '<span class="ml-t">' + o.n + '</span>' + (o.nuevo ? '<b class="ml-new">Nuevo</b>' : '') + (o.cant ? '<span class="ml-cant">' + o.cant + '</span>' : '') + '</button>';
           });
           h += '</div>';
@@ -156,7 +156,7 @@
       });
     });
     if (h !== dibujar._h) { dibujar._h = h; lista.innerHTML = h; }
-    mercados();
+    cabecera();
     if (crumb) {
       var g = grupo(act);
       var ch = g ? ('<span class="ml-cr-ic">' + svg(g.ic, '') + '</span><span class="ml-cr-g">' + g.n + '</span>' + (subAct && subAct !== g.n ? '<span class="ml-cr-s" aria-hidden="true"></span><span class="ml-cr-o">' + subAct + '</span>' : '')) : '';
@@ -165,24 +165,31 @@
   }
   function pedirDibujo() { if (!pend) pend = requestAnimationFrame(dibujar); }
 
-  // ---------- Mercados: pestañas de activos debajo del título, con ícono y subrayado que se desliza ----------
-  var TAB_IC = { fav: 'star', mapas: 'grid', arg_stocks: 'linea', arg_cedears: 'globo', usa_stocks: 'linea', usa_adrs: 'globo',
-    arg_bonds: 'bono', fci: 'torta', cripto: 'cripto', commodities: 'gota', dolares: 'moneda' };
-  function mercados() {
-    var sec = document.getElementById('mercados'); if (!sec) return;
-    var bar = sec.querySelector('.mt-bar'), strip = sec.querySelector('.mt-strip'), top = sec.querySelector('.mt-top');
-    if (bar && strip && bar.nextElementSibling !== strip) strip.parentNode.insertBefore(bar, strip);
-    var title = sec.querySelector('.mt-title');
-    if (title && top && !sec.querySelector('.mt-sub')) {
-      var box = document.createElement('div'); title.parentNode.insertBefore(box, title); box.appendChild(title);
-      var sub = document.createElement('span'); sub.className = 'mt-sub'; sub.textContent = 'Acciones, CEDEARs, bonos, cripto y dólares, con precios en tiempo real.'; box.appendChild(sub);
-    }
-    if (!document.getElementById('mlTabIc')) {
-      var css = Object.keys(TAB_IC).map(function (k) {
-        var u = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + IC[TAB_IC[k]] + '</svg>');
-        return 'html.ml-on #mercados .mt-tabs .mkt-tab[data-cat="' + k + '"]{--ml-tab-ic:url("' + u + '")}';
-      }).join('\n');
-      var st = document.createElement('style'); st.id = 'mlTabIc'; st.textContent = css; document.head.appendChild(st);
+  // ---------- Encabezado parejo para todas las secciones: mismo lugar, misma letra, sin movimiento ----------
+  var DESC = {
+    mercados: 'Acciones, CEDEARs, bonos, cripto y dólares, con precios en tiempo real.',
+    datos: 'Los números oficiales de la economía argentina, directo del INDEC.',
+    noticias: 'Lo que mueve a los mercados hoy y el análisis de nuestros invitados.',
+    calendario: 'Los datos económicos, resultados y dividendos de la semana.',
+    portfolio: 'Tus inversiones, cuánto rinden y cuánto riesgo tienen, en un solo lugar.',
+    pro: 'Informes de research, el chat de socios y Warren IA.',
+    herramientas: 'Warren IA, tus gastos y la calculadora de objetivos.',
+    university: 'Cursos para aprender a invertir desde cero.'
+  };
+  function cabecera() {
+    var act = grupoActivo(); if (act === 'inicio') return;
+    var h = hashActual(), sec = document.querySelector('section[data-tab]:not(.tab-hidden)');
+    if (!sec || sec.getAttribute('data-tab') === 'inicio' || sec.getAttribute('data-tab') === 'asesoria') return;
+    var g = grupo(act), titulo = g ? g.n : '', d = DESC[act] || '';
+    if (sec.getAttribute('data-tab') === 'university') { titulo = 'University'; d = DESC.university; }
+    var ph = sec.querySelector(':scope > .ml-ph');
+    if (!ph) { ph = document.createElement('header'); ph.className = 'ml-ph'; sec.insertBefore(ph, sec.firstChild); }
+    var html = '<div class="ml-ph-in"><h1 class="ml-ph-t">' + titulo + '</h1>' + (d ? '<p class="ml-ph-d">' + d + '</p>' : '') + '</div>' +
+      (act === 'mercados' ? '<span class="ml-ph-live"><i></i>En vivo</span>' : act === 'datos' ? '<span class="ml-ph-live"><i></i>Fuente: INDEC</span>' : '');
+    if (ph._h !== html) { ph._h = html; ph.innerHTML = html; }
+    if (act === 'mercados') {
+      var bar = sec.querySelector('.mt-bar'), strip = sec.querySelector('.mt-strip');
+      if (bar && strip && bar.nextElementSibling !== strip) strip.parentNode.insertBefore(bar, strip);
     }
     indicador();
   }
