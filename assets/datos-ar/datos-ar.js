@@ -306,7 +306,7 @@
     if (t.salarios) {
       var su = t.salarios.ultimo, ipcMes = ipc.serie.filter(function (o) { return o.p === su.p; })[0];
       var r = realMes(t, 'priv');
-      out.push(tile('salario', 'Salario real registrado', perCorto(su.p), '<span class="ad-d ' + (r >= 0 ? 'bien' : 'mal') + '">' + pct(r, 1, true) + '</span><small>en el mes</small>',
+      out.push(tile('salario', 'Salario real registrado', perCorto(su.p), '<span class="ad-d ' + (r > 0 ? 'bien' : r < 0 ? 'mal' : '') + '">' + pct(r, 1, true) + '</span><small>en el mes</small>',
         'Privado registrado: subió ' + pct(su.priv_m) + ' contra una inflación de ' + pct(ipcMes && ipcMes.m), spark(t.salarios.real.slice(-24).map(function (o) { return o.priv; }), 'ad-kpi__sp')));
     }
     if (t.emae) {
