@@ -13,7 +13,7 @@
   var CSS = "\
   :host{all:initial;--bg:#0a1322;--raised:#0f1c30;--raised2:#132440;--line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.16);\
     --ink:#eef2f7;--ink2:rgba(238,242,247,.86);--ink3:rgba(238,242,247,.68);--gold:#f2c94c;--gold-ink:#f5d67a;--pos:#5cc08e;--neg:#e8675f;\
-    --serif:'DM Serif Display',Georgia,serif;--sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;\
+    --serif:'Instrument Serif', 'DM Serif Display',Georgia,serif;--sans:'Instrument Sans', 'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;\
     --ease:cubic-bezier(.23,1,.32,1);--top:68px;--right:max(16px,calc((100vw - 1200px) / 2 + 32px));\
     font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased}\
   *{box-sizing:border-box}\

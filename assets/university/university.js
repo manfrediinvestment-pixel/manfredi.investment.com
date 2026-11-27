@@ -71,7 +71,7 @@
     C._uv = true;
     C.defaults.color = '#f3f6fb';
     C.defaults.borderColor = 'rgba(214,226,244,.1)';
-    C.defaults.font.family = "'IBM Plex Sans', system-ui, sans-serif";
+    C.defaults.font.family = "'Instrument Sans', 'IBM Plex Sans', system-ui, sans-serif";
     C.register({
       id: 'uvPaleta',
       beforeInit: function (chart) {

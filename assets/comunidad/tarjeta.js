@@ -24,7 +24,7 @@
 
   var logo = new Image(); logo.src = 'assets/img/icon-192.png';
   var listo = Promise.all([
-    document.fonts ? Promise.all(['400 64px "DM Serif Display"', '600 24px "IBM Plex Mono"', '500 32px "IBM Plex Sans"', '600 32px "IBM Plex Mono"'].map(function (f) { return document.fonts.load(f); })) : null,
+    document.fonts ? Promise.all(['400 64px "Instrument Serif", "DM Serif Display"', '600 24px "IBM Plex Mono"', '500 32px "Instrument Sans", "IBM Plex Sans"', '600 32px "IBM Plex Mono"'].map(function (f) { return document.fonts.load(f); })) : null,
     new Promise(function (ok) { if (logo.complete) ok(); else { logo.onload = logo.onerror = ok; } })
   ]).catch(function () {});
 
@@ -102,12 +102,12 @@
       x.textAlign = 'right';
       x.fillText(d.fechaLarga.charAt(0).toUpperCase() + d.fechaLarga.slice(1), R, 105);
       x.textAlign = 'left';
-      x.fillStyle = C.ink; x.font = '400 70px "DM Serif Display"';
+      x.fillStyle = C.ink; x.font = '400 70px "Instrument Serif", "DM Serif Display"';
       x.fillText(d.momento === 'apertura' ? (d.datos.mundoVivo ? 'Apertura del mercado' : 'Antes de la apertura') : 'Cierre del mercado', L, 215);
       var y = 278;
       if (d.clave) {
         // la clave del día, en hasta 2 líneas
-        x.font = '500 32px "IBM Plex Sans"'; x.fillStyle = C.ch;
+        x.font = '500 32px "Instrument Sans", "IBM Plex Sans"'; x.fillStyle = C.ch;
         var lineas = partir(x, d.clave, R - L).slice(0, 2);
         lineas.forEach(function (t, i) { x.fillText(t, L, 282 + i * 42); });
         y = 282 + lineas.length * 42 + 8;
@@ -126,13 +126,13 @@
         if (p.suben.length) extra.push({ k: 'SUBEN', v: p.suben.map(function (a) { return a.n + ' ' + pct(a.c); }).join('   '), c: C.up });
         if (p.bajan.length) extra.push({ k: 'BAJAN', v: p.bajan.map(function (a) { return a.n + ' ' + pct(a.c); }).join('   '), c: C.dn });
       } else if (d.datos.agenda.eventos.length) {
-        d.datos.agenda.eventos.slice(0, 2).forEach(function (e, i) { extra.push({ k: i ? '' : 'HOY', v: cortar(x, e.t, R - L - 150, '500 28px "IBM Plex Sans"'), c: C.ink, sans: true }); });
+        d.datos.agenda.eventos.slice(0, 2).forEach(function (e, i) { extra.push({ k: i ? '' : 'HOY', v: cortar(x, e.t, R - L - 150, '500 28px "Instrument Sans", "IBM Plex Sans"'), c: C.ink, sans: true }); });
       }
       if (extra.length) {
         y += 18; linea(x, L, R, y); y += 46;
         extra.forEach(function (e) {
           x.fillStyle = C.ch; x.font = '600 23px "IBM Plex Mono"'; spaced(x, e.k, L, y, 3);
-          x.fillStyle = e.c; x.font = e.sans ? '500 28px "IBM Plex Sans"' : '600 29px "IBM Plex Mono"'; x.fillText(e.v, L + 150, y);
+          x.fillStyle = e.c; x.font = e.sans ? '500 28px "Instrument Sans", "IBM Plex Sans"' : '600 29px "IBM Plex Mono"'; x.fillText(e.v, L + 150, y);
           y += 50;
         });
       }
@@ -140,7 +140,7 @@
       // pie
       linea(x, L, R, H - 112);
       x.fillStyle = C.ch; x.font = '600 24px "IBM Plex Mono"'; spaced(x, 'MANFREDINVESTMENT.COM', L, H - 70, 3);
-      x.textAlign = 'right'; x.fillStyle = C.ink; x.font = '500 24px "IBM Plex Sans"';
+      x.textAlign = 'right'; x.fillStyle = C.ink; x.font = '500 24px "Instrument Sans", "IBM Plex Sans"';
       x.fillText('Cotizaciones en vivo · Comunidad gratis', R, H - 70);
       x.textAlign = 'left';
       return new Promise(function (ok) { cv.toBlob(ok, 'image/png'); });
@@ -151,7 +151,7 @@
     y += 50;
     filas.forEach(function (f) {
       var v = variacion(f);
-      x.fillStyle = C.ink; x.font = '500 34px "IBM Plex Sans"'; x.textAlign = 'left'; x.fillText(f.n, L, y);
+      x.fillStyle = C.ink; x.font = '500 34px "Instrument Sans", "IBM Plex Sans"'; x.textAlign = 'left'; x.fillText(f.n, L, y);
       x.font = '600 33px "IBM Plex Mono"'; x.textAlign = 'right'; x.fillText(precio(f), R - 200, y);
       x.fillStyle = v.s > 0 ? C.up : v.s < 0 ? C.dn : C.ink; x.fillText(v.t, R, y);
       x.textAlign = 'left';

@@ -96,7 +96,7 @@
     conLC(function (LC) {
       var ch = LC.createChart(el, {
         autoSize: true,
-        layout: { background: { type: 'solid', color: 'transparent' }, textColor: '#f3f6fb', fontFamily: "'IBM Plex Sans', system-ui, sans-serif", fontSize: 11, attributionLogo: false },
+        layout: { background: { type: 'solid', color: 'transparent' }, textColor: '#f3f6fb', fontFamily: "'Instrument Sans', 'IBM Plex Sans', system-ui, sans-serif", fontSize: 11, attributionLogo: false },
         grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(214,226,244,.06)' } },
         rightPriceScale: { borderVisible: false, scaleMargins: { top: .12, bottom: .08 } },
         timeScale: { borderVisible: false, fixLeftEdge: true, fixRightEdge: true, lockVisibleTimeRangeOnResize: true },

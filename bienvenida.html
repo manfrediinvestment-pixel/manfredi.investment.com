@@ -226,7 +226,7 @@ em{font-style:italic}
 .planes{padding:20px 0 140px}
 .planes-h{text-align:center;display:flex;flex-direction:column;align-items:center}
 .planes-h .lead{margin-top:20px}
-.pg{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:60px;max-width:960px;margin-inline:auto}
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:60px}
 .plan{position:relative;display:flex;flex-direction:column;padding:34px 34px 30px;border-radius:26px;background:var(--card);border:1px solid var(--line);box-shadow:0 30px 60px -45px rgba(11,21,38,.4)}
 .plan.pro{background:var(--navy);color:#f6f8fc;border-color:var(--navy)}
 .plan h3{font:400 34px/1 var(--serif);letter-spacing:-.02em}
@@ -283,6 +283,7 @@ em{font-style:italic}
   .tour-g,.trust-g{grid-template-columns:1fr;gap:44px}
   .win{position:relative;top:0}
   .cif-g{grid-template-columns:1fr 1fr}
+  .pg{grid-template-columns:1fr;max-width:560px;margin-inline:auto}
   .cif{border-bottom:1px solid var(--line)}
   .cif:nth-child(2){border-right:0}
   .cif:nth-child(3){padding-left:0}
@@ -443,7 +444,7 @@ em{font-style:italic}
     </div>
     <div class="pg">
       <article class="plan rv">
-        <h3>Gratis</h3>
+        <h3>Plan Gratis</h3>
         <p class="sub">Para seguir el mercado y saber cómo le va a tu cartera.</p>
         <div class="price"><span class="c">USD</span><b>0</b><span>para siempre</span></div>
         <ul class="feats" data-feats="free"></ul>
@@ -451,13 +452,21 @@ em{font-style:italic}
         <p class="fine">Sin tarjeta</p>
       </article>
       <article class="plan pro rv" style="--d:.1s">
-        <span class="best">La más completa</span>
-        <h3>Membresía</h3>
+        <span class="best">Recomendado</span>
+        <h3>Manfredi Pro</h3>
         <p class="sub">Para decidir qué comprar con un análisis serio de cada empresa.</p>
         <div class="price"><span class="c">USD</span><b>15</b><span>por mes</span></div>
         <ul class="feats" data-feats="pro"></ul>
         <a class="pill pill--lg cta" href="/?membresia=1">Sumar la membresía <span class="ar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span></a>
         <p class="fine">Pagás con Mercado Pago y cancelás cuando quieras</p>
+      </article>
+      <article class="plan rv" style="--d:.2s">
+        <h3>Asesoría 1 a 1</h3>
+        <p class="sub">Tu cartera, armada con Ignacio, como agente coproductor de Balanz.</p>
+        <div class="price"><b style="font-size:46px">Sin costo</b><span>adicional</span></div>
+        <ul class="feats" data-feats="ase"></ul>
+        <a class="alt" href="/#asesoria">Conocé la asesoría</a>
+        <p class="fine">Con tu cuenta en Balanz</p>
       </article>
     </div>
   </div>
@@ -581,7 +590,7 @@ em{font-style:italic}
     { id: 'noticias', n: 'Noticias', d: 'Lo que mueve al mercado hoy, de Argentina y de Wall Street, sin el ruido.', free: 1, url: 'reportes' },
     { id: 'calendario', n: 'Calendario', d: 'Datos económicos, balances y dividendos de la semana, antes de que pasen.', free: 1, url: 'calendario' },
     { id: 'portfolio', n: 'Portfolio', d: 'Tu cartera contra el S&P 500: cuánto ganaste de verdad.', free: 1, url: 'portfolio' },
-    { id: 'informes', n: 'Informes y Warren IA', d: 'Más de 45 empresas valuadas a fondo y un analista que te responde.', free: 0, url: 'pro' }
+    { id: 'informes', n: 'Informes y Warren IA', d: 'Más de 50 empresas valuadas a fondo y un analista que te responde.', free: 0, url: 'pro' }
   ];
   var lista = $('#lista'), scr = $('#scr'), url = $('#url'), tour = $('#recorrido');
   lista.innerHTML = SEC.map(function (s, i) {
@@ -719,10 +728,13 @@ em{font-style:italic}
   });
 
   /* ---------- planes ---------- */
+  // Mismos planes que la web (index.html, tarjetas .mb-plan): si cambian allá, cambian acá.
   var FEATS = {
-    free: [['Mercados en vivo', 'Dólares, acciones, bonos, CEDEARs y cripto'], ['Argentina en datos', 'Inflación, salarios, actividad y empleo del INDEC'], ['Noticias y calendario', 'Lo que mueve al mercado, balances y dividendos'], ['Tu cartera contra el S&P 500', 'Importás el PDF de tu broker y ves el rendimiento real']],
-    pro: [['Todo lo del plan gratis', ''], ['Informes de más de 45 empresas', 'Cuatro métodos de valuación y un precio justo explícito'], ['Warren IA', '100 consultas por mes sobre empresas y tu cartera'], ['Riesgo de tu portafolio', 'Beta, volatilidad, Sharpe y caída máxima']]
+    free: [['Mercados y dólares en vivo', 'Acciones, bonos, CEDEARs, fondos y cripto'], ['Argentina en datos', 'Inflación, salarios, actividad y empleo del INDEC'], ['Calendario económico y Noticias', 'Lo que mueve al mercado, balances y dividendos'], ['Portfolio con rendimiento y riesgo', 'Importás el PDF de tu broker y te comparás con el S&P 500'], ['University y Chat de Mercados', 'Cursos, test de perfil y la comunidad']],
+    pro: [['Todo lo del plan Gratis', ''], ['Informes con fair value', 'Más de 50 empresas, cuatro métodos de valuación'], ['Warren IA', '100 consultas por mes'], ['1 informe a pedido por mes', 'Elegís la empresa y la analizamos'], ['Chats Pro con Ignacio y socios', '']],
+    ase: [['Primera charla sin cargo', ''], ['Tu perfil, objetivo y horizonte', ''], ['Propuesta por escrito', ''], ['Revisión cada trimestre', ''], ['Consultas por mail o WhatsApp', '']]
   };
+
   all('[data-feats]').forEach(function (ul) { ul.innerHTML = FEATS[ul.dataset.feats].map(function (f) { return '<li>' + ARR + '<span>' + esc(f[0]) + (f[1] ? '<small>' + esc(f[1]) + '</small>' : '') + '</span></li>'; }).join(''); });
 })();
 </script>

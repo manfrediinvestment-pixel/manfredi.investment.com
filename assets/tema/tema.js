@@ -10,7 +10,7 @@
    La hoja generada se guarda en localStorage y el <head> la aplica antes de pintar (sin parpadeo). */
 (function () {
   'use strict';
-  var KEY = 'mi_tema', KCSS = 'mi_tema_css', VER = 'v9', root = document.documentElement;
+  var KEY = 'mi_tema', KCSS = 'mi_tema_css', VER = 'v10', root = document.documentElement;
   var CLARO = 'html[data-tema="claro"]';
   // ilustraciones que se ven igual en los dos modos (tapas y lomos de los informes)
   var FIJO = /\.(bk3|est-cover|spn|lec__light)(?![\w-])/, FIJO_SEL = '.bk3, .est-cover, .spn, [data-tema-fijo]';

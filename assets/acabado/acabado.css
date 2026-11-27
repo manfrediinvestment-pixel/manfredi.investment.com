@@ -1,0 +1,65 @@
+/* Acabado (fix/carga-movil-bienvenida) — la terminación de la bienvenida, en todo el sitio.
+   Va al final de todo para ganar la cascada. Lo complementa assets/acabado/acabado.js, que marca:
+   .ac-k  → etiquetas cortas en mayúscula que venían en letra de máquina (pasan a Instrument Sans espaciada)
+   .ac-sf → títulos en serif (letra más ajustada, como la bienvenida)
+   Cero texto gris: nada acá baja la opacidad del texto. */
+:root { --ac-ease: cubic-bezier(.2,.75,.2,1); --ac-gold: #f2c94c; }
+
+/* ---------- letra ---------- */
+html.ml-on body { font-feature-settings: "kern" 1, "liga" 1; }
+.ac-k {
+  font-family: 'Instrument Sans', 'IBM Plex Sans', system-ui, sans-serif !important;
+  font-weight: 600 !important; letter-spacing: .13em !important; font-variant-numeric: normal;
+}
+.ac-sf { letter-spacing: -.022em !important; font-weight: 400 !important; }
+.ac-sf em, .ac-sf i { letter-spacing: -.01em; }
+/* números: siempre de ancho fijo, para que no bailen al actualizarse */
+html.ml-on [class*="num"], html.ml-on [class*="price"], html.ml-on [class*="chg"], html.ml-on td { font-variant-numeric: tabular-nums; }
+::selection { background: rgba(242,201,76,.26); }
+
+/* ---------- entrada de cada sección: de borroso a nítido, en escalera ----------
+   Solo opacidad + desenfoque + un poco de movimiento, y sin dejar estilo al terminar
+   (un transform que quede puesto rompería los position:fixed de adentro). */
+@keyframes acIn { from { opacity: 0; filter: blur(7px); transform: translateY(12px); } to { opacity: 1; filter: none; transform: none; } }
+html.ml-on section.ac-entra > :not(.ml-ph):not(script):not(style),
+html.ml-on section.ac-entra > .container > *,
+html.ml-on section.ac-entra > .mt-wrap > *,
+html.ml-on section.ac-entra > .cal-wrap > *,
+html.ml-on section.ac-entra > .nt-wrap > * { animation: acIn .75s var(--ac-ease) backwards; }
+html.ml-on section.ac-entra > .container > :nth-child(2), html.ml-on section.ac-entra > .mt-wrap > :nth-child(2), html.ml-on section.ac-entra > .cal-wrap > :nth-child(2), html.ml-on section.ac-entra > .nt-wrap > :nth-child(2) { animation-delay: .05s; }
+html.ml-on section.ac-entra > .container > :nth-child(3), html.ml-on section.ac-entra > .mt-wrap > :nth-child(3), html.ml-on section.ac-entra > .cal-wrap > :nth-child(3), html.ml-on section.ac-entra > .nt-wrap > :nth-child(3) { animation-delay: .1s; }
+html.ml-on section.ac-entra > .container > :nth-child(4), html.ml-on section.ac-entra > .mt-wrap > :nth-child(4), html.ml-on section.ac-entra > .cal-wrap > :nth-child(4), html.ml-on section.ac-entra > .nt-wrap > :nth-child(4) { animation-delay: .15s; }
+html.ml-on section.ac-entra > .container > :nth-child(n+5), html.ml-on section.ac-entra > .mt-wrap > :nth-child(n+5), html.ml-on section.ac-entra > .cal-wrap > :nth-child(n+5), html.ml-on section.ac-entra > .nt-wrap > :nth-child(n+5) { animation-delay: .2s; }
+
+/* ---------- detalles que se repiten en todo el sitio ---------- */
+/* tarjetas: borde más fino y respuesta suave al pasar el mouse */
+html.ml-on :is(.ad-kpi, .ad-c, .mt-card, .cal-side > *, .pf-card, .pro-card) { transition: border-color .35s var(--ac-ease), transform .35s var(--ac-ease), box-shadow .35s var(--ac-ease); }
+@media (hover: hover) {
+  html.ml-on :is(.ad-kpi, .pf-card, .pro-card):hover { border-color: rgba(242,201,76,.3); transform: translateY(-2px); box-shadow: 0 24px 50px -30px rgba(0,0,0,.8); }
+}
+/* botones y links: el mismo subrayado que se dibuja en la bienvenida */
+html.ml-on a:focus-visible, html.ml-on button:focus-visible { outline: 2px solid var(--ac-gold); outline-offset: 2px; }
+/* separadores dobles (dos líneas seguidas) → una sola */
+html.ml-on .ml-ph + hr, html.ml-on .ml-ph + .pf-divider { display: none; }
+/* scroll más fino en todo el sitio */
+html.ml-on * { scrollbar-width: thin; scrollbar-color: rgba(214,226,244,.16) transparent; }
+
+/* ---------- pie del sitio, como el de la bienvenida ---------- */
+html.ml-on body > footer.ac-foot { background: #070e1b; border-top: 1px solid rgba(226,234,245,.09); padding: 0; margin-top: 40px; }
+.ac-foot .ac-fi { width: min(1360px, 100% - 96px); margin: 0 auto; padding: 64px 0 0; }
+.ac-foot .ac-fg { display: grid; grid-template-columns: 1.5fr repeat(3, 1fr); gap: 36px; padding-bottom: 56px; }
+.ac-foot .ac-fb b { display: block; font: 400 30px/1 'Instrument Serif', 'DM Serif Display', Georgia, serif; letter-spacing: -.02em; color: #f6f8fc; }
+.ac-foot .ac-fb b i { font-style: normal; color: var(--ac-gold); }
+.ac-foot .ac-fb p { margin: 14px 0 0; max-width: 320px; font: 400 14.5px/1.55 'Instrument Sans', sans-serif; color: #f6f8fc; }
+.ac-foot h4 { margin: 0 0 18px; font: 600 11.5px/1 'Instrument Sans', sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--ac-gold); }
+.ac-foot .ac-fg a { display: block; width: max-content; padding: 5px 0; font: 400 14.5px/1.4 'Instrument Sans', sans-serif; color: #f6f8fc; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color .3s var(--ac-ease); }
+.ac-foot .ac-fg a:hover { border-color: currentColor; }
+.ac-foot .ac-fl { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 22px 0 30px; border-top: 1px solid rgba(226,234,245,.09); font: 400 12.5px/1.55 'Instrument Sans', sans-serif; color: #f6f8fc; }
+.ac-foot .ac-fl p { margin: 0; max-width: 760px; }
+html.ml-movil .ac-foot .ac-fi { width: calc(100% - 32px); padding-top: 48px; }
+html.ml-movil .ac-foot .ac-fg { grid-template-columns: 1fr 1fr; gap: 30px; }
+html.ml-movil .ac-foot .ac-fb { grid-column: 1 / -1; }
+
+@media (prefers-reduced-motion: reduce) {
+  html.ml-on section.ac-entra * { animation: none !important; }
+}
