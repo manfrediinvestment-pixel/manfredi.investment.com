@@ -137,6 +137,7 @@
     pend = 0;
     if (!lista) return;
     var act = grupoActivo(), h = '', subAct = '';
+    if (document.documentElement.getAttribute('data-ml-g') !== act) document.documentElement.setAttribute('data-ml-g', act);
     BLOQUES.forEach(function (bl, bi) {
       if (bi) h += '<hr class="ml-sep">';
       bl.forEach(function (g) {
@@ -186,7 +187,7 @@
   };
   function cabecera() {
     var act = grupoActivo(); if (act === 'inicio') return;
-    var h = hashActual(), sec = document.querySelector('section[data-tab]:not(.tab-hidden)');
+    var d0 = document.documentElement, h = hashActual(), sec = d0.classList.contains('tabs-listos') ? document.querySelector('section[data-tab]:not(.tab-hidden)') : document.querySelector('section[data-tab="' + (d0.getAttribute('data-tab-ini') || 'inicio') + '"]');
     if (!sec || sec.getAttribute('data-tab') === 'inicio' || sec.getAttribute('data-tab') === 'asesoria') return;
     var g = grupo(act), titulo = g ? g.n : '', d = DESC[act] || '';
     if (sec.getAttribute('data-tab') === 'university') { titulo = 'University'; d = DESC.university; }
@@ -332,6 +333,16 @@
   }
   // el menú se arma ya (el script va al principio del <body>); la barra de arriba, cuando exista
   aplicar();
+  // mientras se lee la página: apenas aparecen la barra de arriba y la sección pedida, se acomodan (antes de pintarse)
+  (function temprano() {
+    var ini = document.documentElement.getAttribute('data-tab-ini') || 'inicio', listoBarra = false, listoCab = ini === 'inicio';
+    var mo = new MutationObserver(function () {
+      if (!listoBarra && document.querySelector('.navbar .nav-inner #navUserArea')) { barra(); listoBarra = true; }
+      if (!listoCab) { var sec = document.querySelector('section[data-tab="' + ini + '"]'); if (sec && sec.nextElementSibling) { dibujar(); listoCab = true; } }
+      if ((listoBarra && listoCab) || document.readyState !== 'loading') mo.disconnect();
+    });
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+  })();
   if (document.readyState !== 'loading') barra(); else document.addEventListener('DOMContentLoaded', function () { barra(); dibujar(); });
   if (MQ.addEventListener) MQ.addEventListener('change', aplicar); else MQ.addListener(aplicar);
 })();

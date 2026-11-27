@@ -262,3 +262,28 @@ html.ml-movil #mercados .mt-search { flex: 1 1 100%; margin-bottom: 4px; }
 html.ml-movil #mercados .mt-body { border-radius: 16px; }
 html.ml-movil #mercados .mt-detail { border-left: 0; border-top: 1px solid var(--ml-line); padding: 20px 16px; }
 @media (prefers-reduced-motion: reduce) { html.ml-movil .ml-side, html.ml-movil .ml-velo { transition: none; } }
+html.ml-movil[data-ml-g="datos"] .nt-switch { display: none !important; }
+
+/* ====================================================================
+   TERMINACIONES (fix/carga-movil-bienvenida): las mismas de la bienvenida
+   títulos más ajustados, entrada de borroso a nítido, botón de ingreso en píldora
+   ==================================================================== */
+.ml-ph-t { letter-spacing: -.022em; }
+html.ml-on .ml-ph-in { animation: mlNitido .7s var(--ml-ease) both; }
+html.ml-on .ml-ph-live { animation: mlNitido .7s var(--ml-ease) .08s both; }
+@keyframes mlNitido { from { opacity: 0; filter: blur(8px); transform: translateY(8px); } to { opacity: 1; filter: none; transform: none; } }
+html.ml-on .nav-login-btn {
+  display: inline-flex !important; align-items: center; gap: 10px; height: 40px; padding: 0 5px 0 16px !important;
+  background: #fffdf8 !important; color: #0b1526 !important; border: 0 !important; border-radius: 999px !important;
+  font: 500 14px/1 var(--ml-ui) !important; letter-spacing: -.005em; transition: transform .2s var(--ml-ease), box-shadow .3s var(--ml-ease) !important;
+}
+html.ml-on .nav-login-btn::after {
+  content: ""; width: 30px; height: 30px; border-radius: 50%; flex: none; background: #0b1526 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fffdf8' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 6 6 6-6 6'/%3E%3C/svg%3E") center / 14px no-repeat;
+  transition: transform .35s var(--ml-ease);
+}
+html.ml-on .nav-login-btn:hover { background: #fffdf8 !important; box-shadow: 0 0 0 4px rgba(255,253,248,.12); }
+html.ml-on .nav-login-btn:hover::after { transform: translateX(2px); }
+html.ml-on .nav-login-btn:active { transform: scale(.97); }
+html.ml-movil .nav-login-btn { height: 38px; padding: 0 4px 0 14px !important; font-size: 13.5px !important; }
+html.ml-movil .nav-login-btn::after { width: 30px; height: 30px; }
+@media (prefers-reduced-motion: reduce) { html.ml-on .ml-ph-in, html.ml-on .ml-ph-live { animation: none; } }
