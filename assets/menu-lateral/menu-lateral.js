@@ -193,7 +193,8 @@
     if (sec.getAttribute('data-tab') === 'university') { titulo = 'University'; d = DESC.university; }
     var ph = sec.querySelector(':scope > .ml-ph');
     if (!ph) { ph = document.createElement('header'); ph.className = 'ml-ph'; sec.insertBefore(ph, sec.firstChild); }
-    var html = '<div class="ml-ph-in"><h1 class="ml-ph-t">' + titulo + '</h1>' + (d ? '<p class="ml-ph-d">' + d + '</p>' : '') + '</div>' +
+    // sin bajada: el título solo, y el contenido arriba (pedido del user, 27-nov)
+    var html = '<div class="ml-ph-in"><h1 class="ml-ph-t">' + titulo + '</h1></div>' +
       (act === 'mercados' ? '<span class="ml-ph-live"><i></i>En vivo</span>' : act === 'datos' ? '<span class="ml-ph-live"><i></i>Fuente: INDEC</span>' : '');
     if (ph._h !== html) { ph._h = html; ph.innerHTML = html; }
     if (act === 'mercados') {

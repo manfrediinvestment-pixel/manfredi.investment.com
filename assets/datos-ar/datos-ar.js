@@ -349,7 +349,7 @@
       if (st.sec !== 'datos') return;
       var tiles = {}; var tmp = document.createElement('div'); tmp.innerHTML = tarjetas(t);
       tmp.querySelectorAll('.ad-kpi').forEach(function (b) { tiles[b.dataset.ind] = b.outerHTML; });
-      body.innerHTML = bloqueProximo() + GRUPOS_RES.map(function (g) {
+      body.innerHTML = GRUPOS_RES.map(function (g) {
         var ts = g[2].filter(function (k) { return tiles[k]; });
         if (!ts.length) return '';
         return '<section class="ad-grupo"><div class="ad-grupo__h"><h2>' + esc(g[0]) + '</h2><a href="#' + g[1] + '" data-ad-ir="' + g[1] + '">Ver a fondo</a></div>' +
