@@ -296,6 +296,8 @@ em{font-style:italic}
   .brand b{font-size:20px}
   .hero{padding-top:110px}
   .hero-in{margin-top:0}
+  .scroll-cue{display:none}
+  .hero{padding-bottom:120px}
   .h1{font-size:clamp(46px,13vw,64px)}
   .ctas{flex-direction:column;gap:16px}
   .tape{flex-wrap:wrap;justify-content:center;border-radius:18px;margin-top:40px}
@@ -544,7 +546,6 @@ em{font-style:italic}
       cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       cols = Math.ceil(W / paso) + 1;
       while (serie.length < cols) serie.push(nuevo(serie.length ? serie[serie.length - 1] : 6 + rnd() * 4));
-      var filas = Math.floor(H / paso); serie = serie.map(function (v) { return Math.min(v, filas - 1); });
     }
     function dibujar(now) {
       if (!visible) return;
@@ -569,7 +570,7 @@ em{font-style:italic}
     addEventListener('resize', function () { medir(); dibujar(performance.now()); });
     if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }).observe(cv);
     // en vivo: cada tanto entra una columna nueva por la derecha
-    if (!RM) setInterval(function () { if (!visible || document.hidden) return; serie.shift(); serie.push(nuevo(serie[serie.length - 1])); var f = Math.floor(H / paso) - 1; serie[serie.length - 1] = Math.min(serie[serie.length - 1], f); dibujar(performance.now() + 1e5); }, 1400);
+    if (!RM) setInterval(function () { if (!visible || document.hidden) return; serie.shift(); serie.push(nuevo(serie[serie.length - 1])); dibujar(performance.now() + 1e5); }, 1400);
   }
   puntos($('#mapa'), 'claro'); puntos($('#mapa2'), 'osc');
 
