@@ -204,11 +204,11 @@
         options: {
           responsive: true, maintainAspectRatio: false, animation: { duration: 500 },
           plugins: {
-            legend: { display: round || (d.datasets || []).length > 1, labels: { color: '#c9d5e6', font: { family: 'Instrument Sans', 'IBM Plex Sans', size: 11 }, boxWidth: 10, boxHeight: 10 } },
-            tooltip: { backgroundColor: '#0b1629', borderColor: 'rgba(242,201,76,.35)', borderWidth: 1, titleFont: { family: 'Instrument Sans', 'IBM Plex Sans' }, bodyFont: { family: 'IBM Plex Mono' } }
+            legend: { display: round || (d.datasets || []).length > 1, labels: { color: '#c9d5e6', font: { family: "'Instrument Sans', 'IBM Plex Sans'", size: 11 }, boxWidth: 10, boxHeight: 10 } },
+            tooltip: { backgroundColor: '#0b1629', borderColor: 'rgba(242,201,76,.35)', borderWidth: 1, titleFont: { family: "'Instrument Sans', 'IBM Plex Sans'" }, bodyFont: { family: 'IBM Plex Mono' } }
           },
           scales: round ? {} : {
-            x: { ticks: { color: '#9fb3cf', font: { family: 'Instrument Sans', 'IBM Plex Sans', size: 10.5 } }, grid: { display: false }, border: { color: 'rgba(214,226,244,.18)' } },
+            x: { ticks: { color: '#9fb3cf', font: { family: "'Instrument Sans', 'IBM Plex Sans'", size: 10.5 } }, grid: { display: false }, border: { color: 'rgba(214,226,244,.18)' } },
             y: { ticks: { color: '#9fb3cf', font: { family: 'IBM Plex Mono', size: 10.5 } }, grid: { color: 'rgba(214,226,244,.07)' }, border: { display: false }, beginAtZero: type === 'bar' }
           }
         }
