@@ -3,7 +3,9 @@
    grupos con ícono y flecha, opciones con su ícono, separadores entre bloques. Arriba a la
    derecha queda una barra con dónde estás + la cuenta. Las opciones de cada grupo se leen de las
    pestañas internas que ya existen (Mercados, Calendario, Portfolio, Pro): al tocar una opción se
-   "aprieta" esa pestaña, así no se duplica lógica. Solo en pantallas ≥1100px; en celular sigue el ☰. */
+   "aprieta" esa pestaña, así no se duplica lógica.
+   Se carga apenas abre el <body> (sin defer): el menú existe desde la primera pintura.
+   En pantallas <1100px (html.ml-movil) el mismo menú es un cajón que se abre con el botón de la barra de arriba. */
 (function () {
   'use strict';
   var MQ = window.matchMedia('(min-width: 1100px)');
@@ -112,7 +114,7 @@
   function leer(k, def) { try { var v = localStorage.getItem(k); return v == null ? def : JSON.parse(v); } catch (e) { return def; } }
   function guardar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
-  var abiertos = leer(K_AB, {}) || {}, mini = !!leer(K_MINI, false), side, lista, crumb, pend = 0;
+  var abiertos = leer(K_AB, {}) || {}, mini = !!leer(K_MINI, false), side, lista, crumb, velo, obs, pend = 0;
 
   function opciones(g) {
     if (g.src) {
@@ -138,8 +140,8 @@
     BLOQUES.forEach(function (bl, bi) {
       if (bi) h += '<hr class="ml-sep">';
       bl.forEach(function (g) {
-        var esAct = act === g.id, tiene = !!(g.src || g.items), ab = tiene && !mini && (abiertos[g.id] != null ? abiertos[g.id] : esAct);
-        if (esAct && tiene && !mini && abiertos[g.id] == null) ab = true;
+        var esAct = act === g.id, tiene = !!(g.src || g.items), ab = tiene && !(mini && MQ.matches) && (abiertos[g.id] != null ? abiertos[g.id] : esAct);
+        if (esAct && tiene && !(mini && MQ.matches) && abiertos[g.id] == null) ab = true;
         h += '<div class="ml-g' + (esAct ? ' act' : '') + (ab ? ' open' : '') + '">' +
           '<div class="ml-gh"><button type="button" class="ml-gl" data-ml-go="' + g.id + '" title="' + g.n + '"' + (esAct ? ' aria-current="page"' : '') + '>' + svg(g.ic) +
           '<span class="ml-t">' + g.n + (g.pro ? '<b class="ml-pro">PRO</b>' : '') + '</span></button>' +
@@ -230,7 +232,7 @@
 
   function ponerMini(v) {
     mini = v; guardar(K_MINI, v);
-    document.documentElement.classList.toggle('ml-mini', v);
+    document.documentElement.classList.toggle('ml-mini', v && MQ.matches);
     var t = side && side.querySelector('.ml-col');
     if (t) { t.setAttribute('aria-label', v ? 'Expandir menú' : 'Achicar menú'); t.setAttribute('aria-expanded', String(!v)); }
     dibujar();
@@ -244,55 +246,92 @@
       '<div class="ml-top"><a href="#" class="ml-logo" data-ml-go="inicio" aria-label="Manfredi Investment, inicio">' +
         '<span class="ml-mark"><svg class="mi-mark"><use href="#miMark"/></svg></span>' +
         '<span class="ml-brand"><b>Manfredi</b><small>Investment</small></span></a>' +
-        '<button type="button" class="ml-col" aria-label="Achicar menú" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button></div>' +
+        '<button type="button" class="ml-col" aria-label="Achicar menú" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>' +
+        '<button type="button" class="ml-cerrar" aria-label="Cerrar menú"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>' +
       '<nav class="ml-list" aria-label="Secciones del sitio"></nav>' +
       '<div class="ml-foot"><button type="button" class="ml-gl ml-ayuda" title="Ayuda">' + svg('ayuda') + '<span class="ml-t">Ayuda</span></button></div>';
-    document.body.appendChild(side);
+    document.body.insertBefore(side, document.body.firstChild);
+    velo = document.createElement('div'); velo.className = 'ml-velo'; velo.setAttribute('aria-hidden', 'true');
+    document.body.insertBefore(velo, side.nextSibling);
+    velo.addEventListener('click', function () { cajon(false); });
     lista = side.querySelector('.ml-list');
 
-    // barra de arriba: dónde estás (a la izquierda) + la cuenta (lo que ya tenía el navbar, a la derecha)
-    var inner = document.querySelector('.navbar .nav-inner');
-    if (inner && !inner.querySelector('.ml-crumb')) { crumb = document.createElement('div'); crumb.className = 'ml-crumb'; inner.insertBefore(crumb, inner.firstChild); }
-    // la cinta de cotizaciones pasa debajo de la barra de arriba
-    var tk = document.querySelector('.ticker-bar'), nb = document.querySelector('.navbar');
-    if (tk && nb && nb.nextElementSibling !== tk) nb.parentNode.insertBefore(tk, nb.nextSibling);
-
     side.addEventListener('click', function (e) {
+      if (e.target.closest('.ml-cerrar')) { cajon(false); return; }
       var col = e.target.closest('.ml-col'); if (col) { ponerMini(!mini); return; }
-      if (e.target.closest('.ml-ayuda')) { var hst = document.getElementById('miAyuda'), t = hst && hst.shadowRoot && hst.shadowRoot.getElementById('trig'); if (t) t.click(); return; }
+      if (e.target.closest('.ml-ayuda')) { cajon(false); var hst = document.getElementById('miAyuda'), t = hst && hst.shadowRoot && hst.shadowRoot.getElementById('trig'); if (t) t.click(); return; }
       var go = e.target.closest('[data-ml-go]');
-      if (go) { e.preventDefault(); var g = grupo(go.dataset.mlGo); if (g) { if (mini && (g.src || g.items) && grupoActivo() === g.id) { ponerMini(false); return; } irGrupo(g); } return; }
+      if (go) {
+        e.preventDefault(); var g = grupo(go.dataset.mlGo);
+        if (g) {
+          if (movil() && (g.src || g.items) && g.id !== 'inicio' && grupoActivo() !== g.id) { abiertos[g.id] = true; }
+          if (mini && MQ.matches && (g.src || g.items) && grupoActivo() === g.id) { ponerMini(false); return; }
+          irGrupo(g); if (movil() && !(g.src || g.items)) cajon(false);
+        }
+        return;
+      }
       var tg = e.target.closest('[data-ml-tg]');
       if (tg) { var id = tg.dataset.mlTg, ab = tg.getAttribute('aria-expanded') === 'true'; abiertos[id] = !ab; guardar(K_AB, abiertos); dibujar(); return; }
       var it = e.target.closest('.ml-item[data-ml-i]');
-      if (it) { var g2 = grupo(it.dataset.mlG); if (g2) irA(g2, +it.dataset.mlI); }
+      if (it) { var g2 = grupo(it.dataset.mlG); if (g2) irA(g2, +it.dataset.mlI); cajon(false); }
     });
-    new MutationObserver(function (ms) {
-      for (var k = 0; k < ms.length; k++) { var tg = ms[k].target; if (side.contains(tg) || (crumb && crumb.contains(tg)) || (tg.classList && tg.classList.contains('ml-tab-ind'))) continue; if (ms[k].type === 'childList' && ms[k].addedNodes.length === 1 && ms[k].addedNodes[0].className === 'ml-tab-ind') continue; pedirDibujo(); return; }
-    }).observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'aria-selected'] });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.documentElement.classList.contains('ml-abierto')) cajon(false); });
     window.addEventListener('hashchange', function () {
       // al cambiar de sección, la que se abre arranca desplegada y la anterior vuelve a su estado guardado
       var a = grupoActivo(); if (abiertos[a] === false) { delete abiertos[a]; guardar(K_AB, abiertos); }
       pedirDibujo();
     });
+    // la navegación avisa al mostrar una sección: el encabezado entra en el mismo cuadro, sin saltos
+    window.addEventListener('mi:tab', function () { barra(); dibujar(); });
     window.addEventListener('resize', function () { requestAnimationFrame(indicador); });
     ponerMini(mini);
+  }
+  // barra de arriba: botón del cajón (celular) + dónde estás + la cuenta; la cinta de precios va debajo
+  function barra() {
+    var inner = document.querySelector('.navbar .nav-inner'); if (!inner) return;
+    if (!crumb) { crumb = inner.querySelector('.ml-crumb'); if (!crumb) { crumb = document.createElement('div'); crumb.className = 'ml-crumb'; inner.insertBefore(crumb, inner.firstChild); } }
+    if (!inner.querySelector('.ml-burger')) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ml-burger'; b.setAttribute('aria-label', 'Abrir menú'); b.setAttribute('aria-controls', 'mlSide'); b.setAttribute('aria-expanded', 'false');
+      b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>';
+      b.addEventListener('click', function () { cajon(!document.documentElement.classList.contains('ml-abierto')); });
+      inner.insertBefore(b, inner.firstChild);
+    }
+    var tk = document.querySelector('.ticker-bar'), nb = document.querySelector('.navbar');
+    if (tk && nb && nb.nextElementSibling !== tk) nb.parentNode.insertBefore(tk, nb.nextSibling);
+    if (!obs) {
+      obs = new MutationObserver(function (ms) {
+        for (var k = 0; k < ms.length; k++) { var tg = ms[k].target; if (side.contains(tg) || (crumb && crumb.contains(tg)) || (tg.classList && tg.classList.contains('ml-tab-ind'))) continue; if (ms[k].type === 'childList' && ms[k].addedNodes.length === 1 && ms[k].addedNodes[0].className === 'ml-tab-ind') continue; pedirDibujo(); return; }
+      });
+      obs.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'aria-selected'] });
+    }
+  }
+  function movil() { return !MQ.matches; }
+  function cajon(abrir) {
+    var d = document.documentElement;
+    if (abrir && !movil()) return;
+    d.classList.toggle('ml-abierto', !!abrir);
+    var b = document.querySelector('.ml-burger'); if (b) b.setAttribute('aria-expanded', String(!!abrir));
+    if (abrir) { dibujar(); var on = side.querySelector('.ml-item.on, .ml-g.act .ml-gl'); if (on && on.scrollIntoView) on.scrollIntoView({ block: 'center' }); }
   }
   // el botón flotante de Ayuda pasa al pie del menú (está en un shadow DOM: se le inyecta un estilo)
   function ayudaFlotante(on) {
     var hst = document.getElementById('miAyuda');
-    if (!hst || !hst.shadowRoot) { if (on) setTimeout(function () { ayudaFlotante(MQ.matches); }, 400); return; }
+    if (!hst || !hst.shadowRoot) { if (on) setTimeout(function () { ayudaFlotante(true); }, 400); return; }
     var st = hst.shadowRoot.getElementById('mlHide');
     if (!st) { st = document.createElement('style'); st.id = 'mlHide'; st.textContent = '.trig{display:none!important}'; hst.shadowRoot.appendChild(st); }
     st.disabled = !on;
   }
   function aplicar() {
-    var on = MQ.matches;
-    ayudaFlotante(on);
-    document.documentElement.classList.toggle('ml-on', on);
-    document.documentElement.classList.toggle('ml-mini', on && mini);
-    if (on) montar();
+    var on = MQ.matches, d = document.documentElement;
+    ayudaFlotante(true);
+    d.classList.add('ml-on');
+    d.classList.toggle('ml-movil', !on);
+    d.classList.toggle('ml-mini', on && mini);
+    if (on) cajon(false);
+    montar();
   }
-  if (document.readyState !== 'loading') aplicar(); else document.addEventListener('DOMContentLoaded', aplicar);
+  // el menú se arma ya (el script va al principio del <body>); la barra de arriba, cuando exista
+  aplicar();
+  if (document.readyState !== 'loading') barra(); else document.addEventListener('DOMContentLoaded', function () { barra(); dibujar(); });
   if (MQ.addEventListener) MQ.addEventListener('change', aplicar); else MQ.addListener(aplicar);
 })();

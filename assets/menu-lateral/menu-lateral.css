@@ -199,3 +199,66 @@ html.ml-on #mercados .mt-bar { margin-top: 0 !important; }
 
 /* Pro: la marca "Manfredi PRO" repetía el encabezado */
 html.ml-on #inversiones .pro-top { display: none !important; }
+
+/* ====================================================================
+   CELULAR Y TABLET (<1100px): el mismo menú, como cajón
+   html.ml-on.ml-movil · se abre con el botón de la barra de arriba
+   ==================================================================== */
+.ml-burger, .ml-cerrar, .ml-velo { display: none; }
+html.ml-movil body { padding-left: 0; }
+html.ml-movil .ml-side {
+  width: min(318px, 86vw); z-index: 1300; transform: translateX(-102%); visibility: hidden;
+  transition: transform .42s var(--ml-ease), visibility 0s linear .42s; box-shadow: none;
+}
+html.ml-movil.ml-abierto .ml-side { transform: none; visibility: visible; transition: transform .42s var(--ml-ease), visibility 0s; box-shadow: 30px 0 80px -30px rgba(0,0,0,.8); }
+html.ml-movil .ml-velo {
+  display: block; position: fixed; inset: 0; z-index: 1290; background: rgba(3,7,15,.55);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; pointer-events: none; transition: opacity .35s var(--ml-ease);
+}
+html.ml-movil.ml-abierto .ml-velo { opacity: 1; pointer-events: auto; }
+html.ml-movil.ml-abierto, html.ml-movil.ml-abierto body { overflow: hidden; }
+html.ml-movil .ml-top { height: 76px; padding: 0 12px 0 18px; }
+html.ml-movil .ml-col { display: none; }
+html.ml-movil .ml-cerrar { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 50%; border: 1px solid var(--ml-line2); background: none; color: var(--ml-ink); cursor: pointer; }
+html.ml-movil .ml-cerrar svg { width: 17px; height: 17px; }
+html.ml-movil .ml-mark, html.ml-movil .ml-mark .mi-mark { width: 40px; height: 40px; }
+html.ml-movil .ml-gl { padding: 12px 13px; font-size: 16px; }
+html.ml-movil .ml-item { padding: 10px 12px; font-size: 15px; }
+html.ml-movil .ml-foot { padding-bottom: max(14px, env(safe-area-inset-bottom)); }
+
+/* barra de arriba en celular: oscura, fina, con el botón del menú y dónde estás */
+html.ml-movil .navbar { position: sticky; top: 0; z-index: 1200; background: rgba(7,14,27,.86); -webkit-backdrop-filter: blur(16px) saturate(140%); backdrop-filter: blur(16px) saturate(140%); border-bottom: 1px solid var(--ml-line); box-shadow: none; }
+html.ml-movil .navbar .nav-inner { height: 60px; padding: 0 14px; gap: 10px; max-width: none; }
+html.ml-movil .nav-sheet, html.ml-movil .nav-burger { display: none !important; }
+html.ml-movil .ml-burger { display: grid; place-items: center; width: 40px; height: 40px; flex: none; margin-left: -4px; border-radius: 12px; border: 1px solid var(--ml-line2); background: rgba(214,226,244,.04); color: var(--ml-ink); cursor: pointer; transition: border-color .2s var(--ml-ease), transform .2s var(--ml-ease); }
+html.ml-movil .ml-burger svg { width: 20px; height: 20px; }
+html.ml-movil .ml-burger:active { transform: scale(.94); }
+html.ml-movil .ml-burger:focus-visible, html.ml-movil .ml-cerrar:focus-visible { outline: 2px solid var(--ml-gold); outline-offset: 2px; }
+html.ml-movil .ml-crumb { gap: 9px; font-size: 15px; }
+html.ml-movil .ml-crumb .ml-cr-ic { display: none; }
+html.ml-movil .ml-crumb .ml-cr-s, html.ml-movil .ml-crumb .ml-cr-o { display: none; }
+html.ml-movil .ml-crumb .ml-cr-g { font: 400 21px/1 var(--ml-serif); letter-spacing: -.01em; }
+html.ml-movil .mi-tema { width: 36px; height: 36px; margin-right: 2px; }
+html.ml-movil #navUserArea .np-btn .np-name, html.ml-movil #navUserArea .np-btn .np-caret { display: none !important; }
+html.ml-movil .nav-login-btn { padding: 9px 13px !important; font-size: 13.5px !important; }
+
+/* en celular las sub-pestañas de cada sección quedan a mano (deslizables), con el mismo estilo que Mercados */
+html.ml-movil #calTabs, html.ml-movil #pfSecNav, html.ml-movil #proNav, html.ml-movil .nt-switch, html.ml-movil #adNav { display: flex !important; }
+
+/* encabezado parejo, a la medida del celular */
+html.ml-movil section[data-tab]:not([data-tab="inicio"]):not([data-tab="asesoria"]) > .container,
+html.ml-movil section[data-tab] > .mt-wrap, html.ml-movil section[data-tab] > .cal-wrap, html.ml-movil section[data-tab] > .nt-wrap,
+html.ml-movil .ml-ph { width: calc(100% - 32px) !important; }
+html.ml-movil .ml-ph { padding: 30px 0 18px !important; margin-bottom: 18px; gap: 14px; align-items: flex-start; flex-direction: column; }
+html.ml-movil .ml-ph-t { font-size: 34px; }
+html.ml-movil .ml-ph-d { font-size: 15px; margin-top: 8px; }
+html.ml-movil .ml-ph-live { padding: 6px 10px; font-size: 12px; }
+html.ml-movil #mercados .mt-wrap { width: calc(100% - 32px); }
+html.ml-movil #mercados .mt-bar { flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+html.ml-movil #mercados .mt-bar .mt-tabs { width: 100%; scrollbar-width: none; }
+html.ml-movil #mercados .mt-bar .mt-tabs::-webkit-scrollbar { display: none; }
+html.ml-movil #mercados .mt-tabs .mkt-tab { height: 42px; padding: 0 11px; flex: none; }
+html.ml-movil #mercados .mt-search { flex: 1 1 100%; margin-bottom: 4px; }
+html.ml-movil #mercados .mt-body { border-radius: 16px; }
+html.ml-movil #mercados .mt-detail { border-left: 0; border-top: 1px solid var(--ml-line); padding: 20px 16px; }
+@media (prefers-reduced-motion: reduce) { html.ml-movil .ml-side, html.ml-movil .ml-velo { transition: none; } }
