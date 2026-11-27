@@ -63,3 +63,32 @@ html.ml-movil .ac-foot .ac-fb { grid-column: 1 / -1; }
 @media (prefers-reduced-motion: reduce) {
   html.ml-on section.ac-entra * { animation: none !important; }
 }
+
+/* la serif nueva tiene el ojo más chico: se compensa sola (mismo alto de minúscula que la anterior) */
+.ac-sf { font-size-adjust: .47; }
+html.ml-on .ml-ph-t { font-size: 48px; font-size-adjust: none; letter-spacing: -.028em !important; line-height: 1; }
+html.ml-movil .ml-ph-t { font-size: 38px; }
+.ml-brand b, .ml-crumb .ml-cr-g { font-size-adjust: .47; }
+
+/* Mercados: con el menú abierto el cartel del dólar cortaba los precios → va arriba, a lo ancho */
+@media (min-width: 1100px) and (max-width: 1640px) {
+  html.ml-on #mercados .mt-strip { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  html.ml-on #mercados .mt-card--dolar { grid-column: 1 / -1; }
+  html.ml-on #mercados .mt-card--dolar .mt-dl .mt-spark { height: 26px; }
+}
+
+/* Warren: un círculo discreto que se abre al pasar el mouse (antes tapaba contenido a la derecha) */
+html.ml-on .warren-fab { gap: 0 !important; padding: 5px !important; transition: gap .4s var(--ac-ease), padding .4s var(--ac-ease), border-color .3s, background-color .3s !important; }
+html.ml-on .warren-fab .warren-fab-text { display: inline-block !important; max-width: 0; overflow: hidden; opacity: 0; transition: max-width .45s var(--ac-ease), opacity .3s var(--ac-ease), margin .45s var(--ac-ease); }
+@media (hover: hover) {
+  html.ml-on .warren-fab:hover, html.ml-on .warren-fab:focus-visible { gap: 10px !important; padding: 5px 16px 5px 5px !important; }
+  html.ml-on .warren-fab:hover .warren-fab-text, html.ml-on .warren-fab:focus-visible .warren-fab-text { max-width: 200px; opacity: 1; }
+}
+html.ml-on .warren-fab .warren-badge { width: 34px !important; height: 34px !important; }
+
+/* University: un solo estilo de botón, sobrio (antes verde, azul y dorado) */
+html.ml-on .uv-c__btn { background: transparent !important; color: #f6f8fc !important; box-shadow: inset 0 0 0 1px rgba(226,234,245,.2) !important; font-weight: 600 !important; filter: none !important; transition: box-shadow .3s var(--ac-ease), background-color .3s var(--ac-ease); }
+html.ml-on .uv-c__btn:hover { box-shadow: inset 0 0 0 1px rgba(242,201,76,.7) !important; background: rgba(242,201,76,.06) !important; }
+
+/* encabezados viejos de Portfolio y Herramientas: el encabezado parejo ya los reemplaza (dejaban una línea de más) */
+html.ml-on #portfolio > .container > .section-header, html.ml-on #herramientas > .container > .section-header { display: none !important; }
