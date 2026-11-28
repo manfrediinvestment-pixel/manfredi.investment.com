@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Argentina en datos · lo gratis (muestra)</title>
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Muestra de las herramientas GRATIS de Argentina en datos (feat/muestra-argentina-gratis).
+   Datos en vivo desde la API del BCRA (v4) y ArgentinaDatos. Cero texto gris. */
+:root {
+  --bg: #070e1b; --panel: #0c1729; --panel2: #102038; --ink: #f4f7fb; --gold: #f2c94c; --sky: #8cc2f2;
+  --up: #5fd39b; --dn: #f2857b; --warn: #f2c94c; --line: rgba(226,234,245,.1); --line2: rgba(226,234,245,.18);
+  --serif: 'Instrument Serif', Georgia, serif; --sans: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --ease: cubic-bezier(.2,.75,.2,1);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15.5px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+.w { width: min(1180px, 100% - 40px); margin: 0 auto; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -.025em; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(42px, 6vw, 76px); line-height: .98; }
+h2 { font-size: 36px; line-height: 1.02; }
+h3 { font-size: 27px; line-height: 1.05; }
+em { font-style: italic; color: var(--gold); }
+p { margin: 0; }
+.k { font: 600 11px/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.up { color: var(--up); } .dn { color: var(--dn); }
+a { color: var(--sky); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+header.top { padding: 60px 0 34px; display: grid; gap: 18px; }
+header.top .lead { font-size: 18px; max-width: 70ch; }
+
+/* qué es real */
+.real { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 10px 0 46px; }
+.real > div { border: 1px solid var(--line); border-radius: 16px; padding: 18px; background: var(--panel); display: grid; gap: 8px; align-content: start; }
+.real b { font: 400 40px/1 var(--serif); }
+.real ul { margin: 0; padding-left: 18px; font-size: 14px; display: grid; gap: 4px; }
+.badge { display: inline-flex; align-items: center; gap: 7px; font: 600 10.5px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; padding: 6px 9px; border-radius: 999px; border: 1px solid var(--line2); width: max-content; }
+.badge i { width: 7px; height: 7px; border-radius: 50%; }
+.b-vivo { color: var(--up); border-color: rgba(95,211,155,.4); } .b-vivo i { background: var(--up); box-shadow: 0 0 0 3px rgba(95,211,155,.15); }
+.b-proto { color: var(--gold); border-color: rgba(242,201,76,.45); } .b-proto i { background: var(--gold); }
+.b-no { color: var(--dn); border-color: rgba(242,133,123,.45); } .b-no i { background: var(--dn); }
+
+/* herramientas */
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.tool { border: 1px solid var(--line); border-radius: 22px; background: linear-gradient(180deg, var(--panel), #091324); display: flex; flex-direction: column; min-width: 0; }
+.tool.wide { grid-column: 1 / -1; }
+.t-h { padding: 22px 24px 16px; display: grid; gap: 10px; border-bottom: 1px solid var(--line); }
+.t-h p { font-size: 14.5px; }
+.t-b { padding: 18px 24px 22px; display: grid; gap: 16px; flex: 1; align-content: start; }
+.inputs { display: flex; flex-wrap: wrap; gap: 12px 14px; }
+.inputs label { display: grid; gap: 6px; font-size: 12.5px; font-weight: 500; min-width: 0; }
+input, select { font: 500 15px var(--mono); color: var(--ink); background: #070e1b; border: 1px solid var(--line2); border-radius: 10px; padding: 9px 11px; min-width: 0; }
+input[type=number] { width: 150px; } input[type=month], input[type=date] { width: 160px; color-scheme: dark; }
+select { font-family: var(--sans); }
+.res { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.res > div { border: 1px solid var(--line); border-radius: 14px; padding: 13px 14px; background: rgba(226,234,245,.02); min-width: 0; }
+.res b { display: block; margin-top: 8px; font: 500 21px/1.1 var(--mono); letter-spacing: -.03em; overflow-wrap: anywhere; }
+.res small { display: block; margin-top: 6px; font-size: 12.5px; }
+.verd { font-size: 15px; }
+.verd b { color: var(--gold); font-weight: 600; }
+.src { font-size: 12.5px; border-top: 1px solid var(--line); padding: 12px 24px 16px; }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font: 600 10.5px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+td.r, th.r { text-align: right; }
+tr:last-child td { border-bottom: 0; }
+tr.fut td { color: var(--gold); }
+.load { font-size: 14px; }
+svg text { fill: var(--ink); font-family: var(--mono); font-size: 11px; }
+.gauge { display: grid; gap: 10px; }
+.comp { display: grid; gap: 8px; }
+.comp div { display: grid; grid-template-columns: 1fr 120px 52px; gap: 12px; align-items: center; font-size: 14px; }
+.comp .bar { height: 6px; border-radius: 9px; background: rgba(226,234,245,.08); overflow: hidden; }
+.comp .bar i { display: block; height: 100%; border-radius: 9px; }
+.ej { position: relative; }
+.ej::after { content: "EJEMPLO"; position: absolute; top: 10px; right: 12px; font: 600 10px/1 var(--sans); letter-spacing: .16em; color: var(--dn); border: 1px solid rgba(242,133,123,.45); border-radius: 999px; padding: 5px 8px; }
+footer { padding: 50px 0 70px; font-size: 13px; }
+
+@media (max-width: 900px) {
+  .grid, .real { grid-template-columns: 1fr; }
+  .res { grid-template-columns: 1fr 1fr; }
+  .comp div { grid-template-columns: 1fr 90px 46px; }
+}
+@media (max-width: 520px) { .res { grid-template-columns: 1fr; } .t-h, .t-b { padding-left: 18px; padding-right: 18px; } .src { padding-left: 18px; } }
+</style>
+</head>
+<body>
+<div class="w">
+  <header class="top">
+    <span class="k">Muestra · Argentina en datos · lo gratis</span>
+    <h1>Así funcionaría <em>lo gratis.</em></h1>
+    <p class="lead">Las herramientas de esta página usan datos oficiales en vivo: la API del Banco Central y ArgentinaDatos. Cambiá los números y mirá cómo responden. Cada herramienta dice si ya se puede hacer de verdad o si todavía no.</p>
+  </header>
+
+  <section class="real" aria-label="Qué es real y qué no">
+    <div><span class="badge b-vivo"><i></i>Real desde hoy</span><b>6</b><ul><li>Alquiler por ICL o IPC</li><li>Sueldo contra inflación</li><li>Plazo fijo, inflación o dólar</li><li>Cuota UVA</li><li>Tasa real esperada</li><li>Dólar contra la banda</li></ul></div>
+    <div><span class="badge b-proto"><i></i>Real, con método a validar</span><b>1</b><ul><li>Semáforo cambiario: los datos son reales, los pesos de cada señal los definimos nosotros y hay que probarlos con la historia.</li></ul></div>
+    <div><span class="badge b-no"><i></i>Todavía no</span><b>2</b><ul><li>Termómetro de góndola: hay que procesar la base de precios de supermercados todos los días en el servidor.</li><li>Inflación que esperan los bonos: hay que cargar una vez las condiciones de cada bono.</li></ul></div>
+  </section>
+
+  <div class="grid">
+
+    <!-- ALQUILER -->
+    <article class="tool wide" id="alq">
+      <div class="t-h"><span class="badge b-vivo"><i></i>Real · en vivo</span><h3>¿Cuánto sube mi alquiler?</h3><p>Para contratos que ajustan por ICL (los firmados con la ley vieja) o por IPC (los nuevos). Muestra cada ajuste desde el inicio y el próximo.</p></div>
+      <div class="t-b">
+        <div class="inputs">
+          <label for="aMonto">Alquiler inicial ($)<input id="aMonto" type="number" min="1000" step="1000" value="500000"></label>
+          <label for="aIni">Inicio del contrato<input id="aIni" type="month" value="2025-12"></label>
+          <label for="aInd">Índice<select id="aInd"><option value="ipc">IPC (inflación)</option><option value="icl">ICL (BCRA)</option></select></label>
+          <label for="aCada">Ajusta cada<select id="aCada"><option value="3">3 meses</option><option value="4">4 meses</option><option value="6">6 meses</option><option value="12">12 meses</option></select></label>
+        </div>
+        <div class="res"><div><span class="k">Pagás hoy</span><b id="aHoy">—</b><small id="aHoyD"></small></div><div><span class="k">Próximo ajuste</span><b id="aProx">—</b><small id="aProxD"></small></div><div><span class="k">Suba desde el inicio</span><b id="aTot">—</b><small id="aTotD"></small></div></div>
+        <div class="tbl"><table><thead><tr><th>Desde</th><th class="r">Suba</th><th class="r">Alquiler</th><th>Cómo se calculó</th></tr></thead><tbody id="aTab"><tr><td colspan="4" class="load">Cargando datos del BCRA…</td></tr></tbody></table></div>
+      </div>
+      <p class="src">IPC: suma compuesta de los últimos meses publicados al momento del ajuste (si el ajuste es el 1 de abril, se usan los meses hasta febrero, porque marzo se publica a mediados de abril). ICL: cociente del índice entre las dos fechas, como la calculadora del BCRA. Revisá qué dice tu contrato: puede usar otra regla. Fuente: API del BCRA, series 27 y 40.</p>
+    </article>
+
+    <!-- SUELDO -->
+    <article class="tool" id="sue">
+      <div class="t-h"><span class="badge b-vivo"><i></i>Real · en vivo</span><h3>¿Mi sueldo le ganó a la inflación?</h3><p>Desde tu último aumento hasta el último dato del INDEC.</p></div>
+      <div class="t-b">
+        <div class="inputs">
+          <label for="sAntes">Sueldo antes ($)<input id="sAntes" type="number" min="1000" step="1000" value="1200000"></label>
+          <label for="sMes">Mes del aumento<input id="sMes" type="month" value="2026-03"></label>
+          <label for="sHoy">Sueldo hoy ($)<input id="sHoy" type="number" min="1000" step="1000" value="1350000"></label>
+        </div>
+        <div class="res"><div><span class="k">Inflación</span><b id="sInf">—</b><small id="sInfD"></small></div><div><span class="k">Tu aumento</span><b id="sAum">—</b></div><div><span class="k">En términos reales</span><b id="sReal">—</b></div></div>
+        <p class="verd" id="sVer"></p>
+      </div>
+      <p class="src">Inflación mensual del INDEC, vía la API del BCRA (serie 27).</p>
+    </article>
+
+    <!-- PLAZO FIJO -->
+    <article class="tool" id="pf">
+      <div class="t-h"><span class="badge b-vivo"><i></i>Real · en vivo</span><h3>Plazo fijo, inflación o dólar</h3><p>Qué hubiera pasado con tu plata desde una fecha: renovando un plazo fijo cada 30 días o comprando dólar MEP.</p></div>
+      <div class="t-b">
+        <div class="inputs">
+          <label for="pMonto">Monto ($)<input id="pMonto" type="number" min="1000" step="10000" value="1000000"></label>
+          <label for="pDesde">Desde<input id="pDesde" type="date" value="2025-11-28"></label>
+        </div>
+        <div class="res"><div><span class="k">Plazo fijo</span><b id="pPf">—</b><small id="pPfD"></small></div><div><span class="k">Dólar MEP</span><b id="pMep">—</b><small id="pMepD"></small></div><div><span class="k">Para empatar inflación</span><b id="pInf">—</b><small id="pInfD"></small></div></div>
+        <p class="verd" id="pVer"></p>
+      </div>
+      <p class="src">Tasa de plazo fijo a 30 días del sistema (BCRA, serie 1207), CER como medida de inflación (serie 30) y dólar MEP de ArgentinaDatos. No incluye impuestos ni comisiones.</p>
+    </article>
+
+    <!-- UVA -->
+    <article class="tool" id="uva">
+      <div class="t-h"><span class="badge b-vivo"><i></i>Real · en vivo</span><h3>¿Cuánto pagaría por un crédito UVA?</h3><p>Cuota de hoy y cómo cambia si la inflación sigue lo que espera el REM.</p></div>
+      <div class="t-b">
+        <div class="inputs">
+          <label for="uMonto">Préstamo ($)<input id="uMonto" type="number" min="100000" step="1000000" value="80000000"></label>
+          <label for="uAnios">Plazo (años)<input id="uAnios" type="number" min="1" max="30" value="20"></label>
+          <label for="uTasa">Tasa anual (%)<input id="uTasa" type="number" min="0" max="30" step="0.1" value="7.4"></label>
+        </div>
+        <div class="res"><div><span class="k">Primera cuota</span><b id="uC0">—</b><small id="uC0D"></small></div><div><span class="k">En 12 meses</span><b id="uC12">—</b><small id="uC12D"></small></div><div><span class="k">Ingreso necesario</span><b id="uIng">—</b><small>Para que la cuota sea el 25% del ingreso</small></div></div>
+      </div>
+      <p class="src">UVA del día (BCRA, serie 31), tasa promedio de hipotecarios UVA (serie 3963) y expectativa de inflación a 12 meses del REM (serie 29). Sistema francés.</p>
+    </article>
+
+    <!-- TASA REAL -->
+    <article class="tool" id="tr">
+      <div class="t-h"><span class="badge b-vivo"><i></i>Real · en vivo</span><h3>¿El plazo fijo le gana a la inflación esperada?</h3><p>La tasa de hoy contra lo que esperan los analistas que encuesta el BCRA.</p></div>
+      <div class="t-b">
+        <div class="res"><div><span class="k">Plazo fijo 30 días</span><b id="tTna">—</b><small id="tTnaD"></small></div><div><span class="k">Inflación esperada 12 m</span><b id="tRem">—</b><small id="tRemD"></small></div><div><span class="k">Tasa real esperada</span><b id="tReal">—</b><small>Por año</small></div></div>
+        <p class="verd" id="tVer"></p>
+      </div>
+      <p class="src">BCRA, series 1207 (tasa a 30 días, promedio del sistema) y 29 (mediana del REM). Es la expectativa de los analistas, no la de los bonos.</p>
+    </article>
+
+    <!-- BANDA -->
+    <article class="tool wide" id="ban">
+      <div class="t-h"><span class="badge b-vivo"><i></i>Real · en vivo</span><h3>El dólar contra el techo de la banda</h3><p>Dólar mayorista de los últimos seis meses y el techo que fijó el BCRA para el 31 de diciembre.</p></div>
+      <div class="t-b">
+        <div class="res"><div><span class="k">Mayorista hoy</span><b id="bMay">—</b><small id="bMayD"></small></div><div><span class="k">Techo al 31-dic</span><b class="num">$2.032,88</b><small>Fijado tras la inflación de octubre</small></div><div><span class="k">Margen hasta el techo</span><b id="bMar">—</b><small>Cuánto puede subir sin que intervenga el BCRA</small></div></div>
+        <div id="bChart" class="load">Cargando el dólar mayorista…</div>
+      </div>
+      <p class="src">Dólar mayorista A3500 (BCRA, serie 5). El techo se carga a mano cuando el BCRA lo publica cada mes (desde enero se ajusta con la inflación de dos meses antes); en el producto real se calcula solo con la regla oficial.</p>
+    </article>
+
+    <!-- SEMÁFORO -->
+    <article class="tool wide" id="sem">
+      <div class="t-h"><span class="badge b-proto"><i></i>Prototipo · datos reales</span><h3>Semáforo cambiario</h3><p>Cinco señales que mira cualquier mesa de dinero, resumidas de 0 (calma) a 100 (tensión).</p></div>
+      <div class="t-b">
+        <div class="gauge" id="sGauge"><span class="load">Calculando…</span></div>
+        <div class="comp" id="sComp"></div>
+      </div>
+      <p class="src">Datos reales: BCRA (reservas, mayorista, plazo fijo, REM) y ArgentinaDatos (CCL, riesgo país). Lo que falta validar son los umbrales de cada señal: los definimos nosotros y hay que probarlos contra la historia antes de publicarlo.</p>
+    </article>
+
+    <!-- TERMÓMETRO -->
+    <article class="tool ej" id="ter">
+      <div class="t-h"><span class="badge b-no"><i></i>Todavía no</span><h3>Termómetro de góndola</h3><p>La inflación del mes, medida todos los días con precios de supermercados, antes del dato del INDEC.</p></div>
+      <div class="t-b">
+        <div class="res"><div><span class="k">Esta semana</span><b>+0,4%</b></div><div><span class="k">En lo que va del mes</span><b>1,7%</b></div><div><span class="k">Estimación del mes</span><b>2,0%</b><small>±0,3 puntos</small></div></div>
+        <p class="verd"><b>Por qué no está en la muestra:</b> la base oficial de precios (SEPA) trae millones de precios por día. Hay que bajarla y procesarla todas las mañanas en el servidor, armar la canasta y validarla contra doce meses del INDEC. Se puede hacer; no se puede hacer desde una página sola.</p>
+      </div>
+    </article>
+
+    <!-- BONOS -->
+    <article class="tool ej" id="bon">
+      <div class="t-h"><span class="badge b-no"><i></i>Todavía no</span><h3>Inflación que esperan los bonos</h3><p>La inflación que el mercado ya cobra: el cruce entre bonos a tasa fija y bonos CER.</p></div>
+      <div class="t-b">
+        <div class="res"><div><span class="k">A 3 meses</span><b>1,8%</b><small>por mes</small></div><div><span class="k">A 6 meses</span><b>1,7%</b><small>por mes</small></div><div><span class="k">A 12 meses</span><b>1,6%</b><small>por mes</small></div></div>
+        <p class="verd"><b>Por qué no está en la muestra:</b> los precios de los bonos los tenemos en vivo, pero para calcular la tasa hace falta cuánto paga cada bono al vencer y su CER de emisión. Esa tabla se arma una vez a mano con los prospectos y se actualiza con cada licitación. Mientras tanto, la tarjeta de arriba usa la expectativa del REM.</p>
+      </div>
+    </article>
+  </div>
+</div>
+<footer class="w">Muestra interna de Manfredi Investment. Herramientas informativas: no son una recomendación de inversión.</footer>
+
+<script id="calc">
+/* Cálculos puros (sin DOM): se prueban aparte con un script. */
+var Calc = (function () {
+  function mesKey(d) { return d.slice(0, 7); }                         // 'YYYY-MM'
+  function addMeses(ym, n) { var y = +ym.slice(0, 4), m = +ym.slice(5, 7) - 1 + n; y += Math.floor(m / 12); m = ((m % 12) + 12) % 12; return y + '-' + String(m + 1).padStart(2, '0'); }
+  function valorEn(serie, fecha) {                                      // serie ordenada asc [{fecha,valor}]: último valor <= fecha
+    var lo = 0, hi = serie.length - 1, r = null;
+    while (lo <= hi) { var mid = (lo + hi) >> 1; if (serie[mid].fecha <= fecha) { r = serie[mid]; lo = mid + 1; } else hi = mid - 1; }
+    return r;
+  }
+  function ipcMap(ipc) { var m = {}; ipc.forEach(function (x) { m[mesKey(x.fecha)] = x.valor; }); return m; }
+  function promedioUlt(ipc, n) { var u = ipc.slice(-n); return u.reduce(function (s, x) { return s + x.valor; }, 0) / u.length; }
+
+  // Alquiler. ipc: mensual [{fecha:'YYYY-MM-31',valor:%}], icl: diaria. hoy: 'YYYY-MM-DD'.
+  function alquiler(o) {
+    var M = ipcMap(o.ipc), ultMes = mesKey(o.ipc[o.ipc.length - 1].fecha), prom = promedioUlt(o.ipc, 3) / 100;
+    var filas = [], monto = o.monto, prevFecha = o.ini + '-01', hoyMes = mesKey(o.hoy);
+    for (var k = 1; k <= 40; k++) {
+      var ajMes = addMeses(o.ini, k * o.cada), ajFecha = ajMes + '-01', factor = 1, estimado = false, como;
+      if (o.indice === 'ipc') {
+        var desde = addMeses(ajMes, -o.cada - 1), hasta = addMeses(ajMes, -2), meses = [];
+        for (var i = 0; i < o.cada; i++) { var mk = addMeses(desde, i); var v = M[mk]; if (v == null) { v = prom * 100; estimado = true; } factor *= 1 + v / 100; meses.push(mk); }
+        como = 'IPC de ' + meses[0] + ' a ' + meses[meses.length - 1] + (estimado ? ' (con meses estimados)' : '');
+      } else {
+        var a = valorEn(o.icl, prevFecha), b = valorEn(o.icl, ajFecha), ult = o.icl[o.icl.length - 1];
+        if (ajFecha > ult.fecha) { var mesesFalt = (new Date(ajFecha) - new Date(ult.fecha)) / (30.44 * 864e5); b = { valor: ult.valor * Math.pow(1 + prom, mesesFalt) }; estimado = true; }
+        factor = b.valor / a.valor; como = 'ICL ' + prevFecha + ' → ' + ajFecha + (estimado ? ' (estimado)' : '');
+      }
+      monto = monto * factor;
+      filas.push({ mes: ajMes, suba: factor - 1, monto: monto, como: como, estimado: estimado, futuro: ajMes > hoyMes });
+      prevFecha = ajFecha;
+      if (ajMes > hoyMes) break;
+    }
+    var vigentes = filas.filter(function (f) { return !f.futuro; }), hoyMonto = vigentes.length ? vigentes[vigentes.length - 1].monto : o.monto;
+    return { filas: filas, hoy: hoyMonto, prox: filas[filas.length - 1], total: hoyMonto / o.monto - 1, ultMes: ultMes };
+  }
+
+  // Sueldo: inflación compuesta desde el mes del aumento hasta el último publicado.
+  function sueldo(o) {
+    var f = 1, n = 0, desdeK = o.mes;
+    o.ipc.forEach(function (x) { var k = mesKey(x.fecha); if (k >= desdeK) { f *= 1 + x.valor / 100; n++; } });
+    var aum = o.hoy / o.antes - 1, real = (1 + aum) / f - 1;
+    return { inf: f - 1, meses: n, aum: aum, real: real, empatar: o.antes * f, ultMes: mesKey(o.ipc[o.ipc.length - 1].fecha) };
+  }
+
+  // Plazo fijo renovado cada 30 días con la TNA del día de cada renovación; MEP; inflación por CER.
+  function plazoFijo(o) {
+    var d = new Date(o.desde + 'T12:00:00'), fin = new Date(o.hoy + 'T12:00:00'), m = o.monto, ren = 0;
+    while (true) {
+      var t = valorEn(o.tna, d.toISOString().slice(0, 10)); if (!t) break;
+      var next = new Date(d.getTime() + 30 * 864e5);
+      if (next > fin) { var dias = Math.round((fin - d) / 864e5); m *= 1 + t.valor / 100 * dias / 365; break; }
+      m *= 1 + t.valor / 100 * 30 / 365; ren++; d = next;
+    }
+    var c0 = valorEn(o.cer, o.desde), c1 = o.cer[o.cer.length - 1], infl = c1.valor / c0.valor - 1;
+    var mep0 = valorEn(o.mep, o.desde), mep1 = o.mep[o.mep.length - 1];
+    var usd = o.monto / mep0.venta, mepPesos = usd * mep1.compra;
+    return { pf: m, ren: ren, infl: infl, empatar: o.monto * (1 + infl), mep: mepPesos, usd: usd, mep0: mep0.venta, mep1: mep1.compra,
+      realPf: m / (o.monto * (1 + infl)) - 1, realMep: mepPesos / (o.monto * (1 + infl)) - 1 };
+  }
+
+  // UVA: sistema francés en UVAs.
+  function uva(o) {
+    var P = o.monto / o.uva, i = o.tasa / 100 / 12, n = o.anios * 12;
+    var cU = i === 0 ? P / n : P * i / (1 - Math.pow(1 + i, -n));
+    var c0 = cU * o.uva, c12 = c0 * (1 + o.rem / 100);
+    return { uvas: P, cuotaUva: cU, c0: c0, c12: c12, ingreso: c0 / 0.25 };
+  }
+
+  // Tasa real esperada: TNA 30 días capitalizada contra la inflación a 12 meses del REM.
+  function tasaReal(tna, rem) {
+    var tem = tna / 100 * 30 / 365, tea = Math.pow(1 + tem, 365 / 30) - 1;
+    return { tem: tem, tea: tea, real: (1 + tea) / (1 + rem / 100) - 1 };
+  }
+
+  // Semáforo: cada señal 0 (calma) a 100 (tensión), lineal entre dos umbrales.
+  function escala(v, calma, tension) { var t = (v - calma) / (tension - calma); return Math.max(0, Math.min(100, t * 100)); }
+  function semaforo(s) {
+    var c = [
+      { n: 'Margen hasta el techo de la banda', v: s.margen, txt: pctTxt(s.margen), p: escala(s.margen, 0.20, 0) },
+      { n: 'Brecha CCL contra mayorista', v: s.brecha, txt: pctTxt(s.brecha), p: escala(s.brecha, 0.05, 0.40) },
+      { n: 'Riesgo país', v: s.rp, txt: Math.round(s.rp) + ' pb', p: escala(s.rp, 500, 1500) },
+      { n: 'Reservas, últimos 30 días', v: s.res30, txt: pctTxt(s.res30), p: escala(s.res30, 0.02, -0.05) },
+      { n: 'Tasa real esperada', v: s.real, txt: pctTxt(s.real), p: escala(s.real, 0.05, -0.05) }
+    ];
+    var tot = c.reduce(function (a, x) { return a + x.p; }, 0) / c.length;
+    return { comps: c, total: tot, estado: tot < 35 ? 'Calma' : tot < 60 ? 'Atención' : 'Tensión' };
+  }
+  function pctTxt(v) { return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v * 100).toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%'; }
+
+  return { alquiler: alquiler, sueldo: sueldo, plazoFijo: plazoFijo, uva: uva, tasaReal: tasaReal, semaforo: semaforo, valorEn: valorEn, addMeses: addMeses };
+})();
+if (typeof module !== 'undefined') module.exports = Calc;
+</script>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var BCRA = 'https://api.bcra.gob.ar/estadisticas/v4.0/monetarias/';
+  var hoy = new Date().toISOString().slice(0, 10);
+  function hace(dias) { return new Date(Date.now() - dias * 864e5).toISOString().slice(0, 10); }
+  function serie(id, desde) {
+    return fetch(BCRA + id + '?desde=' + desde + '&hasta=' + hoy + '&limit=3000').then(function (r) { return r.json(); })
+      .then(function (j) { return ((j.results && j.results[0] && j.results[0].detalle) || []).slice().sort(function (a, b) { return a.fecha < b.fecha ? -1 : 1; }); });
+  }
+  function ad(p) { return fetch('https://api.argentinadatos.com/v1/' + p).then(function (r) { return r.json(); }); }
+  function pesos(v) { return '$' + Math.round(v).toLocaleString('es-AR'); }
+  function pct(v, d) { d = d == null ? 1 : d; return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v * 100).toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d }) + '%'; }
+  function pctS(v, d) { return Math.abs(v * 100).toLocaleString('es-AR', { minimumFractionDigits: d == null ? 1 : d, maximumFractionDigits: d == null ? 1 : d }) + '%'; }
+  var MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  function mesTxt(ym) { return MES[+ym.slice(5, 7) - 1] + '-' + ym.slice(2, 4); }
+  function fechaTxt(f) { return +f.slice(8, 10) + ' ' + MES[+f.slice(5, 7) - 1] + ' ' + f.slice(0, 4); }
+  function cls(el, v) { el.className = el.className.replace(/\b(up|dn)\b/g, '').trim() + (v > 0 ? ' up' : v < 0 ? ' dn' : ''); }
+  function on(ids, fn) { ids.forEach(function (id) { $(id).addEventListener('input', fn); }); fn(); }
+
+  var D = {};
+  Promise.all([
+    serie(27, '2018-01-01'), serie(40, '2020-07-01'), serie(30, hace(800)), serie(31, hace(10)), serie(1207, hace(800)),
+    serie(29, hace(120)), serie(3963, hace(20)), serie(5, hace(190)), serie(1, hace(45)),
+    ad('cotizaciones/dolares/bolsa'), ad('cotizaciones/dolares/contadoconliqui'), ad('finanzas/indices/riesgo-pais/ultimo')
+  ]).then(function (r) {
+    D = { ipc: r[0], icl: r[1], cer: r[2], uva: r[3], tna: r[4], rem: r[5], hipo: r[6], may: r[7], res: r[8], mep: r[9].slice(-900), ccl: r[10].slice(-5), rp: r[11] };
+    alquiler(); sueldo(); plazoFijo(); uva(); tasaReal(); banda(); semaforo();
+  }).catch(function (e) { document.querySelectorAll('.load').forEach(function (el) { el.textContent = 'No se pudieron cargar los datos: ' + e.message; }); });
+
+  function alquiler() {
+    on(['aMonto', 'aIni', 'aInd', 'aCada'], function () {
+      var o = Calc.alquiler({ monto: +$('aMonto').value || 0, ini: $('aIni').value || '2025-12', indice: $('aInd').value, cada: +$('aCada').value, ipc: D.ipc, icl: D.icl, hoy: hoy });
+      $('aHoy').textContent = pesos(o.hoy); $('aHoyD').textContent = 'Por mes, con los ajustes hasta hoy';
+      $('aProx').textContent = pesos(o.prox.monto); $('aProxD').textContent = 'Desde ' + mesTxt(o.prox.mes) + ' · ' + pct(o.prox.suba) + (o.prox.estimado ? ' · estimado con la inflación de los últimos 3 meses' : '');
+      $('aTot').textContent = pct(o.total); $('aTotD').textContent = 'Último IPC publicado: ' + mesTxt(o.ultMes);
+      $('aTab').innerHTML = '<tr><td>' + mesTxt($('aIni').value) + '</td><td class="r">—</td><td class="r num">' + pesos(+$('aMonto').value) + '</td><td>Inicio del contrato</td></tr>' +
+        o.filas.map(function (f) { return '<tr' + (f.futuro ? ' class="fut"' : '') + '><td>' + mesTxt(f.mes) + (f.futuro ? ' (próximo)' : '') + '</td><td class="r num">' + pct(f.suba) + '</td><td class="r num">' + pesos(f.monto) + '</td><td>' + f.como.replace(/(\d{4})-(\d{2})(?!-)/g, function (m, y, mm) { return MES[+mm - 1] + '-' + y.slice(2); }) + '</td></tr>'; }).join('');
+    });
+  }
+  function sueldo() {
+    on(['sAntes', 'sMes', 'sHoy'], function () {
+      var o = Calc.sueldo({ antes: +$('sAntes').value || 1, mes: $('sMes').value || '2026-03', hoy: +$('sHoy').value || 0, ipc: D.ipc });
+      $('sInf').textContent = pct(o.inf); $('sInfD').textContent = o.meses + ' meses, hasta ' + mesTxt(o.ultMes);
+      $('sAum').textContent = pct(o.aum); $('sReal').textContent = pct(o.real); cls($('sReal'), o.real);
+      $('sVer').innerHTML = o.real >= 0 ? 'Tu sueldo <b>le ganó a la inflación</b> por ' + pctS(o.real) + '.' : 'Tu sueldo <b>perdió ' + pctS(o.real) + '</b> contra la inflación. Para empatar tendría que ser de ' + pesos(o.empatar) + '.';
+    });
+  }
+  function plazoFijo() {
+    on(['pMonto', 'pDesde'], function () {
+      var o = Calc.plazoFijo({ monto: +$('pMonto').value || 0, desde: $('pDesde').value || hace(365), hoy: hoy, tna: D.tna, cer: D.cer, mep: D.mep });
+      $('pPf').textContent = pesos(o.pf); $('pPfD').innerHTML = o.ren + ' renovaciones · real <span class="' + (o.realPf >= 0 ? 'up' : 'dn') + '">' + pct(o.realPf) + '</span>';
+      $('pMep').textContent = pesos(o.mep); $('pMepD').innerHTML = 'US$ ' + o.usd.toLocaleString('es-AR', { maximumFractionDigits: 0 }) + ' · real <span class="' + (o.realMep >= 0 ? 'up' : 'dn') + '">' + pct(o.realMep) + '</span>';
+      $('pInf').textContent = pesos(o.empatar); $('pInfD').textContent = 'Inflación del período: ' + pct(o.infl);
+      var g = o.pf >= o.mep ? 'el plazo fijo' : 'el dólar MEP';
+      $('pVer').innerHTML = 'En este período ganó <b>' + g + '</b>. ' + (Math.max(o.pf, o.mep) >= o.empatar ? 'Y le ganó a la inflación.' : 'Pero ninguno le ganó a la inflación.');
+    });
+  }
+  function uva() {
+    var u = D.uva[D.uva.length - 1], rem = D.rem[D.rem.length - 1], h = D.hipo[D.hipo.length - 1];
+    if (h) $('uTasa').value = h.valor.toFixed(1);
+    on(['uMonto', 'uAnios', 'uTasa'], function () {
+      var o = Calc.uva({ monto: +$('uMonto').value || 0, anios: +$('uAnios').value || 1, tasa: +$('uTasa').value || 0, uva: u.valor, rem: rem.valor });
+      $('uC0').textContent = pesos(o.c0); $('uC0D').textContent = o.cuotaUva.toLocaleString('es-AR', { maximumFractionDigits: 1 }) + ' UVA · UVA de hoy: $' + u.valor.toLocaleString('es-AR');
+      $('uC12').textContent = pesos(o.c12); $('uC12D').textContent = 'Con la inflación que espera el REM: ' + rem.valor.toLocaleString('es-AR') + '%';
+      $('uIng').textContent = pesos(o.ingreso);
+    });
+  }
+  function tasaReal() {
+    var t = D.tna[D.tna.length - 1], rem = D.rem[D.rem.length - 1], o = Calc.tasaReal(t.valor, rem.valor);
+    $('tTna').textContent = t.valor.toLocaleString('es-AR') + '% TNA'; $('tTnaD').textContent = pctS(o.tea) + ' por año, renovando · ' + fechaTxt(t.fecha);
+    $('tRem').textContent = rem.valor.toLocaleString('es-AR') + '%'; $('tRemD').textContent = 'REM de ' + mesTxt(rem.fecha.slice(0, 7));
+    $('tReal').textContent = pct(o.real); cls($('tReal'), o.real);
+    $('tVer').innerHTML = o.real >= 0 ? 'Si la inflación es la que espera el REM, el plazo fijo <b>le gana por ' + pctS(o.real) + '</b> en un año.' : 'Si la inflación es la que espera el REM, el plazo fijo <b>pierde ' + pctS(o.real) + '</b> en un año.';
+  }
+  var TECHO = 2032.88;
+  function banda() {
+    var s = D.may, u = s[s.length - 1], mar = TECHO / u.valor - 1;
+    $('bMay').textContent = '$' + u.valor.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); $('bMayD').textContent = fechaTxt(u.fecha);
+    $('bMar').textContent = pct(mar);
+    var W = 900, H = 220, pl = 10, pr = 70, pt = 16, pb = 24, mn = Math.min.apply(0, s.map(function (x) { return x.valor; })) * 0.97, mx = TECHO * 1.03;
+    function X(i) { return pl + i / (s.length - 1) * (W - pl - pr); } function Y(v) { return pt + (1 - (v - mn) / (mx - mn)) * (H - pt - pb); }
+    var d = s.map(function (x, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(x.valor).toFixed(1); }).join(' ');
+    var ticks = [mn, (mn + TECHO) / 2, TECHO].map(function (v) { return '<text x="' + (W - pr + 8) + '" y="' + (Y(v) + 4) + '">$' + Math.round(v).toLocaleString('es-AR') + '</text>'; }).join('');
+    $('bChart').className = ''; $('bChart').innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto" role="img" aria-label="Dólar mayorista de los últimos seis meses contra el techo de la banda">' +
+      '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + Y(TECHO) + '" y2="' + Y(TECHO) + '" stroke="#f2857b" stroke-dasharray="5 5" stroke-width="1.4"/>' +
+      '<text x="' + pl + '" y="' + (Y(TECHO) - 7) + '" style="fill:#f2857b">Techo de la banda al 31-dic</text>' +
+      '<path d="' + d + ' L' + X(s.length - 1) + ' ' + (H - pb) + ' L' + pl + ' ' + (H - pb) + 'Z" fill="rgba(242,201,76,.08)"/>' +
+      '<path d="' + d + '" fill="none" stroke="#f2c94c" stroke-width="2"/>' +
+      '<circle cx="' + X(s.length - 1) + '" cy="' + Y(u.valor) + '" r="4" fill="#f2c94c"/>' + ticks +
+      '<text x="' + pl + '" y="' + (H - 6) + '">' + fechaTxt(s[0].fecha) + '</text><text x="' + (W - pr) + '" y="' + (H - 6) + '" text-anchor="end">' + fechaTxt(u.fecha) + '</text></svg>';
+  }
+  function semaforo() {
+    var may = D.may[D.may.length - 1].valor, ccl = D.ccl[D.ccl.length - 1], res = D.res, r1 = res[res.length - 1].valor, r0 = Calc.valorEn(res, hace(30)) || res[0];
+    var t = D.tna[D.tna.length - 1], rem = D.rem[D.rem.length - 1];
+    var o = Calc.semaforo({ margen: TECHO / may - 1, brecha: ccl.venta / may - 1, rp: D.rp.valor, res30: r1 / r0.valor - 1, real: Calc.tasaReal(t.valor, rem.valor).real });
+    var col = o.total < 35 ? '#5fd39b' : o.total < 60 ? '#f2c94c' : '#f2857b', x = 20 + o.total / 100 * 600;
+    $('sGauge').innerHTML = '<svg viewBox="0 0 640 96" style="width:100%;max-width:720px;height:auto" role="img" aria-label="Semáforo en ' + Math.round(o.total) + ' de 100"><defs><linearGradient id="sg" x1="0" x2="1"><stop offset="0" stop-color="#5fd39b"/><stop offset=".5" stop-color="#f2c94c"/><stop offset="1" stop-color="#f2857b"/></linearGradient></defs>' +
+      '<rect x="20" y="40" width="600" height="12" rx="6" fill="url(#sg)"/><line x1="' + x + '" x2="' + x + '" y1="30" y2="62" stroke="#f4f7fb" stroke-width="2.5"/>' +
+      '<text x="' + Math.min(560, Math.max(80, x)) + '" y="20" text-anchor="middle" style="fill:' + col + ';font-size:13px">' + Math.round(o.total) + ' · ' + o.estado + '</text><text x="20" y="80">0 · calma</text><text x="620" y="80" text-anchor="end">100 · tensión</text></svg>';
+    $('sComp').innerHTML = o.comps.map(function (c) { var cc = c.p < 35 ? '#5fd39b' : c.p < 60 ? '#f2c94c' : '#f2857b'; return '<div><span>' + c.n + ': <b class="num">' + c.txt + '</b></span><span class="bar"><i style="width:' + Math.max(3, c.p) + '%;background:' + cc + '"></i></span><span class="num" style="text-align:right">' + Math.round(c.p) + '</span></div>'; }).join('');
+  }
+})();
+</script>
+</body>
+</html>
