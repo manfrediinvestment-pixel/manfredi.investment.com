@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Argentina en datos · lo que falta (muestra)</title>
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Muestra con DATOS DE EJEMPLO de las tres herramientas que todavía no existen (feat/muestra-argentina-gratis).
+   Nada de lo que se ve acá es un dato real. Cero texto gris. */
+:root {
+  --bg: #070e1b; --panel: #0c1729; --ink: #f4f7fb; --gold: #f2c94c; --sky: #8cc2f2; --up: #5fd39b; --dn: #f2857b;
+  --line: rgba(226,234,245,.1); --line2: rgba(226,234,245,.18);
+  --serif: 'Instrument Serif', Georgia, serif; --sans: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; --mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15.5px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+.w { width: min(1180px, 100% - 40px); margin: 0 auto; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -.025em; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(42px, 6vw, 76px); line-height: .98; }
+h2 { font-size: clamp(34px, 4vw, 48px); line-height: 1; }
+h3 { font-size: 24px; line-height: 1.1; }
+em { font-style: italic; color: var(--gold); }
+p { margin: 0; }
+.k { font: 600 11px/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.up { color: var(--up); } .dn { color: var(--dn); }
+a { color: var(--sky); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.ejb { display: inline-flex; align-items: center; gap: 8px; font: 600 11px/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--dn); border: 1px solid rgba(242,133,123,.45); border-radius: 999px; padding: 7px 11px; width: max-content; }
+header.top { padding: 60px 0 30px; display: grid; gap: 18px; }
+header.top .lead { font-size: 18px; max-width: 72ch; }
+nav.idx { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+nav.idx a { color: var(--ink); text-decoration: none; border: 1px solid var(--line2); border-radius: 999px; padding: 9px 14px; font-size: 14px; }
+nav.idx a:hover { border-color: var(--gold); }
+
+section.h { padding: 56px 0 30px; border-top: 1px solid var(--line); display: grid; gap: 22px; }
+.sh { display: grid; gap: 12px; max-width: 76ch; }
+.card { border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(180deg, var(--panel), #091324); padding: 20px 22px; display: grid; gap: 14px; min-width: 0; align-content: start; }
+.g2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.g3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.g4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.kpi { border: 1px solid var(--line); border-radius: 16px; padding: 15px 16px; background: rgba(226,234,245,.02); min-width: 0; }
+.kpi b { display: block; margin-top: 10px; font: 500 26px/1 var(--mono); letter-spacing: -.03em; }
+.kpi small { display: block; margin-top: 7px; font-size: 12.5px; }
+.ch { width: 100%; height: auto; display: block; }
+svg text { fill: var(--ink); font-family: var(--mono); font-size: 11px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+th { font: 600 10.5px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+td.r, th.r { text-align: right; }
+tr:last-child td { border-bottom: 0; }
+.tw { overflow-x: auto; }
+.bar { height: 7px; border-radius: 9px; background: rgba(226,234,245,.08); overflow: hidden; min-width: 80px; }
+.bar i { display: block; height: 100%; border-radius: 9px; }
+.ctl { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: end; }
+.ctl label { display: grid; gap: 7px; font-size: 13px; font-weight: 500; }
+input[type=range] { width: min(300px, 100%); accent-color: #f2c94c; }
+input[type=number], select { font: 500 15px var(--mono); color: var(--ink); background: #070e1b; border: 1px solid var(--line2); border-radius: 10px; padding: 9px 11px; }
+select { font-family: var(--sans); }
+.verd { font-size: 15px; } .verd b { color: var(--gold); font-weight: 600; }
+.msg { border: 1px solid rgba(95,211,155,.35); background: rgba(95,211,155,.06); border-radius: 16px; padding: 16px 18px; display: grid; gap: 8px; font-size: 14.5px; }
+.msg .t { display: flex; justify-content: space-between; gap: 10px; font: 600 12px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--up); }
+.tog { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+.tog:last-child { border-bottom: 0; }
+.sw { width: 40px; height: 22px; border-radius: 99px; background: rgba(242,201,76,.85); position: relative; flex: none; }
+.sw::after { content: ""; position: absolute; top: 3px; right: 3px; width: 16px; height: 16px; border-radius: 50%; background: #070e1b; }
+.sw.off { background: rgba(226,234,245,.16); } .sw.off::after { right: auto; left: 3px; background: #f4f7fb; }
+
+/* operación */
+.ops { border: 1px solid rgba(242,201,76,.35); border-radius: 20px; padding: 22px; display: grid; gap: 16px; background: rgba(242,201,76,.035); }
+.ops .top { display: flex; flex-wrap: wrap; gap: 10px 26px; align-items: baseline; }
+.ops .lvl { font: 400 30px/1 var(--serif); }
+.ops ul { margin: 0; padding-left: 18px; display: grid; gap: 7px; font-size: 14.5px; }
+.ops .cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.ops .cols > div { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.resumen { border: 1px solid var(--line2); border-radius: 20px; overflow: hidden; }
+.resumen table td, .resumen table th { padding: 13px 16px; white-space: normal; }
+footer { padding: 46px 0 70px; font-size: 13px; }
+
+@media (max-width: 900px) { .g2, .g3, .ops .cols { grid-template-columns: 1fr; } .g4 { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="w">
+  <header class="top">
+    <span class="ejb">Todo lo de esta página es un ejemplo</span>
+    <h1>Lo que falta, <em>armado de ejemplo.</em></h1>
+    <p class="lead">Las tres herramientas que todavía no existen, como se verían terminadas. Los números son inventados para mostrar la idea. Debajo de cada una está lo más importante: qué tan posible es y qué tendrías que hacer vos, todos los días, para que funcione bien.</p>
+    <nav class="idx"><a href="#ter">Termómetro de góndola</a><a href="#bon">Inflación de los bonos</a><a href="#sem">Semáforo y aviso del dato</a><a href="#res">Resumen de trabajo</a><a href="/muestra-argentina">Volver a lo gratis</a></nav>
+  </header>
+
+  <!-- ================= TERMÓMETRO ================= -->
+  <section class="h" id="ter">
+    <div class="sh"><span class="k">1 · Precios</span><h2>Termómetro de góndola</h2><p>Precios de supermercados medidos todos los días. Estima la inflación de noviembre mientras noviembre pasa, dos semanas antes que el INDEC.</p></div>
+    <div class="g4">
+      <div class="kpi"><span class="k">Hoy, 28 de nov</span><b class="up">+0,08%</b><small>Contra ayer</small></div>
+      <div class="kpi"><span class="k">Esta semana</span><b>+0,41%</b><small>La anterior: +0,52%</small></div>
+      <div class="kpi"><span class="k">Noviembre acumulado</span><b>1,86%</b><small>28 de 30 días medidos</small></div>
+      <div class="kpi"><span class="k">Estimación del IPC</span><b style="color:#f2c94c">2,0%</b><small>Entre 1,7% y 2,3%</small></div>
+    </div>
+    <div class="g2">
+      <div class="card"><span class="k">Noviembre día por día · acumulado</span><div id="terChart"></div><p style="font-size:13.5px">La línea dorada es lo que midió el termómetro. Las punteadas: lo que esperaba el REM (1,7%) y lo que cobran los bonos (1,8%).</p></div>
+      <div class="card"><span class="k">Qué tan bien estimó en los últimos meses</span>
+        <div class="tw"><table><thead><tr><th>Mes</th><th class="r">Termómetro</th><th class="r">INDEC</th><th class="r">Error</th></tr></thead><tbody id="terBack"></tbody></table></div>
+        <p style="font-size:13.5px">Error promedio de ejemplo: <b class="num">0,2</b> puntos. Si un mes se equivoca por más de medio punto, se avisa y se revisa la canasta.</p>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card"><span class="k">Por rubro · noviembre</span><div class="tw"><table><thead><tr><th>Rubro</th><th class="r">Var.</th><th></th></tr></thead><tbody id="terRub"></tbody></table></div></div>
+      <div class="card"><span class="k">Los que más se movieron esta semana</span><div class="tw"><table><thead><tr><th>Producto</th><th class="r">Semana</th></tr></thead><tbody id="terProd"></tbody></table></div><p style="font-size:13.5px">Se descartan precios de promoción y se usa la mediana entre cadenas, para que una oferta no mueva el índice.</p></div>
+    </div>
+    <div class="ops">
+      <div class="top"><span class="k">Qué tan posible</span><span class="lvl">Posible, con dos condiciones</span></div>
+      <div class="cols">
+        <div><span class="k">Lo que hace la máquina sola</span><ul><li>Cada mañana baja la base oficial de precios (SEPA), arma el índice y lo publica en el sitio.</li><li>Cuando sale el INDEC, compara y actualiza la tabla de error.</li><li>Si un día no llegan datos, te avisa por mail.</li></ul></div>
+        <div><span class="k">Lo que hacés vos</span><ul><li><b>A diario: nada.</b></li><li>Una vez por semana, 5 minutos: mirar el aviso de control (si hubo datos raros).</li><li>Una vez al año: revisar la canasta de productos (unos 30 minutos).</li></ul></div>
+        <div><span class="k">Las dos condiciones</span><ul><li>Que el gobierno siga publicando la base SEPA seguido. Hay que confirmarlo antes de empezar.</li><li>Que el proceso corra fuera de Cloudflare (la base es muy pesada para un worker): un proceso diario en GitHub, gratis o casi.</li><li>Antes de mostrarlo, tres meses de prueba en silencio contra el INDEC.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BONOS ================= -->
+  <section class="h" id="bon">
+    <div class="sh"><span class="k">2 · Tasa real</span><h2>Inflación que esperan los bonos</h2><p>La inflación que el mercado ya cobra en cada plazo, sacada del cruce entre bonos a tasa fija y bonos CER. Con eso, cada uno decide si le conviene la tasa fija o el CER.</p></div>
+    <div class="g2">
+      <div class="card"><span class="k">Curva · inflación mensual implícita por plazo</span><div id="bonChart"></div><p style="font-size:13.5px">Dorado: lo que esperan los bonos. Celeste: lo que espera el REM. Si creés que la inflación va a estar arriba de la línea dorada, gana el CER.</p></div>
+      <div class="card"><span class="k">Los bonos que arman la curva</span>
+        <div class="tw"><table><thead><tr><th>Plazo</th><th>Tasa fija</th><th class="r">TEM</th><th>CER</th><th class="r">Real</th><th class="r">Implícita</th></tr></thead><tbody id="bonTab"></tbody></table></div>
+        <p style="font-size:13.5px">Nombres genéricos de ejemplo. En la versión real van los bonos que cotizan, con precio del día.</p>
+      </div>
+    </div>
+    <div class="card">
+      <span class="k">Simulador · tasa fija o CER</span>
+      <div class="ctl">
+        <label for="bPla">Plazo<select id="bPla"></select></label>
+        <label for="bInf">Inflación mensual que esperás: <span class="num" id="bInfV"></span><input id="bInf" type="range" min="0.8" max="3.5" step="0.1" value="2.0"></label>
+        <label for="bMon">Monto ($)<input id="bMon" type="number" value="1000000" step="50000" min="10000" style="width:160px"></label>
+      </div>
+      <div class="g3"><div class="kpi"><span class="k">Tasa fija</span><b id="bF">—</b></div><div class="kpi"><span class="k">CER</span><b id="bC">—</b></div><div class="kpi"><span class="k">Diferencia</span><b id="bD">—</b></div></div>
+      <p class="verd" id="bV"></p>
+    </div>
+    <div class="ops">
+      <div class="top"><span class="k">Qué tan posible</span><span class="lvl">Muy posible</span></div>
+      <div class="cols">
+        <div><span class="k">Lo que hace la máquina sola</span><ul><li>Trae los precios de los bonos en vivo (ya lo hacemos en Mercados).</li><li>Calcula la tasa de cada uno, cruza plazos y arma la curva cada 5 minutos.</li><li>Verifica que cada cálculo cierre; si un bono da un número raro, lo saca de la curva.</li></ul></div>
+        <div><span class="k">Lo que hacés vos</span><ul><li><b>A diario: nada.</b></li><li>Cuando el Tesoro licita (más o menos dos veces por mes): cargar los bonos nuevos en una tabla. Son 10 a 15 minutos por licitación: fecha de vencimiento, cuánto paga y CER de emisión, del comunicado oficial.</li><li>Cuando un bono vence, se cae solo de la tabla.</li></ul></div>
+        <div><span class="k">El cuidado</span><ul><li>Si te olvidás de cargar una licitación, la curva sigue andando con los bonos viejos, solo con menos plazos.</li><li>Los cálculos se verifican con un script antes de publicarse.</li><li>Se presenta como herramienta para entender, nunca como recomendación.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SEMÁFORO ================= -->
+  <section class="h" id="sem">
+    <div class="sh"><span class="k">3 · Dólar y riesgo</span><h2>Semáforo cambiario y aviso del dato</h2><p>El semáforo junta cinco señales en un número de 0 a 100. El aviso llega en el minuto en que el INDEC publica, con la lectura ya hecha.</p></div>
+    <div class="g2">
+      <div class="card"><span class="k">El semáforo en el último año</span><div id="semChart"></div><p style="font-size:13.5px">Con los hechos que lo movieron. Pasando de 60 se manda un aviso.</p></div>
+      <div class="card"><span class="k">Las cinco señales de hoy</span><div class="tw"><table><thead><tr><th>Señal</th><th class="r">Hoy</th><th class="r">Puntos</th><th>Último año</th></tr></thead><tbody id="semTab"></tbody></table></div></div>
+    </div>
+    <div class="g2">
+      <div class="card"><span class="k">Así llega el aviso del dato</span>
+        <div class="msg"><div class="t"><span>Manfredi · Inflación de noviembre</span><span>mar 15 dic · 16:00</span></div>
+          <p><b>2,0% en noviembre.</b> El REM esperaba 1,7% y el termómetro, 2,0%. Los bonos cobraban 1,8%: este mes el CER le ganó a la tasa fija.</p>
+          <p>Con este dato, el techo de la banda para enero sube a <b class="num">$2.073</b>. El dólar mayorista está 27% abajo del techo.</p>
+          <p>Semáforo: 34 (calma), sin cambios.</p>
+        </div>
+        <p style="font-size:13.5px">Llega por mail o WhatsApp, a la hora exacta del dato. Ejemplo con números inventados.</p>
+      </div>
+      <div class="card"><span class="k">Qué avisos querés recibir</span>
+        <div class="tog"><span>Dato de inflación del INDEC</span><span class="sw"></span></div>
+        <div class="tog"><span>El semáforo pasa de 60</span><span class="sw"></span></div>
+        <div class="tog"><span>La inflación de los bonos cruza la que vos esperás</span><span class="sw"></span></div>
+        <div class="tog"><span>El dólar queda a menos de 10% del techo de la banda</span><span class="sw off"></span></div>
+        <div class="tog"><span>Termómetro de la semana, los lunes</span><span class="sw off"></span></div>
+      </div>
+    </div>
+    <div class="ops">
+      <div class="top"><span class="k">Qué tan posible</span><span class="lvl">Posible ya</span></div>
+      <div class="cols">
+        <div><span class="k">Lo que hace la máquina sola</span><ul><li>Las cinco señales ya las traemos en vivo (lo viste en la muestra de lo gratis).</li><li>Calcula el semáforo todos los días y guarda la historia.</li><li>Cuando el INDEC publica, arma el mensaje, calcula la nueva banda y lo manda.</li></ul></div>
+        <div><span class="k">Lo que hacés vos</span><ul><li><b>A diario: nada.</b></li><li>El día del dato: nada, salvo que quieras sumar una línea tuya al aviso.</li><li>Una vez por trimestre, 20 minutos: revisar con la historia si los cortes entre calma y tensión siguen teniendo sentido.</li></ul></div>
+        <div><span class="k">El cuidado</span><ul><li>Para WhatsApp hace falta la API oficial de mensajes (tiene costo por mensaje); el mail sale casi gratis.</li><li>El aviso compara con el REM: hay que cargar el REM una vez por mes (sale el primer jueves) o leerlo del BCRA, que ya da la serie.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RESUMEN ================= -->
+  <section class="h" id="res">
+    <div class="sh"><span class="k">Resumen</span><h2>Cuánto trabajo te da <em>todo esto.</em></h2><p>Casi todo corre solo. Lo único manual de verdad es cargar los bonos nuevos cuando el Tesoro licita.</p></div>
+    <div class="resumen tw"><table>
+      <thead><tr><th>Herramienta</th><th>¿Es posible?</th><th>A diario</th><th>De vez en cuando</th><th>Tiempo para armarla</th></tr></thead>
+      <tbody>
+        <tr><td>Lo gratis (alquiler, sueldo, plazo fijo, UVA, banda)</td><td class="up">Ya funciona</td><td>Nada</td><td>Cargar el techo de la banda una vez por mes, hasta que se calcule solo</td><td>Una semana para sumarlo al sitio</td></tr>
+        <tr><td>Semáforo y aviso del dato</td><td class="up">Sí, ya</td><td>Nada</td><td>20 minutos por trimestre</td><td>Dos semanas</td></tr>
+        <tr><td>Inflación de los bonos</td><td class="up">Sí</td><td>Nada</td><td>10 a 15 minutos por licitación (dos por mes)</td><td>Dos a tres semanas</td></tr>
+        <tr><td>Termómetro de góndola</td><td style="color:#f2c94c">Sí, con dos condiciones</td><td>Nada</td><td>5 minutos por semana de control</td><td>Seis a ocho semanas, más tres meses de prueba</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+</div>
+<footer class="w">Muestra interna de Manfredi Investment. Todos los números de esta página son de ejemplo. Nada de esto es una recomendación de inversión.</footer>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  function f(v, d) { return v.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function pesos(v) { return '$' + Math.round(v).toLocaleString('es-AR'); }
+  function sgn(v, d) { return (v > 0 ? '+' : v < 0 ? '−' : '') + f(Math.abs(v), d); }
+
+  /* gráfico de líneas simple */
+  function lineas(o) {
+    var W = 560, H = 240, pl = 10, pr = 58, pt = 14, pb = 26, xs = o.xs, all = [];
+    o.series.forEach(function (s) { all = all.concat(s.v.filter(function (x) { return x != null; })); });
+    var mn = o.min != null ? o.min : Math.min.apply(0, all), mx = o.max != null ? o.max : Math.max.apply(0, all);
+    function X(i) { return pl + i / (xs.length - 1) * (W - pl - pr); } function Y(v) { return pt + (1 - (v - mn) / (mx - mn)) * (H - pt - pb); }
+    var g = '';
+    (o.ticks || []).forEach(function (t) { g += '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + Y(t) + '" y2="' + Y(t) + '" stroke="rgba(226,234,245,.07)"/><text x="' + (W - pr + 8) + '" y="' + (Y(t) + 4) + '">' + o.fmt(t) + '</text>'; });
+    o.series.forEach(function (s) {
+      var d = '', started = false;
+      s.v.forEach(function (v, i) { if (v == null) return; d += (started ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1); started = true; });
+      if (s.area) { var last = s.v.length - 1; while (s.v[last] == null) last--; g += '<path d="' + d + ' L' + X(last) + ' ' + (H - pb) + ' L' + pl + ' ' + (H - pb) + 'Z" fill="' + s.area + '"/>'; }
+      g += '<path d="' + d + '" fill="none" stroke="' + s.c + '" stroke-width="' + (s.w || 2) + '"' + (s.dash ? ' stroke-dasharray="' + s.dash + '"' : '') + '/>';
+      if (s.label) { var li = s.v.length - 1; while (s.v[li] == null) li--; g += '<text x="' + (X(li) - 4) + '" y="' + (Y(s.v[li]) - 8) + '" text-anchor="end" style="fill:' + s.c + '">' + s.label + '</text>'; }
+    });
+    (o.marks || []).forEach(function (m) { g += '<line x1="' + X(m.i) + '" x2="' + X(m.i) + '" y1="' + pt + '" y2="' + (H - pb) + '" stroke="rgba(242,133,123,.35)" stroke-dasharray="3 4"/><text x="' + (X(m.i) + 4) + '" y="' + (pt + 10 + (m.dy || 0)) + '" style="fill:#f2857b;font-size:10.5px">' + m.t + '</text>'; });
+    (o.xl || []).forEach(function (l) { g += '<text x="' + X(l.i) + '" y="' + (H - 7) + '" text-anchor="' + (l.a || 'middle') + '">' + l.t + '</text>'; });
+    return '<svg class="ch" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + o.aria + '">' + g + '</svg>';
+  }
+
+  /* ---------- 1) termómetro ---------- */
+  var diarias = [.12, .05, .09, .02, .10, .08, -.04, .11, .06, .07, .03, .09, .05, .08, -.02, .10, .06, .04, .09, .03, .07, .05, .06, .02, .08, .04, .06, .08];
+  var acum = [], a = 1; diarias.forEach(function (d) { a *= 1 + d / 100; acum.push((a - 1) * 100); });
+  var xs = []; for (var i = 0; i < 30; i++) xs.push(i);
+  var rem = xs.map(function (i) { return 1.7 * (i + 1) / 30; }), bon = xs.map(function (i) { return 1.8 * (i + 1) / 30; });
+  var ter = xs.map(function (i) { return i < acum.length ? acum[i] : null; });
+  $('terChart').innerHTML = lineas({ xs: xs, min: 0, max: 2.2, ticks: [0, .5, 1, 1.5, 2], fmt: function (t) { return f(t, 1) + '%'; }, aria: 'Inflación acumulada de noviembre, día por día (ejemplo)',
+    series: [{ v: rem, c: '#8cc2f2', dash: '4 5', w: 1.4, label: 'REM 1,7%' }, { v: bon, c: '#f4f7fb', dash: '2 4', w: 1.2, label: 'Bonos 1,8%' }, { v: ter, c: '#f2c94c', w: 2.4, area: 'rgba(242,201,76,.08)' }],
+    xl: [{ i: 0, t: '1 nov', a: 'start' }, { i: 14, t: '15 nov' }, { i: 29, t: '30 nov', a: 'end' }] });
+  $('terBack').innerHTML = [['may-26', 2.3, 2.1], ['jun-26', 1.8, 1.9], ['jul-26', 2.0, 2.1], ['ago-26', 1.9, 1.7], ['sep-26', 1.7, 1.9], ['oct-26', 2.1, 2.2]].map(function (r) {
+    var e = r[1] - r[2]; return '<tr><td>' + r[0] + '</td><td class="r num">' + f(r[1], 1) + '%</td><td class="r num">' + f(r[2], 1) + '%</td><td class="r num ' + (Math.abs(e) <= .2 ? 'up' : '') + '" style="' + (Math.abs(e) > .2 ? 'color:#f2c94c' : '') + '">' + sgn(e, 1) + '</td></tr>'; }).join('');
+  var rub = [['Verduras y frutas', 4.1], ['Carnes', 2.6], ['Lácteos y huevos', 2.2], ['Panificados y cereales', 1.8], ['Bebidas', 1.5], ['Almacén', 1.4], ['Limpieza', 1.1], ['Higiene personal', 0.7]];
+  $('terRub').innerHTML = rub.map(function (r) { return '<tr><td>' + r[0] + '</td><td class="r num">' + f(r[1], 1) + '%</td><td style="width:40%"><span class="bar" style="display:block"><i style="width:' + (r[1] / 4.1 * 100) + '%;background:#f2c94c"></i></span></td></tr>'; }).join('');
+  var prod = [['Tomate redondo, 1 kg', 9.8], ['Asado, 1 kg', 4.2], ['Yerba mate, 1 kg', 3.1], ['Leche entera, 1 L', 2.4], ['Aceite de girasol, 1,5 L', -2.6], ['Papa, 1 kg', -5.3]];
+  $('terProd').innerHTML = prod.map(function (r) { return '<tr><td>' + r[0] + '</td><td class="r num ' + (r[1] > 0 ? 'dn' : 'up') + '">' + sgn(r[1], 1) + '%</td></tr>'; }).join('');
+
+  /* ---------- 2) bonos ---------- */
+  var plazos = [1, 2, 3, 4, 6, 9, 12];
+  var tem = [2.05, 2.02, 1.98, 1.95, 1.90, 1.84, 1.80];      // tasa fija mensual de ejemplo
+  var real = [0.20, 0.21, 0.20, 0.22, 0.24, 0.26, 0.28];      // tasa real mensual CER de ejemplo
+  var imp = tem.map(function (t, i) { return ((1 + t / 100) / (1 + real[i] / 100) - 1) * 100; });
+  var remc = plazos.map(function (p) { return 1.75 - p * 0.012; });
+  var xsb = plazos.map(function (p, i) { return i; });
+  $('bonChart').innerHTML = lineas({ xs: xsb, min: 1.4, max: 2.0, ticks: [1.4, 1.6, 1.8, 2.0], fmt: function (t) { return f(t, 1) + '%'; }, aria: 'Curva de inflación mensual implícita por plazo (ejemplo)',
+    series: [{ v: remc, c: '#8cc2f2', dash: '4 5', w: 1.5, label: 'REM' }, { v: imp, c: '#f2c94c', w: 2.6, label: 'Bonos' }],
+    xl: plazos.map(function (p, i) { return { i: i, t: p + (p === 1 ? ' mes' : ' m'), a: i === 0 ? 'start' : i === plazos.length - 1 ? 'end' : 'middle' }; }) });
+  var MESV = ['dic-26', 'ene-27', 'feb-27', 'mar-27', 'may-27', 'ago-27', 'nov-27'];
+  $('bonTab').innerHTML = plazos.map(function (p, i) { return '<tr><td>' + p + (p === 1 ? ' mes' : ' meses') + '</td><td>Fija ' + MESV[i] + '</td><td class="r num">' + f(tem[i], 2) + '%</td><td>CER ' + MESV[i] + '</td><td class="r num">' + f(real[i], 2) + '%</td><td class="r num" style="color:#f2c94c">' + f(imp[i], 2) + '%</td></tr>'; }).join('');
+  $('bPla').innerHTML = plazos.map(function (p, i) { return '<option value="' + i + '"' + (p === 6 ? ' selected' : '') + '>' + p + (p === 1 ? ' mes' : ' meses') + '</option>'; }).join('');
+  function sim() {
+    var i = +$('bPla').value, n = plazos[i], pi = +$('bInf').value / 100, m = Math.max(0, +$('bMon').value || 0);
+    var fija = m * Math.pow(1 + tem[i] / 100, n), cer = m * Math.pow((1 + real[i] / 100) * (1 + pi), n), d = cer - fija;
+    $('bInfV').textContent = f(pi * 100, 1) + '%';
+    $('bF').textContent = pesos(fija); $('bC').textContent = pesos(cer);
+    $('bD').textContent = (d >= 0 ? '+' : '−') + pesos(Math.abs(d)); $('bD').className = d >= 0 ? 'up' : 'dn';
+    var be = f(imp[i], 2);
+    $('bV').innerHTML = (Math.abs(pi * 100 - imp[i]) < 0.03 ? 'Esperás lo mismo que el mercado: empatan.' : d > 0 ? 'Si la inflación termina en ' + f(pi * 100, 1) + '% por mes, <b>gana el CER</b> por ' + pesos(d) + '.' : 'Si la inflación termina en ' + f(pi * 100, 1) + '% por mes, <b>gana la tasa fija</b> por ' + pesos(-d) + '.') + ' A ' + n + (n === 1 ? ' mes' : ' meses') + ' el mercado cobra ' + be + '% por mes.';
+  }
+  ['bPla', 'bInf', 'bMon'].forEach(function (id) { $(id).addEventListener('input', sim); }); sim();
+
+  /* ---------- 3) semáforo ---------- */
+  var hist = [52, 55, 61, 66, 58, 49, 44, 41, 38, 42, 47, 45, 40, 37, 36, 39, 41, 38, 35, 33, 36, 34, 32, 34];
+  $('semChart').innerHTML = lineas({ xs: hist.map(function (v, i) { return i; }), min: 0, max: 100, ticks: [0, 35, 60, 100], fmt: function (t) { return String(t); }, aria: 'Semáforo cambiario en el último año (ejemplo)',
+    series: [{ v: hist.map(function () { return 60; }), c: 'rgba(242,133,123,.6)', dash: '3 5', w: 1 }, { v: hist, c: '#f2c94c', w: 2.4, area: 'rgba(242,201,76,.07)' }],
+    marks: [{ i: 3, t: 'Elecciones' }, { i: 8, t: 'Bandas por inflación', dy: 14 }, { i: 16, t: 'Compra de reservas' }],
+    xl: [{ i: 0, t: 'dic-25', a: 'start' }, { i: 12, t: 'jun-26' }, { i: 23, t: 'nov-26', a: 'end' }] });
+  function spark(v, c) { var W = 110, H = 26, mn = Math.min.apply(0, v), mx = Math.max.apply(0, v); var d = v.map(function (x, i) { return (i ? 'L' : 'M') + (i / (v.length - 1) * W).toFixed(1) + ' ' + (H - 2 - (x - mn) / (mx - mn || 1) * (H - 4)).toFixed(1); }).join(' '); return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="110" height="26" aria-hidden="true"><path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="1.6"/></svg>'; }
+  var comps = [['Margen hasta el techo', '27,0%', 0, [12, 15, 9, 6, 10, 14, 18, 20, 22, 21, 25, 27]], ['Brecha CCL contra mayorista', '9,4%', 13, [22, 25, 31, 28, 20, 15, 12, 11, 10, 9, 10, 9]], ['Riesgo país', '960 pb', 46, [1250, 1180, 1320, 1400, 1150, 1050, 990, 1010, 980, 970, 950, 960]], ['Reservas, 30 días', '−2,8%', 69, [-1, 2, -3, -6, 1, 3, 4, 2, 1, -1, -2, -3]], ['Tasa real esperada', '+1,4%', 36, [-2, -1, 1, 3, 4, 3, 2, 2, 1, 1, 2, 1]]];
+  $('semTab').innerHTML = comps.map(function (c) { var col = c[2] < 35 ? '#5fd39b' : c[2] < 60 ? '#f2c94c' : '#f2857b'; return '<tr><td>' + c[0] + '</td><td class="r num">' + c[1] + '</td><td class="r num" style="color:' + col + '">' + c[2] + '</td><td>' + spark(c[3], col) + '</td></tr>'; }).join('');
+})();
+</script>
+</body>
+</html>
